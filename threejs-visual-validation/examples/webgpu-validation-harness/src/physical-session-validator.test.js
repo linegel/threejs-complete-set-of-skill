@@ -228,9 +228,9 @@ function timestampBatch() {
 
 }
 
-function sustainedWindow() {
+function sustainedWindow( presentationSampleCount = 1800 ) {
 
-	const presentationSamples = Array( 1800 ).fill( 16.67 );
+	const presentationSamples = Array( presentationSampleCount ).fill( 16.67 );
 	const duration = presentationSamples.reduce( ( sum, sample ) => sum + sample, 0 );
 	return {
 		duration: numericDatum( duration, 'ms', 'Measured', 'monotonic clock' ),
@@ -326,7 +326,7 @@ function performanceSession() {
 		viewport: { width: 1920, height: 1080, dpr: 1 },
 		hostReserve: { p95: numericDatum( 0.5, 'ms', 'Measured', 'idle host shell' ) },
 		compositorReserve: { verdict: 'NOT_CLAIMED', reason: 'no real API' },
-		cold: { duration: numericDatum( 2000, 'ms', 'Measured', 'monotonic clock' ) },
+		cold: sustainedWindow( HARDWARE_PERFORMANCE_CONTRACT.coldMinimumSamples.value ),
 		sustainedWindows: [ sustainedWindow(), sustainedWindow() ],
 		governor: {
 			verdict: 'PASS',
@@ -488,6 +488,11 @@ test( 'hardware performance session passes long-window and timestamp gates', () 
 		profile: 'performance',
 		sustainedWindowCount: 2,
 		frameTargetMs: 16.67,
+		coldCpuP50Ms: 1.2,
+		coldCpuP95Ms: 1.2,
+		coldGpuP50Ms: 1.5,
+		coldGpuP95Ms: 1.5,
+		coldPresentationP95Ms: 16.67,
 		presentationP50Ms: 16.67,
 		presentationP95Ms: 16.67,
 		deadlineMissRatio: 0,
@@ -509,9 +514,11 @@ test( 'hardware performance mutations reject short, discontinuous, or fabricated
 		[ 'authored host reserve', ( value ) => { value.hostReserve.p95.label = 'Authored'; }, /Measured/ ],
 		[ 'invented compositor reserve', ( value ) => { value.compositorReserve = { verdict: 'PASS', measurement: { label: 'Authored' } }; }, /Compositor reserve/ ],
 		[ 'anonymous compositor API', ( value ) => { value.compositorReserve = { verdict: 'PASS', measurement: numericDatum( 0.5, 'ms', 'Measured', 'counter' ) }; }, /real timing API identity/ ],
-		[ 'short cold trace', ( value ) => { value.cold.duration.value = 1999; }, /Cold performance/ ],
+		[ 'short cold trace', ( value ) => { value.cold.duration.value = 1999; }, /cold is shorter than its minimum duration/ ],
+		[ 'missing cold timestamp population', ( value ) => { value.cold.gpuTimestampBatches = []; }, /cold has no GPU timestamp batches/ ],
+		[ 'forged cold warm-up population', ( value ) => { value.cold.gpuTimestampBatches[ 0 ].warmupCpuSamples.values.pop(); }, /cold.*warm-up CPU sample count/ ],
 		[ 'one sustained window', ( value ) => { value.sustainedWindows.pop(); }, /at least two/ ],
-		[ 'short sustained window', ( value ) => { value.sustainedWindows[ 0 ].duration.value = 29999; }, /shorter than 30 seconds/ ],
+		[ 'short sustained window', ( value ) => { value.sustainedWindows[ 0 ].duration.value = 29999; }, /shorter than its minimum duration/ ],
 		[ 'too few samples', ( value ) => { value.sustainedWindows[ 0 ].sampleCount.value = 119; }, /fewer than 120/ ],
 		[ 'sample-count mismatch', ( value ) => { value.sustainedWindows[ 0 ].sampleCount.value += 1; }, /sampleCount/ ],
 		[ 'forged maximum gap', ( value ) => { value.sustainedWindows[ 0 ].maximumPresentationGap.value = 17; }, /does not match/ ],

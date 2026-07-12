@@ -52,6 +52,7 @@ export const HARDWARE_PERFORMANCE_CONTRACT = Object.freeze( {
 	} ),
 	idleRefreshMinimumDuration: numericDatum( 2000, 'ms', 'Gated', 'idle-rAF refresh measurement contract' ),
 	coldMinimumDuration: numericDatum( 2000, 'ms', 'Gated', 'cold performance segment contract' ),
+	coldMinimumSamples: numericDatum( 120, 'sample', 'Gated', 'cold performance segment population contract' ),
 	sustainedWindowMinimumDuration: numericDatum( 30000, 'ms', 'Gated', 'sustained performance segment contract' ),
 	sustainedWindowMinimumSamples: numericDatum( 120, 'sample', 'Gated', 'sustained performance segment contract' ),
 	maximumPresentationGap: numericDatum( 100, 'ms', 'Gated', 'foreground physical-browser continuity gate' ),

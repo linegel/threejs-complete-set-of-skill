@@ -361,32 +361,36 @@ export function validatePhysicalRouteSession( session ) {
 
 }
 
-function assertPerformanceWindow( window, index, refreshPeriodMs ) {
+function assertPerformanceWindow( window, index, refreshPeriodMs, options = {} ) {
 
-	const label = `sustainedWindows[${ index }]`;
+	const label = options.label ?? `sustainedWindows[${ index }]`;
+	const minimumDuration = options.minimumDuration ?? HARDWARE_PERFORMANCE_CONTRACT.sustainedWindowMinimumDuration.value;
+	const minimumSamples = options.minimumSamples ?? HARDWARE_PERFORMANCE_CONTRACT.sustainedWindowMinimumSamples.value;
+	const enforceSustainedGates = options.enforceSustainedGates !== false;
 	requireObject( window, label );
 	const duration = numeric( window.duration, `${ label }.duration`, 'Measured' );
 	const sampleCount = numeric( window.sampleCount, `${ label }.sampleCount`, 'Measured' );
 	const maxGap = numeric( window.maximumPresentationGap, `${ label }.maximumPresentationGap`, 'Measured' );
 	const coverage = numeric( window.presentationCoverage, `${ label }.presentationCoverage`, 'Derived' );
 	const presentationSamples = numericArray( window.presentationSamples, `${ label }.presentationSamples`, 'Measured' );
-	if ( duration < HARDWARE_PERFORMANCE_CONTRACT.sustainedWindowMinimumDuration.value ) fail( `${ label } is shorter than 30 seconds.` );
-	if ( sampleCount < HARDWARE_PERFORMANCE_CONTRACT.sustainedWindowMinimumSamples.value || presentationSamples.length < HARDWARE_PERFORMANCE_CONTRACT.sustainedWindowMinimumSamples.value ) fail( `${ label } has fewer than 120 presentation samples.` );
+	if ( duration < minimumDuration ) fail( `${ label } is shorter than its minimum duration.` );
+	if ( sampleCount < minimumSamples || presentationSamples.length < minimumSamples ) fail( `${ label } has fewer than ${ minimumSamples } presentation samples.` );
 	if ( sampleCount !== presentationSamples.length ) fail( `${ label } sampleCount does not match its presentation population.` );
 	if ( presentationSamples.some( ( sample ) => sample <= 0 ) ) fail( `${ label } contains a nonpositive presentation interval.` );
-	if ( Math.abs( presentationSamples.reduce( ( sum, sample ) => sum + sample, 0 ) - duration ) > 1e-6 ) fail( `${ label } presentation intervals do not cover the full sustained duration.` );
+	if ( Math.abs( presentationSamples.reduce( ( sum, sample ) => sum + sample, 0 ) - duration ) > 1e-6 ) fail( `${ label } presentation intervals do not cover the full segment duration.` );
 	const observedMaximumGap = Math.max( ...presentationSamples );
 	if ( Math.abs( observedMaximumGap - maxGap ) > 1e-9 ) fail( `${ label } maximumPresentationGap does not match its presentation population.` );
-	if ( maxGap > HARDWARE_PERFORMANCE_CONTRACT.maximumPresentationGap.value ) fail( `${ label } exceeds the presentation-gap gate.` );
+	if ( enforceSustainedGates && maxGap > HARDWARE_PERFORMANCE_CONTRACT.maximumPresentationGap.value ) fail( `${ label } exceeds the presentation-gap gate.` );
 	const derivedCoverage = presentationSamples.length / ( duration / refreshPeriodMs );
 	if ( Math.abs( coverage - derivedCoverage ) > 1e-9 ) fail( `${ label } presentation-coverage value does not reconcile with elapsed time and the refresh target.` );
-	if ( coverage < HARDWARE_PERFORMANCE_CONTRACT.minimumPresentationCoverage.value || coverage > 1.05 ) fail( `${ label } fails the presentation-coverage gate.` );
+	if ( enforceSustainedGates && ( coverage < HARDWARE_PERFORMANCE_CONTRACT.minimumPresentationCoverage.value || coverage > 1.05 ) ) fail( `${ label } fails the presentation-coverage gate.` );
 	const presentationP95 = percentile( presentationSamples, 0.95 );
-	if ( presentationP95 > HARDWARE_PERFORMANCE_CONTRACT.presentationP95Maximum.value ) fail( `${ label } presentation p95 exceeds the declared cadence gate.` );
+	if ( enforceSustainedGates && presentationP95 > HARDWARE_PERFORMANCE_CONTRACT.presentationP95Maximum.value ) fail( `${ label } presentation p95 exceeds the declared cadence gate.` );
 	const deadlineMissRatio = presentationSamples.filter( ( sample ) => sample > HARDWARE_PERFORMANCE_CONTRACT.deadlineThreshold.value ).length / presentationSamples.length;
-	if ( deadlineMissRatio > HARDWARE_PERFORMANCE_CONTRACT.maximumDeadlineMissRatio.value ) fail( `${ label } deadline-miss ratio exceeds the declared gate.` );
+	if ( enforceSustainedGates && deadlineMissRatio > HARDWARE_PERFORMANCE_CONTRACT.maximumDeadlineMissRatio.value ) fail( `${ label } deadline-miss ratio exceeds the declared gate.` );
 	const batches = requireArray( window.gpuTimestampBatches, `${ label }.gpuTimestampBatches` );
 	if ( batches.length === 0 ) fail( `${ label } has no GPU timestamp batches.` );
+	const windowWarmupCpuSamples = [];
 	const windowCpuSamples = [];
 	const windowGpuSamples = [];
 	for ( const [ batchIndex, batch ] of batches.entries() ) {
@@ -394,12 +398,13 @@ function assertPerformanceWindow( window, index, refreshPeriodMs ) {
 		const batchLabel = `${ label }.gpuTimestampBatches[${ batchIndex }]`;
 		if ( batch.verdict !== 'PASS' || batch.mappingCadence !== 'once-per-batch' ) fail( `${ batchLabel } is not a passing batched timestamp population.` );
 		const warmupFrames = numeric( batch.warmupFrames, `${ batchLabel }.warmupFrames`, 'Measured' );
-		const warmupCpuSamples = numericArray( batch.warmupCpuSamples, `${ batchLabel }.warmupCpuSamples`, 'Measured' );
+		const batchWarmupCpuSamples = numericArray( batch.warmupCpuSamples, `${ batchLabel }.warmupCpuSamples`, 'Measured' );
 		const frames = numeric( batch.sampleFrames, `${ batchLabel }.sampleFrames`, 'Measured' );
 		const resolves = numeric( batch.resolveCount, `${ batchLabel }.resolveCount`, 'Measured' );
 		if ( frames < 1 || resolves < 1 || resolves >= frames ) fail( `${ batchLabel } mapped timestamps per frame or has invalid coverage.` );
 		const cpuSamples = numericArray( batch.cpuSamples, `${ batchLabel }.cpuSamples`, 'Measured' );
-		if ( warmupCpuSamples.length !== warmupFrames ) fail( `${ batchLabel } warm-up CPU sample count does not match its frame population.` );
+		if ( batchWarmupCpuSamples.length !== warmupFrames ) fail( `${ batchLabel } warm-up CPU sample count does not match its frame population.` );
+		windowWarmupCpuSamples.push( ...batchWarmupCpuSamples );
 		if ( cpuSamples.length !== frames ) fail( `${ batchLabel } CPU sample count does not match its frame population.` );
 		windowCpuSamples.push( ...cpuSamples );
 		const gpuSamples = numericArray( batch.gpuSamples, `${ batchLabel }.gpuSamples`, 'Measured' );
@@ -424,10 +429,11 @@ function assertPerformanceWindow( window, index, refreshPeriodMs ) {
 
 	}
 	const cpuP95 = percentile( windowCpuSamples, 0.95 );
-	if ( cpuP95 > HARDWARE_PERFORMANCE_CONTRACT.cpuP95Maximum.value ) fail( `${ label } CPU p95 exceeds the declared current-adapter gate.` );
+	if ( enforceSustainedGates && cpuP95 > HARDWARE_PERFORMANCE_CONTRACT.cpuP95Maximum.value ) fail( `${ label } CPU p95 exceeds the declared current-adapter gate.` );
 	const gpuP95 = percentile( windowGpuSamples, 0.95 );
-	if ( gpuP95 > HARDWARE_PERFORMANCE_CONTRACT.gpuP95Maximum.value ) fail( `${ label } GPU p95 exceeds the declared current-adapter gate.` );
+	if ( enforceSustainedGates && gpuP95 > HARDWARE_PERFORMANCE_CONTRACT.gpuP95Maximum.value ) fail( `${ label } GPU p95 exceeds the declared current-adapter gate.` );
 	return {
+		warmupCpuSamples: windowWarmupCpuSamples,
 		presentationSamples,
 		cpuSamples: windowCpuSamples,
 		gpuSamples: windowGpuSamples,
@@ -573,7 +579,12 @@ export function validateHardwarePerformanceSession( session ) {
 		if ( typeof compositor.api !== 'string' || compositor.api.length === 0 ) fail( 'Measured compositor reserve requires the real timing API identity.' );
 
 	} else if ( compositor.verdict !== 'NOT_CLAIMED' ) fail( 'Compositor reserve must remain NOT_CLAIMED unless a real measured API is recorded.' );
-	if ( numeric( session.cold?.duration, 'cold.duration', 'Measured' ) < HARDWARE_PERFORMANCE_CONTRACT.coldMinimumDuration.value ) fail( 'Cold performance segment is shorter than two seconds.' );
+	const coldSummary = assertPerformanceWindow( session.cold, 0, refreshP50, {
+		label: 'cold',
+		minimumDuration: HARDWARE_PERFORMANCE_CONTRACT.coldMinimumDuration.value,
+		minimumSamples: HARDWARE_PERFORMANCE_CONTRACT.coldMinimumSamples.value,
+		enforceSustainedGates: false
+	} );
 	const windows = requireArray( session.sustainedWindows, 'sustainedWindows' );
 	if ( windows.length < HARDWARE_PERFORMANCE_CONTRACT.minimumSustainedWindows.value ) fail( 'Hardware performance evidence requires at least two sustained windows.' );
 	const windowSummaries = windows.map( ( window, index ) => assertPerformanceWindow( window, index, refreshP50 ) );
@@ -587,6 +598,11 @@ export function validateHardwarePerformanceSession( session ) {
 		profile: session.profile,
 		sustainedWindowCount: windows.length,
 		frameTargetMs: HARDWARE_PERFORMANCE_CONTRACT.frameTarget.value,
+		coldCpuP50Ms: coldSummary.cpuP50,
+		coldCpuP95Ms: coldSummary.cpuP95,
+		coldGpuP50Ms: coldSummary.gpuP50,
+		coldGpuP95Ms: coldSummary.gpuP95,
+		coldPresentationP95Ms: coldSummary.presentationP95,
 		presentationP50Ms: percentile( presentationSamples, 0.5 ),
 		presentationP95Ms: percentile( presentationSamples, 0.95 ),
 		deadlineMissRatio: presentationSamples.filter( ( sample ) => sample > HARDWARE_PERFORMANCE_CONTRACT.deadlineThreshold.value ).length / presentationSamples.length,
