@@ -355,6 +355,7 @@ for (const url of pageUrls) {
   const pathname = new URL(url).pathname;
   const isSkill = pathname.startsWith('/skills/');
   const isDemo = pathname.startsWith('/demos/');
+  const isEvidence = pathname.startsWith('/evidence/');
   const isAbout = pathname === '/about/';
   const record = validateIndexablePage(path, url, {
     requireH1: true,
@@ -365,7 +366,7 @@ for (const url of pageUrls) {
     requireCatalog: isHome,
     requireDemoShell: isDemo,
     requireAbout: isAbout,
-    requireResponsivePreviews: isHome || isSkill,
+    requireResponsivePreviews: isHome || isSkill || isEvidence,
   });
   pageRecords.push({ url, ...record });
 }
@@ -498,7 +499,12 @@ for (const path of walk(DOCS, (file) => file.endsWith('.html'))) {
   }
 }
 
-for (const path of [join(DOCS, 'index.html'), join(DOCS, 'about', 'index.html'), ...walk(join(DOCS, 'skills'), (file) => file.endsWith('.html'))]) {
+for (const path of [
+  join(DOCS, 'index.html'),
+  join(DOCS, 'about', 'index.html'),
+  ...walk(join(DOCS, 'skills'), (file) => file.endsWith('.html')),
+  ...walk(join(DOCS, 'evidence'), (file) => file.endsWith('.html')),
+]) {
   const label = relative(ROOT, path);
   const html = readFileSync(path, 'utf8');
   assert(!/href=["'][^"']*index\.html(?:[#"'])/i.test(html), `${label}: internal navigation reinforces duplicate index.html URLs`);

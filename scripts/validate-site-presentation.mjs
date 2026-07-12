@@ -5,6 +5,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PRIMARY_DEMO_KINDS, buildDemoRegistry } from './lib/lab-registry.mjs';
 import { remoteRuntimeAssetViolations } from './lib/site-runtime-assets.mjs';
+import { validateEvidenceReportManifest } from './lib/evidence-report-validation.mjs';
 import { PROVIDER_DEMOS } from './provider-demos.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -18,6 +19,7 @@ const docsSkillsText = readFileSync(join(docs, 'skills.json'), 'utf8');
 const previewManifest = JSON.parse(readFileSync(join(docs, 'previews', 'manifest.json'), 'utf8'));
 const skillManifest = JSON.parse(rootSkillsText);
 const evidencePreviewConfig = JSON.parse(readFileSync(join(root, 'labs', 'runtime-evidence-previews.json'), 'utf8'));
+const evidenceReportManifest = JSON.parse(readFileSync(join(docs, 'evidence', 'manifest.json'), 'utf8'));
 const errors = [];
 
 const htmlFilesUnder = (directory) => readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
@@ -77,6 +79,7 @@ const requiredLocalAssets = [
   'assets/vendor/katex/fonts/KaTeX_SansSerif-Bold.woff2',
   'assets/vendor/katex/fonts/KaTeX_Typewriter-Regular.woff2',
 ];
+const evidenceReportUrl = (labId) => `${site}evidence/${labId}/`;
 
 for (const asset of requiredLocalAssets) {
   assert(existsSync(join(docs, asset)), `required local presentation asset is missing: ${asset}`);
@@ -220,6 +223,63 @@ for (const demo of primary.filter((entry) => !entry.nonRenderingScenarioSuite &&
   );
 }
 
+assert(homepage.includes('href="evidence/"'), 'homepage does not link the evidence report index');
+errors.push(...validateEvidenceReportManifest({
+  manifest: evidenceReportManifest,
+  demos: primary,
+  buildRevision: registry.buildRevision,
+  configuredRuntimePreviewIds: configuredEvidencePreviewIds,
+}).map((error) => `evidence report manifest: ${error}`));
+const evidenceReportIndexPath = join(docs, 'evidence', 'index.html');
+assert(existsSync(evidenceReportIndexPath), 'evidence report index is missing');
+const evidenceReportIndex = existsSync(evidenceReportIndexPath) ? readFileSync(evidenceReportIndexPath) : Buffer.alloc(0);
+assert(sha256(evidenceReportIndex) === evidenceReportManifest.indexSha256, 'evidence report index hash drift');
+for (const demo of primary) {
+  const record = evidenceReportManifest.reports?.find((entry) => entry.labId === demo.id);
+  assert(Boolean(record), `evidence report manifest omits ${demo.id}`);
+  if (!record) continue;
+  const reportPath = join(docs, 'evidence', demo.id, 'index.html');
+  assert(existsSync(reportPath), `evidence report page is missing: ${demo.id}`);
+  if (!existsSync(reportPath)) continue;
+  const reportBytes = readFileSync(reportPath);
+  const report = reportBytes.toString('utf8');
+  const publishedManifestPath = join(docs, relativePublishPath(demo.publishPath), 'source-manifest.json');
+  const publishedManifest = existsSync(publishedManifestPath)
+    ? JSON.parse(readFileSync(publishedManifestPath, 'utf8'))
+    : null;
+  assert(record.path === `evidence/${demo.id}/`, `evidence report path drift: ${demo.id}`);
+  assert(record.status === demo.status, `evidence report status drift: ${demo.id}`);
+  assert(record.sourceHash === demo.sourceHash, `evidence report source hash drift: ${demo.id}`);
+  assert(record.publishedBundleHash === publishedManifest?.publishedBundleHash, `evidence report published bundle hash drift: ${demo.id}`);
+  assert(record.htmlSha256 === sha256(reportBytes), `evidence report HTML hash drift: ${demo.id}`);
+  assert(report.includes(escapedHtmlText(demo.sourceHash)), `evidence report omits source hash: ${demo.id}`);
+  assert(report.includes(escapedHtmlText(registry.buildRevision)), `evidence report omits build revision: ${demo.id}`);
+  assert(report.includes('id="claims-title"'), `evidence report omits claim verdicts: ${demo.id}`);
+  assert(report.includes('id="limitations-title"'), `evidence report omits limitations: ${demo.id}`);
+  assert(report.includes(`href="/${relativePublishPath(demo.publishPath)}"`), `evidence report does not link its demo: ${demo.id}`);
+  assert(evidenceReportIndex.includes(`href="/evidence/${demo.id}/"`), `evidence report index does not link ${demo.id}`);
+  assert(sitemap.includes(`<loc>${evidenceReportUrl(demo.id)}</loc>`), `sitemap omits evidence report ${demo.id}`);
+
+  const media = record.media ?? [];
+  if (!media.length) {
+    assert(!/<img\b/i.test(report), `evidence report invents media for ${demo.id}`);
+    assert(report.includes('No same-lab evidence image is promoted'), `evidence report lacks a plain no-media state: ${demo.id}`);
+  }
+  for (const image of media) {
+    const imagePath = join(docs, image.file);
+    assert(existsSync(imagePath), `evidence report media is missing: ${demo.id}/${image.file}`);
+    if (existsSync(imagePath)) {
+      assert(sha256(readFileSync(imagePath)) === image.outputSha256, `evidence report media hash drift: ${demo.id}/${image.file}`);
+    }
+    const allowed = configuredEvidencePreviewIds.has(demo.id)
+      ? image.file.startsWith(`visual-validation/${demo.id}/`)
+      : (demo.nonRenderingScenarioSuite && image.file === `previews/primary/${demo.id}.png`);
+    assert(allowed, `evidence report uses unrelated or unconfigured media: ${demo.id}/${image.file}`);
+    assert(report.includes(`src="/${escapedHtmlText(image.file)}"`), `evidence report omits promoted media: ${demo.id}/${image.file}`);
+    assert(report.includes(escapedHtmlText(image.outputSha256)), `evidence report omits media hash: ${demo.id}/${image.file}`);
+  }
+}
+
 for (const demo of flagships) {
   assert(homepage.includes(`>${demo.title}<`), `homepage does not name flagship ${demo.id}`);
   const origin = registry.origins[demo.id];
@@ -240,6 +300,10 @@ for (const demo of registry.demos.filter((entry) => (
   assert(Boolean(shell), `${demo.id} has no opt-in evidence drawer`);
   assert(Boolean(outerDetails) && !/\bopen\b/i.test(outerDetails), `${demo.id} opens its evidence drawer over the canvas by default`);
   assert(shell.includes('demo-seo-shell__summary-state'), `${demo.id} compact drawer control omits acceptance state`);
+  const linkedEvidenceId = PRIMARY_DEMO_KINDS.includes(demo.kind) ? demo.id : demo.proxyStatus?.canonicalLabId;
+  if (linkedEvidenceId) {
+    assert(shell.includes(`href="../../evidence/${linkedEvidenceId}/"`), `${demo.id} does not link its canonical evidence report`);
+  }
   assert(!page.includes('lab-status-banner'), `${demo.id} adds a second fixed primary status banner`);
   assert(!page.includes('classification-banner'), `${demo.id} adds a second fixed secondary classification banner`);
 }
@@ -287,9 +351,11 @@ for (const skill of skillManifest.skills) {
   assert(!page.includes('data-preview-classification="related-'), `${skill.name} page promotes related-skill media as primary preview`);
   for (const demo of primary.filter((entry) => entry.skill === skill.name)) {
     assert(page.includes(`href="../${relativePublishPath(demo.publishPath)}"`), `${skill.name} page does not link primary ${demo.id}`);
+    assert(page.includes(`href="../evidence/${demo.id}/"`), `${skill.name} page does not link evidence report ${demo.id}`);
   }
   for (const demo of flagships.filter((entry) => registry.origins[entry.id]?.ownerSkills?.includes(skill.name))) {
     assert(page.includes(`href="../${relativePublishPath(demo.publishPath)}"`), `${skill.name} page does not link participating flagship ${demo.id}`);
+    assert(page.includes(`href="../evidence/${demo.id}/"`), `${skill.name} page does not link flagship evidence report ${demo.id}`);
   }
 }
 
