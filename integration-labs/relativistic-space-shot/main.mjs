@@ -55,6 +55,8 @@ import {
   parseRelativisticRoute,
 } from "./routes.mjs";
 
+const LAB_ID = "relativistic-space-shot";
+
 export const RELATIVISTIC_TIER_CONFIG = Object.freeze({
   hero: Object.freeze({ dprCap: 2, sceneScale: 1, rayScale: 1, spaceQuality: "hero", maxSteps: 160, particleTier: "ultra", sparkPoolCapacity: 65536, debrisPoolCapacity: 8192, bloomScale: 0.5, exposureTier: "full-histogram", sparkCount: 4096, debrisCount: 512 }),
   balanced: Object.freeze({ dprCap: 1.5, sceneScale: 1, rayScale: 1, spaceQuality: "standard", maxSteps: 96, particleTier: "high", sparkPoolCapacity: 24576, debrisPoolCapacity: 3072, bloomScale: 0.33, exposureTier: "balanced-log-reduction", sparkCount: 2048, debrisCount: 256 }),
@@ -386,6 +388,7 @@ export async function createRelativisticSpaceShotLab({
   await spaceStage.prepare(renderer, camera);
 
   const labController = {
+    get labId() { return LAB_ID; },
     async ready() {
       cameraStage.update();
       await this.renderOnce();
@@ -498,6 +501,7 @@ export async function createRelativisticSpaceShotLab({
     },
     getMetrics() {
       return {
+        labId: LAB_ID,
         threeRevision: REVISION,
         backend: renderer.backend?.isWebGPUBackend === true ? "WebGPU" : "unsupported",
         scenario,
