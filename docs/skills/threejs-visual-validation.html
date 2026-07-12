@@ -9,7 +9,7 @@
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-visual-validation.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:864e535d5339121290117b58e46510a970d7b290728913889a1d9313e9b24e2e" />
+<meta name="skill-pack-build-revision" content="sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -24,7 +24,7 @@
 <meta property="og:title" content="Visual Validation | Three.js WebGPU Skill" />
 <meta property="og:description" content="Validate advanced Three.js WebGPU/TSL scenes with falsifiable visual contracts, mechanism diagnostics, sustained CPU/GPU timing, refresh-derived budgets…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-visual-validation.html" />
-<meta property="article:modified_time" content="2026-07-11T15:38:40+03:00" />
+<meta property="article:modified_time" content="2026-07-11T16:10:33+03:00" />
 <meta property="article:published_time" content="2026-07-04T23:30:21+03:00" />
 <meta property="article:section" content="Planning and Validation" />
 <meta property="og:image" content="https://threejs-skills.com/visual-validation/webgpu-validation-harness/final.design.png" />
@@ -74,7 +74,7 @@
     "https://threejs-skills.com/seo/article/threejs-visual-validation-16x9.png"
    ],
    "datePublished": "2026-07-04T23:30:21+03:00",
-   "dateModified": "2026-07-11T15:38:40+03:00",
+   "dateModified": "2026-07-11T16:10:33+03:00",
    "author": {
     "@id": "https://threejs-skills.com/#publisher"
    },
@@ -301,8 +301,8 @@ a.chip:active{scale:.96}
 <span class="chip">1 secondary surface</span>
       
       <span class="chip">native evidence pending</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-11T15:38:40+03:00">2026-07-11</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/7c6d03bd2a74da7c20cb6f7e85f0fdead079297e">commit 7c6d03b ↗</a>
+      <span class="chip">Latest skill update <time datetime="2026-07-11T16:10:33+03:00">2026-07-11</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/ea2aee1baf4aaa9c192fc98380c9ca85c556121e">commit ea2aee1 ↗</a>
       <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-visual-validation/SKILL.md">SKILL.md on GitHub ↗</a>
       <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-visual-validation/SKILL.md">raw (for agents) ↗</a>
     </div>
@@ -367,12 +367,12 @@ capability manifest, renderer.info counters, per-pass timings — so regressions
   <div class="section" id="validation"><div class="wrap">
     <h2>Preview and evidence ledger</h2>
     <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; canonical acceptance still requires render-target readback and a schema-v2 bundle.</p>
-    <div class="evidence-ledger"><span class="status status--pending">Canonical runtime evidence pending</span><code>23 published images</code></div>
+    <div class="evidence-ledger"><span class="status status--pending">Canonical runtime evidence pending</span><code>25 published images</code></div>
 <div class="runtime-evidence-disclosures">
       <article class="runtime-evidence-disclosure" data-acceptance-status="incomplete">
         <div class="runtime-evidence-head"><div><code>Native WebGPU runtime evidence preview</code><h3>Native WebGPU validation harness</h3></div><span class="status status--pending">Acceptance pending</span></div>
-        <dl><div><dt>visualCorrectness</dt><dd data-verdict="PASS">PASS</dd></div><div><dt>mechanismCorrectness</dt><dd data-verdict="INSUFFICIENT_EVIDENCE">INSUFFICIENT_EVIDENCE</dd></div><div><dt>performanceCompliance</dt><dd data-verdict="INSUFFICIENT_EVIDENCE">INSUFFICIENT_EVIDENCE</dd></div><div><dt>gpuAttribution</dt><dd data-verdict="INSUFFICIENT_EVIDENCE">INSUFFICIENT_EVIDENCE</dd></div><div><dt>lifecycleStability</dt><dd data-verdict="PASS">PASS</dd></div></dl>
-        <ul><li>Visual correctness and the 50-cycle lifecycle profile pass for this static MRT subject.</li><li>A separate 1920x1080 SwiftShader trace reports the measured GPU budget overrun as FAIL while scene-MRT/final-output attribution passes; governor stress and mechanism completeness remain INSUFFICIENT_EVIDENCE.</li></ul>
+        <dl><div><dt>visualCorrectness</dt><dd data-verdict="PASS">PASS</dd></div><div><dt>mechanismCorrectness</dt><dd data-verdict="INSUFFICIENT_EVIDENCE">INSUFFICIENT_EVIDENCE</dd></div><div><dt>performanceCompliance</dt><dd data-verdict="FAIL">FAIL</dd></div><div><dt>gpuAttribution</dt><dd data-verdict="PASS">PASS</dd></div><div><dt>lifecycleStability</dt><dd data-verdict="PASS">PASS</dd></div></dl>
+        <ul><li>Visual correctness and the 50-cycle lifecycle profile pass for this static MRT subject.</li><li>The SwiftShader performance and governor traces report FAIL because the settled reduced tier misses both its GPU and edge-domain visual gates; scene-MRT/final-output attribution passes, while mechanism completeness remains INSUFFICIENT_EVIDENCE.</li></ul>
       </article></div>
     <div class="gallery">
       <figure data-preview-classification="inspected-runtime-evidence-preview" itemscope itemtype="https://schema.org/ImageObject">
@@ -478,6 +478,22 @@ capability manifest, renderer.info counters, per-pass timings — so regressions
           <img data-responsive-preview src="../visual-validation/webgpu-validation-harness/odd-size.final.png" alt="Visual Validation — Odd 641 by 359 aligned-row readback result." itemprop="contentUrl" width="641" height="359" loading="lazy" decoding="async" />
         </picture><span class="preview-badge">inspected runtime evidence preview</span></span>
         <figcaption itemprop="caption"><strong>Odd 641 by 359 aligned-row readback result.</strong></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-validation-harness/tier.target-performance.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-validation-harness/tier.target-performance.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-validation-harness/tier.target-performance.png" alt="Visual Validation — Full-resolution target-performance tier used as the governor visual reference." itemprop="contentUrl" width="1920" height="1080" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">inspected runtime evidence preview</span></span>
+        <figcaption itemprop="caption"><strong>Full-resolution target-performance tier used as the governor visual reference.</strong></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-validation-harness/tier.governor-stress.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-validation-harness/tier.governor-stress.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-validation-harness/tier.governor-stress.png" alt="Visual Validation — Reduced governor-stress tier whose reference-edge p95 error exceeds the frozen gate." itemprop="contentUrl" width="1920" height="1080" loading="lazy" decoding="async" />
+        </picture><span class="preview-badge">inspected runtime evidence preview</span></span>
+        <figcaption itemprop="caption"><strong>Reduced governor-stress tier whose reference-edge p95 error exceeds the frozen gate.</strong></figcaption>
       </figure>
       <figure data-preview-classification="generated-asset-preview" itemscope itemtype="https://schema.org/ImageObject">
         <span class="preview-media"><picture class="responsive-preview">
@@ -1021,7 +1037,7 @@ is unavailable.</p>
 
 <div class="wrap"><footer>
   <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
-  <span style="font-size:13px">Three r185.1 · 40 primary implementations · registry <code>864e535d5339</code></span><br/>
+  <span style="font-size:13px">Three r185.1 · 40 primary implementations · registry <code>580768503f5b</code></span><br/>
   <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
   <span><a href="https://threejs-skills.com/about/">About &amp; methodology</a> · <a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/demos/registry.json">demo registry</a> · <a href="https://threejs-skills.com/llms.txt">llms.txt</a> · <a href="https://threejs-skills.com/skills.json">skills.json</a></span>
 </footer></div>

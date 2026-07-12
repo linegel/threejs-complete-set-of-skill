@@ -88,14 +88,14 @@
     {
       "labId": "webgpu-validation-harness",
       "expectedAcceptanceStatus": "incomplete",
-      "artifactDirectory": "artifacts/visual-validation/webgpu-validation-harness/correctness",
+      "artifactDirectory": "artifacts/visual-validation/webgpu-validation-harness/performance",
       "backendProof": "evidence-manifest.json",
       "claimVerdicts": "evidence-manifest.json",
       "primaryImage": "final.design.png",
       "primaryImageLabel": "Native WebGPU MRT subject render-target readback",
       "limitations": [
         "Visual correctness and the 50-cycle lifecycle profile pass for this static MRT subject.",
-        "A separate 1920x1080 SwiftShader trace reports the measured GPU budget overrun as FAIL while scene-MRT/final-output attribution passes; governor stress and mechanism completeness remain INSUFFICIENT_EVIDENCE."
+        "The SwiftShader performance and governor traces report FAIL because the settled reduced tier misses both its GPU and edge-domain visual gates; scene-MRT/final-output attribution passes, while mechanism completeness remains INSUFFICIENT_EVIDENCE."
       ],
       "images": [
         { "source": "images/final.design.png", "output": "final.design.png", "encoding": "png-copy", "meaning": "Color-managed final output from the single RenderPipeline owner." },
@@ -110,7 +110,9 @@
         { "source": "images/seed-9e3779b9.final.png", "output": "seed-9e3779b9.final.png", "encoding": "png-copy", "meaning": "Stress deterministic seed capture." },
         { "source": "images/temporal.t000.png", "output": "temporal.t000.png", "encoding": "png-copy", "meaning": "Static-subject temporal baseline immediately after reset." },
         { "source": "images/temporal.t001.png", "output": "temporal.t001.png", "encoding": "png-copy", "meaning": "Static-subject temporal capture one fixed 1/60-second step later." },
-        { "source": "images/odd-size.final.png", "output": "odd-size.final.png", "encoding": "png-copy", "meaning": "Odd 641 by 359 aligned-row readback result." }
+        { "source": "images/odd-size.final.png", "output": "odd-size.final.png", "encoding": "png-copy", "meaning": "Odd 641 by 359 aligned-row readback result." },
+        { "source": "images/tier.target-performance.png", "output": "tier.target-performance.png", "encoding": "png-copy", "meaning": "Full-resolution target-performance tier used as the governor visual reference." },
+        { "source": "images/tier.governor-stress.png", "output": "tier.governor-stress.png", "encoding": "png-copy", "meaning": "Reduced governor-stress tier whose reference-edge p95 error exceeds the frozen gate." }
       ]
     }
   ]

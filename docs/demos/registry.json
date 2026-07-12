@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:864e535d5339121290117b58e46510a970d7b290728913889a1d9313e9b24e2e",
+  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
   "demoKinds": [
     "canonical-lab",
     "mechanism-demo",
@@ -270,10 +270,10 @@
   ],
   "counts": {
     "skills": 27,
-    "demos": 87,
+    "demos": 89,
     "primary": 40,
     "acceptedPrimary": 2,
-    "secondary": 47
+    "secondary": 49
   },
   "demos": [
     {
@@ -2952,6 +2952,70 @@
     },
     {
       "schemaVersion": 2,
+      "id": "object-sculptor-shared-fixture",
+      "skill": "threejs-object-sculptor",
+      "threeRevision": "0.185.1",
+      "kind": "contract-fixture",
+      "status": "secondary",
+      "canonicalSource": [
+        "threejs-object-sculptor/examples/shared"
+      ],
+      "browserEntry": null,
+      "publishPath": null,
+      "scenarios": [],
+      "mechanisms": [],
+      "tiers": [],
+      "modes": [],
+      "cameras": [],
+      "seeds": [],
+      "capabilityRequirements": [],
+      "runtimeProof": [],
+      "evidenceContract": "none",
+      "evidenceBundle": null,
+      "validationCommand": null,
+      "sourceHash": "sha256:a01873202cee7e1b2c80069e7311a876eaa3d0aaaa94754873770b1fce99103e",
+      "proxyStatus": {
+        "limitation": "Source or contract fixture without an accepted native-WebGPU browser/evidence contract.",
+        "canonicalLabId": null
+      },
+      "sourceHashInputs": [
+        "threejs-object-sculptor/examples/shared"
+      ]
+    },
+    {
+      "schemaVersion": 2,
+      "id": "object-sculptor-webgpu-object-sculptor-corpus-fixture",
+      "skill": "threejs-object-sculptor",
+      "threeRevision": "0.185.1",
+      "kind": "contract-fixture",
+      "status": "secondary",
+      "canonicalSource": [
+        "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus"
+      ],
+      "browserEntry": null,
+      "publishPath": null,
+      "scenarios": [],
+      "mechanisms": [],
+      "tiers": [],
+      "modes": [],
+      "cameras": [],
+      "seeds": [],
+      "capabilityRequirements": [],
+      "runtimeProof": [],
+      "evidenceContract": "none",
+      "evidenceBundle": null,
+      "validationCommand": null,
+      "sourceHash": "sha256:16da20aef05b490618fb5ee4758e124f32d4a9bc2463cb2efd4f646a36813055",
+      "proxyStatus": {
+        "limitation": "Source or contract fixture without an accepted native-WebGPU browser/evidence contract.",
+        "canonicalLabId": null
+      },
+      "sourceHashInputs": [
+        "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus"
+      ]
+    },
+    {
+      "schemaVersion": 2,
       "id": "ocean-generated-wave-seeds",
       "title": "Directional Wave Seed Surface",
       "skill": "threejs-spectral-ocean",
@@ -4239,6 +4303,8 @@
       "canonicalSource": [
         "threejs-choose-skills/examples/router-manifest-lab/router-core.mjs",
         "threejs-choose-skills/examples/router-manifest-lab/router-fixtures.json",
+        "threejs-choose-skills/examples/router-manifest-lab/route-urls.mjs",
+        "threejs-choose-skills/examples/router-manifest-lab/runnable-demos.mjs",
         "threejs-choose-skills/examples/router-manifest-lab/app.mjs"
       ],
       "browserEntry": "threejs-choose-skills/examples/router-manifest-lab/index.html",
@@ -4495,7 +4561,7 @@
         "validateQuick": "npm --prefix threejs-choose-skills/examples/router-manifest-lab run validate:quick",
         "validateFull": "npm --prefix threejs-choose-skills/examples/router-manifest-lab run validate:full"
       },
-      "sourceHash": "sha256:dc8411db4bdc256d962223f4a3341baf00086af4be16a010a562ec415a62519d",
+      "sourceHash": "sha256:bd1faf3bb97980b022ae32e0491cc8fe3e41fb29994479b083422185fd846412",
       "proxyStatus": null,
       "nonRenderingScenarioSuite": true,
       "sourceHashInputs": [
@@ -6158,7 +6224,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "node threejs-visual-validation/examples/webgpu-validation-harness/src/validate.js",
-      "sourceHash": "sha256:b67792fb39e96bf27572c3354d893cdf58298f4ab6f0dacb72d497ea7fd1d0b2",
+      "sourceHash": "sha256:28d5789bb49f5b01261a102328da461d01c1f0bb8f860dc0d368bca736add4ba",
       "proxyStatus": {
         "limitation": "The docs page visualizes the evidence bundle and diagnostic obligations; the canonical harness writes the JSON/PNG artifact contract. Production validation still requires rendered captures, target/storage inventories, timing labels, leak loops, and explicit accept/withhold decisions.",
         "canonicalLabId": "webgpu-validation-harness"
@@ -12482,9 +12548,10 @@
         "validateQuick": "npm --prefix threejs-object-sculptor/examples/webgpu-tower-ship-sculptor run validate:quick",
         "validateFull": "npm --prefix threejs-object-sculptor/examples/webgpu-tower-ship-sculptor run validate:full"
       },
-      "sourceHash": "sha256:cbc0156079c5ab5310aa91251be4adaa1afbeddac35dc612ffa1740ef3b6be05",
+      "sourceHash": "sha256:36250f53fbaa67b0fd410bd74ce1aa3dd6e7744af435bc8950119925a825abd1",
       "proxyStatus": null,
       "sourceHashInputs": [
+        "labs/runtime/aligned-readback.mjs",
         "threejs-object-sculptor/examples/webgpu-tower-ship-sculptor"
       ]
     },
@@ -12789,7 +12856,7 @@
         "validateQuick": "npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run validate:quick",
         "validateFull": "npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run validate:full"
       },
-      "sourceHash": "sha256:1e8dd506e4ea5c8252bbb8cc12923fa8c54e5196cb69f8422de462d0c8a2e030",
+      "sourceHash": "sha256:69f361995d8a99d1a34ba53e224b1baa26e616e8082599c6db7fcfa87a98c5dc",
       "proxyStatus": null,
       "notes": [
         "Current-adapter browser capture and lifecycle evidence remain incomplete; no runtime acceptance is claimed."
@@ -13705,6 +13772,16 @@
       "type": "inferred-secondary",
       "path": "threejs-image-pipeline/examples/integration-shared-framegraph",
       "canonicalDir": "threejs-image-pipeline/examples/integration-shared-framegraph"
+    },
+    "object-sculptor-shared-fixture": {
+      "type": "inferred-secondary",
+      "path": "threejs-object-sculptor/examples/shared",
+      "canonicalDir": "threejs-object-sculptor/examples/shared"
+    },
+    "object-sculptor-webgpu-object-sculptor-corpus-fixture": {
+      "type": "inferred-secondary",
+      "path": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus",
+      "canonicalDir": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus"
     },
     "particles-trails-and-effects-reentry-plasma-fixture": {
       "type": "inferred-secondary",

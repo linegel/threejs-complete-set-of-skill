@@ -23,8 +23,8 @@
     "docs/demos/structured-ash-growth",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:7ed2390aa8bf118b1111cd0818696a72f3512e5b4b6da1f5d1ff004583ec2b9c",
+  "publishedBundleHash": "sha256:3fe9b93d813291b973d9579117078a72f6c47741b6c3b9b33fe579eee1e5c67b",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:864e535d5339121290117b58e46510a970d7b290728913889a1d9313e9b24e2e",
+  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
   "evidenceBundleId": null
 }

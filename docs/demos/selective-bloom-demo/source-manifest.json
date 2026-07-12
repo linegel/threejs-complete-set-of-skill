@@ -23,8 +23,8 @@
     "docs/demos/selective-bloom-demo",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:973192282991c6a859c67254be1b3608bf3c4bdaba963ac912d1a28913fdf372",
+  "publishedBundleHash": "sha256:5e40c5125f61a18c42571f7809c7a856cc2cd408ffe33a0cbbc9c461501b0302",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:864e535d5339121290117b58e46510a970d7b290728913889a1d9313e9b24e2e",
+  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
   "evidenceBundleId": null
 }

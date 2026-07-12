@@ -19,8 +19,8 @@
     "docs/demos/webgpu-touch-history-frost",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:e8bd2c5aade4b529c16110cb7632903f3b223f820f94fa8d12a75b9ee7352f64",
+  "publishedBundleHash": "sha256:b8610f928cf9dba320aaf8cda3391b40de97549ab16cd85d2055a3a77fd64446",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:864e535d5339121290117b58e46510a970d7b290728913889a1d9313e9b24e2e",
+  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
   "evidenceBundleId": null
 }

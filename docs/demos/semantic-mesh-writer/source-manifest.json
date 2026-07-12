@@ -15,8 +15,8 @@
     "docs/demos/semantic-mesh-writer",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:847fbff3f107998bf47eaae31b1615ccc58cf673bd651950b99f6aee6c473dc1",
+  "publishedBundleHash": "sha256:16e45821c7af995b37e586d9b02793350b915d9f3cdbb151e7525edf2ac538a4",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:864e535d5339121290117b58e46510a970d7b290728913889a1d9313e9b24e2e",
+  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
   "evidenceBundleId": null
 }

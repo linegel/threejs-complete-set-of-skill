@@ -24,7 +24,7 @@
   "coverageSummary": {
     "schemaVersion": 2,
     "threeRevision": "0.185.1",
-    "buildRevision": "sha256:864e535d5339121290117b58e46510a970d7b290728913889a1d9313e9b24e2e",
+    "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
     "skills": 27,
     "primaryImplementations": 40,
     "loadablePrimaryImplementations": 40,
@@ -33,7 +33,7 @@
     "focusedSupportPrimaries": 7,
     "acceptedPrimary": 2,
     "pendingPrimary": 38,
-    "secondaryRecords": 47,
+    "secondaryRecords": 49,
     "routes": {
       "base": 40,
       "scenarios": 170,
@@ -605,12 +605,14 @@
           "canonicalSource": [
             "threejs-choose-skills/examples/router-manifest-lab/router-core.mjs",
             "threejs-choose-skills/examples/router-manifest-lab/router-fixtures.json",
+            "threejs-choose-skills/examples/router-manifest-lab/route-urls.mjs",
+            "threejs-choose-skills/examples/router-manifest-lab/runnable-demos.mjs",
             "threejs-choose-skills/examples/router-manifest-lab/app.mjs"
           ],
           "sourceHashInputs": [
             "threejs-choose-skills/examples/router-manifest-lab"
           ],
-          "sourceHash": "sha256:dc8411db4bdc256d962223f4a3341baf00086af4be16a010a562ec415a62519d",
+          "sourceHash": "sha256:bd1faf3bb97980b022ae32e0491cc8fe3e41fb29994479b083422185fd846412",
           "proxyStatus": null
         },
         {
@@ -641,9 +643,9 @@
       ],
       "latestUpdate": {
         "date": "2026-07-11",
-        "datetime": "2026-07-11T12:37:30+03:00",
-        "commit": "72f468614be79628e732fc4cd0ff169bdae724fe",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/72f468614be79628e732fc4cd0ff169bdae724fe"
+        "datetime": "2026-07-11T16:03:10+03:00",
+        "commit": "8ff14617b40cae66ed17cfe1180737e6950d9bd2",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/8ff14617b40cae66ed17cfe1180737e6950d9bd2"
       },
       "page": "https://threejs-skills.com/skills/threejs-choose-skills.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-choose-skills/SKILL.md",
@@ -1494,6 +1496,40 @@
       "flagshipParticipation": [],
       "demos": [
         {
+          "id": "object-sculptor-shared-fixture",
+          "kind": "contract-fixture",
+          "status": "secondary",
+          "publishPath": null,
+          "canonicalSource": [
+            "threejs-object-sculptor/examples/shared"
+          ],
+          "sourceHashInputs": [
+            "threejs-object-sculptor/examples/shared"
+          ],
+          "sourceHash": "sha256:9a718cbfc49e35f620a50952a709403e724be718bc733289f802ab970e657d17",
+          "proxyStatus": {
+            "limitation": "Source or contract fixture without an accepted native-WebGPU browser/evidence contract.",
+            "canonicalLabId": null
+          }
+        },
+        {
+          "id": "object-sculptor-webgpu-object-sculptor-corpus-fixture",
+          "kind": "contract-fixture",
+          "status": "secondary",
+          "publishPath": null,
+          "canonicalSource": [
+            "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus"
+          ],
+          "sourceHashInputs": [
+            "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus"
+          ],
+          "sourceHash": "sha256:e65e2042a44a826436b6cf3a58423fe7b03ec0e321ef13eb3e7407670094bada",
+          "proxyStatus": {
+            "limitation": "Source or contract fixture without an accepted native-WebGPU browser/evidence contract.",
+            "canonicalLabId": null
+          }
+        },
+        {
           "id": "webgpu-tower-ship-sculptor",
           "kind": "canonical-lab",
           "status": "incomplete",
@@ -1502,17 +1538,18 @@
             "threejs-object-sculptor/examples/webgpu-tower-ship-sculptor"
           ],
           "sourceHashInputs": [
+            "labs/runtime/aligned-readback.mjs",
             "threejs-object-sculptor/examples/webgpu-tower-ship-sculptor"
           ],
-          "sourceHash": "sha256:cbc0156079c5ab5310aa91251be4adaa1afbeddac35dc612ffa1740ef3b6be05",
+          "sourceHash": "sha256:36250f53fbaa67b0fd410bd74ce1aa3dd6e7744af435bc8950119925a825abd1",
           "proxyStatus": null
         }
       ],
       "latestUpdate": {
         "date": "2026-07-11",
-        "datetime": "2026-07-11T13:58:02+03:00",
-        "commit": "97394fd92148687cf432d0c394fb472e21928cda",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/97394fd92148687cf432d0c394fb472e21928cda"
+        "datetime": "2026-07-11T17:12:50+03:00",
+        "commit": "6677d4ac15c009064f4eb246aabae8cb4ad9b080",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/6677d4ac15c009064f4eb246aabae8cb4ad9b080"
       },
       "page": "https://threejs-skills.com/skills/threejs-object-sculptor.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-object-sculptor/SKILL.md",
@@ -3069,7 +3106,7 @@
             "scripts/provider-demos.mjs",
             "threejs-visual-validation/examples/webgpu-validation-harness"
           ],
-          "sourceHash": "sha256:b67792fb39e96bf27572c3354d893cdf58298f4ab6f0dacb72d497ea7fd1d0b2",
+          "sourceHash": "sha256:28d5789bb49f5b01261a102328da461d01c1f0bb8f860dc0d368bca736add4ba",
           "proxyStatus": {
             "limitation": "The docs page visualizes the evidence bundle and diagnostic obligations; the canonical harness writes the JSON/PNG artifact contract. Production validation still requires rendered captures, target/storage inventories, timing labels, leak loops, and explicit accept/withhold decisions.",
             "canonicalLabId": "webgpu-validation-harness"
@@ -3086,15 +3123,15 @@
           "sourceHashInputs": [
             "threejs-visual-validation/examples/webgpu-validation-harness"
           ],
-          "sourceHash": "sha256:1e8dd506e4ea5c8252bbb8cc12923fa8c54e5196cb69f8422de462d0c8a2e030",
+          "sourceHash": "sha256:69f361995d8a99d1a34ba53e224b1baa26e616e8082599c6db7fcfa87a98c5dc",
           "proxyStatus": null
         }
       ],
       "latestUpdate": {
         "date": "2026-07-11",
-        "datetime": "2026-07-11T15:38:40+03:00",
-        "commit": "7c6d03bd2a74da7c20cb6f7e85f0fdead079297e",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/7c6d03bd2a74da7c20cb6f7e85f0fdead079297e"
+        "datetime": "2026-07-11T16:10:33+03:00",
+        "commit": "ea2aee1baf4aaa9c192fc98380c9ca85c556121e",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/ea2aee1baf4aaa9c192fc98380c9ca85c556121e"
       },
       "page": "https://threejs-skills.com/skills/threejs-visual-validation.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-visual-validation/SKILL.md",

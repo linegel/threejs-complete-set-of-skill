@@ -23,8 +23,8 @@
     "docs/demos/water-integration-surface",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:8749ab93624bd9c8ba9d98a96d3b040dc042ea1b13cd9655b4516d12db6d2aef",
+  "publishedBundleHash": "sha256:05084556ecfda621430fc1f1ff03edccd2f14e56c4df33e5eacf9815af95ff79",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:864e535d5339121290117b58e46510a970d7b290728913889a1d9313e9b24e2e",
+  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
   "evidenceBundleId": null
 }

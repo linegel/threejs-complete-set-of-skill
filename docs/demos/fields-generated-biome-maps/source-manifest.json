@@ -23,8 +23,8 @@
     "docs/demos/fields-generated-biome-maps",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:218f9e7dfb37af513ea088466373027492f55c29b94b431b489c4f1aaf462f43",
+  "publishedBundleHash": "sha256:a490fb027ded41cd055c7e04d6acdac5873fd94e930220b346eeab2b4fde562e",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:864e535d5339121290117b58e46510a970d7b290728913889a1d9313e9b24e2e",
+  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
   "evidenceBundleId": null
 }

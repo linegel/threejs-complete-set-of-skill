@@ -21,7 +21,7 @@ Routing: after installing the whole pack, start broad requests with threejs-choo
 - Focused integration and mechanism surfaces: 7
 - Fixed startup contracts: 505 (170 scenarios, 222 mechanisms, 113 tiers) across 545 unique published primary URLs
 - Runtime evidence status: 2 accepted, 38 pending
-- Secondary records: 47; none count toward primary acceptance
+- Secondary records: 49; none count toward primary acceptance
 
 ## Skills
 

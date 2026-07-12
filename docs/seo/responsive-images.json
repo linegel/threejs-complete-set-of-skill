@@ -2112,6 +2112,50 @@
           "encoding": "quality-80"
         }
       }
+    },
+    "visual-validation/webgpu-validation-harness/tier.governor-stress.png": {
+      "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/tier.governor-stress.png",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 99369,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/tier.governor-stress.avif",
+          "width": 1920,
+          "height": 1080,
+          "bytes": 10965,
+          "encoding": "quality-60"
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/tier.governor-stress.webp",
+          "width": 1920,
+          "height": 1080,
+          "bytes": 16040,
+          "encoding": "quality-80"
+        }
+      }
+    },
+    "visual-validation/webgpu-validation-harness/tier.target-performance.png": {
+      "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/tier.target-performance.png",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 81526,
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/tier.target-performance.avif",
+          "width": 1920,
+          "height": 1080,
+          "bytes": 6434,
+          "encoding": "quality-60"
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/tier.target-performance.webp",
+          "width": 1920,
+          "height": 1080,
+          "bytes": 17888,
+          "encoding": "quality-80"
+        }
+      }
     }
   }
 }

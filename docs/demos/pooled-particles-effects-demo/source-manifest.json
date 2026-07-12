@@ -23,8 +23,8 @@
     "docs/demos/pooled-particles-effects-demo",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:d67a8c4796d5ab3426c3112df7922371c2b5e3b43c558a3436da0787cc288b0d",
+  "publishedBundleHash": "sha256:fd23df00308f9cb3aa15b58d1a82883048d02389a7b6b14e64eec05e83938a4a",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:864e535d5339121290117b58e46510a970d7b290728913889a1d9313e9b24e2e",
+  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
   "evidenceBundleId": null
 }

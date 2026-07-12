@@ -23,8 +23,8 @@
     "docs/demos/webgpu-shadow-architecture-bench",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:5ea094b59a495212646315f705d2672f28cfbabef3c21c172b469e02316e9617",
+  "publishedBundleHash": "sha256:31dca3b71875e3e9d524b3bd0acd443635497b77f3a2f9567c3f44819406aff4",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:864e535d5339121290117b58e46510a970d7b290728913889a1d9313e9b24e2e",
+  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
   "evidenceBundleId": null
 }

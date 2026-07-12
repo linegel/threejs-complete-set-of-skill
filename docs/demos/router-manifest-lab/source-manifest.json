@@ -6,19 +6,21 @@
   "canonicalSource": [
     "threejs-choose-skills/examples/router-manifest-lab/router-core.mjs",
     "threejs-choose-skills/examples/router-manifest-lab/router-fixtures.json",
+    "threejs-choose-skills/examples/router-manifest-lab/route-urls.mjs",
+    "threejs-choose-skills/examples/router-manifest-lab/runnable-demos.mjs",
     "threejs-choose-skills/examples/router-manifest-lab/app.mjs"
   ],
   "sourceHashInputs": [
     "threejs-choose-skills/examples/router-manifest-lab"
   ],
   "browserEntry": "threejs-choose-skills/examples/router-manifest-lab/index.html",
-  "sourceHash": "sha256:dc8411db4bdc256d962223f4a3341baf00086af4be16a010a562ec415a62519d",
+  "sourceHash": "sha256:bd1faf3bb97980b022ae32e0491cc8fe3e41fb29994479b083422185fd846412",
   "publishedHashInputs": [
     "docs/demos/router-manifest-lab",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:8672faf84f1305ef68b37aa2789cd62bb352e80b18281966795a68e62f88f8be",
+  "publishedBundleHash": "sha256:6a1b90d7a3de6ad94d248269ec9cb2c65d26ca7987ffd28abb1b002df24074d5",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:864e535d5339121290117b58e46510a970d7b290728913889a1d9313e9b24e2e",
+  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
   "evidenceBundleId": null
 }

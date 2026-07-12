@@ -3,11 +3,11 @@
   "labId": "webgpu-validation-harness",
   "classification": "inspected-runtime-evidence-preview",
   "acceptanceStatus": "incomplete",
-  "evidenceBundleId": "correctness",
+  "evidenceBundleId": "performance",
   "canonicalSource": [
     "threejs-visual-validation/examples/webgpu-validation-harness"
   ],
-  "canonicalSourceHash": "sha256:1e8dd506e4ea5c8252bbb8cc12923fa8c54e5196cb69f8422de462d0c8a2e030",
+  "canonicalSourceHash": "sha256:69f361995d8a99d1a34ba53e224b1baa26e616e8082599c6db7fcfa87a98c5dc",
   "threeRevision": "0.185.1",
   "runtime": {
     "renderer": "WebGPURenderer",
@@ -18,8 +18,8 @@
   "claimVerdicts": {
     "visualCorrectness": "PASS",
     "mechanismCorrectness": "INSUFFICIENT_EVIDENCE",
-    "performanceCompliance": "INSUFFICIENT_EVIDENCE",
-    "gpuAttribution": "INSUFFICIENT_EVIDENCE",
+    "performanceCompliance": "FAIL",
+    "gpuAttribution": "PASS",
     "lifecycleStability": "PASS"
   },
   "primaryImage": "final.design.png",
@@ -154,10 +154,30 @@
       "width": 641,
       "height": 359,
       "encoding": "png-copy"
+    },
+    {
+      "file": "tier.target-performance.png",
+      "meaning": "Full-resolution target-performance tier used as the governor visual reference.",
+      "source": "images/tier.target-performance.png",
+      "sourceSha256": "sha256:d38e31560a1372c4d0ff87eb936fca40976bfed9a82c1b33607fb6391036399c",
+      "outputSha256": "sha256:d38e31560a1372c4d0ff87eb936fca40976bfed9a82c1b33607fb6391036399c",
+      "width": 1920,
+      "height": 1080,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "tier.governor-stress.png",
+      "meaning": "Reduced governor-stress tier whose reference-edge p95 error exceeds the frozen gate.",
+      "source": "images/tier.governor-stress.png",
+      "sourceSha256": "sha256:5bcdbd3be63553fe70bdfb4d4f476ae73bba65faa63aa8718f7776db922a5a89",
+      "outputSha256": "sha256:5bcdbd3be63553fe70bdfb4d4f476ae73bba65faa63aa8718f7776db922a5a89",
+      "width": 1920,
+      "height": 1080,
+      "encoding": "png-copy"
     }
   ],
   "limitations": [
     "Visual correctness and the 50-cycle lifecycle profile pass for this static MRT subject.",
-    "A separate 1920x1080 SwiftShader trace reports the measured GPU budget overrun as FAIL while scene-MRT/final-output attribution passes; governor stress and mechanism completeness remain INSUFFICIENT_EVIDENCE."
+    "The SwiftShader performance and governor traces report FAIL because the settled reduced tier misses both its GPU and edge-domain visual gates; scene-MRT/final-output attribution passes, while mechanism completeness remains INSUFFICIENT_EVIDENCE."
   ]
 }

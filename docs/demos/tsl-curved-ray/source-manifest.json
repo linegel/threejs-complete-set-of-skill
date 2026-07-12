@@ -19,8 +19,8 @@
     "docs/demos/tsl-curved-ray",
     "docs/demos/assets"
   ],
-  "publishedBundleHash": "sha256:8176682c9e0a89f53a63c2682feb715a1b7de268a4888c5c5eb1ed32ae318c85",
+  "publishedBundleHash": "sha256:5542b8ccdbc3a9f04e4d52909e2a822bd9bfc5ae88ef9756b69a37a5b3701f5a",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:864e535d5339121290117b58e46510a970d7b290728913889a1d9313e9b24e2e",
+  "buildRevision": "sha256:580768503f5ba4d519e51a4241a3aaee8b129cf75a468fbafc0340272f6fca3d",
   "evidenceBundleId": null
 }
