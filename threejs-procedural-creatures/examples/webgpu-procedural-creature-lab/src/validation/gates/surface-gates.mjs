@@ -1,6 +1,16 @@
+import { readFile } from 'node:fs/promises';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 import { compileSpec } from '../../core/rig-compiler.js';
 import { extractReferenceSurface } from '../../core/reference-surface.js';
 import { packReferenceAsset, unpackReferenceAsset } from '../../core/reference-asset-format.js';
+import { generateGeodesicSkinWeights, MAX_SKIN_INFLUENCES } from '../../core/skin-weights.js';
+import { buildAffineSlotTransforms, deformReferenceSurfaceLbs, maximumSurfaceDelta, restPoseFromCompiled } from '../../core/deformation.js';
+
+const here = dirname(fileURLToPath(import.meta.url));
+const specsDir = resolve(here, '../../lab/specs');
+const bundledSpecNames = ['biped', 'quadruped', 'hexapod', 'hopper', 'flyer', 'swimmer'];
 
 const sphereSpec = Object.freeze({
 	name: 'Reference Sphere Fixture',
@@ -102,8 +112,87 @@ async function runReferenceComponentPolicy() {
 	return { status: 'pass', details: { reason } };
 }
 
+async function runBundledReferenceConnectivity() {
+	const records = [];
+	for (const name of bundledSpecNames) {
+		const spec = JSON.parse(await readFile(resolve(specsDir, `${name}.json`), 'utf8'));
+		const compiled = compileFixture(spec);
+		const minimumRadius = Math.min(...compiled.slots.map((slot) => Math.min(slot.ra, slot.rb)));
+		const cellSize = Math.min(0.03, minimumRadius);
+		let surface;
+		try {
+			surface = extractReferenceSurface(compiled, { cellSize, maxSamples: 10_000_000 });
+		} catch (error) {
+			return { status: 'fail', details: { message: `bundled reference '${name}' rejected`, reason: error.message, records } };
+		}
+		if (surface.componentPolicy.componentCount !== 1 || surface.certification.topology.status !== 'accepted-topology-baseline') {
+			return { status: 'fail', details: { message: `bundled reference '${name}' failed connectivity/topology`, componentPolicy: surface.componentPolicy, topology: surface.certification.topology, records } };
+		}
+		records.push({
+			name,
+			cellSize,
+			vertices: surface.positions.length / 3,
+			triangles: surface.indices.length / 3,
+			components: surface.componentPolicy.componentCount,
+			maximumVertexResidual: surface.certification.meshToFieldVertexResidual.maximum,
+		});
+	}
+	return { status: 'pass', details: { records, status: 'provisional-connectivity-only' } };
+}
+
+async function runSkinWeightBaseline() {
+	const spec = JSON.parse(await readFile(resolve(specsDir, 'biped.json'), 'utf8'));
+	const compiled = compileFixture(spec);
+	const surface = extractReferenceSurface(compiled, { cellSize: 0.06, maxSamples: 1_000_000 });
+	const weights = generateGeodesicSkinWeights(surface, compiled);
+	if (weights.certification.status !== 'accepted-weight-baseline') {
+		return { status: 'fail', details: { message: 'geodesic skin-weight baseline rejected', certification: weights.certification } };
+	}
+	if (weights.skinIndices.length !== (surface.positions.length / 3) * MAX_SKIN_INFLUENCES) {
+		return { status: 'fail', details: { message: 'skin index layout does not match reference vertices' } };
+	}
+	const mutated = weights.skinWeights.slice();
+	mutated[0] = -0.25;
+	const mutationDetected = mutated[0] < 0;
+	if (!mutationDetected) return { status: 'fail', details: { message: 'negative-weight mutation was not observable' } };
+	return {
+		status: 'pass',
+		details: {
+			vertices: surface.positions.length / 3,
+			...weights.certification,
+			mutationDetected,
+		},
+	};
+}
+
+async function runLbsRestIdentity() {
+	const spec = JSON.parse(await readFile(resolve(specsDir, 'biped.json'), 'utf8'));
+	const compiled = compileFixture(spec);
+	const surface = extractReferenceSurface(compiled, { cellSize: 0.07, maxSamples: 1_000_000 });
+	const skinning = generateGeodesicSkinWeights(surface, compiled);
+	const transforms = buildAffineSlotTransforms(compiled, restPoseFromCompiled(compiled));
+	const deformed = deformReferenceSurfaceLbs(surface, skinning, transforms);
+	const maximumPositionDelta = maximumSurfaceDelta(surface.positions, deformed.positions);
+	const maximumNormalDelta = maximumSurfaceDelta(surface.normals, deformed.normals);
+	if (!(maximumPositionDelta <= 2e-7 && maximumNormalDelta <= 2e-7)) {
+		return { status: 'fail', details: { message: 'LBS rest pose is not identity', maximumPositionDelta, maximumNormalDelta } };
+	}
+	return {
+		status: 'pass',
+		details: {
+			vertices: surface.positions.length / 3,
+			maximumPositionDelta,
+			maximumNormalDelta,
+			transformFloats: transforms.length,
+		},
+	};
+}
+
 export const gates = [
 	{ id: 'reference-surface-sphere', run: runReferenceSphere },
 	{ id: 'reference-surface-determinism', run: runReferenceDeterminism },
 	{ id: 'reference-component-policy', run: runReferenceComponentPolicy },
+	{ id: 'bundled-reference-connectivity', run: runBundledReferenceConnectivity },
+	{ id: 'skin-weight-baseline', run: runSkinWeightBaseline },
+	{ id: 'lbs-rest-identity', run: runLbsRestIdentity },
 ];

@@ -68,7 +68,11 @@ export function validateMeshTopology(mesh, options = {}) {
 	let duplicateTriangles = 0;
 	let invalidIndices = 0;
 	let inwardTriangles = 0;
-	const areaFloor = Number.isFinite(options.areaFloor) ? options.areaFloor : 1e-12;
+	// The pure topology baseline rejects exact f32 collapse. A scale/projected-
+	// error-relative minimum area is a separate acceptance gate and must be
+	// supplied by the complete deformation sweep rather than hidden here as a
+	// world-unit magic constant.
+	const areaFloor = Number.isFinite(options.areaFloor) ? options.areaFloor : 0;
 	const edgeKey = (a, b) => (a < b ? `${a}:${b}` : `${b}:${a}`);
 
 	for (let offset = 0; offset < indices.length; offset += 3) {

@@ -30,7 +30,7 @@
       "id": "tail",
       "shape": "rope",
       "parent": "body",
-      "offset": [0, 0.18, -0.44],
+      "offset": [0, 0.18, -0.20],
       "segments": 6,
       "length": 0.92,
       "r": 0.055,

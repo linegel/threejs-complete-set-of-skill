@@ -325,11 +325,22 @@ export function compileSpec(inputSpec, options = {}) {
 	const spec = validateSpec(inputSpec, { maxParts: options.maxParts });
 	const origins = resolveOrigins(spec.parts, spec.scale);
 	const parts = canonicalParts(spec.parts, origins);
+	const semanticPartIndexById = new Map(parts.map((part, index) => [part.id, index]));
+	const semanticParts = parts.map((part, index) => ({
+		index,
+		id: part.id,
+		parentIndex: part.parent ? semanticPartIndexById.get(part.parent) : null,
+	}));
 	const slots = [];
 	const partSlotIndices = new Map();
 	for (const part of parts) {
 		const first = slots.length;
-		slots.push(...compilePart(part, origins.get(part.id), spec.scale));
+		const records = compilePart(part, origins.get(part.id), spec.scale);
+		for (const record of records) {
+			record.semanticPartIndex = semanticPartIndexById.get(part.id);
+			record.semanticParentPartIndex = part.parent ? semanticPartIndexById.get(part.parent) : null;
+		}
+		slots.push(...records);
 		partSlotIndices.set(part.id, Array.from({ length: slots.length - first }, (_, index) => first + index));
 	}
 	if (options.maxParts !== undefined && slots.length > options.maxParts) {
@@ -367,7 +378,14 @@ export function compileSpec(inputSpec, options = {}) {
 	})));
 	const blendSource = blendDag.canonicalSource;
 	const compilerSignature = digest128({ schema: SCHEMA_VERSION, compiler: COMPILER_VERSION, shader: SHADER_CONTRACT_VERSION });
-	const topologySignature = digest128({ tier, slotClasses, blendSource, candidateK, candidateCertificateDigest });
+	const topologySignature = digest128({
+		tier,
+		slotClasses,
+		blendSource,
+		candidateK,
+		candidateCertificateDigest,
+		semanticStructure: semanticParts.map((part) => ({ index: part.index, parentIndex: part.parentIndex })),
+	});
 	const geometryDigest = digest128(geometrySource);
 	const shaderContractDigest = digest128({ shader: SHADER_CONTRACT_VERSION, maxParts: options.maxParts ?? slots.length, candidateK });
 	const digest = digest128({ compilerSignature, topologySignature, geometryDigest, shaderContractDigest });
@@ -386,6 +404,7 @@ export function compileSpec(inputSpec, options = {}) {
 		candidateSets,
 		candidateCertificates,
 		candidateCertificateDigest,
+		semanticParts,
 		adjacency,
 		bodyLift: computeBodyLift(spec),
 		maxRadius,
