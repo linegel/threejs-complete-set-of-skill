@@ -17,6 +17,12 @@ import {
   alignedBytesPerRow,
   requiredPaddedByteLength,
 } from "../../../labs/runtime/aligned-readback.mjs";
+import {
+  acquireCorpusGpuDeviceBinding,
+  assertCorpusGpuDeviceBindingLeaseMatchesRenderer,
+  describeCorpusGpuDeviceBinding,
+  releaseCorpusGpuDeviceBindingLease,
+} from "./gpu-device-binding.js";
 
 export {
   createObjectSculptorCorpusFrameDriver,
@@ -1062,6 +1068,7 @@ export async function createObjectSculptorCorpusController({
   timestampQueriesRequired = false,
   performanceTimestampMode = "auto",
   cameraInteractionEnabled = true,
+  gpuDeviceBinding = null,
   dependencies: dependencyOverrides,
 } = {}) {
   if (subjectId !== undefined && scenario !== undefined && subjectId !== scenario) {
@@ -1098,13 +1105,30 @@ export async function createObjectSculptorCorpusController({
     throw new Error("timestampQueriesRequired conflicts with disabled-for-cadence timestamp mode");
   }
 
+  const retainedGpuDeviceBinding = gpuDeviceBinding === null
+    ? null
+    : gpuDeviceBinding;
+  const retainedGpuDeviceBindingEvidence = retainedGpuDeviceBinding === null
+    ? null
+    : describeCorpusGpuDeviceBinding(retainedGpuDeviceBinding);
+
   const dependencies = resolveDependencies(dependencyOverrides);
   const initialDefinition = dependencies.getTargetDefinition(initialSubjectId);
   if (initialDefinition?.id !== initialSubjectId) {
     throw new Error(`Target definition for "${initialSubjectId}" has a mismatched ID`);
   }
   const preInitCapabilities = normalizePreInitCapabilities(
-    await dependencies.resolvePreInitCapabilities({ runtimeProfile, timestampQueriesRequired }),
+    retainedGpuDeviceBindingEvidence
+      ? {
+          source: "retained-gpu-adapter-device-binding",
+          adapterAvailable: true,
+          timestampQuerySupported: retainedGpuDeviceBindingEvidence.device.features
+            .includes("timestamp-query"),
+        }
+      : await dependencies.resolvePreInitCapabilities({
+          runtimeProfile,
+          timestampQueriesRequired,
+        }),
     runtimeProfile,
   );
   if (timestampQueriesRequired && preInitCapabilities.timestampQuerySupported !== true) {
@@ -1216,6 +1240,9 @@ export async function createObjectSculptorCorpusController({
   let lifecycleAcceptanceStatus = "provisional-no-uncertain-teardown";
   let rendererMonitoringInstalledBeforeInit = false;
   let rendererBackendEvidence = null;
+  let verifiedGpuDeviceBindingEvidence = null;
+  let immutablePerformanceAdapterIdentity = null;
+  let gpuDeviceBindingLease = null;
   let initializedRendererDevice = null;
   let rendererDeviceGeneration = 0;
   let deviceLossGeneration = 0;
@@ -1533,6 +1560,7 @@ export async function createObjectSculptorCorpusController({
   }
 
   function performanceEvidence() {
+    const adapterIdentity = performanceAdapterIdentity();
     return deepFreezePlain({
       schemaVersion: "object-sculptor-performance-evidence-v1",
       runtimeProfile,
@@ -1543,6 +1571,8 @@ export async function createObjectSculptorCorpusController({
       timestampQueriesRequested: timestampTrackingRequested,
       timestampQueriesActive: timestampTrackingActive,
       timingMethod,
+      performanceAdapterIdentityStatus: adapterIdentity.status,
+      performanceAdapterIdentity: adapterIdentity.identity,
       status: timestampEvidenceStatus(),
       rendererDeviceGeneration,
       deviceLossGeneration,
@@ -1573,6 +1603,68 @@ export async function createObjectSculptorCorpusController({
       cpuRenderSubmissions: cpuRenderSubmissionSamples.map((sample) => ({ ...sample })),
       sustainedAcceptance: "not-evaluated-controller-exposes-raw-samples-only",
     });
+  }
+
+  function performanceAdapterIdentity() {
+    if (immutablePerformanceAdapterIdentity) return immutablePerformanceAdapterIdentity;
+    if (runtimeProfile !== "performance") {
+      immutablePerformanceAdapterIdentity = deepFreezePlain({
+        status: "not-claimed-correctness-profile",
+        identity: null,
+      });
+      return immutablePerformanceAdapterIdentity;
+    }
+    if (!verifiedGpuDeviceBindingEvidence) {
+      immutablePerformanceAdapterIdentity = deepFreezePlain({
+        status: "insufficient-no-retained-adapter-device-binding",
+        identity: null,
+      });
+      return immutablePerformanceAdapterIdentity;
+    }
+    if (
+      verifiedGpuDeviceBindingEvidence.adapterRequest.authority
+      !== "navigator.gpu-current-realm"
+    ) {
+      immutablePerformanceAdapterIdentity = deepFreezePlain({
+        status: "insufficient-untrusted-adapter-request-source",
+        identity: null,
+      });
+      return immutablePerformanceAdapterIdentity;
+    }
+    const adapter = verifiedGpuDeviceBindingEvidence.adapter;
+    if (!new Set(["hardware", "software"]).has(adapter.adapterClass)) {
+      immutablePerformanceAdapterIdentity = deepFreezePlain({
+        status: "insufficient-adapter-class-unresolved",
+        identity: null,
+      });
+      return immutablePerformanceAdapterIdentity;
+    }
+    if (typeof adapter.name !== "string" || adapter.name.length === 0) {
+      immutablePerformanceAdapterIdentity = deepFreezePlain({
+        status: "insufficient-adapter-name-unavailable",
+        identity: null,
+      });
+      return immutablePerformanceAdapterIdentity;
+    }
+    immutablePerformanceAdapterIdentity = deepFreezePlain({
+      status: "verified-exact-renderer-device-binding",
+      identity: {
+        adapterClass: adapter.adapterClass,
+        name: adapter.name,
+        identitySource: adapter.identitySource,
+        details: {
+          nameSource: adapter.nameSource,
+          isFallbackAdapter: adapter.isFallbackAdapter,
+          info: adapter.info,
+          adapterFeatures: adapter.features,
+          adapterLimits: adapter.limits,
+          deviceFeatures: verifiedGpuDeviceBindingEvidence.device.features,
+          deviceLimits: verifiedGpuDeviceBindingEvidence.device.limits,
+          rendererBindingStatus: verifiedGpuDeviceBindingEvidence.rendererBindingStatus,
+        },
+      },
+    });
+    return immutablePerformanceAdapterIdentity;
   }
 
   function recordDeviceEvent(kind, info = {}) {
@@ -1618,7 +1710,7 @@ export async function createObjectSculptorCorpusController({
       try {
         previousDeviceLost?.call(renderer, info);
       } finally {
-        recordDeviceEvent("device-lost", info);
+        if (!retainedGpuDeviceBinding) recordDeviceEvent("device-lost", info);
       }
     };
     renderer.onError = function onCorpusRendererError(info) {
@@ -1643,6 +1735,16 @@ export async function createObjectSculptorCorpusController({
     if (!device.lost || typeof device.lost.then !== "function") {
       throw new Error("Initialized WebGPU renderer device does not expose the required loss monitor promise");
     }
+    if (gpuDeviceBindingLease) {
+      const bindingEvidence = assertCorpusGpuDeviceBindingLeaseMatchesRenderer(
+        gpuDeviceBindingLease,
+        device,
+      );
+      verifiedGpuDeviceBindingEvidence = deepFreezePlain({
+        ...bindingEvidence,
+        rendererBindingStatus: "verified-exact-renderer-backend-device",
+      });
+    }
     rendererDeviceGeneration = 1;
     initializedRendererDevice = device;
     if (rendererDeviceStatus !== "lost") rendererDeviceStatus = "active";
@@ -1654,14 +1756,21 @@ export async function createObjectSculptorCorpusController({
       deviceType: device.constructor?.name ?? "unknown",
       deviceLabel: typeof device.label === "string" ? device.label : "",
       rendererDeviceGeneration,
-      deviceIdentitySource: "renderer.backend.device-after-init",
+      deviceIdentitySource: verifiedGpuDeviceBindingEvidence
+        ? "retained-GPUAdapter-requestDevice-bound-to-renderer.backend.device"
+        : "renderer.backend.device-after-init",
       deviceIdentityVerified: renderer.backend?.device === device,
+      retainedAdapterDeviceBinding: verifiedGpuDeviceBindingEvidence,
+      adapterDeviceIdentityVerified: verifiedGpuDeviceBindingEvidence !== null,
+      directRetainedDeviceLossObserverInstalled: gpuDeviceBindingLease !== null,
       monitoringInstalledBeforeRendererInit: rendererMonitoringInstalledBeforeInit,
       lossPromiseObservedOnActualDevice: true,
       timestampQueryFeatureOnActualDevice: actualTimestampFeature,
       backendTimestampTrackingActive: backend.trackTimestamp === true,
       timestampRequestMatchedActualBackend: timestampTrackingRequested === timestampTrackingActive,
-      preflightDeviceIdentityClaim: "none-preflight-adapter-is-not-renderer-device-evidence",
+      preflightDeviceIdentityClaim: verifiedGpuDeviceBindingEvidence
+        ? "retained-adapter-request-produced-the-exact-renderer-device"
+        : "none-preflight-adapter-is-not-renderer-device-evidence",
     });
     if (rendererDeviceStatus === "lost") {
       throw new Error("WebGPU device was lost during renderer initialization");
@@ -2628,11 +2737,28 @@ export async function createObjectSculptorCorpusController({
   }
 
   try {
-    renderer = dependencies.createRenderer({
+    const rendererOptions = {
       canvas,
       antialias: antialiasRequested,
       trackTimestamp: timestampTrackingRequested,
-    });
+    };
+    if (retainedGpuDeviceBinding) {
+      gpuDeviceBindingLease = acquireCorpusGpuDeviceBinding(
+        retainedGpuDeviceBinding,
+        {
+          owner: "webgpu-object-sculptor-corpus-controller",
+          onDeviceLost(info) {
+            recordDeviceEvent("device-lost", {
+              api: "WebGPU",
+              reason: info.reason,
+              message: info.message,
+            });
+          },
+        },
+      );
+      rendererOptions.device = gpuDeviceBindingLease.device;
+    }
+    renderer = dependencies.createRenderer(rendererOptions);
     if (!renderer || typeof renderer.init !== "function" || typeof renderer.render !== "function") {
       throw new TypeError("renderer dependency must provide init() and render()");
     }
@@ -2729,6 +2855,20 @@ export async function createObjectSculptorCorpusController({
         operation,
       );
       if (result.error) cleanupErrors.push(result.error);
+    }
+    if (gpuDeviceBindingLease) {
+      try {
+        releaseCorpusGpuDeviceBindingLease(gpuDeviceBindingLease, {
+          reusable: cleanupErrors.length === 0,
+          reason: cleanupErrors.length > 0
+            ? `initialization cleanup was uncertain: ${cleanupErrors.map(errorMessage).join("; ")}`
+            : undefined,
+        });
+      } catch (releaseError) {
+        cleanupErrors.push(releaseError);
+      } finally {
+        gpuDeviceBindingLease = null;
+      }
     }
     if (cleanupErrors.length > 0) {
       throw new AggregateError(
@@ -3594,6 +3734,7 @@ export async function createObjectSculptorCorpusController({
     },
     getMetrics() {
       const physicsHandoffCount = activeTarget.runtime.colliders?.size ?? summary.colliders ?? 0;
+      const adapterIdentity = performanceAdapterIdentity();
       return {
         ...summary,
         labId: "webgpu-object-sculptor-corpus",
@@ -3654,6 +3795,11 @@ export async function createObjectSculptorCorpusController({
         timestampQueriesRequested: timestampTrackingRequested,
         timestampQueriesActive: timestampTrackingActive,
         rendererBackendEvidence,
+        gpuDeviceBindingLifecycle: retainedGpuDeviceBinding
+          ? describeCorpusGpuDeviceBinding(retainedGpuDeviceBinding).lifecycle
+          : null,
+        performanceAdapterIdentityStatus: adapterIdentity.status,
+        performanceAdapterIdentity: adapterIdentity.identity,
         timingMethod,
         gpuTimestampResolveAttempts,
         gpuTimestampResolveFailures,
@@ -3712,6 +3858,7 @@ export async function createObjectSculptorCorpusController({
       };
     },
     describePipeline() {
+      const adapterIdentity = performanceAdapterIdentity();
       return {
         owner: "WebGPURenderer",
         sceneRendersPerFrame: CORPUS_RENDER_POLICY.sceneRendersPerFrame,
@@ -3731,6 +3878,8 @@ export async function createObjectSculptorCorpusController({
           initializedBackend: rendererBackendEvidence,
         },
         timingMethod,
+        performanceAdapterIdentityStatus: adapterIdentity.status,
+        performanceAdapterIdentity: adapterIdentity.identity,
         timingEvidenceStatus: timestampEvidenceStatus(),
         gpuTimestampSampleCount,
         gpuTimestampSamplesRetained: gpuTimestampSamples.length,
@@ -3743,6 +3892,7 @@ export async function createObjectSculptorCorpusController({
       };
     },
     describeResources() {
+      const adapterIdentity = performanceAdapterIdentity();
       const targetRenderResources = describeTargetRenderResources(activeTarget);
       const floorRenderResources = describeTargetRenderResources({
         runtime: { subjectId: "controller-floor", meshes: new Map([["floor", floor]]) },
@@ -4077,6 +4227,8 @@ export async function createObjectSculptorCorpusController({
           timestampQueriesActive: timestampTrackingActive,
           preInitCapabilities,
           initializedBackend: rendererBackendEvidence,
+          performanceAdapterIdentityStatus: adapterIdentity.status,
+          performanceAdapterIdentity: adapterIdentity.identity,
           timingMethod,
         },
         device: {
@@ -4092,6 +4244,9 @@ export async function createObjectSculptorCorpusController({
             dropped: deviceErrorsDropped,
           },
           lastDeviceError,
+          gpuDeviceBindingLifecycle: retainedGpuDeviceBinding
+            ? describeCorpusGpuDeviceBinding(retainedGpuDeviceBinding).lifecycle
+            : null,
         },
         motionWitness,
         performanceEvidence: performanceEvidence(),
@@ -4143,6 +4298,20 @@ export async function createObjectSculptorCorpusController({
         }
         if (errors.length === 0 && teardownReport().uncertain > 0) {
           errors.push(new Error("Controller teardown includes a resource with uncertain prior disposal"));
+        }
+        if (gpuDeviceBindingLease) {
+          try {
+            releaseCorpusGpuDeviceBindingLease(gpuDeviceBindingLease, {
+              reusable: errors.length === 0,
+              reason: errors.length > 0
+                ? `controller teardown was uncertain: ${errors.map(errorMessage).join("; ")}`
+                : undefined,
+            });
+          } catch (error) {
+            errors.push(error);
+          } finally {
+            gpuDeviceBindingLease = null;
+          }
         }
         if (errors.length > 0) {
           const aggregate = new AggregateError(
