@@ -369,13 +369,16 @@ async function runHardwarePerformance() {
 	session.adapter = { adapterClass: target.metrics.adapterClass, identity: target.metrics.adapterIdentity?.info ?? {} };
 	const governor = await collectRoute( HARDWARE_PERFORMANCE_ROUTE_PLAN[ 1 ], async ( controller ) => {
 
-		const trace = await controller.runGovernorStressProfile( { windowCount: 6, framesPerWindow: 30 } );
+		const trace = await controller.runGovernorStressProfile( {
+			windowCount: HARDWARE_PERFORMANCE_CONTRACT.governorWindowCount.value,
+			framesPerWindow: HARDWARE_PERFORMANCE_CONTRACT.governorFramesPerWindow.value
+		} );
 		await controller.setTier( 'governor-stress' );
 		let settledResidence = 0;
-		for ( let index = trace.windows.length - 1; index >= 0 && trace.windows[ index ].tier === trace.settledState; index -- ) settledResidence ++;
+		for ( let index = trace.windows.length - 1; index >= 0 && trace.windows[ index ].measuredTier === trace.settledState; index -- ) settledResidence ++;
 		return {
-			verdict: trace.oscillationDetected === false && settledResidence >= 2 ? 'PASS' : 'FAIL',
-			settled: settledResidence >= 2,
+			verdict: trace.oscillationDetected === false && settledResidence >= HARDWARE_PERFORMANCE_CONTRACT.governorMinimumResidence.value && trace.transitions.length >= HARDWARE_PERFORMANCE_CONTRACT.minimumGovernorTransitions.value ? 'PASS' : 'FAIL',
+			settled: settledResidence >= HARDWARE_PERFORMANCE_CONTRACT.governorMinimumResidence.value,
 			settledState: trace.settledState,
 			settledResidenceWindows: numericDatum( settledResidence, 'window', 'Measured', 'final consecutive governor trace windows' ),
 			oscillationDetected: trace.oscillationDetected,

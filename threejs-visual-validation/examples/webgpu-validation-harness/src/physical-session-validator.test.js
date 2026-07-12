@@ -220,6 +220,82 @@ function sustainedWindow() {
 
 }
 
+function governorWindow( window, measuredTier, tier, gpuP95, decision, residence, cooldown ) {
+
+	const timestampRows = Array.from( { length: 30 }, ( _, frameId ) => ( {
+		frameId,
+		sceneUid: `governor-scene:${ window }:${ frameId }`,
+		outputUid: `governor-output:${ window }:${ frameId }`,
+		sceneMs: gpuP95 - 0.5,
+		outputMs: 0.5,
+		totalMs: gpuP95,
+		residualMs: null,
+		totalProvenance: 'Derived',
+		independentPerFrameTotalAvailable: false
+	} ) );
+	return {
+		window,
+		measuredTier,
+		tier,
+		gpuSamples: timestampRows.map( ( row ) => row.totalMs ),
+		gpuP95,
+		timestampRows,
+		lastFrameResolveResidualMs: 0,
+		decision,
+		residence,
+		cooldown
+	};
+
+}
+
+function governorTrace() {
+
+	return {
+		adapterClass: 'hardware',
+		windowCount: 6,
+		framesPerWindow: 30,
+		targetMs: 1000 / 60 - 2,
+		hysteresisMs: 2,
+		minimumResidenceWindows: 2,
+		cooldownWindows: 2,
+		states: [ 'target-performance', 'governor-stress' ],
+		windows: [
+			governorWindow( 0, 'target-performance', 'target-performance', 16, 'hold', 1, 0 ),
+			governorWindow( 1, 'target-performance', 'governor-stress', 16, 'degrade', 0, 2 ),
+			governorWindow( 2, 'governor-stress', 'governor-stress', 13, 'hold', 1, 1 ),
+			governorWindow( 3, 'governor-stress', 'governor-stress', 13, 'hold', 2, 0 ),
+			governorWindow( 4, 'governor-stress', 'governor-stress', 13, 'hold', 3, 0 ),
+			governorWindow( 5, 'governor-stress', 'governor-stress', 13, 'hold', 4, 0 )
+		],
+		transitions: [ {
+			window: 1,
+			from: 'target-performance',
+			to: 'governor-stress',
+			cause: 'gpu-p95-over-budget',
+			gpuP95: 16,
+			rebuildCpuSubmissionMs: 0.2,
+			rebuildGpuMs: 1.5,
+			rebuildTimestampRow: {
+				frameId: 0,
+				sceneUid: 'governor-transition-scene:1',
+				outputUid: 'governor-transition-output:1',
+				sceneMs: 1,
+				outputMs: 0.5,
+				totalMs: 1.5,
+				residualMs: null,
+				totalProvenance: 'Derived',
+				independentPerFrameTotalAvailable: false
+			},
+			lastFrameResolveResidualMs: 0,
+			fromResourceBytes: 100,
+			toResourceBytes: 60
+		} ],
+		settledState: 'governor-stress',
+		oscillationDetected: false
+	};
+
+}
+
 function performanceSession() {
 
 	return {
@@ -234,7 +310,8 @@ function performanceSession() {
 			oscillationDetected: false,
 			settled: true,
 			settledState: 'governor-stress',
-			settledResidenceWindows: numericDatum( 2, 'window', 'Measured', 'governor trace' )
+			settledResidenceWindows: numericDatum( 4, 'window', 'Measured', 'governor trace' ),
+			trace: governorTrace()
 		}
 	};
 
@@ -391,7 +468,9 @@ test( 'hardware performance session passes long-window and timestamp gates', () 
 		cpuP50Ms: 1.2,
 		cpuP95Ms: 1.2,
 		gpuP50Ms: 1.5,
-		gpuP95Ms: 1.5
+		gpuP95Ms: 1.5,
+		governorTransitionCount: 1,
+		governorSettledResidenceWindows: 4
 	} );
 
 } );
@@ -454,7 +533,15 @@ test( 'hardware performance mutations reject short, discontinuous, or fabricated
 
 		}, /GPU p95/ ],
 		[ 'fabricated per-frame total', ( value ) => { value.sustainedWindows[ 0 ].gpuTimestampBatches[ 0 ].timestampRows[ 0 ].independentPerFrameTotalAvailable = true; }, /fabricates/ ],
-		[ 'unsettled governor', ( value ) => { value.governor.settled = false; }, /did not settle/ ]
+		[ 'missing governor transition', ( value ) => { value.governor.trace.transitions = []; }, /did not exercise/ ],
+		[ 'forged governor p95', ( value ) => { value.governor.trace.windows[ 0 ].gpuP95 = 15; }, /does not reconcile/ ],
+		[ 'forged governor timestamp row', ( value ) => { value.governor.trace.windows[ 0 ].timestampRows[ 0 ].sceneMs += 1; }, /not derived/ ],
+		[ 'forged governor decision', ( value ) => { value.governor.trace.windows[ 1 ].decision = 'hold'; }, /decision does not follow/ ],
+		[ 'forged governor cooldown', ( value ) => { value.governor.trace.windows[ 2 ].cooldown = 0; }, /committed state counters/ ],
+		[ 'forged governor resource direction', ( value ) => { value.governor.trace.transitions[ 0 ].toResourceBytes = 120; }, /resource direction/ ],
+		[ 'forged governor oscillation', ( value ) => { value.governor.trace.oscillationDetected = true; }, /oscillation verdict/ ],
+		[ 'forged governor settled residence', ( value ) => { value.governor.settledResidenceWindows.value = 5; }, /does not reconcile/ ],
+		[ 'unsettled governor', ( value ) => { value.governor.settled = false; }, /summary does not match/ ]
 	];
 	for ( const [ name, mutate, pattern ] of mutations ) {
 

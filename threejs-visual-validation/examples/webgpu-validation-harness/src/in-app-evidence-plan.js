@@ -38,6 +38,13 @@ export const HARDWARE_PERFORMANCE_CONTRACT = Object.freeze( {
 	presentationP95Maximum: numericDatum( 20, 'ms', 'Gated', 'foreground 60 Hz cadence jitter gate' ),
 	deadlineThreshold: numericDatum( 25.005, 'ms', 'Gated', '1.5 times the 16.67 ms frame target' ),
 	maximumDeadlineMissRatio: numericDatum( 0.01, 'ratio', 'Gated', 'sustained foreground presentation gate' ),
+	governorWindowCount: numericDatum( 6, 'window', 'Gated', 'fixed hardware governor stress trace' ),
+	governorFramesPerWindow: numericDatum( 30, 'frame', 'Gated', 'fixed hardware governor percentile population' ),
+	governorTarget: numericDatum( 1000 / 60 - 2, 'ms', 'Gated', '60 Hz frame period minus 2 ms host and presentation reserve' ),
+	governorHysteresis: numericDatum( 2, 'ms', 'Gated', 'upgrade margin below the governor target' ),
+	governorMinimumResidence: numericDatum( 2, 'window', 'Gated', 'minimum residence before a tier transition' ),
+	governorCooldown: numericDatum( 2, 'window', 'Gated', 'post-transition cooldown' ),
+	minimumGovernorTransitions: numericDatum( 1, 'transition', 'Gated', 'governor stress must exercise a real tier change' ),
 	viewport: Object.freeze( {
 		width: numericDatum( 1920, 'pixel', 'Gated', 'hardware performance capture contract' ),
 		height: numericDatum( 1080, 'pixel', 'Gated', 'hardware performance capture contract' ),

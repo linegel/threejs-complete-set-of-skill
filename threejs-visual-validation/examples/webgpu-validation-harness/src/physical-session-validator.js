@@ -441,6 +441,116 @@ function assertPerformanceWindow( window, index, refreshPeriodMs ) {
 
 }
 
+function assertGovernorTimestampRow( row, sample, label ) {
+
+	requireObject( row, label );
+	for ( const key of [ 'sceneMs', 'outputMs', 'totalMs' ] ) requireFinite( row[ key ], `${ label }.${ key }`, 0 );
+	if ( Math.abs( row.sceneMs + row.outputMs - row.totalMs ) > 1e-9 ) fail( `${ label } total is not derived from its explicit stages.` );
+	if ( Math.abs( sample - row.totalMs ) > 1e-9 ) fail( `${ label } total does not match the bound GPU sample.` );
+	if ( row.totalProvenance !== 'Derived' || row.independentPerFrameTotalAvailable !== false || row.residualMs !== null ) fail( `${ label } fabricates an independent per-frame aggregate.` );
+
+}
+
+function assertGovernorTrace( governor ) {
+
+	const trace = requireObject( governor.trace, 'governor.trace' );
+	if ( trace.adapterClass !== 'hardware' ) fail( 'Quality governor trace requires a hardware adapter.' );
+	if ( trace.windowCount !== HARDWARE_PERFORMANCE_CONTRACT.governorWindowCount.value || Number.isInteger( trace.windowCount ) === false ) fail( 'Quality governor window count differs from the fixed stress contract.' );
+	if ( trace.framesPerWindow !== HARDWARE_PERFORMANCE_CONTRACT.governorFramesPerWindow.value || Number.isInteger( trace.framesPerWindow ) === false ) fail( 'Quality governor frame population differs from the fixed stress contract.' );
+	if ( Math.abs( trace.targetMs - HARDWARE_PERFORMANCE_CONTRACT.governorTarget.value ) > 1e-9 ) fail( 'Quality governor target differs from the fixed stress contract.' );
+	if ( Math.abs( trace.hysteresisMs - HARDWARE_PERFORMANCE_CONTRACT.governorHysteresis.value ) > 1e-9 ) fail( 'Quality governor hysteresis differs from the fixed stress contract.' );
+	if ( trace.minimumResidenceWindows !== HARDWARE_PERFORMANCE_CONTRACT.governorMinimumResidence.value ) fail( 'Quality governor minimum residence differs from the fixed stress contract.' );
+	if ( trace.cooldownWindows !== HARDWARE_PERFORMANCE_CONTRACT.governorCooldown.value ) fail( 'Quality governor cooldown differs from the fixed stress contract.' );
+	const states = requireArray( trace.states, 'governor.trace.states' );
+	if ( stableStringify( states ) !== stableStringify( [ 'target-performance', 'governor-stress' ] ) ) fail( 'Quality governor states differ from the fixed tier order.' );
+	const windows = requireArray( trace.windows, 'governor.trace.windows' );
+	if ( windows.length !== trace.windowCount ) fail( 'Quality governor window population does not match windowCount.' );
+	const transitions = requireArray( trace.transitions, 'governor.trace.transitions' );
+	if ( transitions.length < HARDWARE_PERFORMANCE_CONTRACT.minimumGovernorTransitions.value ) fail( 'Quality governor did not exercise a real tier transition.' );
+
+	let stateIndex = 0;
+	let residence = 0;
+	let cooldown = 0;
+	let transitionIndex = 0;
+	for ( const [ index, window ] of windows.entries() ) {
+
+		const label = `governor.trace.windows[${ index }]`;
+		requireObject( window, label );
+		if ( window.window !== index ) fail( `${ label } sequence index drifted.` );
+		if ( window.measuredTier !== states[ stateIndex ] ) fail( `${ label } measured tier does not match the active governor state.` );
+		const gpuSamples = requireArray( window.gpuSamples, `${ label }.gpuSamples` );
+		if ( gpuSamples.length !== trace.framesPerWindow || gpuSamples.some( ( sample ) => Number.isFinite( sample ) === false || sample < 0 ) ) fail( `${ label } does not contain the fixed finite GPU population.` );
+		const gpuP95 = percentile( gpuSamples, 0.95 );
+		if ( Number.isFinite( window.gpuP95 ) === false || Math.abs( window.gpuP95 - gpuP95 ) > 1e-9 ) fail( `${ label } GPU p95 does not reconcile with its sample population.` );
+		const timestampRows = requireArray( window.timestampRows, `${ label }.timestampRows` );
+		if ( timestampRows.length !== trace.framesPerWindow ) fail( `${ label } timestamp rows do not cover the fixed GPU population.` );
+		for ( let frame = 0; frame < timestampRows.length; frame ++ ) assertGovernorTimestampRow( timestampRows[ frame ], gpuSamples[ frame ], `${ label }.timestampRows[${ frame }]` );
+		const resolveResidual = requireFinite( window.lastFrameResolveResidualMs, `${ label }.lastFrameResolveResidualMs`, 0 );
+		if ( resolveResidual > 0.001 ) fail( `${ label } final-frame timestamp resolve does not reconcile.` );
+
+		residence ++;
+		if ( cooldown > 0 ) cooldown --;
+		let decision = 'hold';
+		let nextStateIndex = stateIndex;
+		if ( cooldown === 0 && residence >= trace.minimumResidenceWindows ) {
+
+			if ( gpuP95 > trace.targetMs && stateIndex < states.length - 1 ) {
+
+				decision = 'degrade';
+				nextStateIndex ++;
+
+			} else if ( gpuP95 < trace.targetMs - trace.hysteresisMs && stateIndex > 0 ) {
+
+				decision = 'upgrade';
+				nextStateIndex --;
+
+			}
+
+		}
+		if ( window.decision !== decision ) fail( `${ label } decision does not follow target, hysteresis, residence, and cooldown.` );
+		if ( decision === 'hold' ) {
+
+			if ( transitions[ transitionIndex ]?.window === index ) fail( `${ label } records an unexpected transition.` );
+
+		} else {
+
+			const transition = requireObject( transitions[ transitionIndex ], `governor.trace.transitions[${ transitionIndex }]` );
+			const from = states[ stateIndex ];
+			const to = states[ nextStateIndex ];
+			const expectedCause = decision === 'degrade' ? 'gpu-p95-over-budget' : 'gpu-p95-below-hysteresis';
+			if ( transition.window !== index || transition.from !== from || transition.to !== to || transition.cause !== expectedCause ) fail( `${ label } transition lineage does not match its decision.` );
+			if ( Math.abs( transition.gpuP95 - gpuP95 ) > 1e-9 ) fail( `${ label } transition p95 does not match its triggering population.` );
+			requireFinite( transition.rebuildCpuSubmissionMs, `${ label } transition rebuildCpuSubmissionMs`, 0 );
+			const rebuildGpuMs = requireFinite( transition.rebuildGpuMs, `${ label } transition rebuildGpuMs`, 0 );
+			assertGovernorTimestampRow( transition.rebuildTimestampRow, rebuildGpuMs, `${ label } transition rebuildTimestampRow` );
+			if ( requireFinite( transition.lastFrameResolveResidualMs, `${ label } transition lastFrameResolveResidualMs`, 0 ) > 0.001 ) fail( `${ label } transition rebuild timestamp does not reconcile.` );
+			const fromResourceBytes = requireFinite( transition.fromResourceBytes, `${ label } transition fromResourceBytes`, 0 );
+			const toResourceBytes = requireFinite( transition.toResourceBytes, `${ label } transition toResourceBytes`, 0 );
+			if ( decision === 'degrade' ? toResourceBytes >= fromResourceBytes : toResourceBytes <= fromResourceBytes ) fail( `${ label } transition resource direction contradicts the tier change.` );
+			stateIndex = nextStateIndex;
+			residence = 0;
+			cooldown = trace.cooldownWindows;
+			transitionIndex ++;
+
+		}
+		if ( window.tier !== states[ stateIndex ] || window.residence !== residence || window.cooldown !== cooldown ) fail( `${ label } committed state counters do not match the governor state machine.` );
+
+	}
+	if ( transitionIndex !== transitions.length ) fail( 'Quality governor trace contains transitions not produced by its state machine.' );
+	const directions = transitions.map( ( transition ) => states.indexOf( transition.to ) - states.indexOf( transition.from ) );
+	const oscillationDetected = directions.some( ( direction, index ) => index > 0 && direction !== directions[ index - 1 ] );
+	if ( trace.oscillationDetected !== oscillationDetected ) fail( 'Quality governor oscillation verdict does not reconcile with its transitions.' );
+	if ( oscillationDetected ) fail( 'Quality governor trace oscillated.' );
+	if ( trace.settledState !== states[ stateIndex ] ) fail( 'Quality governor settled state does not match the final state-machine state.' );
+	let settledResidence = 0;
+	for ( let index = windows.length - 1; index >= 0 && windows[ index ].measuredTier === trace.settledState; index -- ) settledResidence ++;
+	if ( settledResidence < HARDWARE_PERFORMANCE_CONTRACT.governorMinimumResidence.value ) fail( 'Quality governor lacks a two-window settled residence.' );
+	if ( governor.verdict !== 'PASS' || governor.settled !== true || governor.settledState !== trace.settledState || governor.oscillationDetected !== trace.oscillationDetected ) fail( 'Quality governor summary does not match its trace.' );
+	if ( numeric( governor.settledResidenceWindows, 'governor.settledResidenceWindows', 'Measured' ) !== settledResidence ) fail( 'Quality governor settled residence does not reconcile with measured-tier windows.' );
+	return { transitionCount: transitions.length, settledResidence };
+
+}
+
 export function validateHardwarePerformanceSession( session ) {
 
 	requireObject( session, 'hardware performance session' );
@@ -467,8 +577,7 @@ export function validateHardwarePerformanceSession( session ) {
 	if ( windows.length < HARDWARE_PERFORMANCE_CONTRACT.minimumSustainedWindows.value ) fail( 'Hardware performance evidence requires at least two sustained windows.' );
 	const windowSummaries = windows.map( ( window, index ) => assertPerformanceWindow( window, index, refreshP50 ) );
 	const governor = requireObject( session.governor, 'governor' );
-	if ( governor.verdict !== 'PASS' || governor.oscillationDetected !== false || governor.settled !== true || typeof governor.settledState !== 'string' ) fail( 'Quality governor did not settle cleanly.' );
-	if ( numeric( governor.settledResidenceWindows, 'governor.settledResidenceWindows', 'Measured' ) < 2 ) fail( 'Quality governor lacks a two-window settled residence.' );
+	const governorSummary = assertGovernorTrace( governor );
 	const presentationSamples = windowSummaries.flatMap( ( window ) => window.presentationSamples );
 	const cpuSamples = windowSummaries.flatMap( ( window ) => window.cpuSamples );
 	const gpuSamples = windowSummaries.flatMap( ( window ) => window.gpuSamples );
@@ -483,7 +592,9 @@ export function validateHardwarePerformanceSession( session ) {
 		cpuP50Ms: percentile( cpuSamples, 0.5 ),
 		cpuP95Ms: percentile( cpuSamples, 0.95 ),
 		gpuP50Ms: percentile( gpuSamples, 0.5 ),
-		gpuP95Ms: percentile( gpuSamples, 0.95 )
+		gpuP95Ms: percentile( gpuSamples, 0.95 ),
+		governorTransitionCount: governorSummary.transitionCount,
+		governorSettledResidenceWindows: governorSummary.settledResidence
 	};
 
 }
