@@ -12,6 +12,7 @@ import {
   assertCaptureState,
   assertFinalCaptureState,
   assertNoCaptureFailures,
+  assertRecipeCaptureMode,
   assertSymlinkConfinedPath,
   buildCaptureUrl,
   buildCaptureArtifactPayload,
@@ -459,7 +460,8 @@ test('capture artifacts retain transport bytes while PNG uses independently norm
   const topRow = [0, 0, 255, 255, 255, 255, 255, 255];
   const source = Uint8Array.from([...bottomRow, ...topRow]);
   const capture = normalizePixelCapture({
-    target: 'final',
+    target: 'final.design',
+    captureMode: 'final',
     width: 2,
     height: 2,
     bytesPerPixel: 4,
@@ -467,8 +469,8 @@ test('capture artifacts retain transport bytes while PNG uses independently norm
     outputColorSpace: 'srgb',
     origin: 'bottom-left',
     evidence: {
-      recipe: { id: 'final.design', schemaVersion: 1 },
-      effectiveState: { tier: 'webgpu-correctness' },
+      recipe: { id: 'final.design', schemaVersion: 1, target: 'final' },
+      effectiveState: { tier: 'webgpu-correctness', mode: 'final' },
       restoration: { status: 'PASS' },
     },
     data: source,
@@ -493,6 +495,8 @@ test('capture artifacts retain transport bytes while PNG uses independently norm
   assert.deepEqual([...topLeftCapture.data], [...topRow, ...bottomRow]);
 
   const payload = buildCaptureArtifactPayload(capture, 'final.design.png');
+  assert.equal(capture.captureMode, 'final');
+  assert.equal(payload.captureMode, 'final');
   assert.equal(payload.transport.layout.origin, 'bottom-left');
   assert.equal(payload.transport.layout.layout, 'compact');
   assert.equal(payload.transport.layout.rowBytes, 8);
@@ -509,6 +513,7 @@ test('capture artifacts retain transport bytes while PNG uses independently norm
   assert.deepEqual(payload.evidence, capture.evidence);
   assert.equal(Object.isFrozen(payload.evidence), true);
   const writtenMetadata = captureMetadataOnly(payload);
+  assert.equal(writtenMetadata.captureMode, 'final');
   assert.deepEqual(writtenMetadata.evidence, capture.evidence);
   assert.equal(Object.hasOwn(writtenMetadata, 'bytes'), false);
   assert.doesNotThrow(() => assertCaptureArtifactBinding(payload));
@@ -518,6 +523,52 @@ test('capture artifacts retain transport bytes while PNG uses independently norm
     normalized: payload.normalized,
   });
   assert.doesNotMatch(serialized, /"data"|"paddedData"/);
+});
+
+test('final recipe metadata validation detects post-capture mode mutation', () => {
+  const capture = normalizePixelCapture({
+    target: 'camera.near',
+    captureMode: 'final',
+    width: 1,
+    height: 1,
+    bytesPerPixel: 4,
+    format: 'rgba8unorm',
+    outputColorSpace: 'srgb',
+    data: Uint8Array.from([12, 34, 56, 255]),
+    evidence: {
+      recipe: { id: 'camera.near', target: 'final' },
+      effectiveState: { mode: 'final' },
+    },
+  });
+  const payload = buildCaptureArtifactPayload(capture, 'camera.near.png');
+  const writtenMetadata = captureMetadataOnly(payload);
+  assert.equal(assertRecipeCaptureMode(writtenMetadata, 'camera.near', ['final', 'normal']), 'final');
+
+  writtenMetadata.captureMode = 'normal';
+  assert.throws(
+    () => assertRecipeCaptureMode(writtenMetadata, 'camera.near', ['final', 'normal']),
+    /captureMode normal does not match evidence recipe target final and effective mode final/,
+  );
+
+  writtenMetadata.captureMode = 'final';
+  writtenMetadata.evidence = {
+    recipe: { id: 'camera.near', target: 'normal' },
+    effectiveState: { mode: 'normal' },
+  };
+  assert.throws(
+    () => assertRecipeCaptureMode(writtenMetadata, 'camera.near', ['final', 'normal']),
+    /captureMode final does not match evidence recipe target normal and effective mode normal/,
+  );
+
+  writtenMetadata.captureMode = 'invented';
+  writtenMetadata.evidence = {
+    recipe: { id: 'camera.near', target: 'invented' },
+    effectiveState: { mode: 'invented' },
+  };
+  assert.throws(
+    () => assertRecipeCaptureMode(writtenMetadata, 'camera.near', ['final', 'normal']),
+    /captureMode invented is not a known lab mode/,
+  );
 });
 
 test('controller-normalized bytes must exactly reconcile with independent transport normalization', () => {

@@ -6,7 +6,8 @@ export const WATER_PHYSICS_INTEGRATION_BOUNDARY = Object.freeze( {
 	canonicalPhysicsAbi: false,
 	acceptedInputs: Object.freeze( [
 		'presentation-authored-weather-state',
-		'presentation-authored-drop-event'
+		'presentation-authored-drop-event',
+		'presentation-authored-moving-boundary-object-impulse'
 	] ),
 	forbiddenClaims: Object.freeze( [
 		'PhysicsContext publication',

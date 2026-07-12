@@ -1083,6 +1083,7 @@ const boundedWaterReadme = readFileSync(join(root, 'threejs-water-optics', 'exam
 for (const token of [
   'bounded-water-render-integration-only-v1',
   'canonicalPhysicsAbi: false',
+  'presentation-authored-moving-boundary-object-impulse',
   'InteractionRecord consumption',
   'InteractionBatchLedger exact-once delivery',
   'conservation or two-way coupling'

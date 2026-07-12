@@ -229,6 +229,11 @@ assert(rejectedNonWebGpu, "Missing WebGPU must block without fallback.");
 
 assert(WATER_EXAMPLE_CLAIM_BOUNDARY.classification === "canonical-native-webgpu-lab-incomplete", "Claim boundary must match the canonical incomplete status.");
 assert(WATER_PHYSICS_INTEGRATION_BOUNDARY.canonicalPhysicsAbi === false, "Render integration shell must not claim the canonical physics ABI.");
+assert(JSON.stringify(WATER_PHYSICS_INTEGRATION_BOUNDARY.acceptedInputs) === JSON.stringify([
+  "presentation-authored-weather-state",
+  "presentation-authored-drop-event",
+  "presentation-authored-moving-boundary-object-impulse",
+]), "Render integration shell must enumerate every accepted presentation-authored input exactly.");
 assert(WATER_PHYSICS_INTEGRATION_BOUNDARY.forbiddenClaims.includes("InteractionRecord consumption")
   && WATER_PHYSICS_INTEGRATION_BOUNDARY.forbiddenClaims.includes("conservation or two-way coupling"), "Render integration shell must enumerate its forbidden physics claims.");
 assert(appSource.includes("presentation-authored moving-boundary ripple") || readFileSync(join(here, "README.md"), "utf8").includes("presentation-authored moving-boundary ripple"), "Ad-hoc water events must be labelled presentation-authored.");
