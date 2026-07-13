@@ -236,7 +236,7 @@ export function recomputePerformanceTrace( trace ) {
 export function bytesPerTexel( format ) {
 
 	if ( format === 'rgba16float' ) return 8;
-	if ( format === 'rgba8unorm' || format === 'rgba8' ) return 4;
+	if ( format === 'rgba8unorm' || format === 'rgba8unorm-srgb' || format === 'rgba8' ) return 4;
 	if ( format === 'depth32float' ) return 4;
 	throw new Error( `Runtime v2 assembler does not know the byte width of ${ format }.` );
 

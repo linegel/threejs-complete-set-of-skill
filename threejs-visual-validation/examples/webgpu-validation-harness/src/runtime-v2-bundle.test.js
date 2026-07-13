@@ -178,6 +178,7 @@ test( 'runtime bundle format widths include the canonical depth allocation', () 
 
 	assert.equal( bytesPerTexel( 'rgba16float' ), 8 );
 	assert.equal( bytesPerTexel( 'rgba8unorm' ), 4 );
+	assert.equal( bytesPerTexel( 'rgba8unorm-srgb' ), 4 );
 	assert.equal( bytesPerTexel( 'depth32float' ), 4 );
 	assert.throws( () => bytesPerTexel( 'depth24plus' ), /does not know the byte width/ );
 
