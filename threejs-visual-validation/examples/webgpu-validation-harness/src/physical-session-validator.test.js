@@ -7,6 +7,7 @@ import { test } from 'node:test';
 
 import { numericDatum } from './physical-evidence-common.js';
 import { createCorrectnessCaptureSessionFixture, createCorrectnessResourceLedgerFixture } from './correctness-capture-session.fixture.js';
+import { createCorrectnessWriteLedger } from './correctness-write-ledger.js';
 import { HARDWARE_PERFORMANCE_CONTRACT, HARDWARE_PERFORMANCE_ROUTE_PLAN, PHYSICAL_ROUTE_PLAN } from './in-app-evidence-plan.js';
 import { assertLabelledNumerics } from './numeric-evidence.js';
 import { createRuntimeGovernorTrace, createRuntimePerformanceTrace } from './physical-performance-trace.js';
@@ -855,6 +856,11 @@ test( 'release artifact projector requires the strict three-lane join and projec
 
 	const correctnessRecord = correctnessCaptureSession();
 	const correctnessSession = boundArtifact( 'sessions/correctness.capture-session.json', correctnessRecord, 'capture-session-document' );
+	const correctnessWriteLedger = createCorrectnessWriteLedger( correctnessRecord, {
+		...correctnessSession.ledgerEntry,
+		path: 'capture-session.json'
+	} );
+	const correctnessLedger = boundArtifact( 'capture-write-ledger.json', correctnessWriteLedger.value, 'capture-session-write-ledger' );
 	const physicalImport = await importedWrapper( baseSession( 'physical-route', PHYSICAL_ROUTE_PLAN ), { filename: 'physical-route.json' } );
 	const performanceImport = await importedWrapper( performanceSession(), { filename: 'performance.json' } );
 	const verifiedPhysical = await loadVerifiedImportedPhysicalRecord( physicalImport.path, { expectedProfile: 'physical-route' } );
@@ -867,7 +873,11 @@ test( 'release artifact projector requires the strict three-lane join and projec
 		rawBundleDirectory: '/external/raw-correctness',
 		releaseBundleDirectory: '/external/release-candidate',
 		performanceClaims: true,
-		correctness: correctnessLaneReference( correctnessRecord, correctnessSession.ledgerEntry.sha256 ),
+		correctness: correctnessLaneReference(
+			correctnessRecord,
+			{ ...correctnessSession.ledgerEntry, path: 'capture-session.json' },
+			correctnessLedger.ledgerEntry
+		),
 		physicalRoute: physicalLaneReference( verifiedPhysical.record, verifiedPhysical.sourceDocumentSha256 ),
 		hardwarePerformance: physicalLaneReference( verifiedPerformance.record, verifiedPerformance.sourceDocumentSha256 )
 	};

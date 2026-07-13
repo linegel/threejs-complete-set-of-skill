@@ -75,6 +75,12 @@ function correctnessCaptureRecord() {
 	return createCorrectnessCaptureSessionFixture();
 
 }
+
+function correctnessBinding( kind, path, hash ) {
+
+	return { kind, path, sha256: hash, byteLength: 1234 };
+
+}
 test( 'offline promotion hook requires three distinct matching lanes for performance claims', () => {
 
 	assert.deepEqual( validateEvidenceLaneJoin( joined() ), {
@@ -93,11 +99,16 @@ test( 'offline promotion hook requires three distinct matching lanes for perform
 
 test( 'shared Playwright correctness sessions produce a separately typed lane reference', () => {
 
-	const reference = correctnessLaneReference( correctnessCaptureRecord(), HASHES[ 0 ] );
+	const document = correctnessBinding( 'capture-session-document', 'capture-session.json', HASHES[ 0 ] );
+	const writeLedger = correctnessBinding( 'capture-session-write-ledger', 'capture-write-ledger.json', HASHES[ 1 ] );
+	const reference = correctnessLaneReference( correctnessCaptureRecord(), document, writeLedger );
 	assert.equal( reference.lane, 'correctness' );
 	assert.equal( reference.automationSurface, 'playwright-headless-chromium' );
 	assert.equal( reference.finalized, true );
-	assert.match( reference.captureSessionWriteLedgerHash, /^sha256:/ );
+	assert.equal( reference.captureSessionDocumentHash, document.sha256 );
+	assert.equal( reference.captureSessionWriteLedgerHash, writeLedger.sha256 );
+	assert.throws( () => correctnessLaneReference( correctnessCaptureRecord(), document, { ...writeLedger, sha256: 'sha256:short' } ), /write-ledger binding has no valid/ );
+	assert.throws( () => correctnessLaneReference( correctnessCaptureRecord(), { ...document, path: 'other.json' }, writeLedger ), /exact capture-session document/ );
 	assert.throws( () => physicalLaneReference( correctnessCaptureRecord(), HASHES[ 0 ] ), /physical-route or performance/ );
 
 } );

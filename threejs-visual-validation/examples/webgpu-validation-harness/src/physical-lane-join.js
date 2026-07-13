@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 
 import { CORRECTNESS_PROFILE, HARDWARE_PERFORMANCE_PROFILE, PHYSICAL_ROUTE_PROFILE, stableStringify } from './physical-evidence-common.js';
+import { CORRECTNESS_SESSION_PATH, CORRECTNESS_WRITE_LEDGER_PATH } from './correctness-write-ledger.js';
 import { validateCorrectnessCaptureSession } from './physical-session-validator.js';
 
 const SHA256 = /^sha256:[a-f0-9]{64}$/;
@@ -171,10 +172,21 @@ export function physicalLaneReference( record, sessionSha256 ) {
 
 }
 
-export function correctnessLaneReference( record, sessionSha256 ) {
+function requireExactCaptureBinding( binding, kind, path, label ) {
+
+	if ( binding?.kind !== kind || binding.path !== path ) throw new Error( `Correctness lane requires the exact ${ label } binding.` );
+	if ( SHA256.test( binding.sha256 ?? '' ) === false ) throw new Error( `Correctness lane ${ label } binding has no valid SHA-256 digest.` );
+	if ( Number.isSafeInteger( binding.byteLength ) === false || binding.byteLength <= 0 ) throw new Error( `Correctness lane ${ label } binding has no positive byte length.` );
+	return binding;
+
+}
+
+export function correctnessLaneReference( record, documentBinding, writeLedgerBinding ) {
 
 	validateCorrectnessCaptureSession( record );
-	if ( SHA256.test( sessionSha256 ?? '' ) === false ) throw new Error( 'Correctness lane requires the finalized capture-session file hash.' );
+	const document = requireExactCaptureBinding( documentBinding, 'capture-session-document', CORRECTNESS_SESSION_PATH, 'capture-session document' );
+	const writeLedger = requireExactCaptureBinding( writeLedgerBinding, 'capture-session-write-ledger', CORRECTNESS_WRITE_LEDGER_PATH, 'capture-session write-ledger' );
+	const sessionSha256 = document.sha256;
 	const state = {
 		locked: record.route?.lockedState,
 		observed: record.route?.observedState,
@@ -222,8 +234,8 @@ export function correctnessLaneReference( record, sessionSha256 ) {
 		routeDigest: stableHash( record.route ),
 		stateDigest: stableHash( state ),
 		routeStateDigest: stableHash( { route: record.route, state } ),
-		captureSessionDocumentHash: sessionSha256,
-		captureSessionWriteLedgerHash: stableHash( record.artifactWrites ),
+		captureSessionDocumentHash: document.sha256,
+		captureSessionWriteLedgerHash: writeLedger.sha256,
 		sourceClosureHash: record.sourceClosureHash,
 		buildRevision: record.buildRevision,
 		threeRevision: record.threeRevision,
