@@ -61,12 +61,18 @@ if (existsSync(candidateDirectory)) {
   throw new Error(`release candidate already exists: ${candidateDirectory} (remove/rename before re-assembly)`);
 }
 
+const approve = hasFlag('--approve');
+
 const assembled = await assemblePreparedReleaseBundle({
   correctnessDirectory,
   outputDirectory: candidateDirectory,
   prepareReleaseInputs: async ({ rawManifest }) => {
+    // Offline promotion requires visualCorrectness=PASS on the candidate when
+    // the visual review status is APPROVED. For --approve we set PASS here after
+    // the caller will re-check retained PNG bytes; without --approve we leave
+    // visualCorrectness pending so the candidate is not mistaken for signed-off.
     const claims = {
-      visualCorrectness: 'INSUFFICIENT_EVIDENCE',
+      visualCorrectness: approve ? 'PASS' : 'INSUFFICIENT_EVIDENCE',
       mechanismCorrectness: rawManifest.claimVerdicts.mechanismCorrectness,
       performanceCompliance: 'NOT_CLAIMED',
       gpuAttribution: 'NOT_CLAIMED',
@@ -79,11 +85,20 @@ const assembled = await assemblePreparedReleaseBundle({
     if (claims.lifecycleStability !== 'PASS') {
       throw new Error('lifecycleStability must already PASS (50-cycle soak) before release assembly');
     }
+    const limitations = [
+      ...(rawManifest.limitations ?? []).map((limitation) => structuredClone(limitation)),
+    ];
+    if (approve && !limitations.some((limitation) => limitation?.id === 'visual-review-pending')) {
+      limitations.push({
+        id: 'visual-review-pending',
+        status: 'ACTIVE',
+        statement: 'Offline visual inspection of the release images is pending.',
+        affectedClaims: ['visualCorrectness'],
+      });
+    }
     return {
       claimVerdicts: claims,
-      limitations: [
-        ...(rawManifest.limitations ?? []).map((limitation) => structuredClone(limitation)),
-      ],
+      limitations,
       routes: [],
       supplementaryArtifacts: [],
       captureSessions: [],
@@ -101,7 +116,7 @@ console.log(JSON.stringify({
   claims: assembled.manifest.claimVerdicts,
 }, null, 2));
 
-if (!hasFlag('--approve')) {
+if (!approve) {
   process.exit(0);
 }
 

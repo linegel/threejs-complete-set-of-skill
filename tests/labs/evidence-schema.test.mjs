@@ -606,8 +606,14 @@ test('release bundles require correctness only; physical-route is optional', () 
 
   const correctnessOnly = releaseRecord();
   correctnessOnly.captureSessions = correctnessOnly.captureSessions.filter((entry) => entry.profile === 'correctness');
-  // Binding/session digests must match the reduced session set for a full contract check;
-  // schema-level releaseBundleRequirements only requires correctness presence.
+  // Drop optional physical session files so the ledger matches a correctness-only release.
+  correctnessOnly.files = correctnessOnly.files.filter((entry) => {
+    if (entry.kind !== 'capture-session-document' && entry.kind !== 'capture-session-write-ledger') return true;
+    return entry.path === 'capture-session.json' || entry.path === 'capture-write-ledger.json'
+      || String(entry.path).includes('correctness');
+  });
+  // Schema-level releaseBundleRequirements only requires correctness presence;
+  // releaseFiles require at least one capture-session document + write-ledger, not two.
   assertSchemaValid(correctnessOnly, 'release with correctness lane only (no physical-route QA tooling)');
 
   const softwareCorrectness = releaseRecord();
