@@ -78,7 +78,8 @@ let nextRendererDeviceGeneration = 1;
 export const timestampResolutionPolicy = Object.freeze( {
 	mappingCadence: 'once-per-batch',
 	maximumQueriesPerBatch: 2048,
-	contextsPerFrame: 2
+	contextsPerFrame: 2,
+	stageCallOrder: Object.freeze( [ 'final-output', 'scene-mrt' ] )
 } );
 
 export function configureExplicitRenderSubmissionPass( passNode ) {
@@ -139,9 +140,11 @@ export function summarizeTimestampBatch( { entries, resolvedLastFrameTotalMs } )
 	let previousFrameId = null;
 	for ( let index = 0; index < parsedEntries.length; index += timestampResolutionPolicy.contextsPerFrame ) {
 
-		const scene = parsedEntries[ index ];
-		const output = parsedEntries[ index + 1 ];
-		if ( scene.stage !== 'scene-mrt' || output.stage !== 'final-output' ) throw new Error( `Timestamp submission at render call ${ scene.frameCall } must contain scene-mrt followed by final-output.` );
+		const first = parsedEntries[ index ];
+		const second = parsedEntries[ index + 1 ];
+		if ( first.stage !== timestampResolutionPolicy.stageCallOrder[ 0 ] || second.stage !== timestampResolutionPolicy.stageCallOrder[ 1 ] ) throw new Error( `Timestamp submission at render call ${ first.frameCall } must contain ${ timestampResolutionPolicy.stageCallOrder.join( ' followed by ' ) }.` );
+		const output = first;
+		const scene = second;
 		if ( scene.frameId !== output.frameId ) throw new Error( `Timestamp submission at render call ${ scene.frameCall } crosses renderer frame identities.` );
 		if ( previousFrameId !== null && scene.frameId < previousFrameId ) throw new Error( 'Timestamp batch renderer frame IDs regress in capture order.' );
 		previousFrameId = scene.frameId;

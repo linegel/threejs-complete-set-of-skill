@@ -559,12 +559,13 @@ test( 'concurrent disposal calls join one in-flight operation and rejected start
 test( 'timestamp populations are resolved once per sustained batch', () => {
 
 	assert.equal( timestampResolutionPolicy.mappingCadence, 'once-per-batch' );
+	assert.deepEqual( timestampResolutionPolicy.stageCallOrder, [ 'final-output', 'scene-mrt' ] );
 	const batch = summarizeTimestampBatch( {
 		entries: [
-			{ uid: 'r:2:41:f10', stage: 'final-output', durationMs: 1 },
-			{ uid: 'r:1:17:f10', stage: 'scene-mrt', durationMs: 3 },
-			{ uid: 'r:4:41:f11', stage: 'final-output', durationMs: 2 },
-			{ uid: 'r:3:17:f11', stage: 'scene-mrt', durationMs: 4 }
+			{ uid: 'r:2:17:f10', stage: 'scene-mrt', durationMs: 3 },
+			{ uid: 'r:1:41:f10', stage: 'final-output', durationMs: 1 },
+			{ uid: 'r:4:17:f11', stage: 'scene-mrt', durationMs: 4 },
+			{ uid: 'r:3:41:f11', stage: 'final-output', durationMs: 2 }
 		],
 		resolvedLastFrameTotalMs: 6
 	} );
@@ -575,17 +576,17 @@ test( 'timestamp populations are resolved once per sustained batch', () => {
 	assert.equal( batch.resolveCount, 1 );
 	assert.equal( batch.lastFrameResolveResidualMs, 0 );
 	assert.equal( batch.independentPerFrameTotalsAvailable, false );
-	assert.equal( batch.rows[ 0 ].sceneUid, 'r:1:17:f10' );
-	assert.equal( batch.rows[ 0 ].outputUid, 'r:2:41:f10' );
+	assert.equal( batch.rows[ 0 ].sceneUid, 'r:2:17:f10' );
+	assert.equal( batch.rows[ 0 ].outputUid, 'r:1:41:f10' );
 	assert.equal( batch.rows[ 0 ].residualMs, null );
 	assert.deepEqual( parseRenderTimestampUid( 'r:123:45:f67' ), { uid: 'r:123:45:f67', frameCall: 123, contextId: 45, frameId: 67 } );
 	assert.throws( () => parseRenderTimestampUid( 'r:scene:f67' ), /does not match Three r185/ );
 	const sharedRendererFrame = summarizeTimestampBatch( {
 		entries: [
-			{ uid: 'r:10:17:f3', stage: 'scene-mrt', durationMs: 1 },
-			{ uid: 'r:11:41:f3', stage: 'final-output', durationMs: 0.5 },
-			{ uid: 'r:12:17:f3', stage: 'scene-mrt', durationMs: 2 },
-			{ uid: 'r:13:41:f3', stage: 'final-output', durationMs: 0.75 }
+			{ uid: 'r:10:41:f3', stage: 'final-output', durationMs: 0.5 },
+			{ uid: 'r:11:17:f3', stage: 'scene-mrt', durationMs: 1 },
+			{ uid: 'r:12:41:f3', stage: 'final-output', durationMs: 0.75 },
+			{ uid: 'r:13:17:f3', stage: 'scene-mrt', durationMs: 2 }
 		],
 		resolvedLastFrameTotalMs: 2.75
 	} );
@@ -597,15 +598,15 @@ test( 'timestamp populations are resolved once per sustained batch', () => {
 test( 'timestamp attribution rejects ordering, stage, frame, and context forgeries', () => {
 
 	const base = [
-		{ uid: 'r:1:17:f10', stage: 'scene-mrt', durationMs: 3 },
-		{ uid: 'r:2:41:f10', stage: 'final-output', durationMs: 1 },
-		{ uid: 'r:3:17:f11', stage: 'scene-mrt', durationMs: 4 },
-		{ uid: 'r:4:41:f11', stage: 'final-output', durationMs: 2 }
+		{ uid: 'r:1:41:f10', stage: 'final-output', durationMs: 1 },
+		{ uid: 'r:2:17:f10', stage: 'scene-mrt', durationMs: 3 },
+		{ uid: 'r:3:41:f11', stage: 'final-output', durationMs: 2 },
+		{ uid: 'r:4:17:f11', stage: 'scene-mrt', durationMs: 4 }
 	];
 	assert.throws( () => summarizeTimestampBatch( {
-		entries: base.map( ( entry, index ) => index === 1 ? { ...entry, uid: 'r:2:17:f10', stage: 'scene-mrt' } : entry ),
+		entries: base.map( ( entry, index ) => index === 1 ? { ...entry, uid: 'r:2:41:f10', stage: 'final-output' } : entry ),
 		resolvedLastFrameTotalMs: 6
-	} ), /scene-mrt followed by final-output/ );
+	} ), /final-output followed by scene-mrt/ );
 	assert.throws( () => summarizeTimestampBatch( {
 		entries: base.map( ( entry, index ) => index === 3 ? { ...entry, uid: 'r:4:99:f11' } : entry ),
 		resolvedLastFrameTotalMs: 6
@@ -619,7 +620,7 @@ test( 'timestamp attribution rejects ordering, stage, frame, and context forgeri
 		resolvedLastFrameTotalMs: 6
 	} ), /render-call identities must be contiguous/ );
 	assert.throws( () => summarizeTimestampBatch( {
-		entries: base.map( ( entry ) => entry.stage === 'final-output' ? { ...entry, uid: entry.uid.replace( ':41:', ':17:' ) } : entry ),
+		entries: base.map( ( entry ) => entry.stage === 'scene-mrt' ? { ...entry, uid: entry.uid.replace( ':17:', ':41:' ) } : entry ),
 		resolvedLastFrameTotalMs: 6
 	} ), /two distinct stable render contexts/ );
 

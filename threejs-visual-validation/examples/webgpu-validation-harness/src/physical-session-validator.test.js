@@ -208,8 +208,8 @@ function timestampBatch( { frameBase = 0, frameCallBase = 0 } = {} ) {
 		const frameId = frameBase + index;
 		return {
 		frameId,
-		sceneUid: `r:${ frameCallBase + index * 2 + 1 }:17:f${ frameId }`,
-		outputUid: `r:${ frameCallBase + index * 2 + 2 }:41:f${ frameId }`,
+		sceneUid: `r:${ frameCallBase + index * 2 + 2 }:17:f${ frameId }`,
+		outputUid: `r:${ frameCallBase + index * 2 + 1 }:41:f${ frameId }`,
 		sceneMs: 1,
 		outputMs: 0.5,
 		totalMs: 1.5,

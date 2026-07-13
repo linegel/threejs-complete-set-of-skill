@@ -140,7 +140,7 @@ function mapTimestampSegment( segment, label ) {
 			const output = parseRenderUid( row.outputUid, `${ rowLabel }.outputUid` );
 			if ( scene.frameId !== row.frameId || output.frameId !== row.frameId ) fail( `${ rowLabel } UID frame identity differs from frameId.` );
 			if ( scene.contextId !== contextIds[ 'scene-mrt' ] || output.contextId !== contextIds[ 'final-output' ] ) fail( `${ rowLabel } UID render context differs from the declared stage context.` );
-			if ( output.frameCall !== scene.frameCall + 1 || scene.uid === output.uid ) fail( `${ rowLabel } does not bind consecutive scene and output render calls.` );
+			if ( scene.frameCall !== output.frameCall + 1 || scene.uid === output.uid ) fail( `${ rowLabel } does not bind the outer final-output call followed by the nested scene-mrt call.` );
 			if ( previousFrameId !== null && row.frameId < previousFrameId ) fail( `${ batchLabel } frame IDs regress in capture order.` );
 			previousFrameId = row.frameId;
 			if ( seenFrameCalls.has( scene.frameCall ) || seenFrameCalls.has( output.frameCall ) || seenUids.has( scene.uid ) || seenUids.has( output.uid ) ) fail( `${ rowLabel } duplicates a timestamp or render-call identity.` );
