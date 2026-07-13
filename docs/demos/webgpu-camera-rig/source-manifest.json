@@ -25,7 +25,7 @@
     "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig"
   ],
   "browserEntry": "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/index.html",
-  "sourceHash": "sha256:28e26085a6ee74008be35c435dcfa22faf9edc39914ee08da147380332807275",
+  "sourceHash": "sha256:9f3c73624401575863b2ed755e5bdaed7a1895084a4d4854f928cc95b9ac4d63",
   "publishedHashInputs": [
     "docs/demos/webgpu-camera-rig",
     "docs/demos/assets/CameraDirectionController-bRQgyYUd.js",
@@ -45,8 +45,8 @@
     "docs/demos/assets/three.webgpu-Dss1ekdK.js",
     "docs/demos/assets/webgpu-device-identity-uNUcs3Wh.js"
   ],
-  "publishedBundleHash": "sha256:ccfc69beef152768c8950786df486b8b667cadaad877b9b1d2192f061bfd034c",
+  "publishedBundleHash": "sha256:7cf959945849d8755df7cd3950f74dbde7d71f4d1145793cb8a1193495ecd4d8",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:49ab4c316e51d9bb267cb0cda243b6d6c4dd9af8afa65d1c469737eaa2a18260",
-  "evidenceBundleId": null
+  "buildRevision": "sha256:caa4bd9a0d957e7dd8f25b94091ab083fa62083edb7c9a6f00872b044beac719",
+  "evidenceBundleId": "correctness"
 }

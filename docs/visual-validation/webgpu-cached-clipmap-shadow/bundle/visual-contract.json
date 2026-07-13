@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 2,
+  "subject": "webgpu-cached-clipmap-shadow",
+  "identity": {
+    "labId": "webgpu-cached-clipmap-shadow",
+    "skill": "threejs-scalable-real-time-shadows",
+    "threeRevision": "0.185.1",
+    "sourceHash": "sha256:6141e40a0f87dc34b03e4d490ada32bd146d960c32d23f817feda87dade21dc4"
+  },
+  "invariants": [
+    "native WebGPU backend required",
+    "aligned readback retained",
+    "single tone/output owner where declared"
+  ],
+  "requiredImages": [
+    "final.design.png",
+    "no-post.design.png",
+    "diagnostics.mosaic.png",
+    "camera.near.png",
+    "camera.design.png",
+    "camera.far.png",
+    "seed-0001.final.png",
+    "seed-9e3779b9.final.png",
+    "temporal.t000.png",
+    "temporal.t001.png"
+  ],
+  "performanceClaims": "NOT_CLAIMED",
+  "limitations": [
+    "Correctness capture lane; hardware GPU timing not claimed unless timestamp windows exist."
+  ]
+}

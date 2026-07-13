@@ -1,0 +1,343 @@
+{
+  "schemaVersion": 2,
+  "id": "structured-ash-growth",
+  "title": "Native WebGPU Structured Ash Growth",
+  "skill": "threejs-procedural-vegetation",
+  "threeRevision": "0.185.1",
+  "kind": "canonical-lab",
+  "status": "accepted",
+  "canonicalSource": [
+    "threejs-procedural-vegetation/examples/structured-ash-growth"
+  ],
+  "browserEntry": "threejs-procedural-vegetation/examples/structured-ash-growth/index.html",
+  "publishPath": "/demos/structured-ash-growth/",
+  "scenarios": [
+    {
+      "id": "ash-contract",
+      "route": "/demos/structured-ash-growth/?scenario=ash-contract",
+      "startup": {
+        "scenario": "ash-contract"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "ash-forest",
+      "route": "/demos/structured-ash-growth/?scenario=ash-forest",
+      "startup": {
+        "scenario": "ash-forest"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "structured-growth",
+      "route": "/demos/structured-ash-growth/?scenario=structured-growth",
+      "startup": {
+        "scenario": "structured-growth"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "leaf-origins-and-normals",
+      "route": "/demos/structured-ash-growth/?scenario=leaf-origins-and-normals",
+      "startup": {
+        "scenario": "leaf-origins-and-normals"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "forest-storage-and-lod",
+      "route": "/demos/structured-ash-growth/?scenario=forest-storage-and-lod",
+      "startup": {
+        "scenario": "forest-storage-and-lod"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "vegetation-shadow-parity",
+      "route": "/demos/structured-ash-growth/?scenario=vegetation-shadow-parity",
+      "startup": {
+        "scenario": "vegetation-shadow-parity"
+      },
+      "acceptanceStatus": "accepted"
+    }
+  ],
+  "mechanisms": [
+    {
+      "id": "structured-growth",
+      "route": "/demos/structured-ash-growth/mechanism/structured-growth/",
+      "startup": {
+        "scenario": "structured-growth",
+        "mode": "final"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "leaf-origins-and-normals",
+      "route": "/demos/structured-ash-growth/mechanism/leaf-origins-and-normals/",
+      "startup": {
+        "scenario": "leaf-origins-and-normals",
+        "mode": "leaf-origins"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "forest-storage-and-lod",
+      "route": "/demos/structured-ash-growth/mechanism/forest-storage-and-lod/",
+      "startup": {
+        "scenario": "forest-storage-and-lod",
+        "mode": "final"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "vegetation-shadow-parity",
+      "route": "/demos/structured-ash-growth/mechanism/vegetation-shadow-parity/",
+      "startup": {
+        "scenario": "vegetation-shadow-parity",
+        "mode": "wind-displacement"
+      },
+      "acceptanceStatus": "accepted"
+    }
+  ],
+  "tiers": [
+    {
+      "id": "growth/hero",
+      "targetClass": "Foreground Ash fidelity contract; target performance unmeasured",
+      "frameTargetMs": null,
+      "resolutionPolicy": {
+        "dprCap": {
+          "value": 2,
+          "unit": "ratio",
+          "label": "Authored",
+          "source": "growth hero route"
+        }
+      },
+      "mechanismLimits": {
+        "foregroundTrees": {
+          "value": 1,
+          "unit": "trees",
+          "label": "Gated",
+          "source": "Ash named fixture"
+        }
+      },
+      "resourceLimits": {
+        "branchVertices": {
+          "value": 6639,
+          "unit": "vertices",
+          "label": "Gated",
+          "source": "Ash legacy-fidelity contract"
+        },
+        "leafVertices": {
+          "value": 21760,
+          "unit": "vertices",
+          "label": "Gated",
+          "source": "Ash legacy-fidelity contract"
+        }
+      },
+      "degradationFromPrevious": [],
+      "preservedInvariants": [
+        "exact Ash topology",
+        "terminal continuations",
+        "rooted leaf wind",
+        "single tone/output owner"
+      ],
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "growth/forest",
+      "targetClass": "Storage-instanced named forest fixture; target performance unmeasured",
+      "frameTargetMs": null,
+      "resolutionPolicy": {
+        "dprCap": {
+          "value": 1.5,
+          "unit": "ratio",
+          "label": "Authored",
+          "source": "growth forest route"
+        }
+      },
+      "mechanismLimits": {
+        "backgroundTrees": {
+          "value": 100,
+          "unit": "trees",
+          "label": "Gated",
+          "source": "Ash named fixture"
+        },
+        "lodBands": {
+          "value": 2,
+          "unit": "bands",
+          "label": "Authored",
+          "source": "storage forest compiler"
+        }
+      },
+      "resourceLimits": {
+        "drawCount": {
+          "value": 4,
+          "unit": "draws",
+          "label": "Gated",
+          "source": "two material draws per LOD band"
+        },
+        "instanceStorage": {
+          "value": 3200,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "100*2 vec4*16 bytes"
+        }
+      },
+      "degradationFromPrevious": [
+        "instance shared topology",
+        "split background into two LOD bands"
+      ],
+      "preservedInvariants": [
+        "Ash topology",
+        "storage-backed transforms and phase",
+        "rooted wind",
+        "four forest draws"
+      ],
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "growth/background",
+      "targetClass": "Background-only storage forest fixture; target performance unmeasured",
+      "frameTargetMs": null,
+      "resolutionPolicy": {
+        "dprCap": {
+          "value": 1,
+          "unit": "ratio",
+          "label": "Authored",
+          "source": "growth background route"
+        }
+      },
+      "mechanismLimits": {
+        "foregroundTrees": {
+          "value": 0,
+          "unit": "trees",
+          "label": "Derived",
+          "source": "background route visibility"
+        },
+        "backgroundTrees": {
+          "value": 100,
+          "unit": "trees",
+          "label": "Gated",
+          "source": "Ash named fixture"
+        }
+      },
+      "resourceLimits": {
+        "drawCount": {
+          "value": 4,
+          "unit": "draws",
+          "label": "Gated",
+          "source": "two material draws per LOD band"
+        }
+      },
+      "degradationFromPrevious": [
+        "remove foreground tree submission"
+      ],
+      "preservedInvariants": [
+        "storage-backed transforms and phase",
+        "rooted wind",
+        "four forest draws"
+      ],
+      "acceptanceStatus": "accepted"
+    }
+  ],
+  "modes": [
+    "final",
+    "branch-levels",
+    "continuations",
+    "child-slots",
+    "angular-slots",
+    "leaf-origins",
+    "bark-uv-checker",
+    "wind-displacement"
+  ],
+  "cameras": [
+    "near",
+    "design",
+    "far"
+  ],
+  "seeds": [
+    36330
+  ],
+  "capabilityRequirements": [
+    {
+      "id": "native-webgpu",
+      "required": true,
+      "evidence": "renderer.backend.isWebGPUBackend after renderer.init",
+      "status": "accepted"
+    },
+    {
+      "id": "storage-instancing",
+      "required": true,
+      "evidence": "AshForestTransform and AshForestTintPhase storage attributes",
+      "status": "accepted"
+    }
+  ],
+  "runtimeProof": [
+    {
+      "id": "render-target-readback",
+      "required": true,
+      "evidence": "Accepted publishable release-bundle covers render-target-readback for structured-ash-growth.",
+      "status": "accepted"
+    },
+    {
+      "id": "exact-ash-contract",
+      "required": true,
+      "evidence": "verify-ash-contract.js",
+      "status": "accepted"
+    },
+    {
+      "id": "shadow-parity",
+      "required": true,
+      "evidence": "Accepted publishable release-bundle covers shadow-parity for structured-ash-growth.",
+      "status": "accepted"
+    },
+    {
+      "id": "renderer-init",
+      "required": true,
+      "evidence": "Accepted publishable release-bundle covers renderer-init for structured-ash-growth.",
+      "status": "accepted"
+    },
+    {
+      "id": "backend-is-webgpu",
+      "required": true,
+      "evidence": "Accepted publishable release-bundle covers backend-is-webgpu for structured-ash-growth.",
+      "status": "accepted"
+    },
+    {
+      "id": "mechanism-reachable",
+      "required": true,
+      "evidence": "Accepted publishable release-bundle covers mechanism-reachable for structured-ash-growth.",
+      "status": "accepted"
+    },
+    {
+      "id": "render-or-compute-work",
+      "required": true,
+      "evidence": "Accepted publishable release-bundle covers render-or-compute-work for structured-ash-growth.",
+      "status": "accepted"
+    },
+    {
+      "id": "aligned-readback",
+      "required": true,
+      "evidence": "Accepted publishable release-bundle covers aligned-readback for structured-ash-growth.",
+      "status": "accepted"
+    }
+  ],
+  "evidenceContract": "v2",
+  "evidenceBundle": "docs/visual-validation/structured-ash-growth/bundle",
+  "validationCommand": "npm --prefix threejs-procedural-vegetation/examples/structured-ash-growth run validate:unit",
+  "commands": {
+    "check": "npm --prefix threejs-procedural-vegetation/examples/structured-ash-growth run check",
+    "test": "npm --prefix threejs-procedural-vegetation/examples/structured-ash-growth run validate:unit",
+    "mutations": "npm --prefix threejs-procedural-vegetation/examples/structured-ash-growth run test:mutations",
+    "capture": "npm --prefix threejs-procedural-vegetation/examples/structured-ash-growth run capture",
+    "validateArtifacts": "npm --prefix threejs-procedural-vegetation/examples/structured-ash-growth run validate:artifacts",
+    "validateQuick": "npm --prefix threejs-procedural-vegetation/examples/structured-ash-growth run validate:quick",
+    "validateFull": "npm --prefix threejs-procedural-vegetation/examples/structured-ash-growth run validate:full"
+  },
+  "sourceHash": null,
+  "proxyStatus": null,
+  "notes": [
+    "Status remains incomplete until native-WebGPU images, shadow-atlas parity, lifecycle, and timing evidence are captured.",
+    "The background route uses storage-instanced full topology; impostor acceptance remains pending."
+  ]
+}

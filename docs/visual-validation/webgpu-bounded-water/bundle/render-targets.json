@@ -1,0 +1,379 @@
+{
+  "schemaVersion": 2,
+  "targets": [
+    {
+      "name": "webgpu-bounded-water-capture-target-1",
+      "owner": "threejs-water-optics",
+      "semantic": "final.design.png native WebGPU RGBA8 readback",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "final.design.png retained capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "final.design.png retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples",
+        "label": "Authored",
+        "source": "single-sample capture target"
+      },
+      "residentBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * 4"
+      }
+    },
+    {
+      "name": "webgpu-bounded-water-capture-target-2",
+      "owner": "threejs-water-optics",
+      "semantic": "no-post.design.png native WebGPU RGBA8 readback",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "no-post.design.png retained capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "no-post.design.png retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples",
+        "label": "Authored",
+        "source": "single-sample capture target"
+      },
+      "residentBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * 4"
+      }
+    },
+    {
+      "name": "webgpu-bounded-water-capture-target-3",
+      "owner": "threejs-water-optics",
+      "semantic": "diagnostics.mosaic.png native WebGPU RGBA8 readback",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "diagnostics.mosaic.png retained capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "diagnostics.mosaic.png retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples",
+        "label": "Authored",
+        "source": "single-sample capture target"
+      },
+      "residentBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * 4"
+      }
+    },
+    {
+      "name": "webgpu-bounded-water-capture-target-4",
+      "owner": "threejs-water-optics",
+      "semantic": "camera.near.png native WebGPU RGBA8 readback",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "camera.near.png retained capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "camera.near.png retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples",
+        "label": "Authored",
+        "source": "single-sample capture target"
+      },
+      "residentBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * 4"
+      }
+    },
+    {
+      "name": "webgpu-bounded-water-capture-target-5",
+      "owner": "threejs-water-optics",
+      "semantic": "camera.design.png native WebGPU RGBA8 readback",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "camera.design.png retained capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "camera.design.png retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples",
+        "label": "Authored",
+        "source": "single-sample capture target"
+      },
+      "residentBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * 4"
+      }
+    },
+    {
+      "name": "webgpu-bounded-water-capture-target-6",
+      "owner": "threejs-water-optics",
+      "semantic": "camera.far.png native WebGPU RGBA8 readback",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "camera.far.png retained capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "camera.far.png retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples",
+        "label": "Authored",
+        "source": "single-sample capture target"
+      },
+      "residentBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * 4"
+      }
+    },
+    {
+      "name": "webgpu-bounded-water-capture-target-7",
+      "owner": "threejs-water-optics",
+      "semantic": "seed-0001.final.png native WebGPU RGBA8 readback",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "seed-0001.final.png retained capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "seed-0001.final.png retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples",
+        "label": "Authored",
+        "source": "single-sample capture target"
+      },
+      "residentBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * 4"
+      }
+    },
+    {
+      "name": "webgpu-bounded-water-capture-target-8",
+      "owner": "threejs-water-optics",
+      "semantic": "seed-9e3779b9.final.png native WebGPU RGBA8 readback",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "seed-9e3779b9.final.png retained capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "seed-9e3779b9.final.png retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples",
+        "label": "Authored",
+        "source": "single-sample capture target"
+      },
+      "residentBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * 4"
+      }
+    },
+    {
+      "name": "webgpu-bounded-water-capture-target-9",
+      "owner": "threejs-water-optics",
+      "semantic": "temporal.t000.png native WebGPU RGBA8 readback",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "temporal.t000.png retained capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "temporal.t000.png retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples",
+        "label": "Authored",
+        "source": "single-sample capture target"
+      },
+      "residentBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * 4"
+      }
+    },
+    {
+      "name": "webgpu-bounded-water-capture-target-10",
+      "owner": "threejs-water-optics",
+      "semantic": "temporal.t001.png native WebGPU RGBA8 readback",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "temporal.t001.png retained capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "temporal.t001.png retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples",
+        "label": "Authored",
+        "source": "single-sample capture target"
+      },
+      "residentBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * 4"
+      }
+    }
+  ],
+  "accountingScope": "transactional-capture-targets-only",
+  "completeness": "PARTIAL",
+  "trackedRenderTargetBytes": {
+    "value": 38400000,
+    "unit": "bytes",
+    "label": "Derived",
+    "source": "sum of 10 transactional RGBA8 capture target extents"
+  },
+  "trackedPeakLiveRenderTargetBytes": {
+    "value": 3840000,
+    "unit": "bytes",
+    "label": "Derived",
+    "source": "one transactional capture target is live at a time"
+  }
+}

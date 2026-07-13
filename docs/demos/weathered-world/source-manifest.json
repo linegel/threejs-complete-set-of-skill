@@ -48,14 +48,14 @@
     "threejs-water-optics/examples/webgpu-bounded-water/webgpu-bounded-water.js"
   ],
   "browserEntry": "integration-labs/weathered-world/index.html",
-  "sourceHash": "sha256:821894aaaceba1c88b77c0c44096b8615f517db97369be97d10aaabcc2640756",
+  "sourceHash": "sha256:df4effe0e07f696e37fb44ef1771cb594009f135d48ca85df84cf7930048681f",
   "publishedHashInputs": [
     "docs/demos/weathered-world",
     "docs/demos/assets/dense-grass-system-CmVTxhFW.js",
     "docs/demos/assets/index-8_7qPQrz.css",
-    "docs/demos/assets/index-DPK3HMpC.js",
-    "docs/demos/assets/integration-adapter-BA-zkb3u.js",
+    "docs/demos/assets/index-KTBBZY-Y.js",
     "docs/demos/assets/integration-adapter-CBZChN7k.js",
+    "docs/demos/assets/integration-adapter-GS_XK2C2.js",
     "docs/demos/assets/integration-stage-DelEZhWP.js",
     "docs/demos/assets/integration-stage-vgQFmTFc.js",
     "docs/demos/assets/meadow-density-a-Bi7C7Dbi.png",
@@ -78,9 +78,9 @@
   "emittedAssetDependencies": [
     "docs/demos/assets/dense-grass-system-CmVTxhFW.js",
     "docs/demos/assets/index-8_7qPQrz.css",
-    "docs/demos/assets/index-DPK3HMpC.js",
-    "docs/demos/assets/integration-adapter-BA-zkb3u.js",
+    "docs/demos/assets/index-KTBBZY-Y.js",
     "docs/demos/assets/integration-adapter-CBZChN7k.js",
+    "docs/demos/assets/integration-adapter-GS_XK2C2.js",
     "docs/demos/assets/integration-stage-DelEZhWP.js",
     "docs/demos/assets/integration-stage-vgQFmTFc.js",
     "docs/demos/assets/meadow-density-a-Bi7C7Dbi.png",
@@ -100,8 +100,8 @@
     "docs/demos/assets/webgpu-lut-atmosphere-DkMbDrwr.js",
     "docs/demos/assets/webgpu-weather-volume-clouds-CWin3xhq.js"
   ],
-  "publishedBundleHash": "sha256:3ec0cf828a1edbf3ec492125e902fb2a362b7f07c653fe98fdc002278053ff4a",
+  "publishedBundleHash": "sha256:c0d59daa719f534a1326b293033a71055df51b982f53e3d8ec50e0523fae9fc2",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:49ab4c316e51d9bb267cb0cda243b6d6c4dd9af8afa65d1c469737eaa2a18260",
-  "evidenceBundleId": null
+  "buildRevision": "sha256:caa4bd9a0d957e7dd8f25b94091ab083fa62083edb7c9a6f00872b044beac719",
+  "evidenceBundleId": "correctness"
 }

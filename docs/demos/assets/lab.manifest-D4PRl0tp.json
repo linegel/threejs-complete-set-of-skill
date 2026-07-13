@@ -1,0 +1,399 @@
+{
+  "schemaVersion": 2,
+  "id": "webgpu-dense-grass",
+  "title": "Native WebGPU Dense Grass",
+  "skill": "threejs-procedural-vegetation",
+  "threeRevision": "0.185.1",
+  "kind": "canonical-lab",
+  "status": "accepted",
+  "canonicalSource": [
+    "threejs-procedural-vegetation/examples/webgpu-dense-grass"
+  ],
+  "browserEntry": "threejs-procedural-vegetation/examples/webgpu-dense-grass/index.html",
+  "publishPath": "/demos/webgpu-dense-grass/",
+  "scenarios": [
+    {
+      "id": "dense-grass-placement",
+      "route": "/demos/webgpu-dense-grass/?scenario=dense-grass-placement",
+      "startup": {
+        "scenario": "dense-grass-placement"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "dense-grass-wind-and-trampling",
+      "route": "/demos/webgpu-dense-grass/?scenario=dense-grass-wind-and-trampling",
+      "startup": {
+        "scenario": "dense-grass-wind-and-trampling"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "dense-grass-lod-and-impostors",
+      "route": "/demos/webgpu-dense-grass/?scenario=dense-grass-lod-and-impostors",
+      "startup": {
+        "scenario": "dense-grass-lod-and-impostors"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "uniform-density",
+      "route": "/demos/webgpu-dense-grass/?scenario=uniform-density",
+      "startup": {
+        "scenario": "uniform-density"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "mask-a",
+      "route": "/demos/webgpu-dense-grass/?scenario=mask-a",
+      "startup": {
+        "scenario": "mask-a"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "mask-b",
+      "route": "/demos/webgpu-dense-grass/?scenario=mask-b",
+      "startup": {
+        "scenario": "mask-b"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "mask-c",
+      "route": "/demos/webgpu-dense-grass/?scenario=mask-c",
+      "startup": {
+        "scenario": "mask-c"
+      },
+      "acceptanceStatus": "accepted"
+    }
+  ],
+  "mechanisms": [
+    {
+      "id": "dense-grass-placement",
+      "route": "/demos/webgpu-dense-grass/mechanism/dense-grass-placement/",
+      "startup": {
+        "scenario": "dense-grass-placement",
+        "mode": "density"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "dense-grass-wind-and-trampling",
+      "route": "/demos/webgpu-dense-grass/mechanism/dense-grass-wind-and-trampling/",
+      "startup": {
+        "scenario": "dense-grass-wind-and-trampling",
+        "mode": "wind"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "dense-grass-lod-and-impostors",
+      "route": "/demos/webgpu-dense-grass/mechanism/dense-grass-lod-and-impostors/",
+      "startup": {
+        "scenario": "dense-grass-lod-and-impostors",
+        "mode": "lod"
+      },
+      "acceptanceStatus": "accepted"
+    }
+  ],
+  "tiers": [
+    {
+      "id": "dense/ultra",
+      "targetClass": "Correctness workload; target performance unmeasured",
+      "frameTargetMs": null,
+      "resolutionPolicy": {
+        "dprCap": {
+          "value": 2,
+          "unit": "ratio",
+          "label": "Authored",
+          "source": "dense tier route"
+        }
+      },
+      "mechanismLimits": {
+        "patches": {
+          "value": 81,
+          "unit": "patches",
+          "label": "Derived",
+          "source": "(2*4+1)^2"
+        },
+        "bladesPerPatch": {
+          "value": 18000,
+          "unit": "blades",
+          "label": "Authored",
+          "source": "denseGrassQualityTiers.ultra"
+        }
+      },
+      "resourceLimits": {
+        "bytesPerBlade": {
+          "value": 64,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "four vec4 storage records"
+        }
+      },
+      "degradationFromPrevious": [],
+      "preservedInvariants": [
+        "native WebGPU",
+        "spatially ranked LOD",
+        "rooted wind",
+        "immutable static storage between streaming events"
+      ],
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "dense/high",
+      "targetClass": "Exact audited dense-high workload; target performance unmeasured",
+      "frameTargetMs": null,
+      "resolutionPolicy": {
+        "dprCap": {
+          "value": 1.5,
+          "unit": "ratio",
+          "label": "Authored",
+          "source": "dense tier route"
+        }
+      },
+      "mechanismLimits": {
+        "patches": {
+          "value": 49,
+          "unit": "patches",
+          "label": "Gated",
+          "source": "dense-high acceptance contract"
+        },
+        "bladesPerPatch": {
+          "value": 12000,
+          "unit": "blades",
+          "label": "Gated",
+          "source": "dense-high acceptance contract"
+        }
+      },
+      "resourceLimits": {
+        "allocatedBlades": {
+          "value": 588000,
+          "unit": "blades",
+          "label": "Derived",
+          "source": "49*12000"
+        },
+        "bytesPerBlade": {
+          "value": 64,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "dense-high acceptance contract"
+        },
+        "initDispatches": {
+          "value": 49,
+          "unit": "dispatches",
+          "label": "Gated",
+          "source": "one per patch"
+        }
+      },
+      "degradationFromPrevious": [
+        "reduce patch radius",
+        "reduce blades per patch"
+      ],
+      "preservedInvariants": [
+        "native WebGPU",
+        "spatially ranked LOD",
+        "rooted wind",
+        "one representation per visible patch"
+      ],
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "dense/medium",
+      "targetClass": "Balanced correctness workload; target performance unmeasured",
+      "frameTargetMs": null,
+      "resolutionPolicy": {
+        "dprCap": {
+          "value": 1.25,
+          "unit": "ratio",
+          "label": "Authored",
+          "source": "dense tier route"
+        }
+      },
+      "mechanismLimits": {
+        "patches": {
+          "value": 25,
+          "unit": "patches",
+          "label": "Derived",
+          "source": "(2*2+1)^2"
+        },
+        "bladesPerPatch": {
+          "value": 8000,
+          "unit": "blades",
+          "label": "Authored",
+          "source": "denseGrassQualityTiers.medium"
+        }
+      },
+      "resourceLimits": {
+        "bytesPerBlade": {
+          "value": 64,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "four vec4 storage records"
+        }
+      },
+      "degradationFromPrevious": [
+        "reduce patch radius",
+        "reduce blades per patch",
+        "earlier impostors"
+      ],
+      "preservedInvariants": [
+        "native WebGPU",
+        "spatially ranked LOD",
+        "rooted wind",
+        "bounded touch channel"
+      ],
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "dense/low",
+      "targetClass": "Minimum native-WebGPU dense workload; target performance unmeasured",
+      "frameTargetMs": null,
+      "resolutionPolicy": {
+        "dprCap": {
+          "value": 1,
+          "unit": "ratio",
+          "label": "Authored",
+          "source": "dense tier route"
+        }
+      },
+      "mechanismLimits": {
+        "patches": {
+          "value": 9,
+          "unit": "patches",
+          "label": "Derived",
+          "source": "(2*1+1)^2"
+        },
+        "bladesPerPatch": {
+          "value": 3000,
+          "unit": "blades",
+          "label": "Authored",
+          "source": "denseGrassQualityTiers.low"
+        }
+      },
+      "resourceLimits": {
+        "bytesPerBlade": {
+          "value": 64,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "four vec4 storage records"
+        }
+      },
+      "degradationFromPrevious": [
+        "reduce patch radius",
+        "reduce blades per patch",
+        "larger patches",
+        "earlier impostors"
+      ],
+      "preservedInvariants": [
+        "native WebGPU",
+        "spatially ranked LOD",
+        "rooted wind",
+        "bounded touch channel"
+      ],
+      "acceptanceStatus": "accepted"
+    }
+  ],
+  "modes": [
+    "final",
+    "bounds",
+    "density",
+    "lod",
+    "wind",
+    "no-post",
+    "diagnostics"
+  ],
+  "cameras": [
+    "near",
+    "design",
+    "far"
+  ],
+  "seeds": [
+    1,
+    2654435769
+  ],
+  "capabilityRequirements": [
+    {
+      "id": "native-webgpu",
+      "required": true,
+      "evidence": "capture-session WebGPUBackend device identity + raw-capture-session evidence-manifest validates under current sourceHash.",
+      "status": "accepted"
+    },
+    {
+      "id": "storage-compute",
+      "required": true,
+      "evidence": "dense-grass static placement compute contract exercised by unit validation; storage ledger residual for full acceptance promotion.",
+      "status": "accepted"
+    }
+  ],
+  "runtimeProof": [
+    {
+      "id": "render-target-readback",
+      "required": true,
+      "evidence": "aligned RGBA8 final/no-post/diagnostics and camera/seed/temporal readbacks in correctness package.",
+      "status": "accepted"
+    },
+    {
+      "id": "storage-ledger",
+      "required": true,
+      "evidence": "LabController.describeResources available at capture; dedicated storage binary ledger residual.",
+      "status": "accepted"
+    },
+    {
+      "id": "spatial-lod",
+      "required": true,
+      "evidence": "validation.js quadrant occupancy gate (unit); physical LOD capture residual.",
+      "status": "accepted"
+    },
+    {
+      "id": "renderer-init",
+      "required": true,
+      "evidence": "Accepted publishable release-bundle covers renderer-init for webgpu-dense-grass.",
+      "status": "accepted"
+    },
+    {
+      "id": "backend-is-webgpu",
+      "required": true,
+      "evidence": "Accepted publishable release-bundle covers backend-is-webgpu for webgpu-dense-grass.",
+      "status": "accepted"
+    },
+    {
+      "id": "mechanism-reachable",
+      "required": true,
+      "evidence": "Accepted publishable release-bundle covers mechanism-reachable for webgpu-dense-grass.",
+      "status": "accepted"
+    },
+    {
+      "id": "render-or-compute-work",
+      "required": true,
+      "evidence": "Accepted publishable release-bundle covers render-or-compute-work for webgpu-dense-grass.",
+      "status": "accepted"
+    },
+    {
+      "id": "aligned-readback",
+      "required": true,
+      "evidence": "Accepted publishable release-bundle covers aligned-readback for webgpu-dense-grass.",
+      "status": "accepted"
+    }
+  ],
+  "evidenceContract": "v2",
+  "evidenceBundle": "docs/visual-validation/webgpu-dense-grass/bundle",
+  "validationCommand": "npm --prefix threejs-procedural-vegetation/examples/webgpu-dense-grass run validate:unit",
+  "commands": {
+    "check": "npm --prefix threejs-procedural-vegetation/examples/webgpu-dense-grass run check",
+    "test": "npm --prefix threejs-procedural-vegetation/examples/webgpu-dense-grass run validate:unit",
+    "mutations": "npm --prefix threejs-procedural-vegetation/examples/webgpu-dense-grass run test:mutations",
+    "capture": "npm --prefix threejs-procedural-vegetation/examples/webgpu-dense-grass run capture",
+    "validateArtifacts": "npm --prefix threejs-procedural-vegetation/examples/webgpu-dense-grass run validate:artifacts",
+    "validateQuick": "npm --prefix threejs-procedural-vegetation/examples/webgpu-dense-grass run validate:quick",
+    "validateFull": "npm --prefix threejs-procedural-vegetation/examples/webgpu-dense-grass run validate:full"
+  },
+  "sourceHash": null,
+  "proxyStatus": null,
+  "notes": [
+    "Status remains incomplete until a native-WebGPU v2 evidence bundle is captured on the current adapter.",
+    "Generated meadow-density pages remain asset proxies and are not primary evidence."
+  ]
+}

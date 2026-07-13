@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 2,
+  "subject": "webgpu-bounded-water",
+  "identity": {
+    "labId": "webgpu-bounded-water",
+    "skill": "threejs-water-optics",
+    "threeRevision": "0.185.1",
+    "sourceHash": "sha256:8daeac67b7ad4246c6b7d4440b6489ae1f93648c865e1103f1f4d62cd6ed0df1"
+  },
+  "invariants": [
+    "native WebGPU backend required",
+    "aligned readback retained",
+    "single tone/output owner where declared"
+  ],
+  "requiredImages": [
+    "final.design.png",
+    "no-post.design.png",
+    "diagnostics.mosaic.png",
+    "camera.near.png",
+    "camera.design.png",
+    "camera.far.png",
+    "seed-0001.final.png",
+    "seed-9e3779b9.final.png",
+    "temporal.t000.png",
+    "temporal.t001.png"
+  ],
+  "performanceClaims": "NOT_CLAIMED",
+  "limitations": [
+    "Correctness capture lane; hardware GPU timing not claimed unless timestamp windows exist."
+  ]
+}

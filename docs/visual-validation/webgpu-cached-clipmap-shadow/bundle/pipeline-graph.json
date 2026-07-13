@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 2,
+  "owners": {
+    "renderer": "threejs-scalable-real-time-shadows",
+    "scenePass": "webgpu-cached-clipmap-shadow",
+    "finalPipeline": "webgpu-cached-clipmap-shadow",
+    "toneMap": "renderOutput",
+    "outputTransform": "renderOutput"
+  },
+  "signals": [
+    {
+      "id": "output",
+      "producer": "webgpu-cached-clipmap-shadow",
+      "consumers": [
+        "presentation"
+      ],
+      "reachable": true
+    }
+  ],
+  "sceneSubmissions": [
+    {
+      "id": "shared-scene-pass",
+      "owner": "webgpu-cached-clipmap-shadow",
+      "kind": "lit-scene",
+      "submissionCount": {
+        "value": 1,
+        "unit": "submissions-per-frame",
+        "label": "Measured",
+        "source": "LabController.describePipeline"
+      }
+    }
+  ],
+  "computeDispatches": [],
+  "resources": [],
+  "finalToneMapOwner": "renderOutput",
+  "finalOutputTransformOwner": "renderOutput"
+}

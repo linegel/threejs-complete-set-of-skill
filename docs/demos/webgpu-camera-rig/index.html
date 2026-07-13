@@ -58,54 +58,30 @@
       <h1>WebGPU Camera Rig</h1>
       <p>Interactive Three.js WebGPU/TSL demo for WebGPU Camera Rig, with 1 scenario, 6 mechanisms, and 3 quality tiers and evidence-gated validation.</p>
       <p class="demo-seo-shell__evidence"><strong>Evidence status:</strong> The implementation is available for technical review, but its native-WebGPU runtime and evidence gates remain incomplete.</p>
-      <details class="demo-roadmap" data-demo-roadmap data-roadmap-status="incomplete" data-open-count="12">
-        <summary>Readiness &amp; remaining fixes <span>12</span></summary>
+      <details class="demo-roadmap" data-demo-roadmap data-roadmap-status="incomplete" data-open-count="6">
+        <summary>Readiness &amp; remaining fixes <span>6</span></summary>
         <div class="demo-roadmap__body">
-          <p>12 open closure items. Loadable does not mean accepted or performance-valid.</p>
+          <p>6 open closure items. Loadable does not mean accepted or performance-valid.</p>
           <ol><li data-roadmap-item data-priority="P0" data-category="performance">
           <div><span>P0</span><strong>Define and measure the target performance contract</strong></div>
           <p>The full, budgeted, minimum tiers have no accepted frame target. Record named device/browser/GPU, viewport, DPR, sustained CPU/GPU/presentation p50 and p95, deadline misses, memory, and settled quality. Submission time is not GPU timing.</p>
           <code>tiers[].frameTargetMs</code>
         </li><li data-roadmap-item data-priority="P0" data-category="capability">
-          <div><span>P0</span><strong>Native Webgpu capability proof</strong></div>
-          <p>Capture current-source evidence for the declared native webgpu gate.</p>
-          <code>capabilityRequirements.native-webgpu</code>
-        </li><li data-roadmap-item data-priority="P0" data-category="capability">
           <div><span>P0</span><strong>Storage Buffer capability proof</strong></div>
-          <p>Capture current-source evidence for the declared storage buffer gate.</p>
+          <p>origin storage is part of the camera-rig controller contract; dedicated storage binary ledger residual for full acceptance.</p>
           <code>capabilityRequirements.storage-buffer</code>
         </li><li data-roadmap-item data-priority="P0" data-category="runtime">
-          <div><span>P0</span><strong>Renderer Init runtime proof</strong></div>
-          <p>Capture current-source evidence for the declared renderer init gate.</p>
-          <code>runtimeProof.renderer-init</code>
-        </li><li data-roadmap-item data-priority="P0" data-category="runtime">
-          <div><span>P0</span><strong>Backend Is Webgpu runtime proof</strong></div>
-          <p>Capture current-source evidence for the declared backend is webgpu gate.</p>
-          <code>runtimeProof.backend-is-webgpu</code>
-        </li><li data-roadmap-item data-priority="P0" data-category="runtime">
-          <div><span>P0</span><strong>Mechanism Reachable runtime proof</strong></div>
-          <p>Capture current-source evidence for the declared mechanism reachable gate.</p>
-          <code>runtimeProof.mechanism-reachable</code>
-        </li><li data-roadmap-item data-priority="P0" data-category="runtime">
-          <div><span>P0</span><strong>Aligned Readback runtime proof</strong></div>
-          <p>Capture current-source evidence for the declared aligned readback gate.</p>
-          <code>runtimeProof.aligned-readback</code>
-        </li><li data-roadmap-item data-priority="P0" data-category="runtime">
           <div><span>P0</span><strong>MRT Readback runtime proof</strong></div>
-          <p>Capture current-source evidence for the declared mrt readback gate.</p>
+          <p>MRT attachment recipes residual; primary presentation readbacks only on this package.</p>
           <code>runtimeProof.mrt-readback</code>
         </li><li data-roadmap-item data-priority="P0" data-category="runtime">
           <div><span>P0</span><strong>Origin Storage Readback runtime proof</strong></div>
-          <p>Capture current-source evidence for the declared origin storage readback gate.</p>
+          <p>origin storage binary ledger residual for full acceptance.</p>
           <code>runtimeProof.origin-storage-readback</code>
         </li><li data-roadmap-item data-priority="P0" data-category="runtime">
           <div><span>P0</span><strong>Current Adapter GPU Timestamp runtime proof</strong></div>
-          <p>Capture current-source evidence for the declared current adapter gpu timestamp gate.</p>
+          <p>timestampQueriesActive remains false for correctness profile; GPU timing is not accepted as performance evidence.</p>
           <code>runtimeProof.current-adapter-gpu-timestamp</code>
-        </li><li data-roadmap-item data-priority="P1" data-category="evidence">
-          <div><span>P1</span><strong>Capture a current-source evidence bundle</strong></div>
-          <p>Publish source-hash-bound renderer/backend facts, required diagnostic images, aligned readbacks, resource inventory, timing method, and limitations; directly inspect the important artifacts before promotion.</p>
-          <code>evidenceBundle</code>
         </li><li data-roadmap-item data-priority="P2" data-category="tiers">
           <div><span>P2</span><strong>Close tier-specific acceptance</strong></div>
           <p>Validate and promote full, budgeted, minimum as independent visual and performance contracts without crossing their protected invariants.</p>

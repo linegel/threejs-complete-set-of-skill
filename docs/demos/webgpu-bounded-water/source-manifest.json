@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "labId": "webgpu-bounded-water",
   "kind": "canonical-lab",
-  "status": "incomplete",
+  "status": "accepted",
   "canonicalSource": [
     "threejs-water-optics/examples/webgpu-bounded-water",
     "scripts/capture-lab-browser.mjs",
@@ -31,11 +31,11 @@
     "threejs-water-optics/examples/webgpu-bounded-water"
   ],
   "browserEntry": "threejs-water-optics/examples/webgpu-bounded-water/index.html",
-  "sourceHash": "sha256:fa528573afdb607a124bef4f0578a803e93319da06728cd711aac36a0c14efe2",
+  "sourceHash": "sha256:e862f22425735e058c309a055eb695c15f724a67dd1897dce397d98d30e98caa",
   "publishedHashInputs": [
     "docs/demos/webgpu-bounded-water",
     "docs/demos/assets/aligned-readback-XAnJComS.js",
-    "docs/demos/assets/index-YX0DO7As.js",
+    "docs/demos/assets/index-p89BhbFQ.js",
     "docs/demos/assets/integration-stage-DelEZhWP.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
     "docs/demos/assets/three.tsl--5AYqKVA.js",
@@ -45,7 +45,7 @@
   ],
   "emittedAssetDependencies": [
     "docs/demos/assets/aligned-readback-XAnJComS.js",
-    "docs/demos/assets/index-YX0DO7As.js",
+    "docs/demos/assets/index-p89BhbFQ.js",
     "docs/demos/assets/integration-stage-DelEZhWP.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
     "docs/demos/assets/three.tsl--5AYqKVA.js",
@@ -53,8 +53,8 @@
     "docs/demos/assets/webgpu-bounded-water-BTmuFlv9.js",
     "docs/demos/assets/webgpu-device-identity-uNUcs3Wh.js"
   ],
-  "publishedBundleHash": "sha256:c7da43ecee3effae6d8bb6f598a9b9378a81c20d6dae0cc87fc46c36bac4d560",
+  "publishedBundleHash": "sha256:fa42a9cb2b2f4a07fa037a6450d9785db5d463df79f6147838a579170f6fb13d",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:49ab4c316e51d9bb267cb0cda243b6d6c4dd9af8afa65d1c469737eaa2a18260",
-  "evidenceBundleId": null
+  "buildRevision": "sha256:caa4bd9a0d957e7dd8f25b94091ab083fa62083edb7c9a6f00872b044beac719",
+  "evidenceBundleId": "bundle"
 }

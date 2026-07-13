@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "labId": "webgpu-cached-clipmap-shadow",
   "kind": "canonical-lab",
-  "status": "incomplete",
+  "status": "accepted",
   "canonicalSource": [
     "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow"
   ],
@@ -11,11 +11,11 @@
     "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow"
   ],
   "browserEntry": "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/canonical.html",
-  "sourceHash": "sha256:e83b51d594bc422c0b4e4550f6ce50905de15cc9b0fd88d0c3e4ebc5d6a1d988",
+  "sourceHash": "sha256:cb4d3abfaab1a84e0fbef28fd523befc0f09ed465690426c58eff739e7b1171c",
   "publishedHashInputs": [
     "docs/demos/webgpu-cached-clipmap-shadow",
-    "docs/demos/assets/canonical-lab-Cho1YMq8.js",
-    "docs/demos/assets/index-Q6pGU4wS.js",
+    "docs/demos/assets/canonical-lab-C1FaueBf.js",
+    "docs/demos/assets/index-DJt1jRZc.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
     "docs/demos/assets/shadow-architectures-CnBoOeHY.js",
     "docs/demos/assets/three.tsl--5AYqKVA.js",
@@ -23,16 +23,16 @@
     "docs/demos/assets/webgpu-device-identity-uNUcs3Wh.js"
   ],
   "emittedAssetDependencies": [
-    "docs/demos/assets/canonical-lab-Cho1YMq8.js",
-    "docs/demos/assets/index-Q6pGU4wS.js",
+    "docs/demos/assets/canonical-lab-C1FaueBf.js",
+    "docs/demos/assets/index-DJt1jRZc.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
     "docs/demos/assets/shadow-architectures-CnBoOeHY.js",
     "docs/demos/assets/three.tsl--5AYqKVA.js",
     "docs/demos/assets/three.webgpu-Dss1ekdK.js",
     "docs/demos/assets/webgpu-device-identity-uNUcs3Wh.js"
   ],
-  "publishedBundleHash": "sha256:3457053de5ab050ce0d1000d459599610d5c1995d4127b2cdc220050717c0a91",
+  "publishedBundleHash": "sha256:72e144235093a27db006d320ace064ac03847d86675a96d56284aef9768ad47a",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:49ab4c316e51d9bb267cb0cda243b6d6c4dd9af8afa65d1c469737eaa2a18260",
-  "evidenceBundleId": null
+  "buildRevision": "sha256:caa4bd9a0d957e7dd8f25b94091ab083fa62083edb7c9a6f00872b044beac719",
+  "evidenceBundleId": "bundle"
 }
