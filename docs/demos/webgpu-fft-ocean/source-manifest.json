@@ -7,27 +7,30 @@
     "threejs-spectral-ocean/examples/webgpu-fft-ocean"
   ],
   "sourceHashInputs": [
+    "labs/runtime/webgpu-device-identity.mjs",
     "threejs-spectral-ocean/examples/webgpu-fft-ocean"
   ],
   "browserEntry": "threejs-spectral-ocean/examples/webgpu-fft-ocean/index.html",
-  "sourceHash": "sha256:8e5b5f310de4938e4041daac7f9688054085f68004fba69e6d560b9e30acf125",
+  "sourceHash": "sha256:d8bfba57799a06f5fb8bdaf78eb70bb58a6de29a5de8f98724aa03bf85bda91a",
   "publishedHashInputs": [
     "docs/demos/webgpu-fft-ocean",
-    "docs/demos/assets/index-Dhvz353-.js",
-    "docs/demos/assets/integration-stage-s6vGCOlT.js",
+    "docs/demos/assets/index-CatAq_Ze.js",
+    "docs/demos/assets/integration-stage-vgQFmTFc.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js",
+    "docs/demos/assets/webgpu-device-identity-uNUcs3Wh.js"
   ],
   "emittedAssetDependencies": [
-    "docs/demos/assets/index-Dhvz353-.js",
-    "docs/demos/assets/integration-stage-s6vGCOlT.js",
+    "docs/demos/assets/index-CatAq_Ze.js",
+    "docs/demos/assets/integration-stage-vgQFmTFc.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js",
+    "docs/demos/assets/webgpu-device-identity-uNUcs3Wh.js"
   ],
-  "publishedBundleHash": "sha256:a999ebba1260c4dfbfa0ca033c3e7e857002a7180679201f352e19bcfe53153e",
+  "publishedBundleHash": "sha256:fea09ca36e3de2839b52f25a9215f7e4110136c32152bf2eecbbf48827961c58",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b",
+  "buildRevision": "sha256:1e6b394e627f62530067de74268edff55eabade9d23fac107528808e31614555",
   "evidenceBundleId": null
 }

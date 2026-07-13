@@ -4,6 +4,7 @@
   "kind": "canonical-lab",
   "status": "incomplete",
   "canonicalSource": [
+    "threejs-procedural-fields/examples/webgpu-field-bake",
     "threejs-procedural-fields/examples/webgpu-field-bake/field-constants.mjs",
     "threejs-procedural-fields/examples/webgpu-field-bake/field-bundle.mjs",
     "threejs-procedural-fields/examples/webgpu-field-bake/field-bake.mjs",
@@ -14,30 +15,30 @@
     "threejs-procedural-fields/examples/webgpu-field-bake"
   ],
   "browserEntry": "threejs-procedural-fields/examples/webgpu-field-bake/index.html",
-  "sourceHash": "sha256:030f7fbeb88364101b6f9e32be7c6a957a12cc0929ae93b384fea9de32b08ecc",
+  "sourceHash": "sha256:015f3e41078f1c643c314785c9c8cb6a54091805c1f6ce8646f17b1b54fd93f6",
   "publishedHashInputs": [
     "docs/demos/webgpu-field-bake",
     "docs/demos/assets/biome-field-a-R50xQW_s.png",
     "docs/demos/assets/biome-field-b-DSx0H3Jp.png",
     "docs/demos/assets/biome-field-c-BZ_lWbL6.png",
-    "docs/demos/assets/field-bake-CHyvAERN.js",
-    "docs/demos/assets/index-DVM_NF4k.js",
+    "docs/demos/assets/field-bake-DwuzVV-H.js",
+    "docs/demos/assets/index-Dl9fBqXE.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js"
   ],
   "emittedAssetDependencies": [
     "docs/demos/assets/biome-field-a-R50xQW_s.png",
     "docs/demos/assets/biome-field-b-DSx0H3Jp.png",
     "docs/demos/assets/biome-field-c-BZ_lWbL6.png",
-    "docs/demos/assets/field-bake-CHyvAERN.js",
-    "docs/demos/assets/index-DVM_NF4k.js",
+    "docs/demos/assets/field-bake-DwuzVV-H.js",
+    "docs/demos/assets/index-Dl9fBqXE.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js"
   ],
-  "publishedBundleHash": "sha256:9236bcef683258e342c046eaba9a87634272f4c36574a9f6cee81002a6f9b75c",
+  "publishedBundleHash": "sha256:18e8726033bc15c543ad25aee05f2163cd992f014437da26d287f70ee58d6910",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b",
+  "buildRevision": "sha256:1e6b394e627f62530067de74268edff55eabade9d23fac107528808e31614555",
   "evidenceBundleId": null
 }

@@ -628,6 +628,75 @@
       ]
     },
     {
+      "labId": "webgpu-field-bake",
+      "expectedAcceptanceStatus": "incomplete",
+      "artifactDirectory": "artifacts/visual-validation/webgpu-field-bake/correctness",
+      "backendProof": "capture-session.json",
+      "claimVerdicts": "capture-session.json",
+      "primaryImage": "final.design.png",
+      "primaryImageLabel": "final.design.png",
+      "limitations": [
+        "Native WebGPU correctness bundle with field/storage/placement/probe readbacks and mechanism diagnostics.",
+        "Current-adapter GPU timestamps remain unaccepted in the correctness profile."
+      ],
+      "images": [
+        {
+          "source": "final.design.png",
+          "output": "final.design.png",
+          "encoding": "png-copy",
+          "meaning": "Field gallery final presentation readback."
+        },
+        {
+          "source": "diagnostics.mosaic.png",
+          "output": "diagnostics.mosaic.png",
+          "encoding": "png-copy",
+          "meaning": "Gradient diagnostic mosaic readback."
+        },
+        {
+          "source": "camera.near.png",
+          "output": "camera.near.png",
+          "encoding": "png-copy",
+          "meaning": "Near camera field presentation."
+        },
+        {
+          "source": "camera.design.png",
+          "output": "camera.design.png",
+          "encoding": "png-copy",
+          "meaning": "Design camera field presentation."
+        },
+        {
+          "source": "camera.far.png",
+          "output": "camera.far.png",
+          "encoding": "png-copy",
+          "meaning": "Far camera field presentation."
+        },
+        {
+          "source": "seed-0001.final.png",
+          "output": "seed-0001.final.png",
+          "encoding": "png-copy",
+          "meaning": "Structured-placement seed 1 final."
+        },
+        {
+          "source": "seed-9e3779b9.final.png",
+          "output": "seed-9e3779b9.final.png",
+          "encoding": "png-copy",
+          "meaning": "Structured-placement stress seed final."
+        },
+        {
+          "source": "temporal.t000.png",
+          "output": "temporal.t000.png",
+          "encoding": "png-copy",
+          "meaning": "Shared-cause composition at t=0."
+        },
+        {
+          "source": "temporal.t001.png",
+          "output": "temporal.t001.png",
+          "encoding": "png-copy",
+          "meaning": "Shared-cause composition at t=25s step."
+        }
+      ]
+    },
+    {
       "labId": "webgpu-exposure-color-pipeline",
       "expectedAcceptanceStatus": "incomplete",
       "artifactDirectory": "artifacts/visual-validation/webgpu-exposure-color-pipeline-v2",
@@ -927,6 +996,40 @@
       ]
     },
     {
+      "labId": "weathered-world",
+      "expectedAcceptanceStatus": "incomplete",
+      "artifactDirectory": "artifacts/visual-validation/weathered-world/correctness",
+      "backendProof": "capture-session.json",
+      "claimVerdicts": "claim-verdicts.json",
+      "primaryImage": "final.design.png",
+      "primaryImageLabel": "Weathered World multi-skill composition readback",
+      "limitations": [
+        "Correctness capture records native r185 WebGPUBackend with device identity proof.",
+        "GPU timestamps, 50-cycle lifecycle, and full mechanism/tier matrix remain incomplete.",
+        "Named-adapter 60 Hz performance compliance is NOT_CLAIMED."
+      ],
+      "images": [
+        {
+          "source": "final.design.png",
+          "output": "final.design.png",
+          "encoding": "png-copy",
+          "meaning": "Primary final composition readback."
+        },
+        {
+          "source": "no-post.design.png",
+          "output": "no-post.design.png",
+          "encoding": "png-copy",
+          "meaning": "No-post / scene-HDR baseline readback."
+        },
+        {
+          "source": "diagnostics.mosaic.png",
+          "output": "diagnostics.mosaic.png",
+          "encoding": "png-copy",
+          "meaning": "Owner-graph diagnostics display readback."
+        }
+      ]
+    },
+    {
       "labId": "webgpu-bounded-water",
       "expectedAcceptanceStatus": "incomplete",
       "artifactDirectory": "artifacts/visual-validation/webgpu-bounded-water/correctness",
@@ -1130,6 +1233,82 @@
           "output": "tier.medium.png",
           "encoding": "png-copy",
           "meaning": "Medium tier frame."
+        }
+      ]
+    },
+    {
+      "labId": "webgpu-quadtree-planet",
+      "expectedAcceptanceStatus": "incomplete",
+      "artifactDirectory": "artifacts/visual-validation/webgpu-quadtree-planet/correctness",
+      "backendProof": "capture-session.json",
+      "claimVerdicts": "evidence-manifest.json",
+      "primaryImage": "final.design.png",
+      "primaryImageLabel": "Quadtree planet correctness presentation",
+      "limitations": [
+        "Current-source correctness capture after interleaved vertex packing + adapter maxBufferSize request; validate:artifacts structuralVerdict PASS.",
+        "GPU timestamps NOT_CLAIMED; visualCorrectness and lifecycle remain INSUFFICIENT_EVIDENCE; not a publishable release-bundle.",
+        "Root cause fixed: separate BufferAttributes exceeded WebGPU max vertex buffers (16>8); geometry is now one InterleavedBuffer."
+      ],
+      "images": [
+        {
+          "source": "final.design.png",
+          "output": "final.design.png",
+          "encoding": "png-copy",
+          "meaning": "Final solid-body presentation."
+        },
+        {
+          "source": "no-post.design.png",
+          "output": "no-post.design.png",
+          "encoding": "png-copy",
+          "meaning": "Ambient-only lighting control (no post stack; sun stripped)."
+        },
+        {
+          "source": "diagnostics.mosaic.png",
+          "output": "diagnostics.mosaic.png",
+          "encoding": "png-copy",
+          "meaning": "Diagnostics mosaic (height alias path)."
+        },
+        {
+          "source": "camera.design.png",
+          "output": "camera.design.png",
+          "encoding": "png-copy",
+          "meaning": "Design camera."
+        },
+        {
+          "source": "camera.near.png",
+          "output": "camera.near.png",
+          "encoding": "png-copy",
+          "meaning": "Near camera."
+        },
+        {
+          "source": "camera.far.png",
+          "output": "camera.far.png",
+          "encoding": "png-copy",
+          "meaning": "Far camera."
+        },
+        {
+          "source": "seed-0001.final.png",
+          "output": "seed-0001.final.png",
+          "encoding": "png-copy",
+          "meaning": "Seed 0x1 final."
+        },
+        {
+          "source": "seed-9e3779b9.final.png",
+          "output": "seed-9e3779b9.final.png",
+          "encoding": "png-copy",
+          "meaning": "Seed 0x9e3779b9 final."
+        },
+        {
+          "source": "temporal.t000.png",
+          "output": "temporal.t000.png",
+          "encoding": "png-copy",
+          "meaning": "Temporal t=0 (sun azimuth baseline)."
+        },
+        {
+          "source": "temporal.t001.png",
+          "output": "temporal.t001.png",
+          "encoding": "png-copy",
+          "meaning": "Temporal t=1/60 (sun azimuth advanced)."
         }
       ]
     }

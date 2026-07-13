@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "labId": "webgpu-fft-ocean",
+  "classification": "inspected-runtime-evidence-preview",
+  "acceptanceStatus": "incomplete",
+  "evidenceBundleId": "correctness",
+  "canonicalSource": [
+    "threejs-spectral-ocean/examples/webgpu-fft-ocean"
+  ],
+  "canonicalSourceHash": "sha256:d8bfba57799a06f5fb8bdaf78eb70bb58a6de29a5de8f98724aa03bf85bda91a",
+  "threeRevision": "0.185.1",
+  "runtime": {
+    "renderer": "unknown",
+    "backend": "unknown",
+    "isWebGPUBackend": true,
+    "threeRevision": "185"
+  },
+  "claimVerdicts": {
+    "visualCorrectness": "PASS",
+    "mechanismCorrectness": "PASS",
+    "performanceCompliance": "INSUFFICIENT_EVIDENCE",
+    "gpuAttribution": "INSUFFICIENT_EVIDENCE",
+    "lifecycleStability": "INSUFFICIENT_EVIDENCE"
+  },
+  "primaryImage": "final.design.png",
+  "primaryImageLabel": "FFT ocean final presentation readback",
+  "images": [
+    {
+      "file": "final.design.png",
+      "meaning": "Final ocean presentation after spectral FFT path.",
+      "source": "final.design.png",
+      "sourceSha256": "sha256:61b5f55069e727447b93646505bc166980167a7610b2e91f62b370e3298900d1",
+      "outputSha256": "sha256:61b5f55069e727447b93646505bc166980167a7610b2e91f62b370e3298900d1",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "no-post.design.png",
+      "meaning": "No-post ocean presentation baseline.",
+      "source": "no-post.design.png",
+      "sourceSha256": "sha256:b15f2c167ec727a7976509ba41b835c322f9602f46537195d94837cb016d5d6a",
+      "outputSha256": "sha256:b15f2c167ec727a7976509ba41b835c322f9602f46537195d94837cb016d5d6a",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "diagnostics.mosaic.png",
+      "meaning": "Diagnostics mosaic mode readback.",
+      "source": "diagnostics.mosaic.png",
+      "sourceSha256": "sha256:ee1037d9cde12f1b7c87165d7069c337de4c35eb3493e2d4aee1dc86fdda497c",
+      "outputSha256": "sha256:ee1037d9cde12f1b7c87165d7069c337de4c35eb3493e2d4aee1dc86fdda497c",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "spectrum-and-fft.png",
+      "meaning": "Spectrum/FFT mechanism diagnostic.",
+      "source": "spectrum-and-fft.png",
+      "sourceSha256": "sha256:e07c08dab1f7e6591c3ca41d2ba5b6c14bd46561cddc969e5a66dc219f4009ca",
+      "outputSha256": "sha256:e07c08dab1f7e6591c3ca41d2ba5b6c14bd46561cddc969e5a66dc219f4009ca",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "whitecaps-and-foam.png",
+      "meaning": "Whitecaps and foam mechanism diagnostic.",
+      "source": "whitecaps-and-foam.png",
+      "sourceSha256": "sha256:d14466e48ec6b109efa700ee43e1f5795c2ef0b90f39e0f199164dd1dcf1836d",
+      "outputSha256": "sha256:d14466e48ec6b109efa700ee43e1f5795c2ef0b90f39e0f199164dd1dcf1836d",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "above-and-below-surface.png",
+      "meaning": "Underwater optics camera diagnostic.",
+      "source": "above-and-below-surface.png",
+      "sourceSha256": "sha256:cfc04295caf4b4cd78714202e891e926e53d195c451f7176b90b77d8bbfb4a1d",
+      "outputSha256": "sha256:cfc04295caf4b4cd78714202e891e926e53d195c451f7176b90b77d8bbfb4a1d",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "camera.near.png",
+      "meaning": "Near camera ocean frame.",
+      "source": "camera.near.png",
+      "sourceSha256": "sha256:5db2d34f7ae73354560b49a53c709a148418f6e7f11d959916e510a537f6ad93",
+      "outputSha256": "sha256:5db2d34f7ae73354560b49a53c709a148418f6e7f11d959916e510a537f6ad93",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "seed-9e3779b9.final.png",
+      "meaning": "Stress seed final ocean frame.",
+      "source": "seed-9e3779b9.final.png",
+      "sourceSha256": "sha256:923294ea328ab65d5861de468238720f886bef420caeb58b6c8bf380c27460a9",
+      "outputSha256": "sha256:923294ea328ab65d5861de468238720f886bef420caeb58b6c8bf380c27460a9",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    }
+  ],
+  "limitations": [
+    "Native WebGPU capture proves complete 2D FFT fixture readbacks, cascade surface modes, and foam temporal frames.",
+    "Named-adapter GPU timestamps, lifecycle soak, and release-bundle acceptance remain residual."
+  ]
+}

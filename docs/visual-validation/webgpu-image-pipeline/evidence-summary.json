@@ -7,7 +7,7 @@
   "canonicalSource": [
     "threejs-image-pipeline/examples/webgpu-image-pipeline"
   ],
-  "canonicalSourceHash": "sha256:ea95e70d32fb11058979ac8a28b7bdd66d6488476742ac382432bae9a6fefdaa",
+  "canonicalSourceHash": "sha256:1abae9bb29b9f64aa5cd70ae7c916d0c0371304da94e7a6190630834b311c0ec",
   "threeRevision": "0.185.1",
   "runtime": {
     "renderer": "WebGPURenderer",

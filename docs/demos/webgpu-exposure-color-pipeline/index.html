@@ -50,11 +50,11 @@
 				}
 			}
 		</script>
-  <script type="module" crossorigin src="../assets/index-BirgHsGS.js"></script>
+  <script type="module" crossorigin src="../assets/index-CpjZJyzU.js"></script>
   <link rel="modulepreload" crossorigin href="../assets/modulepreload-polyfill-Dezn_h7o.js">
-  <link rel="modulepreload" crossorigin href="../assets/three.webgpu-Bjfb9xWU.js">
-  <link rel="modulepreload" crossorigin href="../assets/three.tsl-0l0bfIsw.js">
-  <link rel="modulepreload" crossorigin href="../assets/stage-Cd2YMrtA.js">
+  <link rel="modulepreload" crossorigin href="../assets/three.webgpu-Dss1ekdK.js">
+  <link rel="modulepreload" crossorigin href="../assets/three.tsl--5AYqKVA.js">
+  <link rel="modulepreload" crossorigin href="../assets/stage-CpfIdkfY.js">
 </head>
 	<body>
 <main class="demo-seo-shell" data-demo-seo-shell data-demo-id="webgpu-exposure-color-pipeline" data-owning-skill="threejs-exposure-color-grading">
@@ -65,37 +65,17 @@
       <h1>WebGPU Exposure Color Pipeline</h1>
       <p>Interactive Three.js WebGPU/TSL demo for WebGPU Exposure Color Pipeline, with 5 scenarios, 6 mechanisms, and 3 quality tiers and evidence-gated validation.</p>
       <p class="demo-seo-shell__evidence"><strong>Evidence status:</strong> The implementation is available for technical review, but its native-WebGPU runtime and evidence gates remain incomplete.</p>
-      <details class="demo-roadmap" data-demo-roadmap data-roadmap-status="incomplete" data-open-count="9">
-        <summary>Readiness &amp; remaining fixes <span>9</span></summary>
+      <details class="demo-roadmap" data-demo-roadmap data-roadmap-status="incomplete" data-open-count="4">
+        <summary>Readiness &amp; remaining fixes <span>4</span></summary>
         <div class="demo-roadmap__body">
-          <p>9 open closure items. Loadable does not mean accepted or performance-valid.</p>
+          <p>4 open closure items. Loadable does not mean accepted or performance-valid.</p>
           <ol><li data-roadmap-item data-priority="P0" data-category="performance">
           <div><span>P0</span><strong>Define and measure the target performance contract</strong></div>
           <p>The full-histogram, balanced-log-reduction, minimum-fixed-shot tiers have no accepted frame target. Record named device/browser/GPU, viewport, DPR, sustained CPU/GPU/presentation p50 and p95, deadline misses, memory, and settled quality. Submission time is not GPU timing.</p>
           <code>tiers[].frameTargetMs</code>
-        </li><li data-roadmap-item data-priority="P0" data-category="capability">
-          <div><span>P0</span><strong>Native Webgpu capability proof</strong></div>
-          <p>Capture current-source evidence for the declared native webgpu gate.</p>
-          <code>capabilityRequirements.native-webgpu</code>
-        </li><li data-roadmap-item data-priority="P0" data-category="capability">
-          <div><span>P0</span><strong>Storage Buffers capability proof</strong></div>
-          <p>Capture current-source evidence for the declared storage buffers gate.</p>
-          <code>capabilityRequirements.storage-buffers</code>
-        </li><li data-roadmap-item data-priority="P0" data-category="capability">
-          <div><span>P0</span><strong>Storage Atomics capability proof</strong></div>
-          <p>required by full-histogram tier</p>
-          <code>capabilityRequirements.storage-atomics</code>
-        </li><li data-roadmap-item data-priority="P0" data-category="runtime">
-          <div><span>P0</span><strong>Renderer Init runtime proof</strong></div>
-          <p>INSUFFICIENT_EVIDENCE</p>
-          <code>runtimeProof.renderer-init</code>
-        </li><li data-roadmap-item data-priority="P0" data-category="runtime">
-          <div><span>P0</span><strong>Compute Readback runtime proof</strong></div>
-          <p>INSUFFICIENT_EVIDENCE</p>
-          <code>runtimeProof.compute-readback</code>
         </li><li data-roadmap-item data-priority="P0" data-category="runtime">
           <div><span>P0</span><strong>Current Adapter Timing runtime proof</strong></div>
-          <p>INSUFFICIENT_EVIDENCE</p>
+          <p>No named-adapter timestamp capture accepted; performance remains INSUFFICIENT_EVIDENCE.</p>
           <code>runtimeProof.current-adapter-timing</code>
         </li><li data-roadmap-item data-priority="P1" data-category="evidence">
           <div><span>P1</span><strong>Capture a current-source evidence bundle</strong></div>

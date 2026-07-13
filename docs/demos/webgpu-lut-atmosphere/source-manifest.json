@@ -4,6 +4,7 @@
   "kind": "canonical-lab",
   "status": "incomplete",
   "canonicalSource": [
+    "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere",
     "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere/webgpu-lut-atmosphere.js",
     "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere/atmosphere-config.js",
     "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere/atmosphere-math.js",
@@ -14,27 +15,30 @@
     "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere/route-shell.js"
   ],
   "sourceHashInputs": [
+    "labs/runtime/webgpu-device-identity.mjs",
     "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere"
   ],
   "browserEntry": "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere/index.html",
-  "sourceHash": "sha256:3fa15f99b8c751a662324fbb5d148f4ae7d426f54786e80e607881c0c7471797",
+  "sourceHash": "sha256:e93675b0f1b0ec4adb8c247bf7dfb5a3e6a3f9c8c260b4cb239ab0afcd7e433c",
   "publishedHashInputs": [
     "docs/demos/webgpu-lut-atmosphere",
-    "docs/demos/assets/index-DG1t1Glt.js",
+    "docs/demos/assets/index-DwIlMwYj.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js",
-    "docs/demos/assets/webgpu-lut-atmosphere-BQM5Fa5Z.js"
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js",
+    "docs/demos/assets/webgpu-device-identity-uNUcs3Wh.js",
+    "docs/demos/assets/webgpu-lut-atmosphere-DkMbDrwr.js"
   ],
   "emittedAssetDependencies": [
-    "docs/demos/assets/index-DG1t1Glt.js",
+    "docs/demos/assets/index-DwIlMwYj.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js",
-    "docs/demos/assets/webgpu-lut-atmosphere-BQM5Fa5Z.js"
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js",
+    "docs/demos/assets/webgpu-device-identity-uNUcs3Wh.js",
+    "docs/demos/assets/webgpu-lut-atmosphere-DkMbDrwr.js"
   ],
-  "publishedBundleHash": "sha256:500458457a073fb8d8ce223c46bfe622e06d9ae5c350870ddb8703dd7ec95818",
+  "publishedBundleHash": "sha256:8f99fdd1a753f03df4a3959bf9cd452c149659742877168bd1397492baaac7ed",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b",
+  "buildRevision": "sha256:1e6b394e627f62530067de74268edff55eabade9d23fac107528808e31614555",
   "evidenceBundleId": null
 }

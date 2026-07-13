@@ -7,6 +7,7 @@
     "threejs-image-pipeline/examples/webgpu-image-pipeline"
   ],
   "sourceHashInputs": [
+    "labs/runtime/webgpu-device-identity.mjs",
     "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/constants.js",
     "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/exposure-nodes.js",
     "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/lut.js",
@@ -14,30 +15,32 @@
     "threejs-image-pipeline/examples/webgpu-image-pipeline"
   ],
   "browserEntry": "threejs-image-pipeline/examples/webgpu-image-pipeline/index.html",
-  "sourceHash": "sha256:3f4e180bd7ed3802f25020df37f654d2e8359b39b16271f28664ad7d8d144bbc",
+  "sourceHash": "sha256:1abae9bb29b9f64aa5cd70ae7c916d0c0371304da94e7a6190630834b311c0ec",
   "publishedHashInputs": [
     "docs/demos/webgpu-image-pipeline",
-    "docs/demos/assets/BloomNode-qktuf1Q7.js",
-    "docs/demos/assets/GTAONode-DrPYssY_.js",
-    "docs/demos/assets/TRAANode-BHDUI1yA.js",
-    "docs/demos/assets/canonical-browser-app-DP12SSG4.js",
+    "docs/demos/assets/BloomNode-B7VcMtwE.js",
+    "docs/demos/assets/GTAONode-IHocvv2Q.js",
+    "docs/demos/assets/TRAANode-s2X8LMY_.js",
+    "docs/demos/assets/canonical-browser-app-BHlpABDs.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/stage-Cd2YMrtA.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+    "docs/demos/assets/stage-CpfIdkfY.js",
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js",
+    "docs/demos/assets/webgpu-device-identity-uNUcs3Wh.js"
   ],
   "emittedAssetDependencies": [
-    "docs/demos/assets/BloomNode-qktuf1Q7.js",
-    "docs/demos/assets/GTAONode-DrPYssY_.js",
-    "docs/demos/assets/TRAANode-BHDUI1yA.js",
-    "docs/demos/assets/canonical-browser-app-DP12SSG4.js",
+    "docs/demos/assets/BloomNode-B7VcMtwE.js",
+    "docs/demos/assets/GTAONode-IHocvv2Q.js",
+    "docs/demos/assets/TRAANode-s2X8LMY_.js",
+    "docs/demos/assets/canonical-browser-app-BHlpABDs.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/stage-Cd2YMrtA.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+    "docs/demos/assets/stage-CpfIdkfY.js",
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js",
+    "docs/demos/assets/webgpu-device-identity-uNUcs3Wh.js"
   ],
-  "publishedBundleHash": "sha256:6b138953a8abd892d54de4a1ff6fed4b89afd913d2dc98c1c8d6bda996e27771",
+  "publishedBundleHash": "sha256:faabe9378ad01133253dcf27a4b56bca809789feff3e586fd154352faed201e3",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b",
+  "buildRevision": "sha256:1e6b394e627f62530067de74268edff55eabade9d23fac107528808e31614555",
   "evidenceBundleId": null
 }

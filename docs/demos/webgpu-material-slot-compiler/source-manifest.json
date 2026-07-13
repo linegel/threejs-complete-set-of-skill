@@ -7,27 +7,30 @@
     "threejs-procedural-buildings-and-cities/examples/webgpu-material-slot-compiler"
   ],
   "sourceHashInputs": [
+    "labs/runtime/webgpu-device-identity.mjs",
     "threejs-procedural-buildings-and-cities/examples/webgpu-material-slot-compiler"
   ],
   "browserEntry": "threejs-procedural-buildings-and-cities/examples/webgpu-material-slot-compiler/index.html",
-  "sourceHash": "sha256:7ad7958a7bf3a2a3bdda298b38666f2e4f4983b7b0780aef6b74d4795e99da3b",
+  "sourceHash": "sha256:dd6b7dfc24b0553b4562b465dcfd3dcf5a10c6741d76da60e2f70ceb8355e500",
   "publishedHashInputs": [
     "docs/demos/webgpu-material-slot-compiler",
-    "docs/demos/assets/compiler-CgFt0OYt.js",
-    "docs/demos/assets/index-BqWWXv64.js",
+    "docs/demos/assets/compiler-CCDJScob.js",
+    "docs/demos/assets/index-DTGpFjif.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js",
+    "docs/demos/assets/webgpu-device-identity-uNUcs3Wh.js"
   ],
   "emittedAssetDependencies": [
-    "docs/demos/assets/compiler-CgFt0OYt.js",
-    "docs/demos/assets/index-BqWWXv64.js",
+    "docs/demos/assets/compiler-CCDJScob.js",
+    "docs/demos/assets/index-DTGpFjif.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js",
+    "docs/demos/assets/webgpu-device-identity-uNUcs3Wh.js"
   ],
-  "publishedBundleHash": "sha256:56491d75b79f11b6f28cb515b561527d985c80bea914a5363ec9716ff5d0948f",
+  "publishedBundleHash": "sha256:7354717cd511bff93c96511b87d47edcaae1f105e8ea41379d9343ec6eb298d9",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b",
+  "buildRevision": "sha256:1e6b394e627f62530067de74268edff55eabade9d23fac107528808e31614555",
   "evidenceBundleId": null
 }

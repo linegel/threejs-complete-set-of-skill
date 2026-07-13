@@ -74,13 +74,14 @@
 			}
 		</script>
   <script type="module" crossorigin src="../assets/modulepreload-polyfill-Dezn_h7o.js"></script>
-  <script type="module" crossorigin src="../assets/three.webgpu-Bjfb9xWU.js"></script>
-  <script type="module" crossorigin src="../assets/three.tsl-0l0bfIsw.js"></script>
-  <script type="module" crossorigin src="../assets/BloomNode-qktuf1Q7.js"></script>
-  <script type="module" crossorigin src="../assets/GTAONode-DrPYssY_.js"></script>
-  <script type="module" crossorigin src="../assets/TRAANode-BHDUI1yA.js"></script>
-  <script type="module" crossorigin src="../assets/stage-Cd2YMrtA.js"></script>
-  <script type="module" crossorigin src="../assets/canonical-browser-app-DP12SSG4.js"></script>
+  <script type="module" crossorigin src="../assets/three.webgpu-Dss1ekdK.js"></script>
+  <script type="module" crossorigin src="../assets/three.tsl--5AYqKVA.js"></script>
+  <script type="module" crossorigin src="../assets/webgpu-device-identity-uNUcs3Wh.js"></script>
+  <script type="module" crossorigin src="../assets/BloomNode-B7VcMtwE.js"></script>
+  <script type="module" crossorigin src="../assets/GTAONode-IHocvv2Q.js"></script>
+  <script type="module" crossorigin src="../assets/TRAANode-s2X8LMY_.js"></script>
+  <script type="module" crossorigin src="../assets/stage-CpfIdkfY.js"></script>
+  <script type="module" crossorigin src="../assets/canonical-browser-app-BHlpABDs.js"></script>
 </head>
 	<body>
 <main class="demo-seo-shell" data-demo-seo-shell data-demo-id="webgpu-image-pipeline" data-owning-skill="threejs-image-pipeline">
@@ -91,37 +92,21 @@
       <h1>WebGPU Image Pipeline</h1>
       <p>Interactive Three.js WebGPU/TSL demo for WebGPU Image Pipeline, with 1 scenario, 6 mechanisms, and 3 quality tiers and evidence-gated validation.</p>
       <p class="demo-seo-shell__evidence"><strong>Evidence status:</strong> The implementation is available for technical review, but its native-WebGPU runtime and evidence gates remain incomplete.</p>
-      <details class="demo-roadmap" data-demo-roadmap data-roadmap-status="incomplete" data-open-count="9">
-        <summary>Readiness &amp; remaining fixes <span>9</span></summary>
+      <details class="demo-roadmap" data-demo-roadmap data-roadmap-status="incomplete" data-open-count="5">
+        <summary>Readiness &amp; remaining fixes <span>5</span></summary>
         <div class="demo-roadmap__body">
-          <p>9 open closure items. Loadable does not mean accepted or performance-valid.</p>
+          <p>5 open closure items. Loadable does not mean accepted or performance-valid.</p>
           <ol><li data-roadmap-item data-priority="P0" data-category="performance">
           <div><span>P0</span><strong>Define and measure the target performance contract</strong></div>
           <p>The full, reduced, debug tiers have no accepted frame target. Record named device/browser/GPU, viewport, DPR, sustained CPU/GPU/presentation p50 and p95, deadline misses, memory, and settled quality. Submission time is not GPU timing.</p>
           <code>tiers[].frameTargetMs</code>
         </li><li data-roadmap-item data-priority="P0" data-category="capability">
-          <div><span>P0</span><strong>Native Webgpu capability proof</strong></div>
-          <p>Capture current-source evidence for the declared native webgpu gate.</p>
-          <code>capabilityRequirements.native-webgpu</code>
-        </li><li data-roadmap-item data-priority="P0" data-category="capability">
           <div><span>P0</span><strong>Timestamp Query capability proof</strong></div>
-          <p>required for performance claims</p>
+          <p>required for performance claims; correctness capture does not accept current-adapter timestamps.</p>
           <code>capabilityRequirements.timestamp-query</code>
         </li><li data-roadmap-item data-priority="P0" data-category="runtime">
-          <div><span>P0</span><strong>Renderer Init runtime proof</strong></div>
-          <p>INSUFFICIENT_EVIDENCE</p>
-          <code>runtimeProof.renderer-init</code>
-        </li><li data-roadmap-item data-priority="P0" data-category="runtime">
-          <div><span>P0</span><strong>MRT Readback runtime proof</strong></div>
-          <p>INSUFFICIENT_EVIDENCE</p>
-          <code>runtimeProof.mrt-readback</code>
-        </li><li data-roadmap-item data-priority="P0" data-category="runtime">
-          <div><span>P0</span><strong>Temporal Reset runtime proof</strong></div>
-          <p>INSUFFICIENT_EVIDENCE</p>
-          <code>runtimeProof.temporal-reset</code>
-        </li><li data-roadmap-item data-priority="P0" data-category="runtime">
           <div><span>P0</span><strong>Current Adapter Timing runtime proof</strong></div>
-          <p>INSUFFICIENT_EVIDENCE</p>
+          <p>Current-adapter GPU timestamps remain INSUFFICIENT_EVIDENCE.</p>
           <code>runtimeProof.current-adapter-timing</code>
         </li><li data-roadmap-item data-priority="P1" data-category="evidence">
           <div><span>P1</span><strong>Capture a current-source evidence bundle</strong></div>
