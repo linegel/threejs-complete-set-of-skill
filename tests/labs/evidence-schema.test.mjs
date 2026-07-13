@@ -608,7 +608,11 @@ test('release bundles require separate correctness and physical-route lanes', ()
 
   const softwareCorrectness = releaseRecord();
   softwareCorrectness.captureSessions.find((entry) => entry.profile === 'correctness').adapterClass = 'software';
-  assertSchemaInvalid(softwareCorrectness, 'release correctness lane on a software adapter');
+  assertSchemaValid(softwareCorrectness, 'release correctness lane on a software adapter with separate hardware review');
+
+  const softwarePhysical = releaseRecord();
+  softwarePhysical.captureSessions.find((entry) => entry.profile === 'physical-route').adapterClass = 'software';
+  assertSchemaInvalid(softwarePhysical, 'release physical-route lane on a software adapter');
 });
 
 test('capture profiles reject cross-lane automation surfaces', () => {

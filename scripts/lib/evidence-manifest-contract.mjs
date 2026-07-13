@@ -220,7 +220,7 @@ function validateCaptureSessions( manifest, fileIndex, errors ) {
 		if ( session?.routeDigest !== canonicalSha256( manifest.route ) ) errors.push( `${ label } route digest differs from the canonical release route.` );
 		if ( session?.stateDigest !== manifest.route?.stateDigest ) errors.push( `${ label } state digest differs from the release route state.` );
 		if ( session?.rendererInitialized !== true || session?.isWebGPUBackend !== true ) errors.push( `${ label } does not prove initialized native WebGPU execution.` );
-		if ( manifest.bundleKind === 'release-bundle' && session?.adapterClass !== 'hardware' ) errors.push( `${ label } release capture lane is not bound to a hardware adapter.` );
+		if ( manifest.bundleKind === 'release-bundle' && [ 'physical-route', 'performance' ].includes( session?.profile ) && session?.adapterClass !== 'hardware' ) errors.push( `${ label } physical release lane is not bound to a hardware adapter.` );
 		if ( manifest.bundleKind === 'release-bundle' && session?.profile === 'performance' && session?.timestampQuerySupported !== true ) errors.push( `${ label } performance lane lacks timestamp-query support.` );
 		for ( const [ field, kind ] of Object.entries( SESSION_IDENTITY_KINDS ) ) if ( session?.[ field ]?.kind !== kind || typeof session?.[ field ]?.digest !== 'string' ) errors.push( `${ label } ${ field } reference is invalid.` );
 		if ( typeof session?.limitationsDigest !== 'string' ) errors.push( `${ label } limitations digest is invalid.` );

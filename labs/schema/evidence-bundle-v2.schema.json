@@ -970,11 +970,10 @@
             {
               "contains": {
                 "type": "object",
-                "required": ["profile", "automationSurface", "adapterClass"],
+                "required": ["profile", "automationSurface"],
                 "properties": {
                   "profile": { "const": "correctness" },
-                  "automationSurface": { "const": "playwright-headless-chromium" },
-                  "adapterClass": { "const": "hardware" }
+                  "automationSurface": { "const": "playwright-headless-chromium" }
                 }
               },
               "minContains": 1
@@ -982,10 +981,11 @@
             {
               "contains": {
                 "type": "object",
-                "required": ["profile", "automationSurface"],
+                "required": ["profile", "automationSurface", "adapterClass"],
                 "properties": {
                   "profile": { "const": "physical-route" },
-                  "automationSurface": { "const": "codex-in-app-browser" }
+                  "automationSurface": { "const": "codex-in-app-browser" },
+                  "adapterClass": { "const": "hardware" }
                 }
               },
               "minContains": 1
