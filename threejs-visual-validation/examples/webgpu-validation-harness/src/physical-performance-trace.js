@@ -235,6 +235,11 @@ export function createRuntimePerformanceTrace( verified ) {
 	const deadlineIntervalMs = HARDWARE_PERFORMANCE_CONTRACT.deadlineThreshold.value;
 	const trace = {
 		adapterClass: record.adapter.adapterClass,
+		refreshHz: record.refresh.hz.value,
+		refreshP50: record.refresh.p50.value,
+		refreshP95: record.refresh.p95.value,
+		hostReserveP95: record.hostReserve.p95.value,
+		compositorReserve: structuredClone( record.compositorReserve ),
 		warmupCpuSamples: [ ...cold.warmupCpuSamples ],
 		coldCpuSamples: [ ...cold.cpuSamples ],
 		coldGpuSamples: [ ...cold.gpuSamples ],

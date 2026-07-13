@@ -8,6 +8,7 @@ import { getAlignedReadbackLayout } from './readback.js';
 import { REQUIRED_V2_IMAGES } from './schema/v2.js';
 
 const RUNTIME_SOURCE = 'native WebGPU correctness capture';
+const PERFORMANCE_SOURCE = 'named-hardware physical-browser performance capture';
 const M = ( value, unit, source = RUNTIME_SOURCE ) => numericDatum( value, unit, NumericLabel.MEASURED, source );
 const D = ( value, unit, source ) => numericDatum( value, unit, NumericLabel.DERIVED, source );
 const G = ( value, unit, source ) => numericDatum( value, unit, NumericLabel.GATED, source );
@@ -36,6 +37,18 @@ function canonicalize( value ) {
 
 	if ( Array.isArray( value ) ) return value.map( canonicalize );
 	if ( value && typeof value === 'object' ) return Object.fromEntries( Object.keys( value ).sort().map( ( key ) => [ key, canonicalize( value[ key ] ) ] ) );
+	return value;
+
+}
+
+function deepFreeze( value ) {
+
+	if ( value && typeof value === 'object' && Object.isFrozen( value ) === false ) {
+
+		for ( const entry of Object.values( value ) ) deepFreeze( entry );
+		Object.freeze( value );
+
+	}
 	return value;
 
 }
@@ -491,13 +504,13 @@ export function summarizeLifecycleEvidence( lifecycle ) {
 
 }
 
-export function buildTraceSegment( samples, label, targetIntervalMs, presentationSamples = null, deadlineIntervalMs = targetIntervalMs ) {
+export function buildTraceSegment( samples, label, targetIntervalMs, presentationSamples = null, deadlineIntervalMs = targetIntervalMs, sourceIdentity = RUNTIME_SOURCE ) {
 
 	if ( Number.isFinite( deadlineIntervalMs ) === false || deadlineIntervalMs <= 0 ) throw new Error( 'Trace segment requires a positive deadline interval.' );
-	const source = `${ RUNTIME_SOURCE }; ${ label } CPU samples`;
+	const source = `${ sourceIdentity }; ${ label } CPU samples`;
 	const measuredPresentation = Array.isArray( presentationSamples ) && presentationSamples.length > 0;
 	const presentationSource = measuredPresentation
-		? `${ RUNTIME_SOURCE }; requestAnimationFrame cadence with rendering enabled`
+		? `${ sourceIdentity }; requestAnimationFrame cadence with rendering enabled`
 		: 'authored target interval; presentation cadence was not measured';
 	const cadenceSamples = measuredPresentation ? presentationSamples : [ targetIntervalMs ];
 	const presentationP95 = percentile( cadenceSamples, 0.95 );
@@ -685,6 +698,232 @@ export function classifyMechanismProof( proof, diagnosticDifferences, pipeline )
 
 }
 
+export function createPerformanceEvidenceArtifacts( input ) {
+
+	const {
+		captureProfile,
+		adapterClass: rawAdapterClass,
+		metrics,
+		gpuTiming,
+		performanceTrace = null,
+		governorTrace = null
+	} = input;
+	const adapterClass = requireAdapterClass( rawAdapterClass ?? performanceTrace?.adapterClass ?? 'unknown' );
+	if ( performanceTrace !== null && performanceTrace.adapterClass !== adapterClass ) throw new Error( 'Performance trace adapter class disagrees with the runtime adapter.' );
+	const targetRate = 60;
+	const targetIntervalMs = 1000 / targetRate;
+	const gates = {
+		cpuP95: HARDWARE_PERFORMANCE_CONTRACT.cpuP95Maximum.value,
+		gpuP95: HARDWARE_PERFORMANCE_CONTRACT.gpuP95Maximum.value,
+		deadlineMissRatio: HARDWARE_PERFORMANCE_CONTRACT.maximumDeadlineMissRatio.value
+	};
+	const performanceVerdict = classifyPerformanceTrace( performanceTrace, gates, adapterClass );
+	const gpuAttributionVerdict = classifyGpuStageAttribution( performanceTrace );
+	const governorVerdict = classifyGovernorTrace( governorTrace );
+	const performanceComplianceVerdict = classifyPerformanceCompliance( performanceVerdict, governorVerdict );
+	const hardwarePerformanceClaim = performanceTrace !== null && adapterClass === 'hardware';
+	const sourceIdentity = hardwarePerformanceClaim ? PERFORMANCE_SOURCE : RUNTIME_SOURCE;
+
+	let refreshPeriod = targetIntervalMs;
+	let browserMainThreadReserve = A( 1, 'ms', 'authored correctness target envelope' );
+	let compositorGpuReserve = A( 1, 'ms', 'authored correctness target envelope' );
+	if ( hardwarePerformanceClaim ) {
+
+		for ( const [ value, label ] of [
+			[ performanceTrace.refreshHz, 'measured refresh Hz' ],
+			[ performanceTrace.refreshP50, 'measured refresh p50' ],
+			[ performanceTrace.refreshP95, 'measured refresh p95' ],
+			[ performanceTrace.hostReserveP95, 'measured host reserve p95' ]
+		] ) if ( Number.isFinite( value ) === false || value < 0 ) throw new Error( `Hardware performance trace omits ${ label }.` );
+		if ( performanceTrace.refreshHz <= 0 || Math.abs( 1000 / performanceTrace.refreshHz - performanceTrace.refreshP50 ) > 1e-6 ) throw new Error( 'Hardware performance refresh period does not reconcile with measured refresh Hz.' );
+		refreshPeriod = 1000 / performanceTrace.refreshHz;
+		browserMainThreadReserve = M( performanceTrace.hostReserveP95, 'ms', `${ PERFORMANCE_SOURCE }; idle-rAF p95 minus p50` );
+		const compositor = performanceTrace.compositorReserve;
+		if ( compositor?.verdict === 'PASS' ) {
+
+			if ( compositor.measurement?.label !== 'Measured' || Number.isFinite( compositor.measurement.value ) === false || compositor.measurement.value < 0 || typeof compositor.api !== 'string' || compositor.api.length === 0 ) throw new Error( 'Claimed compositor reserve lacks a measured API-bound value.' );
+			compositorGpuReserve = M( compositor.measurement.value, 'ms', `${ PERFORMANCE_SOURCE }; ${ compositor.api }` );
+
+		} else if ( compositor?.verdict === 'NOT_CLAIMED' ) compositorGpuReserve = {
+
+			status: 'NOT_CLAIMED',
+			value: null,
+			reason: compositor.reason ?? 'No browser API exposed compositor GPU reserve.'
+
+		};
+		else throw new Error( 'Hardware performance trace must explicitly claim or decline compositor reserve.' );
+
+	}
+
+	const performanceEnvelope = schema( {
+		gpuTimingRequirement: hardwarePerformanceClaim ? 'required' : 'not-claimed',
+		refreshRate: hardwarePerformanceClaim ? M( performanceTrace.refreshHz, 'Hz', `${ PERFORMANCE_SOURCE }; idle-rAF median interval` ) : A( targetRate, 'Hz', 'authored correctness target rate' ),
+		refreshPeriod: D( refreshPeriod, 'ms', hardwarePerformanceClaim ? '1000 / measured refresh Hz' : '1000 / authored 60 Hz correctness target' ),
+		browserMainThreadReserve,
+		compositorGpuReserve,
+		cpuSafetyReserve: A( 1, 'ms', 'authored target envelope' ),
+		gpuSafetyReserve: A( 1, 'ms', 'authored target envelope' ),
+		cpuSceneEnvelope: hardwarePerformanceClaim ? G( gates.cpuP95, 'ms', 'frozen current-adapter CPU scene budget' ) : D( gates.cpuP95, 'ms', 'exact 60 Hz refresh period - authored browser reserve - CPU reserve' ),
+		gpuSceneEnvelope: hardwarePerformanceClaim ? G( gates.gpuP95, 'ms', 'frozen current-adapter GPU scene budget' ) : D( gates.gpuP95, 'ms', 'exact 60 Hz refresh period - authored compositor reserve - GPU reserve' ),
+		cpuP95Gate: G( gates.cpuP95, 'ms', 'frozen 60 Hz scene budget' ),
+		gpuP95Gate: G( gates.gpuP95, 'ms', 'frozen 60 Hz scene budget' ),
+		deadlineInterval: G( HARDWARE_PERFORMANCE_CONTRACT.deadlineThreshold.value, 'ms', '1.5 times the authored 16.67 ms current-adapter frame target' ),
+		deadlineMissRatioGate: G( gates.deadlineMissRatio, 'ratio', performanceTrace === null ? 'authored target; presentation cadence unmeasured' : 'authored target applied to measured presentation cadence' )
+	} );
+
+	const samples = ( performanceTrace?.cpuSamples ?? metrics?.cpuFrameMs?.samples ?? [] ).filter( Number.isFinite );
+	if ( samples.length === 0 ) throw new Error( 'Performance evidence builder requires at least one measured CPU render sample.' );
+	const warmupSamples = ( performanceTrace?.warmupCpuSamples ?? samples.slice( 0, Math.min( 5, samples.length ) ) ).filter( Number.isFinite );
+	const coldSamples = ( performanceTrace?.coldCpuSamples ?? [ samples[ 0 ] ] ).filter( Number.isFinite );
+	const coldPresentationSamples = ( performanceTrace?.coldPresentationSamples ?? [] ).filter( Number.isFinite );
+	const sustainedSamples = performanceTrace === null ? samples.slice( Math.min( 5, samples.length ) ) : [ ...samples ];
+	if ( sustainedSamples.length === 0 ) sustainedSamples.push( samples[ samples.length - 1 ] );
+	const gpuSamples = ( performanceTrace?.gpuSamples ?? [] ).filter( Number.isFinite );
+	const measuredPresentationSamples = ( performanceTrace?.presentationSamples ?? [] ).filter( Number.isFinite );
+	const measuredPresentationP50 = measuredPresentationSamples.length > 0 ? percentile( measuredPresentationSamples, 0.5 ) : null;
+	const renderTimestamp = gpuSamples.length > 0
+		? D( percentile( gpuSamples, 0.95 ), 'ms', `${ sourceIdentity }; p95 of derived sustained frame timestamp totals` )
+		: gpuTiming?.renderMs === null || gpuTiming?.renderMs === undefined ? null : M( gpuTiming.renderMs, 'ms', 'single resolved Three.js render timestamp after correctness capture' );
+	const frameTrace = schema( {
+		captureProfile,
+		adapterClass,
+		clockSource: 'performance.now around RenderPipeline.render calls',
+		warmup: buildTraceSegment( warmupSamples, 'warmup capture sequence', targetIntervalMs, null, HARDWARE_PERFORMANCE_CONTRACT.deadlineThreshold.value, sourceIdentity ),
+		cold: buildTraceSegment(
+			coldSamples,
+			performanceTrace === null ? 'first post-initialization render' : 'physical-browser cold segment',
+			targetIntervalMs,
+			coldPresentationSamples,
+			performanceTrace?.deadlineIntervalMs ?? HARDWARE_PERFORMANCE_CONTRACT.deadlineThreshold.value,
+			sourceIdentity
+		),
+		sustained: buildTraceSegment(
+			sustainedSamples,
+			performanceTrace === null ? 'remaining correctness capture sequence; not a sustained performance run' : `${ performanceTrace.sampleFrames }-frame sustained target-performance trace`,
+			targetIntervalMs,
+			measuredPresentationSamples,
+			performanceTrace?.deadlineIntervalMs ?? HARDWARE_PERFORMANCE_CONTRACT.deadlineThreshold.value,
+			sourceIdentity
+		),
+		gpuTimingAvailable: gpuTiming?.verdict === 'PASS',
+		renderTimestamp,
+		computeTimestamp: gpuTiming?.computeMs === null || gpuTiming?.computeMs === undefined ? null : M( gpuTiming.computeMs, 'ms', 'single resolved Three.js compute timestamp after correctness capture' ),
+		presentationCadence: measuredPresentationP50 === null
+			? A( targetRate, 'frame/s', 'target only; presentation cadence was not measured' )
+			: D( 1000 / measuredPresentationP50, 'frame/s', `${ sourceIdentity }; inverse measured requestAnimationFrame interval p50` ),
+		sampleFrames: performanceTrace === null ? null : M( performanceTrace.sampleFrames, 'frame', `${ sourceIdentity }; sustained batch population` ),
+		timestampResolveCount: performanceTrace === null ? null : M( performanceTrace.timestampResolveCount, 'resolve', `${ sourceIdentity }; batched timestamp resolution count` ),
+		timestampMappingCadence: performanceTrace?.timestampMappingCadence ?? 'not-claimed',
+		gpuSamples: gpuSamples.length === 0 ? null : DA( gpuSamples, 'ms', 'sum of two measured render-context timestamps per sustained frame' ),
+		gpuP50: gpuSamples.length === 0 ? null : D( percentile( gpuSamples, 0.5 ), 'ms', 'p50 of derived sustained frame totals' ),
+		gpuP95: gpuSamples.length === 0 ? null : D( percentile( gpuSamples, 0.95 ), 'ms', 'p95 of derived sustained frame totals' ),
+		gpuStageAttribution: performanceTrace === null ? null : {
+			'scene-mrt': {
+				samples: MA( performanceTrace.gpuStageSamples[ 'scene-mrt' ], 'ms', `${ sourceIdentity }; resolved r185 render-context timestamps` ),
+				p50: D( performanceTrace.gpuStageP50[ 'scene-mrt' ], 'ms', 'p50 of scene MRT timestamp samples' ),
+				p95: D( performanceTrace.gpuStageP95[ 'scene-mrt' ], 'ms', 'p95 of scene MRT timestamp samples' )
+			},
+			'final-output': {
+				samples: MA( performanceTrace.gpuStageSamples[ 'final-output' ], 'ms', `${ sourceIdentity }; resolved r185 render-context timestamps` ),
+				p50: D( performanceTrace.gpuStageP50[ 'final-output' ], 'ms', 'p50 of final-output timestamp samples' ),
+				p95: D( performanceTrace.gpuStageP95[ 'final-output' ], 'ms', 'p95 of final-output timestamp samples' )
+			},
+			timestampRows: performanceTrace.timestampRows.map( ( row ) => timestampEvidenceRow( row, 'sustained timestamp batch' ) ),
+			lastFrameResolveResidual: D( performanceTrace.lastFrameResolveResidualMs, 'ms', 'Three r185 final-frame aggregate minus the final attributed stage sum' ),
+			reconciliationGate: G( 0.001, 'ms', 'frozen timestamp-sum tolerance' ),
+			reconciliationScope: performanceTrace.timestampReconciliationScope,
+			independentPerFrameTotalsAvailable: false,
+			verdict: gpuAttributionVerdict
+		},
+		excludedPhases: performanceTrace === null
+			? [ 'renderer initialization', 'pipeline compilation', 'readback mapping', 'PNG encoding', 'no sustained timing window' ]
+			: [ 'renderer initialization', 'pipeline compilation', 'PNG encoding', 'timestamp readback excluded from CPU render samples', 'timestamp resolution and mapping deferred until after cadence sampling' ]
+	} );
+
+	const visualDatum = ( tier, value, unit, source ) => tier === 'target-performance' ? D( value, unit, source ) : M( value, unit, source );
+	const qualityGovernor = governorTrace === null ? schema( {
+		enabled: false,
+		states: [ metrics?.tier ],
+		inputMetric: 'none in correctness capture',
+		filter: 'none',
+		hysteresis: A( 0, 'ms', 'quality governor not exercised' ),
+		minimumResidence: A( 0, 'window', 'quality governor not exercised' ),
+		cooldown: A( 0, 'window', 'quality governor not exercised' ),
+		windows: [],
+		transitions: [],
+		settledState: metrics?.tier,
+		oscillationDetected: false,
+		verdict: 'NOT_CLAIMED'
+	} ) : schema( {
+		enabled: true,
+		states: [ ...governorTrace.states ],
+		inputMetric: 'resolved total-render GPU timestamp p95',
+		filter: `${ governorTrace.framesPerWindow }-frame percentile window`,
+		target: G( governorTrace.targetMs, 'ms', '60 Hz scene budget after reserves' ),
+		hysteresis: G( governorTrace.hysteresisMs, 'ms', 'frozen upgrade margin' ),
+		minimumResidence: G( governorTrace.minimumResidenceWindows, 'window', 'frozen transition residence' ),
+		cooldown: G( governorTrace.cooldownWindows, 'window', 'frozen post-transition cooldown' ),
+		windows: governorTrace.windows.map( ( window ) => {
+
+			const visual = governorTrace.visualErrorByTier[ window.measuredTier ];
+			return {
+				window: M( window.window, 'window', 'measured governor sequence' ),
+				measuredTier: window.measuredTier,
+				resultingTier: window.tier,
+				gpuSamples: DA( window.gpuSamples, 'ms', 'sum of measured render-context timestamps in governor window' ),
+				gpuP95: D( window.gpuP95, 'ms', 'p95 of derived governor frame totals' ),
+				timestampRows: window.timestampRows.map( ( row ) => timestampEvidenceRow( row, `governor window ${ window.window } timestamp batch` ) ),
+				lastFrameResolveResidual: D( window.lastFrameResolveResidualMs, 'ms', 'Three r185 final-frame aggregate minus final governor-window stage sum' ),
+				visualError: visualDatum( window.measuredTier, visual.meanRgbByteDifference, 'mean-rgb-byte-difference', window.measuredTier === 'target-performance' ? 'reference tier identity comparison' : 'fixed tier render-target comparison' ),
+				visualErrorGate: G( governorTrace.visualErrorGates.meanRgbByteDifference, 'mean-rgb-byte-difference', 'frozen whole-frame tier-degradation gate' ),
+				edgeMaskPixels: M( visual.edgeMaskPixels, 'pixel', 'reference-gradient edge mask' ),
+				edgeMeanVisualError: visualDatum( window.measuredTier, visual.edgeMeanRgbByteDifference, 'mean-rgb-byte-difference', window.measuredTier === 'target-performance' ? 'reference tier identity comparison' : 'reference-edge-mask tier comparison' ),
+				edgeP95VisualError: visualDatum( window.measuredTier, visual.edgeP95RgbByteDifference, 'mean-rgb-byte-difference', window.measuredTier === 'target-performance' ? 'reference tier identity comparison' : 'reference-edge-mask tier comparison' ),
+				edgeP95VisualErrorGate: G( governorTrace.visualErrorGates.edgeP95RgbByteDifference, 'mean-rgb-byte-difference', 'frozen reference-edge p95 tier-degradation gate' ),
+				decision: window.decision,
+				residence: M( window.residence, 'window', 'governor state counter' ),
+				cooldown: M( window.cooldown, 'window', 'governor cooldown counter' )
+			};
+
+		} ),
+		transitions: governorTrace.transitions.map( ( transition ) => ( {
+			window: M( transition.window, 'window', 'governor transition record' ),
+			from: transition.from,
+			to: transition.to,
+			cause: transition.cause,
+			gpuP95: D( transition.gpuP95, 'ms', 'p95 of triggering governor window timestamp totals' ),
+			rebuildCpuSubmission: M( transition.rebuildCpuSubmissionMs, 'ms', 'first render after tier transition' ),
+			rebuildGpu: M( transition.rebuildGpuMs, 'ms', 'first attributed GPU frame after tier transition' ),
+			rebuildTimestampRow: timestampEvidenceRow( transition.rebuildTimestampRow, `governor transition ${ transition.window } rebuild` ),
+			lastFrameResolveResidual: D( transition.lastFrameResolveResidualMs, 'ms', 'Three r185 rebuild-frame aggregate minus attributed stage sum' ),
+			fromResourceBytes: M( transition.fromResourceBytes, 'byte', 'render-target ledger before transition' ),
+			toResourceBytes: M( transition.toResourceBytes, 'byte', 'render-target ledger after transition' )
+		} ) ),
+		finalStableGpuP95: D( governorTrace.windows.at( - 1 ).gpuP95, 'ms', 'p95 of final governor window timestamp totals' ),
+		finalStableVisualError: visualDatum( governorTrace.settledState, governorTrace.visualErrorByTier[ governorTrace.settledState ].meanRgbByteDifference, 'mean-rgb-byte-difference', governorTrace.settledState === 'target-performance' ? 'reference tier identity comparison' : 'fixed settled-tier render-target comparison' ),
+		visualErrorGate: G( governorTrace.visualErrorGates.meanRgbByteDifference, 'mean-rgb-byte-difference', 'frozen whole-frame tier-degradation gate' ),
+		finalStableEdgeP95VisualError: visualDatum( governorTrace.settledState, governorTrace.visualErrorByTier[ governorTrace.settledState ].edgeP95RgbByteDifference, 'mean-rgb-byte-difference', governorTrace.settledState === 'target-performance' ? 'reference tier identity comparison' : 'reference-edge-mask settled-tier comparison' ),
+		edgeP95VisualErrorGate: G( governorTrace.visualErrorGates.edgeP95RgbByteDifference, 'mean-rgb-byte-difference', 'frozen reference-edge p95 tier-degradation gate' ),
+		settledState: governorTrace.settledState,
+		oscillationDetected: governorTrace.oscillationDetected,
+		verdict: governorVerdict
+	} );
+
+	return deepFreeze( {
+		artifacts: {
+			'performance-envelope.json': performanceEnvelope,
+			'frame-trace.json': frameTrace,
+			'quality-governor.json': qualityGovernor
+		},
+		performanceVerdict,
+		gpuAttributionVerdict,
+		governorVerdict,
+		performanceComplianceVerdict,
+		hardwarePerformanceClaim
+	} );
+
+}
+
 function writeArtifacts( session, artifacts ) {
 
 	return Promise.all( Object.entries( artifacts ).map( ( [ filename, artifact ] ) => {
@@ -721,21 +960,23 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 		throw new Error( 'Runtime v2 assembler received a noncanonical final viewport state.' );
 
 	}
-	const targetRate = 60;
-	const targetIntervalMs = 1000 / targetRate;
-	const performanceGates = {
-		cpuP95: HARDWARE_PERFORMANCE_CONTRACT.cpuP95Maximum.value,
-		gpuP95: HARDWARE_PERFORMANCE_CONTRACT.gpuP95Maximum.value,
-		deadlineMissRatio: HARDWARE_PERFORMANCE_CONTRACT.maximumDeadlineMissRatio.value
-	};
 	const adapterClass = requireAdapterClass( metrics.adapterClass ?? performanceTrace?.adapterClass ?? 'unknown' );
-	if ( performanceTrace !== null && performanceTrace.adapterClass !== adapterClass ) throw new Error( 'Performance trace adapter class disagrees with the runtime adapter.' );
-	const performanceVerdict = classifyPerformanceTrace( performanceTrace, performanceGates, adapterClass );
-	const gpuAttributionVerdict = classifyGpuStageAttribution( performanceTrace );
-	const governorVerdict = classifyGovernorTrace( governorTrace );
-	const performanceComplianceVerdict = classifyPerformanceCompliance( performanceVerdict, governorVerdict );
+	const performanceEvidence = createPerformanceEvidenceArtifacts( {
+		captureProfile: session.profile,
+		adapterClass,
+		metrics,
+		gpuTiming,
+		performanceTrace,
+		governorTrace
+	} );
+	const {
+		performanceVerdict,
+		gpuAttributionVerdict,
+		governorVerdict,
+		performanceComplianceVerdict,
+		hardwarePerformanceClaim
+	} = performanceEvidence;
 	const mechanismVerdict = classifyMechanismProof( mechanismProof, diagnosticDifferences, pipeline );
-	const hardwarePerformanceClaim = performanceTrace !== null && adapterClass === 'hardware';
 	const candidateClaimVerdicts = {
 		visualCorrectness: 'PASS',
 		mechanismCorrectness: mechanismVerdict,
@@ -785,7 +1026,7 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 		...( adapterClass === 'software' ? [ 'Software-adapter timestamps are retained only as diagnostic data and cannot support a hardware performance claim.' ] : [] ),
 		performanceTrace === null
 			? 'Owned adapter identity, features, and limits are serialized; physical display refresh and presentation cadence were not measured by this profile.'
-			: 'Owned adapter identity, features, and limits are serialized; physical display refresh remains unmeasured while requestAnimationFrame cadence is measured separately.'
+			: 'Owned adapter identity, features, and limits are serialized; physical display refresh and requestAnimationFrame cadence are measured, while compositor reserve remains unclaimed without a real browser timing API.'
 	];
 	const visualContract = schema( {
 		contractRevision: 'webgpu-validation-runtime-v2-1',
@@ -855,148 +1096,10 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 			numericCounters: 'retained in capture-session.json; not promoted without per-counter provenance'
 		} ]
 	} );
-	const refreshPeriod = D( targetIntervalMs, 'ms', '1000 / authored 60 Hz correctness target' );
-	const performanceEnvelope = schema( {
-		gpuTimingRequirement: hardwarePerformanceClaim ? 'required' : 'not-claimed',
-		refreshPeriod,
-		browserMainThreadReserve: A( 1, 'ms', 'authored target envelope' ),
-		compositorGpuReserve: A( 1, 'ms', 'authored target envelope' ),
-		cpuSafetyReserve: A( 1, 'ms', 'authored target envelope' ),
-		gpuSafetyReserve: A( 1, 'ms', 'authored target envelope' ),
-		cpuSceneEnvelope: D( performanceGates.cpuP95, 'ms', 'exact 60 Hz refresh period - browser reserve - CPU reserve' ),
-		gpuSceneEnvelope: D( performanceGates.gpuP95, 'ms', 'exact 60 Hz refresh period - compositor reserve - GPU reserve' ),
-		cpuP95Gate: G( performanceGates.cpuP95, 'ms', 'frozen 60 Hz scene budget' ),
-		gpuP95Gate: G( performanceGates.gpuP95, 'ms', 'frozen 60 Hz scene budget' ),
-		deadlineInterval: G( HARDWARE_PERFORMANCE_CONTRACT.deadlineThreshold.value, 'ms', '1.5 times the authored 16.67 ms current-adapter frame target' ),
-		deadlineMissRatioGate: G( performanceGates.deadlineMissRatio, 'ratio', performanceTrace === null ? 'authored target; presentation cadence unmeasured' : 'authored target applied to measured presentation cadence' )
-	} );
-	const samples = ( performanceTrace?.cpuSamples ?? metrics.cpuFrameMs.samples ).filter( Number.isFinite );
-	if ( samples.length === 0 ) throw new Error( 'Runtime v2 assembler requires at least one measured CPU render sample.' );
-	const warmupSamples = ( performanceTrace?.warmupCpuSamples ?? samples.slice( 0, Math.min( 5, samples.length ) ) ).filter( Number.isFinite );
-	const coldSamples = ( performanceTrace?.coldCpuSamples ?? [ samples[ 0 ] ] ).filter( Number.isFinite );
-	const coldPresentationSamples = ( performanceTrace?.coldPresentationSamples ?? [] ).filter( Number.isFinite );
-	const sustainedSamples = performanceTrace === null ? samples.slice( Math.min( 5, samples.length ) ) : samples;
-	if ( sustainedSamples.length === 0 ) sustainedSamples.push( samples[ samples.length - 1 ] );
-	const gpuSamples = ( performanceTrace?.gpuSamples ?? [] ).filter( Number.isFinite );
-	const measuredPresentationSamples = ( performanceTrace?.presentationSamples ?? [] ).filter( Number.isFinite );
-	const measuredPresentationP50 = measuredPresentationSamples.length > 0 ? percentile( measuredPresentationSamples, 0.5 ) : null;
-	const frameTrace = schema( {
-		captureProfile: session.profile,
-		adapterClass,
-		clockSource: 'performance.now around RenderPipeline.render calls',
-		warmup: buildTraceSegment( warmupSamples, 'warmup capture sequence', targetIntervalMs, null, HARDWARE_PERFORMANCE_CONTRACT.deadlineThreshold.value ),
-		cold: buildTraceSegment(
-			coldSamples,
-			performanceTrace === null ? 'first post-initialization render' : 'physical-browser cold segment',
-			targetIntervalMs,
-			coldPresentationSamples,
-			performanceTrace?.deadlineIntervalMs ?? HARDWARE_PERFORMANCE_CONTRACT.deadlineThreshold.value
-		),
-		sustained: buildTraceSegment(
-			sustainedSamples,
-			performanceTrace === null ? 'remaining correctness capture sequence; not a sustained performance run' : `${ performanceTrace.sampleFrames }-frame sustained target-performance trace`,
-			targetIntervalMs,
-			measuredPresentationSamples,
-			performanceTrace?.deadlineIntervalMs ?? HARDWARE_PERFORMANCE_CONTRACT.deadlineThreshold.value
-		),
-		gpuTimingAvailable: gpuTiming.verdict === 'PASS',
-		renderTimestamp: gpuSamples.length > 0
-			? M( percentile( gpuSamples, 0.95 ), 'ms', 'sustained WebGPU render timestamp p95' )
-			: gpuTiming.renderMs === null ? null : M( gpuTiming.renderMs, 'ms', 'single resolved Three.js render timestamp after correctness capture' ),
-		computeTimestamp: gpuTiming.computeMs === null ? null : M( gpuTiming.computeMs, 'ms', 'single resolved Three.js compute timestamp after correctness capture' ),
-		presentationCadence: measuredPresentationP50 === null
-			? A( targetRate, 'frame/s', 'target only; presentation cadence was not measured' )
-			: M( 1000 / measuredPresentationP50, 'frame/s', 'inverse measured requestAnimationFrame interval p50' ),
-		sampleFrames: performanceTrace === null ? null : M( performanceTrace.sampleFrames, 'frame', 'sustained batch population' ),
-		timestampResolveCount: performanceTrace === null ? null : M( performanceTrace.timestampResolveCount, 'resolve', 'batched timestamp resolution count' ),
-		timestampMappingCadence: performanceTrace?.timestampMappingCadence ?? 'not-claimed',
-		gpuSamples: gpuSamples.length === 0 ? null : DA( gpuSamples, 'ms', 'sum of two measured render-context timestamps per sustained frame' ),
-		gpuP50: gpuSamples.length === 0 ? null : D( percentile( gpuSamples, 0.5 ), 'ms', 'p50 of derived sustained frame totals' ),
-		gpuP95: gpuSamples.length === 0 ? null : D( percentile( gpuSamples, 0.95 ), 'ms', 'p95 of derived sustained frame totals' ),
-		gpuStageAttribution: performanceTrace === null ? null : {
-			'scene-mrt': {
-				samples: MA( performanceTrace.gpuStageSamples[ 'scene-mrt' ], 'ms', 'resolved r185 render-context timestamps' ),
-				p50: D( performanceTrace.gpuStageP50[ 'scene-mrt' ], 'ms', 'p50 of scene MRT timestamp samples' ),
-				p95: D( performanceTrace.gpuStageP95[ 'scene-mrt' ], 'ms', 'p95 of scene MRT timestamp samples' )
-			},
-			'final-output': {
-				samples: MA( performanceTrace.gpuStageSamples[ 'final-output' ], 'ms', 'resolved r185 render-context timestamps' ),
-				p50: D( performanceTrace.gpuStageP50[ 'final-output' ], 'ms', 'p50 of final-output timestamp samples' ),
-				p95: D( performanceTrace.gpuStageP95[ 'final-output' ], 'ms', 'p95 of final-output timestamp samples' )
-			},
-			timestampRows: performanceTrace.timestampRows.map( ( row ) => timestampEvidenceRow( row, 'sustained timestamp batch' ) ),
-			lastFrameResolveResidual: D( performanceTrace.lastFrameResolveResidualMs, 'ms', 'Three r185 final-frame aggregate minus the final attributed stage sum' ),
-			reconciliationGate: G( 0.001, 'ms', 'frozen timestamp-sum tolerance' ),
-			reconciliationScope: performanceTrace.timestampReconciliationScope,
-			independentPerFrameTotalsAvailable: false,
-			verdict: gpuAttributionVerdict
-		},
-		excludedPhases: performanceTrace === null
-			? [ 'renderer initialization', 'pipeline compilation', 'readback mapping', 'PNG encoding', 'no sustained timing window' ]
-			: [ 'renderer initialization', 'pipeline compilation', 'PNG encoding', 'timestamp readback excluded from CPU render samples', 'timestamp resolution and mapping deferred until after cadence sampling' ]
-	} );
-	const qualityGovernor = governorTrace === null ? schema( {
-		enabled: false,
-		states: [ metrics.tier ],
-		inputMetric: 'none in correctness capture',
-		filter: 'none',
-		hysteresis: A( 0, 'ms', 'quality governor not exercised' ),
-		minimumResidence: A( 0, 'window', 'quality governor not exercised' ),
-		cooldown: A( 0, 'window', 'quality governor not exercised' ),
-		windows: [],
-		transitions: [],
-		settledState: metrics.tier,
-		oscillationDetected: false,
-		verdict: 'NOT_CLAIMED'
-	} ) : schema( {
-		enabled: true,
-		states: governorTrace.states,
-		inputMetric: 'resolved total-render GPU timestamp p95',
-		filter: `${ governorTrace.framesPerWindow }-frame percentile window`,
-		target: G( governorTrace.targetMs, 'ms', '60 Hz scene budget after reserves' ),
-		hysteresis: G( governorTrace.hysteresisMs, 'ms', 'frozen upgrade margin' ),
-		minimumResidence: G( governorTrace.minimumResidenceWindows, 'window', 'frozen transition residence' ),
-		cooldown: G( governorTrace.cooldownWindows, 'window', 'frozen post-transition cooldown' ),
-		windows: governorTrace.windows.map( ( window ) => ( {
-			window: M( window.window, 'window', 'measured governor sequence' ),
-			measuredTier: window.measuredTier,
-			resultingTier: window.tier,
-			gpuSamples: DA( window.gpuSamples, 'ms', 'sum of measured render-context timestamps in governor window' ),
-			gpuP95: D( window.gpuP95, 'ms', 'p95 of derived governor frame totals' ),
-			timestampRows: window.timestampRows.map( ( row ) => timestampEvidenceRow( row, `governor window ${ window.window } timestamp batch` ) ),
-			lastFrameResolveResidual: D( window.lastFrameResolveResidualMs, 'ms', 'Three r185 final-frame aggregate minus final governor-window stage sum' ),
-			visualError: M( governorTrace.visualErrorByTier[ window.measuredTier ].meanRgbByteDifference, 'mean-rgb-byte-difference', 'fixed tier render-target comparison' ),
-			visualErrorGate: G( governorTrace.visualErrorGates.meanRgbByteDifference, 'mean-rgb-byte-difference', 'frozen whole-frame tier-degradation gate' ),
-			edgeMaskPixels: M( governorTrace.visualErrorByTier[ window.measuredTier ].edgeMaskPixels, 'pixel', 'reference-gradient edge mask' ),
-			edgeMeanVisualError: M( governorTrace.visualErrorByTier[ window.measuredTier ].edgeMeanRgbByteDifference, 'mean-rgb-byte-difference', 'reference-edge-mask tier comparison' ),
-			edgeP95VisualError: M( governorTrace.visualErrorByTier[ window.measuredTier ].edgeP95RgbByteDifference, 'mean-rgb-byte-difference', 'reference-edge-mask tier comparison' ),
-			edgeP95VisualErrorGate: G( governorTrace.visualErrorGates.edgeP95RgbByteDifference, 'mean-rgb-byte-difference', 'frozen reference-edge p95 tier-degradation gate' ),
-			decision: window.decision,
-			residence: M( window.residence, 'window', 'governor state counter' ),
-			cooldown: M( window.cooldown, 'window', 'governor cooldown counter' )
-		} ) ),
-		transitions: governorTrace.transitions.map( ( transition ) => ( {
-			window: M( transition.window, 'window', 'governor transition record' ),
-			from: transition.from,
-			to: transition.to,
-			cause: transition.cause,
-			gpuP95: M( transition.gpuP95, 'ms', 'triggering governor window' ),
-			rebuildCpuSubmission: M( transition.rebuildCpuSubmissionMs, 'ms', 'first render after tier transition' ),
-			rebuildGpu: M( transition.rebuildGpuMs, 'ms', 'first attributed GPU frame after tier transition' ),
-			rebuildTimestampRow: timestampEvidenceRow( transition.rebuildTimestampRow, `governor transition ${ transition.window } rebuild` ),
-			lastFrameResolveResidual: D( transition.lastFrameResolveResidualMs, 'ms', 'Three r185 rebuild-frame aggregate minus attributed stage sum' ),
-			fromResourceBytes: M( transition.fromResourceBytes, 'byte', 'render-target ledger before transition' ),
-			toResourceBytes: M( transition.toResourceBytes, 'byte', 'render-target ledger after transition' )
-		} ) ),
-		finalStableGpuP95: M( governorTrace.windows.at( - 1 ).gpuP95, 'ms', 'final governor window' ),
-		finalStableVisualError: M( governorTrace.visualErrorByTier[ governorTrace.settledState ].meanRgbByteDifference, 'mean-rgb-byte-difference', 'fixed settled-tier render-target comparison' ),
-		visualErrorGate: G( governorTrace.visualErrorGates.meanRgbByteDifference, 'mean-rgb-byte-difference', 'frozen whole-frame tier-degradation gate' ),
-		finalStableEdgeP95VisualError: M( governorTrace.visualErrorByTier[ governorTrace.settledState ].edgeP95RgbByteDifference, 'mean-rgb-byte-difference', 'reference-edge-mask settled-tier comparison' ),
-		edgeP95VisualErrorGate: G( governorTrace.visualErrorGates.edgeP95RgbByteDifference, 'mean-rgb-byte-difference', 'frozen reference-edge p95 tier-degradation gate' ),
-		settledState: governorTrace.settledState,
-		oscillationDetected: governorTrace.oscillationDetected,
-		verdict: governorVerdict
-	} );
+	const performanceEnvelope = performanceEvidence.artifacts[ 'performance-envelope.json' ];
+	const frameTrace = performanceEvidence.artifacts[ 'frame-trace.json' ];
+	const qualityGovernor = performanceEvidence.artifacts[ 'quality-governor.json' ];
+	const authoredTargetRate = 60;
 	const targets = resources.renderTargets.map( ( target ) => targetArtifact( target, targetReadbackCapture ) );
 	const totalTargetBytes = resources.renderTargets.reduce( ( sum, target ) => sum + target.bytes, 0 );
 	const renderTargets = schema( {
@@ -1042,7 +1145,7 @@ export async function writeIncompleteV2RuntimeBundle( session, input ) {
 		} ],
 		lowerBoundBytesPerFrame: D( totalTargetBytes, 'byte/frame', 'reported target store lower bound' ),
 		upperBoundBytesPerFrame: D( totalTargetBytes * 2, 'byte/frame', 'reported target load-plus-store upper bound' ),
-		bytesPerSecond: D( totalTargetBytes * targetRate, 'byte/s', 'lower bound * authored target rate' ),
+		bytesPerSecond: D( totalTargetBytes * authoredTargetRate, 'byte/s', 'lower bound * authored target rate' ),
 		assumptions: [ 'Logical uncompressed target bytes include depth32float; physical compression, cache, tile residency, and staging remain unclaimed.' ],
 		hardwareCountersAvailable: false,
 		verdict: 'INSUFFICIENT_EVIDENCE'

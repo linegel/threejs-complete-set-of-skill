@@ -92,7 +92,7 @@ function fixtureGovernor() {
       from: 'full',
       to: 'balanced',
       cause: 'gpu-p95-over-budget',
-      gpuP95: numeric(14, 'ms', 'Measured', 'fixture triggering governor window'),
+      gpuP95: numeric(14, 'ms', 'Derived', 'fixture triggering governor window percentile'),
       rebuildCpuSubmission: numeric(2, 'ms', 'Measured', 'fixture tier rebuild CPU submission'),
       rebuildGpu: numeric(6, 'ms', 'Measured', 'fixture tier rebuild GPU timestamp'),
       rebuildTimestampRow: {
@@ -104,7 +104,7 @@ function fixtureGovernor() {
       fromResourceBytes: numeric(16_000_000, 'byte', 'Measured', 'fixture full-tier resource ledger'),
       toResourceBytes: numeric(8_000_000, 'byte', 'Measured', 'fixture balanced-tier resource ledger'),
     }],
-    finalStableGpuP95: numeric(8, 'ms', 'Measured', 'fixture final governor window'),
+    finalStableGpuP95: numeric(8, 'ms', 'Derived', 'fixture final governor window percentile'),
     finalStableVisualError: numeric(1, 'mean-rgb-byte-difference', 'Measured', 'fixture settled tier'),
     visualErrorGate: numeric(8, 'mean-rgb-byte-difference', 'Gated', 'fixture visual gate'),
     finalStableEdgeP95VisualError: numeric(2, 'mean-rgb-byte-difference', 'Measured', 'fixture settled edge domain'),

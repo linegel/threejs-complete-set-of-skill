@@ -1139,7 +1139,8 @@ export function validatePublishableProvenance( artifacts ) {
 	for ( const key of [ 'target', 'hysteresis', 'minimumResidence', 'cooldown', 'visualErrorGate', 'edgeP95VisualErrorGate' ] ) requireNumericProvenance( governor[ key ], [ 'Gated' ], `quality-governor.json.${ key }` );
 	for ( const [ index, window ] of governor.windows.entries() ) {
 
-		for ( const key of [ 'window', 'visualError', 'edgeMaskPixels', 'edgeMeanVisualError', 'edgeP95VisualError', 'residence', 'cooldown' ] ) requireNumericProvenance( window[ key ], [ 'Measured' ], `quality-governor.json.windows[${ index }].${ key }` );
+		for ( const key of [ 'window', 'edgeMaskPixels', 'residence', 'cooldown' ] ) requireNumericProvenance( window[ key ], [ 'Measured' ], `quality-governor.json.windows[${ index }].${ key }` );
+		for ( const key of [ 'visualError', 'edgeMeanVisualError', 'edgeP95VisualError' ] ) requireNumericProvenance( window[ key ], [ 'Derived', 'Measured' ], `quality-governor.json.windows[${ index }].${ key }` );
 		for ( const key of [ 'gpuSamples', 'gpuP95' ] ) requireNumericProvenance( window[ key ], [ 'Derived' ], `quality-governor.json.windows[${ index }].${ key }` );
 		for ( const key of [ 'visualErrorGate', 'edgeP95VisualErrorGate' ] ) requireNumericProvenance( window[ key ], [ 'Gated' ], `quality-governor.json.windows[${ index }].${ key }` );
 

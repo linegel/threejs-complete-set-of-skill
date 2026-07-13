@@ -288,7 +288,7 @@ function validateGovernor(governor) {
       throw new Error(`quality governor transition ${index} breaks source-window tier lineage`);
     }
     const transitionP95 = requireDatum(transition.gpuP95, `quality-governor.json.transitions[${index}].gpuP95`, {
-      unit: 'ms', labels: ['Measured'], minimum: 0,
+      unit: 'ms', labels: ['Derived'], minimum: 0,
     });
     requireRecomputed(
       transitionP95,
@@ -330,7 +330,7 @@ function validateGovernor(governor) {
     });
   }
   const finalStableGpuP95 = requireDatum(governor.finalStableGpuP95, 'quality-governor.json.finalStableGpuP95', {
-    unit: 'ms', labels: ['Measured'], minimum: 0,
+    unit: 'ms', labels: ['Derived'], minimum: 0,
   });
   requireRecomputed(
     finalStableGpuP95,

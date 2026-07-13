@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { loadCheckedEvidenceSchemas, validateCheckedJsonSchema } from './checked-json-schema.js';
-import { buildTraceSegment, bytesPerTexel, classifyGovernorTrace, classifyGpuStageAttribution, classifyMechanismProof, classifyPerformanceCompliance, classifyPerformanceTrace, createRuntimePipelineGraph, resolveBundlePromotion, summarizeLifecycleEvidence, VISUAL_SIGNOFF_IMAGES } from './runtime-v2-bundle.js';
+import { buildTraceSegment, bytesPerTexel, classifyGovernorTrace, classifyGpuStageAttribution, classifyMechanismProof, classifyPerformanceCompliance, classifyPerformanceTrace, createPerformanceEvidenceArtifacts, createRuntimePipelineGraph, resolveBundlePromotion, summarizeLifecycleEvidence, VISUAL_SIGNOFF_IMAGES } from './runtime-v2-bundle.js';
 
 function timestampTrace( adapterClass = 'hardware', overrides = {} ) {
 
@@ -60,6 +60,49 @@ function governorWindow( window, measuredTier, tier, total = 12 ) {
 		independentPerFrameTotalAvailable: false
 	} ) );
 	return { window, gpuSamples: [ total, total, total ], timestampRows, lastFrameResolveResidualMs: 0, gpuP95: total, measuredTier, tier };
+
+}
+
+function performanceGovernorTrace() {
+
+	const windows = Array.from( { length: 6 }, ( _, window ) => ( {
+		...governorWindow( window, window === 0 ? 'governor-stress' : 'target-performance', 'target-performance' ),
+		decision: window === 0 ? 'upgrade' : 'hold',
+		residence: window,
+		cooldown: Math.max( 0, 2 - window )
+	} ) );
+	return {
+		adapterClass: 'hardware',
+		states: [ 'target-performance', 'governor-stress' ],
+		framesPerWindow: 3,
+		windowCount: windows.length,
+		targetMs: 14,
+		hysteresisMs: 2,
+		minimumResidenceWindows: 2,
+		cooldownWindows: 2,
+		initialState: 'governor-stress',
+		settledState: 'target-performance',
+		visualErrorByTier: {
+			'target-performance': { meanRgbByteDifference: 0, edgeMaskPixels: 100, edgeMeanRgbByteDifference: 0, edgeP95RgbByteDifference: 0 },
+			'governor-stress': { meanRgbByteDifference: 3, edgeMaskPixels: 100, edgeMeanRgbByteDifference: 5, edgeP95RgbByteDifference: 12 }
+		},
+		visualErrorGates: { meanRgbByteDifference: 8, edgeP95RgbByteDifference: 32 },
+		windows,
+		transitions: [ {
+			window: 0,
+			from: 'governor-stress',
+			to: 'target-performance',
+			cause: 'upgrade-after-hysteresis',
+			gpuP95: 12,
+			rebuildCpuSubmissionMs: 0.2,
+			rebuildGpuMs: 10,
+			rebuildTimestampRow: { frameId: 0, sceneUid: 'r:1:17:f0', outputUid: 'r:2:41:f0', sceneMs: 8, outputMs: 2, totalMs: 10, residualMs: null, totalProvenance: 'Derived', independentPerFrameTotalAvailable: false },
+			lastFrameResolveResidualMs: 0,
+			fromResourceBytes: 60,
+			toResourceBytes: 100
+		} ],
+		oscillationDetected: false
+	};
 
 }
 
@@ -223,6 +266,56 @@ test( 'trace segments distinguish measured cadence from an authored target', () 
 	assert.equal( measured.deadlineMissRatio.label, 'Measured' );
 	assert.equal( measured.deadlineMissRatio.value, 0.25 );
 	assert.throws( () => buildTraceSegment( [ 1 ], 'unit trace', 16, [ 16 ], 0 ), /positive deadline interval/ );
+
+} );
+
+test( 'pure performance artifacts preserve measured inputs and derived estimators', () => {
+
+	const trace = {
+		...timestampTrace(),
+		refreshHz: 60,
+		refreshP50: 1000 / 60,
+		refreshP95: 17,
+		hostReserveP95: 17 - 1000 / 60,
+		compositorReserve: { verdict: 'NOT_CLAIMED', reason: 'no compositor timing API' },
+		warmupCpuSamples: Array( 30 ).fill( 1 ),
+		coldCpuSamples: [ 2 ],
+		coldPresentationSamples: [ 16 ],
+		timestampResolveCount: 1,
+		timestampMappingCadence: 'once-per-batch',
+		timestampReconciliationScope: 'maximum final-frame aggregate residual'
+	};
+	const governorTrace = performanceGovernorTrace();
+	const result = createPerformanceEvidenceArtifacts( {
+		captureProfile: 'performance',
+		adapterClass: 'hardware',
+		metrics: { tier: 'target-performance', cpuFrameMs: { samples: [ 1 ] } },
+		gpuTiming: { verdict: 'PASS', renderMs: 12.8, computeMs: null },
+		performanceTrace: trace,
+		governorTrace
+	} );
+	const envelope = result.artifacts[ 'performance-envelope.json' ];
+	const frameTrace = result.artifacts[ 'frame-trace.json' ];
+	const governor = result.artifacts[ 'quality-governor.json' ];
+	assert.equal( result.performanceVerdict, 'PASS' );
+	assert.equal( result.gpuAttributionVerdict, 'PASS' );
+	assert.equal( result.governorVerdict, 'PASS' );
+	assert.equal( result.performanceComplianceVerdict, 'PASS' );
+	assert.equal( envelope.refreshRate.label, 'Measured' );
+	assert.equal( envelope.refreshPeriod.label, 'Derived' );
+	assert.equal( envelope.browserMainThreadReserve.label, 'Measured' );
+	assert.equal( envelope.compositorGpuReserve.status, 'NOT_CLAIMED' );
+	assert.equal( frameTrace.renderTimestamp.label, 'Derived' );
+	assert.equal( frameTrace.presentationCadence.label, 'Derived' );
+	assert.match( frameTrace.sustained.cpuSamples.source, /physical-browser performance/ );
+	assert.equal( governor.windows[ 1 ].visualError.label, 'Derived' );
+	assert.equal( governor.windows[ 1 ].edgeMaskPixels.label, 'Measured' );
+	assert.equal( governor.finalStableGpuP95.label, 'Derived' );
+	assert.equal( governor.finalStableVisualError.label, 'Derived' );
+	assert.equal( Object.isFrozen( result ), true );
+	assert.equal( Object.isFrozen( trace ), false );
+	assert.equal( Object.isFrozen( governorTrace ), false );
+	assert.equal( Object.isFrozen( governorTrace.states ), false );
 
 } );
 
