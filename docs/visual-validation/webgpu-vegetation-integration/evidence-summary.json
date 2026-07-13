@@ -130,5 +130,12 @@
   "limitations": [
     "Performance and GPU attribution remain NOT_CLAIMED unless a hardware performance lane is present.",
     "Promoted media are native-WebGPU correctness readbacks bound by the accepted release-bundle ledger."
-  ]
+  ],
+  "status": "accepted",
+  "sourceHash": "sha256:8a87d3f3d13fec679b92809ee861d339bf5727a1774906d7723c2378afd5c615",
+  "sourceClosureHash": "sha256:8a87d3f3d13fec679b92809ee861d339bf5727a1774906d7723c2378afd5c615",
+  "buildRevision": "sha256:ee09bc128f95bd2ae10ef1e2afae2355634ce992509c31f09727e5fa079bec16",
+  "publishable": true,
+  "promotionStatus": "APPROVED",
+  "updatedAt": "2026-07-13T14:21:46.634Z"
 }

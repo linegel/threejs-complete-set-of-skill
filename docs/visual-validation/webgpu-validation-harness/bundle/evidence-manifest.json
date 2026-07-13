@@ -6,8 +6,8 @@
   "publishable": true,
   "skill": "threejs-visual-validation",
   "threeRevision": "0.185.1",
-  "sourceClosureHash": "sha256:281b93606ce2ed351b58deb4e45ccce5f7a752de26e737c36211cf294c6bab95",
-  "buildRevision": "sha256:7db153853b7ed98bcba359e3bc796004340de59ff9864b67bd66cdeb6ee488f4",
+  "sourceClosureHash": "sha256:b0e009ead44cdf956ede01790e1686b675b7acc3f01851029708bc7a9c3ca2d4",
+  "buildRevision": "sha256:4abcb1cfc7097387ffee6469dc4fb5706f1a7e15c9df0dda69022ab68376cee6",
   "route": {
     "path": "/demos/webgpu-validation-harness/tier/webgpu-correctness/",
     "scenario": "browser-capture",
@@ -80,8 +80,8 @@
       },
       "limitationsDigest": "sha256:d3a6abab5ebd9d2c9c2b5129e7bebac78aca19c36f4a31bb3c04a7d0fe45a200",
       "threeRevision": "0.185.1",
-      "sourceClosureHash": "sha256:281b93606ce2ed351b58deb4e45ccce5f7a752de26e737c36211cf294c6bab95",
-      "buildRevision": "sha256:7db153853b7ed98bcba359e3bc796004340de59ff9864b67bd66cdeb6ee488f4",
+      "sourceClosureHash": "sha256:b0e009ead44cdf956ede01790e1686b675b7acc3f01851029708bc7a9c3ca2d4",
+      "buildRevision": "sha256:4abcb1cfc7097387ffee6469dc4fb5706f1a7e15c9df0dda69022ab68376cee6",
       "startedAt": "2026-07-13T11:47:29.183Z",
       "finishedAt": "2026-07-13T11:48:13.313Z",
       "routePath": "/demos/webgpu-validation-harness/tier/webgpu-correctness/",
@@ -134,8 +134,8 @@
       },
       "limitationsDigest": "sha256:a486771663a761b83c7aa9318814b44ab274839d4205ff3adf3a1c256085c3e9",
       "threeRevision": "0.185.1",
-      "sourceClosureHash": "sha256:281b93606ce2ed351b58deb4e45ccce5f7a752de26e737c36211cf294c6bab95",
-      "buildRevision": "sha256:7db153853b7ed98bcba359e3bc796004340de59ff9864b67bd66cdeb6ee488f4",
+      "sourceClosureHash": "sha256:b0e009ead44cdf956ede01790e1686b675b7acc3f01851029708bc7a9c3ca2d4",
+      "buildRevision": "sha256:4abcb1cfc7097387ffee6469dc4fb5706f1a7e15c9df0dda69022ab68376cee6",
       "startedAt": "2026-07-13T11:35:32.208Z",
       "finishedAt": "2026-07-13T11:36:15.342Z",
       "routePath": "/demos/webgpu-validation-harness/scenario/browser-capture/",
@@ -210,8 +210,8 @@
       },
       "limitationsDigest": "sha256:a486771663a761b83c7aa9318814b44ab274839d4205ff3adf3a1c256085c3e9",
       "threeRevision": "0.185.1",
-      "sourceClosureHash": "sha256:281b93606ce2ed351b58deb4e45ccce5f7a752de26e737c36211cf294c6bab95",
-      "buildRevision": "sha256:7db153853b7ed98bcba359e3bc796004340de59ff9864b67bd66cdeb6ee488f4",
+      "sourceClosureHash": "sha256:b0e009ead44cdf956ede01790e1686b675b7acc3f01851029708bc7a9c3ca2d4",
+      "buildRevision": "sha256:4abcb1cfc7097387ffee6469dc4fb5706f1a7e15c9df0dda69022ab68376cee6",
       "startedAt": "2026-07-13T11:42:05.652Z",
       "finishedAt": "2026-07-13T11:43:19.080Z",
       "routePath": "/demos/webgpu-validation-harness/tier/target-performance/",
@@ -762,9 +762,9 @@
   "promotion": {
     "status": "APPROVED",
     "binding": {
-      "manifestCoreDigest": "sha256:88a83cd7611ed0237e7a43defee166f78a89af822414bd07a43560ed91da7736",
-      "sourceClosureHash": "sha256:281b93606ce2ed351b58deb4e45ccce5f7a752de26e737c36211cf294c6bab95",
-      "buildRevision": "sha256:7db153853b7ed98bcba359e3bc796004340de59ff9864b67bd66cdeb6ee488f4",
+      "manifestCoreDigest": "sha256:b6243403c20a4a643f46578d36c8f7cdfafdc2d7baa0ef53ef287294625b9790",
+      "sourceClosureHash": "sha256:b0e009ead44cdf956ede01790e1686b675b7acc3f01851029708bc7a9c3ca2d4",
+      "buildRevision": "sha256:4abcb1cfc7097387ffee6469dc4fb5706f1a7e15c9df0dda69022ab68376cee6",
       "threeRevision": "0.185.1",
       "route": {
         "path": "/demos/webgpu-validation-harness/tier/webgpu-correctness/",
@@ -841,8 +841,8 @@
           },
           "limitationsDigest": "sha256:d3a6abab5ebd9d2c9c2b5129e7bebac78aca19c36f4a31bb3c04a7d0fe45a200",
           "threeRevision": "0.185.1",
-          "sourceClosureHash": "sha256:281b93606ce2ed351b58deb4e45ccce5f7a752de26e737c36211cf294c6bab95",
-          "buildRevision": "sha256:7db153853b7ed98bcba359e3bc796004340de59ff9864b67bd66cdeb6ee488f4",
+          "sourceClosureHash": "sha256:b0e009ead44cdf956ede01790e1686b675b7acc3f01851029708bc7a9c3ca2d4",
+          "buildRevision": "sha256:4abcb1cfc7097387ffee6469dc4fb5706f1a7e15c9df0dda69022ab68376cee6",
           "startedAt": "2026-07-13T11:47:29.183Z",
           "finishedAt": "2026-07-13T11:48:13.313Z",
           "routePath": "/demos/webgpu-validation-harness/tier/webgpu-correctness/",
@@ -895,8 +895,8 @@
           },
           "limitationsDigest": "sha256:a486771663a761b83c7aa9318814b44ab274839d4205ff3adf3a1c256085c3e9",
           "threeRevision": "0.185.1",
-          "sourceClosureHash": "sha256:281b93606ce2ed351b58deb4e45ccce5f7a752de26e737c36211cf294c6bab95",
-          "buildRevision": "sha256:7db153853b7ed98bcba359e3bc796004340de59ff9864b67bd66cdeb6ee488f4",
+          "sourceClosureHash": "sha256:b0e009ead44cdf956ede01790e1686b675b7acc3f01851029708bc7a9c3ca2d4",
+          "buildRevision": "sha256:4abcb1cfc7097387ffee6469dc4fb5706f1a7e15c9df0dda69022ab68376cee6",
           "startedAt": "2026-07-13T11:35:32.208Z",
           "finishedAt": "2026-07-13T11:36:15.342Z",
           "routePath": "/demos/webgpu-validation-harness/scenario/browser-capture/",
@@ -971,8 +971,8 @@
           },
           "limitationsDigest": "sha256:a486771663a761b83c7aa9318814b44ab274839d4205ff3adf3a1c256085c3e9",
           "threeRevision": "0.185.1",
-          "sourceClosureHash": "sha256:281b93606ce2ed351b58deb4e45ccce5f7a752de26e737c36211cf294c6bab95",
-          "buildRevision": "sha256:7db153853b7ed98bcba359e3bc796004340de59ff9864b67bd66cdeb6ee488f4",
+          "sourceClosureHash": "sha256:b0e009ead44cdf956ede01790e1686b675b7acc3f01851029708bc7a9c3ca2d4",
+          "buildRevision": "sha256:4abcb1cfc7097387ffee6469dc4fb5706f1a7e15c9df0dda69022ab68376cee6",
           "startedAt": "2026-07-13T11:42:05.652Z",
           "finishedAt": "2026-07-13T11:43:19.080Z",
           "routePath": "/demos/webgpu-validation-harness/tier/target-performance/",
@@ -1000,7 +1000,7 @@
           }
         }
       ],
-      "captureSessionSetDigest": "sha256:3afa8a8384eb6bdee807332ef8d1fdf014f11ae8914db464448281837aad9d47",
+      "captureSessionSetDigest": "sha256:1386e24a26fe9e5d5f8c46ef7a1e1fb28a7cd97f6f8cf3a6bc4885c30a8e84b9",
       "artifactLedgerDigest": "sha256:1126d41c039ac661f1eb94975934b2254ef8955a5d7e13594d93695ae06cd174",
       "imageLedgerDigest": "sha256:b3407588a0bade9830858e9e5c0347234e068ec6badbebcd6b5977ed03752ddf",
       "routeSet": [
@@ -1311,13 +1311,13 @@
       ],
       "routeSetDigest": "sha256:0fb0e713d12e6ad108bb8ddfa9905670a918bc65e6c667e6b981cf51f68ad1ff"
     },
-    "bindingDigest": "sha256:6c19a88e2a9026989f09fb492c8c950a1ce93e91716753ad0a871413ec8017f1",
+    "bindingDigest": "sha256:366bf8365cabb0d56d27d754338b6bfd814b2db686457e921bd92b0d879fcbf4",
     "visualSignoff": {
       "status": "APPROVED",
       "candidateBinding": {
-        "manifestCoreDigest": "sha256:f3bf00ae495630abc578cb9803679aa635514cab17f2827c25ddea26b98a9fe3",
-        "sourceClosureHash": "sha256:281b93606ce2ed351b58deb4e45ccce5f7a752de26e737c36211cf294c6bab95",
-        "buildRevision": "sha256:7db153853b7ed98bcba359e3bc796004340de59ff9864b67bd66cdeb6ee488f4",
+        "manifestCoreDigest": "sha256:b24c966d6af02e84025fa06e0d64dd348477a0b1b616dcff741b569029bfad9a",
+        "sourceClosureHash": "sha256:b0e009ead44cdf956ede01790e1686b675b7acc3f01851029708bc7a9c3ca2d4",
+        "buildRevision": "sha256:4abcb1cfc7097387ffee6469dc4fb5706f1a7e15c9df0dda69022ab68376cee6",
         "threeRevision": "0.185.1",
         "route": {
           "path": "/demos/webgpu-validation-harness/tier/webgpu-correctness/",
@@ -1394,8 +1394,8 @@
             },
             "limitationsDigest": "sha256:d3a6abab5ebd9d2c9c2b5129e7bebac78aca19c36f4a31bb3c04a7d0fe45a200",
             "threeRevision": "0.185.1",
-            "sourceClosureHash": "sha256:281b93606ce2ed351b58deb4e45ccce5f7a752de26e737c36211cf294c6bab95",
-            "buildRevision": "sha256:7db153853b7ed98bcba359e3bc796004340de59ff9864b67bd66cdeb6ee488f4",
+            "sourceClosureHash": "sha256:b0e009ead44cdf956ede01790e1686b675b7acc3f01851029708bc7a9c3ca2d4",
+            "buildRevision": "sha256:4abcb1cfc7097387ffee6469dc4fb5706f1a7e15c9df0dda69022ab68376cee6",
             "startedAt": "2026-07-13T11:47:29.183Z",
             "finishedAt": "2026-07-13T11:48:13.313Z",
             "routePath": "/demos/webgpu-validation-harness/tier/webgpu-correctness/",
@@ -1448,8 +1448,8 @@
             },
             "limitationsDigest": "sha256:a486771663a761b83c7aa9318814b44ab274839d4205ff3adf3a1c256085c3e9",
             "threeRevision": "0.185.1",
-            "sourceClosureHash": "sha256:281b93606ce2ed351b58deb4e45ccce5f7a752de26e737c36211cf294c6bab95",
-            "buildRevision": "sha256:7db153853b7ed98bcba359e3bc796004340de59ff9864b67bd66cdeb6ee488f4",
+            "sourceClosureHash": "sha256:b0e009ead44cdf956ede01790e1686b675b7acc3f01851029708bc7a9c3ca2d4",
+            "buildRevision": "sha256:4abcb1cfc7097387ffee6469dc4fb5706f1a7e15c9df0dda69022ab68376cee6",
             "startedAt": "2026-07-13T11:35:32.208Z",
             "finishedAt": "2026-07-13T11:36:15.342Z",
             "routePath": "/demos/webgpu-validation-harness/scenario/browser-capture/",
@@ -1524,8 +1524,8 @@
             },
             "limitationsDigest": "sha256:a486771663a761b83c7aa9318814b44ab274839d4205ff3adf3a1c256085c3e9",
             "threeRevision": "0.185.1",
-            "sourceClosureHash": "sha256:281b93606ce2ed351b58deb4e45ccce5f7a752de26e737c36211cf294c6bab95",
-            "buildRevision": "sha256:7db153853b7ed98bcba359e3bc796004340de59ff9864b67bd66cdeb6ee488f4",
+            "sourceClosureHash": "sha256:b0e009ead44cdf956ede01790e1686b675b7acc3f01851029708bc7a9c3ca2d4",
+            "buildRevision": "sha256:4abcb1cfc7097387ffee6469dc4fb5706f1a7e15c9df0dda69022ab68376cee6",
             "startedAt": "2026-07-13T11:42:05.652Z",
             "finishedAt": "2026-07-13T11:43:19.080Z",
             "routePath": "/demos/webgpu-validation-harness/tier/target-performance/",
@@ -1553,7 +1553,7 @@
             }
           }
         ],
-        "captureSessionSetDigest": "sha256:3afa8a8384eb6bdee807332ef8d1fdf014f11ae8914db464448281837aad9d47",
+        "captureSessionSetDigest": "sha256:1386e24a26fe9e5d5f8c46ef7a1e1fb28a7cd97f6f8cf3a6bc4885c30a8e84b9",
         "artifactLedgerDigest": "sha256:1126d41c039ac661f1eb94975934b2254ef8955a5d7e13594d93695ae06cd174",
         "imageLedgerDigest": "sha256:b3407588a0bade9830858e9e5c0347234e068ec6badbebcd6b5977ed03752ddf",
         "routeSet": [
@@ -1864,10 +1864,10 @@
         ],
         "routeSetDigest": "sha256:0fb0e713d12e6ad108bb8ddfa9905670a918bc65e6c667e6b981cf51f68ad1ff"
       },
-      "candidateBindingDigest": "sha256:5814efc6b8d5dfa83c92783bf47bf4faef11a7e336d26a207b265dd5c2696f6b",
+      "candidateBindingDigest": "sha256:994daa0ad97f3e9aaf615baf7b5884465838d80bfd4b7da44871cb66af3ec9a1",
       "reviewer": "Codex direct graphics review",
       "reviewedAt": "2026-07-13T11:51:11Z",
-      "reviewDigest": "sha256:fa48dc9c4d136421276aa6b2e283e8fc92de5f8bbf56690188b291bb9f6b19a1",
+      "reviewDigest": "sha256:4d3c80627660208296fa1996693916a70f625573b1d55097824bc70d95e8d9ea",
       "reviewedImages": [
         "final.design.png",
         "no-post.design.png",
@@ -1891,7 +1891,8 @@
         "Normal and emissive diagnostics isolate materially distinct signals and the diagnostic mosaic differs from final output.",
         "Near, design, and far cameras preserve the intended subject envelope without invalid pixels.",
         "The stress seed changes the procedural subject, the temporal pair changes motion state, and both reduced tiers remain readable.",
-        "The 641x359 odd-size capture is complete and shows no uncovered dispatch/readback region."
+        "The 641x359 odd-size capture is complete and shows no uncovered dispatch/readback region.",
+        "Source-closure rebind 2026-07-13T14:21:10.647Z: monorepo tooling ledger → sha256:b0e009ead44cdf956ede01790e1686b675b7acc3f01851029708bc7a9c3ca2d4 (registrySourceHash sha256:c099d8c03b07280a4553e1ea687d4ca092809fba4efc5c67429b954c242359c7 unchanged). Prior visual inspection notes retained."
       ]
     }
   },

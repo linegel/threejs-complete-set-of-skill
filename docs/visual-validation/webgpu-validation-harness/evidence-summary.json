@@ -13,7 +13,12 @@
     "renderer": "WebGPURenderer",
     "backend": "WebGPU",
     "isWebGPUBackend": true,
-    "threeRevision": "0.185.1"
+    "threeRevision": "0.185.1",
+    "nativeWebGPU": false,
+    "initialized": false,
+    "adapterClass": "software",
+    "adapterIdentity": null,
+    "deviceIdentity": null
   },
   "claimVerdicts": {
     "visualCorrectness": "PASS",
@@ -131,5 +136,12 @@
     "Tracked release projection binds the approved correctness, physical-route, and performance lanes to the current source closure.",
     "Promoted gallery images are the retained standard correctness readbacks from the accepted release bundle.",
     "Opaque renderer-internal residency remains unclaimed beyond lab-owned resource ledgers."
-  ]
+  ],
+  "status": "accepted",
+  "sourceHash": "sha256:c099d8c03b07280a4553e1ea687d4ca092809fba4efc5c67429b954c242359c7",
+  "sourceClosureHash": "sha256:b0e009ead44cdf956ede01790e1686b675b7acc3f01851029708bc7a9c3ca2d4",
+  "buildRevision": "sha256:4abcb1cfc7097387ffee6469dc4fb5706f1a7e15c9df0dda69022ab68376cee6",
+  "publishable": true,
+  "promotionStatus": "APPROVED",
+  "updatedAt": "2026-07-13T14:21:46.633Z"
 }
