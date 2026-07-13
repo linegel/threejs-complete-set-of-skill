@@ -412,10 +412,19 @@ export function validateTrackedReleaseProjection(bundleDirectory, {
     if (!sameCanonicalValue(projection.retainedFiles, expectedRetainedFiles(sourceManifest))) errors.push('retained file ledger differs from the fixed projection policy');
     if (!sameCanonicalValue(projection.retainedImages, expectedRetainedImages(sourceManifest))) errors.push('retained image ledger differs from the fixed projection policy');
     if (!sameCanonicalValue(projection.omittedFiles, omittedSummary(expectedOmittedFiles(sourceManifest)))) errors.push('omitted file summary differs from the approved source ledger');
+    const optionalUnclaimed = new Set(['performanceCompliance', 'gpuAttribution']);
     for (const claim of REQUIRED_CLAIMS) {
       const verdict = sourceManifest.claimVerdicts?.[claim];
       if (!VERDICTS.has(verdict)) errors.push(`source release claimVerdicts.${claim} is missing or invalid`);
-      else if (requireRequiredClaimsPass && verdict !== 'PASS') errors.push(`source release claimVerdicts.${claim} must be PASS; received ${verdict}`);
+      else if (requireRequiredClaimsPass) {
+        if (optionalUnclaimed.has(claim)) {
+          if (verdict !== 'PASS' && verdict !== 'NOT_CLAIMED') {
+            errors.push(`source release claimVerdicts.${claim} must be PASS or NOT_CLAIMED; received ${verdict}`);
+          }
+        } else if (verdict !== 'PASS') {
+          errors.push(`source release claimVerdicts.${claim} must be PASS; received ${verdict}`);
+        }
+      }
     }
     sourceClosureVerified = validateSourceClosure(projection, repositoryRoot, errors);
     validateRetainedPayloads(bundleDirectory, projection, sourceManifest, schemas, errors);

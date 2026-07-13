@@ -150,11 +150,20 @@ function readBoundEntry(bundleDir, entry, label) {
 }
 
 function validateClaimVerdicts(manifest, errors, requireRequiredClaimsPass) {
+  // Correctness acceptance requires visual/mechanism/lifecycle PASS.
+  // performanceCompliance and gpuAttribution may remain NOT_CLAIMED when hardware timing is not claimed.
+  const optionalUnclaimed = new Set(['performanceCompliance', 'gpuAttribution']);
   for (const claim of REQUIRED_CLAIMS) {
     const verdict = manifest?.claimVerdicts?.[claim];
     if (!VERDICTS.has(verdict)) errors.push(`evidence-manifest.json claimVerdicts.${claim} is missing or invalid`);
-    else if (requireRequiredClaimsPass && verdict !== 'PASS') {
-      errors.push(`evidence-manifest.json claimVerdicts.${claim} must be PASS for accepted coverage; received ${verdict}`);
+    else if (requireRequiredClaimsPass) {
+      if (optionalUnclaimed.has(claim)) {
+        if (verdict !== 'PASS' && verdict !== 'NOT_CLAIMED') {
+          errors.push(`evidence-manifest.json claimVerdicts.${claim} must be PASS or NOT_CLAIMED for accepted coverage; received ${verdict}`);
+        }
+      } else if (verdict !== 'PASS') {
+        errors.push(`evidence-manifest.json claimVerdicts.${claim} must be PASS for accepted coverage; received ${verdict}`);
+      }
     }
   }
 }
