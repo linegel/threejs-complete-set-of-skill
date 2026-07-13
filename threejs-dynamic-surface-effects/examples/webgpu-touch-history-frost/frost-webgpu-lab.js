@@ -17,6 +17,7 @@ import {
 } from "three/webgpu";
 import { color } from "three/tsl";
 
+import { runLifecycleProfile as runSharedLifecycleProfile } from "../../../labs/runtime/lifecycle-profile.mjs";
 import {
   FROST_MECHANISMS,
   FROST_QUALITY_TIERS,
@@ -64,6 +65,13 @@ const FROST_CAMERA_POSES = Object.freeze({
   design: Object.freeze({ position: Object.freeze([0, 1.2, 10.2]), target: Object.freeze([0, 0, 0]) }),
   far: Object.freeze({ position: Object.freeze([0, 3.8, 17]), target: Object.freeze([0, 0, 0]) }),
 });
+const FROST_LIFECYCLE_EXTENTS = Object.freeze([
+  Object.freeze({ width: 641, height: 359, dpr: 1 }),
+  Object.freeze({ width: 320, height: 180, dpr: 1.5 }),
+  Object.freeze({ width: 400, height: 300, dpr: 2 }),
+]);
+const FROST_LIFECYCLE_TIERS = Object.freeze(["full", "balanced", "budgeted"]);
+const FROST_LIFECYCLE_MODES = Object.freeze(["final", "next-history-ra", "frost-mask-after-pointer"]);
 
 const FROST_DEBUG_VIEW_TO_MODE = Object.freeze(Object.fromEntries(
   Object.entries(FROST_MODE_TO_DEBUG_VIEW).map(([mode, debugView]) => [debugView, mode]),
@@ -74,6 +82,17 @@ function applyFrostCameraPose(camera, id) {
   if (!pose) throw new RangeError(`unknown frost camera "${id}"`);
   camera.position.fromArray(pose.position);
   camera.lookAt(...pose.target);
+}
+
+export function frostLifecycleCyclePlan(cycle) {
+  if (!Number.isInteger(cycle) || cycle < 0) throw new RangeError("frost lifecycle cycle must be a nonnegative integer");
+  const extent = FROST_LIFECYCLE_EXTENTS[cycle % FROST_LIFECYCLE_EXTENTS.length];
+  return Object.freeze({
+    ...extent,
+    tier: FROST_LIFECYCLE_TIERS[cycle % FROST_LIFECYCLE_TIERS.length],
+    mode: FROST_LIFECYCLE_MODES[cycle % FROST_LIFECYCLE_MODES.length],
+    resetCause: `frost-lifecycle-cycle-${cycle}`,
+  });
 }
 
 export function parseFrostLabRoute(pathname = "/", search = "") {
@@ -173,6 +192,12 @@ export class WebGPUFrostLab {
     this.captureTransactionSequence = 0;
     this.captureRecipeSetDigest = null;
     this.captureTargetSequence = 0;
+    this.deviceErrors = [];
+    this.labOwnedListenerCount = 0;
+    this.rendererStateBeforeDigest = null;
+    this.rendererStateAfterDigest = null;
+    this.disposeEvidence = null;
+    this.disposed = false;
   }
 
   async initialize() {
@@ -193,6 +218,11 @@ export class WebGPUFrostLab {
     this.rendererDeviceStatus = "active";
     this.deviceLostObserved = false;
     this.lossPromiseObservedOnActualDevice = Boolean(this.rendererDevice.lost?.then);
+    this.uncapturedErrorHandler = (event) => {
+      this.deviceErrors.push(String(event?.error?.message ?? event?.error ?? "unknown WebGPU uncaptured error"));
+    };
+    this.rendererDevice.addEventListener?.("uncapturederror", this.uncapturedErrorHandler);
+    this.labOwnedListenerCount = typeof this.rendererDevice.addEventListener === "function" ? 1 : 0;
     if (this.lossPromiseObservedOnActualDevice) {
       this.rendererDevice.lost.then(() => {
         if (this.rendererDeviceStatus === "disposing" || this.rendererDeviceStatus === "disposed") return;
@@ -223,7 +253,20 @@ export class WebGPUFrostLab {
     this.captureRecipeSetDigest = await sha256FrostEvidence(FROST_ALL_CAPTURE_RECIPES);
     this.mode = FROST_DEBUG_VIEW_TO_MODE[this.effect.debugView] ?? "final";
     this.initialized = true;
+    this.rendererStateBeforeDigest = await sha256FrostEvidence(this.#rendererStateEvidence("active"));
     return this;
+  }
+
+  #rendererStateEvidence(disposition) {
+    return Object.freeze({
+      labId: FROST_LAB_ID,
+      disposition,
+      outputColorSpace: this.renderer?.outputColorSpace ?? null,
+      toneMapping: this.renderer?.toneMapping ?? null,
+      pixelRatio: this.renderer?.getPixelRatio?.() ?? null,
+      deviceGeneration: this.rendererDeviceGeneration ?? 0,
+      deviceLossGeneration: this.deviceLossGeneration ?? 0,
+    });
   }
 
   async ready() {
@@ -636,7 +679,28 @@ export class WebGPUFrostLab {
   }
 
   describeResources() {
-    return this.effect.createResourcePlan();
+    if (this.disposed) {
+      return {
+        resourceState: "disposed",
+        residentStorageBytes: 0,
+        retainedTargetBytes: 0,
+        retainedStorageBytes: 0,
+        retainedMaterialCount: 0,
+        retainedControlCount: 0,
+        retainedListenerCount: this.labOwnedListenerCount,
+        opaqueRendererInternalResidency: "NOT_CLAIMED",
+      };
+    }
+    return {
+      ...this.effect.createResourcePlan(),
+      resourceState: "resident",
+      retainedTargetBytes: null,
+      retainedStorageBytes: null,
+      retainedMaterialCount: null,
+      retainedControlCount: 0,
+      retainedListenerCount: this.labOwnedListenerCount,
+      opaqueRendererInternalResidency: "NOT_CLAIMED",
+    };
   }
 
   getAvailableModes() {
@@ -653,8 +717,10 @@ export class WebGPUFrostLab {
     const deviceIdentityVerified = this.rendererDevice !== null &&
       this.rendererDevice === this.renderer.backend?.device;
     const viewportSize = this.renderer.getSize(new Vector2());
+    const effectMetrics = this.effect.getMetrics();
     return {
-      ...this.effect.getMetrics(),
+      ...effectMetrics,
+      ...(this.disposed ? { storageBytes: 0 } : {}),
       labId: FROST_LAB_ID,
       threeRevision: REVISION,
       runtimeProfile: this.runtimeProfile,
@@ -671,6 +737,12 @@ export class WebGPUFrostLab {
       rendererDeviceGeneration: this.rendererDeviceGeneration,
       deviceLossGeneration: this.deviceLossGeneration,
       deviceLostObserved: this.deviceLostObserved,
+      deviceErrors: [...this.deviceErrors],
+      uncapturedErrors: [...this.deviceErrors],
+      disposed: this.disposed,
+      labOwnedListenerCount: this.labOwnedListenerCount,
+      rendererStateBeforeDigest: this.rendererStateBeforeDigest,
+      rendererStateAfterDigest: this.rendererStateAfterDigest,
       rendererBackendEvidence: {
         backendKind: "WebGPU",
         backendType: "WebGPUBackend",
@@ -706,14 +778,60 @@ export class WebGPUFrostLab {
     };
   }
 
+  async runLifecycleProfile(cycles = 50) {
+    const canvasFactory = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = 320;
+      canvas.height = 180;
+      return canvas;
+    };
+    return runSharedLifecycleProfile(async () => createFrostLab({
+      canvas: canvasFactory(),
+      tier: "balanced",
+      mechanism: this.mechanism,
+      seed: 0x00000001,
+      runtimeProfile: "correctness",
+    }), {
+      cycles,
+      planCycle: frostLifecycleCyclePlan,
+    });
+  }
+
   async dispose() {
+    if (this.disposeEvidence) return this.disposeEvidence;
     this.renderer?.setAnimationLoop(null);
     this.rendererDeviceStatus = "disposing";
+    const queueSettlement = { status: "FAIL", deviceGeneration: this.rendererDeviceGeneration, error: null };
+    try {
+      await this.rendererDevice?.queue?.onSubmittedWorkDone?.();
+      queueSettlement.status = "PASS";
+    } catch (error) {
+      queueSettlement.error = String(error?.message ?? error);
+    }
     this.effect?.dispose();
     this.backdrop?.dispose();
-    this.renderer?.dispose();
+    this.rendererDevice?.removeEventListener?.("uncapturederror", this.uncapturedErrorHandler);
+    this.labOwnedListenerCount = 0;
+    await this.renderer?.dispose();
     this.rendererDeviceStatus = "disposed";
     this.disposed = true;
+    this.rendererStateAfterDigest = await sha256FrostEvidence(this.#rendererStateEvidence("OWNED_RENDERER_DISPOSED"));
+    this.disposeEvidence = Object.freeze({
+      status: queueSettlement.status,
+      queueSettlement: Object.freeze(queueSettlement),
+      rendererStateDisposition: "OWNED_RENDERER_DISPOSED",
+      rendererStateBeforeDigest: this.rendererStateBeforeDigest,
+      rendererStateAfterDigest: this.rendererStateAfterDigest,
+      retainedTargetBytes: 0,
+      retainedStorageBytes: 0,
+      retainedMaterialCount: 0,
+      retainedControlCount: 0,
+      retainedListenerCount: this.labOwnedListenerCount,
+      deviceLossObserved: this.deviceLostObserved,
+      deviceErrors: Object.freeze([...this.deviceErrors]),
+    });
+    if (queueSettlement.status !== "PASS") throw new Error(`Frost queue settlement failed: ${queueSettlement.error}`);
+    return this.disposeEvidence;
   }
 
   get labId() {
