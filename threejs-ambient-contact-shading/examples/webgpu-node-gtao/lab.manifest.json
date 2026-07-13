@@ -162,7 +162,7 @@
     {
       "id": "native-webgpu",
       "required": true,
-      "evidence": "correctness capture-session + evidence-manifest (current sourceHash) validates with WebGPUBackend deviceIdentityVerified; validate:artifacts structuralVerdict PASS.",
+      "evidence": "correctness capture-session + evidence-manifest bound to current sourceHash sha256:d151b7e9512ba31533653581a04ac7359ab067c8ae0963625f675ecdc4781455; validate:artifacts structuralVerdict PASS; WebGPUBackend deviceIdentityVerified.",
       "status": "accepted"
     },
     {
@@ -176,25 +176,25 @@
     {
       "id": "renderer-init",
       "required": true,
-      "evidence": "capture-lab-browser correctness session completed with initialized metrics and 10 standard presentation readbacks.",
+      "evidence": "capture-lab-browser correctness session (current sourceHash) completed with initialized metrics and standard presentation readbacks.",
       "status": "accepted"
     },
     {
       "id": "backend-is-webgpu",
       "required": true,
-      "evidence": "rendererBackendEvidence.isWebGPUBackend===true in capture-session finalRuntime metrics.",
+      "evidence": "rendererBackendEvidence.isWebGPUBackend===true in capture-session finalRuntime metrics for current sourceHash bundle.",
       "status": "accepted"
     },
     {
       "id": "mechanism-reachable",
       "required": true,
-      "evidence": "correctness mechanism-metrics.runtimeReachability routes include final/diagnostics/camera/seed/temporal PNGs; material pair final vs seed-0001 ratio≥0.337 and final vs temporal.t001 ratio≥0.359 with maxChannelDelta≥152; mechanismCorrectness PASS.",
+      "evidence": "mechanism-metrics.runtimeReachability routes + material-difference pairs on current-hash correctness PNGs; mechanismCorrectness PASS.",
       "status": "accepted"
     },
     {
       "id": "aligned-readback",
       "required": true,
-      "evidence": "normalized-readbacks and transport-readbacks written with 256-byte-aligned row strides for 1200x800 captures.",
+      "evidence": "normalized/transport readbacks with 256-byte-aligned row strides for 1200x800 captures in current-hash correctness bundle.",
       "status": "accepted"
     },
     {
@@ -211,7 +211,7 @@
     }
   ],
   "evidenceContract": "v2",
-  "evidenceBundle": "docs/visual-validation/webgpu-node-gtao/bundle",
+  "evidenceBundle": "artifacts/visual-validation/webgpu-node-gtao/correctness",
   "validationCommand": "node threejs-ambient-contact-shading/examples/webgpu-node-gtao/validate.js",
   "commands": {
     "check": "npm --prefix threejs-ambient-contact-shading/examples/webgpu-node-gtao run check",
@@ -222,6 +222,6 @@
     "validateQuick": "npm --prefix threejs-ambient-contact-shading/examples/webgpu-node-gtao run validate:quick",
     "validateFull": "npm --prefix threejs-ambient-contact-shading/examples/webgpu-node-gtao run validate:full"
   },
-  "sourceHash": "sha256:8d8ada8f07dc1489c883c72f30ff880c625514028d184575bac076446a77b577",
+  "sourceHash": "sha256:d151b7e9512ba31533653581a04ac7359ab067c8ae0963625f675ecdc4781455",
   "proxyStatus": null
 }
