@@ -123,6 +123,8 @@ export async function createTowerShipLabController({
 
   let disposed = false;
   let deviceLossReason = null;
+  let currentScenario = Object.entries(TOWER_SHIP_SCENARIOS).find(([, scenarioMode]) => scenarioMode === mode)?.[0]
+    ?? "reference-reconstruction";
 
   const renderer = new THREE.WebGPURenderer({
     canvas,
@@ -142,14 +144,36 @@ export async function createTowerShipLabController({
   if (!initializedDevice?.lost || typeof initializedDevice.lost.then !== "function") {
     throw new Error("Initialized WebGPU device does not expose a loss observer.");
   }
+  const rendererDeviceGeneration = 1;
+  let rendererDeviceStatus = "active";
+  let deviceLossGeneration = 0;
+  const runtimeProfile = "correctness";
+  const timestampQueriesRequested = TOWER_SHIP_RENDER_POLICY.trackTimestamp === true;
+  const timestampQueriesActive = false;
   initializedDevice.lost.then((info) => {
     if (disposed) return;
+    rendererDeviceStatus = "lost";
+    deviceLossGeneration = rendererDeviceGeneration;
     deviceLossReason = info?.message || info?.reason || "unknown device loss";
     onDeviceLost(info);
   }, (error) => {
     if (disposed) return;
+    rendererDeviceStatus = "lost";
+    deviceLossGeneration = rendererDeviceGeneration;
     deviceLossReason = error instanceof Error ? error.message : String(error);
     onDeviceLost(error);
+  });
+  const backendEvidence = () => ({
+    backendKind: "WebGPU",
+    backendType: "WebGPUBackend",
+    isWebGPUBackend: renderer.backend.isWebGPUBackend === true,
+    initialized: true,
+    deviceIdentityVerified: renderer.backend.device === initializedDevice,
+    deviceIdentitySource: "strict identity equality between requested GPUDevice and renderer.backend.device after renderer.init()",
+    deviceType: initializedDevice.constructor?.name || "GPUDevice",
+    deviceLabel: initializedDevice.label || "",
+    lossPromiseObservedOnActualDevice: true,
+    rendererDeviceGeneration,
   });
 
   const scene = new THREE.Scene();
@@ -256,11 +280,14 @@ export async function createTowerShipLabController({
     async setScenario(id) {
       const scenarioMode = TOWER_SHIP_SCENARIOS[id];
       if (!scenarioMode) throw new RangeError(`Unknown scenario "${id}"`);
+      currentScenario = id;
       await this.setMode(scenarioMode);
     },
     async setMode(id) {
       if (!towerShipStateChanged(currentMode, id, TOWER_SHIP_MODES, "mode")) return;
       currentMode = id;
+      const matchingScenario = Object.entries(TOWER_SHIP_SCENARIOS).find(([, scenarioMode]) => scenarioMode === id)?.[0];
+      if (matchingScenario) currentScenario = matchingScenario;
       ship.setMode(id);
       ship.setTime(currentTime, id === "interaction");
     },
@@ -327,7 +354,16 @@ export async function createTowerShipLabController({
         const pixels = preserveTowerShipReadbackRows(readback, layout);
         return {
           target,
-          ...layout,
+          width: layout.width,
+          height: layout.height,
+          format: "rgba8",
+          colorManaged: true,
+          colorEncoding: "srgb",
+          outputColorSpace: "srgb",
+          colorSpace: "srgb",
+          bytesPerPixel: 4,
+          // Padded GPU transport: both reported strides must name the same padded row.
+          bytesPerRow: layout.bytesPerRow,
           sourceBytesPerRow: layout.bytesPerRow,
           sourceByteLength: pixels.byteLength,
           origin: "bottom-left",
@@ -338,16 +374,37 @@ export async function createTowerShipLabController({
       }
     },
     getMetrics() {
+      const evidence = backendEvidence();
       return {
+        labId: "webgpu-tower-ship-sculptor",
+        threeRevision: THREE.REVISION,
+        runtimeProfile,
+        timestampQueriesRequired: false,
+        timestampQueriesRequested,
+        timestampQueriesActive,
+        performanceTimestampMode: "disabled",
+        scenario: currentScenario,
         mode: currentMode,
         tier: currentTier,
         seed: currentSeed,
         camera: currentCamera,
         time: currentTime,
-        backend: "webgpu",
+        timeSeconds: currentTime,
+        backend: "WebGPU",
+        backendKind: "WebGPU",
+        rendererBackend: "WebGPUBackend",
+        rendererType: "WebGPURenderer",
         nativeWebGPU: renderer.backend.isWebGPUBackend === true,
+        rendererDeviceStatus,
+        rendererDeviceGeneration,
+        deviceLossGeneration,
+        rendererBackendEvidence: evidence,
         dpr: appliedDpr,
-        timestampQueriesRequested: TOWER_SHIP_RENDER_POLICY.trackTimestamp,
+        viewport: {
+          width,
+          height,
+          dpr: appliedDpr,
+        },
         timingPolicy: TOWER_SHIP_RENDER_POLICY.timingReason,
         sustainedGpuTimingAvailable: false,
         performanceAcceptance: "insufficient-evidence",
@@ -359,11 +416,21 @@ export async function createTowerShipLabController({
         rebuildCount,
         lastFrameError,
         deviceLossReason,
+        rendererInfo: {
+          rendererType: "WebGPURenderer",
+          backendType: "WebGPUBackend",
+          threeRevision: THREE.REVISION,
+          backendEvidence: evidence,
+        },
         ...summary,
       };
     },
     describePipeline() {
       return {
+        runtimeProfile,
+        timestampQueriesRequired: false,
+        timestampQueriesRequested,
+        timestampQueriesActive,
         owner: "WebGPURenderer",
         sceneRendersPerFrame: 1,
         passes: ["forward-scene"],
