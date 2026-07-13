@@ -410,82 +410,6 @@
       ]
     },
     {
-      "labId": "integration-precipitation-image-pipeline",
-      "expectedAcceptanceStatus": "incomplete",
-      "artifactDirectory": "artifacts/visual-validation/integration-precipitation-image-pipeline/correctness",
-      "backendProof": "capture-session.json",
-      "claimVerdicts": "claim-verdicts.json",
-      "primaryImage": "final.design.png",
-      "primaryImageLabel": "Precipitation/image-pipeline integration presentation",
-      "limitations": [
-        "Host-owned native WebGPU capture session is bound to the current source hash with presentation readbacks.",
-        "Primary dependencies webgpu-rain-snow-and-wet-surfaces and webgpu-image-pipeline are not both formally accepted, so integration acceptance remains incomplete.",
-        "GPU timestamps and lifecycle loop evidence are not claimed."
-      ],
-      "images": [
-        {
-          "source": "final.design.png",
-          "output": "final.design.png",
-          "encoding": "png-copy",
-          "meaning": "Final color-managed presentation readback."
-        },
-        {
-          "source": "no-post.design.png",
-          "output": "no-post.design.png",
-          "encoding": "png-copy",
-          "meaning": "No-post / diagnostic baseline presentation."
-        },
-        {
-          "source": "diagnostics.mosaic.png",
-          "output": "diagnostics.mosaic.png",
-          "encoding": "png-copy",
-          "meaning": "Mechanism/owner diagnostic presentation."
-        },
-        {
-          "source": "camera.near.png",
-          "output": "camera.near.png",
-          "encoding": "png-copy",
-          "meaning": "Near camera presentation."
-        },
-        {
-          "source": "camera.design.png",
-          "output": "camera.design.png",
-          "encoding": "png-copy",
-          "meaning": "Design camera presentation."
-        },
-        {
-          "source": "camera.far.png",
-          "output": "camera.far.png",
-          "encoding": "png-copy",
-          "meaning": "Far camera presentation."
-        },
-        {
-          "source": "seed-0001.final.png",
-          "output": "seed-0001.final.png",
-          "encoding": "png-copy",
-          "meaning": "Baseline seed presentation."
-        },
-        {
-          "source": "seed-9e3779b9.final.png",
-          "output": "seed-9e3779b9.final.png",
-          "encoding": "png-copy",
-          "meaning": "Stress seed presentation."
-        },
-        {
-          "source": "temporal.t000.png",
-          "output": "temporal.t000.png",
-          "encoding": "png-copy",
-          "meaning": "Temporal t=0 presentation."
-        },
-        {
-          "source": "temporal.t001.png",
-          "output": "temporal.t001.png",
-          "encoding": "png-copy",
-          "meaning": "Temporal t=1/60 presentation."
-        }
-      ]
-    },
-    {
       "labId": "integration-temporal-surface",
       "expectedAcceptanceStatus": "incomplete",
       "artifactDirectory": "artifacts/visual-validation/integration-temporal-surface/correctness",
@@ -634,6 +558,217 @@
           "output": "temporal.t001.png",
           "encoding": "png-copy",
           "meaning": "Temporal t=1/60 presentation."
+        }
+      ]
+    },
+    {
+      "labId": "webgpu-touch-history-frost",
+      "expectedAcceptanceStatus": "accepted",
+      "artifactDirectory": "artifacts/visual-validation/webgpu-touch-history-frost/release-approved-current",
+      "backendProof": "capture-session.json",
+      "claimVerdicts": "evidence-manifest.json",
+      "primaryImage": "final.design.png",
+      "primaryImageLabel": "Touch-history Frost hardware WebGPU readback",
+      "limitations": [
+        "Correctness and hardware physical-route visual review pass on the current source closure.",
+        "Named-adapter GPU timestamp timing remains NOT_CLAIMED."
+      ],
+      "images": [
+        {
+          "source": "final.design.png",
+          "output": "final.design.png",
+          "encoding": "png-copy",
+          "meaning": "Final Frost composite"
+        },
+        {
+          "source": "no-post.design.png",
+          "output": "no-post.design.png",
+          "encoding": "png-copy",
+          "meaning": "No-frost baseline"
+        },
+        {
+          "source": "diagnostics.mosaic.png",
+          "output": "diagnostics.mosaic.png",
+          "encoding": "png-copy",
+          "meaning": "History/deposit/mask mosaic"
+        },
+        {
+          "source": "camera.near.png",
+          "output": "camera.near.png",
+          "encoding": "png-copy",
+          "meaning": "Near camera"
+        },
+        {
+          "source": "camera.design.png",
+          "output": "camera.design.png",
+          "encoding": "png-copy",
+          "meaning": "Design camera"
+        },
+        {
+          "source": "camera.far.png",
+          "output": "camera.far.png",
+          "encoding": "png-copy",
+          "meaning": "Far camera"
+        },
+        {
+          "source": "seed-0001.final.png",
+          "output": "seed-0001.final.png",
+          "encoding": "png-copy",
+          "meaning": "Seed 1"
+        },
+        {
+          "source": "seed-9e3779b9.final.png",
+          "output": "seed-9e3779b9.final.png",
+          "encoding": "png-copy",
+          "meaning": "Seed stress"
+        },
+        {
+          "source": "temporal.t000.png",
+          "output": "temporal.t000.png",
+          "encoding": "png-copy",
+          "meaning": "Temporal t0"
+        },
+        {
+          "source": "temporal.t001.png",
+          "output": "temporal.t001.png",
+          "encoding": "png-copy",
+          "meaning": "Temporal t1"
+        }
+      ]
+    },
+    {
+      "labId": "webgpu-camera-rig",
+      "expectedAcceptanceStatus": "incomplete",
+      "artifactDirectory": "artifacts/visual-validation/webgpu-camera-rig/correctness",
+      "backendProof": "capture-session.json",
+      "claimVerdicts": "claim-verdicts.json",
+      "primaryImage": "final.design.png",
+      "primaryImageLabel": "Camera-rig presentation readback",
+      "limitations": [
+        "Correctness capture records native r185 WebGPUBackend with device identity proof.",
+        "Named-adapter GPU timestamps and 60 Hz hardwarePerformance remain NOT_CLAIMED.",
+        "Mechanism and tier routes beyond the primary correctness capture remain incomplete."
+      ],
+      "images": [
+        {
+          "source": "final.design.png",
+          "output": "final.design.png",
+          "encoding": "png-copy",
+          "meaning": "Primary final readback."
+        },
+        {
+          "source": "no-post.design.png",
+          "output": "no-post.design.png",
+          "encoding": "png-copy",
+          "meaning": "No-post / alternate display path readback."
+        },
+        {
+          "source": "diagnostics.mosaic.png",
+          "output": "diagnostics.mosaic.png",
+          "encoding": "png-copy",
+          "meaning": "Diagnostics / mechanism display readback."
+        }
+      ]
+    },
+    {
+      "labId": "webgpu-dense-grass",
+      "expectedAcceptanceStatus": "incomplete",
+      "artifactDirectory": "artifacts/visual-validation/webgpu-dense-grass/correctness",
+      "backendProof": "capture-session.json",
+      "claimVerdicts": "claim-verdicts.json",
+      "primaryImage": "final.design.png",
+      "primaryImageLabel": "Dense-grass final readback",
+      "limitations": [
+        "Correctness capture records native r185 WebGPUBackend with device identity proof.",
+        "GPU timestamps and full lifecycle acceptance remain incomplete.",
+        "Scenario matrix beyond the primary correctness route remains incomplete."
+      ],
+      "images": [
+        {
+          "source": "final.design.png",
+          "output": "final.design.png",
+          "encoding": "png-copy",
+          "meaning": "Primary final readback."
+        },
+        {
+          "source": "no-post.design.png",
+          "output": "no-post.design.png",
+          "encoding": "png-copy",
+          "meaning": "No-post / alternate display path readback."
+        },
+        {
+          "source": "diagnostics.mosaic.png",
+          "output": "diagnostics.mosaic.png",
+          "encoding": "png-copy",
+          "meaning": "Diagnostics / mechanism display readback."
+        }
+      ]
+    },
+    {
+      "labId": "webgpu-bounded-water",
+      "expectedAcceptanceStatus": "incomplete",
+      "artifactDirectory": "artifacts/visual-validation/webgpu-bounded-water/correctness",
+      "backendProof": "capture-session.json",
+      "claimVerdicts": "claim-verdicts.json",
+      "primaryImage": "final.design.png",
+      "primaryImageLabel": "Bounded-water final readback",
+      "limitations": [
+        "Correctness capture records native r185 WebGPUBackend with device identity proof.",
+        "GPU timestamps, 50-cycle lifecycle, and full mechanism matrix remain incomplete.",
+        "Named-adapter performance compliance is NOT_CLAIMED."
+      ],
+      "images": [
+        {
+          "source": "final.design.png",
+          "output": "final.design.png",
+          "encoding": "png-copy",
+          "meaning": "Primary final readback."
+        },
+        {
+          "source": "no-post.design.png",
+          "output": "no-post.design.png",
+          "encoding": "png-copy",
+          "meaning": "No-post / alternate display path readback."
+        },
+        {
+          "source": "diagnostics.mosaic.png",
+          "output": "diagnostics.mosaic.png",
+          "encoding": "png-copy",
+          "meaning": "Diagnostics / mechanism display readback."
+        }
+      ]
+    },
+    {
+      "labId": "webgpu-cached-clipmap-shadow",
+      "expectedAcceptanceStatus": "incomplete",
+      "artifactDirectory": "artifacts/visual-validation/webgpu-cached-clipmap-shadow/correctness",
+      "backendProof": "capture-session.json",
+      "claimVerdicts": "claim-verdicts.json",
+      "primaryImage": "final.design.png",
+      "primaryImageLabel": "Cached clipmap shadow final readback",
+      "limitations": [
+        "Correctness capture records native r185 WebGPUBackend with device identity proof.",
+        "Physical multi-scenario shadow matrix and GPU timestamps remain incomplete.",
+        "Named-adapter 60 Hz performance is NOT_CLAIMED."
+      ],
+      "images": [
+        {
+          "source": "final.design.png",
+          "output": "final.design.png",
+          "encoding": "png-copy",
+          "meaning": "Primary final readback."
+        },
+        {
+          "source": "no-post.design.png",
+          "output": "no-post.design.png",
+          "encoding": "png-copy",
+          "meaning": "No-post / alternate display path readback."
+        },
+        {
+          "source": "diagnostics.mosaic.png",
+          "output": "diagnostics.mosaic.png",
+          "encoding": "png-copy",
+          "meaning": "Diagnostics / mechanism display readback."
         }
       ]
     }
