@@ -259,6 +259,7 @@ function validateCaptureSessions( manifest, fileIndex, errors ) {
 	indexUnique( sessions, 'profile', 'captureSessions', errors );
 	const documentPaths = new Set();
 	const writeLedgerPaths = new Set();
+	const coveredRoutePaths = new Set();
 	for ( const [ index, session ] of sessions.entries() ) {
 
 		const label = `captureSessions[${ index }]`;
@@ -278,6 +279,18 @@ function validateCaptureSessions( manifest, fileIndex, errors ) {
 			if ( session?.stateDigest !== sessionRoute.stateDigest ) errors.push( `${ label } state digest differs from its bound release route state.` );
 
 		}
+		if ( session?.routeSetPaths !== undefined || session?.routeSetDigest !== undefined ) {
+
+			const routeSetPaths = Array.isArray( session?.routeSetPaths ) ? session.routeSetPaths : [];
+			const uniquePaths = new Set( routeSetPaths );
+			if ( routeSetPaths.length === 0 || uniquePaths.size !== routeSetPaths.length ) errors.push( `${ label } route-set path binding is empty or duplicated.` );
+			if ( uniquePaths.has( session?.routePath ) === false ) errors.push( `${ label } route-set path binding omits its canonical routePath.` );
+			const boundRoutes = routeSetPaths.map( ( path ) => routeIndex.get( path ) );
+			for ( const [ routePosition, route ] of boundRoutes.entries() ) if ( route === undefined ) errors.push( `${ label } routeSetPaths[${ routePosition }] is not a member of the release route set.` );
+			if ( boundRoutes.every( Boolean ) && session?.routeSetDigest !== routeSetDigest( boundRoutes ) ) errors.push( `${ label } route-set digest differs from its bound release routes.` );
+			for ( const path of routeSetPaths ) if ( routeIndex.has( path ) ) coveredRoutePaths.add( path );
+
+		} else if ( sessionRoute !== undefined ) coveredRoutePaths.add( session.routePath );
 		if ( session?.rendererInitialized !== true || session?.isWebGPUBackend !== true ) errors.push( `${ label } does not prove initialized native WebGPU execution.` );
 		if ( manifest.bundleKind === 'release-bundle' && [ 'physical-route', 'performance' ].includes( session?.profile ) && session?.adapterClass !== 'hardware' ) errors.push( `${ label } physical release lane is not bound to a hardware adapter.` );
 		if ( manifest.bundleKind === 'release-bundle' && session?.profile === 'performance' && session?.timestampQuerySupported !== true ) errors.push( `${ label } performance lane lacks timestamp-query support.` );
@@ -293,6 +306,8 @@ function validateCaptureSessions( manifest, fileIndex, errors ) {
 	}
 	const profiles = new Map( sessions.map( ( session ) => [ session.profile, session ] ) );
 	if ( manifest.bundleKind === 'release-bundle' ) {
+
+		for ( const path of routeIndex.keys() ) if ( coveredRoutePaths.has( path ) === false ) errors.push( `Release capture sessions do not cover route "${ path }".` );
 
 		if ( profiles.has( 'correctness' ) === false ) errors.push( 'Release bundle is missing the correctness capture lane.' );
 		if ( profiles.has( 'physical-route' ) === false ) errors.push( 'Release bundle is missing the physical-route capture lane.' );

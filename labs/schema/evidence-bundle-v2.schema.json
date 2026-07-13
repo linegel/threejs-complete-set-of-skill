@@ -400,6 +400,16 @@
         },
         "routeDigest": { "$ref": "#/$defs/sha256" },
         "stateDigest": { "$ref": "#/$defs/sha256" },
+        "routeSetPaths": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^/demos/[a-z0-9][a-z0-9/-]*/$"
+          }
+        },
+        "routeSetDigest": { "$ref": "#/$defs/sha256" },
         "document": { "$ref": "#/$defs/sessionDocumentRef" },
         "writeLedger": { "$ref": "#/$defs/sessionWriteLedgerRef" },
         "rendererInitialized": { "const": true },
@@ -407,6 +417,14 @@
         "timestampQuerySupported": { "type": "boolean" }
       },
       "allOf": [
+        {
+          "if": { "required": ["routeSetPaths"] },
+          "then": { "required": ["routeSetDigest"] }
+        },
+        {
+          "if": { "required": ["routeSetDigest"] },
+          "then": { "required": ["routeSetPaths"] }
+        },
         {
           "if": {
             "required": ["profile"],

@@ -27,6 +27,9 @@ function pendingCandidate() {
   secondaryRoute.path = '/demos/webgpu-validation-harness/mechanism/resource-ledger/';
   secondaryRoute.stateDigest = routeStateDigest(secondaryRoute);
   manifest.routeSet = [structuredClone(manifest.route), secondaryRoute];
+  const physical = manifest.captureSessions.find((session) => session.profile === 'physical-route');
+  physical.routeSetPaths = manifest.routeSet.map((route) => route.path);
+  physical.routeSetDigest = routeSetDigest(manifest.routeSet);
   manifest.promotion = null;
   const binding = createReleasePromotionBinding(manifest);
   manifest.promotion = {
