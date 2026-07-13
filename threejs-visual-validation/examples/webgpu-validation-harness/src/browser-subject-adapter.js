@@ -114,8 +114,8 @@ export function assertRendererBackendDeviceIdentity( requestedDevice, backendDev
 export function summarizeTimestampBatch( { entries, resolvedLastFrameTotalMs } ) {
 
 	if ( Array.isArray( entries ) === false || entries.length === 0 ) throw new Error( 'Timestamp batch requires a nonempty explicit-stage population.' );
-	const frames = new Map();
 	const stageContextIds = new Map();
+	const parsedEntries = [];
 	for ( const entry of entries ) {
 
 		const parsed = parseRenderTimestampUid( entry?.uid );
@@ -123,23 +123,30 @@ export function summarizeTimestampBatch( { entries, resolvedLastFrameTotalMs } )
 		if ( Number.isFinite( entry.durationMs ) === false || entry.durationMs < 0 ) throw new Error( `Timestamp UID ${ parsed.uid } has an invalid duration.` );
 		if ( stageContextIds.has( entry.stage ) === false ) stageContextIds.set( entry.stage, parsed.contextId );
 		if ( stageContextIds.get( entry.stage ) !== parsed.contextId ) throw new Error( `Timestamp stage ${ entry.stage } changed render-context identity within the batch.` );
-		if ( frames.has( parsed.frameId ) === false ) frames.set( parsed.frameId, new Map() );
-		const stages = frames.get( parsed.frameId );
-		if ( stages.has( entry.stage ) ) throw new Error( `Timestamp frame ${ parsed.frameId } duplicates stage ${ entry.stage }.` );
-		stages.set( entry.stage, { ...parsed, durationMs: entry.durationMs } );
+		parsedEntries.push( { ...parsed, stage: entry.stage, durationMs: entry.durationMs } );
 
 	}
 	if ( stageContextIds.size !== timestampResolutionPolicy.contextsPerFrame || stageContextIds.get( 'scene-mrt' ) === stageContextIds.get( 'final-output' ) ) throw new Error( 'Timestamp batch must bind two distinct stable render contexts to scene-mrt and final-output.' );
-	const frameIds = [ ...frames.keys() ].sort( ( left, right ) => left - right );
-	for ( let index = 1; index < frameIds.length; index ++ ) if ( frameIds[ index ] !== frameIds[ index - 1 ] + 1 ) throw new Error( 'Timestamp batch frame IDs must be contiguous.' );
-	const rows = frameIds.map( ( frameId ) => {
+	if ( parsedEntries.length % timestampResolutionPolicy.contextsPerFrame !== 0 ) throw new Error( 'Timestamp batch does not contain a complete scene-mrt/final-output submission population.' );
+	parsedEntries.sort( ( left, right ) => left.frameCall - right.frameCall );
+	for ( let index = 1; index < parsedEntries.length; index ++ ) {
 
-		const stages = frames.get( frameId );
-		const scene = stages.get( 'scene-mrt' );
-		const output = stages.get( 'final-output' );
-		if ( ! scene || ! output || stages.size !== timestampResolutionPolicy.contextsPerFrame ) throw new Error( `Timestamp frame ${ frameId } must contain exactly one scene-mrt and one final-output stage.` );
-		return Object.freeze( {
-			frameId,
+		if ( parsedEntries[ index ].frameCall === parsedEntries[ index - 1 ].frameCall ) throw new Error( `Timestamp batch duplicates render-call identity ${ parsedEntries[ index ].frameCall }.` );
+		if ( parsedEntries[ index ].frameCall !== parsedEntries[ index - 1 ].frameCall + 1 ) throw new Error( 'Timestamp batch render-call identities must be contiguous.' );
+
+	}
+	const rows = [];
+	let previousFrameId = null;
+	for ( let index = 0; index < parsedEntries.length; index += timestampResolutionPolicy.contextsPerFrame ) {
+
+		const scene = parsedEntries[ index ];
+		const output = parsedEntries[ index + 1 ];
+		if ( scene.stage !== 'scene-mrt' || output.stage !== 'final-output' ) throw new Error( `Timestamp submission at render call ${ scene.frameCall } must contain scene-mrt followed by final-output.` );
+		if ( scene.frameId !== output.frameId ) throw new Error( `Timestamp submission at render call ${ scene.frameCall } crosses renderer frame identities.` );
+		if ( previousFrameId !== null && scene.frameId < previousFrameId ) throw new Error( 'Timestamp batch renderer frame IDs regress in capture order.' );
+		previousFrameId = scene.frameId;
+		rows.push( Object.freeze( {
+			frameId: scene.frameId,
 			sceneUid: scene.uid,
 			outputUid: output.uid,
 			sceneMs: scene.durationMs,
@@ -148,9 +155,9 @@ export function summarizeTimestampBatch( { entries, resolvedLastFrameTotalMs } )
 			residualMs: null,
 			totalProvenance: 'Derived',
 			independentPerFrameTotalAvailable: false
-		} );
+		} ) );
 
-	} );
+	}
 	const stageSamples = {
 		'scene-mrt': rows.map( ( row ) => row.sceneMs ),
 		'final-output': rows.map( ( row ) => row.outputMs )

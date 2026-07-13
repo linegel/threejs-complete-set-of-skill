@@ -580,6 +580,17 @@ test( 'timestamp populations are resolved once per sustained batch', () => {
 	assert.equal( batch.rows[ 0 ].residualMs, null );
 	assert.deepEqual( parseRenderTimestampUid( 'r:123:45:f67' ), { uid: 'r:123:45:f67', frameCall: 123, contextId: 45, frameId: 67 } );
 	assert.throws( () => parseRenderTimestampUid( 'r:scene:f67' ), /does not match Three r185/ );
+	const sharedRendererFrame = summarizeTimestampBatch( {
+		entries: [
+			{ uid: 'r:10:17:f3', stage: 'scene-mrt', durationMs: 1 },
+			{ uid: 'r:11:41:f3', stage: 'final-output', durationMs: 0.5 },
+			{ uid: 'r:12:17:f3', stage: 'scene-mrt', durationMs: 2 },
+			{ uid: 'r:13:41:f3', stage: 'final-output', durationMs: 0.75 }
+		],
+		resolvedLastFrameTotalMs: 2.75
+	} );
+	assert.deepEqual( sharedRendererFrame.rows.map( ( row ) => row.frameId ), [ 3, 3 ] );
+	assert.deepEqual( sharedRendererFrame.totalSamples, [ 1.5, 2.75 ] );
 
 } );
 
@@ -594,15 +605,19 @@ test( 'timestamp attribution rejects ordering, stage, frame, and context forgeri
 	assert.throws( () => summarizeTimestampBatch( {
 		entries: base.map( ( entry, index ) => index === 1 ? { ...entry, uid: 'r:2:17:f10', stage: 'scene-mrt' } : entry ),
 		resolvedLastFrameTotalMs: 6
-	} ), /duplicates stage|exactly one/ );
+	} ), /scene-mrt followed by final-output/ );
 	assert.throws( () => summarizeTimestampBatch( {
 		entries: base.map( ( entry, index ) => index === 3 ? { ...entry, uid: 'r:4:99:f11' } : entry ),
 		resolvedLastFrameTotalMs: 6
 	} ), /changed render-context identity/ );
 	assert.throws( () => summarizeTimestampBatch( {
-		entries: base.map( ( entry ) => entry.uid.endsWith( 'f11' ) ? { ...entry, uid: entry.uid.replace( 'f11', 'f12' ) } : entry ),
+		entries: base.map( ( entry, index ) => index === 3 ? { ...entry, uid: entry.uid.replace( 'f11', 'f12' ) } : entry ),
 		resolvedLastFrameTotalMs: 6
-	} ), /frame IDs must be contiguous/ );
+	} ), /crosses renderer frame identities/ );
+	assert.throws( () => summarizeTimestampBatch( {
+		entries: base.map( ( entry, index ) => index === 3 ? { ...entry, uid: entry.uid.replace( 'r:4:', 'r:5:' ) } : entry ),
+		resolvedLastFrameTotalMs: 6
+	} ), /render-call identities must be contiguous/ );
 	assert.throws( () => summarizeTimestampBatch( {
 		entries: base.map( ( entry ) => entry.stage === 'final-output' ? { ...entry, uid: entry.uid.replace( ':41:', ':17:' ) } : entry ),
 		resolvedLastFrameTotalMs: 6

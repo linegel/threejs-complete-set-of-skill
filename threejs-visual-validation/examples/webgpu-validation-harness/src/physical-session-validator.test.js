@@ -560,7 +560,21 @@ test( 'verified hardware timing maps the final sustained window without relabell
 	duplicateRecord.sustainedWindows.at( - 1 ).gpuTimestampBatches.push( timestampBatch() );
 	const duplicateImport = await importedWrapper( duplicateRecord );
 	const duplicateVerified = await loadVerifiedImportedPhysicalRecord( duplicateImport.path, { expectedProfile: 'performance' } );
-	assert.throws( () => createRuntimePerformanceTrace( duplicateVerified ), /duplicates a timestamp or frame identity/ );
+	assert.throws( () => createRuntimePerformanceTrace( duplicateVerified ), /duplicates a timestamp or render-call identity/ );
+
+	const sharedFrameRecord = performanceSession();
+	for ( const row of sharedFrameRecord.sustainedWindows.at( - 1 ).gpuTimestampBatches[ 0 ].timestampRows ) {
+
+		row.frameId = 7;
+		row.sceneUid = row.sceneUid.replace( /f\d+$/, 'f7' );
+		row.outputUid = row.outputUid.replace( /f\d+$/, 'f7' );
+
+	}
+	const sharedFrameImport = await importedWrapper( sharedFrameRecord );
+	const sharedFrameVerified = await loadVerifiedImportedPhysicalRecord( sharedFrameImport.path, { expectedProfile: 'performance' } );
+	const sharedFrameTrace = createRuntimePerformanceTrace( sharedFrameVerified );
+	assert.equal( sharedFrameTrace.timestampRows.length, 120 );
+	assert.equal( new Set( sharedFrameTrace.timestampRows.map( ( row ) => row.frameId ) ).size, 1 );
 
 } );
 

@@ -105,7 +105,7 @@ function mapTimestampSegment( segment, label ) {
 	const sceneSamples = [];
 	const outputSamples = [];
 	const seenUids = new Set();
-	const seenFrameIds = new Set();
+	const seenFrameCalls = new Set();
 	let contextIds = null;
 	let timestampResolveCount = 0;
 	let maximumResolveResidualMs = 0;
@@ -140,11 +140,12 @@ function mapTimestampSegment( segment, label ) {
 			const output = parseRenderUid( row.outputUid, `${ rowLabel }.outputUid` );
 			if ( scene.frameId !== row.frameId || output.frameId !== row.frameId ) fail( `${ rowLabel } UID frame identity differs from frameId.` );
 			if ( scene.contextId !== contextIds[ 'scene-mrt' ] || output.contextId !== contextIds[ 'final-output' ] ) fail( `${ rowLabel } UID render context differs from the declared stage context.` );
-			if ( scene.frameCall === output.frameCall || scene.uid === output.uid ) fail( `${ rowLabel } aliases scene and output timestamp identities.` );
-			if ( previousFrameId !== null && row.frameId !== previousFrameId + 1 ) fail( `${ batchLabel } frame IDs are not contiguous in capture order.` );
+			if ( output.frameCall !== scene.frameCall + 1 || scene.uid === output.uid ) fail( `${ rowLabel } does not bind consecutive scene and output render calls.` );
+			if ( previousFrameId !== null && row.frameId < previousFrameId ) fail( `${ batchLabel } frame IDs regress in capture order.` );
 			previousFrameId = row.frameId;
-			if ( seenFrameIds.has( row.frameId ) || seenUids.has( scene.uid ) || seenUids.has( output.uid ) ) fail( `${ rowLabel } duplicates a timestamp or frame identity.` );
-			seenFrameIds.add( row.frameId );
+			if ( seenFrameCalls.has( scene.frameCall ) || seenFrameCalls.has( output.frameCall ) || seenUids.has( scene.uid ) || seenUids.has( output.uid ) ) fail( `${ rowLabel } duplicates a timestamp or render-call identity.` );
+			seenFrameCalls.add( scene.frameCall );
+			seenFrameCalls.add( output.frameCall );
 			seenUids.add( scene.uid );
 			seenUids.add( output.uid );
 			for ( const key of [ 'sceneMs', 'outputMs', 'totalMs' ] ) if ( Number.isFinite( row[ key ] ) === false || row[ key ] < 0 ) fail( `${ rowLabel }.${ key } must be finite and nonnegative.` );
