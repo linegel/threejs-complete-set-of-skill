@@ -131,7 +131,8 @@
     "notes": {
       "type": "array",
       "items": { "type": "string", "minLength": 1 }
-    }
+    },
+    "limitations": { "type": "array" }
   },
   "$defs": {
     "id": {
@@ -223,7 +224,8 @@
         "id": { "$ref": "#/$defs/id" },
         "required": { "type": "boolean" },
         "evidence": { "type": ["string", "null"] },
-        "status": { "$ref": "#/$defs/acceptanceStatus" }
+        "status": { "$ref": "#/$defs/acceptanceStatus" },
+        "acceptanceStatus": { "$ref": "#/$defs/acceptanceStatus" }
       }
     },
     "commands": {

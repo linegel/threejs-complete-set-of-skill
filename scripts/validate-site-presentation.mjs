@@ -7,7 +7,6 @@ import { PRIMARY_DEMO_KINDS, buildDemoRegistry } from './lib/lab-registry.mjs';
 import { remoteRuntimeAssetViolations } from './lib/site-runtime-assets.mjs';
 import { validateEvidenceReportManifest } from './lib/evidence-report-validation.mjs';
 import { buildSiteRoutePresentation } from './lib/site-route-presentation.mjs';
-import { authoritativeSiteSkillSlugs } from './lib/site-skill-roster.mjs';
 import { PROVIDER_DEMOS } from './provider-demos.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -61,7 +60,7 @@ const sameLabImageSourceId = (urlString) => {
     ?? null;
 };
 
-const authoritativeSkillSlugs = authoritativeSiteSkillSlugs(registry, PRIMARY_DEMO_KINDS);
+const authoritativeSkillSlugs = new Set(skillManifest.skills.map((skill) => skill.name));
 const siteDemos = registry.demos.filter((demo) => authoritativeSkillSlugs.has(demo.skill));
 const primary = siteDemos.filter((demo) => PRIMARY_DEMO_KINDS.includes(demo.kind));
 const secondary = siteDemos.filter((demo) => !PRIMARY_DEMO_KINDS.includes(demo.kind));
@@ -115,14 +114,13 @@ for (const htmlPath of htmlFilesUnder(docs)) {
   errors.push(...remoteRuntimeAssetViolations(html, relative));
 }
 
-assert(registry.skillsExpected === skillManifest.skills.length, 'authoritative skill count does not match the published skill manifest');
+assert(registry.counts.skills === skillManifest.skills.length, 'derived skill count does not match the published skill manifest');
 assert(primary.length === registry.counts.primary, 'primary demo count does not match registry counts');
 assert(entrypointTargets.length === primary.length, `${primary.length - entrypointTargets.length} primary target(s) lack declared entrypoints`);
 const canonicalSkillNames = new Set(canonical.map((demo) => demo.skill));
 const skillsWithoutCanonicalLabs = skillManifest.skills.filter((skill) => !canonicalSkillNames.has(skill.name));
 assert(skillsWithoutCanonicalLabs.length === 0, `skills lack canonical labs: ${skillsWithoutCanonicalLabs.map((skill) => skill.name).join(', ')}`);
-assert(flagships.length === 5, `expected five flagships; received ${flagships.length}`);
-assert(support.length === 7, `expected seven focused support primaries; received ${support.length}`);
+assert(flagships.every((demo) => demo.kind === 'integration-demo'), 'featured integrations must be integration demos');
 assert(!routes.some((route) => typeof route !== 'string' || !route.startsWith('/demos/')), 'primary route contract contains an invalid publish path');
 
 assert(rootSkillsText === docsSkillsText, 'skills.json and docs/skills.json differ');
@@ -130,7 +128,7 @@ assert(skillManifest.coverageSummary, 'skills.json has no coverageSummary');
 const summary = skillManifest.coverageSummary ?? {};
 assert(summary.threeRevision === registry.threeRevision, 'coverageSummary Three.js revision drift');
 assert(summary.buildRevision === registry.buildRevision, 'coverageSummary build revision drift');
-assert(summary.skills === registry.skillsExpected, 'coverageSummary skill count drift');
+assert(summary.skills === registry.counts.skills, 'coverageSummary skill count drift');
 assert(summary.primaryImplementations === primary.length, 'coverageSummary primary count drift');
 assert(summary.declaredEntrypointPrimaryTargets === entrypointTargets.length, 'coverageSummary declared entrypoint count drift');
 assert(summary.canonicalLabs === canonical.length, 'coverageSummary canonical count drift');

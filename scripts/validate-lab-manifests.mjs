@@ -15,8 +15,11 @@ import { validateRawLabManifest, validateRegistry } from './lib/lab-validation.m
 
 const args = new Set(process.argv.slice(2));
 const write = args.has('--write-registry');
-const requireComplete = args.has('--require-complete');
 const skipRegistryDrift = args.has('--skip-registry-drift');
+if (args.has('--require-complete')) {
+  console.error('--require-complete was removed: demo status and evidence do not form a repository release gate');
+  process.exit(2);
+}
 
 let targetData;
 try {
@@ -44,7 +47,7 @@ if (rawErrors.length > 0) {
 }
 
 const registry = buildDemoRegistry();
-const result = validateRegistry(registry, { requireComplete });
+const result = validateRegistry(registry);
 
 if (!result.valid) {
   console.error(`lab registry validation failed (${result.errors.length} errors):`);
@@ -66,8 +69,7 @@ if (!skipRegistryDrift && !write) {
   }
 }
 
-const status = requireComplete ? 'complete matrix' : 'migration matrix';
 console.log(
-  `Validated ${status}: ${registry.counts.skills} skills, ${registry.counts.primary} primary targets, `
+  `Validated demo catalog: ${registry.counts.skills} skills, ${registry.counts.primary} primary demos, `
   + `${registry.counts.acceptedPrimary} accepted primary, ${registry.counts.secondary} secondary.`,
 );

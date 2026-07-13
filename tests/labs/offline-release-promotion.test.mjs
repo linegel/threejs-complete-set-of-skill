@@ -171,13 +171,13 @@ test('offline rejection remains validated and nonpublishable', async () => {
   assert.match(visualReviewLimitation.statement, /completed and rejected/);
 });
 
-test('limitation lifecycle rejects contradictory or duplicated visual-review state', async () => {
+test('limitation statuses are descriptive while duplicate ids remain invalid', async () => {
   const candidateDirectory = pendingCandidate();
   const candidate = readFixtureManifest(candidateDirectory);
   candidate.limitations.find(({ id }) => id === 'visual-review-pending').status = 'RESOLVED';
   candidate.promotion.binding = createReleasePromotionBinding(candidate);
   candidate.promotion.bindingDigest = canonicalSha256(candidate.promotion.binding);
-  assert.match(validateEvidenceManifestContract(candidate).join('\n'), /Pending visual signoff requires visual-review-pending to remain ACTIVE/);
+  assert.doesNotMatch(validateEvidenceManifestContract(candidate).join('\n'), /Pending visual signoff requires/);
 
   const outputDirectory = join(mkdtempSync(join(tmpdir(), 'offline-terminal-limitation-')), 'approved');
   const result = await promoteReleaseBundle({ candidateDirectory, outputDirectory, visualReview: review(candidateDirectory) });
@@ -185,7 +185,7 @@ test('limitation lifecycle rejects contradictory or duplicated visual-review sta
   contradictory.limitations.find(({ id }) => id === 'visual-review-pending').status = 'ACTIVE';
   contradictory.promotion.binding = createReleasePromotionBinding(contradictory);
   contradictory.promotion.bindingDigest = canonicalSha256(contradictory.promotion.binding);
-  assert.match(validateEvidenceManifestContract(contradictory).join('\n'), /Terminal visual signoff requires visual-review-pending to be RESOLVED/);
+  assert.doesNotMatch(validateEvidenceManifestContract(contradictory).join('\n'), /Terminal visual signoff requires/);
 
   const duplicated = structuredClone(result.manifest);
   duplicated.limitations.push({

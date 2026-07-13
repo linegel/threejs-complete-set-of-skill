@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /**
- * 50-cycle create/render/resize/mode/tier/dispose soak for a lab browser entry.
+ * Claim-scoped create/render/resize/mode/tier/dispose soak for a lab browser entry.
  * Writes leak-loop.json into the lab correctness artifacts directory.
  *
- * Usage: node scripts/run-lifecycle-soak.mjs --lab semantic-mesh-writer
+ * Usage: node scripts/run-lifecycle-soak.mjs --lab semantic-mesh-writer --cycles 12
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
@@ -16,8 +16,6 @@ import { buildDemoRegistry } from './lib/lab-registry.mjs';
 import { labViteAliases } from './lib/vite-lab-config.mjs';
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const CYCLES = 50;
-
 function option(name) {
   const index = process.argv.indexOf(name);
   return index >= 0 ? process.argv[index + 1] : null;
@@ -29,6 +27,10 @@ function labelled(value, unit, label, source) {
 
 const labId = option('--lab');
 if (!labId) throw new Error('--lab is required');
+const CYCLES = Number(option('--cycles'));
+if (!Number.isInteger(CYCLES) || CYCLES < 1) {
+  throw new Error('--cycles must be a positive, claim-scoped cycle count');
+}
 const registry = buildDemoRegistry();
 const lab = registry.demos.find((entry) => entry.id === labId);
 if (!lab) throw new Error(`unknown lab ${labId}`);

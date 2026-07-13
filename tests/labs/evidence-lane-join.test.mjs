@@ -12,7 +12,7 @@ function fixture() {
   const buildRevision = hash('build');
   const route = { path: '/mechanism/frost/index.html', finalUrl: 'https://example.test/mechanism/frost/index.html', controllerReady: true, lockedState: { mode: 'final' }, observedState: { mode: 'final' } };
   const record = {
-    schemaVersion: 1, recordKind: 'lab-physical-route-review-v1', labId: 'example-lab', profile: 'physical-route', automationSurface: 'codex-in-app-browser', publishable: false,
+    schemaVersion: 1, recordKind: 'lab-physical-route-review-v1', labId: 'example-lab', profile: 'demo-review', automationSurface: 'manual-browser-review', publishable: false,
     sourceClosureHash, buildRevision, threeRevision: '0.185.1', startedAt: '2026-07-13T00:00:00Z', finishedAt: '2026-07-13T00:01:00Z',
     immutableBuild: { immutable: true, viteDevelopmentServer: false, transformAtServe: false, sourceClosureHash, buildRevision, threeRevision: '0.185.1', bundleHash: hash('bundle'), servedLedgerHash: hash('served') },
     browser: { webdriver: false, headless: false, visibilityState: 'visible', userAgent: 'fixture', platform: 'macOS' }, adapter: { adapterClass: 'hardware', identity: { vendor: 'apple' } }, route,
@@ -26,23 +26,24 @@ function fixture() {
   const rawManifest = {
     labId: 'example-lab', bundleKind: 'raw-capture-session', publishable: false, sourceClosureHash, buildRevision, threeRevision: '0.185.1', limitations: [],
     claimVerdicts: { visualCorrectness: 'INSUFFICIENT_EVIDENCE', mechanismCorrectness: 'PASS', performanceCompliance: 'NOT_CLAIMED', gpuAttribution: 'NOT_CLAIMED', lifecycleStability: 'PASS', visualError: 'PASS' },
-    captureSessions: [ { profile: 'correctness', automationSurface: 'playwright-headless-chromium', adapterClass: 'software', sessionId: 'correctness:1', isWebGPUBackend: true, sourceClosureHash, buildRevision, threeRevision: '0.185.1', document: { sha256: hash('document') }, writeLedger: { sha256: hash('ledger') }, routeDigest: hash('route'), stateDigest: hash('state') } ],
+    captureSessions: [ { profile: 'correctness', automationSurface: 'headless-test-runner', adapterClass: 'software', sessionId: 'correctness:1', isWebGPUBackend: true, sourceClosureHash, buildRevision, threeRevision: '0.185.1', document: { sha256: hash('document') }, writeLedger: { sha256: hash('ledger') }, routeDigest: hash('route'), stateDigest: hash('state') } ],
   };
   return { rawManifest, physicalReview };
 }
 
-test('two-lane join accepts software correctness and hardware physical review without performance claims', () => {
+test('optional demo evidence composite is independent of automation product identity', () => {
   const input = fixture();
   const join = createEvidenceLaneJoin(input);
   assert.equal(join.claimVerdicts.visualCorrectness, 'PASS');
   assert.equal(join.lanes.correctness.adapterClass, 'software');
   assert.equal(join.lanes.physicalRoute.adapterClass, 'hardware');
+  assert.equal(join.status, 'COMPOSITE_EVIDENCE');
   assert.equal(validateEvidenceLaneJoin(join).laneCount, 2);
   const { joinSha256, ...joinBody } = join;
   assert.equal(joinSha256, hash(joinBody));
 });
 
-test('lane join rejects source drift and missing performance attribution', () => {
+test('demo evidence composite rejects source drift and unsupported performance attribution', () => {
   const drift = fixture();
   drift.physicalReview.record.sourceClosureHash = hash('drift');
   drift.physicalReview.record.immutableBuild.sourceClosureHash = hash('drift');

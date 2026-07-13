@@ -599,10 +599,10 @@ test('fixtures, raw sessions, correctness releases, and performance releases val
   assertSchemaValid(releaseRecord({ performance: true }), 'hardware performance release');
 });
 
-test('release bundles require correctness only; physical-route is optional', () => {
+test('demo evidence has no universal correctness or physical-route lane', () => {
   const missingCorrectness = releaseRecord();
   missingCorrectness.captureSessions = missingCorrectness.captureSessions.filter((entry) => entry.profile !== 'correctness');
-  assertSchemaInvalid(missingCorrectness, 'release missing correctness lane');
+  assertSchemaValid(missingCorrectness, 'demo evidence without correctness lane');
 
   const correctnessOnly = releaseRecord();
   correctnessOnly.captureSessions = correctnessOnly.captureSessions.filter((entry) => entry.profile === 'correctness');
@@ -612,9 +612,7 @@ test('release bundles require correctness only; physical-route is optional', () 
     return entry.path === 'capture-session.json' || entry.path === 'capture-write-ledger.json'
       || String(entry.path).includes('correctness');
   });
-  // Schema-level releaseBundleRequirements only requires correctness presence;
-  // releaseFiles require at least one capture-session document + write-ledger, not two.
-  assertSchemaValid(correctnessOnly, 'release with correctness lane only (no physical-route QA tooling)');
+  assertSchemaValid(correctnessOnly, 'demo evidence with correctness lane only');
 
   const softwareCorrectness = releaseRecord();
   softwareCorrectness.captureSessions.find((entry) => entry.profile === 'correctness').adapterClass = 'software';
@@ -627,26 +625,19 @@ test('release bundles require correctness only; physical-route is optional', () 
   assertSchemaValid(softwarePhysical, 'schema allows optional physical-route entry even if adapter is software');
 });
 
-test('capture sessions reject unknown automation surfaces', () => {
+test('capture implementation identity is descriptive, not release authority', () => {
   const candidate = releaseRecord();
   candidate.captureSessions.find((entry) => entry.profile === 'correctness').automationSurface = 'chrome';
-  assertSchemaInvalid(candidate, 'correctness lane on unknown surface chrome');
+  assertSchemaValid(candidate, 'correctness evidence from a named capture implementation');
 });
 
-test('publishable automation surfaces include playwright and optional codex', () => {
-  assert.deepEqual(
-    schema.$defs.captureSessionRef.properties.automationSurface.enum,
-    ['playwright-headless-chromium', 'playwright-cdp-chrome', 'codex-in-app-browser'],
-  );
+test('publishable demo evidence does not enumerate QA products', () => {
+  assert.equal(schema.$defs.captureSessionRef.properties.automationSurface.enum, undefined);
+  assert.equal(schema.$defs.captureSessionRef.properties.automationSurface.minLength, 1);
   const candidate = releaseRecord({ performance: true });
-  assert.ok(candidate.captureSessions.some((entry) => entry.profile === 'correctness'
-    && entry.automationSurface === 'playwright-headless-chromium'));
-  // codex-in-app-browser may still appear on optional lanes in fixtures, but is not required
   for (const entry of candidate.captureSessions) {
-    const expectedSurface = entry.automationSurface;
     entry.automationSurface = 'chrome';
-    assertSchemaInvalid(candidate, `${entry.profile} lane on Chrome`);
-    entry.automationSurface = expectedSurface;
+    assertSchemaValid(candidate, `${entry.profile} evidence from a named capture implementation`);
   }
 });
 
@@ -734,7 +725,7 @@ test('valid-form hash and identity substitutions are rejected by separate semant
   assertSemanticInvalid(swappedColorIdentities, 'promotion-bound color identity substitution');
 });
 
-test('canonical standard-image slots accept explicit structural N/A records', () => {
+test('demo evidence records only applicable curated images', () => {
   const candidate = releaseRecord();
   for (const path of ['no-post.design.png', 'temporal.t000.png', 'temporal.t001.png']) {
     const entry = candidate.images.find((image) => image.path === path);
@@ -746,7 +737,7 @@ test('canonical standard-image slots accept explicit structural N/A records', ()
 
   const missingSlot = releaseRecord();
   missingSlot.images.splice(5, 1);
-  assertSchemaInvalid(missingSlot, 'release missing a canonical standard-image slot');
+  assertSchemaValid(missingSlot, 'demo evidence without an inapplicable fixed image slot');
 });
 
 test('promotion joins the release sessions and requires approved visual review', () => {

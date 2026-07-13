@@ -52,12 +52,6 @@ export const EXECUTION_CLASSES = Object.freeze([
   'non-rendering',
 ]);
 
-export const AUTHORITATIVE_COUNT_FIELDS = Object.freeze({
-  fixedRoutes: 'fixedRoutesExpected',
-  requiredCapabilities: 'requiredCapabilitiesExpected',
-  requiredRuntimeProofs: 'requiredRuntimeProofsExpected',
-});
-
 const GENERATED_PROVIDER_IDS = new Set([
   'water-generated-caustics',
   'cloud-generated-weather-maps',
@@ -113,25 +107,10 @@ export function validateCanonicalTargets(targetData) {
   if (targetData?.threeRevision !== '0.185.1') errors.push('canonical targets Three revision must be 0.185.1');
   if (!Array.isArray(targetData?.targets)) errors.push('canonical targets targets must be an array');
   if (!Array.isArray(targetData?.integrations)) errors.push('canonical targets integrations must be an array');
-  for (const key of [
-    'skillsExpected',
-    'primaryExpected',
-    'integrationsExpected',
-    'flagshipsExpected',
-    ...Object.values(AUTHORITATIVE_COUNT_FIELDS),
-  ]) {
-    if (!Number.isInteger(targetData?.[key]) || targetData[key] <= 0) {
-      errors.push(`canonical targets ${key} must be a positive integer`);
-    }
-  }
   if (!Array.isArray(roster) || roster.length === 0) {
     errors.push('canonical targets primaryRoster must be a non-empty array');
     return { valid: false, errors };
   }
-  if (roster.length !== targetData.primaryExpected) {
-    errors.push(`primaryRoster contains ${roster.length} records; primaryExpected is ${targetData.primaryExpected}`);
-  }
-
   const allowedKeys = new Set([
     'id', 'kind', 'canonicalDir', 'executionClass', 'flagship', 'dependencyLabIds',
   ]);
@@ -183,15 +162,6 @@ export function validateCanonicalTargets(targetData) {
     }
   }
 
-  const integrationCount = roster.filter((entry) => entry.kind === 'integration-demo').length;
-  if (integrationCount !== targetData.integrationsExpected) {
-    errors.push(`primaryRoster contains ${integrationCount} integrations; integrationsExpected is ${targetData.integrationsExpected}`);
-  }
-  const flagshipCount = roster.filter((entry) => entry.flagship === true).length;
-  if (flagshipCount !== targetData.flagshipsExpected) {
-    errors.push(`primaryRoster contains ${flagshipCount} flagships; flagshipsExpected is ${targetData.flagshipsExpected}`);
-  }
-
   const declaredTargets = [...targets, ...integrations];
   const duplicateTargetIds = duplicateValues(declaredTargets.map((entry) => entry.id));
   if (duplicateTargetIds.length > 0) {
@@ -222,10 +192,6 @@ export function validateCanonicalTargets(targetData) {
   if (!sameValues(declaredFlagshipIds, expectedFlagshipIds)) {
     errors.push('canonical integration declarations must exactly cover every flagship primaryRoster entry');
   }
-  if (integrations.length !== targetData.flagshipsExpected) {
-    errors.push(`canonical flagship declarations contain ${integrations.length} records; flagshipsExpected is ${targetData.flagshipsExpected}`);
-  }
-
   const visiting = new Set();
   const visited = new Set();
   const visit = (id, stack) => {
@@ -261,11 +227,12 @@ export function authoritativePrimaryRoster(targetData = loadCanonicalTargets()) 
 }
 
 export function authoritativeSkillDirs(targetData = loadCanonicalTargets()) {
-  const skills = [...new Set(targetData.targets.map((entry) => entry.canonicalDir.split('/')[0]))]
+  void targetData;
+  const skills = readdirSync(REPO_ROOT, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory() && /^threejs-[a-z0-9-]+$/.test(entry.name)
+      && existsSync(join(REPO_ROOT, entry.name, 'SKILL.md')))
+    .map((entry) => entry.name)
     .sort((a, b) => a.localeCompare(b));
-  if (skills.length !== targetData.skillsExpected) {
-    throw new Error(`authoritative skill directory count drift: expected ${targetData.skillsExpected}, received ${skills.length}`);
-  }
   for (const skill of skills) {
     if (!/^threejs-[a-z0-9-]+$/.test(skill) || !existsSync(join(REPO_ROOT, skill, 'SKILL.md'))) {
       throw new Error(`authoritative skill directory is missing or invalid: ${skill}`);
@@ -854,7 +821,7 @@ export function validatePrimaryRosterClosure(demos, origins, targetData = loadCa
   if (missing.length > 0) errors.push(`primary roster is missing demos: ${missing.join(', ')}`);
   if (extra.length > 0) errors.push(`unrostered primary demos are forbidden: ${extra.join(', ')}`);
   if (!sameValues(actualIds, expectedIds)) {
-    errors.push(`primary demo set does not equal the authoritative ${targetData.primaryExpected}-entry roster`);
+    errors.push('primary demo set does not equal the authored primaryRoster');
   }
 
   const primaryById = new Map(primary.map((demo) => [demo.id, demo]));
@@ -998,13 +965,6 @@ export function buildDemoRegistry() {
 
   const skillCoverage = deriveSkillCoverage(demos, skills);
   const counts = deriveRegistryCounts(demos, skills);
-  for (const [countKey, expectedKey] of Object.entries(AUTHORITATIVE_COUNT_FIELDS)) {
-    if (counts[countKey] !== targetData[expectedKey]) {
-      throw new Error(
-        `authoritative ${countKey} denominator drift: derived ${counts[countKey]}, expected ${targetData[expectedKey]}`,
-      );
-    }
-  }
   const primaryIds = roster.map((entry) => entry.id);
   const integrationPrimaryIds = roster.filter((entry) => entry.kind === 'integration-demo').map((entry) => entry.id);
   const flagshipIds = roster.filter((entry) => entry.flagship).map((entry) => entry.id);
@@ -1016,7 +976,6 @@ export function buildDemoRegistry() {
     demoKinds: [...DEMO_KINDS],
     primaryDemoKinds: [...PRIMARY_DEMO_KINDS],
     acceptanceStatuses: [...ACCEPTANCE_STATUSES],
-    skillsExpected: targetData.skillsExpected,
     primaryIds,
     integrationPrimaryIds,
     flagshipIds,

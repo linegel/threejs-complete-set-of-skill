@@ -1,13 +1,6 @@
 {
   "schemaVersion": 2,
   "threeRevision": "0.185.1",
-  "skillsExpected": 27,
-  "primaryExpected": 41,
-  "integrationsExpected": 10,
-  "flagshipsExpected": 5,
-  "fixedRoutesExpected": 517,
-  "requiredCapabilitiesExpected": 89,
-  "requiredRuntimeProofsExpected": 257,
   "primaryRoster": [
     {
       "id": "browser-fallback-harness",

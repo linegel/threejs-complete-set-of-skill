@@ -16,7 +16,6 @@ import { SCIENCE } from './science-cards.mjs';
 import { PROVIDER_DEMOS } from './provider-demos.mjs';
 import { PRIMARY_DEMO_KINDS, buildDemoRegistry } from './lib/lab-registry.mjs';
 import { buildSiteRoutePresentation } from './lib/site-route-presentation.mjs';
-import { authoritativeSiteSkillSlugs } from './lib/site-skill-roster.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const siteVendorSource = join(root, 'assets', 'site', 'vendor', 'katex');
@@ -60,7 +59,10 @@ const ROUTER_FIXTURES = JSON.parse(readFileSync(join(
   'router-manifest-lab',
   'router-fixtures.json',
 ), 'utf8'));
-const AUTHORITATIVE_SKILL_SLUGS = authoritativeSiteSkillSlugs(DEMO_REGISTRY, PRIMARY_DEMO_KINDS);
+const AUTHORITATIVE_SKILL_SLUGS = new Set(readdirSync(root, { withFileTypes: true })
+  .filter((entry) => entry.isDirectory() && entry.name.startsWith('threejs-')
+    && existsSync(join(root, entry.name, 'SKILL.md')))
+  .map((entry) => entry.name));
 const SITE_DEMOS = DEMO_REGISTRY.demos.filter((demo) => AUTHORITATIVE_SKILL_SLUGS.has(demo.skill));
 const ATTRIBUTIONS = {
   'threejs-object-sculptor': {
@@ -76,7 +78,7 @@ const ATTRIBUTIONS = {
 };
 
 const CATEGORIES = [
-  { name: 'Planning and Validation', blurb: 'Route requests to the right experts, diagnose version-dependent failures, and prove results with reproducible evidence.', slugs: ['threejs-choose-skills', 'threejs-debugging', 'threejs-visual-validation', 'threejs-compatibility-fallbacks'] },
+  { name: 'Planning and Validation', blurb: 'Route requests to the right experts, diagnose version-dependent failures, and prove results with reproducible evidence.', slugs: ['threejs-choose-skills', 'threejs-debugging', 'threejs-visual-validation', 'threejs-physics-integration', 'threejs-compatibility-fallbacks'] },
   { name: 'Cameras, Lighting, and Final Image', blurb: 'Who owns depth, tone mapping, and the last pass determines the difference between a demo and an image.', slugs: ['threejs-camera-controls-and-rigs', 'threejs-scalable-real-time-shadows', 'threejs-ambient-contact-shading', 'threejs-bloom', 'threejs-exposure-color-grading', 'threejs-image-pipeline'] },
   { name: 'Worlds and Environments', blurb: 'Skies, oceans, weather, and water that share causes instead of fighting each other.', slugs: ['threejs-sky-atmosphere-and-haze', 'threejs-volumetric-clouds', 'threejs-spectral-ocean', 'threejs-water-optics', 'threejs-rain-snow-and-wet-surfaces'] },
   { name: 'Procedural Content', blurb: 'Fields, materials, geometry, object reconstruction, buildings, planets, vegetation, and creatures as authored systems, not noise soup.', slugs: ['threejs-procedural-fields', 'threejs-procedural-materials', 'threejs-procedural-geometry', 'threejs-object-sculptor', 'threejs-procedural-buildings-and-cities', 'threejs-procedural-planets', 'threejs-procedural-vegetation', 'threejs-procedural-creatures'] },

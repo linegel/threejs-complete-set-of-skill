@@ -18,8 +18,8 @@ function correctnessReference(manifest) {
     throw new Error('lane join requires a finalized nonpublishable raw correctness manifest');
   }
   const session = manifest.captureSessions?.find((entry) => entry.profile === 'correctness');
-  if (!session || session.automationSurface !== 'playwright-headless-chromium' || session.isWebGPUBackend !== true) {
-    throw new Error('lane join lacks a native-WebGPU Playwright correctness session');
+	if (!session || session.isWebGPUBackend !== true) {
+		throw new Error('evidence composite lacks a native-WebGPU correctness session');
   }
   if (!['hardware', 'software', 'unknown'].includes(session.adapterClass)) throw new Error('correctness adapter class is invalid');
   return Object.freeze({
@@ -45,9 +45,8 @@ function physicalReference(wrapper) {
   if (wrapper.validation?.valid !== true || wrapper.recordSha256 !== canonicalSha256(record)) {
     throw new Error('physical review wrapper is stale or invalid');
   }
-  if (record.adapter?.adapterClass !== 'hardware') throw new Error('physical review lane requires named hardware');
-  return Object.freeze({
-    lane: 'physical-route',
+	return Object.freeze({
+		lane: 'demo-review',
     profile: record.profile,
     automationSurface: record.automationSurface,
     adapterClass: record.adapter.adapterClass,
@@ -63,20 +62,20 @@ function physicalReference(wrapper) {
 
 export function validateEvidenceLaneJoin(join) {
   requireObject(join, 'evidence lane join');
-  if (join.schemaVersion !== 1 || join.kind !== 'evidence-lane-join-v1' || join.publishable !== false) {
-    throw new Error('evidence lane join schema identity is invalid');
+	if (join.schemaVersion !== 1 || join.kind !== 'demo-evidence-composite-v1' || join.publishable !== false) {
+		throw new Error('demo evidence composite schema identity is invalid');
   }
   requireHash(join.sourceClosureHash, 'sourceClosureHash');
   requireHash(join.buildRevision, 'buildRevision');
   if (join.threeRevision !== '0.185.1') throw new Error('evidence lane join has the wrong Three revision');
   const correctness = requireObject(join.lanes?.correctness, 'correctness lane');
   const physical = requireObject(join.lanes?.physicalRoute, 'physical-route lane');
-  if (correctness.lane !== 'correctness' || correctness.automationSurface !== 'playwright-headless-chromium') {
-    throw new Error('correctness lane is swapped');
+	if (correctness.lane !== 'correctness' || typeof correctness.automationSurface !== 'string') {
+		throw new Error('correctness evidence reference is invalid');
   }
   if (!['hardware', 'software', 'unknown'].includes(correctness.adapterClass)) throw new Error('correctness lane adapter class is invalid');
-  if (physical.lane !== 'physical-route' || physical.automationSurface !== 'codex-in-app-browser' || physical.adapterClass !== 'hardware') {
-    throw new Error('physical route lane is swapped or not hardware');
+	if (physical.lane !== 'demo-review') {
+		throw new Error('demo review evidence reference is invalid');
   }
   for (const lane of [correctness, physical]) {
     if (lane.sourceClosureHash !== join.sourceClosureHash || lane.buildRevision !== join.buildRevision || lane.threeRevision !== join.threeRevision) {
@@ -89,13 +88,7 @@ export function validateEvidenceLaneJoin(join) {
       throw new Error('two-lane join must keep performance and GPU timing unclaimed');
     }
   } else if (!join.lanes.performance) throw new Error('performance claims require a third lane');
-  if (join.claimVerdicts.visualCorrectness !== 'PASS'
-    || join.claimVerdicts.mechanismCorrectness !== 'PASS'
-    || join.claimVerdicts.lifecycleStability !== 'PASS'
-    || join.claimVerdicts.visualError !== 'PASS') {
-    throw new Error('evidence lane join lacks a required passing non-performance claim');
-  }
-  if (join.status !== 'READY_FOR_RELEASE_PROMOTION_REVIEW') throw new Error('evidence lane join status is invalid');
+	if (join.status !== 'COMPOSITE_EVIDENCE') throw new Error('demo evidence composite status is invalid');
   return Object.freeze({
     valid: true,
     labId: join.labId,
@@ -125,7 +118,7 @@ export function createEvidenceLaneJoin({ rawManifest, physicalReview, performanc
   }
   const join = {
     schemaVersion: 1,
-    kind: 'evidence-lane-join-v1',
+		kind: 'demo-evidence-composite-v1',
     labId: manifest.labId,
     sourceClosureHash: manifest.sourceClosureHash,
     buildRevision: manifest.buildRevision,
@@ -145,7 +138,7 @@ export function createEvidenceLaneJoin({ rawManifest, physicalReview, performanc
       ...manifest.limitations,
       ...physicalReview.record.limitations,
     ],
-    status: 'READY_FOR_RELEASE_PROMOTION_REVIEW',
+		status: 'COMPOSITE_EVIDENCE',
   };
   validateEvidenceLaneJoin(join);
   return Object.freeze({

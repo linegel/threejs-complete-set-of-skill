@@ -12,7 +12,6 @@ import { validateRegistry } from '../../scripts/lib/lab-validation.mjs';
 
 test('site roster excludes extra secondary-only skill directories', () => {
   const registry = {
-    skillsExpected: 2,
     demos: [
       { id: 'a', skill: 'threejs-a', kind: 'canonical-lab' },
       { id: 'b', skill: 'threejs-b', kind: 'integration-demo' },
@@ -24,22 +23,20 @@ test('site roster excludes extra secondary-only skill directories', () => {
     ['threejs-a', 'threejs-b'],
   );
 
-  registry.skillsExpected = 3;
-  assert.throws(
-    () => authoritativeSiteSkillSlugs(registry, ['canonical-lab', 'integration-demo']),
-    /authoritative skill roster count drift/,
-  );
 });
 
-test('demo registry follows the authored canonical roster instead of filesystem discovery', () => {
+test('demo owner roster is independent from the complete skill product roster', () => {
   const targets = loadCanonicalTargets();
   const skills = authoritativeSkillDirs(targets);
   const registry = buildDemoRegistry();
   const publishedSkills = authoritativeSiteSkillSlugs(registry, PRIMARY_DEMO_KINDS);
 
-  assert.equal(skills.length, targets.skillsExpected);
-  assert.equal(registry.counts.skills, targets.skillsExpected);
-  assert.deepEqual([...publishedSkills].sort(), skills);
-  assert.ok(registry.demos.every((demo) => publishedSkills.has(demo.skill)));
+  assert.equal(registry.counts.skills, skills.length);
+  assert.ok(skills.includes('threejs-physics-integration'));
+  assert.equal(publishedSkills.has('threejs-physics-integration'), false);
+  assert.ok([...publishedSkills].every((skill) => skills.includes(skill)));
+  assert.ok(registry.demos
+    .filter((demo) => PRIMARY_DEMO_KINDS.includes(demo.kind))
+    .every((demo) => publishedSkills.has(demo.skill)));
   assert.deepEqual(validateRegistry(registry, { validateEvidence: false }).errors, []);
 });

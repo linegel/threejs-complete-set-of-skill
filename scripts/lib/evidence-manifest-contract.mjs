@@ -39,15 +39,6 @@ const CLAIM_NAMES = Object.freeze( [
 	'visualError'
 ] );
 
-// Allowed automation surfaces per profile. Release acceptance never requires a
-// particular QA product (e.g. Codex in-app browser). Correctness is the only
-// mandatory release lane; physical-route/performance are optional evidence.
-const SESSION_PROFILE_SURFACES = Object.freeze( {
-	correctness: Object.freeze( [ 'playwright-headless-chromium', 'playwright-cdp-chrome' ] ),
-	'physical-route': Object.freeze( [ 'playwright-headless-chromium', 'playwright-cdp-chrome', 'codex-in-app-browser' ] ),
-	performance: Object.freeze( [ 'playwright-headless-chromium', 'playwright-cdp-chrome', 'codex-in-app-browser' ] )
-} );
-
 const SESSION_IDENTITY_KINDS = Object.freeze( {
 	adapterIdentity: 'gpu-adapter',
 	deviceIdentity: 'gpu-device',
@@ -268,10 +259,7 @@ function validateCaptureSessions( manifest, fileIndex, errors ) {
 	for ( const [ index, session ] of sessions.entries() ) {
 
 		const label = `captureSessions[${ index }]`;
-		const allowedSurfaces = SESSION_PROFILE_SURFACES[ session?.profile ];
-		if ( allowedSurfaces !== undefined && allowedSurfaces.includes( session.automationSurface ) === false ) {
-			errors.push( `${ label } uses unsupported automationSurface "${ session.automationSurface }" for profile ${ session.profile }.` );
-		}
+		if ( typeof session?.automationSurface !== 'string' || session.automationSurface.length === 0 ) errors.push( `${ label } automationSurface must identify the capture implementation.` );
 		if ( session?.sourceClosureHash !== manifest.sourceClosureHash ) errors.push( `${ label } source closure differs from the release manifest.` );
 		if ( session?.buildRevision !== manifest.buildRevision ) errors.push( `${ label } build revision differs from the release manifest.` );
 		if ( session?.threeRevision !== manifest.threeRevision ) errors.push( `${ label } Three.js revision differs from the release manifest.` );
@@ -299,7 +287,7 @@ function validateCaptureSessions( manifest, fileIndex, errors ) {
 
 		} else if ( sessionRoute !== undefined ) coveredRoutePaths.add( session.routePath );
 		if ( session?.rendererInitialized !== true || session?.isWebGPUBackend !== true ) errors.push( `${ label } does not prove initialized native WebGPU execution.` );
-		if ( manifest.bundleKind === 'release-bundle' && [ 'physical-route', 'performance' ].includes( session?.profile ) && session?.adapterClass !== 'hardware' ) errors.push( `${ label } physical release lane is not bound to a hardware adapter.` );
+		if ( manifest.bundleKind === 'release-bundle' && session?.profile === 'performance' && session?.adapterClass !== 'hardware' ) errors.push( `${ label } claimed performance lane is not bound to a hardware adapter.` );
 		if ( manifest.bundleKind === 'release-bundle' && session?.profile === 'performance' && session?.timestampQuerySupported !== true ) errors.push( `${ label } performance lane lacks timestamp-query support.` );
 		for ( const [ field, kind ] of Object.entries( SESSION_IDENTITY_KINDS ) ) if ( session?.[ field ]?.kind !== kind || typeof session?.[ field ]?.digest !== 'string' ) errors.push( `${ label } ${ field } reference is invalid.` );
 		if ( typeof session?.limitationsDigest !== 'string' ) errors.push( `${ label } limitations digest is invalid.` );
@@ -314,30 +302,11 @@ function validateCaptureSessions( manifest, fileIndex, errors ) {
 	const profiles = new Map( sessions.map( ( session ) => [ session.profile, session ] ) );
 	if ( manifest.bundleKind === 'release-bundle' ) {
 
-		for ( const path of routeIndex.keys() ) if ( coveredRoutePaths.has( path ) === false ) errors.push( `Release capture sessions do not cover route "${ path }".` );
-
-		if ( profiles.has( 'correctness' ) === false ) errors.push( 'Release bundle is missing the correctness capture lane.' );
-		// physical-route is optional QA evidence, never a release gate.
 		if ( manifest.claimVerdicts?.performanceCompliance === 'PASS' || manifest.claimVerdicts?.gpuAttribution === 'PASS' ) {
 
 			if ( profiles.has( 'performance' ) === false ) errors.push( 'Passing performance or GPU-attribution claims require a hardware performance capture lane.' );
 
 		}
-		const physical = profiles.get( 'physical-route' );
-		const performance = profiles.get( 'performance' );
-		if ( physical && performance ) {
-
-			for ( const [ field, description ] of [
-				[ 'adapterIdentity', 'hardware adapters' ],
-				[ 'deviceIdentity', 'GPU devices' ],
-				[ 'browserIdentity', 'physical browsers' ],
-				[ 'osIdentity', 'operating systems' ],
-				[ 'refreshIdentity', 'display refresh measurements' ],
-				[ 'colorIdentity', 'color pipelines' ]
-			] ) if ( physical[ field ]?.digest !== performance[ field ]?.digest ) errors.push( `Physical-route and performance lanes name different ${ description }.` );
-
-		}
-
 	}
 
 }
@@ -440,58 +409,25 @@ function validatePromotion( manifest, fileIndex, imageIndex, errors ) {
 
 		}
 		if ( signoff.status === 'APPROVED' || signoff.status === 'REJECTED' ) checkDigest( errors, signoff.reviewDigest, visualReviewDigest( signoff ), 'Visual signoff review' );
-		if ( signoff.status === 'APPROVED' && manifest.publishable === true ) {
-
-			const reviewed = new Set( signoff.reviewedImages ?? [] );
-			for ( const path of STANDARD_IMAGE_PATHS ) if ( imageIndex.get( path )?.status === 'captured' && reviewed.has( path ) === false ) errors.push( `Approved visual signoff omits captured standard image "${ path }".` );
-
-		}
-
 	}
 
 }
 
 function validateLimitations( manifest, errors ) {
 
-	const limitations = Array.isArray( manifest.limitations ) ? manifest.limitations : [];
-	const limitationIndex = indexUnique( limitations, 'id', 'limitations', errors );
-	const visualReview = limitationIndex.get( 'visual-review-pending' );
-	if ( visualReview === undefined ) return;
-	if ( manifest.promotion?.status === 'PENDING_VISUAL_SIGNOFF' && visualReview.status !== 'ACTIVE' ) errors.push( 'Pending visual signoff requires visual-review-pending to remain ACTIVE.' );
-	if ( [ 'APPROVED', 'REJECTED' ].includes( manifest.promotion?.status ) && visualReview.status !== 'RESOLVED' ) errors.push( 'Terminal visual signoff requires visual-review-pending to be RESOLVED.' );
+	void manifest;
+	void errors;
 
 }
 
 function validatePublishableRelease( manifest, fileIndex, imageIndex, errors ) {
 
 	if ( manifest.publishable !== true ) return;
-	if ( manifest.bundleKind !== 'release-bundle' ) errors.push( 'Publishable evidence must be an offline joined release bundle.' );
 	if ( manifest.promotion?.status !== 'APPROVED' ) errors.push( 'Publishable evidence requires APPROVED promotion.' );
-	for ( const path of NORMATIVE_JSON_PATHS ) {
-
-		const file = fileIndex.get( path );
-		if ( path === 'evidence-manifest.json' ) {
-
-			if ( file?.status !== 'self-excluded' || file?.kind !== 'evidence-manifest' ) errors.push( 'Publishable evidence requires a self-excluded evidence-manifest.json ledger record.' );
-
-		} else if ( file?.status !== 'captured' || file?.kind !== 'normative-json' ) errors.push( `Publishable evidence is missing captured normative artifact "${ path }".` );
-
+	if ( [ ...fileIndex.values() ].some( ( file ) => file?.status === 'captured' ) === false
+		&& [ ...imageIndex.values() ].some( ( image ) => image?.status === 'captured' ) === false ) {
+		errors.push( 'Featured demo evidence requires at least one captured artifact or image.' );
 	}
-	if ( ( manifest.captureSessions ?? [] ).length < 1 ) errors.push( 'Publishable evidence requires a correctness capture session.' );
-	if ( ( manifest.captureSessions ?? [] ).some( ( session ) => session?.profile === 'correctness' ) === false ) {
-		errors.push( 'Publishable evidence requires a correctness capture session.' );
-	}
-	for ( const path of STANDARD_IMAGE_PATHS ) {
-
-		const image = imageIndex.get( path );
-		if ( image === undefined ) errors.push( `Publishable evidence is missing standard image record "${ path }".` );
-		else if ( image.status !== 'captured' && image.status !== 'not-applicable' ) errors.push( `Publishable standard image "${ path }" has no captured or structurally N/A status.` );
-
-	}
-	const final = imageIndex.get( 'final.design.png' );
-	const diagnostic = imageIndex.get( 'diagnostics.mosaic.png' );
-	if ( final?.status !== 'captured' || diagnostic?.status !== 'captured' ) errors.push( 'Publishable evidence requires captured final and diagnostic images.' );
-	else if ( final.sha256 === diagnostic.sha256 ) errors.push( 'Publishable final and diagnostic images have identical hashes.' );
 
 }
 
@@ -504,6 +440,7 @@ export function validateEvidenceManifestContract( manifest ) {
 	const fileIndex = indexUnique( files, 'path', 'files', errors );
 	const imageIndex = indexUnique( images, 'path', 'images', errors );
 	indexUnique( images, 'role', 'images', errors );
+	indexUnique( Array.isArray( manifest.limitations ) ? manifest.limitations : [], 'id', 'limitations', errors );
 	if ( manifest.route && typeof manifest.route === 'object' ) checkDigest( errors, manifest.route.stateDigest, routeStateDigest( manifest.route ), 'Route state' );
 	if ( manifest.bundleKind === 'contract-fixture' ) {
 

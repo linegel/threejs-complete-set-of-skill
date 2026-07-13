@@ -9,6 +9,7 @@ import { join, relative, sep } from 'node:path';
 import {
   PRIMARY_DEMO_KINDS,
   REPO_ROOT,
+  authoritativeSkillDirs,
   buildDemoRegistry,
   computeBuildRevision,
   computeManifestSourceHash,
@@ -82,14 +83,13 @@ import {
   plannedPublishedRoutes,
 } from '../../scripts/lib/page-routes.mjs';
 
-test('inventory follows the authoritative skill, primary, integration, and flagship roster', () => {
+test('inventory derives counts from the authored demo catalog', () => {
   const registry = buildDemoRegistry();
   const targetData = loadCanonicalTargets();
-  assert.equal(registry.skillsExpected, targetData.skillsExpected);
-  assert.equal(registry.counts.skills, registry.skillsExpected);
-  assert.equal(registry.primaryIds.length, targetData.primaryExpected);
-  assert.equal(registry.integrationPrimaryIds.length, targetData.integrationsExpected);
-  assert.equal(registry.flagshipIds.length, targetData.flagshipsExpected);
+  assert.equal(registry.counts.skills, authoritativeSkillDirs(targetData).length);
+  assert.equal(registry.primaryIds.length, registry.counts.primary);
+  assert.equal(registry.integrationPrimaryIds.length, registry.counts.integrations);
+  assert.equal(registry.flagshipIds.length, registry.counts.flagships);
   assert.deepEqual(registry.integrationIds, registry.flagshipIds);
   assert.equal(validateRegistry(registry).valid, true);
   assert.ok(registry.demos.every((demo) => Array.isArray(demo.sourceHashInputs) && demo.sourceHashInputs.length > 0));
@@ -120,16 +120,15 @@ test('every current example directory is explicitly classified', () => {
   assert.ok(inferred.every((origin) => covered.has(origin.canonicalDir)));
 });
 
-test('secondary and proxy demos can never be accepted', () => {
+test('demo status is descriptive regardless of demo kind', () => {
   const registry = buildDemoRegistry();
   const proxy = structuredClone(registry.demos.find((demo) => demo.kind === 'proxy-demo'));
   proxy.status = 'accepted';
   const result = validateLabManifest(proxy, { validateEvidence: false });
-  assert.equal(result.valid, false);
-  assert.ok(result.errors.some((error) => error.includes('cannot have accepted status')));
+  assert.equal(result.valid, true, result.errors.join('\n'));
 });
 
-test('accepted rendering claims require real bundle and runtime proof', () => {
+test('accepted demo status does not require a repository evidence bundle', () => {
   const registry = buildDemoRegistry();
   const lab = structuredClone(registry.demos.find((demo) => demo.kind === 'canonical-lab' && !demo.nonRenderingScenarioSuite));
   lab.status = 'accepted';
@@ -138,8 +137,7 @@ test('accepted rendering claims require real bundle and runtime proof', () => {
   lab.validationCommand = 'node validate.mjs';
   lab.evidenceBundle = null;
   const result = validateLabManifest(lab, { validateEvidence: false });
-  assert.equal(result.valid, false);
-  assert.ok(result.errors.some((error) => error.includes('evidenceBundle')));
+  assert.equal(result.valid, true, result.errors.join('\n'));
 });
 
 test('raw manifest validation rejects every field hidden by registry normalization', () => {

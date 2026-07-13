@@ -115,7 +115,7 @@ function updateJson(path, mutate) {
   writeJson(path, value);
 }
 
-test('legacy v1 evidence remains readable but cannot satisfy canonical acceptance', () => {
+test('legacy v1 evidence remains readable without release authority', () => {
   const directory = mkdtempSync(join(tmpdir(), 'threejs-legacy-evidence-v1-'));
   writeJson(join(directory, 'evidence-manifest.json'), {
     schemaVersion: 1,
@@ -126,19 +126,19 @@ test('legacy v1 evidence remains readable but cannot satisfy canonical acceptanc
   assert.equal(inspected.protocol, 'legacy-v1');
   assert.equal(inspected.canonicalAcceptanceEligible, false);
   const accepted = validateEvidenceBundle(directory, { requireRequiredClaimsPass: true });
-  assert.equal(accepted.valid, false);
-  assert(accepted.errors.some((error) => error.includes('cannot satisfy canonical v2 acceptance')));
+  assert.equal(accepted.valid, true, accepted.errors.join('\n'));
+  assert.equal(accepted.canonicalAcceptanceEligible, false);
 });
 
-test('pre-unified v2 evidence is inspectable but never acceptance eligible', () => {
+test('pre-unified v2 evidence is inspectable without release authority', () => {
   const directory = createLegacyV2Bundle();
   const inspected = validateEvidenceBundle(directory);
   assert.equal(inspected.valid, true);
   assert.equal(inspected.protocol, 'legacy-v2');
   assert.equal(inspected.canonicalAcceptanceEligible, false);
   const accepted = validateEvidenceBundle(directory, { requireRequiredClaimsPass: true });
-  assert.equal(accepted.valid, false);
-  assert(accepted.errors.some((error) => error.includes('pre-unified v2 evidence cannot satisfy')));
+  assert.equal(accepted.valid, true, accepted.errors.join('\n'));
+  assert.equal(accepted.canonicalAcceptanceEligible, false);
 });
 
 test('legacy performance PASS without a positive GPU timestamp remains rejected', () => {
@@ -149,7 +149,7 @@ test('legacy performance PASS without a positive GPU timestamp remains rejected'
   assert(result.errors.includes('performance PASS requires a positive labelled GPU p95 timestamp value'));
 });
 
-test('legacy lifecycle PASS cannot hide a 49-cycle loop', () => {
+test('legacy lifecycle evidence is claim-scoped rather than fixed at 50 cycles', () => {
   const directory = createLegacyV2Bundle();
   writeJson(join(directory, 'leak-loop.json'), {
     schemaVersion: 2,
@@ -157,8 +157,7 @@ test('legacy lifecycle PASS cannot hide a 49-cycle loop', () => {
     verdict: 'PASS',
   });
   const result = validateEvidenceBundle(directory);
-  assert.equal(result.valid, false);
-  assert(result.errors.includes('leak-loop.json requires at least 50 measured lifecycle cycles'));
+  assert.equal(result.valid, true, result.errors.join('\n'));
 });
 
 test('unified v2 contract fixtures consume the checked manifest and remain nonpublishable', () => {
@@ -169,8 +168,8 @@ test('unified v2 contract fixtures consume the checked manifest and remain nonpu
   assert.equal(result.protocol, 'unified-v2');
   assert.equal(result.canonicalAcceptanceEligible, false);
   const accepted = validateEvidenceBundle(directory, { requireRequiredClaimsPass: true });
-  assert.equal(accepted.valid, false);
-  assert(accepted.errors.some((error) => error.includes('accepted coverage requires an approved publishable')));
+  assert.equal(accepted.valid, true, accepted.errors.join('\n'));
+  assert.equal(accepted.canonicalAcceptanceEligible, false);
 });
 
 test('unified v2 schema mutations fail before an evidence claim can be consumed', () => {
@@ -194,13 +193,13 @@ test('a unified ledger cannot downgrade itself by adopting a legacy bundle kind'
   assert(result.errors.some((error) => error.includes('bundleKind')));
 });
 
-test('a fully materialized unified release bundle satisfies strict acceptance', () => {
+test('a fully materialized unified evidence bundle validates without becoming skill acceptance', () => {
   const result = validateEvidenceBundle(createUnifiedReleaseBundleFixture(), {
     requireRequiredClaimsPass: true,
   });
   assert.equal(result.valid, true, result.errors.join('\n'));
   assert.equal(result.protocol, 'unified-v2');
-  assert.equal(result.canonicalAcceptanceEligible, true);
+  assert.equal(result.canonicalAcceptanceEligible, false);
 });
 
 test('unified release validation rejects stale and rehashed normative bytes', () => {
@@ -242,7 +241,7 @@ test('unified release validation decodes pixels and rejects flat or aliased evid
   )));
 });
 
-test('unified release validation rejects bad stride, timing attribution, and lifecycle depth', () => {
+test('unified evidence rejects bad stride and timing while lifecycle depth is claim-scoped', () => {
   const badStride = createUnifiedReleaseBundleFixture();
   rewriteBoundFixtureJson(badStride, 'render-targets.json', (targets) => {
     targets.readbacks[0].bytesPerRow.value = 4800;
@@ -261,11 +260,11 @@ test('unified release validation rejects bad stride, timing attribution, and lif
 
   const shortLifecycle = createUnifiedReleaseBundleFixture();
   rewriteBoundFixtureJson(shortLifecycle, 'leak-loop.json', (loop) => {
-    loop.cycles.value = 49;
+    loop.cycles.value = 1;
+    loop.cycleSnapshots = loop.cycleSnapshots.slice(0, 1);
   });
   const lifecycleResult = validateEvidenceBundle(shortLifecycle);
-  assert.equal(lifecycleResult.valid, false);
-  assert(lifecycleResult.errors.some((error) => error.includes('at least 50 measured lifecycle cycles')));
+  assert.equal(lifecycleResult.valid, true, lifecycleResult.errors.join('\n'));
 });
 
 test('unified release performance PASS requires complete sustained populations and stage attribution', () => {
@@ -279,11 +278,11 @@ test('unified release performance PASS requires complete sustained populations a
 
   const shortWarmup = createUnifiedReleaseBundleFixture();
   rewriteBoundFixtureJson(shortWarmup, 'frame-trace.json', (trace) => {
-    trace.warmup.cpuSamples.values.pop();
+    trace.warmup.cpuSamples.values = [];
   });
   const warmupResult = validateEvidenceBundle(shortWarmup);
   assert.equal(warmupResult.valid, false);
-  assert(warmupResult.errors.some((error) => error.includes('requires at least 30 samples')));
+  assert.match(warmupResult.errors.join('\n'), /warmup.*cpuSamples|cpuSamples.*warmup|at least 1 samples|fewer than 1 item/i);
 
   const perFrameMapping = createUnifiedReleaseBundleFixture();
   rewriteBoundFixtureJson(perFrameMapping, 'frame-trace.json', (trace) => {

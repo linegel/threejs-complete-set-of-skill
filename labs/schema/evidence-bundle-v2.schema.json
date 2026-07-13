@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://linegel.github.io/threejs-complete-set-of-skill/schemas/evidence-bundle-v2.json",
-  "title": "Native WebGPU evidence release bundle v2 manifest",
-  "description": "Strict lab-general manifest for raw capture-session records, contract fixtures, and release bundles that join immutable capture lanes without relabeling them. Release bundles require a correctness capture session only. Optional physical-route/performance lanes may be attached but are never mandated by tooling identity. QA automation product names (e.g. Codex in-app browser) are not release gates.",
+  "title": "Native WebGPU demo evidence v2 manifest",
+  "description": "Lab and marketing evidence metadata. The legacy release-bundle value groups curated demo evidence; it is not a skill-release contract and requires no QA lane or automation product.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -90,28 +90,7 @@
       "uniqueItems": true,
       "items": {
         "$ref": "#/$defs/fileEntry"
-      },
-      "contains": {
-        "type": "object",
-        "required": [
-          "path",
-          "status",
-          "kind"
-        ],
-        "properties": {
-          "path": {
-            "const": "evidence-manifest.json"
-          },
-          "status": {
-            "const": "self-excluded"
-          },
-          "kind": {
-            "const": "evidence-manifest"
-          }
-        }
-      },
-      "minContains": 1,
-      "maxContains": 1
+      }
     },
     "images": {
       "type": "array",
@@ -621,11 +600,7 @@
         },
         "automationSurface": {
           "type": "string",
-          "enum": [
-            "playwright-headless-chromium",
-            "playwright-cdp-chrome",
-            "codex-in-app-browser"
-          ]
+          "minLength": 1
         },
         "adapterClass": {
           "$ref": "#/$defs/adapterClass"
@@ -725,28 +700,6 @@
             "required": [
               "routeSetPaths"
             ]
-          }
-        },
-        {
-          "if": {
-            "required": [
-              "profile"
-            ],
-            "properties": {
-              "profile": {
-                "const": "correctness"
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "automationSurface": {
-                "enum": [
-                  "playwright-headless-chromium",
-                  "playwright-cdp-chrome"
-                ]
-              }
-            }
           }
         }
       ]
@@ -1452,345 +1405,6 @@
         }
       ]
     },
-    "selfManifestEntry": {
-      "type": "object",
-      "required": [
-        "path",
-        "status",
-        "kind"
-      ],
-      "properties": {
-        "path": {
-          "const": "evidence-manifest.json"
-        },
-        "status": {
-          "const": "self-excluded"
-        },
-        "kind": {
-          "const": "evidence-manifest"
-        }
-      }
-    },
-    "capturedNormativeFile": {
-      "type": "object",
-      "required": [
-        "status",
-        "kind"
-      ],
-      "properties": {
-        "status": {
-          "const": "captured"
-        },
-        "kind": {
-          "const": "normative-json"
-        }
-      }
-    },
-    "releaseFiles": {
-      "type": "array",
-      "minItems": 16,
-      "prefixItems": [
-        {
-          "allOf": [
-            {
-              "$ref": "#/$defs/capturedNormativeFile"
-            },
-            {
-              "properties": {
-                "path": {
-                  "const": "visual-contract.json"
-                }
-              }
-            }
-          ]
-        },
-        {
-          "$ref": "#/$defs/selfManifestEntry"
-        },
-        {
-          "allOf": [
-            {
-              "$ref": "#/$defs/capturedNormativeFile"
-            },
-            {
-              "properties": {
-                "path": {
-                  "const": "renderer-info.json"
-                }
-              }
-            }
-          ]
-        },
-        {
-          "allOf": [
-            {
-              "$ref": "#/$defs/capturedNormativeFile"
-            },
-            {
-              "properties": {
-                "path": {
-                  "const": "pipeline-graph.json"
-                }
-              }
-            }
-          ]
-        },
-        {
-          "allOf": [
-            {
-              "$ref": "#/$defs/capturedNormativeFile"
-            },
-            {
-              "properties": {
-                "path": {
-                  "const": "performance-envelope.json"
-                }
-              }
-            }
-          ]
-        },
-        {
-          "allOf": [
-            {
-              "$ref": "#/$defs/capturedNormativeFile"
-            },
-            {
-              "properties": {
-                "path": {
-                  "const": "frame-trace.json"
-                }
-              }
-            }
-          ]
-        },
-        {
-          "allOf": [
-            {
-              "$ref": "#/$defs/capturedNormativeFile"
-            },
-            {
-              "properties": {
-                "path": {
-                  "const": "quality-governor.json"
-                }
-              }
-            }
-          ]
-        },
-        {
-          "allOf": [
-            {
-              "$ref": "#/$defs/capturedNormativeFile"
-            },
-            {
-              "properties": {
-                "path": {
-                  "const": "render-targets.json"
-                }
-              }
-            }
-          ]
-        },
-        {
-          "allOf": [
-            {
-              "$ref": "#/$defs/capturedNormativeFile"
-            },
-            {
-              "properties": {
-                "path": {
-                  "const": "storage-resources.json"
-                }
-              }
-            }
-          ]
-        },
-        {
-          "allOf": [
-            {
-              "$ref": "#/$defs/capturedNormativeFile"
-            },
-            {
-              "properties": {
-                "path": {
-                  "const": "resident-resources.json"
-                }
-              }
-            }
-          ]
-        },
-        {
-          "allOf": [
-            {
-              "$ref": "#/$defs/capturedNormativeFile"
-            },
-            {
-              "properties": {
-                "path": {
-                  "const": "bandwidth-model.json"
-                }
-              }
-            }
-          ]
-        },
-        {
-          "allOf": [
-            {
-              "$ref": "#/$defs/capturedNormativeFile"
-            },
-            {
-              "properties": {
-                "path": {
-                  "const": "visual-errors.json"
-                }
-              }
-            }
-          ]
-        },
-        {
-          "allOf": [
-            {
-              "$ref": "#/$defs/capturedNormativeFile"
-            },
-            {
-              "properties": {
-                "path": {
-                  "const": "leak-loop.json"
-                }
-              }
-            }
-          ]
-        },
-        {
-          "allOf": [
-            {
-              "$ref": "#/$defs/capturedNormativeFile"
-            },
-            {
-              "properties": {
-                "path": {
-                  "const": "mechanism-metrics.json"
-                }
-              }
-            }
-          ]
-        }
-      ],
-      "allOf": [
-        {
-          "contains": {
-            "type": "object",
-            "required": [
-              "status",
-              "kind"
-            ],
-            "properties": {
-              "status": {
-                "const": "captured"
-              },
-              "kind": {
-                "const": "capture-session-document"
-              }
-            }
-          },
-          "minContains": 1
-        },
-        {
-          "contains": {
-            "type": "object",
-            "required": [
-              "status",
-              "kind"
-            ],
-            "properties": {
-              "status": {
-                "const": "captured"
-              },
-              "kind": {
-                "const": "capture-session-write-ledger"
-              }
-            }
-          },
-          "minContains": 1
-        }
-      ]
-    },
-    "releaseImages": {
-      "type": "array",
-      "minItems": 10,
-      "prefixItems": [
-        {
-          "properties": {
-            "path": {
-              "const": "final.design.png"
-            }
-          }
-        },
-        {
-          "properties": {
-            "path": {
-              "const": "no-post.design.png"
-            }
-          }
-        },
-        {
-          "properties": {
-            "path": {
-              "const": "diagnostics.mosaic.png"
-            }
-          }
-        },
-        {
-          "properties": {
-            "path": {
-              "const": "camera.near.png"
-            }
-          }
-        },
-        {
-          "properties": {
-            "path": {
-              "const": "camera.design.png"
-            }
-          }
-        },
-        {
-          "properties": {
-            "path": {
-              "const": "camera.far.png"
-            }
-          }
-        },
-        {
-          "properties": {
-            "path": {
-              "const": "seed-0001.final.png"
-            }
-          }
-        },
-        {
-          "properties": {
-            "path": {
-              "const": "seed-9e3779b9.final.png"
-            }
-          }
-        },
-        {
-          "properties": {
-            "path": {
-              "const": "temporal.t000.png"
-            }
-          }
-        },
-        {
-          "properties": {
-            "path": {
-              "const": "temporal.t001.png"
-            }
-          }
-        }
-      ]
-    },
     "contractFixtureRequirements": {
       "type": "object",
       "properties": {
@@ -1869,40 +1483,10 @@
     },
     "releaseBundleRequirements": {
       "type": "object",
-      "description": "Release bundles require a correctness capture only. Optional physical-route/performance lanes may be attached. QA product names (e.g. Codex in-app browser) are never release gates.",
+      "description": "Legacy name for a curated demo-evidence grouping. No correctness, physical-route, performance, hardware-adapter, browser-product, file-count, or image-count lane is universally required.",
       "properties": {
         "captureSessions": {
-          "type": "array",
-          "minItems": 1,
-          "allOf": [
-            {
-              "contains": {
-                "type": "object",
-                "required": [
-                  "profile",
-                  "automationSurface"
-                ],
-                "properties": {
-                  "profile": {
-                    "const": "correctness"
-                  },
-                  "automationSurface": {
-                    "enum": [
-                      "playwright-headless-chromium",
-                      "playwright-cdp-chrome"
-                    ]
-                  }
-                }
-              },
-              "minContains": 1
-            }
-          ]
-        },
-        "files": {
-          "$ref": "#/$defs/releaseFiles"
-        },
-        "images": {
-          "$ref": "#/$defs/releaseImages"
+          "type": "array"
         },
         "promotion": {
           "type": "object",
@@ -1965,13 +1549,6 @@
                     },
                     "timestampQuerySupported": {
                       "const": true
-                    },
-                    "automationSurface": {
-                      "enum": [
-                        "playwright-headless-chromium",
-                        "playwright-cdp-chrome",
-                        "codex-in-app-browser"
-                      ]
                     }
                   }
                 },
@@ -2067,13 +1644,6 @@
                     },
                     "timestampQuerySupported": {
                       "const": true
-                    },
-                    "automationSurface": {
-                      "enum": [
-                        "playwright-headless-chromium",
-                        "playwright-cdp-chrome",
-                        "codex-in-app-browser"
-                      ]
                     }
                   }
                 },

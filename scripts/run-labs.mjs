@@ -101,7 +101,6 @@ if (!allowedOperations.has(operation)) {
 const requestedLab = readOption('--lab');
 const profile = readOption('--profile');
 const includeIncomplete = process.argv.includes('--include-incomplete');
-const exerciseIncompleteByDefault = ['check', 'test', 'mutations', 'quick'].includes(operation);
 const registry = buildDemoRegistry();
 let labs = registry.demos.filter((manifest) => ['canonical-lab', 'mechanism-demo', 'tier-demo', 'integration-demo'].includes(manifest.kind));
 if (requestedLab) {
@@ -110,7 +109,7 @@ if (requestedLab) {
     console.error(`unknown lab: ${requestedLab}`);
     process.exit(1);
   }
-} else if (!includeIncomplete && !exerciseIncompleteByDefault) {
+} else if (!includeIncomplete) {
   labs = labs.filter((manifest) => manifest.status === 'accepted');
 }
 

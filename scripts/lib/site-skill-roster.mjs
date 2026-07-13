@@ -12,8 +12,5 @@ export function authoritativeSiteSkillSlugs(registry, primaryKinds) {
   if (slugs.has(undefined) || slugs.has(null) || slugs.has('')) {
     throw new Error('primary demo registry contains an invalid skill owner');
   }
-  if (slugs.size !== registry.skillsExpected) {
-    throw new Error(`authoritative skill roster count drift: expected ${registry.skillsExpected}, received ${slugs.size}`);
-  }
   return slugs;
 }

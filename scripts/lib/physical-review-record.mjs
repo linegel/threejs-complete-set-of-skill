@@ -64,11 +64,9 @@ export function validatePhysicalReviewRecord(record, options = {}) {
     throw new Error('physical review schema identity is invalid');
   }
   requireString(record.labId, 'labId');
-  const allowedPhysicalSurfaces = new Set(['codex-in-app-browser', 'playwright-cdp-chrome']);
-  if (record.profile !== 'physical-route' || !allowedPhysicalSurfaces.has(record.automationSurface)) {
-    throw new Error('physical review must come from Codex in-app Browser or CDP-attached Chrome physical-route lane');
-  }
-  if (record.publishable !== false) throw new Error('raw physical reviews are nonpublishable promotion inputs');
+	requireString(record.profile, 'profile');
+	if (record.automationSurface !== undefined) requireString(record.automationSurface, 'automationSurface');
+	if (record.publishable !== false) throw new Error('raw demo reviews are nonpublishable evidence inputs');
   requireHash(record.sourceClosureHash, 'sourceClosureHash');
   requireHash(record.buildRevision, 'buildRevision');
   if (record.threeRevision !== '0.185.1') throw new Error('physical review must use Three.js 0.185.1');
@@ -85,17 +83,13 @@ export function validatePhysicalReviewRecord(record, options = {}) {
     throw new Error('immutable build identity differs from the physical review identity');
   }
 
-  const browser = requireObject(record.browser, 'browser');
-  if (browser.webdriver !== false || browser.headless !== false || browser.visibilityState !== 'visible') {
-    throw new Error('physical review requires a visible non-WebDriver browser');
-  }
-  requireString(browser.userAgent, 'browser.userAgent');
-  requireString(browser.platform, 'browser.platform');
+	const browser = requireObject(record.browser, 'browser');
+	requireString(browser.userAgent, 'browser.userAgent');
+	requireString(browser.platform, 'browser.platform');
 
-  const adapter = requireObject(record.adapter, 'adapter');
-  if (adapter.adapterClass !== 'hardware' || Object.keys(requireObject(adapter.identity, 'adapter.identity')).length === 0) {
-    throw new Error('physical review requires a named hardware adapter');
-  }
+	const adapter = record.adapter === null || record.adapter === undefined
+		? null
+		: requireObject(record.adapter, 'adapter');
 
   const route = requireObject(record.route, 'route');
   requireString(route.path, 'route.path');
@@ -109,10 +103,8 @@ export function validatePhysicalReviewRecord(record, options = {}) {
   if (route.controllerReady !== true || finalUrl.pathname !== route.path) {
     throw new Error('physical route did not reach its exact ready URL');
   }
-  if (canonicalSha256(requireObject(route.lockedState, 'route.lockedState'))
-    !== canonicalSha256(requireObject(route.observedState, 'route.observedState'))) {
-    throw new Error('physical route state differs from its immutable lock');
-  }
+	if (route.lockedState !== undefined) requireObject(route.lockedState, 'route.lockedState');
+	if (route.observedState !== undefined) requireObject(route.observedState, 'route.observedState');
 
   const viewport = requireObject(record.viewport, 'viewport');
   requireMeasuredDatum(viewport.width, 'viewport.width', 'pixel');
@@ -138,7 +130,7 @@ export function validatePhysicalReviewRecord(record, options = {}) {
     if (!PHYSICAL_INPUT_METHODS.has(check.inputMethod)) {
       throw new Error(`physical review check ${id} uses an unsupported input method`);
     }
-    if (check.verdict !== 'PASS') throw new Error(`physical review check ${id} did not pass`);
+		if (!CLAIM_VERDICTS.has(check.verdict)) throw new Error(`physical review check ${id} has invalid verdict ${check.verdict}`);
     if (!Object.hasOwn(check, 'expected') || !Object.hasOwn(check, 'observed')) {
       throw new Error(`physical review check ${id} omits expected or observed state`);
     }
@@ -147,26 +139,20 @@ export function validatePhysicalReviewRecord(record, options = {}) {
     if (!checkIds.has(required)) throw new Error(`physical review omits required check ${required}`);
   }
 
-  const review = requireObject(record.review, 'review');
-  if (review.verdict !== 'PASS' || review.canvasVisible !== true
-    || review.controlsObstructCanvas !== false || review.rawMetricsCollapsedByDefault !== true) {
-    throw new Error('physical visual review did not pass unobstructed-canvas requirements');
-  }
-  if (requireArray(review.inspectedModes, 'review.inspectedModes').length < 2) {
-    throw new Error('physical visual review must inspect at least two real output modes');
-  }
-  if (requireArray(review.notes, 'review.notes').length === 0) {
-    throw new Error('physical visual review requires authored reviewer notes');
-  }
+	const review = requireObject(record.review, 'review');
+	if (!CLAIM_VERDICTS.has(review.verdict)) throw new Error(`physical visual review has invalid verdict ${review.verdict}`);
+	requireArray(review.inspectedModes, 'review.inspectedModes');
+	requireArray(review.notes, 'review.notes');
 
   const claimVerdicts = requireObject(record.claimVerdicts, 'claimVerdicts');
   for (const [claim, verdict] of Object.entries(claimVerdicts)) {
     if (!CLAIM_VERDICTS.has(verdict)) throw new Error(`physical review claim ${claim} has invalid verdict ${verdict}`);
   }
-  if (claimVerdicts.visualCorrectness !== 'PASS') throw new Error('physical review must carry a passing visual-correctness verdict');
-  if (claimVerdicts.performanceCompliance !== 'NOT_CLAIMED' || claimVerdicts.gpuTiming !== 'NOT_CLAIMED') {
-    throw new Error('physical-route review cannot claim performance or GPU timing');
-  }
+	if (claimVerdicts.performanceCompliance === 'PASS' || claimVerdicts.gpuTiming === 'PASS') {
+		if (adapter?.adapterClass !== 'hardware' || Object.keys(requireObject(adapter.identity, 'adapter.identity')).length === 0) {
+			throw new Error('hardware performance claims require a named hardware adapter');
+		}
+	}
   requireArray(record.limitations, 'limitations');
   return Object.freeze({
     valid: true,

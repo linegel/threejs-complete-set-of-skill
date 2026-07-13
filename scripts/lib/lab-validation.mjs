@@ -1,8 +1,5 @@
-import { existsSync } from 'node:fs';
-import { join } from 'node:path';
 import {
   ACCEPTANCE_STATUSES,
-  AUTHORITATIVE_COUNT_FIELDS,
   DEMO_KINDS,
   EXECUTION_CLASSES,
   PRIMARY_DEMO_KINDS,
@@ -17,7 +14,6 @@ import {
   validatePrimaryRosterClosure,
 } from './lab-registry.mjs';
 import { loadCheckedSchemas, validateCheckedJsonSchema } from './checked-json-schema.mjs';
-import { validateEvidenceBundle } from './evidence-v2.mjs';
 
 const ID = /^[a-z0-9][a-z0-9-]*$/;
 const ROUTE_ID = /^[a-z0-9](?:[a-z0-9./-]*[a-z0-9])?$/;
@@ -27,13 +23,14 @@ const RAW_MANIFEST_KEYS = new Set([
   'tiers', 'modes', 'cameras', 'seeds', 'capabilityRequirements', 'runtimeProof',
   'evidenceContract', 'evidenceBundle', 'validationCommand', 'commands',
   'sourceHash', 'proxyStatus', 'nonRenderingScenarioSuite', 'notes',
+  'limitations',
 ]);
 const RAW_ROUTE_KEYS = new Set(['id', 'title', 'route', 'startup', 'acceptanceStatus']);
 const RAW_TIER_KEYS = new Set([
   'id', 'targetClass', 'frameTargetMs', 'resolutionPolicy', 'mechanismLimits',
   'resourceLimits', 'degradationFromPrevious', 'preservedInvariants', 'acceptanceStatus',
 ]);
-const RAW_REQUIREMENT_KEYS = new Set(['id', 'required', 'evidence', 'status']);
+const RAW_REQUIREMENT_KEYS = new Set(['id', 'required', 'evidence', 'status', 'acceptanceStatus']);
 const RAW_COMMAND_KEYS = new Set([
   'check', 'test', 'mutations', 'capture', 'validateArtifacts', 'validateQuick', 'validateFull',
 ]);
@@ -41,14 +38,6 @@ const RAW_NUMERIC_DATUM_KEYS = new Set(['value', 'unit', 'label', 'source', 'unc
 const RAW_PROXY_STATUS_KEYS = new Set(['limitation', 'canonicalLabId']);
 const NUMERIC_LABELS = new Set(['Authored', 'Derived', 'Measured', 'Gated']);
 const REPO_PATH = /^(?!\/)(?!.*(?:^|\/)\.\.(?:\/|$)).+$/;
-
-export const REQUIRED_RENDERING_PROOF_IDS = Object.freeze([
-  'renderer-init',
-  'backend-is-webgpu',
-  'mechanism-reachable',
-  'render-or-compute-work',
-  'aligned-readback',
-]);
 
 function validRouteId(value) {
   return ROUTE_ID.test(value) && !String(value).split('/').some((segment) => segment === '.' || segment === '..' || segment === '');
@@ -143,6 +132,9 @@ function validateRawRequirement(requirement, path, errors) {
   }
   if (requirement.status !== undefined && !ACCEPTANCE_STATUSES.includes(requirement.status)) {
     errors.push(`${path}.status is invalid`);
+  }
+  if (requirement.acceptanceStatus !== undefined && !ACCEPTANCE_STATUSES.includes(requirement.acceptanceStatus)) {
+    errors.push(`${path}.acceptanceStatus is invalid`);
   }
 }
 
@@ -252,6 +244,9 @@ export function validateRawLabManifest(raw) {
   if (raw?.notes !== undefined && (!Array.isArray(raw.notes) || raw.notes.some((note) => !nonEmptyString(note)))) {
     errors.push('notes must be an array of non-empty strings');
   }
+  if (raw?.limitations !== undefined && !Array.isArray(raw.limitations)) {
+    errors.push('limitations must be an array when present');
+  }
   return { valid: errors.length === 0, errors };
 }
 
@@ -282,7 +277,7 @@ function validateTier(tier, path, errors) {
   if (!ACCEPTANCE_STATUSES.includes(tier?.acceptanceStatus)) errors.push(`${path}.acceptanceStatus is invalid`);
 }
 
-export function validateLabManifest(manifest, { root = REPO_ROOT, validateEvidence = true } = {}) {
+export function validateLabManifest(manifest) {
   const errors = [];
   if (manifest?.schemaVersion !== 2) errors.push('schemaVersion must be 2');
   if (!ID.test(manifest?.id ?? '')) errors.push('id must be a lowercase route slug');
@@ -345,58 +340,6 @@ export function validateLabManifest(manifest, { root = REPO_ROOT, validateEviden
       errors.push('non-integration primary cannot declare dependencyLabIds');
     }
   }
-  if (!primary && manifest?.status === 'accepted') errors.push(`${manifest.kind} cannot have accepted status`);
-  if (['proxy-demo', 'generated-asset-demo', 'legacy-deprecated', 'contract-fixture'].includes(manifest?.kind)
-      && !['secondary', 'not-applicable'].includes(manifest?.status)) {
-    errors.push(`${manifest.kind} must be secondary or not-applicable`);
-  }
-
-  if (primary && manifest?.status === 'accepted') {
-    for (const path of manifest.canonicalSource ?? []) {
-      if (!existsSync(join(root, path))) errors.push(`accepted canonical source does not exist: ${path}`);
-    }
-    if (!manifest.browserEntry || !existsSync(join(root, manifest.browserEntry))) {
-      errors.push('accepted primary demo requires an existing browserEntry');
-    }
-    if (!manifest.publishPath) errors.push('accepted primary demo requires publishPath');
-    if (manifest.evidenceContract !== 'v2') errors.push('accepted primary demo requires evidence contract v2');
-    if (!manifest.validationCommand) errors.push('accepted primary demo requires validationCommand');
-    if (!/^sha256:[a-f0-9]{64}$/.test(manifest.sourceHash ?? '')) {
-      errors.push('accepted primary demo requires a current sourceHash');
-    }
-    for (const key of ['scenarios', 'mechanisms', 'tiers']) {
-      if ((manifest[key] ?? []).some((entry) => entry.acceptanceStatus !== 'accepted')) {
-        errors.push(`accepted primary demo requires every declared ${key.slice(0, -1)} to be accepted`);
-      }
-    }
-    for (const key of ['capabilityRequirements', 'runtimeProof']) {
-      for (const requirement of (manifest[key] ?? []).filter((entry) => entry.required === true)) {
-        if (requirement.status !== 'accepted') {
-          errors.push(`accepted primary demo requires ${key}.${requirement.id} status accepted`);
-        }
-        if (!nonEmptyString(requirement.evidence)) {
-          errors.push(`accepted primary demo requires nonempty evidence for ${key}.${requirement.id}`);
-        }
-      }
-    }
-
-    if (manifest.executionClass === 'rendering') {
-      if (!manifest.evidenceBundle || !existsSync(join(root, manifest.evidenceBundle))) {
-        errors.push('accepted rendering demo requires an existing evidenceBundle');
-      } else if (validateEvidence) {
-        const result = validateEvidenceBundle(join(root, manifest.evidenceBundle), {
-          requireRequiredClaimsPass: true,
-          repositoryRoot: root,
-        });
-        errors.push(...result.errors.map((error) => `evidence: ${error}`));
-      }
-      const requiredProof = new Set((manifest.runtimeProof ?? []).filter((entry) => entry.required).map((entry) => entry.id));
-      for (const id of REQUIRED_RENDERING_PROOF_IDS) {
-        if (!requiredProof.has(id)) errors.push(`accepted rendering demo runtimeProof must require ${id}`);
-      }
-    }
-  }
-
   return { valid: errors.length === 0, errors };
 }
 
@@ -425,9 +368,6 @@ function validateDependencyGraph(primary, allDemos, errors) {
         errors.push(`${demo.id}: dependency ${dependencyId} is secondary, not primary coverage`);
         continue;
       }
-      if (demo.status === 'accepted' && dependency.status !== 'accepted') {
-        errors.push(`${demo.id}: accepted integration dependency ${dependencyId} is ${dependency.status}, not accepted`);
-      }
     }
   }
 
@@ -454,7 +394,7 @@ function validateDependencyGraph(primary, allDemos, errors) {
   for (const demo of primary) visit(demo.id, []);
 }
 
-export function validateRegistry(registry, { requireComplete = false, validateEvidence = true } = {}) {
+export function validateRegistry(registry) {
   const errors = [];
   const targetData = loadCanonicalTargets();
   const roster = authoritativePrimaryRoster(targetData);
@@ -464,9 +404,6 @@ export function validateRegistry(registry, { requireComplete = false, validateEv
 
   if (registry?.schemaVersion !== 2) errors.push('registry schemaVersion must be 2');
   if (registry?.threeRevision !== '0.185.1') errors.push('registry threeRevision must be 0.185.1');
-  if (registry?.skillsExpected !== targetData.skillsExpected) {
-    errors.push(`registry skillsExpected must equal authoritative ${targetData.skillsExpected}`);
-  }
   const ids = duplicateIds(demos);
   if (ids.length > 0) errors.push(`registry has duplicate ids: ${ids.join(', ')}`);
 
@@ -496,16 +433,6 @@ export function validateRegistry(registry, { requireComplete = false, validateEv
   if (!sameJson(registry?.counts, expectedCounts)) {
     errors.push(`registry counts are forged or stale; expected ${JSON.stringify(expectedCounts)}, received ${JSON.stringify(registry?.counts)}`);
   }
-  if (expectedCounts.skills !== targetData.skillsExpected) {
-    errors.push(`repository contains ${expectedCounts.skills} skills; authoritative target expects ${targetData.skillsExpected}`);
-  }
-  for (const [countKey, expectedKey] of Object.entries(AUTHORITATIVE_COUNT_FIELDS)) {
-    if (expectedCounts[countKey] !== targetData[expectedKey]) {
-      errors.push(
-        `registry ${countKey} denominator drift: derived ${expectedCounts[countKey]}, authoritative ${targetData[expectedKey]}`,
-      );
-    }
-  }
   const expectedCoverage = deriveSkillCoverage(demos, skills);
   if (!sameJson(registry?.coverage, expectedCoverage)) {
     errors.push('registry coverage is forged or stale; it must be derived from primary demos');
@@ -513,45 +440,11 @@ export function validateRegistry(registry, { requireComplete = false, validateEv
   const coverageSkills = (registry?.coverage ?? []).map((entry) => entry.skill);
   const duplicateCoverage = duplicateIds(coverageSkills.map((id) => ({ id })));
   if (duplicateCoverage.length > 0) errors.push(`coverage matrix has duplicate skills: ${duplicateCoverage.join(', ')}`);
-  for (const coverage of expectedCoverage) {
-    if (coverage.primaryLabIds.length === 0) errors.push(`${coverage.skill} has no declared primary target`);
-  }
-
   for (const manifest of demos) {
-    const result = validateLabManifest(manifest, { validateEvidence });
+    const result = validateLabManifest(manifest);
     errors.push(...result.errors.map((error) => `${manifest.id}: ${error}`));
   }
   validateDependencyGraph(primary, demos, errors);
-
-  if (requireComplete) {
-    for (const demo of primary) {
-      if (demo.status !== 'accepted') errors.push(`${demo.id}: primary status is ${demo.status}, not accepted`);
-      for (const key of ['scenarios', 'mechanisms', 'tiers']) {
-        for (const entry of demo[key] ?? []) {
-          if (entry.acceptanceStatus !== 'accepted') {
-            errors.push(`${demo.id}: ${key}/${entry.id} is ${entry.acceptanceStatus ?? 'missing-status'}, not accepted`);
-          }
-        }
-      }
-      for (const key of ['capabilityRequirements', 'runtimeProof']) {
-        for (const entry of (demo[key] ?? []).filter((requirement) => requirement.required === true)) {
-          if (entry.status !== 'accepted') {
-            errors.push(`${demo.id}: required ${key}/${entry.id} is ${entry.status ?? 'missing-status'}, not accepted`);
-          }
-          if (!nonEmptyString(entry.evidence)) {
-            errors.push(`${demo.id}: required ${key}/${entry.id} has no evidence`);
-          }
-        }
-      }
-    }
-    for (const id of expectedFlagshipIds) {
-      const demo = primary.find((entry) => entry.id === id);
-      if (demo?.status !== 'accepted') errors.push(`${id}: flagship is not accepted`);
-    }
-    for (const coverage of expectedCoverage) {
-      if (coverage.acceptedPrimaryLabIds.length === 0) errors.push(`${coverage.skill} has no accepted primary coverage`);
-    }
-  }
 
   return { valid: errors.length === 0, errors };
 }

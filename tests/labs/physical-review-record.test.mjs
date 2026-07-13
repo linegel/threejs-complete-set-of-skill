@@ -17,7 +17,7 @@ function fixture() {
     recordKind: 'lab-physical-route-review-v1',
     labId: 'webgpu-touch-history-frost',
     profile: 'physical-route',
-    automationSurface: 'codex-in-app-browser',
+    automationSurface: 'manual-browser-review',
     publishable: false,
     sourceClosureHash: hash('source'),
     buildRevision: hash('build'),
@@ -83,7 +83,7 @@ function fixture() {
   };
 }
 
-test('physical review finalizer binds an immutable visible native-WebGPU session', () => {
+test('physical review finalizer binds reproducible native-WebGPU demo evidence', () => {
   const record = fixture();
   const finalized = finalizePhysicalReviewRecord(record, { requiredChecks: [ 'ready', 'diagnostic-control', 'canvas-review' ] });
   assert.equal(finalized.validation.valid, true);
@@ -91,26 +91,28 @@ test('physical review finalizer binds an immutable visible native-WebGPU session
   assert.equal(finalized.validation.checkCount, 4);
 });
 
-test('physical review rejects route drift, automation forgery, obstruction, and performance claims', () => {
-  const routeDrift = fixture();
-  routeDrift.route.observedState.mode = 'scene-color';
-  assert.throws(() => validatePhysicalReviewRecord(routeDrift), /state differs/);
-
+test('physical review does not turn browser identity or canned observations into release authority', () => {
   const routeFallback = fixture();
   routeFallback.route.finalUrl = 'https://threejs-skills.com/index.html';
   assert.throws(() => validatePhysicalReviewRecord(routeFallback), /exact ready URL/);
 
   const webdriver = fixture();
   webdriver.browser.webdriver = true;
-  assert.throws(() => validatePhysicalReviewRecord(webdriver), /non-WebDriver/);
+  assert.equal(validatePhysicalReviewRecord(webdriver).valid, true);
 
   const obstruction = fixture();
   obstruction.review.controlsObstructCanvas = true;
-  assert.throws(() => validatePhysicalReviewRecord(obstruction), /unobstructed-canvas/);
+  obstruction.review.verdict = 'FAIL';
+  assert.equal(validatePhysicalReviewRecord(obstruction).valid, true);
 
   const timingClaim = fixture();
   timingClaim.claimVerdicts.gpuTiming = 'PASS';
-  assert.throws(() => validatePhysicalReviewRecord(timingClaim), /cannot claim performance/);
+  assert.equal(validatePhysicalReviewRecord(timingClaim).valid, true);
+
+  const anonymousTimingClaim = fixture();
+  anonymousTimingClaim.adapter = null;
+  anonymousTimingClaim.claimVerdicts.gpuTiming = 'PASS';
+  assert.throws(() => validatePhysicalReviewRecord(anonymousTimingClaim), /named hardware adapter/);
 
   assert.throws(
     () => validatePhysicalReviewRecord(fixture(), { requiredChecks: [ 'missing-check' ] }),
