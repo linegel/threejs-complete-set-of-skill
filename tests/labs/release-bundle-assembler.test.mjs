@@ -36,6 +36,8 @@ function makeRawCorrectnessBundle() {
     !['capture-session-document', 'capture-session-write-ledger'].includes(entry.kind)
     || retainedSessionPaths.has(entry.path)
   ));
+  manifest.files.reverse();
+  manifest.images.reverse();
   manifest.promotion = {
     status: 'NOT_ELIGIBLE',
     binding: null,
@@ -152,6 +154,12 @@ test('offline assembler creates a validated nonpublishable multi-route release c
   assert.equal(result.manifest.publishable, false);
   assert.equal(result.manifest.promotion.status, 'PENDING_VISUAL_SIGNOFF');
   assert.deepEqual(result.manifest.routeSet.map((route) => route.path), [manifest.route.path, reviewedRoute().path]);
+  assert.deepEqual(result.manifest.images.slice(0, 3).map((image) => image.path), [
+    'final.design.png', 'no-post.design.png', 'diagnostics.mosaic.png',
+  ]);
+  assert.deepEqual(result.manifest.files.slice(0, 3).map((file) => file.path), [
+    'visual-contract.json', 'evidence-manifest.json', 'renderer-info.json',
+  ]);
   assert.equal(result.manifest.captureSessions.find((session) => session.profile === 'physical-route').routePath, reviewedRoute().path);
   await assert.rejects(() => assemblePendingReleaseBundle({
     correctnessDirectory: directory,

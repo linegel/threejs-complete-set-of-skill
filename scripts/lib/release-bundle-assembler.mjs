@@ -22,8 +22,10 @@ import {
   captureSessionSetDigest,
   imageLedgerDigest,
   manifestCoreDigest,
+  NORMATIVE_JSON_PATHS,
   routeSetDigest,
   routeStateDigest,
+  STANDARD_IMAGE_PATHS,
 } from './evidence-manifest-contract.mjs';
 import { validateEvidenceLaneJoin } from './evidence-lane-join.mjs';
 import { validateEvidenceBundle } from './evidence-v2.mjs';
@@ -109,6 +111,17 @@ function pendingSignoff() {
     reviewedImages: [],
     notes: [],
   };
+}
+
+function orderByRequiredPrefix(entries, requiredPaths, label) {
+  const index = new Map(entries.map((entry) => [entry.path, entry]));
+  const prefix = requiredPaths.map((path) => {
+    const entry = index.get(path);
+    if (!entry) throw new Error(`${label} is missing required entry ${path}`);
+    index.delete(path);
+    return entry;
+  });
+  return [...prefix, ...[...index.values()].sort((left, right) => left.path.localeCompare(right.path))];
 }
 
 function promotionBinding(manifest) {
@@ -232,12 +245,13 @@ export async function assemblePendingReleaseBundle({
     limitations: releaseLimitations,
     claimVerdicts: structuredClone(laneJoin.claimVerdicts),
     captureSessions: [structuredClone(raw.captureSessions[0]), physicalSession],
-    files: [
+    files: orderByRequiredPrefix([
       ...structuredClone(raw.files),
       capturedFile(physicalDocument),
       capturedFile(physicalLedger),
       capturedFile(joinedLedger),
-    ],
+    ], NORMATIVE_JSON_PATHS, 'release file ledger'),
+    images: orderByRequiredPrefix(structuredClone(raw.images), STANDARD_IMAGE_PATHS, 'release image ledger'),
     promotion: null,
   };
   const bindingValue = promotionBinding(manifest);
