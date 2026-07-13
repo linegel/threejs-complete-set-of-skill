@@ -6,9 +6,9 @@ import { validateCorrectnessCaptureSession } from './physical-session-validator.
 const SHA256 = /^sha256:[a-f0-9]{64}$/;
 
 const LANE_CONTRACTS = Object.freeze( {
-	correctness: Object.freeze( { profile: CORRECTNESS_PROFILE, automationSurface: 'playwright-headless-chromium' } ),
-	physicalRoute: Object.freeze( { profile: PHYSICAL_ROUTE_PROFILE, automationSurface: 'codex-in-app-browser' } ),
-	hardwarePerformance: Object.freeze( { profile: HARDWARE_PERFORMANCE_PROFILE, automationSurface: 'codex-in-app-browser' } )
+	correctness: Object.freeze( { profile: CORRECTNESS_PROFILE, automationSurface: 'playwright-headless-chromium', adapterClasses: Object.freeze( [ 'hardware', 'software' ] ) } ),
+	physicalRoute: Object.freeze( { profile: PHYSICAL_ROUTE_PROFILE, automationSurface: 'codex-in-app-browser', adapterClasses: Object.freeze( [ 'hardware' ] ) } ),
+	hardwarePerformance: Object.freeze( { profile: HARDWARE_PERFORMANCE_PROFILE, automationSurface: 'codex-in-app-browser', adapterClasses: Object.freeze( [ 'hardware' ] ) } )
 } );
 
 const IMMUTABLE_IDENTITY_FIELDS = Object.freeze( [
@@ -124,7 +124,7 @@ function assertLaneReference( reference, lane ) {
 	const startedAt = Date.parse( reference.startedAt );
 	const finishedAt = Date.parse( reference.finishedAt );
 	if ( Number.isFinite( startedAt ) === false || Number.isFinite( finishedAt ) === false || finishedAt < startedAt ) throw new Error( `Evidence lane ${ lane } has an invalid capture interval.` );
-	if ( reference.adapterClass !== 'hardware' ) throw new Error( `Evidence lane ${ lane } has an invalid adapter class.` );
+	if ( contract.adapterClasses.includes( reference.adapterClass ) === false ) throw new Error( `Evidence lane ${ lane } has an invalid adapter class.` );
 	if ( reference.identityBindingDigest !== laneIdentityBindingDigest( reference ) ) throw new Error( `Evidence lane ${ lane } immutable identity binding is stale or swapped.` );
 	return reference;
 

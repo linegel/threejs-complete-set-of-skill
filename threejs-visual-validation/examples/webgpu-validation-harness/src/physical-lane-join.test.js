@@ -52,7 +52,7 @@ function lane( name, profile, automationSurface, hashIndex ) {
 
 function joined() {
 
-	return {
+	const value = {
 		schemaVersion: 1,
 		publishable: false,
 		rawEvidenceManifestFinalized: true,
@@ -64,6 +64,9 @@ function joined() {
 		physicalRoute: lane( 'physicalRoute', 'physical-route', 'codex-in-app-browser', 1 ),
 		hardwarePerformance: lane( 'hardwarePerformance', 'performance', 'codex-in-app-browser', 2 )
 	};
+	value.correctness.adapterClass = 'software';
+	value.correctness.identityBindingDigest = laneIdentityBindingDigest( value.correctness );
+	return value;
 
 }
 
@@ -166,6 +169,18 @@ test( 'offline promotion hook rejects missing, swapped, cross-source, and raw-pu
 		[ 'swapped capture document hash', ( value ) => { value.physicalRoute.captureSessionDocumentHash = value.hardwarePerformance.captureSessionDocumentHash; }, /identity binding is stale or swapped/ ],
 		[ 'swapped write ledger hash', ( value ) => { value.correctness.captureSessionWriteLedgerHash = value.physicalRoute.captureSessionWriteLedgerHash; }, /identity binding is stale or swapped/ ],
 		[ 'raw session publishable', ( value ) => { value.hardwarePerformance.publishable = true; }, /must remain nonpublishable/ ],
+		[ 'unknown correctness adapter', ( value ) => {
+
+			value.correctness.adapterClass = 'unknown';
+			value.correctness.identityBindingDigest = laneIdentityBindingDigest( value.correctness );
+
+		}, /correctness has an invalid adapter class/ ],
+		[ 'software physical adapter', ( value ) => {
+
+			value.physicalRoute.adapterClass = 'software';
+			value.physicalRoute.identityBindingDigest = laneIdentityBindingDigest( value.physicalRoute );
+
+		}, /physicalRoute has an invalid adapter class/ ],
 		[ 'raw join publishable', ( value ) => { value.publishable = true; }, /nonpublishable promotion input/ ],
 		[ 'wrong Three revision', ( value ) => { value.correctness.threeRevision = '0.184.0'; }, /wrong Three revision/ ],
 		[ 'invalid capture interval', ( value ) => { value.physicalRoute.finishedAt = '2026-07-11T00:00:00.000Z'; }, /invalid capture interval/ ],

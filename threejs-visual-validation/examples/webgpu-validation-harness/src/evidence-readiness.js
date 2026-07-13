@@ -91,10 +91,10 @@ async function inspectBundle( input, path, expected ) {
 			? manifest.captureSessions.find( ( session ) => session.profile === expected.profile )
 			: null;
 		const adapterClass = captureSession?.adapterClass ?? null;
-		const hardwareRequired = expected.hardwareRequired === true;
-		const hardwareReady = hardwareRequired === false || adapterClass === 'hardware';
+		const allowedAdapterClasses = expected.allowedAdapterClasses ?? [ 'hardware' ];
+		const adapterReady = allowedAdapterClasses.includes( adapterClass );
 		const promotionReady = expected.promotionStatuses === undefined || expected.promotionStatuses.includes( manifest.promotion?.status );
-		const status = claimsPass && hardwareReady && promotionReady ? expected.readyStatus : 'INSUFFICIENT_EVIDENCE';
+		const status = claimsPass && adapterReady && promotionReady ? expected.readyStatus : 'INSUFFICIENT_EVIDENCE';
 		return inputSummary( input, path, status, {
 			schemaVersion: validation.schemaVersion,
 			bundleKind: validation.bundleKind,
@@ -109,8 +109,8 @@ async function inspectBundle( input, path, expected ) {
 			threeRevision: manifest.threeRevision,
 			message: claimsPass === false
 				? `Required claims are not all PASS: ${ requiredClaims.filter( ( claim ) => validation.claimVerdicts?.[ claim ] !== 'PASS' ).join( ', ' ) }.`
-				: hardwareReady === false
-					? `The ${ expected.profile } lane must be captured on a hardware adapter before release assembly.`
+				: adapterReady === false
+					? `The ${ expected.profile } lane adapter class must be one of: ${ allowedAdapterClasses.join( ', ' ) }.`
 					: promotionReady === false
 						? `Promotion status ${ manifest.promotion?.status ?? '<missing>' } is not eligible for this input.`
 						: null
@@ -157,7 +157,7 @@ async function inspectPhysicalRecord( input, path, expectedProfile ) {
 function inputBlocker( input ) {
 
 	const messages = {
-		correctness: 'Capture a current-source hardware correctness lane with the pinned Playwright runner.',
+		correctness: 'Capture a current-source deterministic correctness lane with the pinned Playwright runner.',
 		physicalRoute: 'Import a finalized immutable physical-route session from the Codex in-app Browser.',
 		hardwarePerformance: 'Import a finalized named-hardware performance session with timestamp attribution.',
 		releaseCandidate: 'Assemble the three immutable lanes into a separate nonpublishable release candidate.',
@@ -247,7 +247,7 @@ export async function inspectHarnessAcceptanceReadiness( options = {} ) {
 			bundleKind: 'raw-capture-session',
 			profile: 'correctness',
 			publishable: false,
-			hardwareRequired: true,
+			allowedAdapterClasses: [ 'hardware', 'software' ],
 			requiredClaims: REQUIRED_CORRECTNESS_CLAIMS,
 			readyStatus: 'READY'
 		} ),
