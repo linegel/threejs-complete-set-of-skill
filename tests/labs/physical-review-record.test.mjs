@@ -62,6 +62,7 @@ function fixture() {
     errors: { page: [], console: [], request: [], device: [], postDisposal: [] },
     checks: [
       { id: 'ready', inputMethod: 'public-controller-read', expected: true, observed: true, verdict: 'PASS' },
+      { id: 'review-trace', inputMethod: 'public-controller-call', expected: 1, observed: 1, verdict: 'PASS' },
       { id: 'diagnostic-control', inputMethod: 'user-facing-control', expected: 'frost-mask-after-pointer', observed: 'frost-mask-after-pointer', verdict: 'PASS' },
       { id: 'canvas-review', inputMethod: 'direct-visual-inspection', expected: 'legible scene', observed: 'legible scene', verdict: 'PASS' },
     ],
@@ -87,7 +88,7 @@ test('physical review finalizer binds an immutable visible native-WebGPU session
   const finalized = finalizePhysicalReviewRecord(record, { requiredChecks: [ 'ready', 'diagnostic-control', 'canvas-review' ] });
   assert.equal(finalized.validation.valid, true);
   assert.equal(finalized.recordSha256, canonicalSha256(record));
-  assert.equal(finalized.validation.checkCount, 3);
+  assert.equal(finalized.validation.checkCount, 4);
 });
 
 test('physical review rejects route drift, automation forgery, obstruction, and performance claims', () => {
@@ -115,4 +116,8 @@ test('physical review rejects route drift, automation forgery, obstruction, and 
     () => validatePhysicalReviewRecord(fixture(), { requiredChecks: [ 'missing-check' ] }),
     /omits required check/,
   );
+
+  const unknownInputMethod = fixture();
+  unknownInputMethod.checks[0].inputMethod = 'controller-ish';
+  assert.throws(() => validatePhysicalReviewRecord(unknownInputMethod), /unsupported input method/);
 });

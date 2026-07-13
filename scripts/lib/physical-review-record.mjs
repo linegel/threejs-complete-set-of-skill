@@ -2,6 +2,12 @@ import { canonicalSha256 } from './evidence-manifest-contract.mjs';
 
 const SHA256 = /^sha256:[a-f0-9]{64}$/;
 const CLAIM_VERDICTS = new Set([ 'PASS', 'FAIL', 'INSUFFICIENT_EVIDENCE', 'NOT_CLAIMED' ]);
+const PHYSICAL_INPUT_METHODS = new Set([
+  'user-facing-control',
+  'public-controller-read',
+  'public-controller-call',
+  'direct-visual-inspection',
+]);
 
 function requireObject(value, label) {
   if (value === null || typeof value !== 'object' || Array.isArray(value)) {
@@ -128,7 +134,7 @@ export function validatePhysicalReviewRecord(record, options = {}) {
     const id = requireString(check.id, `checks[${index}].id`);
     if (checkIds.has(id)) throw new Error(`physical review duplicates check ${id}`);
     checkIds.add(id);
-    if (![ 'user-facing-control', 'public-controller-read', 'direct-visual-inspection' ].includes(check.inputMethod)) {
+    if (!PHYSICAL_INPUT_METHODS.has(check.inputMethod)) {
       throw new Error(`physical review check ${id} uses an unsupported input method`);
     }
     if (check.verdict !== 'PASS') throw new Error(`physical review check ${id} did not pass`);
