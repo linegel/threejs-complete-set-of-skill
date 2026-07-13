@@ -6,11 +6,7 @@
   "kind": "canonical-lab",
   "status": "incomplete",
   "canonicalSource": [
-    "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/space-lab.mjs",
-    "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/space-transfer-stage.js",
-    "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/space-gpu-probes.js",
-    "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/space-integrators.js",
-    "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/curved-ray-accretion.js"
+    "threejs-black-holes-and-space-effects/examples/tsl-curved-ray"
   ],
   "browserEntry": "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/index.html",
   "publishPath": "/demos/tsl-curved-ray/",

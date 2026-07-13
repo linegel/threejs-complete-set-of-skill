@@ -118,6 +118,16 @@ export async function captureLab(session) {
   assertCaptureHashesDistinct(captures, "seed-0001.final.png", "seed-9e3779b9.final.png");
   assertCaptureHashesDistinct(captures, "temporal.t000.png", "temporal.t001.png");
 
+  // Restore the capture-session locked route so assertFinalCaptureState can bind.
+  const locked = session.lockedState ?? {};
+  await selectState(session, {
+    mode: locked.scenario ?? locked.mode ?? "frame-and-rail-profile",
+    camera: locked.camera ?? "design",
+    seed: locked.seed ?? 0x00000001,
+    time: locked.time ?? 0,
+    tier: locked.tier ?? "hero",
+  });
+
   const runtimeProof = {
     schemaVersion: 1,
     labId: session.lab.id,

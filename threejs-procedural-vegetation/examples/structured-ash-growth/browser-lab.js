@@ -63,16 +63,59 @@ async function createLab() {
     if (!response.ok) throw new Error(`failed to load Ash manifest: ${response.status}`);
     return response.json();
   });
-  const renderer = new WebGPURenderer({ canvas, antialias: false });
+  const runtimeProfile = globalThis.__LAB_CAPTURE_PROFILE__?.id ?? "interactive";
+  const timestampQueriesRequested = runtimeProfile === "performance";
+  const renderer = new WebGPURenderer({
+    canvas,
+    antialias: false,
+    trackTimestamp: timestampQueriesRequested,
+  });
   renderer.setPixelRatio(1);
   renderer.setSize(1200, 800, false);
   await renderer.init();
   if (renderer.backend?.isWebGPUBackend !== true) {
     throw new Error("structured Ash canonical lab requires native WebGPU");
   }
+  const rendererDevice = renderer.backend.device;
+  if (!rendererDevice || typeof rendererDevice.lost?.then !== "function") {
+    throw new Error("initialized WebGPU backend did not expose its actual GPUDevice loss promise");
+  }
+  const rendererDeviceGeneration = 1;
+  let rendererDeviceStatus = "active";
+  let deviceLossGeneration = 0;
+  let deviceLossDetails = null;
+  let disposing = false;
+  rendererDevice.lost.then((info) => {
+    if (disposing) return;
+    rendererDeviceStatus = "lost";
+    deviceLossGeneration = rendererDeviceGeneration;
+    deviceLossDetails = {
+      reason: info?.reason ?? "unknown",
+      message: info?.message ?? "GPU device lost",
+    };
+  });
+  const timestampQueriesActive =
+    timestampQueriesRequested && renderer.hasFeature?.("timestamp-query") === true;
+  const backendEvidence = () => ({
+    backendKind: "WebGPU",
+    backendType: "WebGPUBackend",
+    deviceIdentityVerified: renderer.backend.device === rendererDevice,
+    deviceIdentitySource: "renderer.backend.device captured immediately after await renderer.init()",
+    deviceType: rendererDevice.constructor?.name || "GPUDevice",
+    deviceLabel: rendererDevice.label || "",
+    lossPromiseObservedOnActualDevice: true,
+    rendererDeviceGeneration,
+  });
+  const adapterIdentity = {
+    source: "initialized renderer.backend.device",
+    adapterClass: "unknown",
+    deviceType: rendererDevice.constructor?.name || "GPUDevice",
+    deviceLabel: rendererDevice.label || "",
+    featureNames: Array.from(rendererDevice.features ?? [], String).sort(),
+  };
   renderer.shadowMap.enabled = true;
 
-  const state = createAshScene({ loadTextures: true });
+  const state = await createAshScene({ loadTextures: true });
   state.sun.shadow.mapSize.set(1024, 1024);
   state.sun.shadow.camera.left = -90;
   state.sun.shadow.camera.right = 90;
@@ -227,7 +270,7 @@ async function createLab() {
         bytesPerPixel: 4,
         bytesPerRow: readback.bytesPerRow,
         format: "rgba8unorm",
-        colorSpace: "display-srgb",
+        colorSpace: "srgb",
         colorManaged: true,
         colorTransformOwner: "renderOutput",
         sourceBytesPerRow: readback.bytesPerRow,
@@ -239,6 +282,11 @@ async function createLab() {
     },
     describePipeline() {
       return {
+        runtimeProfile,
+        timestampQueriesRequired: timestampQueriesRequested,
+        timestampQueriesRequested,
+        timestampQueriesActive,
+        performanceTimestampMode: timestampQueriesRequested ? "auto" : "disabled",
         owners: {
           renderer: "structured-ash-growth",
           scenePass: "structured-ash-growth",
@@ -252,6 +300,7 @@ async function createLab() {
         resources: [implementation.describeResources()],
         finalToneMapOwner: "renderOutput",
         finalOutputTransformOwner: "renderOutput",
+        outputColorTransformDisabledOnPipeline: pipeline.outputColorTransform === false,
       };
     },
     describeResources() {
@@ -302,19 +351,48 @@ async function createLab() {
     },
     getMetrics() {
       return {
-        backend: "webgpu",
-        isWebGPUBackend: true,
-        renderer: { threeRevision: REVISION, isWebGPUBackend: true },
+        labId: "structured-ash-growth",
+        runtimeProfile,
+        timestampQueriesRequired: timestampQueriesRequested,
+        timestampQueriesRequested,
+        timestampQueriesActive,
+        performanceTimestampMode: timestampQueriesRequested ? "auto" : "disabled",
+        initialized: true,
+        nativeWebGPU: renderer.backend.isWebGPUBackend === true,
+        backend: "WebGPU",
+        backendKind: "WebGPU",
+        isWebGPUBackend: renderer.backend.isWebGPUBackend === true,
+        rendererType: "WebGPURenderer",
+        rendererDeviceStatus,
+        rendererDeviceGeneration,
+        deviceLossGeneration,
+        deviceLossDetails,
+        rendererBackendEvidence: backendEvidence(),
+        adapterIdentity,
+        renderer: { threeRevision: REVISION, isWebGPUBackend: renderer.backend.isWebGPUBackend === true },
         scenario,
         tier,
         mode,
         camera: cameraId,
         seed: 36330,
+        timeSeconds: elapsed,
         elapsed,
         frameCount,
         worldUnitsPerMeter: state.worldUnitsPerMeter,
+        viewport: {
+          width: viewport.width,
+          height: viewport.height,
+          dpr: viewport.actualDpr,
+        },
         dpr: { ...viewport, cap: TIER_DPR_CAP[tier] },
-        rendererInfo: rendererInfoSnapshot(),
+        rendererInfo: {
+          ...rendererInfoSnapshot(),
+          rendererType: "WebGPURenderer",
+          backendType: "WebGPU",
+          backendEvidence: backendEvidence(),
+        },
+        rendererBackend: renderer.backend.isWebGPUBackend === true ? "WebGPU" : "unsupported",
+        threeRevision: REVISION,
         stats: state.tree.stats,
         resources: controller.describeResources(),
       };
@@ -322,6 +400,8 @@ async function createLab() {
     async dispose() {
       if (disposed) return;
       disposed = true;
+      disposing = true;
+      rendererDeviceStatus = "disposed";
       forest.dispose();
       state.branchMesh.geometry.dispose();
       state.leafMesh.geometry.dispose();

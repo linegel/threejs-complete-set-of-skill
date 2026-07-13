@@ -309,7 +309,14 @@ export class SpaceIntegratorLab {
     this.renderer.setPixelRatio(dpr);
     this.renderer.setSize(width, height, false);
     this.scenePass.setSize(width, height);
-    this.bloomPass.setSize(width, height);
+    // BloomNode.setSize requires resolution/invSize initialized by the node graph;
+    // headless first-resize can race before that internal state exists.
+    if (this.bloomPass?.resolution?.invSize) {
+      this.bloomPass.setSize(width, height);
+    } else if (typeof this.bloomPass?.setResolutionScale === "function") {
+      this.bloomPass.setResolutionScale(0.5);
+      if (this.bloomPass?.resolution?.invSize) this.bloomPass.setSize(width, height);
+    }
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
     this.captureTarget?.setSize(width, height);

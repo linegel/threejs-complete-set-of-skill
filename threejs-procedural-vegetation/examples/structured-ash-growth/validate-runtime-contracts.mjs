@@ -17,7 +17,7 @@ assert.equal(contract.leafTriangles, 10880);
 assert(Math.abs(contract.branchMaxY - 80.2981) < 1e-3);
 assert(Math.abs(contract.leafMaxY - 83.6902) < 1e-3);
 
-const scene = createAshScene({ loadTextures: false });
+const scene = await createAshScene({ loadTextures: false });
 const geometryLedger = getAshGeometryResourceLedger(scene.tree);
 assert(geometryLedger.residentBytes > 0 && geometryLedger.uniqueBufferArrays >= 3);
 for (const name of ["leafTangentU", "leafTangentV", "leafRoot", "leafUvY"]) {
@@ -62,7 +62,7 @@ for (const band of forest.bands) {
   assert(band.foliage.material.normalNode);
 }
 
-const scaled = createAshScene({ loadTextures: false, worldUnitsPerMeter: 2 });
+const scaled = await createAshScene({ loadTextures: false, worldUnitsPerMeter: 2 });
 const scaledForest = createAshForestStorage({
   tree: scaled.tree,
   materials: scaled.materials,

@@ -7,10 +7,7 @@
   "kind": "canonical-lab",
   "status": "incomplete",
   "canonicalSource": [
-    "threejs-procedural-vegetation/examples/structured-ash-growth/browser-lab.js",
-    "threejs-procedural-vegetation/examples/structured-ash-growth/ash-scene.js",
-    "threejs-procedural-vegetation/examples/structured-ash-growth/tree-system.js",
-    "threejs-procedural-vegetation/examples/structured-ash-growth/route-contract.js"
+    "threejs-procedural-vegetation/examples/structured-ash-growth"
   ],
   "browserEntry": "threejs-procedural-vegetation/examples/structured-ash-growth/index.html",
   "publishPath": "/demos/structured-ash-growth/",

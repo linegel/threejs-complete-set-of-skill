@@ -911,6 +911,15 @@ test('browser, request, and device failures remain independent blocking channels
       },
     },
   }));
+  assert.doesNotThrow(() => assertNoCaptureFailures({
+    consoleErrors: [
+      'Failed to load resource: the server responded with a status of 404 (Not Found) (http://127.0.0.1:5174/favicon.ico:0:0)',
+    ],
+    requestErrors: [
+      '404 GET http://127.0.0.1:5174/favicon.ico',
+      '404 GET http://127.0.0.1:5174/favicon.svg',
+    ],
+  }));
 });
 
 test('software adapters are identified without inventing a hardware label', () => {

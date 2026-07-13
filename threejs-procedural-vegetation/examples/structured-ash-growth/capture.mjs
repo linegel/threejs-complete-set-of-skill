@@ -1,4 +1,5 @@
 import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
 import { captureLabBrowser } from "../../../scripts/capture-lab-browser.mjs";
 
@@ -12,4 +13,5 @@ await captureLabBrowser({
   profile: option("--profile", "correctness"),
   outputDir: option("--output") ? resolve(option("--output")) : null,
   target: option("--target", "final"),
+  hookPath: fileURLToPath(new URL("./capture-hook.mjs", import.meta.url)),
 });

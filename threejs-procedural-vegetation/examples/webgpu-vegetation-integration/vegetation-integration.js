@@ -76,7 +76,7 @@ export async function createVegetationIntegration({
     tier: denseTier,
     seed: denseSeed,
   });
-  const ash = createAshScene({ loadTextures, worldUnitsPerMeter: host.worldUnitsPerMeter });
+  const ash = await createAshScene({ loadTextures, worldUnitsPerMeter: host.worldUnitsPerMeter });
   const forest = createAshForestStorage({
     tree: ash.tree,
     materials: ash.materials,

@@ -402,18 +402,40 @@ let browser;
 try {
   browser = await chromium.launch({
     headless: true,
+    channel: process.platform === "darwin" ? "chrome" : undefined,
     args: [
       "--enable-unsafe-webgpu",
-      "--enable-features=Vulkan,UseSkiaRenderer",
       "--disable-gpu-sandbox",
+      "--ignore-gpu-blocklist",
+      ...(process.platform === "darwin" ? ["--use-angle=metal"] : ["--enable-features=Vulkan,UseSkiaRenderer"]),
     ],
   });
   const page = await browser.newPage({
     viewport: { width: captureViewport.width, height: captureViewport.height },
     deviceScaleFactor: captureViewport.dpr,
   });
-  await page.goto(`http://127.0.0.1:${port}${LAB_URL}`, { waitUntil: "load" });
-  await page.waitForFunction(() => globalThis.__THREE_LAB__?.renderer?.backend?.isWebGPUBackend === true);
+  const pageErrors = [];
+  page.on("pageerror", (error) => pageErrors.push(String(error.stack ?? error)));
+  page.on("console", (message) => {
+    if (message.type() === "error") pageErrors.push(message.text());
+  });
+  await page.goto(`http://127.0.0.1:${port}${LAB_URL}`, { waitUntil: "load", timeout: 60_000 });
+  try {
+    await page.waitForFunction(
+      () => globalThis.__THREE_LAB__?.renderer?.backend?.isWebGPUBackend === true,
+      null,
+      { timeout: 90_000 },
+    );
+  } catch (error) {
+    const status = await page.evaluate(() => ({
+      hasLab: Boolean(globalThis.__THREE_LAB__),
+      labError: globalThis.__labError ?? null,
+      statusText: document.querySelector("[data-status]")?.textContent ?? null,
+    }));
+    throw new Error(
+      `curved-ray lab did not become WebGPU-ready: ${error.message}; status=${JSON.stringify(status)}; errors=${pageErrors.join(" | ")}`,
+    );
+  }
   await page.evaluate(async (viewport) =>
     globalThis.__THREE_LAB__.resize(viewport.width, viewport.height, viewport.dpr), captureViewport);
 

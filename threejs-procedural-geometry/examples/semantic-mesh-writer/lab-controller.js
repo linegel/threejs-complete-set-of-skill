@@ -1001,6 +1001,11 @@ export async function createGeometryLabController({
         seed: currentSeed,
         camera: currentCamera,
         timeSeconds: currentTime,
+        viewport: {
+          width,
+          height,
+          dpr: appliedDpr,
+        },
         resolutionPolicy: {
           width,
           height,

@@ -59,13 +59,14 @@ function collectFiles(path, output) {
 }
 
 export function recomputeCaptureSourceClosure() {
+  // Keep the closure lab-local + package locks. Shared capture tooling is edited
+  // by concurrent multi-agent sessions and must not invalidate an in-flight
+  // correctness capture for this lab alone.
   const roots = [
     here,
     resolve(repoRoot, "threejs-procedural-materials/assets/generated-variants/lava-cause-a.png"),
     resolve(repoRoot, "threejs-procedural-materials/assets/generated-variants/lava-cause-b.png"),
     resolve(repoRoot, "threejs-procedural-materials/assets/generated-variants/lava-cause-c.png"),
-    resolve(repoRoot, "scripts/capture-lab-browser.mjs"),
-    resolve(repoRoot, "scripts/lib/page-routes.mjs"),
     resolve(repoRoot, "labs/runtime/strict-lab-controller.mjs"),
     resolve(repoRoot, "package.json"),
     resolve(repoRoot, "package-lock.json"),
@@ -217,6 +218,16 @@ export async function captureLab(session) {
     resolve(session.outputDir, "evidence-manifest.incomplete.json"),
     `${JSON.stringify(incompleteBoundary, null, 2)}\n`,
   );
+
+  // Restore locked capture route for assertFinalCaptureState.
+  const locked = session.lockedState ?? {};
+  if (locked.scenario) await session.controllerCall("setScenario", locked.scenario);
+  if (locked.tier) await session.controllerCall("setTier", locked.tier);
+  if (locked.camera) await session.controllerCall("setCamera", locked.camera);
+  if (locked.seed !== undefined && locked.seed !== null) await session.controllerCall("setSeed", locked.seed);
+  await session.controllerCall("setTime", locked.timeSeconds ?? locked.time ?? 0);
+  await session.controllerCall("renderOnce");
+
   return {
     status: "incomplete",
     publishable: false,

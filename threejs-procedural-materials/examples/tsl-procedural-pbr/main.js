@@ -1253,6 +1253,11 @@ export async function createProceduralPbrScene({
       camera: activeCamera,
       activeCamera,
       timeSeconds: elapsedSeconds,
+      viewport: {
+        width: viewport.width,
+        height: viewport.height,
+        dpr: viewport.effectiveDpr,
+      },
       routeSelection: {
         scenario: activeScenario,
         mechanism: activeScenario,

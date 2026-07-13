@@ -8,8 +8,8 @@ import {
   setAshDiagnosticMode,
 } from "./ash-scene.js";
 
-assert.throws(() => createAshScene({ loadTextures: false, worldUnitsPerMeter: 0 }), /worldUnitsPerMeter/);
-const scene = createAshScene({ loadTextures: false });
+await assert.rejects(() => createAshScene({ loadTextures: false, worldUnitsPerMeter: 0 }), /worldUnitsPerMeter/);
+const scene = await createAshScene({ loadTextures: false });
 assert.throws(() => setAshDiagnosticMode(scene, "shadow-label-only"), /unknown Ash diagnostic mode/);
 
 const root = evaluateAshLeafWindCPU({

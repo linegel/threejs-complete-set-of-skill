@@ -64,8 +64,8 @@ const ASSET_URLS = Object.freeze({
   leafAlpha: new URL("../../assets/structured-ash-growth/ash.png", import.meta.url),
 });
 
-function makeTexture(loader, url, colorSpace) {
-  const texture = loader.load(url.href);
+async function makeTexture(loader, url, colorSpace) {
+  const texture = await loader.loadAsync(url.href);
   texture.colorSpace = colorSpace;
   texture.wrapS = RepeatWrapping;
   texture.wrapT = RepeatWrapping;
@@ -100,7 +100,7 @@ export function getAshGeometryResourceLedger(tree) {
   });
 }
 
-function createBarkMaterial({ textureLoader, loadTextures }) {
+async function createBarkMaterial({ textureLoader, loadTextures }) {
   const material = new MeshStandardNodeMaterial();
   material.name = "ash-bark-final";
   material.color = new Color(ashMedium.bark.tint);
@@ -108,9 +108,9 @@ function createBarkMaterial({ textureLoader, loadTextures }) {
   material.metalness = 0;
 
   if (loadTextures) {
-    material.map = makeTexture(textureLoader, ASSET_URLS.barkColor, SRGBColorSpace);
-    material.normalMap = makeTexture(textureLoader, ASSET_URLS.barkNormal, NoColorSpace);
-    material.roughnessMap = makeTexture(textureLoader, ASSET_URLS.barkRoughness, NoColorSpace);
+    material.map = await makeTexture(textureLoader, ASSET_URLS.barkColor, SRGBColorSpace);
+    material.normalMap = await makeTexture(textureLoader, ASSET_URLS.barkNormal, NoColorSpace);
+    material.roughnessMap = await makeTexture(textureLoader, ASSET_URLS.barkRoughness, NoColorSpace);
     material.map.repeat.set(1, 1 / ashMedium.bark.textureScaleY);
   }
 
@@ -163,7 +163,7 @@ export function evaluateAshLeafWindCPU({
   });
 }
 
-function createLeafMaterial({ textureLoader, loadTextures, timeNode, windStrengthNode }) {
+async function createLeafMaterial({ textureLoader, loadTextures, timeNode, windStrengthNode }) {
   const material = new MeshStandardNodeMaterial();
   material.name = "ash-leaves-final-rooted-wind";
   material.side = DoubleSide;
@@ -174,8 +174,8 @@ function createLeafMaterial({ textureLoader, loadTextures, timeNode, windStrengt
   material.metalness = 0;
 
   if (loadTextures) {
-    material.map = makeTexture(textureLoader, ASSET_URLS.leafColor, SRGBColorSpace);
-    material.alphaMap = makeTexture(textureLoader, ASSET_URLS.leafAlpha, NoColorSpace);
+    material.map = await makeTexture(textureLoader, ASSET_URLS.leafColor, SRGBColorSpace);
+    material.alphaMap = await makeTexture(textureLoader, ASSET_URLS.leafAlpha, NoColorSpace);
   }
 
   const windNodes = createAshLeafWindNodes({ timeNode, windStrengthNode });
@@ -268,7 +268,7 @@ export function createAshCamera({ aspect = 1.5, worldUnitsPerMeter = 1 } = {}) {
   return camera;
 }
 
-export function createAshScene({
+export async function createAshScene({
   loadTextures = true,
   textureLoader = new TextureLoader(),
   timeNode = uniform(0),
@@ -284,8 +284,8 @@ export function createAshScene({
   const group = new Group();
   const ground = createGround(worldUnitsPerMeter);
   const materials = {
-    bark: createBarkMaterial({ textureLoader, loadTextures }),
-    leaves: createLeafMaterial({ textureLoader, loadTextures, timeNode, windStrengthNode }),
+    bark: await createBarkMaterial({ textureLoader, loadTextures }),
+    leaves: await createLeafMaterial({ textureLoader, loadTextures, timeNode, windStrengthNode }),
     diagnostics: createDiagnosticMaterials(),
   };
   materials.diagnostics["leaf-wind-displacement"] = createLeafWindDiagnosticMaterial(materials.leaves);

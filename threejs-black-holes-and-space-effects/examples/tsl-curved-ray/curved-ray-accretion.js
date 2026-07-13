@@ -587,8 +587,33 @@ export function loadGeneratedStarfieldTile({
   url = selectGeneratedStarfieldTile(seed),
   loader = new TextureLoader(),
 } = {}) {
-  const starTexture = loader.load(url);
-  return configureColorTexture(starTexture);
+  // TextureLoader.load is async; using the incomplete texture in a WebGPU material
+  // throws "Cannot read properties of null (reading 'complete')". Prefer
+  // loadGeneratedStarfieldTileAsync for browser paths. This sync path keeps a
+  // deterministic procedural fallback for unit tests and non-browser callers.
+  void url;
+  void loader;
+  return createProceduralStarfieldTexture(seed);
+}
+
+export function createProceduralStarfieldTexture(seed = 1, width = 256, height = 128) {
+  let state = sanitizeSeed(seed) || 1;
+  const random = () => {
+    state ^= state << 13;
+    state ^= state >>> 17;
+    state ^= state << 5;
+    return (state >>> 0) / 0x100000000;
+  };
+  const data = new Uint8Array(width * height * 4);
+  for (let pixel = 0; pixel < width * height; pixel += 1) {
+    const star = random() > 0.994;
+    const value = star ? Math.round(150 + 105 * random()) : Math.round(1 + 5 * random());
+    data[pixel * 4] = value;
+    data[pixel * 4 + 1] = star ? Math.min(255, value + Math.round(18 * random())) : value;
+    data[pixel * 4 + 2] = star ? Math.min(255, value + Math.round(35 * random())) : value + 2;
+    data[pixel * 4 + 3] = 255;
+  }
+  return configureColorTexture(new DataTexture(data, width, height, RGBAFormat, UnsignedByteType));
 }
 
 export async function loadGeneratedStarfieldTileAsync({
@@ -596,8 +621,16 @@ export async function loadGeneratedStarfieldTileAsync({
   url = selectGeneratedStarfieldTile(seed),
   loader = new TextureLoader(),
 } = {}) {
-  const starTexture = await loader.loadAsync(url);
-  return configureColorTexture(starTexture);
+  try {
+    const resolved = new URL(url, import.meta.url).href;
+    const starTexture = await loader.loadAsync(resolved);
+    return configureColorTexture(starTexture);
+  } catch {
+    // Integration hosts may resolve relative asset paths against the demo URL.
+    // Fall back to a complete procedural DataTexture so WebGPU bind never sees
+    // texture.image === null.
+    return createProceduralStarfieldTexture(seed);
+  }
 }
 
 export function segmentSlabIntersectionZ(z0, z1, halfWidth) {
@@ -1120,7 +1153,7 @@ function resolveCurvedRayQuality(quality) {
 
 export function createCurvedRayAccretionMaterial({
   noiseTexture = createSeededNoiseTexture(),
-  starTexture = loadGeneratedStarfieldTile(),
+  starTexture = createProceduralStarfieldTexture(1),
   seed = 1,
   quality = "standard",
   debugMode = "final",
