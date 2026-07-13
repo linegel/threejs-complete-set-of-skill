@@ -11,7 +11,7 @@
     "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/main.js",
     "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/index.html"
   ],
-  "canonicalSourceHash": "sha256:d71192998a5bb04e87777bb88fbec406ea85eb967a27655eabe602c7ff8cac70",
+  "canonicalSourceHash": "sha256:2a67c3128f673276b9e7e0c8ccf3d582f19f4279804119525c4f2235c605ec6b",
   "threeRevision": "0.185.1",
   "runtime": {
     "renderer": "WebGPURenderer",
@@ -20,11 +20,12 @@
     "threeRevision": "0.185.1"
   },
   "claimVerdicts": {
-    "visualCorrectness": "PASS",
+    "visualCorrectness": "INSUFFICIENT_EVIDENCE",
     "mechanismCorrectness": "PASS",
     "performanceCompliance": "NOT_CLAIMED",
-    "gpuAttribution": "INSUFFICIENT_EVIDENCE",
-    "lifecycleStability": "PASS"
+    "gpuAttribution": "NOT_CLAIMED",
+    "lifecycleStability": "PASS",
+    "visualError": "PASS"
   },
   "primaryImage": "final.design.png",
   "primaryImageLabel": "Touch-history Frost native-WebGPU readback",
@@ -93,7 +94,7 @@
   "limitations": [
     "Correctness, camera, seed, temporal, full-tier 641x359 dispatch, aligned readback, and DPR extent gates pass on the current source closure.",
     "The temporal one-step response is measured and bounded but intentionally subtle in the final frame; the raw history diagnostics provide the decisive mechanism view.",
-    "Fifty fresh create/render/resize/mode/tier/dispose cycles pass with queue and two-frame settlement; opaque renderer-internal byte residency remains explicitly unclaimed.",
-    "A unified 14-file v2 release bundle, named-hardware timing, and final acceptance remain incomplete."
+    "The unified-v2 raw bundle validates 14 normative JSON slots, 18 captured images, immutable raw-readback ledgers, and fifty settled lifecycle cycles.",
+    "Physical-route review, named-hardware timing, offline release promotion, and final acceptance remain incomplete; opaque renderer-internal byte residency remains explicitly unclaimed."
   ]
 }
