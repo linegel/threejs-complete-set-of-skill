@@ -277,6 +277,7 @@ async function collectPerformanceSegment( controller, minimumDurationMs, label, 
 				stageContextIds: batch.stageContextIds,
 				lastFrameResolveResidualMs: batch.lastFrameResolveResidualMs,
 				independentPerFrameTotalsAvailable: batch.independentPerFrameTotalsAvailable,
+				reconciliationKind: batch.timestampReconciliationKind,
 				reconciliationScope: batch.timestampReconciliationScope
 			} );
 

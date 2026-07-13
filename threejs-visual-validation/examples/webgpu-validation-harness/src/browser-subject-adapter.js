@@ -179,6 +179,7 @@ export function summarizeTimestampBatch( { entries, resolvedLastFrameTotalMs } )
 		resolveCount: 1,
 		lastFrameResolveResidualMs: Math.abs( resolvedLastFrameTotalMs - derivedFinalRendererFrameTotalMs ),
 		independentPerFrameTotalsAvailable: false,
+		reconciliationKind: 'final-renderer-frame-aggregate',
 		reconciliationScope: `Every submission is explicitly stage-bound and summed; Three r185 independently returns the aggregate of all timestamp contexts in final renderer frame ${ finalRendererFrameId }, checked separately.`
 	};
 
@@ -1984,6 +1985,7 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 				independentPerFrameTotalsAvailable: sustainedBatch.independentPerFrameTotalsAvailable,
 				timestampResolveCount: sustainedBatch.resolveCount,
 				timestampMappingCadence: timestampResolutionPolicy.mappingCadence,
+				timestampReconciliationKind: sustainedBatch.reconciliationKind,
 				timestampReconciliationScope: sustainedBatch.reconciliationScope,
 				presentationSamples,
 				cpuP50: percentile( cpuSamples, 0.5 ),

@@ -1041,7 +1041,8 @@ function assertPerformanceWindow( window, index, refreshPeriodMs, options = {} )
 		if ( batch.independentPerFrameTotalsAvailable !== false ) fail( `${ batchLabel } falsely claims independent per-frame aggregate timestamps.` );
 		const lastFrameResolveResidualMs = requireFinite( batch.lastFrameResolveResidualMs, `${ batchLabel }.lastFrameResolveResidualMs`, 0 );
 		if ( lastFrameResolveResidualMs > 0.001 ) fail( `${ batchLabel } final-frame timestamp resolve does not reconcile.` );
-		if ( typeof batch.reconciliationScope !== 'string' || /final-frame/i.test( batch.reconciliationScope ) === false ) fail( `${ batchLabel } does not confine the independent resolve residual to the final frame.` );
+		if ( batch.reconciliationKind !== 'final-renderer-frame-aggregate' ) fail( `${ batchLabel } does not declare the final-renderer-frame aggregate reconciliation kind.` );
+		if ( typeof batch.reconciliationScope !== 'string' || batch.reconciliationScope.length === 0 ) fail( `${ batchLabel } omits its reconciliation scope explanation.` );
 
 	}
 	const cpuP95 = percentile( windowCpuSamples, 0.95 );

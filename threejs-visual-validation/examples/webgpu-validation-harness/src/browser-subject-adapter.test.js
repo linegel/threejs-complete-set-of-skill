@@ -593,6 +593,7 @@ test( 'timestamp populations are resolved once per sustained batch', () => {
 	assert.deepEqual( sharedRendererFrame.rows.map( ( row ) => row.frameId ), [ 3, 3 ] );
 	assert.deepEqual( sharedRendererFrame.totalSamples, [ 1.5, 2.75 ] );
 	assert.equal( sharedRendererFrame.lastFrameResolveResidualMs, 0 );
+	assert.equal( sharedRendererFrame.reconciliationKind, 'final-renderer-frame-aggregate' );
 	assert.match( sharedRendererFrame.reconciliationScope, /all timestamp contexts in final renderer frame 3/ );
 
 } );

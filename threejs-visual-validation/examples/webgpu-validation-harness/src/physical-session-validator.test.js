@@ -232,6 +232,7 @@ function timestampBatch( { frameBase = 0, frameCallBase = 0 } = {} ) {
 		stageContextIds: { 'scene-mrt': 17, 'final-output': 41 },
 		lastFrameResolveResidualMs: 0,
 		independentPerFrameTotalsAvailable: false,
+		reconciliationKind: 'final-renderer-frame-aggregate',
 		reconciliationScope: 'Independent Three aggregate checked only for the final-frame resolve.'
 	};
 
@@ -640,6 +641,7 @@ test( 'hardware performance mutations reject short, discontinuous, or fabricated
 		}, /GPU p95/ ],
 		[ 'fabricated per-frame total', ( value ) => { value.sustainedWindows[ 0 ].gpuTimestampBatches[ 0 ].timestampRows[ 0 ].independentPerFrameTotalAvailable = true; }, /fabricates/ ],
 		[ 'unreconciled batch resolve', ( value ) => { value.sustainedWindows[ 0 ].gpuTimestampBatches[ 0 ].lastFrameResolveResidualMs = 0.002; }, /final-frame timestamp resolve/ ],
+		[ 'wrong batch reconciliation kind', ( value ) => { value.sustainedWindows[ 0 ].gpuTimestampBatches[ 0 ].reconciliationKind = 'last-submission'; }, /final-renderer-frame aggregate/ ],
 		[ 'missing governor transition', ( value ) => { value.governor.trace.transitions = []; }, /did not exercise/ ],
 		[ 'wrong governor initial state', ( value ) => { value.governor.trace.initialState = 'target-performance'; }, /locked governor-stress route/ ],
 		[ 'forged governor p95', ( value ) => { value.governor.trace.windows[ 0 ].gpuP95 = 15; }, /does not reconcile/ ],
