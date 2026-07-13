@@ -448,7 +448,7 @@
       "path": "resident-resources.json",
       "status": "captured",
       "kind": "normative-json",
-      "sha256": "sha256:6fc1377d8131845b579a304b535bc8832ac8ad8663760f592519d1c3ab76a856",
+      "sha256": "sha256:94ec3708440540462d00dbd836483eef7ca0ed98e36d028f1ef1123678be79d9",
       "byteLength": 1329
     },
     {
@@ -469,7 +469,7 @@
       "path": "leak-loop.json",
       "status": "captured",
       "kind": "normative-json",
-      "sha256": "sha256:5b809a2f7f8d75287e81cfb12611400173dd5bc1ce47ded7d38437f0768d90a4",
+      "sha256": "sha256:f60670ffe6a46fdb0fe6e90a0b5c3889fb4a4a27d7e4ae8aca706bef00b2bf8b",
       "byteLength": 131661
     },
     {

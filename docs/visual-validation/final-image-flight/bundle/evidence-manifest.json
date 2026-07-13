@@ -236,8 +236,8 @@
       "path": "resident-resources.json",
       "status": "captured",
       "kind": "normative-json",
-      "sha256": "sha256:6fc1377d8131845b579a304b535bc8832ac8ad8663760f592519d1c3ab76a856",
-      "byteLength": 1329
+      "sha256": "sha256:8ea8b047d70ca3c6ac0cc6541fa957d8c57003d029aa304d758412492956cf96",
+      "byteLength": 2384
     },
     {
       "path": "bandwidth-model.json",
@@ -257,8 +257,8 @@
       "path": "leak-loop.json",
       "status": "captured",
       "kind": "normative-json",
-      "sha256": "sha256:5b809a2f7f8d75287e81cfb12611400173dd5bc1ce47ded7d38437f0768d90a4",
-      "byteLength": 131661
+      "sha256": "sha256:520b414486e82d60037db6e52b5517595f9d3b4d14c07eb934194a611ba1deba",
+      "byteLength": 131662
     },
     {
       "path": "mechanism-metrics.json",

@@ -1,19 +1,20 @@
 {
   "schemaVersion": 2,
+  "labId": "creature-habitat",
   "textures": [],
   "geometry": [],
   "buffers": [],
   "histories": [],
   "staging": [
-    "transient WebGPU readback staging; opaque byte residency not claimed"
+    "creature-habitat: transient WebGPU readback staging; opaque byte residency not claimed"
   ],
   "readback": [
     "final.design.png",
-    "no-post.design.png",
     "diagnostics.mosaic.png",
     "camera.near.png",
     "camera.design.png",
     "camera.far.png",
+    "no-post.design.png",
     "seed-0001.final.png",
     "seed-9e3779b9.final.png",
     "temporal.t000.png",
@@ -23,27 +24,58 @@
   "accountingScope": "transactional-capture-targets-only",
   "completeness": "PARTIAL",
   "inventoryCompleteness": "PARTIAL",
-  "labOwnedNonTargetResources": [],
+  "labOwnedNonTargetResources": [
+    {
+      "name": "creature-habitat-renderer",
+      "owner": "threejs-image-pipeline",
+      "semantic": "renderer",
+      "kind": "pipeline-owner-binding"
+    },
+    {
+      "name": "creature-habitat-scenePass",
+      "owner": "creature-habitat",
+      "semantic": "scenePass",
+      "kind": "pipeline-owner-binding"
+    },
+    {
+      "name": "creature-habitat-finalPipeline",
+      "owner": "creature-habitat",
+      "semantic": "finalPipeline",
+      "kind": "pipeline-owner-binding"
+    },
+    {
+      "name": "creature-habitat-toneMap",
+      "owner": "threejs-image-pipeline",
+      "semantic": "toneMap",
+      "kind": "pipeline-owner-binding"
+    },
+    {
+      "name": "creature-habitat-outputTransform",
+      "owner": "threejs-image-pipeline",
+      "semantic": "outputTransform",
+      "kind": "pipeline-owner-binding"
+    }
+  ],
   "opaqueRendererInternalResidency": {
     "verdict": "NOT_CLAIMED",
-    "reason": "Exact Three.js renderer-internal pipeline and cache byte residency is unavailable."
+    "reason": "Exact Three.js renderer-internal pipeline and cache byte residency is unavailable for creature-habitat."
   },
   "trackedRenderTargetBytes": {
     "value": 38400000,
     "unit": "bytes",
     "label": "Derived",
-    "source": "sum of transactional capture targets"
+    "source": "sum of 10 transactional RGBA8 capture targets for creature-habitat"
   },
   "trackedPeakLiveRenderTargetBytes": {
     "value": 3840000,
     "unit": "bytes",
     "label": "Derived",
-    "source": "one transactional capture target is live at a time"
+    "source": "one transactional capture target live at a time (creature-habitat)"
   },
   "uploadChurnPerFrame": {
     "value": 0,
     "unit": "bytes",
     "label": "Derived",
-    "source": "correctness capture does not measure upload churn"
+    "source": "creature-habitat correctness capture does not measure upload churn"
   }
 }
