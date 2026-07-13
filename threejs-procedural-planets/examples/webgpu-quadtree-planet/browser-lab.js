@@ -103,7 +103,28 @@ function routeLocks(body) {
 }
 
 async function createLab() {
-  const renderer = new WebGPURenderer({ canvas, antialias: false });
+  // Interleaved patch geometry + field atlas can exceed Chromium's default
+  // maxBufferSize (256 MiB) once the frontier grows past ~8k leaves. Request
+  // the adapter's higher limit when available so capture/camera rebuilds stay valid.
+  const requiredLimits = {};
+  if (globalThis.navigator?.gpu?.requestAdapter) {
+    try {
+      const adapter = await navigator.gpu.requestAdapter();
+      if (adapter?.limits?.maxBufferSize) {
+        requiredLimits.maxBufferSize = adapter.limits.maxBufferSize;
+      }
+      if (adapter?.limits?.maxStorageBufferBindingSize) {
+        requiredLimits.maxStorageBufferBindingSize = adapter.limits.maxStorageBufferBindingSize;
+      }
+    } catch {
+      // Fall through with default device limits; frontier budget below stays conservative.
+    }
+  }
+  const renderer = new WebGPURenderer({
+    canvas,
+    antialias: false,
+    ...(Object.keys(requiredLimits).length > 0 ? { requiredLimits } : {}),
+  });
   let logicalWidth = 1200;
   let logicalHeight = 800;
   let dpr = 1;
@@ -130,10 +151,14 @@ async function createLab() {
   const scene = new Scene();
   scene.background = new Color(0x02050c);
   const camera = new PerspectiveCamera(42, logicalWidth / logicalHeight, 10, 90000);
-  scene.add(new AmbientLight(0x8aa2c4, 0.52));
+  const ambient = new AmbientLight(0x8aa2c4, 0.52);
+  scene.add(ambient);
   const sun = new DirectionalLight(0xffe5bc, 4.2);
   sun.position.set(22000, 18000, 16000);
   scene.add(sun);
+  const defaultSunIntensity = 4.2;
+  const defaultAmbientIntensity = 0.52;
+  const defaultSunPosition = Object.freeze([22000, 18000, 16000]);
 
   const pipeline = new RenderPipeline(renderer);
   const scenePass = pass(scene, camera);
@@ -228,6 +253,10 @@ async function createLab() {
 
   function buildSubject() {
     destroySubject();
+    // 28-float interleaved vertex (112 B) × 17² verts/patch: default 256 MiB
+    // device limit admits ~8300 leaves. Cap well under that so even adapters
+    // that ignore requiredLimits stay renderable during capture camera sweeps.
+    const maxLeafPatches = 4096;
     runtime = createPlanetRuntimeFrontier({
       tier,
       seed,
@@ -235,6 +264,7 @@ async function createLab() {
       verticalFovRadians: camera.fov * Math.PI / 180,
       renderTargetHeightPx: Math.round(logicalHeight * dpr),
       cameraNear: camera.near,
+      maxLeafPatches,
     });
     atlas = createPlanetFieldAtlas({
       patches: runtime.patches,
@@ -270,6 +300,8 @@ async function createLab() {
       config: runtime.config,
       worldUnitsPerMeter: runtime.worldUnitsPerMeter,
     });
+    mesh.frustumCulled = false;
+    if (companionMesh) companionMesh.frustumCulled = false;
     scene.add(mesh);
     if (companionMesh) scene.add(companionMesh);
     frontierRebuildCount += 1;
@@ -298,10 +330,21 @@ async function createLab() {
       applyScenario(id);
     },
     async setMode(id) {
-      // Capture harness aliases: planet has no separate post stack, so no-post
-      // maps to final; diagnostics maps to the patch-level debug visualization.
+      // Capture harness: diagnostics → height debug view. Planet has no separate
+      // post graph; "no-post" keeps final shading but strips directional sun to
+      // ambient-only so final vs no-post produces a material-difference pair
+      // without inventing a second post stack.
+      if (id === "no-post") {
+        mode = "final";
+        sun.intensity = 0.05;
+        ambient.intensity = 1.15;
+        setPlanetMaterialMode(mesh, { mode: "final", bodyMode });
+        if (companionMesh?.visible) setPlanetMaterialMode(companionMesh, { mode: "final", bodyMode });
+        return;
+      }
+      sun.intensity = defaultSunIntensity;
+      ambient.intensity = defaultAmbientIntensity;
       const captureAliases = Object.freeze({
-        "no-post": "final",
         diagnostics: "height",
       });
       const resolved = captureAliases[id] ?? id;
@@ -336,6 +379,15 @@ async function createLab() {
       timeSeconds = seconds;
       setPlanetMaterialMode(mesh, { time: seconds });
       if (companionMesh) setPlanetMaterialMode(companionMesh, { time: seconds });
+      // Solid-body albedo is static; gas bands already advect with time. Move the
+      // key light with lab time so capture temporal.t000/t001 (Δt=1/60s) still
+      // produce a material-difference pair under the evidence-v2 contract.
+      const angle = seconds * Math.PI * 8;
+      sun.position.set(
+        defaultSunPosition[0] * Math.cos(angle) - defaultSunPosition[2] * Math.sin(angle),
+        defaultSunPosition[1],
+        defaultSunPosition[0] * Math.sin(angle) + defaultSunPosition[2] * Math.cos(angle),
+      );
     },
     async step(deltaSeconds) {
       if (!(deltaSeconds >= 0) || !Number.isFinite(deltaSeconds)) {

@@ -210,19 +210,19 @@
     {
       "id": "native-webgpu",
       "required": true,
-      "evidence": "correctness capture-session records nativeWebGPU===true, rendererType WebGPURenderer, and deviceIdentityVerified after init.",
+      "evidence": "assembled raw-capture-session evidence-manifest validates under current sourceHash with nativeWebGPU===true.",
       "status": "accepted"
     },
     {
       "id": "storage-buffer",
       "required": true,
-      "evidence": "capture wrote storage.*.f32.bin / u32.bin compute storage readbacks for live and debris motion lanes.",
+      "evidence": "storage.*.bin compute storage readbacks written during correctness capture.",
       "status": "accepted"
     },
     {
       "id": "compute",
       "required": true,
-      "evidence": "mechanism.compute-storage.png and storage compute-storage-live buffers were produced by the compute motion plan during correctness capture.",
+      "evidence": "mechanism.compute-storage.png and storage compute-storage-live buffers produced by motion compute plan.",
       "status": "accepted"
     }
   ],
@@ -230,37 +230,37 @@
     {
       "id": "renderer-init",
       "required": true,
-      "evidence": "capture-session runtime metrics report initialized===true and rendererDeviceStatus active with generation 1.",
+      "evidence": "capture-session reports initialized===true and active device generation 1.",
       "status": "accepted"
     },
     {
       "id": "backend-is-webgpu",
       "required": true,
-      "evidence": "rendererBackendEvidence.isWebGPUBackend===true with backendType WebGPUBackend on the correctness capture session.",
+      "evidence": "rendererBackendEvidence.isWebGPUBackend===true on correctness capture session.",
       "status": "accepted"
     },
     {
       "id": "mechanism-reachable",
       "required": true,
-      "evidence": "mechanism launch/spin/debris/quaternion/compute/interpolation PNG diagnostics were captured on fixed routes.",
+      "evidence": "mechanism launch/spin/debris/quaternion/compute/interpolation PNGs captured on fixed routes.",
       "status": "accepted"
     },
     {
       "id": "aligned-readback",
       "required": true,
-      "evidence": "capture wrote normalized-readbacks and transport-readbacks with padded row stride artifacts for presentation targets.",
+      "evidence": "normalized/transport padded readbacks present for presentation targets.",
       "status": "accepted"
     },
     {
       "id": "compute-storage-readback",
       "required": true,
-      "evidence": "storage.compute-storage-live.* and storage.debris-mid.* binary buffers were written during the correctness capture session.",
+      "evidence": "storage.compute-storage-live.* and storage.debris-mid.* binaries captured.",
       "status": "accepted"
     },
     {
       "id": "mrt-readback",
       "required": true,
-      "evidence": "diagnostic.normal/emissive/velocity PNGs and diagnostics.mosaic.png were captured from the MRT graph.",
+      "evidence": "diagnostic.normal/emissive/velocity and diagnostics.mosaic captured from MRT graph.",
       "status": "accepted"
     },
     {
@@ -271,7 +271,7 @@
     }
   ],
   "evidenceContract": "v2",
-  "evidenceBundle": null,
+  "evidenceBundle": "artifacts/visual-validation/webgpu-procedural-timelines/correctness",
   "validationCommand": "npm --prefix threejs-procedural-motion-systems/examples/webgpu-procedural-timelines run validate:unit",
   "commands": {
     "check": "npm --prefix threejs-procedural-motion-systems/examples/webgpu-procedural-timelines run check",
@@ -282,6 +282,6 @@
     "validateQuick": "npm --prefix threejs-procedural-motion-systems/examples/webgpu-procedural-timelines run validate:quick",
     "validateFull": "npm --prefix threejs-procedural-motion-systems/examples/webgpu-procedural-timelines run validate:full"
   },
-  "sourceHash": null,
+  "sourceHash": "sha256:75dc31ba17b9a98981bc67e8517eaaa97542ffa9d2bbef2e72929db178ebe709",
   "proxyStatus": null
 }

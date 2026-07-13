@@ -25,7 +25,7 @@
     "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/tier/balanced/index.html",
     "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/tier/test-minimum/index.html"
   ],
-  "canonicalSourceHash": "sha256:f82d73a0387ee333ce3d7fab3917f528f65d92bbb3c8d956fe3366d4872d158c",
+  "canonicalSourceHash": "sha256:75dc31ba17b9a98981bc67e8517eaaa97542ffa9d2bbef2e72929db178ebe709",
   "threeRevision": "0.185.1",
   "runtime": {
     "renderer": "unknown",
@@ -34,107 +34,109 @@
     "threeRevision": "0.185.1"
   },
   "claimVerdicts": {
-    "mechanismCorrectness": "INSUFFICIENT_EVIDENCE",
-    "performanceCompliance": "INSUFFICIENT_EVIDENCE",
-    "lifecycleStability": "INSUFFICIENT_EVIDENCE"
+    "visualCorrectness": "INSUFFICIENT_EVIDENCE",
+    "mechanismCorrectness": "PASS",
+    "performanceCompliance": "NOT_CLAIMED",
+    "gpuAttribution": "NOT_CLAIMED",
+    "lifecycleStability": "INSUFFICIENT_EVIDENCE",
+    "visualError": "PASS"
   },
   "primaryImage": "final.design.png",
-  "primaryImageLabel": "Procedural timelines final presentation readback",
+  "primaryImageLabel": "Procedural timelines correctness presentation",
   "images": [
     {
       "file": "final.design.png",
-      "meaning": "Final presentation readback.",
+      "meaning": "Final presentation.",
       "source": "final.design.png",
-      "sourceSha256": "sha256:b7e28df88e0c7e75c407f1f5d2891da939bba1f3caf98ef0832b8157d2bca45b",
-      "outputSha256": "sha256:b7e28df88e0c7e75c407f1f5d2891da939bba1f3caf98ef0832b8157d2bca45b",
+      "sourceSha256": "sha256:a8b991b33d6632f9b134f9177b3b1c1b0bd185b5a31693056a688c4fe8372f52",
+      "outputSha256": "sha256:a8b991b33d6632f9b134f9177b3b1c1b0bd185b5a31693056a688c4fe8372f52",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     },
     {
       "file": "diagnostics.mosaic.png",
-      "meaning": "Diagnostic mosaic of normal/emissive/velocity panels.",
+      "meaning": "Diagnostic mosaic.",
       "source": "diagnostics.mosaic.png",
-      "sourceSha256": "sha256:7742dc1cbaf8419ca04fbaebfa3fc13fedda98db705cfa32cbf6c1e19149bed6",
-      "outputSha256": "sha256:7742dc1cbaf8419ca04fbaebfa3fc13fedda98db705cfa32cbf6c1e19149bed6",
+      "sourceSha256": "sha256:d5c41825d5cd5f1f7013098e102c16e088153930c42ff3356d944f0e4f2c0212",
+      "outputSha256": "sha256:d5c41825d5cd5f1f7013098e102c16e088153930c42ff3356d944f0e4f2c0212",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     },
     {
       "file": "diagnostic.normal.png",
-      "meaning": "Normal diagnostic readback.",
+      "meaning": "Normal diagnostic.",
       "source": "diagnostic.normal.png",
-      "sourceSha256": "sha256:9eae4e0888a60aac3e0cff00e51f368f6788f299bac22a62cfaee1a30d184cea",
-      "outputSha256": "sha256:9eae4e0888a60aac3e0cff00e51f368f6788f299bac22a62cfaee1a30d184cea",
+      "sourceSha256": "sha256:c7a51a048a68d80573df717a7fcc6c14a18bdc2dac42435942f7f6e86c5de29e",
+      "outputSha256": "sha256:c7a51a048a68d80573df717a7fcc6c14a18bdc2dac42435942f7f6e86c5de29e",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     },
     {
       "file": "diagnostic.emissive.png",
-      "meaning": "Emissive diagnostic readback.",
+      "meaning": "Emissive diagnostic.",
       "source": "diagnostic.emissive.png",
-      "sourceSha256": "sha256:3881f3a053e0f413e583e604104730944422cca43ea8c42acad6008bdfc5d16e",
-      "outputSha256": "sha256:3881f3a053e0f413e583e604104730944422cca43ea8c42acad6008bdfc5d16e",
+      "sourceSha256": "sha256:295c72ceb55803652f173bbf1307c519ccd0a3d5949a067ad78c03eb2329793d",
+      "outputSha256": "sha256:295c72ceb55803652f173bbf1307c519ccd0a3d5949a067ad78c03eb2329793d",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     },
     {
       "file": "diagnostic.velocity.png",
-      "meaning": "Velocity diagnostic readback.",
+      "meaning": "Velocity diagnostic.",
       "source": "diagnostic.velocity.png",
-      "sourceSha256": "sha256:50fbeac28b662dd37b5fb3d7c0ed635d4d64117577c0fee0da220440470bf3d0",
-      "outputSha256": "sha256:50fbeac28b662dd37b5fb3d7c0ed635d4d64117577c0fee0da220440470bf3d0",
+      "sourceSha256": "sha256:0eea5d1ea2ddeb541b86e12d502ac681ca049c21afad8546870b11a814a80ae6",
+      "outputSha256": "sha256:0eea5d1ea2ddeb541b86e12d502ac681ca049c21afad8546870b11a814a80ae6",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     },
     {
       "file": "camera.design.png",
-      "meaning": "Design camera presentation.",
+      "meaning": "Design camera.",
       "source": "camera.design.png",
-      "sourceSha256": "sha256:bdab217f8b1c4b0c6fd35c1c18fe0b9eb840d5bcd923fb07476237b886c8cf8d",
-      "outputSha256": "sha256:bdab217f8b1c4b0c6fd35c1c18fe0b9eb840d5bcd923fb07476237b886c8cf8d",
+      "sourceSha256": "sha256:fd32bbcf464c5b147f844c8f39538300838d6fe1e689dc21f1915db418376aed",
+      "outputSha256": "sha256:fd32bbcf464c5b147f844c8f39538300838d6fe1e689dc21f1915db418376aed",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     },
     {
       "file": "mechanism.launch-and-staging.png",
-      "meaning": "Launch-and-staging mechanism diagnostic.",
+      "meaning": "Launch-and-staging mechanism.",
       "source": "mechanism.launch-and-staging.png",
-      "sourceSha256": "sha256:c10b4877f50f0a2bbb372ec7039b425367f6818bfa6215c0b2f5efe741d6e696",
-      "outputSha256": "sha256:c10b4877f50f0a2bbb372ec7039b425367f6818bfa6215c0b2f5efe741d6e696",
+      "sourceSha256": "sha256:fa488fac77a32ece6f0d16ea1fb221fe3d4872b8ba1c42e6a8da277fe30b2d91",
+      "outputSha256": "sha256:fa488fac77a32ece6f0d16ea1fb221fe3d4872b8ba1c42e6a8da277fe30b2d91",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     },
     {
       "file": "mechanism.spin-docking.png",
-      "meaning": "Spin-docking mechanism diagnostic.",
+      "meaning": "Spin-docking mechanism.",
       "source": "mechanism.spin-docking.png",
-      "sourceSha256": "sha256:b6ea3340dcde2196fbe819b55da8b75e04a19ee7b8a50156a92c59a87b0e141a",
-      "outputSha256": "sha256:b6ea3340dcde2196fbe819b55da8b75e04a19ee7b8a50156a92c59a87b0e141a",
+      "sourceSha256": "sha256:4db2130a67e2e75f5d4d81351a1a0e5b82299a469c9792a72fc09fd599a4b122",
+      "outputSha256": "sha256:4db2130a67e2e75f5d4d81351a1a0e5b82299a469c9792a72fc09fd599a4b122",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     },
     {
       "file": "mechanism.compute-storage.png",
-      "meaning": "Compute-storage mechanism diagnostic.",
+      "meaning": "Compute-storage mechanism.",
       "source": "mechanism.compute-storage.png",
-      "sourceSha256": "sha256:00b184505d811e5ebd74e6b46c4697cfcf84737be2bf04edd735b8c01d0f1482",
-      "outputSha256": "sha256:00b184505d811e5ebd74e6b46c4697cfcf84737be2bf04edd735b8c01d0f1482",
+      "sourceSha256": "sha256:2769ca82ed21c8095daba64fcf5e7a4ba253ebf7cf3268681708982bbee64492",
+      "outputSha256": "sha256:2769ca82ed21c8095daba64fcf5e7a4ba253ebf7cf3268681708982bbee64492",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     }
   ],
   "limitations": [
-    "Correctness capture produced presentation, camera, seed, temporal, and mechanism diagnostic PNGs plus storage-buffer readbacks under native WebGPU.",
-    "Capture status remains incomplete; current-adapter GPU timestamps are not accepted as performance evidence.",
-    "No full v2 accepted evidence-manifest is claimed from this correctness session."
+    "Current-source correctness capture assembles raw-capture-session evidence-manifest and validate:artifacts PASS.",
+    "GPU timestamps NOT_CLAIMED; lifecycle INSUFFICIENT_EVIDENCE; not a publishable release-bundle."
   ]
 }

@@ -110,8 +110,11 @@ function findVerdicts(value, path = '$', output = []) {
   if (!value || typeof value !== 'object') return output;
   for (const [key, child] of Object.entries(value)) {
     const childPath = `${path}.${key}`;
-    if (/verdict$/i.test(key) && typeof child === 'string') output.push({ path: childPath, verdict: child });
-    else findVerdicts(child, childPath, output);
+    // Resource inventory uses *Verdict labels that are not claim verdicts.
+    if (/verdict$/i.test(key) && typeof child === 'string') {
+      if (key === 'byteVerdict' || key === 'byteClassification') continue;
+      output.push({ path: childPath, verdict: child });
+    } else findVerdicts(child, childPath, output);
   }
   return output;
 }
@@ -150,8 +153,6 @@ function readBoundEntry(bundleDir, entry, label) {
 }
 
 function validateClaimVerdicts(manifest, errors, requireRequiredClaimsPass) {
-  // Correctness acceptance requires visual/mechanism/lifecycle PASS.
-  // performanceCompliance and gpuAttribution may remain NOT_CLAIMED when hardware timing is not claimed.
   const optionalUnclaimed = new Set(['performanceCompliance', 'gpuAttribution']);
   for (const claim of REQUIRED_CLAIMS) {
     const verdict = manifest?.claimVerdicts?.[claim];

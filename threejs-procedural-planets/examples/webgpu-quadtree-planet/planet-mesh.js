@@ -1,6 +1,8 @@
 import {
   BufferAttribute,
   BufferGeometry,
+  InterleavedBuffer,
+  InterleavedBufferAttribute,
   Mesh,
   MeshPhysicalNodeMaterial,
   MeshStandardNodeMaterial,
@@ -178,21 +180,72 @@ export function createPlanetPatchGeometry({
 
   const IndexType = vertexCount > 65535 ? Uint32Array : Uint16Array;
   const geometry = new BufferGeometry();
-  // The base position and canonical surface direction are deliberately the
-  // same unit vector. positionNode applies the single metric displacement.
-  geometry.setAttribute("position", new BufferAttribute(directions.slice(), 3));
-  geometry.setAttribute("surfaceDirection", new BufferAttribute(directions, 3));
-  geometry.setAttribute("patchLevel", new BufferAttribute(levels, 1));
-  geometry.setAttribute("transitionMask", new BufferAttribute(masks, 1));
-  geometry.setAttribute("atlasIndex", new BufferAttribute(atlasIndices, 1));
-  geometry.setAttribute("atlasMipIndex", new BufferAttribute(mipIndices, 1));
-  geometry.setAttribute("morphWeights", new BufferAttribute(morphWeights, 4));
-  geometry.setAttribute("morphFactor", new BufferAttribute(morphFactors, 1));
+  // WebGPU requires ≤8 vertex buffers (spec minimum). Separate BufferAttributes
+  // become one GPU vertex buffer each; packing every float attribute into a
+  // single InterleavedBuffer keeps the render pipeline valid while preserving
+  // named TSL attribute() bindings. Indices that were Uint32 are stored as
+  // float (exact for the atlas index domain ≪ 2^24) and cast with uint() in TSL.
+  //
+  // Layout per vertex (28 floats):
+  //   0..2   position / surfaceDirection (identical unit vector)
+  //   3      patchLevel
+  //   4      transitionMask
+  //   5      atlasIndex
+  //   6      atlasMipIndex
+  //   7..10  morphWeights
+  //   11     morphFactor
+  //   12..15 morphIndex0..3
+  //   16..18 morphDirection0
+  //   19..21 morphDirection1
+  //   22..24 morphDirection2
+  //   25..27 morphDirection3
+  const stride = 28;
+  const packed = new Float32Array(vertexCount * stride);
+  for (let vertexIndex = 0; vertexIndex < vertexCount; vertexIndex += 1) {
+    const base = vertexIndex * stride;
+    const dirLane = vertexIndex * 3;
+    packed[base + 0] = directions[dirLane + 0];
+    packed[base + 1] = directions[dirLane + 1];
+    packed[base + 2] = directions[dirLane + 2];
+    packed[base + 3] = levels[vertexIndex];
+    packed[base + 4] = masks[vertexIndex];
+    packed[base + 5] = atlasIndices[vertexIndex];
+    packed[base + 6] = mipIndices[vertexIndex];
+    packed[base + 7] = morphWeights[vertexIndex * 4 + 0];
+    packed[base + 8] = morphWeights[vertexIndex * 4 + 1];
+    packed[base + 9] = morphWeights[vertexIndex * 4 + 2];
+    packed[base + 10] = morphWeights[vertexIndex * 4 + 3];
+    packed[base + 11] = morphFactors[vertexIndex];
+    packed[base + 12] = morphIndices[0][vertexIndex];
+    packed[base + 13] = morphIndices[1][vertexIndex];
+    packed[base + 14] = morphIndices[2][vertexIndex];
+    packed[base + 15] = morphIndices[3][vertexIndex];
+    for (let corner = 0; corner < 4; corner += 1) {
+      const dest = base + 16 + corner * 3;
+      packed[dest + 0] = morphDirections[corner][dirLane + 0];
+      packed[dest + 1] = morphDirections[corner][dirLane + 1];
+      packed[dest + 2] = morphDirections[corner][dirLane + 2];
+    }
+  }
+  const interleaved = new InterleavedBuffer(packed, stride);
+  // Base position and canonical surface direction are the same unit vector.
+  // positionNode applies the single metric displacement on the GPU.
+  geometry.setAttribute("position", new InterleavedBufferAttribute(interleaved, 3, 0));
+  geometry.setAttribute("surfaceDirection", new InterleavedBufferAttribute(interleaved, 3, 0));
+  geometry.setAttribute("patchLevel", new InterleavedBufferAttribute(interleaved, 1, 3));
+  geometry.setAttribute("transitionMask", new InterleavedBufferAttribute(interleaved, 1, 4));
+  geometry.setAttribute("atlasIndex", new InterleavedBufferAttribute(interleaved, 1, 5));
+  geometry.setAttribute("atlasMipIndex", new InterleavedBufferAttribute(interleaved, 1, 6));
+  geometry.setAttribute("morphWeights", new InterleavedBufferAttribute(interleaved, 4, 7));
+  geometry.setAttribute("morphFactor", new InterleavedBufferAttribute(interleaved, 1, 11));
   for (let corner = 0; corner < 4; corner += 1) {
-    geometry.setAttribute(`morphIndex${corner}`, new BufferAttribute(morphIndices[corner], 1));
+    geometry.setAttribute(
+      `morphIndex${corner}`,
+      new InterleavedBufferAttribute(interleaved, 1, 12 + corner),
+    );
     geometry.setAttribute(
       `morphDirection${corner}`,
-      new BufferAttribute(morphDirections[corner], 3),
+      new InterleavedBufferAttribute(interleaved, 3, 16 + corner * 3),
     );
   }
   geometry.setIndex(new BufferAttribute(new IndexType(indices), 1));
@@ -279,8 +332,10 @@ export function createPlanetNodeMaterial({
     time: uniform(0),
   };
   const direction = normalize(attribute("surfaceDirection", "vec3"));
-  const atlasIndex = uint(attribute("atlasIndex", "uint"));
-  const mipIndex = uint(attribute("atlasMipIndex", "uint"));
+  // Atlas indices ride the interleaved float vertex buffer (WebGPU ≤8 VBs);
+  // cast to uint for storage-buffer addressing (domain is well inside f32 exact ints).
+  const atlasIndex = uint(attribute("atlasIndex", "float"));
+  const mipIndex = uint(attribute("atlasMipIndex", "float"));
   const directFields = atlas ? null : planetFieldNodes({
       direction,
       seed: uniforms.seed,
@@ -325,7 +380,7 @@ export function createPlanetNodeMaterial({
     const morphDirections = Array.from({ length: 4 }, (_, corner) =>
       attribute(`morphDirection${corner}`, "vec3"));
     const morphHeights = Array.from({ length: 4 }, (_, corner) =>
-      atlas.sampleHeightNode(uint(attribute(`morphIndex${corner}`, "uint")), 0));
+      atlas.sampleHeightNode(uint(attribute(`morphIndex${corner}`, "float")), 0));
     const solidCorners = morphDirections.map((cornerDirection, corner) =>
       cornerDirection.mul(uniforms.radius.add(morphHeights[corner].mul(uniforms.amplitude))));
     const roundCorners = morphDirections.map((cornerDirection) =>

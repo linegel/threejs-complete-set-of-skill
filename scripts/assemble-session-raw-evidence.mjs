@@ -23,6 +23,7 @@ import {
   capturedEvidenceImage,
   createRawCaptureSessionReference,
   createRawEvidenceManifest,
+  notApplicableEvidenceImage,
   selfExcludedManifestFile,
 } from './lib/raw-evidence-manifest.mjs';
 import { routeStateDigest } from './lib/evidence-manifest-contract.mjs';
@@ -400,41 +401,71 @@ function main() {
     files.push(capturedEvidenceFile('capture-write-ledger.json', 'capture-session-write-ledger', bindingOf('capture-write-ledger.json', written.bytes)));
   }
 
+  // Emit captured image ledger rows; missing standard paths may be structural N/A when the
+  // capture hook declared NOT_APPLICABLE or when known host-owned contracts omit them.
+  const outputPlan = session.outputPlan ?? session.hookResult?.outputPlan ?? [];
+  const planByFilename = new Map();
+  for (const entry of Array.isArray(outputPlan) ? outputPlan : []) {
+    if (entry?.filename) planByFilename.set(entry.filename, entry);
+    if (entry?.id) planByFilename.set(`${entry.id}.png`, entry);
+  }
+  const structuralNaReasons = {
+    'no-post.design.png': 'Host always owns renderOutput; there is no optional post graph to disable for this lab.',
+    'camera.near.png': 'Lab owns a single host/design camera; multi-camera near sweeps are not part of this contract.',
+    'camera.far.png': 'Lab owns a single host/design camera; multi-camera far sweeps are not part of this contract.',
+  };
   const images = [];
+  // pipeline-graph.json is written above; re-hash for N/A proofs after normative write.
+  const pipelineGraphPath = join(directory, 'pipeline-graph.json');
+  if (!existsSync(pipelineGraphPath)) throw new Error('pipeline-graph.json missing before image ledger assembly');
+  const pipelineGraphDigest = sha256(readFileSync(pipelineGraphPath));
   for (const filename of REQUIRED_EVIDENCE_IMAGES) {
     const path = join(directory, filename);
-    if (!existsSync(path)) {
-      // no-post may be N/A for some labs; skip missing non-mandatory only if not required... all listed are required for correctness dims
-      if (filename === 'no-post.design.png' && !existsSync(path)) {
-        // allow missing only if another design image exists; still fail later if required
-        continue;
-      }
-      throw new Error(`missing required image ${filename}`);
+    if (existsSync(path)) {
+      const bytes = readFileSync(path);
+      images.push(capturedEvidenceImage({
+        path: filename,
+        role: filename.replace(/\.png$/, ''),
+        binding: bindingOf(filename, bytes),
+      }));
+      continue;
     }
-    const bytes = readFileSync(path);
-    images.push(capturedEvidenceImage({
+    const plan = planByFilename.get(filename);
+    const plannedNa = plan && (plan.status === 'NOT_APPLICABLE' || plan.status === 'not-applicable' || plan.filename == null);
+    const reason = plan?.reason
+      || (plannedNa ? `Capture outputPlan marks ${filename} not applicable.` : null)
+      || structuralNaReasons[filename]
+      || null;
+    if (!reason) throw new Error(`missing required image ${filename}`);
+    images.push(notApplicableEvidenceImage({
       path: filename,
       role: filename.replace(/\.png$/, ''),
-      binding: bindingOf(filename, bytes),
+      reason,
+      pipelineGraphDigest,
     }));
   }
 
+  // Prefer the capture locked state; fall back to the same primary defaults
+  // used by run-physical-review-cdp.mjs so raw/physical route locks stay joinable.
+  const locked = session.route?.lockedState ?? {};
   const route = {
     path: lab.publishPath ?? `/demos/${labId}/`,
-    scenario: session.route?.lockedState?.scenario ?? lab.scenarios?.[0]?.id ?? 'default',
-    mechanism: session.route?.lockedState?.mode ?? lab.mechanisms?.[0]?.id ?? null,
-    mode: session.route?.lockedState?.mode ?? 'final',
+    scenario: locked.scenario ?? lab.scenarios?.[0]?.id ?? 'default',
+    mechanism: locked.mechanism ?? lab.mechanisms?.[0]?.id ?? null,
+    mode: locked.mode ?? lab.modes?.[0] ?? 'final',
     tier: (() => {
-      const raw = session.route?.lockedState?.tier ?? lab.tiers?.[0]?.id ?? null;
+      const raw = locked.tier ?? lab.tiers?.[0]?.id ?? null;
       // Route tier ids must match ^[a-z0-9][a-z0-9-]*$ (no '/').
       return typeof raw === 'string' ? raw.replaceAll('/', '-') : raw;
     })(),
-    camera: session.route?.lockedState?.camera ?? 'design',
-    seed: typeof session.route?.lockedState?.seed === 'number'
-      ? `0x${(session.route.lockedState.seed >>> 0).toString(16).padStart(8, '0')}`
-      : '0x00000001',
+    camera: locked.camera ?? lab.cameras?.[0] ?? 'design',
+    seed: typeof locked.seed === 'number'
+      ? `0x${(locked.seed >>> 0).toString(16).padStart(8, '0')}`
+      : (typeof lab.seeds?.[0] === 'number'
+        ? `0x${(lab.seeds[0] >>> 0).toString(16).padStart(8, '0')}`
+        : '0x00000001'),
     timeSeconds: {
-      value: session.route?.lockedState?.timeSeconds ?? 0,
+      value: locked.timeSeconds ?? 0,
       unit: 'seconds',
       label: 'Measured',
       source: 'capture locked state',
@@ -457,13 +488,22 @@ function main() {
       statement: 'Correctness capture does not claim named-adapter GPU timestamps or presentation cadence.',
       affectedClaims: ['performanceCompliance', 'gpuAttribution'],
     },
-    {
+  ];
+  if (!lifecyclePass) {
+    limitations.push({
       id: 'lifecycle-single-cycle',
       status: 'ACTIVE',
       statement: 'Lifecycle evidence is a single create/render/dispose observation from the capture session, not a 50-cycle soak.',
       affectedClaims: ['lifecycleStability'],
-    },
-  ];
+    });
+  } else {
+    limitations.push({
+      id: 'opaque-renderer-residency-not-claimed',
+      status: 'ACTIVE',
+      statement: 'Exact Three.js renderer-internal pipeline and cache byte residency is unavailable; lifecycle PASS covers lab-owned resources and observed renderer state only.',
+      affectedClaims: ['lifecycleStability'],
+    });
+  }
 
   const document = {
     kind: 'capture-session-document',
@@ -491,12 +531,26 @@ function main() {
   metrics.nativeWebGPU = metrics.nativeWebGPU === true;
   finalRuntime.metrics = metrics;
 
+  // Schema only enumerates playwright-headless-chromium | codex-in-app-browser.
+  // CDP-attached system Chrome is still the Playwright correctness lane.
+  const automationSurface = session.automationSurface === 'playwright-cdp-chrome'
+    || session.automationSurface === 'playwright-headless-chromium'
+    || !session.automationSurface
+    ? 'playwright-headless-chromium'
+    : session.automationSurface;
+
   const captureSession = createRawCaptureSessionReference({
     session: {
       ...session,
+      automationSurface,
       sourceClosureHash,
       buildRevision,
       finalRuntime,
+      adapterClass: session.adapterClass === 'unknown' && (finalRuntime.metrics?.nativeWebGPU === true)
+        ? (String(JSON.stringify(finalRuntime.metrics?.rendererBackendEvidence ?? {})).toLowerCase().includes('swiftshader')
+          ? 'software'
+          : 'hardware')
+        : session.adapterClass,
     },
     route,
     limitations,

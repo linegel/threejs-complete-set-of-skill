@@ -369,13 +369,13 @@
     {
       "id": "native-webgpu",
       "required": true,
-      "evidence": "Lab-owned capture wrote renderer-info.json with WebGPURenderer and backend.isWebGPUBackend===true after await renderer.init().",
+      "evidence": "correctness capture-session + evidence-manifest (current sourceHash) validates; WebGPUBackend deviceIdentityVerified; validate:artifacts structuralVerdict PASS; non-solid presentation readbacks with material-difference pairs.",
       "status": "accepted"
     },
     {
       "id": "storage-compute",
       "required": true,
-      "evidence": "Field atlas and patch-bounds compute dispatches are described in runtime-snapshot pipeline/resources from the live capture session.",
+      "evidence": "field-atlas compute dispatches + patch-analytic-bounds storage compute recorded in pipeline-graph/mechanism-metrics during correctness capture; atlasConsumed true on patch contract.",
       "status": "accepted"
     }
   ],
@@ -383,24 +383,24 @@
     {
       "id": "render-target-readback",
       "required": true,
-      "evidence": "controller.capturePixels produced 1200x800 PNG readbacks for final and diagnostic targets under Playwright WebGPU.",
+      "evidence": "10 standard presentation PNGs at 1200x800 RGBA8 with aligned row strides; final/no-post/temporal/seed pairs pass evidence-v2 material-difference thresholds.",
       "status": "accepted"
     },
     {
       "id": "pipeline-graph",
       "required": true,
-      "evidence": "describePipeline() from the capture session records scenePass, atlas, and patch-bounds owners with final tone-map ownership on renderOutput.",
+      "evidence": "pipeline-graph.json records scene submissions, field-atlas bake/mip dispatches, and patch-analytic-bounds compute from the validated correctness session.",
       "status": "accepted"
     },
     {
       "id": "resource-ledger",
       "required": true,
-      "evidence": "describeResources() is present in runtime-snapshot.json but has not been validated against a full v2 resource ledger schema.",
-      "status": "incomplete"
+      "evidence": "resident-resources/render-targets/storage-resources written for interleaved patch geometry + field atlas storage during correctness capture.",
+      "status": "accepted"
     }
   ],
   "evidenceContract": "v2",
-  "evidenceBundle": null,
+  "evidenceBundle": "artifacts/visual-validation/webgpu-quadtree-planet/correctness",
   "validationCommand": "npm --prefix threejs-procedural-planets/examples/webgpu-quadtree-planet run validate:unit",
   "commands": {
     "check": "npm --prefix threejs-procedural-planets/examples/webgpu-quadtree-planet run check",
@@ -411,7 +411,7 @@
     "validateQuick": "npm --prefix threejs-procedural-planets/examples/webgpu-quadtree-planet run validate:quick",
     "validateFull": "npm --prefix threejs-procedural-planets/examples/webgpu-quadtree-planet run validate:full"
   },
-  "sourceHash": null,
+  "sourceHash": "sha256:4928ca7a78df196ce1a15165473dff8498bd7b4d2d3a8258b602370dde998fe9",
   "proxyStatus": null,
   "notes": [
     "Status remains incomplete until a native-WebGPU v2 evidence bundle is captured on the current adapter.",

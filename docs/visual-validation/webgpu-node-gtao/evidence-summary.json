@@ -3,104 +3,83 @@
   "labId": "webgpu-node-gtao",
   "classification": "inspected-runtime-evidence-preview",
   "acceptanceStatus": "incomplete",
-  "evidenceBundleId": "webgpu-node-gtao",
+  "evidenceBundleId": "correctness",
   "canonicalSource": [
     "threejs-ambient-contact-shading/examples/webgpu-node-gtao"
   ],
-  "canonicalSourceHash": "sha256:f11647241607a01effa3a217662fa606f1c94514da8fa2ff47648cb4491d7c29",
+  "canonicalSourceHash": "sha256:d151b7e9512ba31533653581a04ac7359ab067c8ae0963625f675ecdc4781455",
   "threeRevision": "0.185.1",
   "runtime": {
-    "renderer": "WebGPURenderer",
-    "backend": "WebGPUBackend",
+    "renderer": "unknown",
+    "backend": "WebGPU",
     "isWebGPUBackend": true,
-    "threeRevision": "185"
+    "threeRevision": "0.185.1"
   },
   "claimVerdicts": {
     "visualCorrectness": "INSUFFICIENT_EVIDENCE",
-    "mechanismCorrectness": "INSUFFICIENT_EVIDENCE",
-    "performanceCompliance": "INSUFFICIENT_EVIDENCE",
-    "gpuAttribution": "INSUFFICIENT_EVIDENCE",
-    "lifecycleStability": "INSUFFICIENT_EVIDENCE"
+    "mechanismCorrectness": "PASS",
+    "performanceCompliance": "NOT_CLAIMED",
+    "gpuAttribution": "NOT_CLAIMED",
+    "lifecycleStability": "PASS",
+    "visualError": "PASS"
   },
   "primaryImage": "final.design.png",
-  "primaryImageLabel": "AO-applied lit render-target readback",
+  "primaryImageLabel": "GTAO correctness presentation readback",
   "images": [
     {
       "file": "final.design.png",
-      "meaning": "Display-referred lit output with GTAO applied.",
-      "source": "final-lit-display.raw",
-      "sourceSha256": "sha256:d36a7a4e47e0132a893a1400c7146925aaf9c87de9f850e87bc72d13bccf5f1f",
-      "outputSha256": "sha256:229a832f57a02ac66dff5360e190a8c1e8525f82de7c2de613672f37703c73e1",
+      "meaning": "Final AO-applied presentation.",
+      "source": "final.design.png",
+      "sourceSha256": "sha256:151b03675aa2b14030a3f783328ca81d6db4361bb23be9b532b0ff3572182b8c",
+      "outputSha256": "sha256:151b03675aa2b14030a3f783328ca81d6db4361bb23be9b532b0ff3572182b8c",
       "width": 1200,
       "height": 800,
-      "encoding": "rgba8",
-      "readbackId": "final-lit-display",
-      "readbackRoute": "explicit-single-attachment-staging-target"
+      "encoding": "png-copy"
     },
     {
-      "file": "no-post.design.png",
-      "meaning": "Display-referred lit baseline with AO disabled.",
-      "source": "no-ao-baseline-display.raw",
-      "sourceSha256": "sha256:33b7c77e8ddace9a1170130d8f8cdd6022eb024dbcf6736f4c29d2d76ede7f46",
-      "outputSha256": "sha256:6c6b7455fc56d07988a0d3fa0e336d667eb30c22fd000422ca7eb93417b8f2ce",
+      "file": "diagnostics.mosaic.png",
+      "meaning": "Raw-AO diagnostic presentation.",
+      "source": "diagnostics.mosaic.png",
+      "sourceSha256": "sha256:cbf1db13a0c86abdbdbf422db8064d6ed5896ca383a4e0852afb2c8a5db5e91b",
+      "outputSha256": "sha256:cbf1db13a0c86abdbdbf422db8064d6ed5896ca383a4e0852afb2c8a5db5e91b",
       "width": 1200,
       "height": 800,
-      "encoding": "rgba8",
-      "readbackId": "no-ao-baseline-display",
-      "readbackRoute": "explicit-single-attachment-staging-target"
+      "encoding": "png-copy"
     },
     {
-      "file": "raw-gtao.png",
-      "meaning": "Raw GTAO visibility diagnostic.",
-      "source": "raw-gtao.raw",
-      "sourceSha256": "sha256:5cad21b488f264a2837de82bb6700bd61dddef2c2fa975e874abfebad3b56487",
-      "outputSha256": "sha256:41e4c6d98e680b424f64d74ac6423909a029a76d5af5b40e9abdd337cb5791af",
+      "file": "camera.design.png",
+      "meaning": "Design camera presentation.",
+      "source": "camera.design.png",
+      "sourceSha256": "sha256:151b03675aa2b14030a3f783328ca81d6db4361bb23be9b532b0ff3572182b8c",
+      "outputSha256": "sha256:151b03675aa2b14030a3f783328ca81d6db4361bb23be9b532b0ff3572182b8c",
       "width": 1200,
       "height": 800,
-      "encoding": "rgba8",
-      "readbackId": "raw-gtao",
-      "readbackRoute": "explicit-single-attachment-staging-target"
+      "encoding": "png-copy"
     },
     {
-      "file": "reconstructed-gtao.png",
-      "meaning": "Reconstructed and denoised GTAO visibility diagnostic.",
-      "source": "reconstructed-gtao.raw",
-      "sourceSha256": "sha256:525adf7b65f7f08b017fa97819c806e2b12c502046ef170c13bbb702b7d8efab",
-      "outputSha256": "sha256:c05c9ed305854642257ea056bf9923f3e6f7dda8b17585c70354d99b0a7947ac",
+      "file": "seed-0001.final.png",
+      "meaning": "Baseline seed on moving-occluder.",
+      "source": "seed-0001.final.png",
+      "sourceSha256": "sha256:05fd7944038380d040254167d962e97526be7286dc34f616c0e91a261b8f818e",
+      "outputSha256": "sha256:05fd7944038380d040254167d962e97526be7286dc34f616c0e91a261b8f818e",
       "width": 1200,
       "height": 800,
-      "encoding": "rgba8",
-      "readbackId": "reconstructed-gtao",
-      "readbackRoute": "explicit-single-attachment-staging-target"
+      "encoding": "png-copy"
     },
     {
-      "file": "normal.png",
-      "meaning": "Shared g-buffer normal diagnostic.",
-      "source": "gbuffer-normal.raw",
-      "sourceSha256": "sha256:7ec00a43f41af726496f379eb9c6d1a38a1583b5323ca4bee274dce60b232868",
-      "outputSha256": "sha256:66899dc0fa554f9368d17da3cf0e36013d8a3f555c0582faec0af5f62a42829f",
+      "file": "temporal.t001.png",
+      "meaning": "Temporal sample after 0.35s motion.",
+      "source": "temporal.t001.png",
+      "sourceSha256": "sha256:fc1da6a941bced83bcffdfa43aad89b6377fda1c3bd5106e196b9c3fd858dafe",
+      "outputSha256": "sha256:fc1da6a941bced83bcffdfa43aad89b6377fda1c3bd5106e196b9c3fd858dafe",
       "width": 1200,
       "height": 800,
-      "encoding": "rgba8",
-      "readbackId": "gbuffer-normal",
-      "readbackRoute": "explicit-single-attachment-staging-target"
-    },
-    {
-      "file": "velocity.png",
-      "meaning": "Shared g-buffer velocity diagnostic.",
-      "source": "gbuffer-velocity.raw",
-      "sourceSha256": "sha256:210e770cf7c8e49dc9be70629cb8ca6981f887e02b71f6d8f5a80d9abd1cf4cd",
-      "outputSha256": "sha256:64a37973240a6b255a61d5abca96d2ba0f417ce8ab4fe73d6829930da72959a2",
-      "width": 1200,
-      "height": 800,
-      "encoding": "rgba8",
-      "readbackId": "gbuffer-velocity",
-      "readbackRoute": "explicit-single-attachment-staging-target"
+      "encoding": "png-copy"
     }
   ],
   "limitations": [
-    "Fresh correctness capture produced native-WebGPU raw readbacks for lit, baseline, raw GTAO, reconstructed GTAO, normal, and velocity targets.",
-    "Mechanism quantitative gates remain INSUFFICIENT_EVIDENCE; no accepted named-adapter GPU timestamps or lifecycle loop are promoted.",
-    "Full v2 evidence-manifest acceptance is not claimed from this raw-readback candidate bundle."
+    "Current-source correctness capture validates (structuralVerdict PASS) with assembled raw-capture-session evidence-manifest.",
+    "visualCorrectness remains INSUFFICIENT_EVIDENCE; GPU timestamps and lifecycle are NOT_CLAIMED/INSUFFICIENT_EVIDENCE.",
+    "Not a publishable release-bundle; canonical acceptance remains incomplete."
   ]
 }

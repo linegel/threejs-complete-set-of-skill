@@ -16,108 +16,129 @@
     "threejs-procedural-planets/examples/webgpu-quadtree-planet/planet-mesh.js",
     "threejs-procedural-planets/examples/webgpu-quadtree-planet/planet-quadtree.js"
   ],
-  "canonicalSourceHash": "sha256:a5544f67eb16c9b42970dd6cf0ffd2ffb1f20d5d1a8b2afef92b43d908df1882",
+  "canonicalSourceHash": "sha256:4928ca7a78df196ce1a15165473dff8498bd7b4d2d3a8258b602370dde998fe9",
   "threeRevision": "0.185.1",
   "runtime": {
-    "renderer": "WebGPURenderer",
-    "backend": "WebGPUBackend",
+    "renderer": "unknown",
+    "backend": "WebGPU",
     "isWebGPUBackend": true,
-    "threeRevision": "185"
+    "threeRevision": "0.185.1"
   },
   "claimVerdicts": {
     "visualCorrectness": "INSUFFICIENT_EVIDENCE",
-    "mechanismCorrectness": "INSUFFICIENT_EVIDENCE",
-    "performanceCompliance": "INSUFFICIENT_EVIDENCE",
-    "gpuAttribution": "INSUFFICIENT_EVIDENCE",
-    "lifecycleStability": "INSUFFICIENT_EVIDENCE"
+    "mechanismCorrectness": "PASS",
+    "performanceCompliance": "NOT_CLAIMED",
+    "gpuAttribution": "NOT_CLAIMED",
+    "lifecycleStability": "INSUFFICIENT_EVIDENCE",
+    "visualError": "PASS"
   },
   "primaryImage": "final.design.png",
-  "primaryImageLabel": "Quadtree planet final render-target readback",
+  "primaryImageLabel": "Quadtree planet correctness presentation",
   "images": [
     {
       "file": "final.design.png",
-      "meaning": "Final solid-body presentation readback.",
+      "meaning": "Final solid-body presentation.",
       "source": "final.design.png",
-      "sourceSha256": "sha256:27e681bc957745f0cd7a7d464fa2de4360c90d8540cf4899ff5dbd4bc64b1103",
-      "outputSha256": "sha256:27e681bc957745f0cd7a7d464fa2de4360c90d8540cf4899ff5dbd4bc64b1103",
+      "sourceSha256": "sha256:bc54d722365be433fe42139ed88cd8cf22746eb21092a39695affd7ccde693a1",
+      "outputSha256": "sha256:bc54d722365be433fe42139ed88cd8cf22746eb21092a39695affd7ccde693a1",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "no-post.design.png",
+      "meaning": "Ambient-only lighting control (no post stack; sun stripped).",
+      "source": "no-post.design.png",
+      "sourceSha256": "sha256:2e14d28de879ceec195bdcd62cb7d1e80cbf61e4582f7bd220361d4b2fa53860",
+      "outputSha256": "sha256:2e14d28de879ceec195bdcd62cb7d1e80cbf61e4582f7bd220361d4b2fa53860",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     },
     {
       "file": "diagnostics.mosaic.png",
-      "meaning": "Patch-level diagnostic presentation (capture alias for diagnostics).",
+      "meaning": "Diagnostics mosaic (height alias path).",
       "source": "diagnostics.mosaic.png",
-      "sourceSha256": "sha256:7b3b3f5cf46c5e6ab5b7c84979a0526562d9c1b6fea4b9f6aa3c0dfd7229e426",
-      "outputSha256": "sha256:7b3b3f5cf46c5e6ab5b7c84979a0526562d9c1b6fea4b9f6aa3c0dfd7229e426",
-      "width": 1200,
-      "height": 800,
-      "encoding": "png-copy"
-    },
-    {
-      "file": "transition-mask.design.png",
-      "meaning": "Transition-mask diagnostic readback.",
-      "source": "images/transition-mask.design.png",
-      "sourceSha256": "sha256:7b3b3f5cf46c5e6ab5b7c84979a0526562d9c1b6fea4b9f6aa3c0dfd7229e426",
-      "outputSha256": "sha256:7b3b3f5cf46c5e6ab5b7c84979a0526562d9c1b6fea4b9f6aa3c0dfd7229e426",
-      "width": 1200,
-      "height": 800,
-      "encoding": "png-copy"
-    },
-    {
-      "file": "field-atlas.design.png",
-      "meaning": "Field-atlas diagnostic readback.",
-      "source": "images/field-atlas.design.png",
-      "sourceSha256": "sha256:7b3b3f5cf46c5e6ab5b7c84979a0526562d9c1b6fea4b9f6aa3c0dfd7229e426",
-      "outputSha256": "sha256:7b3b3f5cf46c5e6ab5b7c84979a0526562d9c1b6fea4b9f6aa3c0dfd7229e426",
-      "width": 1200,
-      "height": 800,
-      "encoding": "png-copy"
-    },
-    {
-      "file": "gas-giant.design.png",
-      "meaning": "Gas-giant body-mode readback.",
-      "source": "images/gas-giant.design.png",
-      "sourceSha256": "sha256:7b3b3f5cf46c5e6ab5b7c84979a0526562d9c1b6fea4b9f6aa3c0dfd7229e426",
-      "outputSha256": "sha256:7b3b3f5cf46c5e6ab5b7c84979a0526562d9c1b6fea4b9f6aa3c0dfd7229e426",
-      "width": 1200,
-      "height": 800,
-      "encoding": "png-copy"
-    },
-    {
-      "file": "ice-giant.design.png",
-      "meaning": "Ice-giant body-mode readback.",
-      "source": "images/ice-giant.design.png",
-      "sourceSha256": "sha256:7b3b3f5cf46c5e6ab5b7c84979a0526562d9c1b6fea4b9f6aa3c0dfd7229e426",
-      "outputSha256": "sha256:7b3b3f5cf46c5e6ab5b7c84979a0526562d9c1b6fea4b9f6aa3c0dfd7229e426",
-      "width": 1200,
-      "height": 800,
-      "encoding": "png-copy"
-    },
-    {
-      "file": "camera.near.png",
-      "meaning": "Near camera presentation readback.",
-      "source": "camera.near.png",
-      "sourceSha256": "sha256:7b3b3f5cf46c5e6ab5b7c84979a0526562d9c1b6fea4b9f6aa3c0dfd7229e426",
-      "outputSha256": "sha256:7b3b3f5cf46c5e6ab5b7c84979a0526562d9c1b6fea4b9f6aa3c0dfd7229e426",
+      "sourceSha256": "sha256:5188373bdc831523e124fe011eb9f105b3e5fd57c408ac992d9aee91728a569b",
+      "outputSha256": "sha256:5188373bdc831523e124fe011eb9f105b3e5fd57c408ac992d9aee91728a569b",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     },
     {
       "file": "camera.design.png",
-      "meaning": "Design camera presentation readback.",
+      "meaning": "Design camera.",
       "source": "camera.design.png",
-      "sourceSha256": "sha256:7b3b3f5cf46c5e6ab5b7c84979a0526562d9c1b6fea4b9f6aa3c0dfd7229e426",
-      "outputSha256": "sha256:7b3b3f5cf46c5e6ab5b7c84979a0526562d9c1b6fea4b9f6aa3c0dfd7229e426",
+      "sourceSha256": "sha256:bc54d722365be433fe42139ed88cd8cf22746eb21092a39695affd7ccde693a1",
+      "outputSha256": "sha256:bc54d722365be433fe42139ed88cd8cf22746eb21092a39695affd7ccde693a1",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "camera.near.png",
+      "meaning": "Near camera.",
+      "source": "camera.near.png",
+      "sourceSha256": "sha256:248c4ee59bde5094695eaf2a2b1d7d942a4bc63f46fc650f68551b263fcfeab3",
+      "outputSha256": "sha256:248c4ee59bde5094695eaf2a2b1d7d942a4bc63f46fc650f68551b263fcfeab3",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "camera.far.png",
+      "meaning": "Far camera.",
+      "source": "camera.far.png",
+      "sourceSha256": "sha256:19720c92501b2e23a3ff3697030e443484ac36eb186e1bf48b99393b79f1bf2e",
+      "outputSha256": "sha256:19720c92501b2e23a3ff3697030e443484ac36eb186e1bf48b99393b79f1bf2e",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "seed-0001.final.png",
+      "meaning": "Seed 0x1 final.",
+      "source": "seed-0001.final.png",
+      "sourceSha256": "sha256:bc54d722365be433fe42139ed88cd8cf22746eb21092a39695affd7ccde693a1",
+      "outputSha256": "sha256:bc54d722365be433fe42139ed88cd8cf22746eb21092a39695affd7ccde693a1",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "seed-9e3779b9.final.png",
+      "meaning": "Seed 0x9e3779b9 final.",
+      "source": "seed-9e3779b9.final.png",
+      "sourceSha256": "sha256:bfc0b85c1498a7e7a05ebe71504e7875250d9f86f1837189aee0d59e9379663e",
+      "outputSha256": "sha256:bfc0b85c1498a7e7a05ebe71504e7875250d9f86f1837189aee0d59e9379663e",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "temporal.t000.png",
+      "meaning": "Temporal t=0 (sun azimuth baseline).",
+      "source": "temporal.t000.png",
+      "sourceSha256": "sha256:bc54d722365be433fe42139ed88cd8cf22746eb21092a39695affd7ccde693a1",
+      "outputSha256": "sha256:bc54d722365be433fe42139ed88cd8cf22746eb21092a39695affd7ccde693a1",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "temporal.t001.png",
+      "meaning": "Temporal t=1/60 (sun azimuth advanced).",
+      "source": "temporal.t001.png",
+      "sourceSha256": "sha256:2ff42a4d6046c9e9971fc616a89880d1383301b8405d65e72322707a346565ff",
+      "outputSha256": "sha256:2ff42a4d6046c9e9971fc616a89880d1383301b8405d65e72322707a346565ff",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     }
   ],
   "limitations": [
-    "Lab-owned WebGPU capturePixels path produced 1200x800 presentation PNGs for final, patch-level, transition-mask, field-atlas, and giant body modes.",
-    "Final presentation currently compresses to a near-black frame under the solid-body design camera; diagnostic modes contain more non-zero content.",
-    "No accepted GPU timestamp or full v2 evidence-manifest bundle is claimed."
+    "Current-source correctness capture after interleaved vertex packing + adapter maxBufferSize request; validate:artifacts structuralVerdict PASS.",
+    "GPU timestamps NOT_CLAIMED; visualCorrectness and lifecycle remain INSUFFICIENT_EVIDENCE; not a publishable release-bundle.",
+    "Root cause fixed: separate BufferAttributes exceeded WebGPU max vertex buffers (16>8); geometry is now one InterleavedBuffer."
   ]
 }

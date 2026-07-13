@@ -11,7 +11,7 @@
     "threejs-particles-trails-and-effects/examples/webgpu-pooled-effects/effect-pool.js",
     "threejs-particles-trails-and-effects/examples/webgpu-pooled-effects/reentry-shell.js"
   ],
-  "canonicalSourceHash": "sha256:7e7ed00519917a344bf65f0f26ca4269e05e1a3c0e988f50a72d0c232b5f2e71",
+  "canonicalSourceHash": "sha256:c1cfa5fb0841304840abfd5345fcbfeca96f981778f28c7dd86db982ac2a75d0",
   "threeRevision": "0.185.1",
   "runtime": {
     "renderer": "WebGPURenderer",
@@ -22,97 +22,97 @@
   "claimVerdicts": {
     "visualCorrectness": "INSUFFICIENT_EVIDENCE",
     "mechanismCorrectness": "INSUFFICIENT_EVIDENCE",
-    "performanceCompliance": "INSUFFICIENT_EVIDENCE",
-    "gpuAttribution": "PASS",
-    "lifecycleStability": "FAIL"
+    "performanceCompliance": "NOT_CLAIMED",
+    "gpuAttribution": "NOT_CLAIMED",
+    "lifecycleStability": "INSUFFICIENT_EVIDENCE"
   },
   "primaryImage": "final.design.png",
-  "primaryImageLabel": "Pooled effects final render-target readback",
+  "primaryImageLabel": "Pooled effects correctness presentation",
   "images": [
     {
       "file": "final.design.png",
-      "meaning": "Final pooled-effects composite under the high tier.",
+      "meaning": "Final pooled-effects presentation.",
       "source": "final.design.png",
-      "sourceSha256": "sha256:d4203a21b8a29b9fe0fe78c763ec19303c962be074d3352bba113d88e8b6ac30",
-      "outputSha256": "sha256:d4203a21b8a29b9fe0fe78c763ec19303c962be074d3352bba113d88e8b6ac30",
+      "sourceSha256": "sha256:7421b703583d7e678e745397292185573c5ac0969056e9ce76aef9333ebab190",
+      "outputSha256": "sha256:7421b703583d7e678e745397292185573c5ac0969056e9ce76aef9333ebab190",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     },
     {
       "file": "no-post.design.png",
-      "meaning": "No-post presentation baseline for the same route.",
+      "meaning": "No-post baseline.",
       "source": "no-post.design.png",
-      "sourceSha256": "sha256:4fd5d0fc4f2bccf5ba1d20f182dfab9ab32884c9ff861d1fe5c05d9eb1b59fbb",
-      "outputSha256": "sha256:4fd5d0fc4f2bccf5ba1d20f182dfab9ab32884c9ff861d1fe5c05d9eb1b59fbb",
+      "sourceSha256": "sha256:f0b4e77840a2e45638ec965bc524bd2b7e826ee737d483f120f5514d0d94721a",
+      "outputSha256": "sha256:f0b4e77840a2e45638ec965bc524bd2b7e826ee737d483f120f5514d0d94721a",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     },
     {
       "file": "diagnostics.mosaic.png",
-      "meaning": "Diagnostic mosaic of emissive/bloom/normal channels.",
+      "meaning": "Diagnostic mosaic.",
       "source": "diagnostics.mosaic.png",
-      "sourceSha256": "sha256:c900f7b9f448d8a0161931fc8e4cfbfbb43003c0a3cc5de3b40c47eb8a9834b2",
-      "outputSha256": "sha256:c900f7b9f448d8a0161931fc8e4cfbfbb43003c0a3cc5de3b40c47eb8a9834b2",
+      "sourceSha256": "sha256:7a8aa484e817e225f4aa3d1ac0377e400fc80210235ad6f32545aa32d0dad753",
+      "outputSha256": "sha256:7a8aa484e817e225f4aa3d1ac0377e400fc80210235ad6f32545aa32d0dad753",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     },
     {
       "file": "mechanism.impact-sparks.png",
-      "meaning": "Impact-sparks mechanism scenario readback.",
+      "meaning": "Impact-sparks mechanism.",
       "source": "mechanism.impact-sparks.png",
-      "sourceSha256": "sha256:c6e7d4570de68e065eb563d3caa1c9f8e6ac3ff20956c5ac8c43414e603071ee",
-      "outputSha256": "sha256:c6e7d4570de68e065eb563d3caa1c9f8e6ac3ff20956c5ac8c43414e603071ee",
+      "sourceSha256": "sha256:f521442a6aad187deb2568a6548ce8ace4bdfd2bc59aa59d581522c77329c937",
+      "outputSha256": "sha256:f521442a6aad187deb2568a6548ce8ace4bdfd2bc59aa59d581522c77329c937",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     },
     {
       "file": "mechanism.debris-dissolve.png",
-      "meaning": "Debris-dissolve mechanism scenario readback.",
+      "meaning": "Debris-dissolve mechanism.",
       "source": "mechanism.debris-dissolve.png",
-      "sourceSha256": "sha256:66857d1d12a77d8228e7446e412564c69c9ad37f1b7c34c3c2e3bafbea8a84d8",
-      "outputSha256": "sha256:66857d1d12a77d8228e7446e412564c69c9ad37f1b7c34c3c2e3bafbea8a84d8",
+      "sourceSha256": "sha256:83e28a7525fbc1e2772f693ce40935a5cf6f876c99ad9bb1477959ce098bb7ad",
+      "outputSha256": "sha256:83e28a7525fbc1e2772f693ce40935a5cf6f876c99ad9bb1477959ce098bb7ad",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     },
     {
       "file": "mechanism.gpu-pool-and-compaction.png",
-      "meaning": "GPU pool and compaction mechanism scenario readback.",
+      "meaning": "GPU pool compaction mechanism.",
       "source": "mechanism.gpu-pool-and-compaction.png",
-      "sourceSha256": "sha256:66857d1d12a77d8228e7446e412564c69c9ad37f1b7c34c3c2e3bafbea8a84d8",
-      "outputSha256": "sha256:66857d1d12a77d8228e7446e412564c69c9ad37f1b7c34c3c2e3bafbea8a84d8",
+      "sourceSha256": "sha256:83e28a7525fbc1e2772f693ce40935a5cf6f876c99ad9bb1477959ce098bb7ad",
+      "outputSha256": "sha256:83e28a7525fbc1e2772f693ce40935a5cf6f876c99ad9bb1477959ce098bb7ad",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     },
     {
       "file": "tier.ultra.png",
-      "meaning": "Ultra tier final frame.",
+      "meaning": "Ultra tier frame.",
       "source": "tier.ultra.png",
-      "sourceSha256": "sha256:6e72065f015556a2668fd79a7be43fa6395584e4374e5280eeb38029917c40f8",
-      "outputSha256": "sha256:6e72065f015556a2668fd79a7be43fa6395584e4374e5280eeb38029917c40f8",
+      "sourceSha256": "sha256:9da1e7147c80102fb1f81c353d33c51fc64c9f81d7df418a42e838b6e36c305a",
+      "outputSha256": "sha256:9da1e7147c80102fb1f81c353d33c51fc64c9f81d7df418a42e838b6e36c305a",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     },
     {
       "file": "tier.medium.png",
-      "meaning": "Medium tier final frame.",
+      "meaning": "Medium tier frame.",
       "source": "tier.medium.png",
-      "sourceSha256": "sha256:64962dc911980fcfc5ae573ab11b96345cff9d7d581f3c5a4f81c582dcecbd82",
-      "outputSha256": "sha256:64962dc911980fcfc5ae573ab11b96345cff9d7d581f3c5a4f81c582dcecbd82",
+      "sourceSha256": "sha256:fab014e5f85b0d316efe3e387f9ba93f18e28499d4c6e0f51cd9b622dc4d28b4",
+      "outputSha256": "sha256:fab014e5f85b0d316efe3e387f9ba93f18e28499d4c6e0f51cd9b622dc4d28b4",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     }
   ],
   "limitations": [
-    "Correctness capture wrote native-WebGPU presentation and mechanism readbacks including dense-swap and indirect-draw scenarios.",
-    "evidence-manifest schema remains incomplete relative to full v2 acceptance; lifecycleStability is FAIL and mechanism claims stay INSUFFICIENT_EVIDENCE.",
-    "GPU timestamp performance acceptance is not claimed from this bundle."
+    "Current-source correctness capture validates under lab validate:artifacts with legacy-v2 evidence-manifest bound to canonical sourceHash.",
+    "Mechanism/visual claims remain INSUFFICIENT_EVIDENCE; GPU timestamps NOT_CLAIMED.",
+    "Not a publishable release-bundle."
   ]
 }

@@ -112,7 +112,7 @@ async function captureFrame(page, {
     const canvas = document.createElement("canvas");
     canvas.width = capture.width;
     canvas.height = capture.height;
-    canvas.getContext("2d", { alpha: false }).putImageData(
+    canvas.getContext("2d", { alpha: true }).putImageData(
       new ImageData(rgba, capture.width, capture.height),
       0,
       0,
@@ -201,7 +201,7 @@ async function mosaic(page, captures) {
     const canvas = document.createElement("canvas");
     canvas.width = width;
     canvas.height = height;
-    const context = canvas.getContext("2d", { alpha: false });
+    const context = canvas.getContext("2d", { alpha: true });
     for (let index = 0; index < encoded.length; index += 1) {
       const response = await fetch(`data:image/png;base64,${encoded[index]}`);
       const bitmap = await createImageBitmap(await response.blob());
@@ -611,28 +611,27 @@ try {
     dprSweep,
     verdict: insufficient,
   });
+  // Legacy-v2 shape: must NOT include unified ledger keys (files/images/captureSessions/promotion)
+  // or validateEvidenceBundle routes to the unified schema path.
   writeJson("evidence-manifest.json", {
     schemaVersion: 2,
     labId: LAB_ID,
     bundleId,
-    sourceHash: labManifest.sourceHash,
+    sourceHash: (buildDemoRegistry().demos.find((d) => d.id === LAB_ID)?.sourceHash)
+      ?? labManifest.sourceHash
+      ?? null,
     claimVerdicts: {
       visualCorrectness: insufficient,
       mechanismCorrectness: mechanismVerdict,
-      performanceCompliance: performanceVerdict,
-      gpuAttribution: runtime.renderer.backend.isWebGPUBackend && gpuTimingValid ? "PASS" : insufficient,
-      lifecycleStability: lifecycle.verdict,
+      performanceCompliance: "NOT_CLAIMED",
+      gpuAttribution: "NOT_CLAIMED",
+      lifecycleStability: lifecycle.verdict === "PASS" ? "PASS" : insufficient,
     },
-    mechanismClaims: mechanismVerdicts.claims,
-    files: REQUIRED_EVIDENCE_JSON,
-    images: REQUIRED_EVIDENCE_IMAGES,
-    extraImages: [
-      "tier.ultra.png",
-      "tier.high.png",
-      "tier.medium.png",
-      ...Object.values(mechanismImages).filter((filename) => filename !== "final.design.png"),
-    ],
-    mechanismImages,
+    // retained for lab-local validator cross-checks (not unified ledger)
+    mechanismClaimLedger: mechanismVerdicts.claims,
+    requiredJson: REQUIRED_EVIDENCE_JSON,
+    requiredImages: REQUIRED_EVIDENCE_IMAGES,
+    mechanismImageLedger: mechanismImages,
   });
   writeJson("renderer-info.json", { schemaVersion: 2, ...runtime.renderer });
   writeJson("pipeline-graph.json", { schemaVersion: 2, ...runtime.pipeline });

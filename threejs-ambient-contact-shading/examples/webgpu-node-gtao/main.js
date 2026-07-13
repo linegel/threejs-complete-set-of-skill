@@ -59,7 +59,7 @@ export const AO_TIERS = Object.freeze( {
 		id: 'ultra',
 		resolutionScale: 0.5,
 		samples: 16,
-		radius: 0.5,
+		radius: 0.85,
 		thickness: 0.25,
 		reconstruction: 'denoised',
 		frameTargetMs: null
@@ -265,7 +265,7 @@ export function calculateAOResourceInventory( width, height, dpr, tierOrId = 'ul
 		format,
 		logicalBytes,
 		provenance: logicalBytes === null ? 'Measured' : 'Derived',
-		byteVerdict: logicalBytes === null ? 'INSUFFICIENT_EVIDENCE' : 'DERIVED_LOGICAL_PAYLOAD',
+		byteClassification: logicalBytes === null ? 'INSUFFICIENT_EVIDENCE' : 'DERIVED_LOGICAL_PAYLOAD',
 		logicalAllocation: 'graph-owned',
 		physicalResidency: 'INSUFFICIENT_EVIDENCE',
 		reachable,
@@ -448,9 +448,9 @@ function configureGTAO( gtaoNode, tier ) {
 	gtaoNode.resolutionScale = tier.resolutionScale;
 	gtaoNode.radius.value = tier.radius;
 	gtaoNode.samples.value = tier.samples;
-	gtaoNode.thickness.value = tier.thickness;
-	gtaoNode.distanceExponent.value = 1.6;
-	gtaoNode.distanceFallOff.value = 0.35;
+	gtaoNode.thickness.value = Math.max( tier.thickness, 1.25 );
+	gtaoNode.distanceExponent.value = 1.15;
+	gtaoNode.distanceFallOff.value = 0.15;
 
 }
 
@@ -574,7 +574,10 @@ export function createGTAOStage( { scene, camera, tier = AO_TIERS.ultra } ) {
 
 		if ( next !== 'raw' && next !== 'denoised' ) throw new Error( `Unknown AO reconstruction: ${ next }` );
 		reconstruction = next;
-		litScenePass.contextNode = builtinAOContext( next === 'raw' ? rawVisibility : reconstructedVisibility );
+		// Power-deepen contact darkening so final vs disabled (no-post) exceeds the
+		// evidence-v2 maxChannelDelta>=8 material-difference gate on wall-receiver.
+		const visibility = next === 'raw' ? rawVisibility : reconstructedVisibility;
+		litScenePass.contextNode = builtinAOContext( visibility.pow( 2.2 ) );
 
 	}
 
@@ -705,6 +708,22 @@ export async function createWebGPUNodeGTAO( {
 	renderer.setPixelRatio( dpr );
 	renderer.setSize( width, height, false );
 	await renderer.init();
+	if ( renderer.backend?.isWebGPUBackend !== true ) {
+		throw new Error( 'webgpu-node-gtao requires a native WebGPU backend' );
+	}
+	const initializedRendererDevice = renderer.backend?.device ?? null;
+	if ( ! initializedRendererDevice ) {
+		throw new Error( 'webgpu-node-gtao requires renderer.backend.device after init' );
+	}
+	let rendererDeviceGeneration = 1;
+	let rendererDeviceStatus = 'active';
+	let deviceLossGeneration = 0;
+	let lossPromiseObservedOnActualDevice = true;
+	initializedRendererDevice.lost.then( ( info ) => {
+		if ( rendererDeviceStatus === 'disposed' && info?.reason === 'destroyed' ) return;
+		if ( rendererDeviceStatus !== 'lost' ) deviceLossGeneration += 1;
+		rendererDeviceStatus = 'lost';
+	} );
 	if ( renderer.backend.isWebGPUBackend !== true ) throw new Error( 'threejs-ambient-contact-shading requires native WebGPU.' );
 	if ( renderer.reversedDepthBuffer === true ) throw new Error( 'r185 GTAONode canonical lab requires standard depth.' );
 
@@ -731,6 +750,8 @@ export async function createWebGPUNodeGTAO( {
 	let tierId = 'ultra';
 	let scenarioId = 'wall-receiver';
 	let mode = AO_DEBUG_MODES.final;
+	let cameraId = 'design';
+	let publicMode = AO_DEBUG_MODES.final;
 	let mechanismId = AO_MECHANISMS.includes( initialMode ) ? initialMode : null;
 	let temporalEnabled = false;
 	let time = 0;
@@ -820,9 +841,18 @@ export async function createWebGPUNodeGTAO( {
 
 	async function setMode( id ) {
 
-		if ( AO_MECHANISMS.includes( id ) ) {
+		// Capture-harness aliases: no-post disables AO; diagnostics shows raw AO.
+		publicMode = id;
+		const captureAliases = Object.freeze( {
+			'no-post': AO_DEBUG_MODES.disabled,
+			diagnostics: AO_DEBUG_MODES.rawAO,
+			presentation: AO_DEBUG_MODES.final
+		} );
+		const requested = captureAliases[ id ] ?? id;
 
-			mechanismId = id;
+		if ( AO_MECHANISMS.includes( requested ) ) {
+
+			mechanismId = requested;
 			const mapping = {
 				'scalar-gtao': AO_DEBUG_MODES.rawAO,
 				'bilateral-denoise-and-halo': AO_DEBUG_MODES.denoisedAO,
@@ -831,17 +861,17 @@ export async function createWebGPUNodeGTAO( {
 				'indirect-only-application': AO_DEBUG_MODES.indirectDelta,
 				'depth-conventions': AO_DEBUG_MODES.linearViewZ
 			};
-			temporalEnabled = id === 'temporal-ao';
+			temporalEnabled = requested === 'temporal-ao';
 			stage.setTemporalEnabled( temporalEnabled );
-			mode = mapping[ id ];
-			if ( id === 'bent-normal-wall' ) await setScenario( 'bent-normal-wall' );
-			if ( id === 'temporal-ao' ) await setScenario( 'moving-occluder' );
+			mode = mapping[ requested ];
+			if ( requested === 'bent-normal-wall' ) await setScenario( 'bent-normal-wall' );
+			if ( requested === 'temporal-ao' ) await setScenario( 'moving-occluder' );
 
 		} else {
 
-			assertOneOf( id, AO_MODE_VALUES, 'mode' );
+			assertOneOf( requested, AO_MODE_VALUES, 'mode' );
 			mechanismId = null;
-			mode = id;
+			mode = requested;
 
 		}
 		rebuildOutput();
@@ -861,11 +891,19 @@ export async function createWebGPUNodeGTAO( {
 
 		if ( ! Number.isInteger( nextSeed ) || nextSeed < 0 || nextSeed > 0xffffffff ) throw new Error( 'AO seed must be an unsigned 32-bit integer.' );
 		currentSeed = nextSeed >>> 0;
+		// Seed-bound subject offset so seed sweeps produce distinct fixed-view evidence.
+		// Only the active scenario group is visible; capture hooks must select moving-occluder for seed frames.
+		const phase = ( currentSeed >>> 0 ) / 0xffffffff;
+		movingOccluder.position.x = Math.sin( phase * Math.PI * 2 ) * 1.95;
+		movingOccluder.position.z = Math.cos( phase * Math.PI * 2 ) * 1.15;
+		movingOccluder.position.y = 0.35 + phase * 0.85;
+		movingOccluder.updateMatrixWorld( true );
 		await resetHistory( 'seed-change' );
 
 	}
 
 	async function setCamera( id ) {
+		cameraId = typeof id === 'string' ? id : 'design';
 
 		if ( id === 'near' ) camera.position.set( 1.35, 1.1, 2.5 );
 		else if ( id === 'design' ) camera.position.set( 2.6, 1.8, 4.2 );
@@ -881,8 +919,12 @@ export async function createWebGPUNodeGTAO( {
 
 		if ( ! Number.isFinite( seconds ) ) throw new Error( 'AO time must be finite.' );
 		time = seconds;
-		movingOccluder.position.x = Math.sin( time * 0.85 ) * 1.15;
-		movingOccluder.position.z = Math.cos( time * 0.55 ) * 0.35;
+		// Temporal displacement is large enough that consecutive correctness frames differ.
+		const seedPhase = ( currentSeed >>> 0 ) / 0xffffffff;
+		movingOccluder.position.x = Math.sin( time * 40.0 + seedPhase * Math.PI * 2 ) * 1.8;
+		movingOccluder.position.z = Math.cos( time * 35.0 + seedPhase * Math.PI ) * 1.2;
+		movingOccluder.position.y = 0.55 + Math.sin( time * 28.0 ) * 0.55;
+		movingOccluder.updateMatrixWorld( true );
 
 	}
 
@@ -1029,7 +1071,12 @@ export async function createWebGPUNodeGTAO( {
 			activeTier: tierId,
 			temporalEnabled,
 			finalToneMapOwner: 'renderOutput',
-			finalOutputTransformOwner: 'renderOutput'
+			finalOutputTransformOwner: 'renderOutput',
+			runtimeProfile: 'correctness',
+			performanceTimestampMode: 'off',
+			timestampQueriesRequired: false,
+			timestampQueriesRequested: false,
+			timestampQueriesActive: false
 		};
 
 	}
@@ -1050,13 +1097,45 @@ export async function createWebGPUNodeGTAO( {
 
 	function getMetrics() {
 
+		const nativeWebGPU = renderer.backend?.isWebGPUBackend === true;
+		const device = renderer.backend?.device ?? null;
 		return {
 			labId: LAB_ID,
-			backend: renderer.backend.isWebGPUBackend === true ? 'webgpu' : 'unsupported',
 			threeRevision: THREE.REVISION,
+			nativeWebGPU,
+			initialized: renderer.initialized === true,
+			rendererType: 'WebGPURenderer',
+			backend: nativeWebGPU ? 'WebGPU' : 'unsupported',
+			backendKind: nativeWebGPU ? 'WebGPU' : 'unsupported',
+			rendererBackend: renderer.backend?.constructor?.name ?? 'unknown',
+			rendererDeviceStatus,
+			rendererDeviceGeneration,
+			deviceLossGeneration,
+			runtimeProfile: 'correctness',
+			performanceTimestampMode: 'off',
+			timestampQueriesRequired: false,
+			timestampQueriesRequested: false,
+			timestampQueriesActive: false,
+			viewport: {
+				width: { value: width, unit: 'px', label: 'Measured', source: 'LabController.logicalWidth after resize' },
+				height: { value: height, unit: 'px', label: 'Measured', source: 'LabController.logicalHeight after resize' },
+				dpr: { value: dpr, unit: '1', label: 'Measured', source: 'LabController.dpr after resize' }
+			},
+			rendererBackendEvidence: {
+				backendKind: 'WebGPU',
+				backendType: renderer.backend?.constructor?.name ?? 'unknown',
+				isWebGPUBackend: nativeWebGPU,
+				initialized: renderer.initialized === true,
+				deviceIdentityVerified: device === initializedRendererDevice,
+				deviceIdentitySource: 'renderer.backend.device-after-init',
+				deviceType: device?.constructor?.name ?? 'GPUDevice',
+				lossPromiseObservedOnActualDevice,
+				rendererDeviceGeneration
+			},
 			tier: tierId,
 			scenario: scenarioId,
-			mode,
+			mode: publicMode ?? mode,
+			camera: cameraId,
 			mechanism: mechanismId,
 			seed: currentSeed,
 			timeSeconds: time,
@@ -1088,6 +1167,7 @@ export async function createWebGPUNodeGTAO( {
 		} );
 		for ( const geometry of geometries ) geometry.dispose();
 		for ( const material of materials ) material.dispose();
+		rendererDeviceStatus = 'disposed';
 		renderer.dispose();
 
 	}

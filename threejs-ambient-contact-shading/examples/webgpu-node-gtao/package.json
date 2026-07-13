@@ -7,7 +7,7 @@
     "validate": "node validate.js && node test.mjs",
     "validate:unit": "node test.mjs",
     "test:mutations": "node test-mutations.mjs",
-    "capture": "node ../../../scripts/capture-lab-browser.mjs --lab webgpu-node-gtao --target presentation",
+    "capture": "node ../../../scripts/capture-lab-browser.mjs --lab webgpu-node-gtao --target presentation --hook capture-hook.mjs",
     "capture:evidence": "node capture.mjs",
     "validate:artifacts": "node validate-artifacts.mjs",
     "validate:quick": "npm run validate && npm run test:mutations",

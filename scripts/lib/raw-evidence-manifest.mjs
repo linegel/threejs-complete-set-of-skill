@@ -85,6 +85,26 @@ export function capturedEvidenceImage( { path, role, binding, kind = 'direct-cap
 
 }
 
+export function notApplicableEvidenceImage( { path, role, reason, pipelineGraphDigest } ) {
+
+	requireString( path, 'evidence image path' );
+	requireString( role, `${ path } role` );
+	requireString( reason, `${ path } N/A reason` );
+	requireSha256( pipelineGraphDigest, `${ path } pipeline graph digest` );
+	return Object.freeze( {
+		path,
+		status: 'not-applicable',
+		kind: 'not-applicable',
+		role,
+		notApplicableProof: Object.freeze( {
+			reason,
+			pipelineGraphPath: 'pipeline-graph.json',
+			pipelineGraphDigest
+		} )
+	} );
+
+}
+
 export function notEligiblePromotion() {
 
 	return Object.freeze( {

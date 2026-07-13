@@ -5,7 +5,7 @@ import { validateEvidenceBundle } from '../../../scripts/lib/evidence-v2.mjs';
 
 const here = dirname( fileURLToPath( import.meta.url ) );
 const root = resolve( here, '../../..' );
-const bundleDir = resolve( process.env.LAB_ARTIFACT_DIR ?? resolve( root, 'artifacts/visual-validation/webgpu-node-gtao' ) );
+const bundleDir = resolve( process.env.LAB_ARTIFACT_DIR ?? resolve( root, 'artifacts/visual-validation/webgpu-node-gtao/correctness' ) );
 const requireAllClaims = process.argv.includes( '--require-all-claims' );
 
 if ( ! existsSync( bundleDir ) ) {

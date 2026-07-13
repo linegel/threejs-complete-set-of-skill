@@ -223,25 +223,25 @@
     {
       "id": "webgpu-backend",
       "required": true,
-      "evidence": "correctness capture wrote renderer-info.json with WebGPURenderer and backend.isWebGPUBackend===true.",
+      "evidence": "correctness evidence-manifest bound to current sourceHash; validate:artifacts PASS with WebGPU backend proof.",
       "status": "accepted"
     },
     {
       "id": "storage-buffer",
       "required": true,
-      "evidence": "GPUCompactionEffectPool storage SoA lanes and free-list counters were stepped and read back during capture mechanism evidence.",
+      "evidence": "GPUCompactionEffectPool storage SoA lanes stepped and validated via mechanism-metrics.gpuReadback.allValid.",
       "status": "accepted"
     },
     {
       "id": "indirect-draw",
       "required": true,
-      "evidence": "publish-indirect-count path populated IndirectStorageBufferAttribute instance counts observed in mechanism readback and mechanism.indirect-draws.png.",
+      "evidence": "indirect instance counts match liveCount in mechanism readback; mechanism.indirect-draws.png captured.",
       "status": "accepted"
     },
     {
       "id": "mrt",
       "required": true,
-      "evidence": "diagnostics.mosaic.png and multi-target capture path wrote emissive/bloom/normal diagnostics from the scene MRT graph.",
+      "evidence": "diagnostics.mosaic.png and multi-target presentation captures from scene MRT graph.",
       "status": "accepted"
     }
   ],
@@ -249,25 +249,25 @@
     {
       "id": "backend-is-webgpu",
       "required": true,
-      "evidence": "renderer-info.json backend.isWebGPUBackend===true for the correctness bundle under artifacts/visual-validation/webgpu-pooled-effects/correctness.",
+      "evidence": "renderer-info.json backend.isWebGPUBackend===true in correctness bundle.",
       "status": "accepted"
     },
     {
       "id": "ordered-compute-dispatch",
       "required": true,
-      "evidence": "pipeline-graph.json records the 11-dispatch mark/scan/scatter/expand/publish order used by GPUCompactionEffectPool.step.",
+      "evidence": "pipeline-graph records mark/scan/scatter/expand/publish dispatch order.",
       "status": "accepted"
     },
     {
       "id": "stable-identity-free-list-readback",
       "required": true,
-      "evidence": "readMechanismEvidence validated dense indexToEntity/entityToIndex free-list invariants for spark and debris pools during capture.",
+      "evidence": "mechanism-metrics records validated dense free-list invariants for spark and debris pools.",
       "status": "accepted"
     },
     {
       "id": "indirect-count-readback",
       "required": true,
-      "evidence": "mechanism readback recorded indirect instance counts matching liveCount for both pools.",
+      "evidence": "indirect instance counts equal liveCount in GPU compaction readback.",
       "status": "accepted"
     },
     {
@@ -279,7 +279,7 @@
     {
       "id": "render-target-output",
       "required": true,
-      "evidence": "correctness capture wrote final.design.png, no-post.design.png, camera/seed/temporal PNGs, and tier/mechanism scenario images.",
+      "evidence": "REQUIRED_EVIDENCE_IMAGES captured as 1200x800 RGBA8 PNGs under correctness profile.",
       "status": "accepted"
     },
     {
@@ -290,7 +290,7 @@
     }
   ],
   "evidenceContract": "v2",
-  "evidenceBundle": null,
+  "evidenceBundle": "artifacts/visual-validation/webgpu-pooled-effects/correctness",
   "validationCommand": "node threejs-particles-trails-and-effects/examples/webgpu-pooled-effects/gpu-compaction.test.mjs",
   "commands": {
     "check": "npm run check",
@@ -301,6 +301,6 @@
     "validateQuick": "npm run validate:quick",
     "validateFull": "npm run validate:full"
   },
-  "sourceHash": null,
+  "sourceHash": "sha256:c1cfa5fb0841304840abfd5345fcbfeca96f981778f28c7dd86db982ac2a75d0",
   "proxyStatus": null
 }

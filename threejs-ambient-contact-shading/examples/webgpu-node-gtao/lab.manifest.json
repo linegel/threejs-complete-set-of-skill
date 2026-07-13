@@ -145,7 +145,9 @@
     "velocity",
     "bent-normal",
     "indirect-delta",
-    "disabled"
+    "disabled",
+    "no-post",
+    "diagnostics"
   ],
   "cameras": [
     "near",
@@ -160,7 +162,7 @@
     {
       "id": "native-webgpu",
       "required": true,
-      "evidence": "capture:evidence 2026-07-13 wrote renderer-info.json with WebGPURenderer and backend.isWebGPUBackend===true under Playwright chromium on Apple M4 Max.",
+      "evidence": "correctness capture-session + evidence-manifest (current sourceHash) validates with WebGPUBackend deviceIdentityVerified; validate:artifacts structuralVerdict PASS.",
       "status": "accepted"
     },
     {
@@ -174,25 +176,25 @@
     {
       "id": "renderer-init",
       "required": true,
-      "evidence": "capture.mjs awaited controller ready and completed 7 aligned WebGPU render-target readbacks after resize/renderOnce.",
+      "evidence": "capture-lab-browser correctness session completed with initialized metrics and 10 standard presentation readbacks.",
       "status": "accepted"
     },
     {
       "id": "backend-is-webgpu",
       "required": true,
-      "evidence": "renderer-info.json records backend.isWebGPUBackend===true and threeRevision 185; metrics.backend===webgpu.",
+      "evidence": "rendererBackendEvidence.isWebGPUBackend===true in capture-session finalRuntime metrics.",
       "status": "accepted"
     },
     {
       "id": "mechanism-reachable",
       "required": true,
-      "evidence": null,
-      "status": "incomplete"
+      "evidence": "correctness mechanism-metrics.runtimeReachability routes include final/diagnostics/camera/seed/temporal PNGs; material pair final vs seed-0001 ratio≥0.337 and final vs temporal.t001 ratio≥0.359 with maxChannelDelta≥152; mechanismCorrectness PASS.",
+      "status": "accepted"
     },
     {
       "id": "aligned-readback",
       "required": true,
-      "evidence": "render-targets.json records integer 256-byte-aligned bytesPerRow metadata for final-lit-display, raw-gtao, reconstructed-gtao, normals, velocity, and odd 641x359 AO.",
+      "evidence": "normalized-readbacks and transport-readbacks written with 256-byte-aligned row strides for 1200x800 captures.",
       "status": "accepted"
     },
     {
@@ -209,7 +211,7 @@
     }
   ],
   "evidenceContract": "v2",
-  "evidenceBundle": null,
+  "evidenceBundle": "docs/visual-validation/webgpu-node-gtao/bundle",
   "validationCommand": "node threejs-ambient-contact-shading/examples/webgpu-node-gtao/validate.js",
   "commands": {
     "check": "npm --prefix threejs-ambient-contact-shading/examples/webgpu-node-gtao run check",
@@ -220,6 +222,6 @@
     "validateQuick": "npm --prefix threejs-ambient-contact-shading/examples/webgpu-node-gtao run validate:quick",
     "validateFull": "npm --prefix threejs-ambient-contact-shading/examples/webgpu-node-gtao run validate:full"
   },
-  "sourceHash": null,
+  "sourceHash": "sha256:8d8ada8f07dc1489c883c72f30ff880c625514028d184575bac076446a77b577",
   "proxyStatus": null
 }
