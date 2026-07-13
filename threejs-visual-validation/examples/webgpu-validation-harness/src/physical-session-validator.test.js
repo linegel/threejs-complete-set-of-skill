@@ -8,12 +8,23 @@ import { test } from 'node:test';
 import { numericDatum } from './physical-evidence-common.js';
 import { createCorrectnessCaptureSessionFixture, createCorrectnessResourceLedgerFixture } from './correctness-capture-session.fixture.js';
 import { createCorrectnessWriteLedger } from './correctness-write-ledger.js';
-import { HARDWARE_PERFORMANCE_CONTRACT, HARDWARE_PERFORMANCE_ROUTE_PLAN, PHYSICAL_ROUTE_PLAN } from './in-app-evidence-plan.js';
+import { HARDWARE_PERFORMANCE_CONTRACT } from './in-app-evidence-plan.js';
 import { assertLabelledNumerics } from './numeric-evidence.js';
 import { createRuntimeGovernorTrace, createRuntimePerformanceTrace } from './physical-performance-trace.js';
 import { projectValidationHarnessPerformanceEvidence } from './performance-evidence-projection.js';
 import { projectValidationHarnessPerformanceResources } from './performance-resource-projection.js';
 import { correctnessLaneReference, physicalLaneReference } from './physical-lane-join.js';
+import {
+	createHardwarePerformanceSessionFixture,
+	createPhysicalRouteSessionFixture,
+	createPhysicalTimestampBatchFixture,
+	createTierVisualEvidenceFixture,
+	createTierVisualResourceEvidenceFixture,
+	PHYSICAL_FIXTURE_HASH_A as HASH_A,
+	PHYSICAL_FIXTURE_HASH_B as HASH_B,
+	PHYSICAL_FIXTURE_HASH_C as HASH_C,
+	PHYSICAL_FIXTURE_HASH_D as HASH_D
+} from './physical-session.fixture.js';
 import { validatePhysicalEvidenceRecordFile } from './physical-validate-record.js';
 import {
 	hashPhysicalRecord,
@@ -29,176 +40,6 @@ import {
 import { createValidationHarnessReleaseArtifactProjector } from './release-evidence-projection.js';
 import { classifyGovernorTrace, classifyGpuStageAttribution, classifyPerformanceTrace } from './runtime-v2-bundle.js';
 
-const HASH_A = `sha256:${ 'a'.repeat( 64 ) }`;
-const HASH_B = `sha256:${ 'b'.repeat( 64 ) }`;
-const HASH_C = `sha256:${ 'c'.repeat( 64 ) }`;
-const HASH_D = `sha256:${ 'd'.repeat( 64 ) }`;
-
-function immutableBuild() {
-
-	return {
-		schemaVersion: 1,
-		kind: 'immutable-physical-build',
-		immutable: true,
-		viteDevelopmentServer: false,
-		transformAtServe: false,
-		redirects: false,
-		spaFallback: false,
-		contentAddress: hashPhysicalRecord( { sourceClosureHash: HASH_A, buildRevision: HASH_B, threeRevision: '0.185.1' } ),
-		sourceClosureHash: HASH_A,
-		buildRevision: HASH_B,
-		threeRevision: '0.185.1',
-		sourceClosure: {
-			sourceHash: HASH_A,
-			buildRevision: HASH_B,
-			threeRevision: '0.185.1',
-			roots: [ 'package.json', 'package-lock.json', 'labs/runtime/aligned-readback.mjs' ]
-		},
-		bundleHash: HASH_C,
-		files: {
-			'index.html': { sha256: HASH_A, byteLength: 100 },
-			'src/in-app-evidence.html': { sha256: HASH_B, byteLength: 200 }
-		}
-	};
-
-}
-
-function routeRecord( plan ) {
-
-	const sourceBytesPerRow = Math.ceil( plan.startup.width * 4 / 256 ) * 256;
-	const pipelineGraph = { route: plan.key, owner: 'native-validation-subject' };
-	const resources = plan.runtimeProfile === 'performance'
-		? createCorrectnessResourceLedgerFixture( plan.startup.width, plan.startup.height, plan.id === 'governor-stress' ? 0.5 : 1 )
-		: { route: plan.key, targets: [ 'output', 'normal', 'emissive', 'depth', 'capture-target' ] };
-	return {
-		key: plan.key,
-		kind: plan.kind,
-		id: plan.id,
-		startup: structuredClone( plan.startup ),
-		runtimeProfile: plan.runtimeProfile,
-		controllerReady: true,
-		finalUrlMatches: true,
-		sourceClosureHash: HASH_A,
-		buildRevision: HASH_B,
-		threeRevision: '0.185.1',
-		pipelineGraphDigest: hashPhysicalRecord( pipelineGraph ),
-		resourceDigest: hashPhysicalRecord( resources ),
-		pipelineGraph,
-		resources,
-		backend: {
-			isWebGPUBackend: true,
-			initialized: true,
-			deviceIdentityVerified: true,
-			rendererDeviceGeneration: 1,
-			controllerGeneration: 1,
-			deviceLossGeneration: 0,
-			deviceLostObserved: false,
-			uncapturedErrors: []
-		},
-		adapter: { adapterClass: 'hardware', info: { vendor: 'Apple', device: 'M-series' } },
-		state: {
-			scenario: plan.startup.scenario,
-			mode: plan.startup.mode,
-			tier: plan.startup.tier,
-			camera: plan.startup.camera,
-			seed: plan.startup.seed,
-			timeSeconds: plan.startup.timeSeconds,
-			viewport: { width: plan.startup.width, height: plan.startup.height, dpr: plan.startup.dpr }
-		},
-		readback: {
-			target: plan.startup.mode,
-			width: plan.startup.width,
-			height: plan.startup.height,
-			bytesPerPixel: 4,
-			rowBytes: plan.startup.width * 4,
-			sourceBytesPerRow,
-			format: 'rgba8unorm',
-			resourceFormat: 'rgba8unorm-srgb',
-			colorManaged: true,
-			outputColorSpace: 'srgb',
-			encoding: 'srgb',
-			origin: 'top-left',
-			sourceByteLength: sourceBytesPerRow * plan.startup.height,
-			pixelByteLength: plan.startup.width * plan.startup.height * 4,
-			transportByteLength: sourceBytesPerRow * plan.startup.height,
-			normalizedByteLength: sourceBytesPerRow * plan.startup.height,
-			pixelSha256: HASH_A,
-			transportSha256: HASH_B,
-			normalizedSha256: HASH_C,
-			transportLayout: {
-				width: plan.startup.width,
-				height: plan.startup.height,
-				rowBytes: plan.startup.width * 4,
-				bytesPerRow: sourceBytesPerRow,
-				byteLength: sourceBytesPerRow * plan.startup.height,
-				format: 'rgba8unorm',
-				origin: 'top-left'
-			},
-			normalizedLayout: {
-				width: plan.startup.width,
-				height: plan.startup.height,
-				rowBytes: plan.startup.width * 4,
-				bytesPerRow: sourceBytesPerRow,
-				byteLength: sourceBytesPerRow * plan.startup.height,
-				format: 'rgba8unorm',
-				origin: 'top-left'
-			}
-		},
-		lifecycle: { disposeCompleted: true, twoAnimationFramesSettled: true, delayedErrors: [] },
-		errors: []
-	};
-
-}
-
-function serving( plan ) {
-
-	return {
-		status: 'FINALIZED_EXACT_STATIC_BYTES',
-		ledgerSha256: HASH_D,
-		buildManifestFileSha256: HASH_B,
-		entries: plan.map( ( route ) => ( {
-			status: 200,
-			resolvedPath: 'index.html',
-			query: new URLSearchParams( { lockKind: route.kind, lockId: route.id } ).toString(),
-			sha256: HASH_A,
-			byteLength: 100,
-			responseKind: 'exact-prebuilt-byte',
-			redirected: false,
-			fallback: false,
-			transformed: false
-		} ) )
-	};
-
-}
-
-function baseSession( profile, plan ) {
-
-	const refreshIntervals = Array( 120 ).fill( 16.67 );
-	refreshIntervals.fill( 17.17, 0, 8 );
-	return {
-		schemaVersion: 1,
-		profile,
-		automationSurface: 'codex-in-app-browser',
-		startedAt: '2026-07-12T09:00:00.000Z',
-		servedLedgerStartedAt: '2026-07-12T09:00:00.000Z',
-		finishedAt: '2026-07-12T09:01:00.000Z',
-		browser: { webdriver: false, headless: false, visibilityState: 'visible' },
-		adapter: { adapterClass: 'hardware', identity: { vendor: 'Apple', device: 'M-series' } },
-		refresh: {
-			hz: numericDatum( 1000 / 16.67, 'Hz', 'Measured', 'idle-rAF' ),
-			measurementDuration: numericDatum( 2100, 'ms', 'Measured', 'idle-rAF' ),
-			intervals: { values: refreshIntervals, unit: 'ms', label: 'Measured', source: 'idle-rAF intervals' },
-			p50: numericDatum( 16.67, 'ms', 'Measured', 'idle-rAF intervals' ),
-			p95: numericDatum( 17.17, 'ms', 'Measured', 'idle-rAF intervals' )
-		},
-		immutableBuild: immutableBuild(),
-		routeOrder: plan.map( ( route ) => route.key ),
-		routes: plan.map( routeRecord ),
-		serving: serving( plan )
-	};
-
-}
-
 async function importedWrapper( record, options = {} ) {
 
 	const finalized = structuredClone( record );
@@ -211,200 +52,6 @@ async function importedWrapper( record, options = {} ) {
 	const bytes = Buffer.from( options.compact === true ? JSON.stringify( wrapper ) : `${ JSON.stringify( wrapper, null, 2 ) }\n` );
 	await writeFile( path, bytes, { flag: 'wx' } );
 	return { path, bytes, wrapper };
-
-}
-
-function timestampBatch( { frameBase = 0, frameCallBase = 0 } = {} ) {
-
-	const timestampRows = Array.from( { length: 120 }, ( _, index ) => {
-
-		const frameId = frameBase + index;
-		return {
-		frameId,
-		sceneUid: `r:${ frameCallBase + index * 2 + 2 }:17:f${ frameId }`,
-		outputUid: `r:${ frameCallBase + index * 2 + 1 }:41:f${ frameId }`,
-		sceneMs: 1,
-		outputMs: 0.5,
-		totalMs: 1.5,
-		residualMs: null,
-		totalProvenance: 'Derived',
-		independentPerFrameTotalAvailable: false
-		};
-
-	} );
-	return {
-		verdict: 'PASS',
-		mappingCadence: 'once-per-batch',
-		warmupFrames: numericDatum( 30, 'frame', 'Measured', 'warm-up batch' ),
-		warmupCpuSamples: { values: Array( 30 ).fill( 1.1 ), unit: 'ms', label: 'Measured', source: 'performance.now' },
-		sampleFrames: numericDatum( 120, 'frame', 'Measured', 'timestamp batch' ),
-		cpuSamples: { values: Array( 120 ).fill( 1.2 ), unit: 'ms', label: 'Measured', source: 'performance.now' },
-		resolveCount: numericDatum( 1, 'resolve', 'Measured', 'timestamp batch' ),
-		gpuSamples: { values: timestampRows.map( ( row ) => row.totalMs ), unit: 'ms', label: 'Measured', source: 'WebGPU timestamp rows' },
-		timestampRows,
-		stageContextIds: { 'scene-mrt': 17, 'final-output': 41 },
-		lastFrameResolveResidualMs: 0,
-		independentPerFrameTotalsAvailable: false,
-		reconciliationKind: 'final-renderer-frame-aggregate',
-		reconciliationScope: 'Independent Three aggregate checked only for the final-frame resolve.'
-	};
-
-}
-
-function sustainedWindow( presentationSampleCount = 1800 ) {
-
-	const presentationSamples = Array( presentationSampleCount ).fill( 16.67 );
-	const duration = presentationSamples.reduce( ( sum, sample ) => sum + sample, 0 );
-	return {
-		duration: numericDatum( duration, 'ms', 'Measured', 'monotonic clock' ),
-		sampleCount: numericDatum( presentationSamples.length, 'sample', 'Measured', 'rAF intervals' ),
-		presentationSamples: { values: presentationSamples, unit: 'ms', label: 'Measured', source: 'rAF intervals' },
-		maximumPresentationGap: numericDatum( 16.67, 'ms', 'Measured', 'rAF intervals' ),
-		presentationCoverage: numericDatum( presentationSamples.length / ( duration / 16.67 ), 'ratio', 'Derived', 'observed/expected intervals' ),
-		gpuTimestampBatches: [ timestampBatch() ]
-	};
-
-}
-
-function governorWindow( window, measuredTier, tier, gpuP95, decision, residence, cooldown ) {
-
-	const timestampRows = Array.from( { length: 30 }, ( _, frameId ) => ( {
-		frameId,
-		sceneUid: `governor-scene:${ window }:${ frameId }`,
-		outputUid: `governor-output:${ window }:${ frameId }`,
-		sceneMs: gpuP95 - 0.5,
-		outputMs: 0.5,
-		totalMs: gpuP95,
-		residualMs: null,
-		totalProvenance: 'Derived',
-		independentPerFrameTotalAvailable: false
-	} ) );
-	return {
-		window,
-		measuredTier,
-		tier,
-		gpuSamples: timestampRows.map( ( row ) => row.totalMs ),
-		gpuP95,
-		timestampRows,
-		lastFrameResolveResidualMs: 0,
-		decision,
-		residence,
-		cooldown
-	};
-
-}
-
-function governorTrace() {
-
-	const targetResourceBytes = createCorrectnessResourceLedgerFixture( 1920, 1080, 1 ).trackedRenderTargetBytes;
-	const stressResourceBytes = createCorrectnessResourceLedgerFixture( 1920, 1080, 0.5 ).trackedRenderTargetBytes;
-	return {
-		adapterClass: 'hardware',
-		windowCount: 6,
-		framesPerWindow: 30,
-		targetMs: 1000 / 60 - 2,
-		hysteresisMs: 2,
-		minimumResidenceWindows: 2,
-		cooldownWindows: 2,
-		states: [ 'target-performance', 'governor-stress' ],
-		initialState: 'governor-stress',
-		windows: [
-			governorWindow( 0, 'governor-stress', 'governor-stress', 10, 'hold', 1, 0 ),
-			governorWindow( 1, 'governor-stress', 'target-performance', 10, 'upgrade', 0, 2 ),
-			governorWindow( 2, 'target-performance', 'target-performance', 10, 'hold', 1, 1 ),
-			governorWindow( 3, 'target-performance', 'target-performance', 10, 'hold', 2, 0 ),
-			governorWindow( 4, 'target-performance', 'target-performance', 10, 'hold', 3, 0 ),
-			governorWindow( 5, 'target-performance', 'target-performance', 10, 'hold', 4, 0 )
-		],
-		transitions: [ {
-			window: 1,
-			from: 'governor-stress',
-			to: 'target-performance',
-			cause: 'gpu-p95-below-hysteresis',
-			gpuP95: 10,
-			rebuildCpuSubmissionMs: 0.2,
-			rebuildGpuMs: 1.5,
-			rebuildTimestampRow: {
-				frameId: 0,
-				sceneUid: 'governor-transition-scene:1',
-				outputUid: 'governor-transition-output:1',
-				sceneMs: 1,
-				outputMs: 0.5,
-				totalMs: 1.5,
-				residualMs: null,
-				totalProvenance: 'Derived',
-				independentPerFrameTotalAvailable: false
-			},
-			lastFrameResolveResidualMs: 0,
-			fromResourceBytes: stressResourceBytes,
-			toResourceBytes: targetResourceBytes
-		} ],
-		settledState: 'target-performance',
-		oscillationDetected: false
-	};
-
-}
-
-function performanceSession() {
-
-	return {
-		...baseSession( 'performance', HARDWARE_PERFORMANCE_ROUTE_PLAN ),
-		viewport: { width: 1920, height: 1080, dpr: 1 },
-		hostReserve: { p95: numericDatum( 0.5, 'ms', 'Measured', 'idle host shell' ) },
-		compositorReserve: { verdict: 'NOT_CLAIMED', reason: 'no real API' },
-		cold: sustainedWindow( HARDWARE_PERFORMANCE_CONTRACT.coldMinimumSamples.value ),
-		sustainedWindows: [ sustainedWindow(), sustainedWindow() ],
-		governor: {
-			verdict: 'PASS',
-			oscillationDetected: false,
-			settled: true,
-			settledState: 'target-performance',
-			settledResidenceWindows: numericDatum( 4, 'window', 'Measured', 'governor trace' ),
-			trace: governorTrace()
-		}
-	};
-
-}
-
-function tierVisualEvidence() {
-
-	const binding = {
-		reference: {
-			recipeId: 'tier.target-performance.final',
-			pngSha256: HASH_A,
-			passScale: 1,
-			transaction: { status: 'COMMITTED', restorationVerdict: 'PASS', entryStateDigest: HASH_A, restoredStateDigest: HASH_A },
-			normalized: { width: 1920, height: 1080, compactByteLength: 1920 * 1080 * 4, compactRgbaSha256: HASH_B },
-			effectiveState: { scenario: 'timing-and-governor', mode: 'final', tier: 'target-performance', passScale: 1, outputNodeMode: 'final', viewport: { width: 1920, height: 1080, dpr: 1 }, sceneTarget: { width: 1920, height: 1080 } }
-		},
-		candidate: {
-			recipeId: 'tier.governor-stress.final',
-			pngSha256: HASH_C,
-			passScale: 0.5,
-			transaction: { status: 'COMMITTED', restorationVerdict: 'PASS', entryStateDigest: HASH_A, restoredStateDigest: HASH_A },
-			normalized: { width: 1920, height: 1080, compactByteLength: 1920 * 1080 * 4, compactRgbaSha256: HASH_D },
-			effectiveState: { scenario: 'timing-and-governor', mode: 'final', tier: 'governor-stress', passScale: 0.5, outputNodeMode: 'final', viewport: { width: 1920, height: 1080, dpr: 1 }, sceneTarget: { width: 960, height: 540 } }
-		}
-	};
-	const metrics = {
-		meanRgbByteDifference: numericDatum( 0.25, 'mean-rgb-byte-difference', 'Measured', 'tier readback comparison' ),
-		edgeMaskPixels: numericDatum( 100, 'pixels', 'Measured', 'reference edge mask' ),
-		edgeMeanRgbByteDifference: numericDatum( 0.5, 'mean-rgb-byte-difference', 'Measured', 'tier readback comparison' ),
-		edgeP95RgbByteDifference: numericDatum( 1, 'mean-rgb-byte-difference', 'Measured', 'tier readback comparison' )
-	};
-	const gates = {
-		meanRgbByteDifference: numericDatum( 8, 'mean-rgb-byte-difference', 'Gated', 'frozen tier gate' ),
-		edgeP95RgbByteDifference: numericDatum( 32, 'mean-rgb-byte-difference', 'Gated', 'frozen tier gate' )
-	};
-	return {
-		schemaVersion: 1,
-		kind: 'validation-harness-tier-visual-evidence-v1',
-		binding,
-		metrics,
-		gates,
-		bindingSha256: hashPhysicalRecord( { binding, metrics, gates } ),
-		verdict: 'PASS'
-	};
 
 }
 
@@ -441,20 +88,43 @@ function correctnessProjectionArtifacts() {
 
 }
 
-function tierVisualResourceEvidence() {
-
-	const document = tierVisualEvidence();
-	const resourceEvidence = correctnessCaptureSession().hookResult.tierVisualEvidence;
-	document.binding.reference.resources = structuredClone( resourceEvidence.binding.reference.resources );
-	document.binding.candidate.resources = structuredClone( resourceEvidence.binding.candidate.resources );
-	document.bindingSha256 = hashPhysicalRecord( { binding: document.binding, metrics: document.metrics, gates: document.gates } );
-	return document;
-
-}
 test( 'complete 19-route physical session passes strict validation', () => {
 
-	const session = baseSession( 'physical-route', PHYSICAL_ROUTE_PLAN );
+	const session = createPhysicalRouteSessionFixture();
 	assert.deepEqual( validatePhysicalRouteSession( session ), { valid: true, profile: 'physical-route', routeCount: 19 } );
+
+} );
+
+test( 'shared physical fixtures deterministically rebind source-closure and build identity', () => {
+
+	const sourceClosure = {
+		algorithm: 'fixture-source-closure-v1',
+		roots: [ 'package.json', 'package-lock.json', 'labs/runtime/aligned-readback.mjs' ],
+		files: [ { repositoryPath: 'package.json', sha256: HASH_A, byteLength: 100 } ],
+		threeRevision: '0.185.1',
+		sourceHash: HASH_C,
+		buildRevision: HASH_D,
+		registrySourceHash: HASH_B
+	};
+	const options = { sourceClosureHash: HASH_C, buildRevision: HASH_D, sourceClosure };
+	const physical = createPhysicalRouteSessionFixture( options );
+	const performance = createHardwarePerformanceSessionFixture( options );
+	const expectedContentAddress = hashPhysicalRecord( {
+		sourceClosureHash: HASH_C,
+		buildRevision: HASH_D,
+		threeRevision: '0.185.1'
+	} );
+	for ( const session of [ physical, performance ] ) {
+
+		assert.equal( session.immutableBuild.sourceClosureHash, HASH_C );
+		assert.equal( session.immutableBuild.buildRevision, HASH_D );
+		assert.equal( session.immutableBuild.contentAddress, expectedContentAddress );
+		assert.deepEqual( session.immutableBuild.sourceClosure, sourceClosure );
+		assert.equal( session.routes.every( ( route ) => route.sourceClosureHash === HASH_C && route.buildRevision === HASH_D ), true );
+
+	}
+	assert.deepEqual( validatePhysicalRouteSession( physical ), { valid: true, profile: 'physical-route', routeCount: 19 } );
+	assert.equal( validateHardwarePerformanceSession( performance ).valid, true );
 
 } );
 
@@ -588,7 +258,7 @@ test( 'physical session mutations reject nonphysical or mutable evidence', () =>
 	];
 	for ( const [ name, mutate, pattern ] of mutations ) {
 
-		const value = structuredClone( baseSession( 'physical-route', PHYSICAL_ROUTE_PLAN ) );
+		const value = structuredClone( createPhysicalRouteSessionFixture() );
 		mutate( value );
 		assert.throws( () => validatePhysicalRouteSession( value ), pattern, name );
 
@@ -601,7 +271,7 @@ test( 'hardware performance session passes long-window and timestamp gates', () 
 	assert.equal( HARDWARE_PERFORMANCE_CONTRACT.cpuP95Maximum.value, 1000 / 60 - 2 );
 	assert.equal( HARDWARE_PERFORMANCE_CONTRACT.gpuP95Maximum.value, HARDWARE_PERFORMANCE_CONTRACT.cpuP95Maximum.value );
 	assert.equal( HARDWARE_PERFORMANCE_CONTRACT.governorTarget.value, HARDWARE_PERFORMANCE_CONTRACT.cpuP95Maximum.value );
-	assert.deepEqual( validateHardwarePerformanceSession( performanceSession() ), {
+	assert.deepEqual( validateHardwarePerformanceSession( createHardwarePerformanceSessionFixture() ), {
 		valid: true,
 		profile: 'performance',
 		sustainedWindowCount: 2,
@@ -626,8 +296,8 @@ test( 'hardware performance session passes long-window and timestamp gates', () 
 
 test( 'verified hardware timing maps the final sustained window without relabelling cold samples', async () => {
 
-	const record = performanceSession();
-	record.sustainedWindows.at( - 1 ).gpuTimestampBatches.push( timestampBatch( { frameBase: 120, frameCallBase: 240 } ) );
+	const record = createHardwarePerformanceSessionFixture();
+	record.sustainedWindows.at( - 1 ).gpuTimestampBatches.push( createPhysicalTimestampBatchFixture( { frameBase: 120, frameCallBase: 240 } ) );
 	const imported = await importedWrapper( record );
 	const verified = await loadVerifiedImportedPhysicalRecord( imported.path, { expectedProfile: 'performance' } );
 	const trace = createRuntimePerformanceTrace( verified );
@@ -651,10 +321,10 @@ test( 'verified hardware timing maps the final sustained window without relabell
 	assert.equal( classifyGpuStageAttribution( trace ), 'PASS' );
 	verified.record.sustainedWindows.at( - 1 ).gpuTimestampBatches[ 0 ].cpuSamples.values[ 0 ] = 99;
 	assert.equal( trace.cpuSamples[ 0 ], 1.2 );
-	assert.throws( () => createRuntimePerformanceTrace( { record: performanceSession() } ), /exact wrapper bytes/ );
+	assert.throws( () => createRuntimePerformanceTrace( { record: createHardwarePerformanceSessionFixture() } ), /exact wrapper bytes/ );
 
-	const resetFrameCallRecord = performanceSession();
-	resetFrameCallRecord.sustainedWindows.at( - 1 ).gpuTimestampBatches.push( timestampBatch( { frameBase: 120, frameCallBase: 0 } ) );
+	const resetFrameCallRecord = createHardwarePerformanceSessionFixture();
+	resetFrameCallRecord.sustainedWindows.at( - 1 ).gpuTimestampBatches.push( createPhysicalTimestampBatchFixture( { frameBase: 120, frameCallBase: 0 } ) );
 	const resetFrameCallImport = await importedWrapper( resetFrameCallRecord );
 	const resetFrameCallVerified = await loadVerifiedImportedPhysicalRecord( resetFrameCallImport.path, { expectedProfile: 'performance' } );
 	const resetFrameCallTrace = createRuntimePerformanceTrace( resetFrameCallVerified );
@@ -662,13 +332,13 @@ test( 'verified hardware timing maps the final sustained window without relabell
 	assert.equal( resetFrameCallTrace.timestampRows[ 0 ].sceneUid, 'r:2:17:f0' );
 	assert.equal( resetFrameCallTrace.timestampRows[ 120 ].sceneUid, 'r:2:17:f120' );
 
-	const duplicateRecord = performanceSession();
-	duplicateRecord.sustainedWindows.at( - 1 ).gpuTimestampBatches.push( timestampBatch() );
+	const duplicateRecord = createHardwarePerformanceSessionFixture();
+	duplicateRecord.sustainedWindows.at( - 1 ).gpuTimestampBatches.push( createPhysicalTimestampBatchFixture() );
 	const duplicateImport = await importedWrapper( duplicateRecord );
 	const duplicateVerified = await loadVerifiedImportedPhysicalRecord( duplicateImport.path, { expectedProfile: 'performance' } );
 	assert.throws( () => createRuntimePerformanceTrace( duplicateVerified ), /duplicates a timestamp UID across the mapped segment/ );
 
-	const sharedFrameRecord = performanceSession();
+	const sharedFrameRecord = createHardwarePerformanceSessionFixture();
 	for ( const row of sharedFrameRecord.sustainedWindows.at( - 1 ).gpuTimestampBatches[ 0 ].timestampRows ) {
 
 		row.frameId = 7;
@@ -686,9 +356,9 @@ test( 'verified hardware timing maps the final sustained window without relabell
 
 test( 'verified governor timing joins separately bound tier visual evidence', async () => {
 
-	const imported = await importedWrapper( performanceSession() );
+	const imported = await importedWrapper( createHardwarePerformanceSessionFixture() );
 	const verified = await loadVerifiedImportedPhysicalRecord( imported.path, { expectedProfile: 'performance' } );
-	const visual = tierVisualEvidence();
+	const visual = createTierVisualEvidenceFixture();
 	const trace = createRuntimeGovernorTrace( verified, visual );
 	assert.equal( trace.adapterClass, 'hardware' );
 	assert.equal( trace.initialState, 'governor-stress' );
@@ -706,7 +376,7 @@ test( 'verified governor timing joins separately bound tier visual evidence', as
 		[ 'empty edge mask', ( value ) => { value.metrics.edgeMaskPixels.value = 0; }, /does not satisfy/ ]
 	] ) {
 
-		const mutation = structuredClone( tierVisualEvidence() );
+		const mutation = structuredClone( createTierVisualEvidenceFixture() );
 		mutate( mutation );
 		mutation.bindingSha256 = hashPhysicalRecord( { binding: mutation.binding, metrics: mutation.metrics, gates: mutation.gates } );
 		assert.throws( () => createRuntimeGovernorTrace( verified, mutation ), pattern, name );
@@ -717,9 +387,9 @@ test( 'verified governor timing joins separately bound tier visual evidence', as
 
 test( 'offline performance projection binds the exact hardware and tier-evidence inputs', async () => {
 
-	const imported = await importedWrapper( performanceSession() );
+	const imported = await importedWrapper( createHardwarePerformanceSessionFixture() );
 	const verifiedPerformance = await loadVerifiedImportedPhysicalRecord( imported.path, { expectedProfile: 'performance' } );
-	const tierDocument = tierVisualEvidence();
+	const tierDocument = createTierVisualEvidenceFixture();
 	const tierVisualEvidenceBytes = Buffer.from( `${ JSON.stringify( tierDocument, null, 2 ) }\n` );
 	const tierVisualEvidenceLedgerEntry = {
 		path: 'tier-visual-evidence.json',
@@ -768,9 +438,9 @@ test( 'offline performance projection binds the exact hardware and tier-evidence
 
 test( 'offline resource projection preserves correctness artifacts and adds bound hardware tiers', async () => {
 
-	const imported = await importedWrapper( performanceSession() );
+	const imported = await importedWrapper( createHardwarePerformanceSessionFixture() );
 	const verifiedPerformance = await loadVerifiedImportedPhysicalRecord( imported.path, { expectedProfile: 'performance' } );
-	const tierDocument = tierVisualResourceEvidence();
+	const tierDocument = createTierVisualResourceEvidenceFixture();
 	const tierInput = boundArtifact( 'tier-visual-evidence.json', tierDocument, 'supplementary-json' );
 	const correctnessIdentity = { sourceClosureHash: HASH_A, buildRevision: HASH_B, threeRevision: '0.185.1' };
 	const correctnessArtifacts = correctnessProjectionArtifacts();
@@ -861,8 +531,8 @@ test( 'release artifact projector requires the strict three-lane join and projec
 		path: 'capture-session.json'
 	} );
 	const correctnessLedger = boundArtifact( 'capture-write-ledger.json', correctnessWriteLedger.value, 'capture-session-write-ledger' );
-	const physicalImport = await importedWrapper( baseSession( 'physical-route', PHYSICAL_ROUTE_PLAN ), { filename: 'physical-route.json' } );
-	const performanceImport = await importedWrapper( performanceSession(), { filename: 'performance.json' } );
+	const physicalImport = await importedWrapper( createPhysicalRouteSessionFixture(), { filename: 'physical-route.json' } );
+	const performanceImport = await importedWrapper( createHardwarePerformanceSessionFixture(), { filename: 'performance.json' } );
 	const verifiedPhysical = await loadVerifiedImportedPhysicalRecord( physicalImport.path, { expectedProfile: 'physical-route' } );
 	const verifiedPerformance = await loadVerifiedImportedPhysicalRecord( performanceImport.path, { expectedProfile: 'performance' } );
 	const strictJoin = {
@@ -879,7 +549,7 @@ test( 'release artifact projector requires the strict three-lane join and projec
 		physicalRoute: physicalLaneReference( verifiedPhysical.record, verifiedPhysical.sourceDocumentSha256 ),
 		hardwarePerformance: physicalLaneReference( verifiedPerformance.record, verifiedPerformance.sourceDocumentSha256 )
 	};
-	const tierInput = boundArtifact( 'tier-visual-evidence.json', tierVisualResourceEvidence(), 'supplementary-json' );
+	const tierInput = boundArtifact( 'tier-visual-evidence.json', createTierVisualResourceEvidenceFixture(), 'supplementary-json' );
 	const correctnessInputs = correctnessProjectionArtifacts();
 	const artifacts = Object.fromEntries( Object.entries( correctnessInputs ).map( ( [ path, input ] ) => [ path, JSON.parse( input.bytes ) ] ) );
 	const artifactBindings = Object.fromEntries( Object.entries( correctnessInputs ).map( ( [ path, input ] ) => [ path, {
@@ -1057,7 +727,7 @@ test( 'hardware performance mutations reject short, discontinuous, or fabricated
 	];
 	for ( const [ name, mutate, pattern ] of mutations ) {
 
-		const value = structuredClone( performanceSession() );
+		const value = structuredClone( createHardwarePerformanceSessionFixture() );
 		mutate( value );
 		assert.throws( () => validateHardwarePerformanceSession( value ), pattern, name );
 
@@ -1067,8 +737,8 @@ test( 'hardware performance mutations reject short, discontinuous, or fabricated
 
 test( 'verified physical wrapper loader preserves exact bytes and recomputes both lane types', async () => {
 
-	const physical = await importedWrapper( baseSession( 'physical-route', PHYSICAL_ROUTE_PLAN ) );
-	const performance = await importedWrapper( performanceSession() );
+	const physical = await importedWrapper( createPhysicalRouteSessionFixture() );
+	const performance = await importedWrapper( createHardwarePerformanceSessionFixture() );
 	for ( const fixture of [ physical, performance ] ) {
 
 		const verified = await loadVerifiedImportedPhysicalRecord( fixture.path, { expectedProfile: fixture.wrapper.record.profile } );
@@ -1091,7 +761,7 @@ test( 'verified physical wrapper bytes reject non-JSON and caller-forged summari
 
 	assert.throws( () => verifyImportedPhysicalRecordBytes( Buffer.from( 'not JSON' ) ), /invalid JSON/ );
 	assert.throws( () => verifyImportedPhysicalRecordBytes( 'not bytes' ), /Uint8Array/ );
-	const baseline = await importedWrapper( baseSession( 'physical-route', PHYSICAL_ROUTE_PLAN ) );
+	const baseline = await importedWrapper( createPhysicalRouteSessionFixture() );
 	const mutations = [
 		[ 'stale validation', ( value ) => { value.validation = { valid: true, profile: 'physical-route', routeCount: 999 }; }, /validation summary/ ],
 		[ 'stale record hash', ( value ) => { value.recordSha256 = HASH_D; }, /recordSha256/ ],
@@ -1121,7 +791,7 @@ test( 'verified physical wrapper bytes reject non-JSON and caller-forged summari
 test( 'verified physical wrapper loader rejects raw, stale, promoted, and cross-profile inputs', async () => {
 
 	const directory = await mkdtemp( join( tmpdir(), 'threejs-verified-physical-mutations-' ) );
-	const baseline = await importedWrapper( baseSession( 'physical-route', PHYSICAL_ROUTE_PLAN ), { directory, filename: 'baseline.json' } );
+	const baseline = await importedWrapper( createPhysicalRouteSessionFixture(), { directory, filename: 'baseline.json' } );
 	const mutations = [
 		[ 'raw record', structuredClone( baseline.wrapper.record ), /omits record/ ],
 		[ 'stale validation', { ...structuredClone( baseline.wrapper ), validation: { valid: false } }, /validation summary/ ],
@@ -1148,7 +818,7 @@ test( 'verified physical wrapper loader rejects raw, stale, promoted, and cross-
 		await assert.rejects( loadVerifiedImportedPhysicalRecord( path ), /nonpublishable and incomplete/ );
 
 	}
-	const staleLedger = await importedWrapper( baseSession( 'physical-route', PHYSICAL_ROUTE_PLAN ), { directory, filename: 'stale-ledger.json', servedLedgerSha256: HASH_D } );
+	const staleLedger = await importedWrapper( createPhysicalRouteSessionFixture(), { directory, filename: 'stale-ledger.json', servedLedgerSha256: HASH_D } );
 	await assert.rejects( loadVerifiedImportedPhysicalRecord( staleLedger.path ), /served-byte ledger hash/ );
 
 } );
@@ -1156,7 +826,7 @@ test( 'verified physical wrapper loader rejects raw, stale, promoted, and cross-
 test( 'verified wrapper distinguishes semantic record identity from exact document bytes', async () => {
 
 	const directory = await mkdtemp( join( tmpdir(), 'threejs-verified-physical-format-' ) );
-	const record = baseSession( 'physical-route', PHYSICAL_ROUTE_PLAN );
+	const record = createPhysicalRouteSessionFixture();
 	const pretty = await importedWrapper( record, { directory, filename: 'pretty.json' } );
 	const compact = await importedWrapper( record, { directory, filename: 'compact.json', compact: true } );
 	const prettyVerified = await loadVerifiedImportedPhysicalRecord( pretty.path );
