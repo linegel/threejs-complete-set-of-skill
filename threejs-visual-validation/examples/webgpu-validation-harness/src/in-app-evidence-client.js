@@ -2,6 +2,7 @@ import {
 	HARDWARE_PERFORMANCE_PROFILE,
 	PHYSICAL_EVIDENCE_SCHEMA_VERSION,
 	PHYSICAL_ROUTE_PROFILE,
+	idleRefreshMeasurementComplete,
 	numericDatum,
 	requireCaptureTargetResourceFormat,
 	sha256Hex
@@ -45,8 +46,7 @@ async function measureIdleRefresh() {
 
 	const minimumDuration = HARDWARE_PERFORMANCE_CONTRACT.idleRefreshMinimumDuration.value;
 	const timestamps = [];
-	const started = performance.now();
-	while ( performance.now() - started < minimumDuration || timestamps.length < 121 ) timestamps.push( await new Promise( requestAnimationFrame ) );
+	while ( idleRefreshMeasurementComplete( timestamps, minimumDuration ) === false ) timestamps.push( await new Promise( requestAnimationFrame ) );
 	const intervals = timestamps.slice( 1 ).map( ( value, index ) => value - timestamps[ index ] );
 	const duration = timestamps.at( -1 ) - timestamps[ 0 ];
 	const p50 = percentile( intervals, 0.5 );

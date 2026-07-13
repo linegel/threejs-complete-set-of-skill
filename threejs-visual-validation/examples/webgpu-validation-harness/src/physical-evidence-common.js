@@ -3,6 +3,19 @@ export const CORRECTNESS_PROFILE = 'correctness';
 export const PHYSICAL_ROUTE_PROFILE = 'physical-route';
 export const HARDWARE_PERFORMANCE_PROFILE = 'performance';
 
+export function idleRefreshMeasurementComplete( timestamps, minimumDurationMs, minimumIntervals = 120 ) {
+
+	if ( Array.isArray( timestamps ) === false ) throw new Error( 'Idle-refresh completion requires a timestamp array.' );
+	if ( Number.isFinite( minimumDurationMs ) === false || minimumDurationMs <= 0 ) throw new Error( 'Idle-refresh minimum duration must be finite and positive.' );
+	if ( Number.isInteger( minimumIntervals ) === false || minimumIntervals < 1 ) throw new Error( 'Idle-refresh minimum interval count must be a positive integer.' );
+	if ( timestamps.length < minimumIntervals + 1 ) return false;
+	const first = timestamps[ 0 ];
+	const last = timestamps.at( -1 );
+	if ( Number.isFinite( first ) === false || Number.isFinite( last ) === false || last < first ) throw new Error( 'Idle-refresh timestamp endpoints are invalid.' );
+	return last - first >= minimumDurationMs;
+
+}
+
 export function requireCaptureTargetResourceFormat( resources ) {
 
 	const renderTargets = resources?.renderTargets;
