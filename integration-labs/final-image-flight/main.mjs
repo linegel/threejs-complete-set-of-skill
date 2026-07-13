@@ -412,6 +412,7 @@ export async function createFinalImageFlightLab({
   const cpuFrameSamples = [];
   let scenario = "flight";
   let mode = route.mode;
+  let presentationMode = route.mode;
   let tier = route.tier;
   let cameraId = "design";
   let seed = FINAL_IMAGE_FLIGHT_SEEDS[0];
@@ -638,9 +639,16 @@ export async function createFinalImageFlightLab({
       scenario = id;
     },
     async setMode(id) {
-      requireKnown(id, FINAL_IMAGE_FLIGHT_MODES, "mode");
-      assertFinalImageFlightRouteLock(route, { mode: id });
-      applyMode(id);
+      // Evidence harness presentation aliases (diagnostics is not a flight mode id).
+      const aliases = Object.freeze({
+        presentation: "final",
+        diagnostics: "emissive",
+      });
+      const resolved = aliases[id] ?? id;
+      requireKnown(resolved, FINAL_IMAGE_FLIGHT_MODES, "mode");
+      assertFinalImageFlightRouteLock(route, { mode: resolved });
+      applyMode(resolved);
+      presentationMode = id;
     },
     async setTier(id) {
       requireKnown(id, FINAL_IMAGE_FLIGHT_TIERS, "tier");
@@ -700,10 +708,13 @@ export async function createFinalImageFlightLab({
       updateDebug();
     },
     async capturePixels(target = mode) {
-      if (target !== "presentation") requireKnown(target, FINAL_IMAGE_FLIGHT_MODES, "capture target");
+      // Keep the mode already selected by setMode. Presentation aliases from the
+      // capture host must not re-applyMode("final") and wipe diagnostics/no-post.
+      const presentationAliases = new Set(["presentation", "final", "design", "output"]);
+      if (!presentationAliases.has(target)) requireKnown(target, FINAL_IMAGE_FLIGHT_MODES, "capture target");
       const previousMode = mode;
       try {
-        if (target !== "presentation" && target !== mode) applyMode(target);
+        if (!presentationAliases.has(target) && target !== mode) applyMode(target);
         // Size the capture RTT from the controller's locked logical extent, not
         // the live canvas CSS box (headless layouts can report nonsense
         // clientWidth/height and poison the GPU copy dimensions).
@@ -844,7 +855,7 @@ export async function createFinalImageFlightLab({
         timestampQueriesRequested: trackTimestamp,
         timestampQueriesActive: trackTimestamp && renderer.backend?.isWebGPUBackend === true,
         scenario,
-        mode,
+        mode: presentationMode ?? mode,
         tier,
         camera: cameraId,
         seed,
@@ -852,9 +863,11 @@ export async function createFinalImageFlightLab({
         frameId: lastRenderedFrameId,
         mechanism: route.mechanism,
         viewport: {
-          width: canvas.width || 1,
-          height: canvas.height || 1,
-          dpr: renderer.getPixelRatio?.() ?? 1,
+          // Report locked logical extent used by resize/capture, not the live
+          // canvas CSS box (headless CDP can leave canvas at 800x600).
+          width,
+          height,
+          dpr: renderer.getPixelRatio?.() ?? dpr,
         },
         routeSelection: {
           scenario,

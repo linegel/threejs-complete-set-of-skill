@@ -1,0 +1,768 @@
+{
+  "schemaVersion": 1,
+  "projectionKind": "tracked-release-projection-v1",
+  "policy": {
+    "id": "native-webgpu-tracked-release-v1",
+    "digest": "sha256:e349900d79da27cb5570ea959707f741e03ea7e206d85a717a1129b27268f6a4"
+  },
+  "labId": "webgpu-procedural-creature-lab",
+  "skill": "threejs-procedural-creatures",
+  "threeRevision": "0.185.1",
+  "sourceClosureHash": "sha256:59ff1f1f0ede5b7eabc6596fa991718e7f21eabe51e05c033e0166441b1e6632",
+  "buildRevision": "sha256:f48304e5e3a8fa53f8798e6806cedcdae7b1e3afa1872b6e9673f5faf987c9b7",
+  "sourceRelease": {
+    "path": "evidence-manifest.json",
+    "sha256": "sha256:dd8c706c40bc4eab55da34df82b0f3fc01c513f1d948ea92c4b062bd44dcdcab",
+    "byteLength": 34405,
+    "promotionBindingDigest": "sha256:e4527d792ffc22ae240cbe06d936a1039375dfa0b5d52ca960d7d106911281fa",
+    "candidateBindingDigest": "sha256:86cb9dd77fd265d06b414785fea65191826a51104e35fedeb9df352625056b7a",
+    "artifactLedgerDigest": "sha256:46587e01d87da23039851e9f2803cb030f5d4ab533a75f8f71a5ef352cf0e347",
+    "imageLedgerDigest": "sha256:10056bec657ba7475f6c25d44b5679e7dccc06c73514e16fac97997e1370ba10"
+  },
+  "sourceClosure": {
+    "algorithm": "demo-registry-transitive-source-closure-v2",
+    "roots": [
+      "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab"
+    ],
+    "files": [
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/assets/reference/biped.surface.bin",
+        "sha256": "sha256:b1e1ab2354d68476351312e806e4e87ca97f1342a974cf964ff21a0fcb171c4b",
+        "byteLength": 1389664
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/assets/reference/biped.surface.json",
+        "sha256": "sha256:f5a03563a607574127c2e1f1783a74aa34d8bc709e1a0a12c057bd2371ff8e31",
+        "byteLength": 9032
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/assets/reference/flyer.surface.bin",
+        "sha256": "sha256:4b543ff691e71af984366cb517c70a2ce64ae6850b5ad781b1d77c707df38f87",
+        "byteLength": 4597440
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/assets/reference/flyer.surface.json",
+        "sha256": "sha256:90cf24d8c32548b2901667b19c0306fffb4115ac914f2414bd252329192f242a",
+        "byteLength": 10005
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/assets/reference/hexapod.surface.bin",
+        "sha256": "sha256:148660e4eb449f77046bf92e8823f76a529874c8887f6588965bee2f43439ecf",
+        "byteLength": 7572240
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/assets/reference/hexapod.surface.json",
+        "sha256": "sha256:22b77f6ba90d64f7fb79237e23fd37b438a69d33bf7148a5e79b563d614f554c",
+        "byteLength": 7038
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/assets/reference/hopper.surface.bin",
+        "sha256": "sha256:bb8c34ddbcc4f8ca9f5284c6fbd6b54bc4d96b571e3d355be38465973b931e44",
+        "byteLength": 2820528
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/assets/reference/hopper.surface.json",
+        "sha256": "sha256:f2f7c9dbf2a014896bfc6b3540f138762f7172569570688c4d1b825975ea07f4",
+        "byteLength": 9109
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/assets/reference/quadruped.surface.bin",
+        "sha256": "sha256:11a1db842765a046e798dd4b69cfc833c0429905e4b21eabaab06d1e27de74b9",
+        "byteLength": 2310288
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/assets/reference/quadruped.surface.json",
+        "sha256": "sha256:9fd5248159637882ff0d909c0639387c2098a84ff88ee88cf4b809b743391729",
+        "byteLength": 7067
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/assets/reference/swimmer.surface.bin",
+        "sha256": "sha256:412863bc0a904771b3d0972298d62dfe74fed6b3b93c60901293065f43aa77fb",
+        "byteLength": 4201488
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/assets/reference/swimmer.surface.json",
+        "sha256": "sha256:37ccb6f5c36f34d71e3ad9d19422a0cbcc96661c9705fe5b24299167e8075288",
+        "byteLength": 7068
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/capture-creature-lab.mjs",
+        "sha256": "sha256:2b1d221f9e45a32fe30596355091daa7d8b42d340e3e57c5ecd6f4a4becbd400",
+        "byteLength": 26538
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/index.html",
+        "sha256": "sha256:194e647326fe707a2ed1d5e75a6f28130040ce0dbcf489a69b22db8a37d214be",
+        "byteLength": 1109
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/LAB_FINDINGS.md",
+        "sha256": "sha256:2793fd12cbc847ce9e12837ab811aaa02458452688df21db877a28d811caa5c2",
+        "byteLength": 14594
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/mechanism/coastal-crab/index.html",
+        "sha256": "sha256:f1080b97f05dbc7d94794d809ae53fa3f53daaa9647da1ba1caf50c601a2e8d2",
+        "byteLength": 1008
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/mechanism/crowd-and-culling/index.html",
+        "sha256": "sha256:003cc8d515e3df381a7f392093c62157ef34460956da1f74b7e082dc42e6d06f",
+        "byteLength": 969
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/mechanism/field-and-surface-certification/index.html",
+        "sha256": "sha256:f9f5dcb19a677a8cc7cb96d9c65fea18fc731ab9e3f42bb785a4fe6598302af7",
+        "byteLength": 997
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/mechanism/genome-variation/index.html",
+        "sha256": "sha256:240d79a5bb656e1fe35ed7d3db9f2dc693f8cf5d74dc3ebc8423bdcf3bf89cb2",
+        "byteLength": 967
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/mechanism/locomotion-and-foot-planting/index.html",
+        "sha256": "sha256:4b199e0c22e1260324892f5bdeb713c26bd20ea21b2a9701f720f0c4509de19d",
+        "byteLength": 991
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/mechanism/outline-and-shadow/index.html",
+        "sha256": "sha256:5b04f5e93494dd39bc203622de394b36f3671766f5f360ad5fdb3e14a21d8748",
+        "byteLength": 971
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/mechanism/snap-and-ownership/index.html",
+        "sha256": "sha256:49a38b5de2a7d9fc90cf64c2991c21adeee80e6ba62ab7952767c84590feefce",
+        "byteLength": 971
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/mechanism/tails-ears-and-secondary-motion/index.html",
+        "sha256": "sha256:415d39bca27066f26ec58da55fab2497f0a2e5e35e98811b45f3e002f7ad5ecb",
+        "byteLength": 999
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/package.json",
+        "sha256": "sha256:2596977218216d146a75bd93369c863639baf7843556b9fb2904f2c9c204b2be",
+        "byteLength": 6473
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/README.md",
+        "sha256": "sha256:3fbd90a95a1c256d6bcddc651cad0cc5f87993280febc0d346a075762db99fb9",
+        "byteLength": 3686
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/scripts/compile-reference-assets.mjs",
+        "sha256": "sha256:b7f9ba30d246c2dca85387e54f1e8cdff2f4a158ef0fbbc68195422bc66eaf11",
+        "byteLength": 9431
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/scripts/smoke-webgpu.mjs",
+        "sha256": "sha256:cd93b38c5ee6dc1ae086662d3c4dbca17817779de1fb5e09a86f72e97a18a236",
+        "byteLength": 4008
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/scripts/tune-deformation.mjs",
+        "sha256": "sha256:8867690a2f8f15c2642211fa712ca64e6954ac28053228ce32a9aa4cc47462e1",
+        "byteLength": 9065
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/SESSION_LOCK.md",
+        "sha256": "sha256:4c8ee4ec86ce444c667c348384f1b589a3e8175cade69afbb9a97a6bbef7f069",
+        "byteLength": 81
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/core/blend-dag.js",
+        "sha256": "sha256:8cafbbab18bdf3b103dd45f7903ba5b1cce668751d506ed037e79f6f949d328b",
+        "byteLength": 8241
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/core/candidate-certification.js",
+        "sha256": "sha256:30c94507afacdbead8ea170f39972587a5bd3968f786e42e1e7d5fba522e4f0a",
+        "byteLength": 11531
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/core/correction.js",
+        "sha256": "sha256:2c02272a204de61d5be001ba11ce7e8a614b8ba27a490a4247d3db48b0aa41c9",
+        "byteLength": 9791
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/core/deformation-sweep.js",
+        "sha256": "sha256:d4454a1ec271e5c6d156c16efceec061189b71ca774e21516c731f3b436b73e7",
+        "byteLength": 21175
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/core/deformation.js",
+        "sha256": "sha256:4b9a36472bf2d20d399a2150dd4449f5a0f39907afdd3c2e301294076e9d2963",
+        "byteLength": 15321
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/core/driver.js",
+        "sha256": "sha256:28eb6244863daa30a8c940cfb58c05e14275384dba8aba7b206c22541e07dc63",
+        "byteLength": 11174
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/core/field.js",
+        "sha256": "sha256:96261dcff926e226ec43db63f1574004af9159610f82f73eefb4f5e758226924",
+        "byteLength": 7586
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/core/lcg.js",
+        "sha256": "sha256:b20037a2bf165eaf1d9b6fa489d12075c60d3999d7fc2039f1db9e10b94b6ced",
+        "byteLength": 1012
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/core/locomotion/flyer.js",
+        "sha256": "sha256:cd268d09f4beec60f05dc4d76649e54c8c0b5c56e44aa541df809cf0292975eb",
+        "byteLength": 2461
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/core/locomotion/gait.js",
+        "sha256": "sha256:2a0ec10f9438ca9cf33c36c78a463785cedc898a4185e224233e182e997935f0",
+        "byteLength": 13410
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/core/locomotion/genome.js",
+        "sha256": "sha256:2d6e832b3aa36dea5387c13a9a375682948902315c126afff970dacc1f0ae7cd",
+        "byteLength": 5384
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/core/locomotion/hopper.js",
+        "sha256": "sha256:dd21c776aa28ef742c94c37d8129e774c3552fb99249d31aa91434907e3b11ed",
+        "byteLength": 3775
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/core/locomotion/ik.js",
+        "sha256": "sha256:dc60d7a5d34b45c6dbc18b330babea256613fc54ac7db82a10e2f57ffdfe872e",
+        "byteLength": 4959
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/core/locomotion/rope.js",
+        "sha256": "sha256:51e4827e3f4f73cc1f125463b110a96cde34337e4d9db265e33317ce5cc5873f",
+        "byteLength": 4881
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/core/locomotion/swim.js",
+        "sha256": "sha256:2f647f5a10d0ddd9daf8688774c4a217b5603f45b8d7f5032f36e65068079651",
+        "byteLength": 4697
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/core/marching-cubes.js",
+        "sha256": "sha256:c1a5cd01fdb4d92f798b587a373724e117701b9b715b0ee1efd1848f89d7bc7b",
+        "byteLength": 10751
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/core/mesh-components.js",
+        "sha256": "sha256:706c8eebb0b6d479a7e929a63b3892ea441890996eab85a628d8ebabd7b06882",
+        "byteLength": 3590
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/core/mesh-validity.js",
+        "sha256": "sha256:207a1c356c27025bc98e84def4076215670f9c88d6ffc8ae07bc6503549559a7",
+        "byteLength": 18315
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/core/newton-snap.js",
+        "sha256": "sha256:03efd2918bfaffd8c1cd87aa90b2332814e233bfe528af42a8b1f66e2df53c41",
+        "byteLength": 1448
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/core/reference-asset-format.js",
+        "sha256": "sha256:970596fa8e4508ae478edabf73ec23cbf6a09242317170572ae5f1962aa2dd1b",
+        "byteLength": 5307
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/core/reference-surface.js",
+        "sha256": "sha256:f37f8f2e66c6f435588130b93e2d3783db92530a416f8b5b1bc0af22372f7139",
+        "byteLength": 15426
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/core/rig-compiler.js",
+        "sha256": "sha256:a14c64efa8463e162fd892028cc47d1717dda52ea76c1d13de0064f372e5d7ec",
+        "byteLength": 16487
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/core/shell-writer.js",
+        "sha256": "sha256:eefe77f3f3978bb8542a0a75a967cd7f10166c6531c89810090d9bc4c5949135",
+        "byteLength": 6141
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/core/silhouette.js",
+        "sha256": "sha256:cffcba5be8d4ae88d6d665967041767ae0a294ded8f410cb71029596b33743ec",
+        "byteLength": 9588
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/core/skin-weights.js",
+        "sha256": "sha256:e7e1eae0f0ccc789926f83127f6412b424a3161eee998e38d2540f46cc5354b4",
+        "byteLength": 9235
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/core/spec-schema.js",
+        "sha256": "sha256:b4787aceb884c90392312b85ca91dc38f42031aca86a97c11558195eca9da748",
+        "byteLength": 5924
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/core/water-analytic.js",
+        "sha256": "sha256:0d1fefbf57636b0490b5cf1beccb211412c20d2dab3509821588fa3c791a10ab",
+        "byteLength": 1615
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/crab/crab-gait.js",
+        "sha256": "sha256:c792a16e0c6bac145313dcfaea94fd3b2b3c4dc7d7e220e2776fb0d5ff022368",
+        "byteLength": 8193
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/crab/crab-render-contract.js",
+        "sha256": "sha256:dbc41d48542bc58b94ab9c00f487807d6c84df7cfe89654179e97e2a76c50a53",
+        "byteLength": 2178
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/crab/crab-rig.js",
+        "sha256": "sha256:633f9ddd55f0bab95d72aeb0be1b9b4b819cdd0f8b4c58045d28311b4dd6b47f",
+        "byteLength": 3435
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/crab/crab-spec.js",
+        "sha256": "sha256:9c7c7018ea53b62ec8a21857c22e25687fdfa7efffe568d6f8ab7c18bd93d6b3",
+        "byteLength": 5220
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/crab/crab-webgpu-app.js",
+        "sha256": "sha256:ea27f4540c9d269984e78b3b806ca8f7a90dee3ed99888529646e539e6da7571",
+        "byteLength": 11418
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/lab/browser-app.js",
+        "sha256": "sha256:f20049babf5eeceeb3f7b29161542e1bf8d6bc62a79ab1e961b3dd9250721c5b",
+        "byteLength": 98007
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/lab/performance-profiles.js",
+        "sha256": "sha256:140b960ad11df4a106e504efe0f9124f9d00189dac2cc0ef84943bc04f2c36e4",
+        "byteLength": 9685
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/lab/reference-assets.js",
+        "sha256": "sha256:0ff7d092667c6ee7e2cb840640fad2dfb2fcc818019f85c48d22567ae46c0aed",
+        "byteLength": 2159
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/lab/reference-geometry.js",
+        "sha256": "sha256:d4b6c1e9387fb99e596c4874116fb0e06664e3b8ce10944255107c335f9e44a2",
+        "byteLength": 2938
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/lab/route-config.js",
+        "sha256": "sha256:d88f2026adbe59d4b44b71e81b89d81154077215c69416f5831614b210ffeb8c",
+        "byteLength": 4608
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/lab/specs/biped.json",
+        "sha256": "sha256:56432c6562b3258647fb3b6d976dc76617d4bb4bcd8aa600d947afe1c452e07f",
+        "byteLength": 1129
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/lab/specs/flyer.json",
+        "sha256": "sha256:c2e1f39b9b95580aeee68aea7077f3d04be2e64307b21ea1e0cbd7c07ddfc072",
+        "byteLength": 1009
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/lab/specs/genome.js",
+        "sha256": "sha256:b50c8dfd470af24c027fa905c77c248df06561a8c7bd706b3416080fba2c67b6",
+        "byteLength": 2610
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/lab/specs/hexapod.json",
+        "sha256": "sha256:1be6534213bc183dee701b8dc786374c3b3541ab877f108dc421374d5e6662f0",
+        "byteLength": 2334
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/lab/specs/hopper.json",
+        "sha256": "sha256:35ae7431153e55c7d4ba912c2fb69090d5f17ca71c4195d3538248c45640021c",
+        "byteLength": 782
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/lab/specs/quadruped.json",
+        "sha256": "sha256:0c3467512096cf3a50304b19638f4b9a0f4f5a4ced40410e5a987110bf55e3c7",
+        "byteLength": 1666
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/lab/specs/swimmer.json",
+        "sha256": "sha256:490597178b11e106bf8fe52703363f9ab73575f0370897d090fe96269c1fecdb",
+        "byteLength": 1151
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/lab/tier-render-graphs.js",
+        "sha256": "sha256:c7c553cf0423c8630182576b59a5073d177eadbfb4fedf7e035681f3270e322d",
+        "byteLength": 1341
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/runtime/creature-stage.js",
+        "sha256": "sha256:b56030e5cee56024275d039a478380da04fdc8a94aa51c5f2685f3043e409e3d",
+        "byteLength": 11440
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/runtime/identity-pages.js",
+        "sha256": "sha256:39ed187b83f95c87ac4ce94e432d53f23438880d3e6a92f303eabb05ef984e81",
+        "byteLength": 6027
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/tsl/field-nodes.js",
+        "sha256": "sha256:38b2e0b83fc0f18e155e04472abad8addc1a6d972303eb01ceff4733184f3158",
+        "byteLength": 10242
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/tsl/materials.js",
+        "sha256": "sha256:7ffe741b304092c06d8175457c2bcac94ebfcc6efe8768ac3517798fd2e10309",
+        "byteLength": 10841
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/tsl/outline-pass.js",
+        "sha256": "sha256:5926d1cba26e8e9798d1efd55e9b5deeb57c327722f536c8cde53fc52e866e86",
+        "byteLength": 2412
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/tsl/pose-storage.js",
+        "sha256": "sha256:52716e5e63b6e79ffa203605a16ccb67d38d213d60f767132cd99b48161ed04f",
+        "byteLength": 10164
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/tsl/reference-deformation.js",
+        "sha256": "sha256:bf250e3ba62342994b1f51c4eea3948c039147f3ef58d25c52139315dcb4fc99",
+        "byteLength": 8200
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/tsl/reference-material.js",
+        "sha256": "sha256:6feecc1d1d11052b075a41063a03c3519b30100f0b1a326aa2f6692d02a02618",
+        "byteLength": 1891
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/tsl/reference-page-storage.js",
+        "sha256": "sha256:c6fb72020cbdec5c1959f6834a5e8fee73c9cf84b8619a6c9ec2fbaefd856dc7",
+        "byteLength": 6548
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/validation/gates/artifact-gates.mjs",
+        "sha256": "sha256:336accd9cbcf2d9949d07fc31e0fde70ac5b5d22abf88504cd4c45c830a0df14",
+        "byteLength": 6998
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/validation/gates/correction-gates.mjs",
+        "sha256": "sha256:3857fe2caf2bd0d8dad0072ab25021ae8ecb3155f5a909c1df140568063b2136",
+        "byteLength": 4426
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/validation/gates/crab-gates.mjs",
+        "sha256": "sha256:4fe1d0e60a0cecba4d404cc9dbd5d881ca07b27f377bed241f7c964dce1f9c32",
+        "byteLength": 6854
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/validation/gates/determinism-gates.mjs",
+        "sha256": "sha256:5f4576a31261c2f96faacd9f22f5419386b1c9e6645b7f6c1b51fce80f7988d0",
+        "byteLength": 5457
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/validation/gates/field-gates.mjs",
+        "sha256": "sha256:39de6ec6ae9406cfc1605a78d362272646a76871acfaa1c8f6cf5d524d164444",
+        "byteLength": 9128
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/validation/gates/locomotion-gates.mjs",
+        "sha256": "sha256:5130978ae30d1a78995cc2ed0d3ba53eef5052d533fedc677eb5f2bdcc28aee8",
+        "byteLength": 12400
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/validation/gates/page-gates.mjs",
+        "sha256": "sha256:63dfb408228ca30f0a574f5344c117e92c8fc502e95fab95db4febd48fc3ff34",
+        "byteLength": 11567
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/validation/gates/performance-gates.mjs",
+        "sha256": "sha256:407d44fa7020b70fcfbb90ed8dab86a19fb1f5993b76d3211498a5724035ea66",
+        "byteLength": 7555
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/validation/gates/remediation-gates.mjs",
+        "sha256": "sha256:cb172a2b522834f05816460d67b740c546298afd940e444584ad18a3a45b8a67",
+        "byteLength": 16689
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/validation/gates/route-gates.mjs",
+        "sha256": "sha256:88bb54b5df8c1f395114ea23ff45c53112b2d95e14ace9cd9bd1b5966fb0abc9",
+        "byteLength": 4532
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/validation/gates/shell-gates.mjs",
+        "sha256": "sha256:76ed9c4774c4a01b223f85e81bfe3288a1c5c129051be9f55488318b8925812c",
+        "byteLength": 1442
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/validation/gates/snap-gates.mjs",
+        "sha256": "sha256:322aa740abdb3d0eab6278781fa6d78c0d111f2ef120b1bd9cf5ce6542c99697",
+        "byteLength": 4577
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/validation/gates/surface-gates.mjs",
+        "sha256": "sha256:d4c755b865f889a3547f3f299d46adfd485ecbe10cb7abfcb08a5db638e22681",
+        "byteLength": 27988
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/validation/gates/sweep-gates.mjs",
+        "sha256": "sha256:34e17086ac0700eb4dee12716746ae254949f0bad2bbd4baf9d34dee9c5af404",
+        "byteLength": 5159
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/validation/run-validate.mjs",
+        "sha256": "sha256:8e55f1fb853c51a795147b6afaf75e142b2bc2439be424571bef6850451a4f06",
+        "byteLength": 7841
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/validation/validate-lab-artifacts.mjs",
+        "sha256": "sha256:485a3249f60768dee2703f65a3b7aa507757d687f81875fdcdf9a529d531d4c9",
+        "byteLength": 8166
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/tier/background/index.html",
+        "sha256": "sha256:650531d4bca4ab89d5afa7f46314e58848ba0a3069356714eab29f5f0a7d5af0",
+        "byteLength": 956
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/tier/crowd/index.html",
+        "sha256": "sha256:41c939c25efa3fccf716a8090f6166d2928f7c278394743b52e242e166d45a8a",
+        "byteLength": 946
+      },
+      {
+        "repositoryPath": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/tier/hero/index.html",
+        "sha256": "sha256:1bd4b94b34dd117dbcebfb174c473e71537eb5772529d9baac7f283df131163f",
+        "byteLength": 944
+      }
+    ],
+    "threeRevision": "0.185.1",
+    "sourceHash": "sha256:59ff1f1f0ede5b7eabc6596fa991718e7f21eabe51e05c033e0166441b1e6632",
+    "buildRevision": "sha256:f48304e5e3a8fa53f8798e6806cedcdae7b1e3afa1872b6e9673f5faf987c9b7"
+  },
+  "retainedFiles": [
+    {
+      "path": "visual-contract.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:b10e529b60f6d26ae412f3b551bc8ade923c51dda3abb040c2d37b4e09db9742",
+      "byteLength": 891
+    },
+    {
+      "path": "renderer-info.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:ce98dc437ff1e48283efdd61f5f63f5c0cc95934b77e56c419199c8db5c3b599",
+      "byteLength": 466
+    },
+    {
+      "path": "pipeline-graph.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:a7c3c661df0bd629feb4107543c53eeb484fe7c18eff11a3bc8642f07fe1e730",
+      "byteLength": 908
+    },
+    {
+      "path": "performance-envelope.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:62e1abb57e217febce5044e04788aae2967a749c9dd5c70432f279fc3c45e507",
+      "byteLength": 634
+    },
+    {
+      "path": "frame-trace.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:61e2604f805c8759b4999cc2b6ef8e27ea9446acb8902d2b4f38c58f787479e7",
+      "byteLength": 280
+    },
+    {
+      "path": "quality-governor.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:22ed650070b479783556457ce2e0a7b736d2bc5aca297e6e3792ed78bae3c360",
+      "byteLength": 260
+    },
+    {
+      "path": "render-targets.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:c864bbac1b9bbb7a926f8d22d4a1f31677d1534dad39afc655725bf31e73cb8f",
+      "byteLength": 10740
+    },
+    {
+      "path": "storage-resources.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:579719a4f114bada5939fff4c4a645ac178e5b40a8f18de1cfb9532f02a92486",
+      "byteLength": 333
+    },
+    {
+      "path": "resident-resources.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:6fc1377d8131845b579a304b535bc8832ac8ad8663760f592519d1c3ab76a856",
+      "byteLength": 1329
+    },
+    {
+      "path": "bandwidth-model.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:e921c52741c0a3b03c5a02ac0b1337262a182750cd76a01d10c49323c047a034",
+      "byteLength": 956
+    },
+    {
+      "path": "visual-errors.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:f4b2464fc52bef50bc4fdd264442c77fe07b680905d615eb5be53d0d84a8ff9c",
+      "byteLength": 752
+    },
+    {
+      "path": "leak-loop.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:50610eafa5d03fe2f17b10e8f27bcd2bb5bb10f7b5bb9e0f39a5938dba97d674",
+      "byteLength": 131928
+    },
+    {
+      "path": "mechanism-metrics.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:4a21e6a52c736cbb74e157688eda520fc309257742ec20a3d3afdb607e030e1b",
+      "byteLength": 4668
+    },
+    {
+      "path": "capture-write-ledger.json",
+      "status": "captured",
+      "kind": "capture-session-write-ledger",
+      "sha256": "sha256:60c4eccc94f44b298d7496b697c9e94cd45feeb16faafaa1aa37420c85065366",
+      "byteLength": 10632
+    },
+    {
+      "path": "sessions/physical-route.write-ledger.json",
+      "status": "captured",
+      "kind": "capture-session-write-ledger",
+      "sha256": "sha256:e3b0162fddf69e7a5edcf8495bf07e2ca8a11b350b26e8fbb732693b71f8af23",
+      "byteLength": 7717
+    }
+  ],
+  "retainedImages": [
+    {
+      "path": "final.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "final.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:932eccb3b8f8909c37983619953e31a6be6bedccf8ca19b46a7de5b131e6f62d",
+      "byteLength": 73797
+    },
+    {
+      "path": "no-post.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "no-post.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:3e59edf5f6f7c051c818f8ff7e5c4e6b1ea4e839ab9a2b30b4825cd4595f57d2",
+      "byteLength": 85815
+    },
+    {
+      "path": "diagnostics.mosaic.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "diagnostics.mosaic",
+      "mediaType": "image/png",
+      "sha256": "sha256:90df1b5d3e4806c1bedb221cef0b9721979c08ef3f8ff60127cc2ea40922e4ee",
+      "byteLength": 106263
+    },
+    {
+      "path": "camera.near.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.near",
+      "mediaType": "image/png",
+      "sha256": "sha256:c937350dbcf492818878337a99ffec5e3a19fc3c6b370568de021d3ab00102e3",
+      "byteLength": 129405
+    },
+    {
+      "path": "camera.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:ba68790b87b6dc54dc3f411b111e087fdb42f341d267ef2c7e2061d0dd727ee8",
+      "byteLength": 73813
+    },
+    {
+      "path": "camera.far.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.far",
+      "mediaType": "image/png",
+      "sha256": "sha256:61bfa7fb49595bdaa35453883218f45017411fc3a13e7b1d22b5a132a8b67316",
+      "byteLength": 34943
+    },
+    {
+      "path": "seed-0001.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "seed-0001.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:3acbc8149c5ba5ee6842de7679efe63711a3010a4b53aac5248fbf435c544fc2",
+      "byteLength": 76069
+    },
+    {
+      "path": "seed-9e3779b9.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "seed-9e3779b9.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:1f97974a508e5d54939936cc31267db8fbf7514fc9d46f216a0be6c7146d86cf",
+      "byteLength": 78923
+    },
+    {
+      "path": "temporal.t000.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "temporal.t000",
+      "mediaType": "image/png",
+      "sha256": "sha256:edcbaff0fc0875eff481be170c745b0178d687fa4bde4516d9eec7e23dcb551e",
+      "byteLength": 75959
+    },
+    {
+      "path": "temporal.t001.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "temporal.t001",
+      "mediaType": "image/png",
+      "sha256": "sha256:5793b81500554366aad48bc9e89bfa8ab4480448caa36738c0cb2018ab2e8efb",
+      "byteLength": 76279
+    }
+  ],
+  "omittedFiles": {
+    "ledgerDigest": "sha256:c8d486588c4c866283d2b69587c02a8974c5665c1e99b0146399b0319202abde",
+    "count": 3,
+    "byteLength": 169001,
+    "byKind": [
+      {
+        "kind": "capture-session-document",
+        "count": 2,
+        "byteLength": 165433
+      },
+      {
+        "kind": "supplementary-json",
+        "count": 1,
+        "byteLength": 3568
+      }
+    ]
+  },
+  "checkoutLimitations": [
+    {
+      "id": "detached-source-payloads",
+      "status": "ACTIVE",
+      "statement": "Raw readbacks and capture-session transcript bytes are omitted from the tracked projection. Checkout validation verifies their approved hash and byte-length commitments, not the detached bytes themselves.",
+      "affectedClaims": []
+    }
+  ],
+  "projectionDigest": "sha256:f690aefc4ed2f8835333c7fd75fcff654b1efdfdf36b06d64da1a8f4443e1655"
+}

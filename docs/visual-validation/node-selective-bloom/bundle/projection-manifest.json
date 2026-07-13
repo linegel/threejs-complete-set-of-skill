@@ -1,0 +1,374 @@
+{
+  "schemaVersion": 1,
+  "projectionKind": "tracked-release-projection-v1",
+  "policy": {
+    "id": "native-webgpu-tracked-release-v1",
+    "digest": "sha256:e349900d79da27cb5570ea959707f741e03ea7e206d85a717a1129b27268f6a4"
+  },
+  "labId": "node-selective-bloom",
+  "skill": "threejs-bloom",
+  "threeRevision": "0.185.1",
+  "sourceClosureHash": "sha256:49a5cc06d045327b48c277b02ac188b0e7300bb82a5e20b3c356d119c5479df6",
+  "buildRevision": "sha256:a6db55a2b7dc5ec8d596230c6920176a65325d024d74d075de0ad73011b4118a",
+  "sourceRelease": {
+    "path": "evidence-manifest.json",
+    "sha256": "sha256:a197662a1569470d4209e3db814ce0c1a6bfca243fe9ac4960ce088820bfad95",
+    "byteLength": 34047,
+    "promotionBindingDigest": "sha256:002b9890686304c32efa5bc7147afced8565b3b988b18abaf789f044d9093e75",
+    "candidateBindingDigest": "sha256:aa20f1a05e3d33ea529e62fe73eb37e681960392e423eefc4651e8282219bf75",
+    "artifactLedgerDigest": "sha256:cd9113fdab6045d824666c066b58b2e35010bd5290b06a0d38783fcf6f5cf04a",
+    "imageLedgerDigest": "sha256:e7dfedec8297d8186b6eb8c55e55cefaffba74a3994ebd53f781dd7dfc66fdc6"
+  },
+  "sourceClosure": {
+    "algorithm": "demo-registry-transitive-source-closure-v2",
+    "roots": [
+      "labs/runtime/webgpu-device-identity.mjs",
+      "threejs-bloom/examples/node-selective-bloom"
+    ],
+    "files": [
+      {
+        "repositoryPath": "labs/runtime/webgpu-device-identity.mjs",
+        "sha256": "sha256:4bc6eb92755516473bc39b488c0bcfd419e5f23800c497bc44bbf3d07d509bfe",
+        "byteLength": 4095
+      },
+      {
+        "repositoryPath": "threejs-bloom/examples/node-selective-bloom/browser.js",
+        "sha256": "sha256:35ab7e7fea0330f03706fa826215294b99440c122475f8bf3ac4b565c3cab370",
+        "byteLength": 2678
+      },
+      {
+        "repositoryPath": "threejs-bloom/examples/node-selective-bloom/capture-hook.mjs",
+        "sha256": "sha256:3a570fd590974f9357247ba7a1076d1ba53d52dfe9d40a71a962323c664252b0",
+        "byteLength": 3362
+      },
+      {
+        "repositoryPath": "threejs-bloom/examples/node-selective-bloom/capture.mjs",
+        "sha256": "sha256:5e639696d63fe97f2781d8e9a3e7292b3d6c4f65ff4a71efa12b23fe4ee7a73a",
+        "byteLength": 7493
+      },
+      {
+        "repositoryPath": "threejs-bloom/examples/node-selective-bloom/index.html",
+        "sha256": "sha256:f0f7e8ed3fadd0acd3c13e6936616e5d8ce4c82ff77e17c5b5dad44f022f525f",
+        "byteLength": 766
+      },
+      {
+        "repositoryPath": "threejs-bloom/examples/node-selective-bloom/index.js",
+        "sha256": "sha256:1d827c453d89176d3ac6aba0a2d0471290a8f12b19b257649d55702abfe727cd",
+        "byteLength": 54052
+      },
+      {
+        "repositoryPath": "threejs-bloom/examples/node-selective-bloom/mechanism/depth-and-occlusion/index.html",
+        "sha256": "sha256:9e6d1894e15a3622d9384c63150b28e19d8649c1aa2611358e6f4a96028648ea",
+        "byteLength": 616
+      },
+      {
+        "repositoryPath": "threejs-bloom/examples/node-selective-bloom/mechanism/emissive-hierarchy/index.html",
+        "sha256": "sha256:4cef54cb542ab1840aa6cde9f6b2565f96277097e2a38ab0b9f41eb95b48d7fd",
+        "byteLength": 615
+      },
+      {
+        "repositoryPath": "threejs-bloom/examples/node-selective-bloom/mechanism/point-spread-function/index.html",
+        "sha256": "sha256:ebda2219e773d3193ce370d2ebad317d3f1f4e7b0c76a97b05c5f2eefd63c262",
+        "byteLength": 618
+      },
+      {
+        "repositoryPath": "threejs-bloom/examples/node-selective-bloom/mechanism/shared-emissive-integration/index.html",
+        "sha256": "sha256:5e68bdd13a8fc986387c2b046b2df13820b4f89e9061e9bc8a64bb00d995bcb7",
+        "byteLength": 624
+      },
+      {
+        "repositoryPath": "threejs-bloom/examples/node-selective-bloom/mechanism/threshold-and-knee/index.html",
+        "sha256": "sha256:39133ce9bea41a18f99a91aaf99607a4e8a4eb19c8d413f44b0bd5d62a8da578",
+        "byteLength": 615
+      },
+      {
+        "repositoryPath": "threejs-bloom/examples/node-selective-bloom/mechanism/transparent-emitters/index.html",
+        "sha256": "sha256:073409ffa75791443a5b343ac5384a2ebfccacaaff4d24815d372baa78916d28",
+        "byteLength": 617
+      },
+      {
+        "repositoryPath": "threejs-bloom/examples/node-selective-bloom/package.json",
+        "sha256": "sha256:050beaaf869d4af2dc5d1d0ed8561385df3049a00bd7398fed590b0061772041",
+        "byteLength": 930
+      },
+      {
+        "repositoryPath": "threejs-bloom/examples/node-selective-bloom/README.md",
+        "sha256": "sha256:243bf83c21c19c6d4da3f102892a6bc416da7d77b3092b118499e87d2622dc3a",
+        "byteLength": 7489
+      },
+      {
+        "repositoryPath": "threejs-bloom/examples/node-selective-bloom/routes.js",
+        "sha256": "sha256:02912ff2e9ea239e3ca2c3721dc2848b6d8d79858b8750d6728e6271bb342c30",
+        "byteLength": 3691
+      },
+      {
+        "repositoryPath": "threejs-bloom/examples/node-selective-bloom/test-mutations.mjs",
+        "sha256": "sha256:ca9d485c4474c871685594806d2cf12138b618006c2bd55b2bf256096ea01e8f",
+        "byteLength": 2498
+      },
+      {
+        "repositoryPath": "threejs-bloom/examples/node-selective-bloom/test.mjs",
+        "sha256": "sha256:49a8c8f36a3de01d90f37acfdc528b1907b546acd9d0753da63bff5f4a4b2d80",
+        "byteLength": 10447
+      },
+      {
+        "repositoryPath": "threejs-bloom/examples/node-selective-bloom/tier/balanced/index.html",
+        "sha256": "sha256:0e76a581ba75c3f255832ce2f2f8a5150cca0a926771d8bc378d79217f3266f1",
+        "byteLength": 610
+      },
+      {
+        "repositoryPath": "threejs-bloom/examples/node-selective-bloom/tier/full/index.html",
+        "sha256": "sha256:73a64e35cc12129a13fbce27ff83cf9e2916d9f7b09b733af621a077778c4225",
+        "byteLength": 606
+      },
+      {
+        "repositoryPath": "threejs-bloom/examples/node-selective-bloom/tier/mobile/index.html",
+        "sha256": "sha256:18f6261281d64e72c742d0e4ab19da119f0b3a02a1dfcf8cff853795e3877040",
+        "byteLength": 608
+      },
+      {
+        "repositoryPath": "threejs-bloom/examples/node-selective-bloom/tier/reduced-readable-base/index.html",
+        "sha256": "sha256:35897decab17955d6fdb0f21af3894b119111addbb30de3df986f8f7d3e10492",
+        "byteLength": 618
+      },
+      {
+        "repositoryPath": "threejs-bloom/examples/node-selective-bloom/validate-artifacts.mjs",
+        "sha256": "sha256:877c4db9750ec6c964b9a3f3e9c6d50764cf1957353dbf41b0d45f260bebe86b",
+        "byteLength": 3947
+      },
+      {
+        "repositoryPath": "threejs-bloom/examples/node-selective-bloom/validate-node-selective-bloom.mjs",
+        "sha256": "sha256:d25e6e574ff52fb7845abd964d3d23a6a298569eb138a186ccce53e7ac15db31",
+        "byteLength": 5326
+      }
+    ],
+    "threeRevision": "0.185.1",
+    "sourceHash": "sha256:49a5cc06d045327b48c277b02ac188b0e7300bb82a5e20b3c356d119c5479df6",
+    "buildRevision": "sha256:a6db55a2b7dc5ec8d596230c6920176a65325d024d74d075de0ad73011b4118a"
+  },
+  "retainedFiles": [
+    {
+      "path": "visual-contract.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:5390ef5292fe6a4d3be75e57cdc394820e55489244b3fecb8884467d72c02c48",
+      "byteLength": 856
+    },
+    {
+      "path": "renderer-info.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:ce98dc437ff1e48283efdd61f5f63f5c0cc95934b77e56c419199c8db5c3b599",
+      "byteLength": 466
+    },
+    {
+      "path": "pipeline-graph.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:8fa8eebc1c544cb6fc3a5cf775ed550b3e2dbf6e159d174391de8572b3804a0c",
+      "byteLength": 853
+    },
+    {
+      "path": "performance-envelope.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:62e1abb57e217febce5044e04788aae2967a749c9dd5c70432f279fc3c45e507",
+      "byteLength": 634
+    },
+    {
+      "path": "frame-trace.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:61e2604f805c8759b4999cc2b6ef8e27ea9446acb8902d2b4f38c58f787479e7",
+      "byteLength": 280
+    },
+    {
+      "path": "quality-governor.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:2b686b62e40339d377d993736f9f63cb5ea649273a3fb016da0e1706c7f5a04c",
+      "byteLength": 288
+    },
+    {
+      "path": "render-targets.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:58d70ae2e922775d617abebc7805a1505a6584762709d12f1408925c712d5d4d",
+      "byteLength": 10490
+    },
+    {
+      "path": "storage-resources.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:579719a4f114bada5939fff4c4a645ac178e5b40a8f18de1cfb9532f02a92486",
+      "byteLength": 333
+    },
+    {
+      "path": "resident-resources.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:6fc1377d8131845b579a304b535bc8832ac8ad8663760f592519d1c3ab76a856",
+      "byteLength": 1329
+    },
+    {
+      "path": "bandwidth-model.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:e921c52741c0a3b03c5a02ac0b1337262a182750cd76a01d10c49323c047a034",
+      "byteLength": 956
+    },
+    {
+      "path": "visual-errors.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:f4b2464fc52bef50bc4fdd264442c77fe07b680905d615eb5be53d0d84a8ff9c",
+      "byteLength": 752
+    },
+    {
+      "path": "leak-loop.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:c943a770c5905485b2f58904ab75c81a0086ffaa16f280dbabcc8c0b9c89ade0",
+      "byteLength": 131664
+    },
+    {
+      "path": "mechanism-metrics.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:0e9c55cfb58048ac8ca90746ba182842b77e080c47932759dd945e32f7aa80c7",
+      "byteLength": 4728
+    },
+    {
+      "path": "capture-write-ledger.json",
+      "status": "captured",
+      "kind": "capture-session-write-ledger",
+      "sha256": "sha256:1cff34c733aaaeff295e4aa736193e0e18bb8553014d792c0a6ab999ab8a11ac",
+      "byteLength": 10627
+    },
+    {
+      "path": "sessions/physical-route.write-ledger.json",
+      "status": "captured",
+      "kind": "capture-session-write-ledger",
+      "sha256": "sha256:6253fe55387d23c134fbf382a70254f4cd00464376fb9ac92d4284fc8b038ebe",
+      "byteLength": 1500
+    }
+  ],
+  "retainedImages": [
+    {
+      "path": "final.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "final.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:1c63e176b1088eae54a0d2ad612171362ce1f5bf6d269254fd26024644dac566",
+      "byteLength": 342700
+    },
+    {
+      "path": "no-post.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "no-post.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:e19ba10a8eaed874f8cf9222225147a639f6a9d5b60b31d25301903e4ac17aa2",
+      "byteLength": 9956
+    },
+    {
+      "path": "diagnostics.mosaic.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "diagnostics.mosaic",
+      "mediaType": "image/png",
+      "sha256": "sha256:0724e904fb57e88306e81ec44ecaf110444b008b560cc4a665c8041e992bdd9d",
+      "byteLength": 10359
+    },
+    {
+      "path": "camera.near.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.near",
+      "mediaType": "image/png",
+      "sha256": "sha256:2469326562b96fe57f891df63bac91bede9ab802830d44fd75fb8dc0fd1f9223",
+      "byteLength": 370878
+    },
+    {
+      "path": "camera.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:1c63e176b1088eae54a0d2ad612171362ce1f5bf6d269254fd26024644dac566",
+      "byteLength": 342700
+    },
+    {
+      "path": "camera.far.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.far",
+      "mediaType": "image/png",
+      "sha256": "sha256:f660c079da76ff9060712c10da9fb74b0f7c3a78b06853d4079035474327fd44",
+      "byteLength": 265886
+    },
+    {
+      "path": "seed-0001.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "seed-0001.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:1c63e176b1088eae54a0d2ad612171362ce1f5bf6d269254fd26024644dac566",
+      "byteLength": 342700
+    },
+    {
+      "path": "seed-9e3779b9.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "seed-9e3779b9.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:9c1235b735c9168cff6fdf2c76821f236cefdd217140ac14349d1ecd689d3d2a",
+      "byteLength": 394271
+    },
+    {
+      "path": "temporal.t000.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "temporal.t000",
+      "mediaType": "image/png",
+      "sha256": "sha256:1c63e176b1088eae54a0d2ad612171362ce1f5bf6d269254fd26024644dac566",
+      "byteLength": 342700
+    },
+    {
+      "path": "temporal.t001.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "temporal.t001",
+      "mediaType": "image/png",
+      "sha256": "sha256:05d3d95543a852990d3bea1432733e285cb7334b65556fc406d6b62af3424fda",
+      "byteLength": 341314
+    }
+  ],
+  "omittedFiles": {
+    "ledgerDigest": "sha256:00cdce486ec5a8c90e9be2cda8a2ca9980e9fb3aaaddd9950ea4ec55210d186f",
+    "count": 3,
+    "byteLength": 110289,
+    "byKind": [
+      {
+        "kind": "capture-session-document",
+        "count": 2,
+        "byteLength": 106741
+      },
+      {
+        "kind": "supplementary-json",
+        "count": 1,
+        "byteLength": 3548
+      }
+    ]
+  },
+  "checkoutLimitations": [
+    {
+      "id": "detached-source-payloads",
+      "status": "ACTIVE",
+      "statement": "Raw readbacks and capture-session transcript bytes are omitted from the tracked projection. Checkout validation verifies their approved hash and byte-length commitments, not the detached bytes themselves.",
+      "affectedClaims": []
+    }
+  ],
+  "projectionDigest": "sha256:2b6ccbcec45fdc212c66ba2254af54988ccd37133c7b7d84c51405030e61d8ee"
+}

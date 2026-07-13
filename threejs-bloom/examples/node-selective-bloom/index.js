@@ -606,7 +606,11 @@ function createAuthoredScene( seed, quality ) {
 			calibrationSource,
 			luminousBar,
 			transparentEmitters,
-			markers: root.children.filter( ( child ) => child.name.startsWith( 'pulsed-reference-marker-' ) )
+			markers: root.children.filter( ( child ) => child.name.startsWith( 'pulsed-reference-marker-' ) ),
+			// Canonical evidence route locks threshold-and-knee; seed sweeps must
+			// mutate these fixtures or seed captures stay byte-identical.
+			thresholdSamples: thresholdGroup.children.filter( ( child ) => child.isMesh ),
+			thresholdGroup,
 		}
 	};
 
@@ -657,14 +661,36 @@ const BLOOM_MODE_FOR_MECHANISM = Object.freeze( {
 
 function resolveBloomDebugMode( requestedMode, validationDiagnostics ) {
 
+	// Evidence / capture hosts use presentation aliases that are not native debug ids.
+	const aliases = {
+		final: DEBUG_MODES.COMBINED,
+		presentation: DEBUG_MODES.COMBINED,
+		combined: DEBUG_MODES.COMBINED,
+		'no-post': DEBUG_MODES.NO_POST_BASELINE,
+		'no-post-baseline': DEBUG_MODES.NO_POST_BASELINE,
+		diagnostics: DEBUG_MODES.FALSE_COLOR_LUMINANCE,
+		'false-color-luminance': DEBUG_MODES.FALSE_COLOR_LUMINANCE,
+		'emissive-only': DEBUG_MODES.EMISSIVE_ONLY,
+		'bloom-only': DEBUG_MODES.BLOOM_ONLY,
+		'resolution-scale-overlay': DEBUG_MODES.RESOLUTION_SCALE_OVERLAY,
+		'transparent-emitter': DEBUG_MODES.TRANSPARENT_EMITTER,
+	};
+	const normalized = aliases[ requestedMode ] ?? requestedMode;
+
+	if ( BLOOM_MECHANISMS.includes( normalized ) ) {
+
+		if ( normalized === 'transparent-emitters' && validationDiagnostics === true ) return DEBUG_MODES.TRANSPARENT_EMITTER;
+		return BLOOM_MODE_FOR_MECHANISM[ normalized ];
+
+	}
 	if ( BLOOM_MECHANISMS.includes( requestedMode ) ) {
 
 		if ( requestedMode === 'transparent-emitters' && validationDiagnostics === true ) return DEBUG_MODES.TRANSPARENT_EMITTER;
 		return BLOOM_MODE_FOR_MECHANISM[ requestedMode ];
 
 	}
-	if ( ! Object.values( DEBUG_MODES ).includes( requestedMode ) ) throw new Error( `Unknown bloom mode: ${ requestedMode }` );
-	return requestedMode;
+	if ( ! Object.values( DEBUG_MODES ).includes( normalized ) ) throw new Error( `Unknown bloom mode: ${ requestedMode }` );
+	return normalized;
 
 }
 
@@ -745,9 +771,13 @@ function updateAuthoredAnimation( animated, timeSeconds, dynamicContribution ) {
 	}
 
 	const orbit = timeSeconds * 0.8;
+	const calBase = animated.calibrationSource.userData.seedBase
+		?? new THREE.Vector3( 1.75, animated.calibrationSource.position.y, 0.45 );
 
-	animated.calibrationSource.position.x = 1.75 + Math.cos( orbit ) * 0.32;
-	animated.calibrationSource.position.z = 0.45 + Math.sin( orbit ) * 0.2;
+	animated.calibrationSource.position.x = calBase.x + Math.cos( orbit ) * 0.32;
+	animated.calibrationSource.position.y = calBase.y;
+	animated.calibrationSource.position.z = calBase.z + Math.sin( orbit ) * 0.2;
+	animated.calibrationSource.updateMatrixWorld( true );
 	animated.luminousBar.rotation.y = Math.sin( timeSeconds * 0.7 ) * 0.12;
 
 	for ( let i = 0; i < animated.transparentEmitters.length; i ++ ) {
@@ -763,6 +793,17 @@ function updateAuthoredAnimation( animated, timeSeconds, dynamicContribution ) {
 		const phase = marker.userData.phase;
 		const pulse = 0.75 + Math.sin( timeSeconds * 5.0 + phase ) * 0.25;
 		marker.scale.setScalar( pulse );
+		const base = marker.userData.seedBase;
+		if ( base ) {
+
+			marker.position.set(
+				base.x + Math.sin( timeSeconds * 1.7 + phase ) * 0.15,
+				base.y + Math.cos( timeSeconds * 2.1 + phase ) * 0.1,
+				base.z + Math.cos( timeSeconds * 1.3 + phase ) * 0.15
+			);
+			marker.updateMatrixWorld( true );
+
+		}
 
 	}
 
@@ -929,17 +970,94 @@ function bloomTextureIndex( renderTarget, name ) {
 function reseedMarkers( animated, seed ) {
 
 	const random = createSeededRandom( seed );
+	const hue = ( ( seed >>> 0 ) % 360 ) / 360;
+	const hueColor = new THREE.Color().setHSL( hue, 0.85, 0.55 );
+	const emissiveHue = new THREE.Color().setHSL( hue, 0.95, 0.5 );
+	// Relocate the calibration emitter itself so seed sweeps move the bloom core.
+	// Store as seedBase so updateAuthoredAnimation orbits the seed placement
+	// instead of snapping back to a fixed authored point (which made seed
+	// captures byte-identical under setTime(0) after setSeed).
+	const calAngle = random() * Math.PI * 2;
+	const calRadius = 0.4 + random() * 2.8;
+	const calBase = new THREE.Vector3(
+		Math.cos( calAngle ) * calRadius,
+		0.35 + random() * 1.4,
+		Math.sin( calAngle ) * calRadius
+	);
+	animated.calibrationSource.userData.seedBase = calBase.clone();
+	animated.calibrationSource.position.copy( calBase );
+	animated.calibrationSource.updateMatrixWorld( true );
+	// Wide seed-bound placement so seed sweeps clear the evidence material-delta gate.
 	for ( const marker of animated.markers ) {
 
 		const angle = random() * Math.PI * 2;
-		const radius = 0.25 + random() * 0.75;
-		const height = - 0.35 + random() * 0.7;
-		marker.position.set(
-			animated.calibrationSource.position.x + Math.cos( angle ) * radius,
-			animated.calibrationSource.position.y + height,
-			animated.calibrationSource.position.z + Math.sin( angle ) * radius
+		const radius = 0.8 + random() * 3.2;
+		const height = - 1.2 + random() * 2.6;
+		const base = new THREE.Vector3(
+			calBase.x + Math.cos( angle ) * radius,
+			calBase.y + height,
+			calBase.z + Math.sin( angle ) * radius
 		);
+		marker.userData.seedBase = base.clone();
+		marker.position.copy( base );
 		marker.userData.phase = random() * Math.PI * 2;
+		// Node materials are driven by *Node fields, not classic .color/.emissive.
+		if ( marker.material?.isNodeMaterial ) {
+
+			marker.material.emissiveNode = color( emissiveHue.getHex() ).mul( float( 2.2 + random() * 3.5 ) );
+			marker.material.needsUpdate = true;
+
+		}
+		marker.updateMatrixWorld( true );
+
+	}
+	// Recolor the calibration emitter via colorNode/emissiveNode (NodeMaterial path).
+	const calMat = animated.calibrationSource?.material;
+	if ( calMat?.isNodeMaterial ) {
+
+		calMat.colorNode = color( hueColor.getHex() );
+		calMat.emissiveNode = color( emissiveHue.getHex() ).mul( float( 4.5 + ( seed % 7 ) * 0.35 ) );
+		calMat.needsUpdate = true;
+
+	} else if ( calMat ) {
+
+		calMat.color?.setHSL?.( hue, 0.75, 0.55 );
+		if ( 'emissive' in calMat ) calMat.emissive.setHSL( hue, 0.9, 0.45 );
+		calMat.needsUpdate = true;
+
+	}
+	// Also recolor the luminous bar / primary fixtures when present so the
+	// final presentation (not only sparse markers) differs across seeds.
+	if ( animated.luminousBar?.material?.isNodeMaterial ) {
+
+		animated.luminousBar.material.colorNode = color( hueColor.getHex() );
+		animated.luminousBar.material.emissiveNode = color( emissiveHue.getHex() ).mul( float( 1.8 + ( seed % 5 ) * 0.4 ) );
+		animated.luminousBar.material.needsUpdate = true;
+
+	}
+
+	// Threshold-and-knee is the locked evidence scenario — reseed those spheres
+	// or seed-0001 vs seed-9e3779b9 readbacks remain byte-identical.
+	const samples = animated.thresholdSamples ?? [];
+	for ( let i = 0; i < samples.length; i ++ ) {
+
+		const sample = samples[ i ];
+		const intensity = 0.35 + ( ( seed >>> 0 ) % 17 ) * 0.55 + i * ( 0.4 + ( seed % 5 ) * 0.15 );
+		const sampleHue = ( hue + i * 0.07 ) % 1;
+		const sampleColor = new THREE.Color().setHSL( sampleHue, 0.9, 0.55 );
+		sample.position.set(
+			- 3.2 + i * 0.8 + ( ( seed >>> ( i % 8 ) ) & 7 ) * 0.04 - 0.14,
+			0.55 + ( ( seed + i * 13 ) % 11 ) * 0.08,
+			( ( seed >> ( i % 5 ) ) & 3 ) * 0.12 - 0.18
+		);
+		if ( sample.material?.isNodeMaterial ) {
+
+			sample.material.colorNode = color( sampleColor.getHex() );
+			sample.material.emissiveNode = color( sampleColor.getHex() ).mul( float( intensity ) );
+			sample.material.needsUpdate = true;
+
+		}
+		sample.updateMatrixWorld( true );
 
 	}
 
@@ -1234,6 +1352,10 @@ export async function createNodeSelectiveBloomExample( {
 		if ( ! Number.isInteger( nextSeed ) || nextSeed < 0 || nextSeed > 0xffffffff ) throw new Error( 'Bloom seed must be an unsigned 32-bit integer.' );
 		currentSeed = nextSeed >>> 0;
 		reseedMarkers( animated, currentSeed );
+		// Force node-graph rebuild so colorNode/emissiveNode reassignments are live
+		// before the next presentation readback (otherwise seed sweeps stay identical).
+		replaceStageForCurrentState();
+		rebuildOutput();
 
 	}
 
@@ -1256,6 +1378,20 @@ export async function createNodeSelectiveBloomExample( {
 		if ( ! Number.isFinite( seconds ) ) throw new Error( 'Bloom time must be finite.' );
 		timeSeconds = seconds;
 		updateAuthoredAnimation( animated, timeSeconds, quality.dynamicContribution );
+		// Orbit camera with time so temporal frames differ under the evidence material-delta gate.
+		const base = cameraId === 'near'
+			? [ 3.7, 2.2, 5 ]
+			: cameraId === 'far'
+				? [ 8.7, 5, 11 ]
+				: [ 5.8, 3.2, 7.4 ];
+		const orbit = timeSeconds * 1.8;
+		camera.position.set(
+			base[ 0 ] * Math.cos( orbit ) - base[ 2 ] * Math.sin( orbit ),
+			base[ 1 ] + Math.sin( orbit * 0.7 ) * 0.6,
+			base[ 0 ] * Math.sin( orbit ) + base[ 2 ] * Math.cos( orbit )
+		);
+		camera.lookAt( 0, 0.8, 0 );
+		camera.updateMatrixWorld( true );
 
 	}
 

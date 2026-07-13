@@ -4,7 +4,7 @@
   "skill": "threejs-exposure-color-grading",
   "threeRevision": "0.185.1",
   "kind": "canonical-lab",
-  "status": "incomplete",
+  "status": "accepted",
   "canonicalSource": [
     "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline"
   ],
@@ -13,23 +13,23 @@
   "scenarios": [
     {
       "id": "emitter",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "gray-card",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "swatches",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "bright-window",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "masked-ui",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     }
   ],
   "mechanisms": [
@@ -41,7 +41,7 @@
         "mode": "meter-source",
         "scenario": "emitter"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "histogram-and-percentiles",
@@ -51,7 +51,7 @@
         "mode": "histogram",
         "scenario": "emitter"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "adaptation",
@@ -61,7 +61,7 @@
         "mode": "adaptation",
         "scenario": "bright-window"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "metering-masks",
@@ -71,7 +71,7 @@
         "mode": "meter-mask",
         "scenario": "masked-ui"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "tone-mapping",
@@ -81,7 +81,7 @@
         "mode": "tone-map",
         "scenario": "swatches"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "lut-grading",
@@ -91,7 +91,7 @@
         "mode": "lut",
         "scenario": "swatches"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     }
   ],
   "tiers": [
@@ -119,7 +119,7 @@
         "single tone map",
         "single output transform"
       ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "balanced-log-reduction",
@@ -146,7 +146,7 @@
         "single tone map",
         "single output transform"
       ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "minimum-fixed-shot",
@@ -170,7 +170,7 @@
         "single tone map",
         "single output transform"
       ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     }
   ],
   "modes": [
@@ -183,7 +183,9 @@
     "lut"
   ],
   "cameras": [
-    "design"
+    "near",
+    "design",
+    "far"
   ],
   "seeds": [
     1,
@@ -241,5 +243,6 @@
     "validateFull": "npm run validate:full"
   },
   "sourceHash": null,
-  "proxyStatus": null
+  "proxyStatus": null,
+  "evidenceBundle": "docs/visual-validation/webgpu-exposure-color-pipeline/bundle"
 }

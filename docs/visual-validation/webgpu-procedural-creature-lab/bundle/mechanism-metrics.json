@@ -1,0 +1,204 @@
+{
+  "schemaVersion": 2,
+  "subjectAdapter": "webgpu-procedural-creature-lab",
+  "proofKind": "native-browser-runtime",
+  "captureProfile": "correctness",
+  "pipelineGraphDigest": "sha256:aa49f29f5d2d6841edf4805434d0a687d494e0cc9811d184bd0224d1987f28fc",
+  "runtimeReachability": {
+    "signals": [
+      "output"
+    ],
+    "resources": [],
+    "routes": [
+      "final.design.png",
+      "no-post.design.png",
+      "diagnostics.mosaic.png",
+      "camera.near.png",
+      "camera.design.png",
+      "camera.far.png",
+      "seed-0001.final.png",
+      "seed-9e3779b9.final.png",
+      "temporal.t000.png",
+      "temporal.t001.png"
+    ]
+  },
+  "routeExecutions": [
+    {
+      "filename": "final.design.png",
+      "target": "final",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "no-post.design.png",
+      "target": "final",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "diagnostics.mosaic.png",
+      "target": "final",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "camera.near.png",
+      "target": "final",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "camera.design.png",
+      "target": "final",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "camera.far.png",
+      "target": "final",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "seed-0001.final.png",
+      "target": "final",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "seed-9e3779b9.final.png",
+      "target": "final",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "temporal.t000.png",
+      "target": "final",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "temporal.t001.png",
+      "target": "final",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    }
+  ],
+  "transactionalRouteStateMatrix": [],
+  "negativeControls": [],
+  "diagnosticComparisons": [],
+  "metrics": {
+    "writtenCaptures": {
+      "value": 10,
+      "unit": "captures",
+      "label": "Measured",
+      "source": "capture-session writtenCaptures"
+    }
+  },
+  "verdicts": {
+    "mechanismCorrectness": "PASS",
+    "lifecycleStability": "PASS",
+    "visualError": "PASS"
+  },
+  "verdict": "PASS"
+}

@@ -1,0 +1,61 @@
+{
+  "entries": [
+    {
+      "at": "2026-07-13T15:12:42.319Z",
+      "method": "GET",
+      "requestUrl": "/index.html?physicalReview=1",
+      "redirected": false,
+      "fallback": false,
+      "transformed": false,
+      "status": 200,
+      "resolvedPath": "index.html",
+      "query": "physicalReview=1",
+      "sha256": "sha256:0331e10e6f1dda3d84a58fa5df914849eadd3632ddfab346d1a39318fc2e76d8",
+      "byteLength": 1234,
+      "responseKind": "exact-prebuilt-byte"
+    },
+    {
+      "at": "2026-07-13T15:12:42.345Z",
+      "method": "GET",
+      "requestUrl": "/assets/modulepreload-polyfill-Dezn_h7o.js",
+      "redirected": false,
+      "fallback": false,
+      "transformed": false,
+      "status": 200,
+      "resolvedPath": "assets/modulepreload-polyfill-Dezn_h7o.js",
+      "query": "",
+      "sha256": "sha256:785597bca2e7dd97a652a20a197c077079e635a5663433448e0e1d9fd8c98a64",
+      "byteLength": 698,
+      "responseKind": "exact-prebuilt-byte"
+    },
+    {
+      "at": "2026-07-13T15:12:42.345Z",
+      "method": "GET",
+      "requestUrl": "/assets/browser-app-D-NIkB88.js",
+      "redirected": false,
+      "fallback": false,
+      "transformed": false,
+      "status": 200,
+      "resolvedPath": "assets/browser-app-D-NIkB88.js",
+      "query": "",
+      "sha256": "sha256:702cce97f0cd4c4d785f5e3c3cd6940f542c032fa8af386eb202deb69762f045",
+      "byteLength": 884094,
+      "responseKind": "exact-prebuilt-byte"
+    },
+    {
+      "at": "2026-07-13T15:12:42.471Z",
+      "method": "GET",
+      "requestUrl": "/favicon.ico",
+      "redirected": false,
+      "fallback": false,
+      "transformed": false,
+      "status": 404,
+      "reason": "missing-exact-static-route",
+      "resolvedPath": "favicon.ico",
+      "responseKind": "missing-exact-static-route"
+    }
+  ],
+  "ledgerSha256": "sha256:98bdcbb8ddec6ac039695ddb4997bfdfa11641c1f98907a1ab139aa4cc4264af",
+  "documentSha256": "sha256:7eab110fdde65c25de6eddc75c119bb2abaf6cfa7c3b4f055335c83c96643e6c",
+  "byteLength": 1359
+}

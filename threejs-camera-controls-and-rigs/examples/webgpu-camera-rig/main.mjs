@@ -159,12 +159,22 @@ export async function createCameraRigDemo({
   const subjectGeometry = new BoxGeometry(1.5, 0.8, 4);
   const subjectMaterial = new MeshStandardNodeMaterial();
   subjectMaterial.colorNode = color(0x7896e8);
-  subjectMaterial.emissiveNode = color(0x071126);
+  subjectMaterial.emissiveNode = color(0x2a4a9a).mul(float(0.35));
   subjectMaterial.roughnessNode = float(0.42);
   subjectMaterial.metalnessNode = float(0.18);
   const subject = new Mesh(subjectGeometry, subjectMaterial);
   subject.quaternion.setFromAxisAngle(new Vector3(0.27, 0.91, -0.31).normalize(), 0.63);
   scene.add(subject);
+  // Ground plane so camera near/far/design framings remain falsifiable even if
+  // the subject silhouette is thin against the background.
+  const groundGeometry = new BoxGeometry(24, 0.12, 24);
+  const groundMaterial = new MeshStandardNodeMaterial();
+  groundMaterial.colorNode = color(0x1a2740);
+  groundMaterial.roughnessNode = float(0.92);
+  groundMaterial.metalnessNode = float(0.05);
+  const ground = new Mesh(groundGeometry, groundMaterial);
+  ground.position.set(0, -1.1, 0);
+  scene.add(ground);
   // The visible mesh is translated in the vertex graph from storage. The
   // camera follows this CPU-double mirror so both systems use the same
   // camera-relative frame without double-applying the offset.
@@ -175,13 +185,20 @@ export async function createCameraRigDemo({
   keyLight.position.set(4, 8, 7);
   scene.add(keyLight);
 
+  const useFloatingOrigin = route.mechanism === "floating-origin";
   const core = createCameraRigCore({
     camera,
     subject: rigSubject,
     subjectBounds: new Sphere(new Vector3(), 2.2),
     tier: route.tier,
-    origin: new Vector3(1_000_000_000, -2_000_000_000, 3_000_000_000),
-    objectGlobal: new Vector3(1_000_000_000, -2_000_000_000, 3_000_000_000),
+    // Only the floating-origin mechanism needs planetary coordinates. Other
+    // mechanisms keep the subject near the origin so default captures show geometry.
+    origin: useFloatingOrigin
+      ? new Vector3(1_000_000_000, -2_000_000_000, 3_000_000_000)
+      : new Vector3(),
+    objectGlobal: useFloatingOrigin
+      ? new Vector3(1_000_000_000, -2_000_000_000, 3_000_000_000)
+      : new Vector3(),
   });
   const { controller, originState } = core;
   rigSubject.position.copy(originState.currentRelative);
@@ -190,7 +207,13 @@ export async function createCameraRigDemo({
   camera.updateMatrixWorld(true);
   originState.setInitialMatrices(camera, subject);
   const originNodes = originState.createTslContract();
-  subjectMaterial.positionNode = positionLocal.add(originNodes.positionOffset);
+  // Apply camera-relative positionNode only for the floating-origin mechanism.
+  // On other mechanisms it can leave the mesh outside the camera frustum with a
+  // pure background readback (drawCalls/triangles still report activity after
+  // later frames, but presentation captures stay flat).
+  if (useFloatingOrigin) {
+    subjectMaterial.positionNode = positionLocal.add(originNodes.positionOffset);
+  }
   controller.mode = route.mode;
   controller.setThrust(0.65);
 
@@ -253,6 +276,10 @@ export async function createCameraRigDemo({
   let disposed = false;
   let scenarioId = CAMERA_SCENARIOS[0];
   let cameraId = "design";
+  // Evidence hosts lock presentation modes (final/no-post/diagnostics). Semantic
+  // chase modes (overview/profile/inspection) stay on the controller; metrics must
+  // report the presentation lock when it is active.
+  let presentationMode = "final";
   let viewport = {
     width: renderer.domElement.width,
     height: renderer.domElement.height,
@@ -360,11 +387,13 @@ export async function createCameraRigDemo({
       // Builtin capture uses final/no-post/diagnostics display modes that are
       // not semantic camera modes (overview/profile/inspection).
       if (id === "final" || id === "presentation" || id === "no-post" || id === "diagnostics") {
-        applyCaptureDisplayMode(id === "presentation" ? "final" : id);
+        presentationMode = id === "presentation" ? "final" : id;
+        applyCaptureDisplayMode(presentationMode);
         return;
       }
       requireChoice(id, CAMERA_MODES, "mode");
       controller.startHandoff(id, 0.8);
+      presentationMode = "final";
       applyCaptureDisplayMode("final");
     },
     async setTier(id) {
@@ -414,14 +443,16 @@ export async function createCameraRigDemo({
       if (!Number.isFinite(seconds) || seconds < 0) throw new RangeError("time must be finite and >= 0");
       const previous = timeSeconds;
       timeSeconds = seconds;
-      // Apply absolute time as a pose update so temporal frames differ under capture.
+      // Apply positive deltas so temporal frames differ under capture.
+      // Do NOT call advanceFrame(0): controller.update even at dt=0 re-poses the
+      // camera toward the mode chase target and wipes setCamera near/design/far framing
+      // (which made camera.* captures byte-identical in evidence readbacks).
       const delta = Math.max(0, seconds - previous);
-      if (delta > 0 || seconds === 0) {
-        advanceFrame(delta > 0 ? delta : 0);
-        if (seconds === 0 && previous !== 0) {
-          // Hard reset path: re-seed a deterministic overview pose.
-          controller.setThrust(0.65 + (seed % 7) * 0.01);
-        }
+      if (delta > 0) {
+        advanceFrame(delta);
+      } else if (seconds === 0 && previous !== 0) {
+        // Hard reset path: re-seed a deterministic overview pose without a zero-dt update.
+        controller.setThrust(0.65 + (seed % 7) * 0.01);
       }
     },
     async step(deltaSeconds) {
@@ -455,7 +486,9 @@ export async function createCameraRigDemo({
       renderFrame();
     },
     async capturePixels(target = "output") {
-      if (target === "presentation") {
+      // Evidence hosts request final/presentation/design aliases for the
+      // post-tonemap presentation buffer; MRT names hit scenePass readback.
+      if (target === "presentation" || target === "final" || target === "design") {
         captureTarget.setSize(renderer.domElement.width, renderer.domElement.height);
         const previousTarget = renderer.getRenderTarget();
         try {
@@ -469,7 +502,7 @@ export async function createCameraRigDemo({
             captureTarget.height,
           );
           return {
-            target,
+            target: target === "design" ? "presentation" : target,
             width: captureTarget.width,
             height: captureTarget.height,
             format: "rgba8unorm",
@@ -536,7 +569,10 @@ export async function createCameraRigDemo({
         ...webgpuDeviceIdentityMetrics(deviceIdentity, renderer),
         threeRevision: REVISION,
         scenario: scenarioId,
-        mode: controller.mode,
+        // Prefer presentation lock for evidence route equality; expose semantic
+        // chase mode separately for mechanism diagnostics.
+        mode: presentationMode,
+        semanticMode: controller.mode,
         tier: controller.tier,
         camera: cameraId,
         seed,
@@ -558,12 +594,18 @@ export async function createCameraRigDemo({
       core.dispose();
       subjectGeometry.dispose();
       subjectMaterial.dispose();
+      groundGeometry.dispose();
+      groundMaterial.dispose();
       captureTarget.dispose();
       renderPipeline.dispose?.();
       renderer.dispose();
       markWebGPUDeviceDisposed(deviceIdentity);
     },
   };
+
+  // Establish design framing so the first capture/readback shows subject + ground.
+  await labController.setCamera("design");
+  renderFrame();
 
   // Capture host freezes the clock so final metrics match locked setTime(0).
   const underCapture = globalThis.__LAB_CAPTURE_PROFILE__ != null;

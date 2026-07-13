@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 2,
+  "enabled": false,
+  "states": [
+    "full",
+    "balanced",
+    "mobile",
+    "reduced-readable-base"
+  ],
+  "windows": [],
+  "transitions": [],
+  "verdict": "NOT_CLAIMED",
+  "reason": "No sustained named-hardware timing trace exists in the correctness lane."
+}

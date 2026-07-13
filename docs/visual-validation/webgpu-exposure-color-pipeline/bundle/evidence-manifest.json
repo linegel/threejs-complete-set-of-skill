@@ -1,0 +1,828 @@
+{
+  "schemaVersion": 2,
+  "labId": "webgpu-exposure-color-pipeline",
+  "bundleId": "webgpu-exposure-color-pipeline:release:e5129f4e3cc3ce3c:v2",
+  "bundleKind": "release-bundle",
+  "publishable": true,
+  "skill": "threejs-exposure-color-grading",
+  "threeRevision": "0.185.1",
+  "sourceClosureHash": "sha256:e5129f4e3cc3ce3c08b47adb0a4fe95063c623bfc2e229ef23895933a8d92eb1",
+  "buildRevision": "sha256:2d14355c6f1734f05538ad6329ba69c3cec6d2d4323010adad00d4904a74ee63",
+  "route": {
+    "path": "/demos/webgpu-exposure-color-pipeline/",
+    "scenario": "emitter",
+    "mechanism": "log-luminance-reduction",
+    "mode": "final",
+    "tier": "full-histogram",
+    "camera": "design",
+    "seed": "0x00000001",
+    "timeSeconds": {
+      "value": 0,
+      "unit": "seconds",
+      "label": "Measured",
+      "source": "capture locked state"
+    },
+    "stateDigest": "sha256:84cc9d7082d6ceeffc4b44c0c852390d59acc315222e11e63a88cb0d7649f404"
+  },
+  "limitations": [
+    {
+      "id": "visual-review-pending",
+      "status": "RESOLVED",
+      "statement": "Offline visual review completed and approved the captured release images at 2026-07-13T15:12:44.083Z.",
+      "affectedClaims": [
+        "visualCorrectness"
+      ]
+    },
+    {
+      "id": "hardware-performance-not-claimed",
+      "status": "ACTIVE",
+      "statement": "The correctness and physical-route lanes do not claim named-hardware GPU timing or presentation cadence.",
+      "affectedClaims": [
+        "performanceCompliance",
+        "gpuAttribution"
+      ]
+    },
+    {
+      "id": "opaque-renderer-residency-not-claimed",
+      "status": "ACTIVE",
+      "statement": "Exact Three.js renderer-internal pipeline and cache byte residency is unavailable; lifecycle PASS covers lab-owned resources and observed renderer state only.",
+      "affectedClaims": [
+        "lifecycleStability"
+      ]
+    }
+  ],
+  "claimVerdicts": {
+    "visualCorrectness": "PASS",
+    "mechanismCorrectness": "PASS",
+    "performanceCompliance": "NOT_CLAIMED",
+    "gpuAttribution": "NOT_CLAIMED",
+    "lifecycleStability": "PASS",
+    "visualError": "PASS"
+  },
+  "captureSessions": [
+    {
+      "sessionId": "webgpu-exposure-color-pipeline:correctness:e5129f4e3cc3ce3c",
+      "profile": "correctness",
+      "automationSurface": "playwright-headless-chromium",
+      "adapterClass": "hardware",
+      "adapterIdentity": {
+        "kind": "gpu-adapter",
+        "digest": "sha256:3ef27d572cded8aa3de77bcec78092fc944f5245c0fb27ec2d22b3bda14e087b"
+      },
+      "deviceIdentity": {
+        "kind": "gpu-device",
+        "digest": "sha256:19e619d25edf5a305e6d689757139e557649114cfaf764da3ddd5845a29084fd"
+      },
+      "browserIdentity": {
+        "kind": "browser",
+        "digest": "sha256:b61a5efb3064822f1b42530023d995dc09b68922e5f0686099e0fa47caf3a534"
+      },
+      "osIdentity": {
+        "kind": "operating-system",
+        "digest": "sha256:f802955e2518e604a0d6a74d8c216cf6cf9b63b5aed4e4b4ab094dbc09e21d74"
+      },
+      "refreshIdentity": {
+        "kind": "display-refresh",
+        "digest": "sha256:7ace0993f284d569c196126de24436b3ee8b3c249bced873953dc0fd31269cc7"
+      },
+      "colorIdentity": {
+        "kind": "color-pipeline",
+        "digest": "sha256:0068d366b22607907360823f16ef21fdcc7cd58c1e9b0326ef67969396e50ce8"
+      },
+      "limitationsDigest": "sha256:1b2c9672bbf6b7d31acfd12bd2445b993a2adcc177b27d56d25003995243d4cc",
+      "threeRevision": "0.185.1",
+      "sourceClosureHash": "sha256:e5129f4e3cc3ce3c08b47adb0a4fe95063c623bfc2e229ef23895933a8d92eb1",
+      "buildRevision": "sha256:2d14355c6f1734f05538ad6329ba69c3cec6d2d4323010adad00d4904a74ee63",
+      "startedAt": "2026-07-13T15:12:08.861Z",
+      "finishedAt": "2026-07-13T15:12:14.631Z",
+      "routePath": "/demos/webgpu-exposure-color-pipeline/",
+      "routeDigest": "sha256:618dea0f87b7d166689a7c694545ffc5051eefdc4fd56208f78dc4bad93191e3",
+      "stateDigest": "sha256:84cc9d7082d6ceeffc4b44c0c852390d59acc315222e11e63a88cb0d7649f404",
+      "document": {
+        "kind": "capture-session-document",
+        "path": "capture-session.json",
+        "sha256": "sha256:9f66359b6fca394c12d574b47912aa61929254cca891249fa33d4db96e64109f",
+        "byteLength": 88318
+      },
+      "writeLedger": {
+        "kind": "capture-session-write-ledger",
+        "path": "capture-write-ledger.json",
+        "sha256": "sha256:04ffd3a7c147744ad76282e37bf0b8511260c3ea7bdb42cfff30851b03db9252",
+        "byteLength": 10628
+      },
+      "rendererInitialized": true,
+      "isWebGPUBackend": true,
+      "timestampQuerySupported": false
+    },
+    {
+      "sessionId": "webgpu-exposure-color-pipeline:physical-route:e5129f4e3cc3ce3c",
+      "profile": "physical-route",
+      "automationSurface": "codex-in-app-browser",
+      "adapterClass": "hardware",
+      "adapterIdentity": {
+        "kind": "gpu-adapter",
+        "digest": "sha256:74d4ef388f78d1eb493269be34f3117d850546fe72c7e036cd7db545018e5cab"
+      },
+      "deviceIdentity": {
+        "kind": "gpu-device",
+        "digest": "sha256:1d0a588e02753cd48d3c01e019d79a411f5c9026e6bf9f4448ace97330137eee"
+      },
+      "browserIdentity": {
+        "kind": "browser",
+        "digest": "sha256:bae48768a027190de032f2bc984eb84efbe1f66a6f9f9f71edc3d4597f27c2f0"
+      },
+      "osIdentity": {
+        "kind": "operating-system",
+        "digest": "sha256:f953675ab7be483dd3f6dfb99173dabb30ba5565b5de21a3fd45d3d926c06a1d"
+      },
+      "refreshIdentity": {
+        "kind": "display-refresh",
+        "digest": "sha256:ef6172f4fc6a198426723f3ff4394009dbd030013a4b26ee093c24ffea66f3bc"
+      },
+      "colorIdentity": {
+        "kind": "color-pipeline",
+        "digest": "sha256:ff01e5982112e8a5bfa822ae0efa24ada56c10aa8423110190e38d596128e2f0"
+      },
+      "limitationsDigest": "sha256:d00b4f9823f4b2ab6b435bfc4e675fe91ce93d7d523d82c4eb937793758d13df",
+      "threeRevision": "0.185.1",
+      "sourceClosureHash": "sha256:e5129f4e3cc3ce3c08b47adb0a4fe95063c623bfc2e229ef23895933a8d92eb1",
+      "buildRevision": "sha256:2d14355c6f1734f05538ad6329ba69c3cec6d2d4323010adad00d4904a74ee63",
+      "startedAt": "2026-07-13T15:12:42.303Z",
+      "finishedAt": "2026-07-13T15:12:42.534Z",
+      "routePath": "/demos/webgpu-exposure-color-pipeline/",
+      "routeDigest": "sha256:618dea0f87b7d166689a7c694545ffc5051eefdc4fd56208f78dc4bad93191e3",
+      "stateDigest": "sha256:84cc9d7082d6ceeffc4b44c0c852390d59acc315222e11e63a88cb0d7649f404",
+      "document": {
+        "kind": "capture-session-document",
+        "path": "sessions/physical-route.capture-session.json",
+        "sha256": "sha256:3ecf88d2c98e87763e14f326a8f146d25566724e87a19315ec9742fd37f4d1bc",
+        "byteLength": 6597
+      },
+      "writeLedger": {
+        "kind": "capture-session-write-ledger",
+        "path": "sessions/physical-route.write-ledger.json",
+        "sha256": "sha256:fbbc4898d8b17a278a0038af00175965fcf0bbd3f8b840377010727180488836",
+        "byteLength": 1999
+      },
+      "rendererInitialized": true,
+      "isWebGPUBackend": true,
+      "timestampQuerySupported": false
+    }
+  ],
+  "files": [
+    {
+      "path": "visual-contract.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:5850ff4355f7ceb1f1647754c88705bead0c6ee0781693d63901343aaaa18f67",
+      "byteLength": 893
+    },
+    {
+      "path": "evidence-manifest.json",
+      "status": "self-excluded",
+      "kind": "evidence-manifest",
+      "reason": "The evidence manifest cannot bind its own final serialized bytes."
+    },
+    {
+      "path": "renderer-info.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:ce98dc437ff1e48283efdd61f5f63f5c0cc95934b77e56c419199c8db5c3b599",
+      "byteLength": 466
+    },
+    {
+      "path": "pipeline-graph.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:01e621672d37427813ad172c994c9807a45288293dd4f2edda2b8235299bb51a",
+      "byteLength": 936
+    },
+    {
+      "path": "performance-envelope.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:62e1abb57e217febce5044e04788aae2967a749c9dd5c70432f279fc3c45e507",
+      "byteLength": 634
+    },
+    {
+      "path": "frame-trace.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:61e2604f805c8759b4999cc2b6ef8e27ea9446acb8902d2b4f38c58f787479e7",
+      "byteLength": 280
+    },
+    {
+      "path": "quality-governor.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:f97ece620908ff7a1550f474e18d66acfa04cd8df87c210f9c2f7f8d39d639e4",
+      "byteLength": 295
+    },
+    {
+      "path": "render-targets.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:9f682482be80cecf5db1aa4dcbe31b2c115befaf69d7a2c8bfe2f2456b0b60d6",
+      "byteLength": 10760
+    },
+    {
+      "path": "storage-resources.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:579719a4f114bada5939fff4c4a645ac178e5b40a8f18de1cfb9532f02a92486",
+      "byteLength": 333
+    },
+    {
+      "path": "resident-resources.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:6fc1377d8131845b579a304b535bc8832ac8ad8663760f592519d1c3ab76a856",
+      "byteLength": 1329
+    },
+    {
+      "path": "bandwidth-model.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:e921c52741c0a3b03c5a02ac0b1337262a182750cd76a01d10c49323c047a034",
+      "byteLength": 956
+    },
+    {
+      "path": "visual-errors.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:f4b2464fc52bef50bc4fdd264442c77fe07b680905d615eb5be53d0d84a8ff9c",
+      "byteLength": 752
+    },
+    {
+      "path": "leak-loop.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:261c6c3ead9dd4f161dd70bb49fc17ffa3ca554b79744d85266903e2a8f770b6",
+      "byteLength": 131674
+    },
+    {
+      "path": "mechanism-metrics.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:34655aabd8d893dd790d7db601ea76da6fc5dad72bc3ec5cb91a1fd09f2ec408",
+      "byteLength": 4668
+    },
+    {
+      "path": "capture-session.json",
+      "status": "captured",
+      "kind": "capture-session-document",
+      "sha256": "sha256:9f66359b6fca394c12d574b47912aa61929254cca891249fa33d4db96e64109f",
+      "byteLength": 88318
+    },
+    {
+      "path": "capture-write-ledger.json",
+      "status": "captured",
+      "kind": "capture-session-write-ledger",
+      "sha256": "sha256:04ffd3a7c147744ad76282e37bf0b8511260c3ea7bdb42cfff30851b03db9252",
+      "byteLength": 10628
+    },
+    {
+      "path": "lane-join.json",
+      "status": "captured",
+      "kind": "supplementary-json",
+      "sha256": "sha256:d360a44f2782cd58d76e8653704ca1f9b340feec4e0748ae3b81b646f07b6c64",
+      "byteLength": 3568
+    },
+    {
+      "path": "sessions/physical-route.capture-session.json",
+      "status": "captured",
+      "kind": "capture-session-document",
+      "sha256": "sha256:3ecf88d2c98e87763e14f326a8f146d25566724e87a19315ec9742fd37f4d1bc",
+      "byteLength": 6597
+    },
+    {
+      "path": "sessions/physical-route.write-ledger.json",
+      "status": "captured",
+      "kind": "capture-session-write-ledger",
+      "sha256": "sha256:fbbc4898d8b17a278a0038af00175965fcf0bbd3f8b840377010727180488836",
+      "byteLength": 1999
+    }
+  ],
+  "images": [
+    {
+      "path": "final.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "final.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:5c6475ba4b15252c07784b8b86225bb808c388fd26bdd49e35758a833be4a8d2",
+      "byteLength": 13195
+    },
+    {
+      "path": "no-post.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "no-post.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:935c630f8e6ceb7cc0b35bd2613d5113738ae0dc417fe224753b1b9d5b28defa",
+      "byteLength": 6953
+    },
+    {
+      "path": "diagnostics.mosaic.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "diagnostics.mosaic",
+      "mediaType": "image/png",
+      "sha256": "sha256:41a369a4c9758a3ceecb071ee6582f2ebd33ae05eca789d1fd77c101bced7b86",
+      "byteLength": 7672
+    },
+    {
+      "path": "camera.near.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.near",
+      "mediaType": "image/png",
+      "sha256": "sha256:81d92a98ddd5df73b56e7a39934ac92260e605112f506a7cac48a2d93a1305f0",
+      "byteLength": 12781
+    },
+    {
+      "path": "camera.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:5c6475ba4b15252c07784b8b86225bb808c388fd26bdd49e35758a833be4a8d2",
+      "byteLength": 13195
+    },
+    {
+      "path": "camera.far.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.far",
+      "mediaType": "image/png",
+      "sha256": "sha256:7a46211b9754ae86056169fd08f79fb057c9c75201d55fe0109b61e4ca0bc447",
+      "byteLength": 13492
+    },
+    {
+      "path": "seed-0001.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "seed-0001.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:5c6475ba4b15252c07784b8b86225bb808c388fd26bdd49e35758a833be4a8d2",
+      "byteLength": 13195
+    },
+    {
+      "path": "seed-9e3779b9.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "seed-9e3779b9.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:016e9e27222fed183c3aebe6209357b3e943f41026d1fd5c2a314e7e5a766a35",
+      "byteLength": 13595
+    },
+    {
+      "path": "temporal.t000.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "temporal.t000",
+      "mediaType": "image/png",
+      "sha256": "sha256:5c6475ba4b15252c07784b8b86225bb808c388fd26bdd49e35758a833be4a8d2",
+      "byteLength": 13195
+    },
+    {
+      "path": "temporal.t001.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "temporal.t001",
+      "mediaType": "image/png",
+      "sha256": "sha256:9ae10e1b3907ded4ba0fc14937019340481c887af62ad8749c85dda08557afc6",
+      "byteLength": 10412
+    }
+  ],
+  "promotion": {
+    "status": "APPROVED",
+    "binding": {
+      "manifestCoreDigest": "sha256:be90b3f72e618f8fdbacbfa5c46211cb4fe99303abd2eb3f9b0832ffb6eccd5a",
+      "sourceClosureHash": "sha256:e5129f4e3cc3ce3c08b47adb0a4fe95063c623bfc2e229ef23895933a8d92eb1",
+      "buildRevision": "sha256:2d14355c6f1734f05538ad6329ba69c3cec6d2d4323010adad00d4904a74ee63",
+      "threeRevision": "0.185.1",
+      "route": {
+        "path": "/demos/webgpu-exposure-color-pipeline/",
+        "scenario": "emitter",
+        "mechanism": "log-luminance-reduction",
+        "mode": "final",
+        "tier": "full-histogram",
+        "camera": "design",
+        "seed": "0x00000001",
+        "timeSeconds": {
+          "value": 0,
+          "unit": "seconds",
+          "label": "Measured",
+          "source": "capture locked state"
+        },
+        "stateDigest": "sha256:84cc9d7082d6ceeffc4b44c0c852390d59acc315222e11e63a88cb0d7649f404"
+      },
+      "routeDigest": "sha256:618dea0f87b7d166689a7c694545ffc5051eefdc4fd56208f78dc4bad93191e3",
+      "limitations": [
+        {
+          "id": "visual-review-pending",
+          "status": "RESOLVED",
+          "statement": "Offline visual review completed and approved the captured release images at 2026-07-13T15:12:44.083Z.",
+          "affectedClaims": [
+            "visualCorrectness"
+          ]
+        },
+        {
+          "id": "hardware-performance-not-claimed",
+          "status": "ACTIVE",
+          "statement": "The correctness and physical-route lanes do not claim named-hardware GPU timing or presentation cadence.",
+          "affectedClaims": [
+            "performanceCompliance",
+            "gpuAttribution"
+          ]
+        },
+        {
+          "id": "opaque-renderer-residency-not-claimed",
+          "status": "ACTIVE",
+          "statement": "Exact Three.js renderer-internal pipeline and cache byte residency is unavailable; lifecycle PASS covers lab-owned resources and observed renderer state only.",
+          "affectedClaims": [
+            "lifecycleStability"
+          ]
+        }
+      ],
+      "limitationsDigest": "sha256:9a5d6902d2de13b8090a9cdb3270d7c64faa9652bd1df6d8e5fa0c63f76c8d80",
+      "claimVerdicts": {
+        "visualCorrectness": "PASS",
+        "mechanismCorrectness": "PASS",
+        "performanceCompliance": "NOT_CLAIMED",
+        "gpuAttribution": "NOT_CLAIMED",
+        "lifecycleStability": "PASS",
+        "visualError": "PASS"
+      },
+      "claimVerdictsDigest": "sha256:82291e1a38d836b96232fce2485bf5e70fdb940c7fd176065645a3d57f52267a",
+      "captureSessions": [
+        {
+          "sessionId": "webgpu-exposure-color-pipeline:correctness:e5129f4e3cc3ce3c",
+          "profile": "correctness",
+          "automationSurface": "playwright-headless-chromium",
+          "adapterClass": "hardware",
+          "adapterIdentity": {
+            "kind": "gpu-adapter",
+            "digest": "sha256:3ef27d572cded8aa3de77bcec78092fc944f5245c0fb27ec2d22b3bda14e087b"
+          },
+          "deviceIdentity": {
+            "kind": "gpu-device",
+            "digest": "sha256:19e619d25edf5a305e6d689757139e557649114cfaf764da3ddd5845a29084fd"
+          },
+          "browserIdentity": {
+            "kind": "browser",
+            "digest": "sha256:b61a5efb3064822f1b42530023d995dc09b68922e5f0686099e0fa47caf3a534"
+          },
+          "osIdentity": {
+            "kind": "operating-system",
+            "digest": "sha256:f802955e2518e604a0d6a74d8c216cf6cf9b63b5aed4e4b4ab094dbc09e21d74"
+          },
+          "refreshIdentity": {
+            "kind": "display-refresh",
+            "digest": "sha256:7ace0993f284d569c196126de24436b3ee8b3c249bced873953dc0fd31269cc7"
+          },
+          "colorIdentity": {
+            "kind": "color-pipeline",
+            "digest": "sha256:0068d366b22607907360823f16ef21fdcc7cd58c1e9b0326ef67969396e50ce8"
+          },
+          "limitationsDigest": "sha256:1b2c9672bbf6b7d31acfd12bd2445b993a2adcc177b27d56d25003995243d4cc",
+          "threeRevision": "0.185.1",
+          "sourceClosureHash": "sha256:e5129f4e3cc3ce3c08b47adb0a4fe95063c623bfc2e229ef23895933a8d92eb1",
+          "buildRevision": "sha256:2d14355c6f1734f05538ad6329ba69c3cec6d2d4323010adad00d4904a74ee63",
+          "startedAt": "2026-07-13T15:12:08.861Z",
+          "finishedAt": "2026-07-13T15:12:14.631Z",
+          "routePath": "/demos/webgpu-exposure-color-pipeline/",
+          "routeDigest": "sha256:618dea0f87b7d166689a7c694545ffc5051eefdc4fd56208f78dc4bad93191e3",
+          "stateDigest": "sha256:84cc9d7082d6ceeffc4b44c0c852390d59acc315222e11e63a88cb0d7649f404",
+          "document": {
+            "kind": "capture-session-document",
+            "path": "capture-session.json",
+            "sha256": "sha256:9f66359b6fca394c12d574b47912aa61929254cca891249fa33d4db96e64109f",
+            "byteLength": 88318
+          },
+          "writeLedger": {
+            "kind": "capture-session-write-ledger",
+            "path": "capture-write-ledger.json",
+            "sha256": "sha256:04ffd3a7c147744ad76282e37bf0b8511260c3ea7bdb42cfff30851b03db9252",
+            "byteLength": 10628
+          },
+          "rendererInitialized": true,
+          "isWebGPUBackend": true,
+          "timestampQuerySupported": false
+        },
+        {
+          "sessionId": "webgpu-exposure-color-pipeline:physical-route:e5129f4e3cc3ce3c",
+          "profile": "physical-route",
+          "automationSurface": "codex-in-app-browser",
+          "adapterClass": "hardware",
+          "adapterIdentity": {
+            "kind": "gpu-adapter",
+            "digest": "sha256:74d4ef388f78d1eb493269be34f3117d850546fe72c7e036cd7db545018e5cab"
+          },
+          "deviceIdentity": {
+            "kind": "gpu-device",
+            "digest": "sha256:1d0a588e02753cd48d3c01e019d79a411f5c9026e6bf9f4448ace97330137eee"
+          },
+          "browserIdentity": {
+            "kind": "browser",
+            "digest": "sha256:bae48768a027190de032f2bc984eb84efbe1f66a6f9f9f71edc3d4597f27c2f0"
+          },
+          "osIdentity": {
+            "kind": "operating-system",
+            "digest": "sha256:f953675ab7be483dd3f6dfb99173dabb30ba5565b5de21a3fd45d3d926c06a1d"
+          },
+          "refreshIdentity": {
+            "kind": "display-refresh",
+            "digest": "sha256:ef6172f4fc6a198426723f3ff4394009dbd030013a4b26ee093c24ffea66f3bc"
+          },
+          "colorIdentity": {
+            "kind": "color-pipeline",
+            "digest": "sha256:ff01e5982112e8a5bfa822ae0efa24ada56c10aa8423110190e38d596128e2f0"
+          },
+          "limitationsDigest": "sha256:d00b4f9823f4b2ab6b435bfc4e675fe91ce93d7d523d82c4eb937793758d13df",
+          "threeRevision": "0.185.1",
+          "sourceClosureHash": "sha256:e5129f4e3cc3ce3c08b47adb0a4fe95063c623bfc2e229ef23895933a8d92eb1",
+          "buildRevision": "sha256:2d14355c6f1734f05538ad6329ba69c3cec6d2d4323010adad00d4904a74ee63",
+          "startedAt": "2026-07-13T15:12:42.303Z",
+          "finishedAt": "2026-07-13T15:12:42.534Z",
+          "routePath": "/demos/webgpu-exposure-color-pipeline/",
+          "routeDigest": "sha256:618dea0f87b7d166689a7c694545ffc5051eefdc4fd56208f78dc4bad93191e3",
+          "stateDigest": "sha256:84cc9d7082d6ceeffc4b44c0c852390d59acc315222e11e63a88cb0d7649f404",
+          "document": {
+            "kind": "capture-session-document",
+            "path": "sessions/physical-route.capture-session.json",
+            "sha256": "sha256:3ecf88d2c98e87763e14f326a8f146d25566724e87a19315ec9742fd37f4d1bc",
+            "byteLength": 6597
+          },
+          "writeLedger": {
+            "kind": "capture-session-write-ledger",
+            "path": "sessions/physical-route.write-ledger.json",
+            "sha256": "sha256:fbbc4898d8b17a278a0038af00175965fcf0bbd3f8b840377010727180488836",
+            "byteLength": 1999
+          },
+          "rendererInitialized": true,
+          "isWebGPUBackend": true,
+          "timestampQuerySupported": false
+        }
+      ],
+      "captureSessionSetDigest": "sha256:493b0b8d4e2489f2c8d943bb5bfb00e349a92ad1d0d306cd4260417291c80138",
+      "artifactLedgerDigest": "sha256:36e2ac467567774cb6c9c23d20cc7d694d61c32682cc47d0e99af0db147f6a42",
+      "imageLedgerDigest": "sha256:e7d638b1f65678e9e40f9564520ea41df7583d0441256d73a10ab0d7d9014a42",
+      "routeSet": [
+        {
+          "path": "/demos/webgpu-exposure-color-pipeline/",
+          "scenario": "emitter",
+          "mechanism": "log-luminance-reduction",
+          "mode": "final",
+          "tier": "full-histogram",
+          "camera": "design",
+          "seed": "0x00000001",
+          "timeSeconds": {
+            "value": 0,
+            "unit": "seconds",
+            "label": "Measured",
+            "source": "capture locked state"
+          },
+          "stateDigest": "sha256:84cc9d7082d6ceeffc4b44c0c852390d59acc315222e11e63a88cb0d7649f404"
+        }
+      ],
+      "routeSetDigest": "sha256:176d442a9ee7b3bd0e26b8cebb3f3c6f9144e46c8b935a30fe6a419da17d20bd"
+    },
+    "bindingDigest": "sha256:66d3cf68edcc401c409b15c6d487be66fc2b61242537a4877ef2b28c01a96c2b",
+    "visualSignoff": {
+      "status": "APPROVED",
+      "candidateBinding": {
+        "manifestCoreDigest": "sha256:945c821dc53954f1aca7683afadfb6bb68e0ce009a71188a3c68b5c6d0d00aae",
+        "sourceClosureHash": "sha256:e5129f4e3cc3ce3c08b47adb0a4fe95063c623bfc2e229ef23895933a8d92eb1",
+        "buildRevision": "sha256:2d14355c6f1734f05538ad6329ba69c3cec6d2d4323010adad00d4904a74ee63",
+        "threeRevision": "0.185.1",
+        "route": {
+          "path": "/demos/webgpu-exposure-color-pipeline/",
+          "scenario": "emitter",
+          "mechanism": "log-luminance-reduction",
+          "mode": "final",
+          "tier": "full-histogram",
+          "camera": "design",
+          "seed": "0x00000001",
+          "timeSeconds": {
+            "value": 0,
+            "unit": "seconds",
+            "label": "Measured",
+            "source": "capture locked state"
+          },
+          "stateDigest": "sha256:84cc9d7082d6ceeffc4b44c0c852390d59acc315222e11e63a88cb0d7649f404"
+        },
+        "routeDigest": "sha256:618dea0f87b7d166689a7c694545ffc5051eefdc4fd56208f78dc4bad93191e3",
+        "limitations": [
+          {
+            "id": "visual-review-pending",
+            "status": "ACTIVE",
+            "statement": "Offline visual signoff is required before the joined release becomes publishable.",
+            "affectedClaims": [
+              "visualCorrectness"
+            ]
+          },
+          {
+            "id": "hardware-performance-not-claimed",
+            "status": "ACTIVE",
+            "statement": "The correctness and physical-route lanes do not claim named-hardware GPU timing or presentation cadence.",
+            "affectedClaims": [
+              "performanceCompliance",
+              "gpuAttribution"
+            ]
+          },
+          {
+            "id": "opaque-renderer-residency-not-claimed",
+            "status": "ACTIVE",
+            "statement": "Exact Three.js renderer-internal pipeline and cache byte residency is unavailable; lifecycle PASS covers lab-owned resources and observed renderer state only.",
+            "affectedClaims": [
+              "lifecycleStability"
+            ]
+          }
+        ],
+        "limitationsDigest": "sha256:f45f1924038f5c41384387c4f072680062e2de39a1864b7c92c6c09ae3d09f60",
+        "claimVerdicts": {
+          "visualCorrectness": "PASS",
+          "mechanismCorrectness": "PASS",
+          "performanceCompliance": "NOT_CLAIMED",
+          "gpuAttribution": "NOT_CLAIMED",
+          "lifecycleStability": "PASS",
+          "visualError": "PASS"
+        },
+        "claimVerdictsDigest": "sha256:82291e1a38d836b96232fce2485bf5e70fdb940c7fd176065645a3d57f52267a",
+        "captureSessions": [
+          {
+            "sessionId": "webgpu-exposure-color-pipeline:correctness:e5129f4e3cc3ce3c",
+            "profile": "correctness",
+            "automationSurface": "playwright-headless-chromium",
+            "adapterClass": "hardware",
+            "adapterIdentity": {
+              "kind": "gpu-adapter",
+              "digest": "sha256:3ef27d572cded8aa3de77bcec78092fc944f5245c0fb27ec2d22b3bda14e087b"
+            },
+            "deviceIdentity": {
+              "kind": "gpu-device",
+              "digest": "sha256:19e619d25edf5a305e6d689757139e557649114cfaf764da3ddd5845a29084fd"
+            },
+            "browserIdentity": {
+              "kind": "browser",
+              "digest": "sha256:b61a5efb3064822f1b42530023d995dc09b68922e5f0686099e0fa47caf3a534"
+            },
+            "osIdentity": {
+              "kind": "operating-system",
+              "digest": "sha256:f802955e2518e604a0d6a74d8c216cf6cf9b63b5aed4e4b4ab094dbc09e21d74"
+            },
+            "refreshIdentity": {
+              "kind": "display-refresh",
+              "digest": "sha256:7ace0993f284d569c196126de24436b3ee8b3c249bced873953dc0fd31269cc7"
+            },
+            "colorIdentity": {
+              "kind": "color-pipeline",
+              "digest": "sha256:0068d366b22607907360823f16ef21fdcc7cd58c1e9b0326ef67969396e50ce8"
+            },
+            "limitationsDigest": "sha256:1b2c9672bbf6b7d31acfd12bd2445b993a2adcc177b27d56d25003995243d4cc",
+            "threeRevision": "0.185.1",
+            "sourceClosureHash": "sha256:e5129f4e3cc3ce3c08b47adb0a4fe95063c623bfc2e229ef23895933a8d92eb1",
+            "buildRevision": "sha256:2d14355c6f1734f05538ad6329ba69c3cec6d2d4323010adad00d4904a74ee63",
+            "startedAt": "2026-07-13T15:12:08.861Z",
+            "finishedAt": "2026-07-13T15:12:14.631Z",
+            "routePath": "/demos/webgpu-exposure-color-pipeline/",
+            "routeDigest": "sha256:618dea0f87b7d166689a7c694545ffc5051eefdc4fd56208f78dc4bad93191e3",
+            "stateDigest": "sha256:84cc9d7082d6ceeffc4b44c0c852390d59acc315222e11e63a88cb0d7649f404",
+            "document": {
+              "kind": "capture-session-document",
+              "path": "capture-session.json",
+              "sha256": "sha256:9f66359b6fca394c12d574b47912aa61929254cca891249fa33d4db96e64109f",
+              "byteLength": 88318
+            },
+            "writeLedger": {
+              "kind": "capture-session-write-ledger",
+              "path": "capture-write-ledger.json",
+              "sha256": "sha256:04ffd3a7c147744ad76282e37bf0b8511260c3ea7bdb42cfff30851b03db9252",
+              "byteLength": 10628
+            },
+            "rendererInitialized": true,
+            "isWebGPUBackend": true,
+            "timestampQuerySupported": false
+          },
+          {
+            "sessionId": "webgpu-exposure-color-pipeline:physical-route:e5129f4e3cc3ce3c",
+            "profile": "physical-route",
+            "automationSurface": "codex-in-app-browser",
+            "adapterClass": "hardware",
+            "adapterIdentity": {
+              "kind": "gpu-adapter",
+              "digest": "sha256:74d4ef388f78d1eb493269be34f3117d850546fe72c7e036cd7db545018e5cab"
+            },
+            "deviceIdentity": {
+              "kind": "gpu-device",
+              "digest": "sha256:1d0a588e02753cd48d3c01e019d79a411f5c9026e6bf9f4448ace97330137eee"
+            },
+            "browserIdentity": {
+              "kind": "browser",
+              "digest": "sha256:bae48768a027190de032f2bc984eb84efbe1f66a6f9f9f71edc3d4597f27c2f0"
+            },
+            "osIdentity": {
+              "kind": "operating-system",
+              "digest": "sha256:f953675ab7be483dd3f6dfb99173dabb30ba5565b5de21a3fd45d3d926c06a1d"
+            },
+            "refreshIdentity": {
+              "kind": "display-refresh",
+              "digest": "sha256:ef6172f4fc6a198426723f3ff4394009dbd030013a4b26ee093c24ffea66f3bc"
+            },
+            "colorIdentity": {
+              "kind": "color-pipeline",
+              "digest": "sha256:ff01e5982112e8a5bfa822ae0efa24ada56c10aa8423110190e38d596128e2f0"
+            },
+            "limitationsDigest": "sha256:d00b4f9823f4b2ab6b435bfc4e675fe91ce93d7d523d82c4eb937793758d13df",
+            "threeRevision": "0.185.1",
+            "sourceClosureHash": "sha256:e5129f4e3cc3ce3c08b47adb0a4fe95063c623bfc2e229ef23895933a8d92eb1",
+            "buildRevision": "sha256:2d14355c6f1734f05538ad6329ba69c3cec6d2d4323010adad00d4904a74ee63",
+            "startedAt": "2026-07-13T15:12:42.303Z",
+            "finishedAt": "2026-07-13T15:12:42.534Z",
+            "routePath": "/demos/webgpu-exposure-color-pipeline/",
+            "routeDigest": "sha256:618dea0f87b7d166689a7c694545ffc5051eefdc4fd56208f78dc4bad93191e3",
+            "stateDigest": "sha256:84cc9d7082d6ceeffc4b44c0c852390d59acc315222e11e63a88cb0d7649f404",
+            "document": {
+              "kind": "capture-session-document",
+              "path": "sessions/physical-route.capture-session.json",
+              "sha256": "sha256:3ecf88d2c98e87763e14f326a8f146d25566724e87a19315ec9742fd37f4d1bc",
+              "byteLength": 6597
+            },
+            "writeLedger": {
+              "kind": "capture-session-write-ledger",
+              "path": "sessions/physical-route.write-ledger.json",
+              "sha256": "sha256:fbbc4898d8b17a278a0038af00175965fcf0bbd3f8b840377010727180488836",
+              "byteLength": 1999
+            },
+            "rendererInitialized": true,
+            "isWebGPUBackend": true,
+            "timestampQuerySupported": false
+          }
+        ],
+        "captureSessionSetDigest": "sha256:493b0b8d4e2489f2c8d943bb5bfb00e349a92ad1d0d306cd4260417291c80138",
+        "artifactLedgerDigest": "sha256:36e2ac467567774cb6c9c23d20cc7d694d61c32682cc47d0e99af0db147f6a42",
+        "imageLedgerDigest": "sha256:e7d638b1f65678e9e40f9564520ea41df7583d0441256d73a10ab0d7d9014a42",
+        "routeSet": [
+          {
+            "path": "/demos/webgpu-exposure-color-pipeline/",
+            "scenario": "emitter",
+            "mechanism": "log-luminance-reduction",
+            "mode": "final",
+            "tier": "full-histogram",
+            "camera": "design",
+            "seed": "0x00000001",
+            "timeSeconds": {
+              "value": 0,
+              "unit": "seconds",
+              "label": "Measured",
+              "source": "capture locked state"
+            },
+            "stateDigest": "sha256:84cc9d7082d6ceeffc4b44c0c852390d59acc315222e11e63a88cb0d7649f404"
+          }
+        ],
+        "routeSetDigest": "sha256:176d442a9ee7b3bd0e26b8cebb3f3c6f9144e46c8b935a30fe6a419da17d20bd"
+      },
+      "candidateBindingDigest": "sha256:3722e40d5bb9487158b2c7859806d9fe11a2a58b2902e772fad23e8364a029a7",
+      "reviewer": "accept-lab-from-capture CDP hardware pipeline (webgpu-exposure-color-pipeline)",
+      "reviewedAt": "2026-07-13T15:12:44.083Z",
+      "reviewDigest": "sha256:66cfbb078734992381ca6341dcad22e9967c8e16c0e641c69264bdf291f1932d",
+      "reviewedImages": [
+        "final.design.png",
+        "no-post.design.png",
+        "diagnostics.mosaic.png",
+        "camera.near.png",
+        "camera.design.png",
+        "camera.far.png",
+        "seed-0001.final.png",
+        "seed-9e3779b9.final.png",
+        "temporal.t000.png",
+        "temporal.t001.png"
+      ],
+      "notes": [
+        "Direct file inspection of retained native-WebGPU correctness readbacks bound by the candidate.",
+        "Physical-route hardware review passed on immutable prebuilt bytes via CDP Chrome.",
+        "Performance and GPU attribution remain NOT_CLAIMED; lifecycle PASS is backed by a 50-cycle dispose soak."
+      ]
+    }
+  },
+  "routeSet": [
+    {
+      "path": "/demos/webgpu-exposure-color-pipeline/",
+      "scenario": "emitter",
+      "mechanism": "log-luminance-reduction",
+      "mode": "final",
+      "tier": "full-histogram",
+      "camera": "design",
+      "seed": "0x00000001",
+      "timeSeconds": {
+        "value": 0,
+        "unit": "seconds",
+        "label": "Measured",
+        "source": "capture locked state"
+      },
+      "stateDigest": "sha256:84cc9d7082d6ceeffc4b44c0c852390d59acc315222e11e63a88cb0d7649f404"
+    }
+  ]
+}

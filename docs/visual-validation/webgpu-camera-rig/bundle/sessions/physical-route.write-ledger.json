@@ -1,0 +1,61 @@
+{
+  "entries": [
+    {
+      "at": "2026-07-13T15:08:10.697Z",
+      "method": "GET",
+      "requestUrl": "/index.html?physicalReview=1",
+      "redirected": false,
+      "fallback": false,
+      "transformed": false,
+      "status": 200,
+      "resolvedPath": "index.html",
+      "query": "physicalReview=1",
+      "sha256": "sha256:71666d73d66bf6ddcc5ea1091cfb9937fdee67675d6c6e82d125a19d296eceb3",
+      "byteLength": 1416,
+      "responseKind": "exact-prebuilt-byte"
+    },
+    {
+      "at": "2026-07-13T15:08:10.721Z",
+      "method": "GET",
+      "requestUrl": "/assets/index-CDaDZ6ww.js",
+      "redirected": false,
+      "fallback": false,
+      "transformed": false,
+      "status": 200,
+      "resolvedPath": "assets/index-CDaDZ6ww.js",
+      "query": "",
+      "sha256": "sha256:b28c9694187d81c629ceee707a04f4d3b80d4844616755608fdfca91da30e2ad",
+      "byteLength": 183,
+      "responseKind": "exact-prebuilt-byte"
+    },
+    {
+      "at": "2026-07-13T15:08:10.722Z",
+      "method": "GET",
+      "requestUrl": "/assets/main-Bpr0GIro.js",
+      "redirected": false,
+      "fallback": false,
+      "transformed": false,
+      "status": 200,
+      "resolvedPath": "assets/main-Bpr0GIro.js",
+      "query": "",
+      "sha256": "sha256:9bc9f99fad63572309e2931f9135dc2a3ec06faf06f53d7ac63a870aa9471ed6",
+      "byteLength": 884180,
+      "responseKind": "exact-prebuilt-byte"
+    },
+    {
+      "at": "2026-07-13T15:08:10.812Z",
+      "method": "GET",
+      "requestUrl": "/favicon.ico",
+      "redirected": false,
+      "fallback": false,
+      "transformed": false,
+      "status": 404,
+      "reason": "missing-exact-static-route",
+      "resolvedPath": "favicon.ico",
+      "responseKind": "missing-exact-static-route"
+    }
+  ],
+  "ledgerSha256": "sha256:57a03439129741b39b283b99d5148bf65e4f39f2d63454aba1792c8671f60775",
+  "documentSha256": "sha256:03afbf056f7756484d95a78af79a14fffbef5bfeede0c57194454b2ebcf47171",
+  "byteLength": 1311
+}

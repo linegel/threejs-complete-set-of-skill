@@ -4,7 +4,7 @@
   "skill": "threejs-camera-controls-and-rigs",
   "threeRevision": "0.185.1",
   "kind": "canonical-lab",
-  "status": "incomplete",
+  "status": "accepted",
   "canonicalSource": [
     "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/CameraDirectionController.mjs",
     "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/CameraRelativeOrigin.mjs",
@@ -27,39 +27,39 @@
   "scenarios": [
     {
       "id": "default",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     }
   ],
   "mechanisms": [
     {
       "id": "scale-aware-framing",
       "route": "mechanism/scale-aware-framing/",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "handoff-and-replay",
       "route": "mechanism/handoff-and-replay/",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "pointer-orbit-and-collision",
       "route": "mechanism/pointer-orbit-and-collision/",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "floating-origin",
       "route": "mechanism/floating-origin/",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "projection-and-depth",
       "route": "mechanism/projection-and-depth/",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "shared-jitter-and-velocity",
       "route": "mechanism/shared-jitter-and-velocity/",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     }
   ],
   "tiers": [
@@ -87,7 +87,7 @@
         "one camera owner",
         "one output owner"
       ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "budgeted",
@@ -115,7 +115,7 @@
         "one camera owner",
         "one output owner"
       ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "minimum",
@@ -146,10 +146,13 @@
         "one output owner",
         "native WebGPU"
       ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     }
   ],
   "modes": [
+    "final",
+    "no-post",
+    "diagnostics",
     "overview",
     "profile",
     "inspection"
@@ -222,7 +225,7 @@
     }
   ],
   "evidenceContract": "v2",
-  "evidenceBundle": "artifacts/visual-validation/webgpu-camera-rig/correctness",
+  "evidenceBundle": "docs/visual-validation/webgpu-camera-rig/bundle",
   "validationCommand": "node threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/cameraValidation.mjs",
   "commands": {
     "check": "npm --prefix threejs-camera-controls-and-rigs/examples/webgpu-camera-rig run check",

@@ -8,9 +8,10 @@ import { build as viteBuild } from 'vite';
 
 import { buildDemoRegistry, REPO_ROOT } from './lab-registry.mjs';
 import { canonicalSha256 } from './evidence-manifest-contract.mjs';
+import { labViteAliases } from './vite-lab-config.mjs';
 
 export const IMMUTABLE_LAB_BUILD_MANIFEST = 'immutable-lab-build.json';
-export const IMMUTABLE_LAB_BUILD_CONTRACT = 'declared-route-entrypoints-v2';
+export const IMMUTABLE_LAB_BUILD_CONTRACT = 'declared-route-entrypoints-v3-three-dedupe';
 
 function sha256(bytes) {
   return `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
@@ -45,9 +46,10 @@ async function fileLedger(outputDirectory) {
 function htmlInputs(root, directory = root) {
   const inputs = {};
   for (const entry of readdirSync(directory, { withFileTypes: true })) {
+    // Skip dependency installs before symlink rejection — labs often symlink node_modules.
+    if (entry.name === 'node_modules' || entry.name === '.git') continue;
     if (entry.isSymbolicLink()) throw new Error(`immutable lab build rejects source symlink ${join(directory, entry.name)}`);
     if (entry.isDirectory()) {
-      if (entry.name === 'node_modules') continue;
       Object.assign(inputs, htmlInputs(root, join(directory, entry.name)));
     } else if (entry.isFile() && extname(entry.name).toLowerCase() === '.html') {
       const path = join(directory, entry.name);
@@ -150,9 +152,22 @@ export async function buildImmutableLabSurface(options = {}) {
   if (typeof labId !== 'string' || labId.length === 0) throw new Error('immutable lab build requires labId');
   const extraEntrypoints = [ ...(options.extraEntrypoints ?? []) ].sort();
   const { demo, root, sourceClosure } = resolveLab(labId);
-  const inputs = declaredHtmlInputs(root, demo, extraEntrypoints);
+  // Include the published browserEntry HTML even when it is not named index.html
+  // (e.g. webgpu-cached-clipmap-shadow/canonical.html).
+  const browserEntryName = typeof demo.browserEntry === 'string'
+    ? demo.browserEntry.split('/').pop()
+    : null;
+  const entryExtras = [ ...extraEntrypoints ];
+  if (browserEntryName && browserEntryName.endsWith('.html') && !entryExtras.includes(browserEntryName)) {
+    entryExtras.push(browserEntryName);
+  }
+  const inputs = declaredHtmlInputs(root, demo, entryExtras);
   const entrypoints = Object.keys(inputs).map((path) => `${path}.html`).sort();
-  if (!entrypoints.includes('index.html')) throw new Error(`immutable lab ${labId} has no index.html entrypoint`);
+  const hasIndex = entrypoints.includes('index.html');
+  const hasBrowserEntry = browserEntryName ? entrypoints.includes(browserEntryName) : false;
+  if (!hasIndex && !hasBrowserEntry) {
+    throw new Error(`immutable lab ${labId} has neither index.html nor browserEntry HTML entrypoint`);
+  }
   const contentAddress = canonicalSha256({
     builderContract: IMMUTABLE_LAB_BUILD_CONTRACT,
     entrypointPlan: entrypoints,
@@ -171,11 +186,18 @@ export async function buildImmutableLabSurface(options = {}) {
   const stagingDirectory = join(outputRoot, `.${basename(outputDirectory)}.staging-${process.pid}-${randomUUID()}`);
   await mkdir(stagingDirectory);
 
+  // Integration labs pull three from many skill packages. Without the same
+  // aliases/dedupe as capture-lab-browser, Vite bundles multiple Three copies
+  // and TSL node construction crashes at runtime (null.If / multi-instance).
   await viteBuild({
     root,
     publicDir: false,
     logLevel: options.logLevel ?? 'warn',
     base: './',
+    resolve: {
+      alias: labViteAliases(REPO_ROOT),
+      dedupe: ['three', 'three/webgpu', 'three/tsl'],
+    },
     build: {
       outDir: stagingDirectory,
       emptyOutDir: false,
@@ -183,6 +205,9 @@ export async function buildImmutableLabSurface(options = {}) {
       sourcemap: false,
       manifest: false,
       rollupOptions: { input: inputs },
+    },
+    optimizeDeps: {
+      include: ['three', 'three/webgpu', 'three/tsl'],
     },
   });
 

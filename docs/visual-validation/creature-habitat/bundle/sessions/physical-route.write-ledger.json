@@ -1,0 +1,61 @@
+{
+  "entries": [
+    {
+      "at": "2026-07-13T15:36:04.751Z",
+      "method": "GET",
+      "requestUrl": "/index.html?physicalReview=1",
+      "redirected": false,
+      "fallback": false,
+      "transformed": false,
+      "status": 200,
+      "resolvedPath": "index.html",
+      "query": "physicalReview=1",
+      "sha256": "sha256:46785e5464e4e09f8dec3cff0ed7fdb41bdae43c434ff8efe6a68febaa7e03c0",
+      "byteLength": 1854,
+      "responseKind": "exact-prebuilt-byte"
+    },
+    {
+      "at": "2026-07-13T15:36:04.767Z",
+      "method": "GET",
+      "requestUrl": "/assets/main-KefgGsrN.css",
+      "redirected": false,
+      "fallback": false,
+      "transformed": false,
+      "status": 200,
+      "resolvedPath": "assets/main-KefgGsrN.css",
+      "query": "",
+      "sha256": "sha256:fbee8d59c980ab5ae3fc8950303d86079a6d4ab6165b71e5012e5ca3c10d338d",
+      "byteLength": 2109,
+      "responseKind": "exact-prebuilt-byte"
+    },
+    {
+      "at": "2026-07-13T15:36:04.767Z",
+      "method": "GET",
+      "requestUrl": "/assets/main-Dvd-stmJ.js",
+      "redirected": false,
+      "fallback": false,
+      "transformed": false,
+      "status": 200,
+      "resolvedPath": "assets/main-Dvd-stmJ.js",
+      "query": "",
+      "sha256": "sha256:084d608202b2c8e6e890e9b3b17978a0ae6a1f011b9e7ef00e7f15743d1405a7",
+      "byteLength": 1090249,
+      "responseKind": "exact-prebuilt-byte"
+    },
+    {
+      "at": "2026-07-13T15:36:04.798Z",
+      "method": "GET",
+      "requestUrl": "/favicon.ico",
+      "redirected": false,
+      "fallback": false,
+      "transformed": false,
+      "status": 404,
+      "reason": "missing-exact-static-route",
+      "resolvedPath": "favicon.ico",
+      "responseKind": "missing-exact-static-route"
+    }
+  ],
+  "ledgerSha256": "sha256:76c4377659bd99bcfb2f84f53be48e81c2af4a4a9960cdeb6530b1084556afa3",
+  "documentSha256": "sha256:ab44c87ec9db4b6bf76027167c8f05c6fc0396e7587ae29b6f2b0a33296cfcd9",
+  "byteLength": 1313
+}

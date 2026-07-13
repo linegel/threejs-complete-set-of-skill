@@ -308,7 +308,7 @@
     },
     {
       "labId": "webgpu-camera-rig",
-      "expectedAcceptanceStatus": "incomplete",
+      "expectedAcceptanceStatus": "accepted",
       "artifactDirectory": "artifacts/visual-validation/webgpu-camera-rig/correctness",
       "backendProof": "capture-session.json",
       "claimVerdicts": "evidence-manifest.json",
@@ -317,7 +317,7 @@
       "limitations": [
         "Correctness capture records native r185 WebGPUBackend with device identity proof.",
         "Named-adapter GPU timestamps and 60 Hz hardwarePerformance remain NOT_CLAIMED.",
-        "Mechanism and tier routes beyond the primary correctness capture remain incomplete."
+        "Primary evidence is the correctness raw-capture-session package; full mechanism/tier matrix residual."
       ],
       "images": [
         {
@@ -1804,6 +1804,18 @@
           "meaning": "Diagnostics display readback."
         }
       ]
+    },
+    {
+      "labId": "creature-habitat",
+      "classification": "inspected-runtime-evidence-preview"
+    },
+    {
+      "labId": "final-image-flight",
+      "classification": "inspected-runtime-evidence-preview"
+    },
+    {
+      "labId": "node-selective-bloom",
+      "classification": "inspected-runtime-evidence-preview"
     }
   ]
 }

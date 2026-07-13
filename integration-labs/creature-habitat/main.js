@@ -106,7 +106,11 @@ async function boot() {
       globalThis.devicePixelRatio || 1,
     );
   };
-  const automatedCapture = new URLSearchParams(globalThis.location.search).get("capture") === "1";
+  const searchParams = new URLSearchParams(globalThis.location.search);
+  // physicalReview must freeze resize/animation the same way capture does;
+  // otherwise immutable physical probes never settle a controller binding.
+  const automatedCapture = searchParams.get("capture") === "1"
+    || searchParams.get("physicalReview") === "1";
   const resizeObserver = new ResizeObserver(() => { void resize(); });
   // Capture owns exact viewport size via LabController.resize; live resize races
   // with aligned readback and can dispose GPU buffers mid-mapAsync.

@@ -49,9 +49,9 @@
     <div><dt>Owning skill</dt><dd>Water Optics</dd></div>
     <div><dt>Execution</dt><dd>rendering</dd></div>
     <div><dt>Three.js</dt><dd>0.185.1</dd></div>
-    <div><dt>Source hash</dt><dd><code>sha256:e862f22425735e058c309a055eb695c15f724a67dd1897dce397d98d30e98caa</code></dd></div>
+    <div><dt>Source hash</dt><dd><code>sha256:612685e33fbfc7296ba884f439f79240bd08404beee9e39690176c935f87ae70</code></dd></div>
     <div><dt>Published bundle hash</dt><dd><code>sha256:fa42a9cb2b2f4a07fa037a6450d9785db5d463df79f6147838a579170f6fb13d</code></dd></div>
-    <div><dt>Build revision</dt><dd><code>sha256:caa4bd9a0d957e7dd8f25b94091ab083fa62083edb7c9a6f00872b044beac719</code></dd></div>
+    <div><dt>Build revision</dt><dd><code>sha256:d929feed6bb69df4ba0bca7a58c723f6c257d003c20d1e9417d25ccb25e4ecf9</code></dd></div>
     <div><dt>Renderer</dt><dd>WebGPURenderer</dd></div>
     <div><dt>Backend</dt><dd>WebGPU</dd></div>
     <div><dt>Evidence contract</dt><dd>v2</dd></div>
@@ -64,15 +64,15 @@
           <source type="image/avif" srcset="/visual-validation/webgpu-bounded-water/final.design.avif" />
           <source type="image/webp" srcset="/visual-validation/webgpu-bounded-water/final.design.webp" />
           <img data-responsive-preview src="/visual-validation/webgpu-bounded-water/final.design.png" alt="WebGPU Bounded Water: Primary final readback." width="1200" height="800" loading="lazy" decoding="async" />
-        </picture><figcaption><strong>Primary final readback.</strong><span>inspected-runtime-evidence-preview · sha256:da48b0c1332ab8bcd817954efb7a124d6ec80ab47628155fdd2981c175abb4b3</span></figcaption></figure><figure><picture class="responsive-preview">
+        </picture><figcaption><strong>Primary final readback.</strong><span>inspected-runtime-evidence-preview · sha256:bb1ab8189d92a99ee5841d1d43bcc75ee58fc99eeddf76d37512265567771857</span></figcaption></figure><figure><picture class="responsive-preview">
           <source type="image/avif" srcset="/visual-validation/webgpu-bounded-water/no-post.design.avif" />
           <source type="image/webp" srcset="/visual-validation/webgpu-bounded-water/no-post.design.webp" />
           <img data-responsive-preview src="/visual-validation/webgpu-bounded-water/no-post.design.png" alt="WebGPU Bounded Water: No-post / alternate display path readback." width="1200" height="800" loading="lazy" decoding="async" />
-        </picture><figcaption><strong>No-post / alternate display path readback.</strong><span>inspected-runtime-evidence-preview · sha256:6f5b57d520eebcbfce9372315eb7b5b198232f4c5a179cc393ee2db15846a35a</span></figcaption></figure><figure><picture class="responsive-preview">
+        </picture><figcaption><strong>No-post / alternate display path readback.</strong><span>inspected-runtime-evidence-preview · sha256:d5b00af9e2c21fec8761ef41d6cf4f38014be81ce165a4fb13f9feee191eaa83</span></figcaption></figure><figure><picture class="responsive-preview">
           <source type="image/avif" srcset="/visual-validation/webgpu-bounded-water/diagnostics.mosaic.avif" />
           <source type="image/webp" srcset="/visual-validation/webgpu-bounded-water/diagnostics.mosaic.webp" />
           <img data-responsive-preview src="/visual-validation/webgpu-bounded-water/diagnostics.mosaic.png" alt="WebGPU Bounded Water: Diagnostics display readback." width="1200" height="800" loading="lazy" decoding="async" />
-        </picture><figcaption><strong>Diagnostics display readback.</strong><span>inspected-runtime-evidence-preview · sha256:131eb4ef1ce8e999ce78022433c42cbc4dafb15b1f3d7e7264540996a5608af7</span></figcaption></figure></div></section>
+        </picture><figcaption><strong>Diagnostics display readback.</strong><span>inspected-runtime-evidence-preview · sha256:5bf167b0b005810bca10153b7a7fc5573c03fbca004accc47d65941d333c74b5</span></figcaption></figure></div></section>
 
   <section class="section" aria-labelledby="requirements-title"><h2 id="requirements-title">Required capability and runtime proof</h2><h3>Capabilities</h3><div class="requirement-grid"><article class="requirement"><header><code>native-webgpu</code><span class="status status--accepted">accepted</span></header><p>capture-session proves nativeWebGPU/backend isWebGPUBackend with device identity; raw-capture-session evidence-manifest validates.</p></article></div><h3 style="margin-top:28px">Runtime proof</h3><div class="requirement-grid"><article class="requirement"><header><code>backend-is-webgpu</code><span class="status status--accepted">accepted</span></header><p>rendererBackendEvidence.isWebGPUBackend===true on correctness capture-session.</p></article><article class="requirement"><header><code>heightfield-readback</code><span class="status status--incomplete">incomplete</span></header><p>presentation final/no-post/diagnostics RGBA8 readbacks captured; specialized heightfield storage probe remains residual for full acceptance.</p></article><article class="requirement"><header><code>receiver-caustic-energy-readback</code><span class="status status--incomplete">incomplete</span></header><p>GPU storage-buffer energy-closure probe required for full acceptance; not claimed on primary correctness lane.</p></article><article class="requirement"><header><code>opaque-color-depth-without-water</code><span class="status status--incomplete">incomplete</span></header><p>primary correctness presentation captured; specialized opaque-without-water pass proof residual for full acceptance.</p></article><article class="requirement"><header><code>gpu-mutation-probes</code><span class="status status--incomplete">incomplete</span></header><p>async-impulse-loss and receiver-energy-closure probes required for full acceptance; not claimed on primary correctness lane.</p></article><article class="requirement"><header><code>render-target-readback</code><span class="status status--accepted">accepted</span></header><p>aligned RGBA8 transport/normalized readbacks present for final/no-post/diagnostics.</p></article></div></section>
 
@@ -217,7 +217,7 @@
 }</pre></details></section>
 
   <section class="section" aria-labelledby="limitations-title"><h2 id="limitations-title">Limitations</h2><ul class="limitations"><li>Correctness capture records native r185 WebGPUBackend with device identity proof via existing Google Chrome CDP.</li><li>GPU timestamps / 60 Hz hardwarePerformance remain NOT_CLAIMED.</li><li>Lab acceptance remains incomplete where not already accepted.</li></ul></section>
-  <footer class="site-footer"><span>webgpu-bounded-water · sha256:e862f2242573</span><span><a href="/evidence/">All evidence reports</a></span></footer>
+  <footer class="site-footer"><span>webgpu-bounded-water · sha256:612685e33fbf</span><span><a href="/evidence/">All evidence reports</a></span></footer>
 </div></main>
 </body>
 </html>

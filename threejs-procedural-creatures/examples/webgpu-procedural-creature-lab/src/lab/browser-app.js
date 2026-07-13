@@ -142,6 +142,9 @@ const state = {
 	activeCameraId: 'design',
 	// Capture-locked state mirrored into getMetrics() for assertCaptureState.
 	activeScenarioId: startup.scenario ?? startup.focus ?? null,
+	// Harness presentation mode (final/no-post/diagnostics) may alias to a
+	// different internal debug mode; metrics.mode must report the locked id.
+	presentationMode: startup.mode ?? 'final',
 	activeTimeSeconds: 0,
 	focusIsolation: startup.locked && startup.population === 1,
 	culling: { totalInstances: 0, visibleInstances: 0, culledInstances: 0, submittedInstances: 0, strategy: 'cpu-frustum-compact-to-prefix' },
@@ -808,7 +811,7 @@ function telemetry() {
 		ready: state.ready,
 		// Locked capture-state fields (scenario/mode/tier/seed/camera/timeSeconds).
 		scenario: state.activeScenarioId ?? state.startup?.scenario ?? state.startup?.focus ?? null,
-		mode: state.debugMode,
+		mode: state.presentationMode ?? state.debugMode,
 		tier: state.tier,
 		seed: state.startup?.seed ?? null,
 		camera: state.activeCameraId,
@@ -2025,12 +2028,18 @@ function createLabController() {
       // real set; final/no-post/diagnostics are harness presentation targets.
       const captureAliases = Object.freeze({
         final: 'off',
-        'no-post': 'off',
+        // no-post must NOT alias to the same mode as final — physical review
+        // requires distinct final vs secondary presentation pixel hashes.
+        'no-post': 'unsnapped',
         presentation: 'off',
         diagnostics: 'normals',
       });
-      const resolved = captureActive && captureAliases[id] ? captureAliases[id] : id;
-      return setDebugMode(resolved, captureActive ? { overrideLock: true } : {});
+      // physicalReview=1 uses the same presentation aliases as capture=1.
+      const physicalActive = new URLSearchParams(window.location.search).get('physicalReview') === '1';
+      const harnessActive = captureActive || physicalActive;
+      const resolved = harnessActive && captureAliases[id] ? captureAliases[id] : id;
+      state.presentationMode = id;
+      return setDebugMode(resolved, harnessActive ? { overrideLock: true } : {});
     },
 		async setTier(id) { return setTier(id); },
 		async setSeed(seed) {

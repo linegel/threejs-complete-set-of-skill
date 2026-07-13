@@ -36,7 +36,16 @@ export const HABITAT_MODES = Object.freeze([
   "owner-graph",
 ]);
 
-export const HABITAT_CAMERAS = Object.freeze(["subject", "habitat", "population"]);
+// near/design/far are evidence-host ids; subject/habitat/population remain
+// semantic chase aliases accepted by setCamera.
+export const HABITAT_CAMERAS = Object.freeze([
+  "near",
+  "design",
+  "far",
+  "subject",
+  "habitat",
+  "population",
+]);
 export const HABITAT_TIERS = Object.freeze(["hero", "balanced", "budgeted"]);
 export const HABITAT_SEEDS = Object.freeze([0x00000001, 0x9e3779b9]);
 

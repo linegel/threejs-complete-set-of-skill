@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 2,
+  "owners": {
+    "renderer": "threejs-image-pipeline",
+    "scenePass": "final-image-flight",
+    "finalPipeline": "final-image-flight",
+    "toneMap": "final-image-flight:image-pipeline/exposure-stage",
+    "outputTransform": "final-image-flight:image-pipeline/exposure-stage"
+  },
+  "signals": [
+    {
+      "id": "output",
+      "producer": "final-image-flight",
+      "consumers": [
+        "presentation"
+      ],
+      "reachable": true
+    }
+  ],
+  "sceneSubmissions": [
+    {
+      "id": "shared-scene-pass",
+      "owner": "final-image-flight",
+      "kind": "lit-scene",
+      "submissionCount": {
+        "value": 1,
+        "unit": "submissions-per-frame",
+        "label": "Measured",
+        "source": "LabController.describePipeline"
+      }
+    }
+  ],
+  "computeDispatches": [],
+  "resources": [],
+  "finalToneMapOwner": "final-image-flight:image-pipeline/exposure-stage",
+  "finalOutputTransformOwner": "final-image-flight:image-pipeline/exposure-stage"
+}

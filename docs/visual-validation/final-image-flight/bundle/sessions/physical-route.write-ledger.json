@@ -1,0 +1,61 @@
+{
+  "entries": [
+    {
+      "at": "2026-07-13T15:38:25.666Z",
+      "method": "GET",
+      "requestUrl": "/index.html?physicalReview=1",
+      "redirected": false,
+      "fallback": false,
+      "transformed": false,
+      "status": 200,
+      "resolvedPath": "index.html",
+      "query": "physicalReview=1",
+      "sha256": "sha256:10a0a6a4936a0905b7fb684cef2b4df22c43a553b0369fb1ff25c3aa60f6e3e7",
+      "byteLength": 1584,
+      "responseKind": "exact-prebuilt-byte"
+    },
+    {
+      "at": "2026-07-13T15:38:25.691Z",
+      "method": "GET",
+      "requestUrl": "/assets/browser-R7IV7aRd.css",
+      "redirected": false,
+      "fallback": false,
+      "transformed": false,
+      "status": 200,
+      "resolvedPath": "assets/browser-R7IV7aRd.css",
+      "query": "",
+      "sha256": "sha256:da9b470349037c4791f3d37ecf64b4416c15a07f27cbb911ea1af5ac3d4c9b05",
+      "byteLength": 1502,
+      "responseKind": "exact-prebuilt-byte"
+    },
+    {
+      "at": "2026-07-13T15:38:25.691Z",
+      "method": "GET",
+      "requestUrl": "/assets/browser-zQ94IZ8V.js",
+      "redirected": false,
+      "fallback": false,
+      "transformed": false,
+      "status": 200,
+      "resolvedPath": "assets/browser-zQ94IZ8V.js",
+      "query": "",
+      "sha256": "sha256:d12293a49515165e27c3c8c180dbf9a4b944b301a033d976768ff6c5cfe6f267",
+      "byteLength": 1055054,
+      "responseKind": "exact-prebuilt-byte"
+    },
+    {
+      "at": "2026-07-13T15:38:25.884Z",
+      "method": "GET",
+      "requestUrl": "/favicon.ico",
+      "redirected": false,
+      "fallback": false,
+      "transformed": false,
+      "status": 404,
+      "reason": "missing-exact-static-route",
+      "resolvedPath": "favicon.ico",
+      "responseKind": "missing-exact-static-route"
+    }
+  ],
+  "ledgerSha256": "sha256:6de1c11b1100788eedc6b74e64f96cc3fb8b9ce4ea2fb285a2b64c55f6eb17ab",
+  "documentSha256": "sha256:e5e8096c3ab7c12bb13af0f23a40c28025d0d14b64e6b2c1ef304e940b113a6d",
+  "byteLength": 1325
+}

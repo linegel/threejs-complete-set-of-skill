@@ -1,0 +1,286 @@
+{
+  "schemaVersion": 2,
+  "labId": "webgpu-camera-rig",
+  "profile": "correctness",
+  "records": [
+    {
+      "sequence": 1,
+      "path": "final.design.png",
+      "kind": "writeCapture-png",
+      "existedBefore": true,
+      "contentBinding": "sha256-byte-length-immutable-buffer-v1",
+      "sha256": "sha256:81c0e2ff26eeb2a8df7d94643100e5a083c525cad5ccf08a24fbd70633b20a94",
+      "byteLength": 5917
+    },
+    {
+      "sequence": 2,
+      "path": "transport-readbacks/final.design.rgba8.bin",
+      "kind": "writeCapture-transport",
+      "existedBefore": true,
+      "contentBinding": "sha256-byte-length-immutable-buffer-v1",
+      "sha256": "sha256:a7e59e6c99ef4fcf44b79e7f693e4223f703e8a665ca8d7a100085b8033aa886",
+      "byteLength": 3891136
+    },
+    {
+      "sequence": 3,
+      "path": "normalized-readbacks/final.design.rgba8.padded.bin",
+      "kind": "writeCapture-normalized",
+      "existedBefore": true,
+      "contentBinding": "sha256-byte-length-immutable-buffer-v1",
+      "sha256": "sha256:1480538c3f66c380a4f2564535882803d2fe815ac9c021bd3171235c6dd7088b",
+      "byteLength": 3891200
+    },
+    {
+      "sequence": 4,
+      "path": "no-post.design.png",
+      "kind": "writeCapture-png",
+      "existedBefore": true,
+      "contentBinding": "sha256-byte-length-immutable-buffer-v1",
+      "sha256": "sha256:4f5b2d3c49e03828aae5fec0d999514858ec3c7b84c8c787781b6146edf8a39b",
+      "byteLength": 5893
+    },
+    {
+      "sequence": 5,
+      "path": "transport-readbacks/no-post.design.rgba8.bin",
+      "kind": "writeCapture-transport",
+      "existedBefore": true,
+      "contentBinding": "sha256-byte-length-immutable-buffer-v1",
+      "sha256": "sha256:6398fa5223980ba52e0127d2a1e2ef6ffb88c62bb369089dd9a5b35e94690423",
+      "byteLength": 3891136
+    },
+    {
+      "sequence": 6,
+      "path": "normalized-readbacks/no-post.design.rgba8.padded.bin",
+      "kind": "writeCapture-normalized",
+      "existedBefore": true,
+      "contentBinding": "sha256-byte-length-immutable-buffer-v1",
+      "sha256": "sha256:3608137bc934573207312a10856426f5bed038dec56a49ca5bb335de828cf3d1",
+      "byteLength": 3891200
+    },
+    {
+      "sequence": 7,
+      "path": "diagnostics.mosaic.png",
+      "kind": "writeCapture-png",
+      "existedBefore": true,
+      "contentBinding": "sha256-byte-length-immutable-buffer-v1",
+      "sha256": "sha256:fb57544e5a65619372d33cc043c28a7225e9c9f6b8152e3bbe0e11c2fba4f2b1",
+      "byteLength": 5856
+    },
+    {
+      "sequence": 8,
+      "path": "transport-readbacks/diagnostics.mosaic.rgba8.bin",
+      "kind": "writeCapture-transport",
+      "existedBefore": true,
+      "contentBinding": "sha256-byte-length-immutable-buffer-v1",
+      "sha256": "sha256:7de9fa1b72a2cec746620cab9655b5c79df3a7eaf972e49eb3a1e1e064a6ca2c",
+      "byteLength": 3891136
+    },
+    {
+      "sequence": 9,
+      "path": "normalized-readbacks/diagnostics.mosaic.rgba8.padded.bin",
+      "kind": "writeCapture-normalized",
+      "existedBefore": true,
+      "contentBinding": "sha256-byte-length-immutable-buffer-v1",
+      "sha256": "sha256:049eff4c5fee58e168ff22ad87e5f752ae693af9500a1e54b12a30703b8ae904",
+      "byteLength": 3891200
+    },
+    {
+      "sequence": 10,
+      "path": "camera.near.png",
+      "kind": "writeCapture-png",
+      "existedBefore": true,
+      "contentBinding": "sha256-byte-length-immutable-buffer-v1",
+      "sha256": "sha256:81c0e2ff26eeb2a8df7d94643100e5a083c525cad5ccf08a24fbd70633b20a94",
+      "byteLength": 5917
+    },
+    {
+      "sequence": 11,
+      "path": "transport-readbacks/camera.near.rgba8.bin",
+      "kind": "writeCapture-transport",
+      "existedBefore": true,
+      "contentBinding": "sha256-byte-length-immutable-buffer-v1",
+      "sha256": "sha256:a7e59e6c99ef4fcf44b79e7f693e4223f703e8a665ca8d7a100085b8033aa886",
+      "byteLength": 3891136
+    },
+    {
+      "sequence": 12,
+      "path": "normalized-readbacks/camera.near.rgba8.padded.bin",
+      "kind": "writeCapture-normalized",
+      "existedBefore": true,
+      "contentBinding": "sha256-byte-length-immutable-buffer-v1",
+      "sha256": "sha256:1480538c3f66c380a4f2564535882803d2fe815ac9c021bd3171235c6dd7088b",
+      "byteLength": 3891200
+    },
+    {
+      "sequence": 13,
+      "path": "camera.design.png",
+      "kind": "writeCapture-png",
+      "existedBefore": true,
+      "contentBinding": "sha256-byte-length-immutable-buffer-v1",
+      "sha256": "sha256:81c0e2ff26eeb2a8df7d94643100e5a083c525cad5ccf08a24fbd70633b20a94",
+      "byteLength": 5917
+    },
+    {
+      "sequence": 14,
+      "path": "transport-readbacks/camera.design.rgba8.bin",
+      "kind": "writeCapture-transport",
+      "existedBefore": true,
+      "contentBinding": "sha256-byte-length-immutable-buffer-v1",
+      "sha256": "sha256:a7e59e6c99ef4fcf44b79e7f693e4223f703e8a665ca8d7a100085b8033aa886",
+      "byteLength": 3891136
+    },
+    {
+      "sequence": 15,
+      "path": "normalized-readbacks/camera.design.rgba8.padded.bin",
+      "kind": "writeCapture-normalized",
+      "existedBefore": true,
+      "contentBinding": "sha256-byte-length-immutable-buffer-v1",
+      "sha256": "sha256:1480538c3f66c380a4f2564535882803d2fe815ac9c021bd3171235c6dd7088b",
+      "byteLength": 3891200
+    },
+    {
+      "sequence": 16,
+      "path": "camera.far.png",
+      "kind": "writeCapture-png",
+      "existedBefore": true,
+      "contentBinding": "sha256-byte-length-immutable-buffer-v1",
+      "sha256": "sha256:81c0e2ff26eeb2a8df7d94643100e5a083c525cad5ccf08a24fbd70633b20a94",
+      "byteLength": 5917
+    },
+    {
+      "sequence": 17,
+      "path": "transport-readbacks/camera.far.rgba8.bin",
+      "kind": "writeCapture-transport",
+      "existedBefore": true,
+      "contentBinding": "sha256-byte-length-immutable-buffer-v1",
+      "sha256": "sha256:a7e59e6c99ef4fcf44b79e7f693e4223f703e8a665ca8d7a100085b8033aa886",
+      "byteLength": 3891136
+    },
+    {
+      "sequence": 18,
+      "path": "normalized-readbacks/camera.far.rgba8.padded.bin",
+      "kind": "writeCapture-normalized",
+      "existedBefore": true,
+      "contentBinding": "sha256-byte-length-immutable-buffer-v1",
+      "sha256": "sha256:1480538c3f66c380a4f2564535882803d2fe815ac9c021bd3171235c6dd7088b",
+      "byteLength": 3891200
+    },
+    {
+      "sequence": 19,
+      "path": "seed-0001.final.png",
+      "kind": "writeCapture-png",
+      "existedBefore": true,
+      "contentBinding": "sha256-byte-length-immutable-buffer-v1",
+      "sha256": "sha256:81c0e2ff26eeb2a8df7d94643100e5a083c525cad5ccf08a24fbd70633b20a94",
+      "byteLength": 5917
+    },
+    {
+      "sequence": 20,
+      "path": "transport-readbacks/seed-0001.final.rgba8.bin",
+      "kind": "writeCapture-transport",
+      "existedBefore": true,
+      "contentBinding": "sha256-byte-length-immutable-buffer-v1",
+      "sha256": "sha256:a7e59e6c99ef4fcf44b79e7f693e4223f703e8a665ca8d7a100085b8033aa886",
+      "byteLength": 3891136
+    },
+    {
+      "sequence": 21,
+      "path": "normalized-readbacks/seed-0001.final.rgba8.padded.bin",
+      "kind": "writeCapture-normalized",
+      "existedBefore": true,
+      "contentBinding": "sha256-byte-length-immutable-buffer-v1",
+      "sha256": "sha256:1480538c3f66c380a4f2564535882803d2fe815ac9c021bd3171235c6dd7088b",
+      "byteLength": 3891200
+    },
+    {
+      "sequence": 22,
+      "path": "seed-9e3779b9.final.png",
+      "kind": "writeCapture-png",
+      "existedBefore": true,
+      "contentBinding": "sha256-byte-length-immutable-buffer-v1",
+      "sha256": "sha256:0b34fb59426c9c7136376ba973aee1e8f4ed2cdf006e4cc6163759caf8c5901d",
+      "byteLength": 5957
+    },
+    {
+      "sequence": 23,
+      "path": "transport-readbacks/seed-9e3779b9.final.rgba8.bin",
+      "kind": "writeCapture-transport",
+      "existedBefore": true,
+      "contentBinding": "sha256-byte-length-immutable-buffer-v1",
+      "sha256": "sha256:8afb7ba1e0983ed86268e6c3a84ff5f4efeb15fba61ca9904c0128adbc356660",
+      "byteLength": 3891136
+    },
+    {
+      "sequence": 24,
+      "path": "normalized-readbacks/seed-9e3779b9.final.rgba8.padded.bin",
+      "kind": "writeCapture-normalized",
+      "existedBefore": true,
+      "contentBinding": "sha256-byte-length-immutable-buffer-v1",
+      "sha256": "sha256:2b6dca357ad791a2eaf1203690aeecf978ea74b2e25e09cca0c09bea96ed9aa9",
+      "byteLength": 3891200
+    },
+    {
+      "sequence": 25,
+      "path": "temporal.t000.png",
+      "kind": "writeCapture-png",
+      "existedBefore": true,
+      "contentBinding": "sha256-byte-length-immutable-buffer-v1",
+      "sha256": "sha256:81c0e2ff26eeb2a8df7d94643100e5a083c525cad5ccf08a24fbd70633b20a94",
+      "byteLength": 5917
+    },
+    {
+      "sequence": 26,
+      "path": "transport-readbacks/temporal.t000.rgba8.bin",
+      "kind": "writeCapture-transport",
+      "existedBefore": true,
+      "contentBinding": "sha256-byte-length-immutable-buffer-v1",
+      "sha256": "sha256:a7e59e6c99ef4fcf44b79e7f693e4223f703e8a665ca8d7a100085b8033aa886",
+      "byteLength": 3891136
+    },
+    {
+      "sequence": 27,
+      "path": "normalized-readbacks/temporal.t000.rgba8.padded.bin",
+      "kind": "writeCapture-normalized",
+      "existedBefore": true,
+      "contentBinding": "sha256-byte-length-immutable-buffer-v1",
+      "sha256": "sha256:1480538c3f66c380a4f2564535882803d2fe815ac9c021bd3171235c6dd7088b",
+      "byteLength": 3891200
+    },
+    {
+      "sequence": 28,
+      "path": "temporal.t001.png",
+      "kind": "writeCapture-png",
+      "existedBefore": true,
+      "contentBinding": "sha256-byte-length-immutable-buffer-v1",
+      "sha256": "sha256:89bd3fa4735e1258c029cd29675119a06d006f2dfbb7e6a1b3b46b14a0762887",
+      "byteLength": 5926
+    },
+    {
+      "sequence": 29,
+      "path": "transport-readbacks/temporal.t001.rgba8.bin",
+      "kind": "writeCapture-transport",
+      "existedBefore": true,
+      "contentBinding": "sha256-byte-length-immutable-buffer-v1",
+      "sha256": "sha256:142916f7f74744b84479964d9e1e0b31f74b632259fc1a2c8f7eae9baccab4fc",
+      "byteLength": 3891136
+    },
+    {
+      "sequence": 30,
+      "path": "normalized-readbacks/temporal.t001.rgba8.padded.bin",
+      "kind": "writeCapture-normalized",
+      "existedBefore": true,
+      "contentBinding": "sha256-byte-length-immutable-buffer-v1",
+      "sha256": "sha256:6837ca43195ee378b27dfa9dde5ff9f0a07b31587cbfbbba2bb97cc366e15f79",
+      "byteLength": 3891200
+    },
+    {
+      "sequence": 31,
+      "path": "capture-session.json",
+      "kind": "capture-session-record",
+      "existedBefore": true,
+      "contentBinding": "self-excluded-finalized-offline",
+      "sha256": null,
+      "byteLength": null
+    }
+  ]
+}

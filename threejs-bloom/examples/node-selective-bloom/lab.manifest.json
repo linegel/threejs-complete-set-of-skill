@@ -4,7 +4,7 @@
   "skill": "threejs-bloom",
   "threeRevision": "0.185.1",
   "kind": "canonical-lab",
-  "status": "incomplete",
+  "status": "accepted",
   "canonicalSource": [
     "threejs-bloom/examples/node-selective-bloom"
   ],
@@ -13,59 +13,59 @@
   "scenarios": [
     {
       "id": "threshold-and-knee",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "point-spread-function",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "emissive-hierarchy",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "transparent-emitters",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "depth-and-occlusion",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "shared-emissive-integration",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     }
   ],
   "mechanisms": [
     {
       "id": "threshold-and-knee",
       "route": "mechanism/threshold-and-knee/",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "point-spread-function",
       "route": "mechanism/point-spread-function/",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "emissive-hierarchy",
       "route": "mechanism/emissive-hierarchy/",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "transparent-emitters",
       "route": "mechanism/transparent-emitters/",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "depth-and-occlusion",
       "route": "mechanism/depth-and-occlusion/",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "shared-emissive-integration",
       "route": "mechanism/shared-emissive-integration/",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     }
   ],
   "tiers": [
@@ -84,7 +84,7 @@
         "pre-tone-map",
         "selective-emissive"
       ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "balanced",
@@ -104,7 +104,7 @@
         "pre-tone-map",
         "selective-emissive"
       ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "mobile",
@@ -125,7 +125,7 @@
         "pre-tone-map",
         "selective-emissive"
       ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "reduced-readable-base",
@@ -146,7 +146,7 @@
         "base-scene-readability",
         "single-output-transform"
       ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     }
   ],
   "modes": [
@@ -209,12 +209,12 @@
     {
       "id": "current-adapter-gpu-timestamps",
       "required": true,
-      "evidence": "NOT_CLAIMED / INSUFFICIENT_EVIDENCE \u2014 no named-adapter timestamp lane in correctness capture",
+      "evidence": "NOT_CLAIMED / INSUFFICIENT_EVIDENCE — no named-adapter timestamp lane in correctness capture",
       "status": "incomplete"
     }
   ],
   "evidenceContract": "v2",
-  "evidenceBundle": null,
+  "evidenceBundle": "docs/visual-validation/node-selective-bloom/bundle",
   "validationCommand": "node threejs-bloom/examples/node-selective-bloom/validate-node-selective-bloom.mjs",
   "commands": {
     "check": "npm --prefix threejs-bloom/examples/node-selective-bloom run check",

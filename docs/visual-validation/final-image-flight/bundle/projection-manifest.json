@@ -1,0 +1,494 @@
+{
+  "schemaVersion": 1,
+  "projectionKind": "tracked-release-projection-v1",
+  "policy": {
+    "id": "native-webgpu-tracked-release-v1",
+    "digest": "sha256:e349900d79da27cb5570ea959707f741e03ea7e206d85a717a1129b27268f6a4"
+  },
+  "labId": "final-image-flight",
+  "skill": "threejs-image-pipeline",
+  "threeRevision": "0.185.1",
+  "sourceClosureHash": "sha256:24dfa73d8feadbd219db7edf86484d1ff65c4babde784e104fc4e5741a1685a8",
+  "buildRevision": "sha256:3ba5d0a425e389a656d576d7a50704862784e654641304698e79b89559fac365",
+  "sourceRelease": {
+    "path": "evidence-manifest.json",
+    "sha256": "sha256:2bc7d8f784aec14842117a7e09e1d877ef5db123fd0bd9a8771315c9caf8e5a9",
+    "byteLength": 33947,
+    "promotionBindingDigest": "sha256:b91201b9dc3279d2a5531e956165e1a3ac6d51c7de2e975e2229dd5adfccaca6",
+    "candidateBindingDigest": "sha256:25e385277e0029704b8af10a975776709049e826ff4c9e13a22f7b8fac9f933e",
+    "artifactLedgerDigest": "sha256:cd5d7e0c91c4b1ec31f1efee16439c8a137dff41fb0fce4574655a1f11ac0f02",
+    "imageLedgerDigest": "sha256:79ac022e3cdbeff11bccb06bc25f810665700a6f189ae12cace42f5ba3544a48"
+  },
+  "sourceClosure": {
+    "algorithm": "demo-registry-transitive-source-closure-v2",
+    "roots": [
+      "integration-labs/final-image-flight",
+      "labs/runtime/webgpu-device-identity.mjs",
+      "threejs-ambient-contact-shading/examples/integration-image-pipeline-ao/host-adapter.js",
+      "threejs-ambient-contact-shading/examples/webgpu-node-gtao/main.js",
+      "threejs-bloom/examples/node-selective-bloom/index.js",
+      "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/CameraDirectionController.mjs",
+      "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/CameraRelativeOrigin.mjs",
+      "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/main.mjs",
+      "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/routeState.mjs",
+      "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/constants.js",
+      "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/exposure-nodes.js",
+      "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/lut.js",
+      "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/stage.js",
+      "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/gpu-instance-motion.js",
+      "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/main.js",
+      "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/quaternion-helpers.js",
+      "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/route-state.js",
+      "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/timeline.js",
+      "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/cached-clipmap-shadow-node-v2.js",
+      "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/clipmap-config.js",
+      "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/shadow-architectures.js",
+      "threejs-visual-validation/examples/webgpu-validation-harness/src/readback.js"
+    ],
+    "files": [
+      {
+        "repositoryPath": "integration-labs/final-image-flight/browser.mjs",
+        "sha256": "sha256:0255653449d97a62dcb5030b867e97d66c83ecb84b72a2b4a9fee3823b3130c0",
+        "byteLength": 3785
+      },
+      {
+        "repositoryPath": "integration-labs/final-image-flight/capture.mjs",
+        "sha256": "sha256:c54d00fac5c956c919d0124f598b6deecec02296a63e46e4613bca5b82931c29",
+        "byteLength": 3864
+      },
+      {
+        "repositoryPath": "integration-labs/final-image-flight/contract.json",
+        "sha256": "sha256:befaa7ca828a1b022a8f6578130d5c89c3a50c35a5b05d9f076033fb14e9847d",
+        "byteLength": 24252
+      },
+      {
+        "repositoryPath": "integration-labs/final-image-flight/evidence-status.mjs",
+        "sha256": "sha256:0cef43754e6ea9891c7e6f503895430ec68a06cd6bb02bc0e9d841e5d62e0c1b",
+        "byteLength": 1246
+      },
+      {
+        "repositoryPath": "integration-labs/final-image-flight/index.html",
+        "sha256": "sha256:84cee54afbaeedc9701bc9c70bb6d1ba004a7935ddaee985b9ce3e4c52031463",
+        "byteLength": 1527
+      },
+      {
+        "repositoryPath": "integration-labs/final-image-flight/main.mjs",
+        "sha256": "sha256:64b8b2f1ce866ac078bd656c30dd2b0cd2b29c4142ef922aae9f4874fb2bf86c",
+        "byteLength": 40566
+      },
+      {
+        "repositoryPath": "integration-labs/final-image-flight/mechanism/ao-prepass-lit-pair/index.html",
+        "sha256": "sha256:f8982fffcf06d15362192a0d90bf607e913456c02f683534b45c5b3081488b4b",
+        "byteLength": 1514
+      },
+      {
+        "repositoryPath": "integration-labs/final-image-flight/mechanism/camera-motion-ownership/index.html",
+        "sha256": "sha256:3d1f911a49134eb927aa1a98bda934669c14927ef280450981886e16477d0358",
+        "byteLength": 1535
+      },
+      {
+        "repositoryPath": "integration-labs/final-image-flight/mechanism/exposure-output-order/index.html",
+        "sha256": "sha256:5d8f636a0ab7cea9374f9f752f461465bed22adba01bd3225b1ccf65c5e5e7e2",
+        "byteLength": 1526
+      },
+      {
+        "repositoryPath": "integration-labs/final-image-flight/mechanism/owner-graph/index.html",
+        "sha256": "sha256:fb827fd6fd452708182f07c18527a2c4a49b314a20dc569477bf9f42fe522958",
+        "byteLength": 1511
+      },
+      {
+        "repositoryPath": "integration-labs/final-image-flight/mechanism/shadow-contribution/index.html",
+        "sha256": "sha256:fb93f037c54fabf324aa76fe21dae5005d86d44c08eedc0b0d82571eebb0105b",
+        "byteLength": 1519
+      },
+      {
+        "repositoryPath": "integration-labs/final-image-flight/mechanism/shared-emissive-bloom/index.html",
+        "sha256": "sha256:1c11956accb59be13a0631d7c4707018876e28c24c9e572da4e9572e6433f44a",
+        "byteLength": 1511
+      },
+      {
+        "repositoryPath": "integration-labs/final-image-flight/mutation-test.mjs",
+        "sha256": "sha256:fdc1b81590fa9f528df18001c019c4da1d97fb4bd02bcb979f7bfb6d715efd86",
+        "byteLength": 8035
+      },
+      {
+        "repositoryPath": "integration-labs/final-image-flight/owner-graph.mjs",
+        "sha256": "sha256:1ca8b1a2db5512357cd896ae03215105745a2b9ea0e396d2ca1a881f4dee096f",
+        "byteLength": 16643
+      },
+      {
+        "repositoryPath": "integration-labs/final-image-flight/package.json",
+        "sha256": "sha256:6ad216dc60636b1370db5e0ef822fbe3579bf7f6b9d9187edf5a5c1c9116c7f4",
+        "byteLength": 843
+      },
+      {
+        "repositoryPath": "integration-labs/final-image-flight/quality-governor.mjs",
+        "sha256": "sha256:abc0efa7507fe257eab7701270a93f5e9d4ae1c39133f1f351a3bbb428751ed9",
+        "byteLength": 9988
+      },
+      {
+        "repositoryPath": "integration-labs/final-image-flight/routes.mjs",
+        "sha256": "sha256:ea1b1c25ff70c363d8f7151c80e1d2c889f7488952830c4632faae39289b1324",
+        "byteLength": 4935
+      },
+      {
+        "repositoryPath": "integration-labs/final-image-flight/styles.css",
+        "sha256": "sha256:ba9b807ea507ee12f1e8dd52838604eebcb3de5009f98ffb7269e6efd21736d1",
+        "byteLength": 1811
+      },
+      {
+        "repositoryPath": "integration-labs/final-image-flight/tier/balanced/index.html",
+        "sha256": "sha256:6fdd6f938d44fa56201eddf9af028ecfe68e13ebde02d2f2c5da82d5054fb7e9",
+        "byteLength": 1485
+      },
+      {
+        "repositoryPath": "integration-labs/final-image-flight/tier/budgeted/index.html",
+        "sha256": "sha256:c91941aaf6d8881bc33861921de01f2647d8dc81a5cee445e722b34b44618f17",
+        "byteLength": 1485
+      },
+      {
+        "repositoryPath": "integration-labs/final-image-flight/tier/hero/index.html",
+        "sha256": "sha256:e6679e12c3bf14a4a060fc3706d043ec2947208f9f8397e0220628623124cf1b",
+        "byteLength": 1469
+      },
+      {
+        "repositoryPath": "integration-labs/final-image-flight/validate.mjs",
+        "sha256": "sha256:183f818e68307aec0e2dc52823b58861227c376248d153be344931de192c36ed",
+        "byteLength": 14360
+      },
+      {
+        "repositoryPath": "labs/runtime/webgpu-device-identity.mjs",
+        "sha256": "sha256:4bc6eb92755516473bc39b488c0bcfd419e5f23800c497bc44bbf3d07d509bfe",
+        "byteLength": 4095
+      },
+      {
+        "repositoryPath": "threejs-ambient-contact-shading/examples/integration-image-pipeline-ao/host-adapter.js",
+        "sha256": "sha256:78c007d86eae2d9a8cd3974db004a3915ac2f068ca74c83c09f16b986bd042f8",
+        "byteLength": 8833
+      },
+      {
+        "repositoryPath": "threejs-ambient-contact-shading/examples/webgpu-node-gtao/main.js",
+        "sha256": "sha256:a835055fb1efb19bec38c32de03fadfbbbd28379229cc38138d0831a02fe87a4",
+        "byteLength": 41721
+      },
+      {
+        "repositoryPath": "threejs-bloom/examples/node-selective-bloom/index.js",
+        "sha256": "sha256:1d827c453d89176d3ac6aba0a2d0471290a8f12b19b257649d55702abfe727cd",
+        "byteLength": 54052
+      },
+      {
+        "repositoryPath": "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/CameraDirectionController.mjs",
+        "sha256": "sha256:d54ddf96c15d08b9548042df6f7203936145a1dc6821bfe3ecd5bbd9f11d58a7",
+        "byteLength": 28351
+      },
+      {
+        "repositoryPath": "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/CameraRelativeOrigin.mjs",
+        "sha256": "sha256:1eeffd049dabfe21da3f153c36b92bdb55c22b6004618e96d43f6f5f5828aeee",
+        "byteLength": 8268
+      },
+      {
+        "repositoryPath": "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/main.mjs",
+        "sha256": "sha256:07915d813d3d580cd19b709aae159b13318ff65f90d1ae36c04baed669a5eaf8",
+        "byteLength": 23373
+      },
+      {
+        "repositoryPath": "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/routeState.mjs",
+        "sha256": "sha256:37a82f985bf7d71e7fef63def181b37775262052dd66ae117ab56a91599d635d",
+        "byteLength": 1925
+      },
+      {
+        "repositoryPath": "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/constants.js",
+        "sha256": "sha256:c597508504c9dcc354c43519cd13dd1f1e755bf5b04903fb0d45b03927a5e222",
+        "byteLength": 13102
+      },
+      {
+        "repositoryPath": "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/exposure-nodes.js",
+        "sha256": "sha256:62e423c0ab0e89a323152d4a045a401de0475bc1690a610b391079b473a00df7",
+        "byteLength": 20045
+      },
+      {
+        "repositoryPath": "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/lut.js",
+        "sha256": "sha256:3849e09438871c392123052ca16939d8723d90cad695c4d3c2bf688d6d6e9ada",
+        "byteLength": 6788
+      },
+      {
+        "repositoryPath": "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/stage.js",
+        "sha256": "sha256:e21008e5206440b79315bfc65c4bfa583a459bbe7ccfea9ebec4cf64d96f35c6",
+        "byteLength": 7816
+      },
+      {
+        "repositoryPath": "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/gpu-instance-motion.js",
+        "sha256": "sha256:9f151f35a09897c5978ba4bbb7a2cfa2f52b85198981fd4d5f9a3f72380a1d1a",
+        "byteLength": 58021
+      },
+      {
+        "repositoryPath": "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/main.js",
+        "sha256": "sha256:19aae55dabda122d9d610aec1f073aa0dfab9245c5fb4a8af0ea9591d6198e6f",
+        "byteLength": 40413
+      },
+      {
+        "repositoryPath": "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/quaternion-helpers.js",
+        "sha256": "sha256:0dc67f527e674a133f066a66be6ccddb0d1863198710c44b8eae3805945c4c3b",
+        "byteLength": 3939
+      },
+      {
+        "repositoryPath": "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/route-state.js",
+        "sha256": "sha256:d98fe84e184b57f1003fb155ddbe83c414d019ca782c659069b289fbbcfa6aae",
+        "byteLength": 2753
+      },
+      {
+        "repositoryPath": "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/timeline.js",
+        "sha256": "sha256:7496ce6d469ba90e3aec6ab1d026076746eb8bae86c0a7996fe5a57dfde66ea9",
+        "byteLength": 31611
+      },
+      {
+        "repositoryPath": "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/cached-clipmap-shadow-node-v2.js",
+        "sha256": "sha256:093033c8b0a97406990057eeb1813b688d442164abe07ceedf2603b40d00ec37",
+        "byteLength": 26964
+      },
+      {
+        "repositoryPath": "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/clipmap-config.js",
+        "sha256": "sha256:0fd992a1034097df22f3594b530da5160fd215ed66ed38f482b676afc1e8db88",
+        "byteLength": 22423
+      },
+      {
+        "repositoryPath": "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/shadow-architectures.js",
+        "sha256": "sha256:7d7a44ad72112a61bd44662618e4c4489e03409fe04448225436af0e708846f8",
+        "byteLength": 10636
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/readback.js",
+        "sha256": "sha256:7de3f8df4e29601268a29dba2e5d6928da5622679c458d423c552d4d0bf67b1d",
+        "byteLength": 2859
+      }
+    ],
+    "threeRevision": "0.185.1",
+    "sourceHash": "sha256:24dfa73d8feadbd219db7edf86484d1ff65c4babde784e104fc4e5741a1685a8",
+    "buildRevision": "sha256:3ba5d0a425e389a656d576d7a50704862784e654641304698e79b89559fac365"
+  },
+  "retainedFiles": [
+    {
+      "path": "visual-contract.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:f131b19e67224a81df1d785bd51584445cb131f860dadcae236154c153dc14d5",
+      "byteLength": 861
+    },
+    {
+      "path": "renderer-info.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:ce98dc437ff1e48283efdd61f5f63f5c0cc95934b77e56c419199c8db5c3b599",
+      "byteLength": 466
+    },
+    {
+      "path": "pipeline-graph.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:bbc28e834c27fc370aa09992d34785a5535d6225d62edcdc74390a242bc35d8e",
+      "byteLength": 998
+    },
+    {
+      "path": "performance-envelope.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:62e1abb57e217febce5044e04788aae2967a749c9dd5c70432f279fc3c45e507",
+      "byteLength": 634
+    },
+    {
+      "path": "frame-trace.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:61e2604f805c8759b4999cc2b6ef8e27ea9446acb8902d2b4f38c58f787479e7",
+      "byteLength": 280
+    },
+    {
+      "path": "quality-governor.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:d1fea983c2d3e9cf02031fc523d590c0329b10d3a42ce7dc6ebc9575298d762a",
+      "byteLength": 261
+    },
+    {
+      "path": "render-targets.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:6984f8f20aba8804f97f987496b3052d6a2653225ea14515974ba92eb1a0b62a",
+      "byteLength": 10560
+    },
+    {
+      "path": "storage-resources.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:579719a4f114bada5939fff4c4a645ac178e5b40a8f18de1cfb9532f02a92486",
+      "byteLength": 333
+    },
+    {
+      "path": "resident-resources.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:6fc1377d8131845b579a304b535bc8832ac8ad8663760f592519d1c3ab76a856",
+      "byteLength": 1329
+    },
+    {
+      "path": "bandwidth-model.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:e921c52741c0a3b03c5a02ac0b1337262a182750cd76a01d10c49323c047a034",
+      "byteLength": 956
+    },
+    {
+      "path": "visual-errors.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:f4b2464fc52bef50bc4fdd264442c77fe07b680905d615eb5be53d0d84a8ff9c",
+      "byteLength": 752
+    },
+    {
+      "path": "leak-loop.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:5b809a2f7f8d75287e81cfb12611400173dd5bc1ce47ded7d38437f0768d90a4",
+      "byteLength": 131661
+    },
+    {
+      "path": "mechanism-metrics.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:925e00f01b1a008f1e1aed40c0489ca71565c1bc9b8e433a579a0c60086c9e76",
+      "byteLength": 4656
+    },
+    {
+      "path": "capture-write-ledger.json",
+      "status": "captured",
+      "kind": "capture-session-write-ledger",
+      "sha256": "sha256:0bf1cdecf041083694fc0328ad337254297825dafedfa10b1f3ada1aab34cf5e",
+      "byteLength": 10618
+    },
+    {
+      "path": "sessions/physical-route.write-ledger.json",
+      "status": "captured",
+      "kind": "capture-session-write-ledger",
+      "sha256": "sha256:968e536cc68ac7e6f8d7b797536d498b69a206f2d83e1b879c9c42c8baa26d6e",
+      "byteLength": 1965
+    }
+  ],
+  "retainedImages": [
+    {
+      "path": "final.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "final.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:3298a0edfb58f05678c4906e29993eba26617215d65ea38f0534abeb89feaa77",
+      "byteLength": 80236
+    },
+    {
+      "path": "no-post.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "no-post.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:dc87534f7d1d1901a5c120aac7b34658f0c3281d4d92087054c41741ac203620",
+      "byteLength": 13237
+    },
+    {
+      "path": "diagnostics.mosaic.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "diagnostics.mosaic",
+      "mediaType": "image/png",
+      "sha256": "sha256:69628ca1abcf6e14309b1a8989327a39ce8314eb51e9ba1d3c61a64a09fc18f3",
+      "byteLength": 6424
+    },
+    {
+      "path": "camera.near.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.near",
+      "mediaType": "image/png",
+      "sha256": "sha256:5bc1411eb78261ae94fa6e6bb0be2631e8346f2da443481a626ddd6023ae5b01",
+      "byteLength": 213875
+    },
+    {
+      "path": "camera.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:2acc3aef95eb7122d747323c9eceb1bdad9ff6763119c012ddf6a42bed4208d2",
+      "byteLength": 80186
+    },
+    {
+      "path": "camera.far.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.far",
+      "mediaType": "image/png",
+      "sha256": "sha256:767c8219260ab6ec98f41069fcca5c07d2735f690ee7d86e8d3400644292841a",
+      "byteLength": 37505
+    },
+    {
+      "path": "seed-0001.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "seed-0001.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:de5dad1f11276b355583e82fd03587351262f7748e4109c47ee0748ed121e16a",
+      "byteLength": 79876
+    },
+    {
+      "path": "seed-9e3779b9.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "seed-9e3779b9.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:3a3f1812d661db3129b70cca3a80c03972337fa4b5c0db184622827170767a13",
+      "byteLength": 81869
+    },
+    {
+      "path": "temporal.t000.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "temporal.t000",
+      "mediaType": "image/png",
+      "sha256": "sha256:45584ce123cb81fc395b74c9604dbc6ced2b901db69ef7de1906fe4512dc7a68",
+      "byteLength": 80057
+    },
+    {
+      "path": "temporal.t001.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "temporal.t001",
+      "mediaType": "image/png",
+      "sha256": "sha256:62ddf3ff71041640239dcc3d9513ec8a7ceda46a8e1418575ee1208c5ceda78f",
+      "byteLength": 81268
+    }
+  ],
+  "omittedFiles": {
+    "ledgerDigest": "sha256:0d43a8ee3fa53183e127f14259f9a9e9cb3b2f8562871152d9a265010b651e2a",
+    "count": 3,
+    "byteLength": 161941,
+    "byKind": [
+      {
+        "kind": "capture-session-document",
+        "count": 2,
+        "byteLength": 158397
+      },
+      {
+        "kind": "supplementary-json",
+        "count": 1,
+        "byteLength": 3544
+      }
+    ]
+  },
+  "checkoutLimitations": [
+    {
+      "id": "detached-source-payloads",
+      "status": "ACTIVE",
+      "statement": "Raw readbacks and capture-session transcript bytes are omitted from the tracked projection. Checkout validation verifies their approved hash and byte-length commitments, not the detached bytes themselves.",
+      "affectedClaims": []
+    }
+  ],
+  "projectionDigest": "sha256:4296b49a6b45a2893f42b13ef98433c0f896542f2cb9798d43a62a08ee9bbb94"
+}

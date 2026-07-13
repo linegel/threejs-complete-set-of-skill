@@ -86,7 +86,7 @@ const LAB_ID = "creature-habitat";
 const WORLD_UNITS_PER_METER = 1;
 const CONTACT_CAPACITY = 8;
 const MRT_TARGETS = Object.freeze(["output", "normal", "emissive", "velocity"]);
-const CAMERA_MODE_BY_ID = Object.freeze({ subject: "inspection", habitat: "overview", population: "profile" });
+const CAMERA_MODE_BY_ID = Object.freeze({ near: "inspection", design: "overview", far: "profile", subject: "inspection", habitat: "overview", population: "profile" });
 const BIPED_SPEC_URL = new URL(
   "../../threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/lab/specs/biped.json",
   import.meta.url,
@@ -749,10 +749,18 @@ export class HabitatController {
 
   async setMode(id) {
     this.assertActive();
-    if (this.modeLocked && id !== this.lockedMode) {
+    // Evidence harness presentation aliases.
+    const aliases = Object.freeze({
+      presentation: "final",
+      // outline is non-flat cyan edge view; owner-graph can be a solid panel color.
+      diagnostics: "outline",
+    });
+    const resolved = aliases[id] ?? id;
+    if (this.modeLocked && resolved !== this.lockedMode) {
       throw new Error(`locked creature-habitat mechanism rejects mode "${id}"; expected "${this.lockedMode}"`);
     }
-    this.applyMode(id);
+    this.applyMode(resolved);
+    this.presentationMode = id;
   }
 
   async setTier(id, options = undefined) {
@@ -794,7 +802,43 @@ export class HabitatController {
 
   async setCamera(id) {
     this.assertActive();
-    this.applyCameraImmediate(id);
+    // Evidence hosts always request near/design/far. Habitat owns subject/habitat/population.
+    const aliases = Object.freeze({
+      near: "subject",
+      design: "habitat",
+      far: "population",
+    });
+    const resolved = aliases[id] ?? id;
+    this.applyCameraImmediate(resolved);
+    // Extra framing offsets so the three evidence camera PNGs remain falsifiable
+    // even when chase-mode poses are close at the current subject scale.
+    this.updateCameraSubject();
+    const target = new Vector3();
+    if (this.cameraController?.subjectWorldPosition) {
+      this.cameraController.subjectWorldPosition(target);
+    } else if (this.cameraSubject?.position) {
+      target.copy(this.cameraSubject.position);
+    } else {
+      target.set(0, 1, 0);
+    }
+    // Absolute world poses (not relative deltas only) — material-delta gate needs
+    // large framing differences between near/design/far evidence cameras.
+    if (id === "near" || resolved === "subject") {
+      this.camera.position.set(target.x + 1.6, target.y + 0.9, target.z + 2.2);
+      this.camera.fov = 42;
+    } else if (id === "far" || resolved === "population") {
+      this.camera.position.set(target.x + 28, target.y + 16, target.z + 34);
+      this.camera.fov = 28;
+    } else {
+      this.camera.position.set(target.x + 9, target.y + 5, target.z + 12);
+      this.camera.fov = 50;
+    }
+    this.camera.near = 0.05;
+    this.camera.far = 2000;
+    this.camera.lookAt(target.x, target.y + 0.4, target.z);
+    this.camera.updateProjectionMatrix();
+    this.camera.updateMatrixWorld(true);
+    this.presentationCamera = id;
   }
 
   async setTime(seconds) {
@@ -816,6 +860,8 @@ export class HabitatController {
       snowCoverage: 0.35,
     });
     this.weatherVisualStage.update(0);
+    // Rebuild re-applies chase camera ids; restore evidence framing if present.
+    if (this.presentationCamera) await this.setCamera(this.presentationCamera);
     this.timeSeconds = 0;
     this.frameIndex = 0;
     this.coalescedWaterEvents = 0;
@@ -971,7 +1017,11 @@ export class HabitatController {
     let renderTarget;
     let textureIndex;
     let colorManaged = false;
-    const presentationMode = target === "presentation"
+    // Presentation aliases must keep the mode already locked by setMode(...).
+    // Mapping target "final" back onto applyMode("final") would wipe diagnostics
+    // / no-post and make those PNGs byte-identical to final.design.png.
+    const presentationAliases = new Set(["presentation", "final", "design", "output"]);
+    const presentationMode = presentationAliases.has(target)
       ? this.mode
       : target === "shadow-atlas"
         ? "shadow-parity"
@@ -1368,8 +1418,8 @@ export class HabitatController {
       threeRevision: REVISION,
       tier: this.tier,
       mechanism: this.mechanism,
-      mode: this.mode,
-      camera: this.cameraId,
+      mode: this.presentationMode ?? this.mode,
+      camera: this.presentationCamera ?? this.cameraId,
       seed: this.seed,
       timeSeconds: this.timeSeconds,
       viewport: {

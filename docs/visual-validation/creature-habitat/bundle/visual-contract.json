@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 2,
+  "subject": "creature-habitat",
+  "identity": {
+    "labId": "creature-habitat",
+    "skill": "threejs-image-pipeline",
+    "threeRevision": "0.185.1",
+    "sourceHash": "sha256:8f79e695f0d5c7ad60e95e400ac27caab018db33f2b31ed250bd2e324d6295f9"
+  },
+  "invariants": [
+    "native WebGPU backend required",
+    "aligned readback retained",
+    "single tone/output owner where declared"
+  ],
+  "requiredImages": [
+    "final.design.png",
+    "no-post.design.png",
+    "diagnostics.mosaic.png",
+    "camera.near.png",
+    "camera.design.png",
+    "camera.far.png",
+    "seed-0001.final.png",
+    "seed-9e3779b9.final.png",
+    "temporal.t000.png",
+    "temporal.t001.png"
+  ],
+  "performanceClaims": "NOT_CLAIMED",
+  "limitations": [
+    "Correctness capture lane; hardware GPU timing not claimed unless timestamp windows exist."
+  ]
+}

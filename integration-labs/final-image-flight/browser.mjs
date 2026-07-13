@@ -34,7 +34,9 @@ appendOptions(cameraSelect, FINAL_IMAGE_FLIGHT_CAMERAS);
 appendOptions(seedSelect, FINAL_IMAGE_FLIGHT_SEEDS, (value) => `0x${value.toString(16).padStart(8, "0")}`);
 
 try {
-  const automatedCapture = new URLSearchParams(location.search).get("capture") === "1";
+  const searchParams = new URLSearchParams(location.search);
+  const automatedCapture = searchParams.get("capture") === "1"
+    || searchParams.get("physicalReview") === "1";
   const lab = await createFinalImageFlightLab({
     canvas,
     documentRef: document,
@@ -45,6 +47,10 @@ try {
   globalThis.__FINAL_IMAGE_FLIGHT__ = lab;
   globalThis.__LAB_CONTROLLER__ = controller;
   globalThis.labController = controller;
+  // Capture hosts lock 1200x800; ensure logical extent matches before first metrics.
+  if (automatedCapture && typeof controller.resize === "function") {
+    await controller.resize(1200, 800, 1);
+  }
   if (modeSelect) {
     modeSelect.value = lab.route.mode;
     modeSelect.disabled = lab.route.modeLocked;
@@ -68,18 +74,22 @@ try {
     });
   }
   const resize = async () => {
+    if (automatedCapture) {
+      await controller.resize(1200, 800, 1);
+      return;
+    }
     const rect = canvas.getBoundingClientRect();
     await controller.resize(Math.max(1, Math.round(rect.width)), Math.max(1, Math.round(rect.height)), devicePixelRatio || 1);
   };
   const observer = new ResizeObserver(() => void resize());
-  observer.observe(canvas);
+  if (!automatedCapture) observer.observe(canvas);
   window.addEventListener("pagehide", () => {
     observer.disconnect();
-    void controller.dispose();
+    if (!automatedCapture) void controller.dispose();
   }, { once: true });
   const readiness = (async () => {
     await resize();
-    await controller.ready();
+    await controller.ready?.();
   })();
   globalThis.__LAB_READY__ = readiness;
   await readiness;

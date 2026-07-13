@@ -1,0 +1,4079 @@
+{
+  "schemaVersion": 2,
+  "verdict": "PASS",
+  "operations": [
+    "create",
+    "render",
+    "resize",
+    "mode",
+    "tier",
+    "dispose"
+  ],
+  "cycles": {
+    "value": 50,
+    "unit": "cycle-count",
+    "label": "Measured",
+    "source": "fresh native-WebGPU node-selective-bloom controller lifecycle run"
+  },
+  "cycleSnapshots": [
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 0,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:00aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 1,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:01aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 2,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:02aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 3,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:03aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 4,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:04aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 5,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:05aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 6,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:06aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 7,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:07aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 8,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:08aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 9,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:09aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 10,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:10aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 11,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:11aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 12,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:12aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 13,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:13aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 14,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:14aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 15,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:15aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 16,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:16aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 17,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:17aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 18,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:18aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 19,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:19aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 20,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:20aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 21,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:21aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 22,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:22aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 23,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:23aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 24,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:24aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 25,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:25aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 26,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:26aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 27,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:27aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 28,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:28aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 29,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:29aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 30,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:30aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 31,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:31aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 32,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:32aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 33,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:33aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 34,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:34aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 35,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:35aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 36,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:36aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 37,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:37aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 38,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:38aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 39,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:39aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 40,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:40aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 41,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:41aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 42,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:42aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 43,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:43aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 44,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:44aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 45,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:45aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 46,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:46aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 47,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:47aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 48,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:48aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 49,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh native-WebGPU lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 1024,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime storage resource estimate before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:49aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rendererStateAfterDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "deviceLossObserved": false
+    }
+  ],
+  "before": {
+    "targetBytes": {
+      "value": 0,
+      "unit": "bytes",
+      "label": "Measured",
+      "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+    },
+    "storageBytes": {
+      "value": 0,
+      "unit": "bytes",
+      "label": "Measured",
+      "source": "runtime storage resource estimate before disposal"
+    }
+  },
+  "after": {
+    "targetBytes": {
+      "value": 0,
+      "unit": "bytes",
+      "label": "Measured",
+      "source": "post-disposal resource snapshot"
+    },
+    "storageBytes": {
+      "value": 0,
+      "unit": "bytes",
+      "label": "Measured",
+      "source": "post-disposal resource snapshot"
+    }
+  },
+  "gates": {
+    "targetBytes": {
+      "value": 0,
+      "unit": "bytes",
+      "label": "Gated",
+      "source": "zero retained target gate after dispose"
+    },
+    "storageBytes": {
+      "value": 0,
+      "unit": "bytes",
+      "label": "Gated",
+      "source": "zero retained storage gate after dispose"
+    }
+  },
+  "trend": {
+    "targetBytesPerCycle": {
+      "value": 0,
+      "unit": "bytes-per-cycle",
+      "label": "Measured",
+      "source": "linear slope of retainedTargetBytes across settled cycles"
+    },
+    "storageBytesPerCycle": {
+      "value": 0,
+      "unit": "bytes-per-cycle",
+      "label": "Measured",
+      "source": "linear slope of retainedStorageBytes across settled cycles"
+    }
+  },
+  "deviceErrors": [],
+  "limitations": [],
+  "allowedCachePlateaus": []
+}

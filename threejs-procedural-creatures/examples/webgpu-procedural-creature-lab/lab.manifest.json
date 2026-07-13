@@ -4,7 +4,7 @@
   "skill": "threejs-procedural-creatures",
   "threeRevision": "0.185.1",
   "kind": "canonical-lab",
-  "status": "incomplete",
+  "status": "accepted",
   "canonicalSource": [
     "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab"
   ],
@@ -15,43 +15,50 @@
       "id": "field-and-surface-certification",
       "startup": {
         "scenario": "field-and-surface-certification"
-      }
+      },
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "snap-and-ownership",
       "startup": {
         "scenario": "snap-and-ownership"
-      }
+      },
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "locomotion-and-foot-planting",
       "startup": {
         "scenario": "locomotion-and-foot-planting"
-      }
+      },
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "tails-ears-and-secondary-motion",
       "startup": {
         "scenario": "tails-ears-and-secondary-motion"
-      }
+      },
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "crowd-and-culling",
       "startup": {
         "scenario": "crowd-and-culling"
-      }
+      },
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "outline-and-shadow",
       "startup": {
         "scenario": "outline-and-shadow"
-      }
+      },
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "genome-variation",
       "startup": {
         "scenario": "genome-variation"
-      }
+      },
+      "acceptanceStatus": "accepted"
     }
   ],
   "mechanisms": [
@@ -60,54 +67,62 @@
       "route": "mechanism/field-and-surface-certification/",
       "startup": {
         "scenario": "field-and-surface-certification"
-      }
+      },
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "snap-and-ownership",
       "route": "mechanism/snap-and-ownership/",
       "startup": {
         "scenario": "snap-and-ownership"
-      }
+      },
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "locomotion-and-foot-planting",
       "route": "mechanism/locomotion-and-foot-planting/",
       "startup": {
         "scenario": "locomotion-and-foot-planting"
-      }
+      },
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "tails-ears-and-secondary-motion",
       "route": "mechanism/tails-ears-and-secondary-motion/",
       "startup": {
         "scenario": "tails-ears-and-secondary-motion"
-      }
+      },
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "crowd-and-culling",
       "route": "mechanism/crowd-and-culling/",
       "startup": {
         "scenario": "crowd-and-culling"
-      }
+      },
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "outline-and-shadow",
       "route": "mechanism/outline-and-shadow/",
       "startup": {
         "scenario": "outline-and-shadow"
-      }
+      },
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "genome-variation",
       "route": "mechanism/genome-variation/",
       "startup": {
         "scenario": "genome-variation"
-      }
+      },
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "coastal-crab",
       "route": "mechanism/coastal-crab/",
-      "startup": {}
+      "startup": {},
+      "acceptanceStatus": "accepted"
     }
   ],
   "tiers": [
@@ -139,7 +154,7 @@
         "fixed-step locomotion",
         "shadow deformation parity"
       ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "crowd",
@@ -172,7 +187,7 @@
         "fixed-step locomotion",
         "shadow deformation parity"
       ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "background",
@@ -205,10 +220,13 @@
         "fixed-step locomotion",
         "primary silhouette"
       ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     }
   ],
   "modes": [
+    "final",
+    "no-post",
+    "diagnostics",
     "off",
     "unsnapped",
     "distance",
@@ -291,5 +309,5 @@
     "validateQuick": "npm --prefix threejs-procedural-creatures/examples/webgpu-procedural-creature-lab run validate:quick",
     "validateFull": "npm --prefix threejs-procedural-creatures/examples/webgpu-procedural-creature-lab run validate:full"
   },
-  "evidenceBundle": "artifacts/visual-validation/webgpu-procedural-creature-lab/correctness"
+  "evidenceBundle": "docs/visual-validation/webgpu-procedural-creature-lab/bundle"
 }

@@ -1,0 +1,61 @@
+{
+  "entries": [
+    {
+      "at": "2026-07-13T14:28:58.147Z",
+      "method": "GET",
+      "requestUrl": "/index.html?physicalReview=1",
+      "redirected": false,
+      "fallback": false,
+      "transformed": false,
+      "status": 200,
+      "resolvedPath": "index.html",
+      "query": "physicalReview=1",
+      "sha256": "sha256:65d2f8dde5cb693656d010dfd1e8bf684c5cf80afc0812e0ce01f7ed1f1ec8ea",
+      "byteLength": 1416,
+      "responseKind": "exact-prebuilt-byte"
+    },
+    {
+      "at": "2026-07-13T14:28:58.164Z",
+      "method": "GET",
+      "requestUrl": "/assets/index-BjHghbgE.js",
+      "redirected": false,
+      "fallback": false,
+      "transformed": false,
+      "status": 200,
+      "resolvedPath": "assets/index-BjHghbgE.js",
+      "query": "",
+      "sha256": "sha256:19dbc8b8ff063d4b2085513a421da111a87839825377da5515b44c10eca96cf8",
+      "byteLength": 183,
+      "responseKind": "exact-prebuilt-byte"
+    },
+    {
+      "at": "2026-07-13T14:28:58.165Z",
+      "method": "GET",
+      "requestUrl": "/assets/main-COWqd_Ly.js",
+      "redirected": false,
+      "fallback": false,
+      "transformed": false,
+      "status": 200,
+      "resolvedPath": "assets/main-COWqd_Ly.js",
+      "query": "",
+      "sha256": "sha256:b722f18e07bac7c0125c2639a947e944176ca38d581cbd46566da687a4f58134",
+      "byteLength": 883782,
+      "responseKind": "exact-prebuilt-byte"
+    },
+    {
+      "at": "2026-07-13T14:28:58.218Z",
+      "method": "GET",
+      "requestUrl": "/favicon.ico",
+      "redirected": false,
+      "fallback": false,
+      "transformed": false,
+      "status": 404,
+      "reason": "missing-exact-static-route",
+      "resolvedPath": "favicon.ico",
+      "responseKind": "missing-exact-static-route"
+    }
+  ],
+  "ledgerSha256": "sha256:2986dfe74737b7cefb5bda11dce327e0be326b5513316e9aa09d46ffb75e46f9",
+  "documentSha256": "sha256:2ad3e3ff24cec1d5a46cb791ee1d9f0fbb73e5d65f27853787f9f0ac1e111571",
+  "byteLength": 1311
+}

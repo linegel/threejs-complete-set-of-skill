@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "labId": "webgpu-exposure-color-pipeline",
   "classification": "inspected-runtime-evidence-preview",
-  "acceptanceStatus": "incomplete",
-  "evidenceBundleId": "webgpu-exposure-color-pipeline-v2",
+  "acceptanceStatus": "accepted",
+  "evidenceBundleId": "correctness",
   "canonicalSource": [
     "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline"
   ],
-  "canonicalSourceHash": "sha256:624a69e65b925d89de6524febba86d95e9c4845a5b44818c77dd31cd2996df90",
+  "canonicalSourceHash": "sha256:e5129f4e3cc3ce3c08b47adb0a4fe95063c623bfc2e229ef23895933a8d92eb1",
   "threeRevision": "0.185.1",
   "runtime": {
     "renderer": "WebGPURenderer",
@@ -32,63 +32,93 @@
   "images": [
     {
       "file": "final.design.png",
-      "meaning": "Final exposure, tone-map, LUT, and output-transform readback.",
-      "source": "images/final.design.png",
-      "sourceSha256": "sha256:d90082f594e634ec90b5ed194e4b750267c74d53cc270d632a6a5bfedbcf7990",
-      "outputSha256": "sha256:d90082f594e634ec90b5ed194e4b750267c74d53cc270d632a6a5bfedbcf7990",
+      "meaning": "Accepted release-bundle presentation: final.design.png",
+      "source": "bundle/final.design.png",
+      "sourceSha256": "sha256:5c6475ba4b15252c07784b8b86225bb808c388fd26bdd49e35758a833be4a8d2",
+      "outputSha256": "sha256:5c6475ba4b15252c07784b8b86225bb808c388fd26bdd49e35758a833be4a8d2",
       "width": 1200,
-      "height": 800,
-      "encoding": "png-copy"
+      "height": 800
     },
     {
-      "file": "meter-source.png",
-      "meaning": "Weighted log-luminance meter source diagnostic.",
-      "source": "images/meter-source.png",
-      "sourceSha256": "sha256:70bb722adab265b16c5241b0eb6644090a0940e15f8e92678a324504a0c525aa",
-      "outputSha256": "sha256:70bb722adab265b16c5241b0eb6644090a0940e15f8e92678a324504a0c525aa",
+      "file": "diagnostics.mosaic.png",
+      "meaning": "Accepted release-bundle presentation: diagnostics.mosaic.png",
+      "source": "bundle/diagnostics.mosaic.png",
+      "sourceSha256": "sha256:41a369a4c9758a3ceecb071ee6582f2ebd33ae05eca789d1fd77c101bced7b86",
+      "outputSha256": "sha256:41a369a4c9758a3ceecb071ee6582f2ebd33ae05eca789d1fd77c101bced7b86",
       "width": 1200,
-      "height": 800,
-      "encoding": "png-copy"
+      "height": 800
     },
     {
-      "file": "histogram-percentiles.png",
-      "meaning": "Percentile-selection mask emitted by the histogram path; not a plotted histogram.",
-      "source": "images/histogram-percentiles.png",
-      "sourceSha256": "sha256:8883f7415180a8851a8687f071597b77305905fe7b54fc46405284e2895ebe46",
-      "outputSha256": "sha256:8883f7415180a8851a8687f071597b77305905fe7b54fc46405284e2895ebe46",
+      "file": "camera.near.png",
+      "meaning": "Accepted release-bundle presentation: camera.near.png",
+      "source": "bundle/camera.near.png",
+      "sourceSha256": "sha256:81d92a98ddd5df73b56e7a39934ac92260e605112f506a7cac48a2d93a1305f0",
+      "outputSha256": "sha256:81d92a98ddd5df73b56e7a39934ac92260e605112f506a7cac48a2d93a1305f0",
       "width": 1200,
-      "height": 800,
-      "encoding": "png-copy"
+      "height": 800
     },
     {
-      "file": "meter-mask.png",
-      "meaning": "Metering-mask diagnostic.",
-      "source": "images/meter-mask.png",
-      "sourceSha256": "sha256:c7f122376aa740b7ceffa2067cfca803b0cf703a1aa9ecc062ff98a5d57a0281",
-      "outputSha256": "sha256:c7f122376aa740b7ceffa2067cfca803b0cf703a1aa9ecc062ff98a5d57a0281",
+      "file": "camera.design.png",
+      "meaning": "Accepted release-bundle presentation: camera.design.png",
+      "source": "bundle/camera.design.png",
+      "sourceSha256": "sha256:5c6475ba4b15252c07784b8b86225bb808c388fd26bdd49e35758a833be4a8d2",
+      "outputSha256": "sha256:5c6475ba4b15252c07784b8b86225bb808c388fd26bdd49e35758a833be4a8d2",
       "width": 1200,
-      "height": 800,
-      "encoding": "png-copy"
+      "height": 800
     },
     {
-      "file": "tone-map.png",
-      "meaning": "Tone-map stage diagnostic before the creative LUT.",
-      "source": "images/tone-map.png",
-      "sourceSha256": "sha256:784445dfcb2acb33ea0dee5d08680dffe11a03abf8b7b1f10408ffc6b34a9d34",
-      "outputSha256": "sha256:784445dfcb2acb33ea0dee5d08680dffe11a03abf8b7b1f10408ffc6b34a9d34",
+      "file": "camera.far.png",
+      "meaning": "Accepted release-bundle presentation: camera.far.png",
+      "source": "bundle/camera.far.png",
+      "sourceSha256": "sha256:7a46211b9754ae86056169fd08f79fb057c9c75201d55fe0109b61e4ca0bc447",
+      "outputSha256": "sha256:7a46211b9754ae86056169fd08f79fb057c9c75201d55fe0109b61e4ca0bc447",
       "width": 1200,
-      "height": 800,
-      "encoding": "png-copy"
+      "height": 800
     },
     {
-      "file": "lut.png",
-      "meaning": "Creative LUT stage diagnostic.",
-      "source": "images/lut.png",
-      "sourceSha256": "sha256:2e2f17aedbe4028dc7ff2407d81792b06be37b2396931cfe6ce4ef76d0a8d7f7",
-      "outputSha256": "sha256:2e2f17aedbe4028dc7ff2407d81792b06be37b2396931cfe6ce4ef76d0a8d7f7",
+      "file": "no-post.design.png",
+      "meaning": "Accepted release-bundle presentation: no-post.design.png",
+      "source": "bundle/no-post.design.png",
+      "sourceSha256": "sha256:935c630f8e6ceb7cc0b35bd2613d5113738ae0dc417fe224753b1b9d5b28defa",
+      "outputSha256": "sha256:935c630f8e6ceb7cc0b35bd2613d5113738ae0dc417fe224753b1b9d5b28defa",
       "width": 1200,
-      "height": 800,
-      "encoding": "png-copy"
+      "height": 800
+    },
+    {
+      "file": "seed-0001.final.png",
+      "meaning": "Accepted release-bundle presentation: seed-0001.final.png",
+      "source": "bundle/seed-0001.final.png",
+      "sourceSha256": "sha256:5c6475ba4b15252c07784b8b86225bb808c388fd26bdd49e35758a833be4a8d2",
+      "outputSha256": "sha256:5c6475ba4b15252c07784b8b86225bb808c388fd26bdd49e35758a833be4a8d2",
+      "width": 1200,
+      "height": 800
+    },
+    {
+      "file": "seed-9e3779b9.final.png",
+      "meaning": "Accepted release-bundle presentation: seed-9e3779b9.final.png",
+      "source": "bundle/seed-9e3779b9.final.png",
+      "sourceSha256": "sha256:016e9e27222fed183c3aebe6209357b3e943f41026d1fd5c2a314e7e5a766a35",
+      "outputSha256": "sha256:016e9e27222fed183c3aebe6209357b3e943f41026d1fd5c2a314e7e5a766a35",
+      "width": 1200,
+      "height": 800
+    },
+    {
+      "file": "temporal.t000.png",
+      "meaning": "Accepted release-bundle presentation: temporal.t000.png",
+      "source": "bundle/temporal.t000.png",
+      "sourceSha256": "sha256:5c6475ba4b15252c07784b8b86225bb808c388fd26bdd49e35758a833be4a8d2",
+      "outputSha256": "sha256:5c6475ba4b15252c07784b8b86225bb808c388fd26bdd49e35758a833be4a8d2",
+      "width": 1200,
+      "height": 800
+    },
+    {
+      "file": "temporal.t001.png",
+      "meaning": "Accepted release-bundle presentation: temporal.t001.png",
+      "source": "bundle/temporal.t001.png",
+      "sourceSha256": "sha256:9ae10e1b3907ded4ba0fc14937019340481c887af62ad8749c85dda08557afc6",
+      "outputSha256": "sha256:9ae10e1b3907ded4ba0fc14937019340481c887af62ad8749c85dda08557afc6",
+      "width": 1200,
+      "height": 800
     }
   ],
   "limitations": [

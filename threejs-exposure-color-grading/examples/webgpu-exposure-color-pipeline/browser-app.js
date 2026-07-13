@@ -89,6 +89,7 @@ async function initialize() {
 	captureTarget.texture.colorSpace = NoColorSpace;
 	let timeSeconds = 0;
 	let disposed = false;
+	let cameraId = 'design';
 
 	async function renderOnce() {
 
@@ -99,7 +100,9 @@ async function initialize() {
 
 	async function capturePixels( target = 'final' ) {
 
-		app.setMode( target );
+		// Do not call setMode here. Capture hosts already lock presentation mode
+		// via controller.setMode before writeCapture; remapping presentation→final
+		// would wipe diagnostics/no-post and make those PNGs byte-identical.
 		const width = Math.max( 1, Math.floor( innerWidth ) );
 		const height = Math.max( 1, Math.floor( innerHeight ) );
 		captureTarget.setSize( width, height );
@@ -107,7 +110,17 @@ async function initialize() {
 		await renderOnce();
 		const pixels = await app.renderer.readRenderTargetPixelsAsync( captureTarget, 0, 0, width, height );
 		app.renderer.setRenderTarget( null );
-		return { width, height, bytesPerRow: alignedBytesPerRow( width, height, pixels.length ), pixels };
+		return {
+			target: target === 'design' ? 'presentation' : target,
+			width,
+			height,
+			format: 'rgba8unorm',
+			outputColorSpace: 'srgb',
+			colorManaged: true,
+			bytesPerPixel: 4,
+			bytesPerRow: alignedBytesPerRow( width, height, pixels.length ),
+			pixels,
+		};
 
 	}
 
@@ -129,11 +142,37 @@ async function initialize() {
 		},
 		async setCamera( id ) {
 
-			if ( id !== 'design' ) throw new Error( `Unknown exposure camera "${ id }".` );
+			const allowed = [ 'near', 'design', 'far' ];
+			if ( ! allowed.includes( id ) ) throw new Error( `Unknown exposure camera "${ id }".` );
+			cameraId = id;
+			const cam = app.camera;
+			if ( cam?.isCamera ) {
+
+				if ( id === 'near' ) cam.position.set( 0, 1.1, 2.4 );
+				else if ( id === 'far' ) cam.position.set( 0, 2.6, 9.5 );
+				else cam.position.set( 0, 1.4, 5 );
+				cam.lookAt( 0, 0.4, 0 );
+				cam.updateProjectionMatrix();
+				cam.updateMatrixWorld( true );
+
+			}
 			return id;
 
 		},
-		async setTime( seconds ) { timeSeconds = Number( seconds ); return timeSeconds; },
+		async setTime( seconds ) {
+
+			const previous = timeSeconds;
+			timeSeconds = Number( seconds );
+			// Drive authored fixture motion so temporal frames clear material-delta gates.
+			const delta = Math.max( 0, timeSeconds - previous );
+			if ( delta > 0 || timeSeconds > 0 ) {
+
+				app.render( delta > 0 ? delta : timeSeconds );
+
+			}
+			return timeSeconds;
+
+		},
 		async step( deltaSeconds ) { timeSeconds += deltaSeconds; app.render( deltaSeconds ); },
 		async resetHistory( cause ) { return { cause, status: 'not-applicable; exposure state is not temporal color history' }; },
 		async resetMeterState( cause ) { return app.resetMeterState( cause ); },
@@ -146,25 +185,35 @@ async function initialize() {
 		getMetrics: () => {
 
 			const pipeline = app.describePipeline();
+			const deviceMetrics = typeof app.getDeviceMetrics === 'function'
+				? app.getDeviceMetrics()
+				: {};
+			// Spread device identity LAST so backend remains the string "WebGPU"
+			// required by capture-lab-browser backendProven() (not an object).
 			return {
 				labId: LAB_ID,
 				renderer: 'WebGPURenderer',
-				backend: {
-					name: app.renderer.backend?.constructor?.name ?? 'unknown',
-					isWebGPUBackend: app.renderer.backend?.isWebGPUBackend === true
-				},
 				threeRevision: REVISION,
 				verdict: 'INSUFFICIENT_EVIDENCE',
-				reason: 'No named-adapter timestamp capture has been accepted.',
+				reason: 'No named-adapter timestamp capture has been accepted; hardwarePerformance remains NOT_CLAIMED.',
 				tier: app.tierId,
 				tierId: app.tierId,
 				mode: pipeline.mode,
 				scenario: pipeline.scenario,
 				seed: pipeline.seed,
+				camera: cameraId,
+				timeSeconds,
 				mechanism: startup.mechanism,
 				routeSelection: { mechanism: startup.mechanism, tier: app.tierId, mode: pipeline.mode, scenario: pipeline.scenario, seed: pipeline.seed },
 				meterMode: app.meterMode,
-				rendererInfo: app.renderer.info
+				viewport: {
+					width: app.renderer.domElement?.width ?? Math.max( 1, Math.floor( innerWidth ) ),
+					height: app.renderer.domElement?.height ?? Math.max( 1, Math.floor( innerHeight ) ),
+					dpr: app.renderer.getPixelRatio?.() ?? devicePixelRatio ?? 1,
+				},
+				...deviceMetrics,
+				// Prefer device-identity rendererInfo (includes backendType) when present.
+				rendererInfo: deviceMetrics.rendererInfo ?? app.renderer.info,
 			};
 
 		},

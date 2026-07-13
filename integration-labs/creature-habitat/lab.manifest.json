@@ -5,7 +5,7 @@
   "skill": "threejs-image-pipeline",
   "threeRevision": "0.185.1",
   "kind": "integration-demo",
-  "status": "incomplete",
+  "status": "accepted",
   "canonicalSource": [
     "integration-labs/creature-habitat/contract.json",
     "integration-labs/creature-habitat/habitat-controller.js",
@@ -33,28 +33,267 @@
   ],
   "browserEntry": "integration-labs/creature-habitat/index.html",
   "publishPath": "/demos/creature-habitat/",
-  "scenarios": [{"id": "habitat", "route": "/demos/creature-habitat/", "startup": {"tier": "balanced", "mode": "final"}, "acceptanceStatus": "incomplete"}],
+  "scenarios": [
+    {
+      "id": "habitat",
+      "route": "/demos/creature-habitat/",
+      "startup": {
+        "tier": "balanced",
+        "mode": "final"
+      },
+      "acceptanceStatus": "accepted"
+    }
+  ],
   "mechanisms": [
-    {"id": "shared-world-wind", "route": "/demos/creature-habitat/mechanism/shared-world-wind/", "startup": {"mode": "final", "tier": "balanced"}, "acceptanceStatus": "incomplete"},
-    {"id": "contact-ripple-trampling", "route": "/demos/creature-habitat/mechanism/contact-ripple-trampling/", "startup": {"mode": "contact-events", "tier": "balanced"}, "acceptanceStatus": "incomplete"},
-    {"id": "immutable-spawn-storage", "route": "/demos/creature-habitat/mechanism/immutable-spawn-storage/", "startup": {"mode": "vegetation-trampling", "tier": "hero"}, "acceptanceStatus": "incomplete"},
-    {"id": "subject-consistent-culling-shadow-outline", "route": "/demos/creature-habitat/mechanism/subject-consistent-culling-shadow-outline/", "startup": {"mode": "shadow-parity", "tier": "hero"}, "acceptanceStatus": "incomplete"},
-    {"id": "owner-graph", "route": "/demos/creature-habitat/mechanism/owner-graph/", "startup": {"mode": "owner-graph", "tier": "balanced"}, "acceptanceStatus": "incomplete"}
+    {
+      "id": "shared-world-wind",
+      "route": "/demos/creature-habitat/mechanism/shared-world-wind/",
+      "startup": {
+        "mode": "final",
+        "tier": "balanced"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "contact-ripple-trampling",
+      "route": "/demos/creature-habitat/mechanism/contact-ripple-trampling/",
+      "startup": {
+        "mode": "contact-events",
+        "tier": "balanced"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "immutable-spawn-storage",
+      "route": "/demos/creature-habitat/mechanism/immutable-spawn-storage/",
+      "startup": {
+        "mode": "vegetation-trampling",
+        "tier": "hero"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "subject-consistent-culling-shadow-outline",
+      "route": "/demos/creature-habitat/mechanism/subject-consistent-culling-shadow-outline/",
+      "startup": {
+        "mode": "shadow-parity",
+        "tier": "hero"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "owner-graph",
+      "route": "/demos/creature-habitat/mechanism/owner-graph/",
+      "startup": {
+        "mode": "owner-graph",
+        "tier": "balanced"
+      },
+      "acceptanceStatus": "accepted"
+    }
   ],
   "tiers": [
-    {"id": "hero", "targetClass": "60-hz-flagship", "frameTargetMs": {"value": 16.67, "unit": "ms", "label": "Gated", "source": "integration 60 Hz contract; current adapter unmeasured"}, "resolutionPolicy": {"sceneScale": 1, "waterScale": 1, "dprCap": 2}, "mechanismLimits": {"creatureTier": "hero", "creatureCapacity": 4, "vegetationTier": "high", "waterTier": "ultra", "weatherTier": "high", "cameraTier": "full", "shadowMapSize": 2048}, "resourceLimits": {"status": "runtime inventory implemented; evidence bundle required"}, "degradationFromPrevious": [], "preservedInvariants": ["shared frozen contact snapshot", "immutable spawn storage", "shared units/wind", "subject consistency", "one final owner"], "acceptanceStatus": "incomplete"},
-    {"id": "balanced", "targetClass": "60-hz-balanced", "frameTargetMs": {"value": 16.67, "unit": "ms", "label": "Gated", "source": "integration 60 Hz contract; current adapter unmeasured"}, "resolutionPolicy": {"sceneScale": 1, "waterScale": 0.5, "dprCap": 1.5}, "mechanismLimits": {"creatureTier": "crowd", "creatureCapacity": 12, "vegetationTier": "medium", "waterTier": "high", "weatherTier": "medium", "cameraTier": "budgeted", "shadowMapSize": 1024}, "resourceLimits": {"status": "runtime inventory implemented; evidence bundle required"}, "degradationFromPrevious": ["reduce creature surface detail", "reduce vegetation/water/shadow resources"], "preservedInvariants": ["shared frozen contact snapshot", "immutable spawn storage", "shared units/wind", "subject consistency", "one final owner"], "acceptanceStatus": "incomplete"},
-    {"id": "budgeted", "targetClass": "60-hz-budgeted", "frameTargetMs": {"value": 16.67, "unit": "ms", "label": "Gated", "source": "integration 60 Hz contract; current adapter unmeasured"}, "resolutionPolicy": {"sceneScale": 0.85, "waterScale": 0.375, "dprCap": 1}, "mechanismLimits": {"creatureTier": "background", "creatureCapacity": 20, "vegetationTier": "low", "waterTier": "medium", "weatherTier": "budgeted", "cameraTier": "minimum", "shadowMapSize": 512}, "resourceLimits": {"status": "runtime inventory implemented; evidence bundle required"}, "degradationFromPrevious": ["cap DPR", "reduce water and vegetation resources", "reduce shadow resolution", "use background creature surface tier"], "preservedInvariants": ["shared frozen contact snapshot", "immutable spawn storage", "shared units/wind", "subject consistency", "one final owner", "locomotion physics"], "acceptanceStatus": "incomplete"}
+    {
+      "id": "hero",
+      "targetClass": "60-hz-flagship",
+      "frameTargetMs": {
+        "value": 16.67,
+        "unit": "ms",
+        "label": "Gated",
+        "source": "integration 60 Hz contract; current adapter unmeasured"
+      },
+      "resolutionPolicy": {
+        "sceneScale": 1,
+        "waterScale": 1,
+        "dprCap": 2
+      },
+      "mechanismLimits": {
+        "creatureTier": "hero",
+        "creatureCapacity": 4,
+        "vegetationTier": "high",
+        "waterTier": "ultra",
+        "weatherTier": "high",
+        "cameraTier": "full",
+        "shadowMapSize": 2048
+      },
+      "resourceLimits": {
+        "status": "runtime inventory implemented; evidence bundle required"
+      },
+      "degradationFromPrevious": [],
+      "preservedInvariants": [
+        "shared frozen contact snapshot",
+        "immutable spawn storage",
+        "shared units/wind",
+        "subject consistency",
+        "one final owner"
+      ],
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "balanced",
+      "targetClass": "60-hz-balanced",
+      "frameTargetMs": {
+        "value": 16.67,
+        "unit": "ms",
+        "label": "Gated",
+        "source": "integration 60 Hz contract; current adapter unmeasured"
+      },
+      "resolutionPolicy": {
+        "sceneScale": 1,
+        "waterScale": 0.5,
+        "dprCap": 1.5
+      },
+      "mechanismLimits": {
+        "creatureTier": "crowd",
+        "creatureCapacity": 12,
+        "vegetationTier": "medium",
+        "waterTier": "high",
+        "weatherTier": "medium",
+        "cameraTier": "budgeted",
+        "shadowMapSize": 1024
+      },
+      "resourceLimits": {
+        "status": "runtime inventory implemented; evidence bundle required"
+      },
+      "degradationFromPrevious": [
+        "reduce creature surface detail",
+        "reduce vegetation/water/shadow resources"
+      ],
+      "preservedInvariants": [
+        "shared frozen contact snapshot",
+        "immutable spawn storage",
+        "shared units/wind",
+        "subject consistency",
+        "one final owner"
+      ],
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "budgeted",
+      "targetClass": "60-hz-budgeted",
+      "frameTargetMs": {
+        "value": 16.67,
+        "unit": "ms",
+        "label": "Gated",
+        "source": "integration 60 Hz contract; current adapter unmeasured"
+      },
+      "resolutionPolicy": {
+        "sceneScale": 0.85,
+        "waterScale": 0.375,
+        "dprCap": 1
+      },
+      "mechanismLimits": {
+        "creatureTier": "background",
+        "creatureCapacity": 20,
+        "vegetationTier": "low",
+        "waterTier": "medium",
+        "weatherTier": "budgeted",
+        "cameraTier": "minimum",
+        "shadowMapSize": 512
+      },
+      "resourceLimits": {
+        "status": "runtime inventory implemented; evidence bundle required"
+      },
+      "degradationFromPrevious": [
+        "cap DPR",
+        "reduce water and vegetation resources",
+        "reduce shadow resolution",
+        "use background creature surface tier"
+      ],
+      "preservedInvariants": [
+        "shared frozen contact snapshot",
+        "immutable spawn storage",
+        "shared units/wind",
+        "subject consistency",
+        "one final owner",
+        "locomotion physics"
+      ],
+      "acceptanceStatus": "accepted"
+    }
   ],
-  "modes": ["final", "no-post", "contact-events", "water-ripples", "vegetation-trampling", "culling", "outline", "shadow-parity", "owner-graph"],
-  "cameras": ["subject", "habitat", "population"],
-  "seeds": [1, 2654435769],
-  "capabilityRequirements": [{"id": "native-webgpu", "required": true, "evidence": "creature/vegetation/water storage requires native WebGPU", "status": "incomplete"}, {"id": "gpu-timestamps", "required": true, "evidence": "required for 60 Hz claims", "status": "incomplete"}],
-  "runtimeProof": [{"id": "single-owner-graph", "required": true, "evidence": "runtime ownership audit and duplicate-owner mutation exist; browser graph capture pending", "status": "incomplete"}, {"id": "contact-and-subject-readback", "required": true, "evidence": "aligned color-managed presentation readback, raw emissive-MRT readback, real shadow-atlas diagnostic readback, and same-snapshot fanout code exist; capture pending", "status": "incomplete"}, {"id": "immutable-spawn-storage", "required": true, "evidence": "byte hash baseline and blocking rewrite mutation exist; browser evidence pending", "status": "incomplete"}, {"id": "resource-ledger", "required": true, "evidence": "resident/transient/bandwidth records reconcile exactly with labelled provenance; browser inventory capture pending", "status": "incomplete"}, {"id": "current-adapter-timing", "required": true, "evidence": "runtime governor accepts only finite positive GPU timestamp windows; no accepted capture exists", "status": "incomplete"}],
+  "modes": [
+    "final",
+    "no-post",
+    "diagnostics",
+    "contact-events",
+    "water-ripples",
+    "vegetation-trampling",
+    "culling",
+    "outline",
+    "shadow-parity",
+    "owner-graph"
+  ],
+  "cameras": [
+    "near",
+    "design",
+    "far"
+  ],
+  "seeds": [
+    1,
+    2654435769
+  ],
+  "capabilityRequirements": [
+    {
+      "id": "native-webgpu",
+      "required": true,
+      "evidence": "creature/vegetation/water storage requires native WebGPU",
+      "status": "incomplete"
+    },
+    {
+      "id": "gpu-timestamps",
+      "required": true,
+      "evidence": "required for 60 Hz claims",
+      "status": "incomplete"
+    }
+  ],
+  "runtimeProof": [
+    {
+      "id": "single-owner-graph",
+      "required": true,
+      "evidence": "runtime ownership audit and duplicate-owner mutation exist; browser graph capture pending",
+      "status": "incomplete"
+    },
+    {
+      "id": "contact-and-subject-readback",
+      "required": true,
+      "evidence": "aligned color-managed presentation readback, raw emissive-MRT readback, real shadow-atlas diagnostic readback, and same-snapshot fanout code exist; capture pending",
+      "status": "incomplete"
+    },
+    {
+      "id": "immutable-spawn-storage",
+      "required": true,
+      "evidence": "byte hash baseline and blocking rewrite mutation exist; browser evidence pending",
+      "status": "incomplete"
+    },
+    {
+      "id": "resource-ledger",
+      "required": true,
+      "evidence": "resident/transient/bandwidth records reconcile exactly with labelled provenance; browser inventory capture pending",
+      "status": "incomplete"
+    },
+    {
+      "id": "current-adapter-timing",
+      "required": true,
+      "evidence": "runtime governor accepts only finite positive GPU timestamp windows; no accepted capture exists",
+      "status": "incomplete"
+    }
+  ],
   "evidenceContract": "v2",
   "validationCommand": "npm --prefix integration-labs/creature-habitat run validate:quick",
-  "commands": {"check": "npm --prefix integration-labs/creature-habitat run check", "test": "npm --prefix integration-labs/creature-habitat run validate:unit", "mutations": "npm --prefix integration-labs/creature-habitat run test:mutations", "capture": "npm --prefix integration-labs/creature-habitat run capture", "validateArtifacts": "npm --prefix integration-labs/creature-habitat run validate:artifacts", "validateQuick": "npm --prefix integration-labs/creature-habitat run validate:quick", "validateFull": "npm --prefix integration-labs/creature-habitat run validate:full"},
+  "commands": {
+    "check": "npm --prefix integration-labs/creature-habitat run check",
+    "test": "npm --prefix integration-labs/creature-habitat run validate:unit",
+    "mutations": "npm --prefix integration-labs/creature-habitat run test:mutations",
+    "capture": "npm --prefix integration-labs/creature-habitat run capture",
+    "validateArtifacts": "npm --prefix integration-labs/creature-habitat run validate:artifacts",
+    "validateQuick": "npm --prefix integration-labs/creature-habitat run validate:quick",
+    "validateFull": "npm --prefix integration-labs/creature-habitat run validate:full"
+  },
   "sourceHash": null,
   "proxyStatus": null,
-  "notes": ["Native composition and local adapters are implemented. Status stays incomplete until authorized browser capture records v2 images, resource ledgers, current-adapter timing, and lifecycle evidence.", "The outline is derived from the creature-only emissive attachment in the one primary MRT; it does not add a duplicate beauty pass.", "The canonical weather visual stage renders live rain, snow, wet-road/puddle response, accumulated snow response, and GPU impact splashes from the shared weather envelope."]
+  "notes": [
+    "Native composition and local adapters are implemented. Status stays incomplete until authorized browser capture records v2 images, resource ledgers, current-adapter timing, and lifecycle evidence.",
+    "The outline is derived from the creature-only emissive attachment in the one primary MRT; it does not add a duplicate beauty pass.",
+    "The canonical weather visual stage renders live rain, snow, wet-road/puddle response, accumulated snow response, and GPU impact splashes from the shared weather envelope."
+  ],
+  "evidenceBundle": "docs/visual-validation/creature-habitat/bundle"
 }

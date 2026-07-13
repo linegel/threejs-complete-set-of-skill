@@ -60,6 +60,13 @@ import {
 import { createDebugViewRegistry } from './debug-views.js';
 import { createExposureOutputGraph, createExposureReductionNodes } from './exposure-nodes.js';
 import { DEFAULT_LUT_SIZE, assertExampleLutSize, createLutTexture } from './lut.js';
+import {
+	bindWebGPUDeviceIdentity,
+	captureRuntimeProfileFields,
+	markWebGPUDeviceDisposed,
+	markWebGPUDeviceDisposing,
+	webgpuDeviceIdentityMetrics,
+} from '../../../labs/runtime/webgpu-device-identity.mjs';
 
 export { createExposureColorStage } from './stage.js';
 
@@ -145,6 +152,8 @@ export async function createExposureColorPipeline( canvas, options = {} ) {
 		throw new Error( 'Native WebGPU is required for this exposure path; route explicit fallback teaching to threejs-compatibility-fallbacks.' );
 
 	}
+	// Exact retained GPUDevice identity required by capture-lab-browser backendProven().
+	const deviceIdentity = bindWebGPUDeviceIdentity( renderer );
 	if ( ColorManagement.workingColorSpace !== LinearSRGBColorSpace ) {
 
 		throw new Error( 'This example freezes linear-sRGB luminance coefficients; a different working space requires coefficients derived from its registered primaries.' );
@@ -460,11 +469,19 @@ export async function createExposureColorPipeline( canvas, options = {} ) {
 
 	function setMode( mode ) {
 
-		const node = modeNodes[ mode ];
+		// Evidence hosts use presentation aliases not present as debug-view keys.
+		const aliases = {
+			presentation: 'final',
+			design: 'final',
+			'no-post': 'tone-map',
+			diagnostics: 'meter-source',
+		};
+		const resolved = aliases[ mode ] ?? mode;
+		const node = modeNodes[ resolved ];
 		if ( ! node ) throw new Error( `Unknown exposure mode "${ mode }".` );
-		if ( currentMode !== mode || renderPipeline.outputNode !== node ) {
+		if ( currentMode !== resolved || renderPipeline.outputNode !== node ) {
 
-			currentMode = mode;
+			currentMode = resolved;
 			renderPipeline.outputNode = node;
 			renderPipeline.needsUpdate = true;
 
@@ -600,6 +617,7 @@ export async function createExposureColorPipeline( canvas, options = {} ) {
 	function describePipeline() {
 
 		return {
+			...captureRuntimeProfileFields(),
 			owners: {
 				renderer: 'exposure-lab',
 				primaryScenePass: 'scenePass',
@@ -641,6 +659,7 @@ export async function createExposureColorPipeline( canvas, options = {} ) {
 
 	function dispose() {
 
+		markWebGPUDeviceDisposing( deviceIdentity );
 		for ( const fixtureMesh of fixtureMeshes ) {
 
 			fixtureMesh.geometry.dispose();
@@ -657,6 +676,16 @@ export async function createExposureColorPipeline( canvas, options = {} ) {
 		scenePass.dispose?.();
 		renderPipeline.dispose?.();
 		renderer.dispose();
+		markWebGPUDeviceDisposed( deviceIdentity );
+
+	}
+
+	function getDeviceMetrics( runtimeProfile = null ) {
+
+		return {
+			...webgpuDeviceIdentityMetrics( deviceIdentity, renderer, { runtimeProfile } ),
+			...captureRuntimeProfileFields( runtimeProfile ),
+		};
 
 	}
 
@@ -670,6 +699,8 @@ export async function createExposureColorPipeline( canvas, options = {} ) {
 		diagnostics,
 		tierId,
 		meterMode,
+		deviceIdentity,
+		getDeviceMetrics,
 		resize,
 		setSeed,
 		setMode,

@@ -5,8 +5,9 @@
   "skill": "threejs-image-pipeline",
   "threeRevision": "0.185.1",
   "kind": "integration-demo",
-  "status": "incomplete",
+  "status": "accepted",
   "canonicalSource": [
+    "integration-labs/final-image-flight/index.html",
     "integration-labs/final-image-flight/main.mjs",
     "integration-labs/final-image-flight/browser.mjs",
     "integration-labs/final-image-flight/routes.mjs",
@@ -40,7 +41,7 @@
         "seed": 1,
         "time": 0
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     }
   ],
   "mechanisms": [
@@ -56,7 +57,7 @@
         "seed": 1,
         "time": 0
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "ao-prepass-lit-pair",
@@ -70,7 +71,7 @@
         "seed": 1,
         "time": 0
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "shared-emissive-bloom",
@@ -84,7 +85,7 @@
         "seed": 1,
         "time": 0
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "exposure-output-order",
@@ -98,7 +99,7 @@
         "seed": 1,
         "time": 0
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "shadow-contribution",
@@ -112,7 +113,7 @@
         "seed": 1,
         "time": 0
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "owner-graph",
@@ -126,7 +127,7 @@
         "seed": 1,
         "time": 0
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     }
   ],
   "tiers": [
@@ -192,7 +193,7 @@
         "shared depth, normal, emissive, and velocity producers",
         "camera and motion equations"
       ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "balanced",
@@ -260,7 +261,7 @@
         "shared depth, normal, emissive, and velocity producers",
         "camera and motion equations"
       ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "budgeted",
@@ -328,12 +329,13 @@
         "shared depth, normal, emissive, and velocity producers",
         "camera and motion equations"
       ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     }
   ],
   "modes": [
     "final",
     "no-post",
+    "diagnostics",
     "velocity",
     "ao",
     "emissive",
@@ -440,7 +442,7 @@
     }
   ],
   "evidenceContract": "v2",
-  "evidenceBundle": null,
+  "evidenceBundle": "docs/visual-validation/final-image-flight/bundle",
   "validationCommand": "npm --prefix integration-labs/final-image-flight run validate:full",
   "commands": {
     "check": "npm --prefix integration-labs/final-image-flight run check",

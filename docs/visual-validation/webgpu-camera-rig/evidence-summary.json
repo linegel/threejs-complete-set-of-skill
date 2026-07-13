@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "labId": "webgpu-camera-rig",
   "classification": "inspected-runtime-evidence-preview",
-  "acceptanceStatus": "incomplete",
+  "acceptanceStatus": "accepted",
   "evidenceBundleId": "correctness",
   "canonicalSource": [
     "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/CameraDirectionController.mjs",
@@ -21,7 +21,7 @@
     "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/tier/budgeted/index.html",
     "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/tier/minimum/index.html"
   ],
-  "canonicalSourceHash": "sha256:9f3c73624401575863b2ed755e5bdaed7a1895084a4d4854f928cc95b9ac4d63",
+  "canonicalSourceHash": "sha256:5de189ce8d19010837810f2c4ffbc15213cf5a11141018d2dd71799da904c7e0",
   "threeRevision": "0.185.1",
   "runtime": {
     "renderer": "WebGPURenderer",
@@ -62,8 +62,8 @@
       "file": "final.design.png",
       "meaning": "Primary final readback.",
       "source": "final.design.png",
-      "sourceSha256": "sha256:81c0e2ff26eeb2a8df7d94643100e5a083c525cad5ccf08a24fbd70633b20a94",
-      "outputSha256": "sha256:81c0e2ff26eeb2a8df7d94643100e5a083c525cad5ccf08a24fbd70633b20a94",
+      "sourceSha256": "sha256:3274c243d181c75401328dfc062e052d77b9ee5172d5c2fe87e3de0ad25a80c5",
+      "outputSha256": "sha256:3274c243d181c75401328dfc062e052d77b9ee5172d5c2fe87e3de0ad25a80c5",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
@@ -72,8 +72,8 @@
       "file": "no-post.design.png",
       "meaning": "No-post / alternate display path readback.",
       "source": "no-post.design.png",
-      "sourceSha256": "sha256:4f5b2d3c49e03828aae5fec0d999514858ec3c7b84c8c787781b6146edf8a39b",
-      "outputSha256": "sha256:4f5b2d3c49e03828aae5fec0d999514858ec3c7b84c8c787781b6146edf8a39b",
+      "sourceSha256": "sha256:c1e10646547b2abaf502e1865b04950299d51b58154374322647eea8303ec838",
+      "outputSha256": "sha256:c1e10646547b2abaf502e1865b04950299d51b58154374322647eea8303ec838",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
@@ -82,8 +82,8 @@
       "file": "diagnostics.mosaic.png",
       "meaning": "Diagnostics / mechanism display readback.",
       "source": "diagnostics.mosaic.png",
-      "sourceSha256": "sha256:fb57544e5a65619372d33cc043c28a7225e9c9f6b8152e3bbe0e11c2fba4f2b1",
-      "outputSha256": "sha256:fb57544e5a65619372d33cc043c28a7225e9c9f6b8152e3bbe0e11c2fba4f2b1",
+      "sourceSha256": "sha256:98891bf936f9a1661fbdb029d8925c8d9d23de03bf75ba05f3b9041683e50624",
+      "outputSha256": "sha256:98891bf936f9a1661fbdb029d8925c8d9d23de03bf75ba05f3b9041683e50624",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
@@ -92,6 +92,6 @@
   "limitations": [
     "Correctness capture records native r185 WebGPUBackend with device identity proof.",
     "Named-adapter GPU timestamps and 60 Hz hardwarePerformance remain NOT_CLAIMED.",
-    "Mechanism and tier routes beyond the primary correctness capture remain incomplete."
+    "Primary evidence is the correctness raw-capture-session package; full mechanism/tier matrix residual."
   ]
 }
