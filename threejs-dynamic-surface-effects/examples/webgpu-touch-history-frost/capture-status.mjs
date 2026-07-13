@@ -4,6 +4,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { buildDemoRegistry } from "../../../scripts/lib/lab-registry.mjs";
+import { validateEvidenceBundle } from "../../../scripts/lib/evidence-v2.mjs";
 
 const LAB_ID = "webgpu-touch-history-frost";
 const here = dirname(fileURLToPath(import.meta.url));
@@ -17,10 +18,11 @@ function requiredStandardOutputs(session) {
   return new Map((session.outputPlan ?? []).map((entry) => [entry.filename, entry]));
 }
 
-export function evaluateFrostCaptureStatus({ session, expectedSourceHash, artifactRoot } = {}) {
+export function evaluateFrostCaptureStatus({ session, expectedSourceHash, artifactRoot, bundleValidation } = {}) {
   const failures = [];
   const missingAcceptanceEvidence = [
-    "14-file unified v2 evidence bundle",
+    "physical-route capture and authored visual review",
+    "named-hardware performance and GPU timestamp attribution",
     "approved tracked release subset",
   ];
   if (!session) {
@@ -83,13 +85,20 @@ export function evaluateFrostCaptureStatus({ session, expectedSourceHash, artifa
     || session.hookResult?.lifecycleEvidence?.cycleSnapshots?.length !== 50) {
     failures.push("50-cycle lifecycle evidence did not pass");
   }
+  if (bundleValidation?.valid !== true || bundleValidation?.protocol !== "unified-v2") {
+    failures.push("unified v2 raw bundle did not validate");
+  } else if (bundleValidation.manifest?.sourceClosureHash !== expectedSourceHash
+    || bundleValidation.manifest?.claimVerdicts?.mechanismCorrectness !== "PASS"
+    || bundleValidation.manifest?.claimVerdicts?.lifecycleStability !== "PASS") {
+    failures.push("unified v2 raw bundle identity or claim verdicts drifted");
+  }
 
   const currentCapture = failures.length === 0;
   return Object.freeze({
     lab: LAB_ID,
     verdict: currentCapture ? "INSUFFICIENT_EVIDENCE" : "FAIL",
     reason: currentCapture
-      ? "Current-source native-WebGPU correctness, extent recipes, and 50-cycle lifecycle pass, but unified v2 and promotion evidence remain incomplete."
+      ? "Current-source native-WebGPU correctness, extent recipes, lifecycle, and unified-v2 raw evidence pass; physical review, hardware performance, and release promotion remain incomplete."
       : "The available correctness capture cannot support a current-source claim.",
     captureSession: Object.freeze({
       currentSource: currentCapture,
@@ -100,6 +109,8 @@ export function evaluateFrostCaptureStatus({ session, expectedSourceHash, artifa
       visualDifferenceVerdict: session.hookResult?.visualDifferences?.verdict ?? "INSUFFICIENT_EVIDENCE",
       coverageVerdict: session.hookResult?.coverageEvidence?.verdict ?? "INSUFFICIENT_EVIDENCE",
       lifecycleVerdict: session.hookResult?.lifecycleEvidence?.verdict ?? "INSUFFICIENT_EVIDENCE",
+      evidenceProtocol: bundleValidation?.protocol ?? "missing",
+      capturedNormativeJsonFiles: bundleValidation?.manifest?.files?.filter((entry) => entry.kind === "normative-json").length ?? 0,
     }),
     provenClaims: Object.freeze(currentCapture ? [
       "native WebGPU renderer/device identity",
@@ -110,6 +121,7 @@ export function evaluateFrostCaptureStatus({ session, expectedSourceHash, artifa
       "full-tier 641x359 bounded dispatch and aligned readback",
       "DPR 1/1.5/2 logical-to-physical extent sweep",
       "50 fresh create/render/resize/mode/tier/dispose cycles with queue and two-frame settlement",
+      "unified-v2 raw bundle with 14 normative JSON slots and immutable artifact/image ledgers",
     ] : []),
     failures: Object.freeze(failures),
     missingAcceptanceEvidence: Object.freeze(missingAcceptanceEvidence),
@@ -123,7 +135,8 @@ export function readFrostCaptureStatus({ sessionPath = defaultSessionPath } = {}
   if (!lab) throw new Error(`${LAB_ID} is absent from the demo registry`);
   const artifactRoot = dirname(sessionPath);
   const session = existsSync(sessionPath) ? JSON.parse(readFileSync(sessionPath, "utf8")) : null;
-  return evaluateFrostCaptureStatus({ session, expectedSourceHash: lab.sourceHash, artifactRoot });
+  const bundleValidation = session ? validateEvidenceBundle(artifactRoot) : null;
+  return evaluateFrostCaptureStatus({ session, expectedSourceHash: lab.sourceHash, artifactRoot, bundleValidation });
 }
 
 function main() {

@@ -55,6 +55,15 @@ const stale = evaluateFrostCaptureStatus({
   session,
   expectedSourceHash: "sha256:other",
   artifactRoot: "/path/that/must/not/be-read-for-stale-capture",
+  bundleValidation: {
+    valid: true,
+    protocol: "unified-v2",
+    manifest: {
+      sourceClosureHash: "sha256:source",
+      claimVerdicts: { mechanismCorrectness: "PASS", lifecycleStability: "PASS" },
+      files: [],
+    },
+  },
 });
 assert.equal(stale.verdict, "FAIL");
 assert(stale.failures.includes("capture source hash is stale"));
