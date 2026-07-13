@@ -7,7 +7,7 @@
     "test:capture-recipes": "node test-capture-recipes.mjs",
     "test:capture-transaction": "node test-capture-transaction.mjs",
     "test:mutations": "node test-mutations.mjs",
-    "capture": "node ../../../scripts/capture-lab-browser.mjs --lab webgpu-touch-history-frost --hook capture-hook.mjs --target final",
+    "capture": "node capture-frost-evidence.mjs",
     "validate:artifacts": "node capture-status.mjs",
     "validate:quick": "npm run check && npm run validate:unit && npm run test:mutations",
     "validate:full": "npm run validate:quick && npm run validate:artifacts",
