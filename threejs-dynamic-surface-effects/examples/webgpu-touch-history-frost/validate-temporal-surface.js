@@ -40,6 +40,7 @@ import {
   FROST_MODE_TO_DEBUG_VIEW,
   FROST_SCENARIO_ID,
   WebGPUFrostLab,
+  describeRendererAdapter,
   parseFrostLabRoute,
 } from "./frost-webgpu-lab.js";
 
@@ -401,6 +402,17 @@ for (const { id } of labManifest.tiers) {
 }
 assert.throws(() => parseFrostLabRoute("/demos/frost/mechanism/not-a-mechanism/"), /unknown frost mechanism/);
 assert.throws(() => parseFrostLabRoute("/demos/frost/tier/not-a-tier/"), /unknown frost tier/);
+
+assert.deepEqual(describeRendererAdapter({}, {}).adapterClass, "unknown");
+assert.equal(describeRendererAdapter({
+  adapter: { isFallbackAdapter: true, info: { description: "SwiftShader" } },
+}, {}).adapterClass, "software");
+const hardwareAdapter = describeRendererAdapter({}, {
+  adapterInfo: { vendor: "apple", architecture: "metal-apple-gpu", device: "gpu", description: "Apple GPU" },
+});
+assert.equal(hardwareAdapter.adapterClass, "hardware");
+assert.equal(hardwareAdapter.identity.source, "renderer.backend.device.adapterInfo");
+assert.deepEqual(Object.keys(hardwareAdapter.identity.info), ["vendor", "architecture", "device", "description"]);
 
 const controllerContract = new WebGPUFrostLab({ mechanism: "diffusion" });
 assert.equal(controllerContract.labId, FROST_LAB_ID);

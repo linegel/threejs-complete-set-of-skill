@@ -60,6 +60,27 @@ export const FROST_LAB_MODES = Object.freeze(Object.keys(FROST_MODE_TO_DEBUG_VIE
 export const FROST_LAB_ID = "webgpu-touch-history-frost";
 export const FROST_SCENARIO_ID = "touch-history-frost";
 const FROST_RUNTIME_PROFILES = Object.freeze(["correctness", "performance"]);
+
+export function describeRendererAdapter(backend, device) {
+  const adapter = backend?.adapter ?? null;
+  const sourceInfo = device?.adapterInfo ?? adapter?.info ?? null;
+  const info = {};
+  for (const key of ["vendor", "architecture", "device", "description"]) {
+    if (typeof sourceInfo?.[key] === "string" && sourceInfo[key].length > 0) info[key] = sourceInfo[key];
+  }
+  const isFallbackAdapter = adapter?.isFallbackAdapter === true;
+  const description = Object.values(info).join(" ").toLowerCase();
+  const software = isFallbackAdapter || /swiftshader|software|llvmpipe|lavapipe/.test(description);
+  const adapterClass = software ? "software" : (Object.keys(info).length > 0 ? "hardware" : "unknown");
+  return Object.freeze({
+    adapterClass,
+    identity: Object.freeze({
+      source: device?.adapterInfo ? "renderer.backend.device.adapterInfo" : (adapter?.info ? "renderer.backend.adapter.info" : "unavailable"),
+      isFallbackAdapter,
+      info: Object.freeze(info),
+    }),
+  });
+}
 const FROST_CAMERA_POSES = Object.freeze({
   near: Object.freeze({ position: Object.freeze([0, 0.6, 6.1]), target: Object.freeze([0, 0, 0]) }),
   design: Object.freeze({ position: Object.freeze([0, 1.2, 10.2]), target: Object.freeze([0, 0, 0]) }),
@@ -213,6 +234,7 @@ export class WebGPUFrostLab {
     }
     this.rendererDevice = this.renderer.backend.device ?? null;
     if (!this.rendererDevice) throw new Error("Native WebGPU backend did not expose its initialized GPUDevice");
+    this.rendererAdapterEvidence = describeRendererAdapter(this.renderer.backend, this.rendererDevice);
     this.rendererDeviceGeneration = 1;
     this.deviceLossGeneration = 0;
     this.rendererDeviceStatus = "active";
@@ -733,6 +755,8 @@ export class WebGPUFrostLab {
       backend: "WebGPU",
       backendKind: "WebGPU",
       rendererBackend: "WebGPUBackend",
+      adapterClass: this.rendererAdapterEvidence.adapterClass,
+      adapterIdentity: this.rendererAdapterEvidence.identity,
       rendererDeviceStatus: this.rendererDeviceStatus,
       rendererDeviceGeneration: this.rendererDeviceGeneration,
       deviceLossGeneration: this.deviceLossGeneration,
