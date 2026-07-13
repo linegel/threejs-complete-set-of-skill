@@ -2243,6 +2243,87 @@
       },
       "dependencyClosureHash": "sha256:badd6055043c4d1626ef1ffe3320cf7eb397f1d95fa4b565c4620ec44da0a73b"
     },
+    "visual-validation/weathered-world/diagnostics.mosaic.png": {
+      "ownerId": "weathered-world",
+      "url": "https://threejs-skills.com/visual-validation/weathered-world/diagnostics.mosaic.png",
+      "width": 1200,
+      "height": 800,
+      "bytes": 10803,
+      "sourceSha256": "sha256:5a2bb807ac14c1c8ea871508a350af038a326453fd1494710fd8a1e6fd2f5657",
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/weathered-world/diagnostics.mosaic.avif",
+          "width": 1200,
+          "height": 800,
+          "bytes": 2186,
+          "encoding": "quality-60",
+          "sha256": "sha256:3f1a022f2a3ebff91587022d8915574ed2bf346ce230416afacd8856945efd2e"
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/weathered-world/diagnostics.mosaic.webp",
+          "width": 1200,
+          "height": 800,
+          "bytes": 2830,
+          "encoding": "lossless",
+          "sha256": "sha256:b9eb0f96887cb58ac7b097674ebc0b93443e2a0ec871fe2401881735154f0726"
+        }
+      },
+      "dependencyClosureHash": "sha256:8a8447c39b8fc1897354b4523d9964abce0e39e70540c7690c2f9146f422f7e6"
+    },
+    "visual-validation/weathered-world/final.design.png": {
+      "ownerId": "weathered-world",
+      "url": "https://threejs-skills.com/visual-validation/weathered-world/final.design.png",
+      "width": 1200,
+      "height": 800,
+      "bytes": 51123,
+      "sourceSha256": "sha256:ac30cba745b73d7c1acd70585bf2daf674f457b94306b62b8a0cacee3dd0afbc",
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/weathered-world/final.design.avif",
+          "width": 1200,
+          "height": 800,
+          "bytes": 16634,
+          "encoding": "quality-60",
+          "sha256": "sha256:f36961e6f4da483ebb3bd95e6a02fca056e56df31f119b52d1a00349eee53746"
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/weathered-world/final.design.webp",
+          "width": 1200,
+          "height": 800,
+          "bytes": 33802,
+          "encoding": "lossless",
+          "sha256": "sha256:2ad1f37bd1b02474373462086fbda11941adbed6a8d65d06197213df70e15c77"
+        }
+      },
+      "dependencyClosureHash": "sha256:ac1e01ac7a87c242bd182d2299f5da969b64dd55c3d16dede1f426cef5586630"
+    },
+    "visual-validation/weathered-world/no-post.design.png": {
+      "ownerId": "weathered-world",
+      "url": "https://threejs-skills.com/visual-validation/weathered-world/no-post.design.png",
+      "width": 1200,
+      "height": 800,
+      "bytes": 50445,
+      "sourceSha256": "sha256:6f87a442c87349a1bf255a3575b0a49cfcce4832070a3c54e81b1f427e370454",
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/weathered-world/no-post.design.avif",
+          "width": 1200,
+          "height": 800,
+          "bytes": 17019,
+          "encoding": "quality-60",
+          "sha256": "sha256:2720378f94683636df70032df1871ca1e1f05ff584915bcfddd1194e4f1c6788"
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/weathered-world/no-post.design.webp",
+          "width": 1200,
+          "height": 800,
+          "bytes": 33368,
+          "encoding": "lossless",
+          "sha256": "sha256:7134360f32f37352432479684129e00292218c995e0c7a03eea78065674dbd90"
+        }
+      },
+      "dependencyClosureHash": "sha256:05eec2e26ade8b1f5f223200a1b7e80f822ef8694aa982a82b28fb817ab179a3"
+    },
     "visual-validation/webgpu-bounded-water/diagnostics.mosaic.png": {
       "ownerId": "webgpu-bounded-water",
       "url": "https://threejs-skills.com/visual-validation/webgpu-bounded-water/diagnostics.mosaic.png",
@@ -2729,210 +2810,426 @@
       },
       "dependencyClosureHash": "sha256:42c03d1479feaf957f295ae95b7cf2ad925eafd3ed330b8cf488cf6cdeb2523f"
     },
+    "visual-validation/webgpu-fft-ocean/above-and-below-surface.png": {
+      "ownerId": "webgpu-fft-ocean",
+      "url": "https://threejs-skills.com/visual-validation/webgpu-fft-ocean/above-and-below-surface.png",
+      "width": 1200,
+      "height": 800,
+      "bytes": 224717,
+      "sourceSha256": "sha256:cfc04295caf4b4cd78714202e891e926e53d195c451f7176b90b77d8bbfb4a1d",
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/webgpu-fft-ocean/above-and-below-surface.avif",
+          "width": 1200,
+          "height": 800,
+          "bytes": 20882,
+          "encoding": "quality-60",
+          "sha256": "sha256:cde1c4c61d13a544b5c6eed7dccb20ffb509022fd58bdedcbb715fabe1d0a9dc"
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/webgpu-fft-ocean/above-and-below-surface.webp",
+          "width": 1200,
+          "height": 800,
+          "bytes": 35570,
+          "encoding": "quality-80",
+          "sha256": "sha256:3b19db79f3ce3d8b9bc3c43a8d83745f39a91734b41789ccba1df5e8c2c0e6a6"
+        }
+      },
+      "dependencyClosureHash": "sha256:cddc2b2192015cbbc30a34052d39c15424a9c8d70ad572b1580e2678492dcf3b"
+    },
+    "visual-validation/webgpu-fft-ocean/camera.near.png": {
+      "ownerId": "webgpu-fft-ocean",
+      "url": "https://threejs-skills.com/visual-validation/webgpu-fft-ocean/camera.near.png",
+      "width": 1200,
+      "height": 800,
+      "bytes": 204976,
+      "sourceSha256": "sha256:5db2d34f7ae73354560b49a53c709a148418f6e7f11d959916e510a537f6ad93",
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/webgpu-fft-ocean/camera.near.avif",
+          "width": 1200,
+          "height": 800,
+          "bytes": 6547,
+          "encoding": "quality-60",
+          "sha256": "sha256:e36fea35e65930b2b0a3219628384cd7943711a1c7bbc2875f421d50f820f876"
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/webgpu-fft-ocean/camera.near.webp",
+          "width": 1200,
+          "height": 800,
+          "bytes": 7542,
+          "encoding": "quality-80",
+          "sha256": "sha256:4f2e675f1fa41d014ae0e0684a382650bea1fac5138ed217570c122accd9762a"
+        }
+      },
+      "dependencyClosureHash": "sha256:eb84a6cdcf0d80593ff45bc490441b608df5a249b5c0d097d2cfc17a793497dc"
+    },
+    "visual-validation/webgpu-fft-ocean/diagnostics.mosaic.png": {
+      "ownerId": "webgpu-fft-ocean",
+      "url": "https://threejs-skills.com/visual-validation/webgpu-fft-ocean/diagnostics.mosaic.png",
+      "width": 1200,
+      "height": 800,
+      "bytes": 473866,
+      "sourceSha256": "sha256:ee1037d9cde12f1b7c87165d7069c337de4c35eb3493e2d4aee1dc86fdda497c",
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/webgpu-fft-ocean/diagnostics.mosaic.avif",
+          "width": 1200,
+          "height": 800,
+          "bytes": 19036,
+          "encoding": "quality-60",
+          "sha256": "sha256:a8d8b254aef9c1e57ae79d31e7617cb17e83da3b16ef527cf7ef7e1cd9c61ced"
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/webgpu-fft-ocean/diagnostics.mosaic.webp",
+          "width": 1200,
+          "height": 800,
+          "bytes": 25336,
+          "encoding": "quality-80",
+          "sha256": "sha256:fd309802d5ffebc4d5e8ab092028b691dde79c0dfabd5ad4fc0ef2665cec39d7"
+        }
+      },
+      "dependencyClosureHash": "sha256:9912ece6b71ad7eb06fea32451bafda2ee9e825aeadc391db2647c3f05d70087"
+    },
+    "visual-validation/webgpu-fft-ocean/final.design.png": {
+      "ownerId": "webgpu-fft-ocean",
+      "url": "https://threejs-skills.com/visual-validation/webgpu-fft-ocean/final.design.png",
+      "width": 1200,
+      "height": 800,
+      "bytes": 553273,
+      "sourceSha256": "sha256:61b5f55069e727447b93646505bc166980167a7610b2e91f62b370e3298900d1",
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/webgpu-fft-ocean/final.design.avif",
+          "width": 1200,
+          "height": 800,
+          "bytes": 28547,
+          "encoding": "quality-60",
+          "sha256": "sha256:1aa260d031d3ad21a77be0937cca7cdad2bb4e60d8a919ff9e0e7e3e6d457d85"
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/webgpu-fft-ocean/final.design.webp",
+          "width": 1200,
+          "height": 800,
+          "bytes": 42310,
+          "encoding": "quality-80",
+          "sha256": "sha256:103cffea88753f95f8c1562a04c3a24013568c0ef0381867efeb8a0a4cc272b3"
+        }
+      },
+      "dependencyClosureHash": "sha256:611e3b1fc12882d9e024f6d83126cdc9586c393d5a8d77a63a6082bc906bd849"
+    },
+    "visual-validation/webgpu-fft-ocean/no-post.design.png": {
+      "ownerId": "webgpu-fft-ocean",
+      "url": "https://threejs-skills.com/visual-validation/webgpu-fft-ocean/no-post.design.png",
+      "width": 1200,
+      "height": 800,
+      "bytes": 44208,
+      "sourceSha256": "sha256:b15f2c167ec727a7976509ba41b835c322f9602f46537195d94837cb016d5d6a",
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/webgpu-fft-ocean/no-post.design.avif",
+          "width": 1200,
+          "height": 800,
+          "bytes": 3860,
+          "encoding": "quality-60",
+          "sha256": "sha256:31202d74e29d27203ef08b6d292ac8bd348fd46696ce31f44892b48aaa1f530c"
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/webgpu-fft-ocean/no-post.design.webp",
+          "width": 1200,
+          "height": 800,
+          "bytes": 4688,
+          "encoding": "quality-80",
+          "sha256": "sha256:562b03fd08f8d8da5d1dda97c427dbdb59401cc9a7b22b4082716b5d46c43f63"
+        }
+      },
+      "dependencyClosureHash": "sha256:307f5161b9aea9537c42123bd9e66269cf5f43f5164a19ee2724884695fe44d3"
+    },
+    "visual-validation/webgpu-fft-ocean/seed-9e3779b9.final.png": {
+      "ownerId": "webgpu-fft-ocean",
+      "url": "https://threejs-skills.com/visual-validation/webgpu-fft-ocean/seed-9e3779b9.final.png",
+      "width": 1200,
+      "height": 800,
+      "bytes": 673208,
+      "sourceSha256": "sha256:923294ea328ab65d5861de468238720f886bef420caeb58b6c8bf380c27460a9",
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/webgpu-fft-ocean/seed-9e3779b9.final.avif",
+          "width": 1200,
+          "height": 800,
+          "bytes": 25281,
+          "encoding": "quality-60",
+          "sha256": "sha256:794535da215759686629d0ed787cb82b13e37421f5699c6a2ff4faeca7b22c0a"
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/webgpu-fft-ocean/seed-9e3779b9.final.webp",
+          "width": 1200,
+          "height": 800,
+          "bytes": 39404,
+          "encoding": "quality-80",
+          "sha256": "sha256:4755ad1ed8d2eb7af23ad776cf11fc0a0a552748d8219e899492616a315b154e"
+        }
+      },
+      "dependencyClosureHash": "sha256:5c0e229b9f7be0dd6ace9d4c68d252a66d0a62b63eb5e1823f79b036cdaa665e"
+    },
+    "visual-validation/webgpu-fft-ocean/spectrum-and-fft.png": {
+      "ownerId": "webgpu-fft-ocean",
+      "url": "https://threejs-skills.com/visual-validation/webgpu-fft-ocean/spectrum-and-fft.png",
+      "width": 1200,
+      "height": 800,
+      "bytes": 218065,
+      "sourceSha256": "sha256:e07c08dab1f7e6591c3ca41d2ba5b6c14bd46561cddc969e5a66dc219f4009ca",
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/webgpu-fft-ocean/spectrum-and-fft.avif",
+          "width": 1200,
+          "height": 800,
+          "bytes": 16231,
+          "encoding": "quality-60",
+          "sha256": "sha256:66d186545dfc7e6ac0501ac477aa04fd587f6bd4d60b9ab3b512d8d339d6a533"
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/webgpu-fft-ocean/spectrum-and-fft.webp",
+          "width": 1200,
+          "height": 800,
+          "bytes": 17724,
+          "encoding": "quality-80",
+          "sha256": "sha256:b0e8368f1b172f4cb6fe7d62f917da08e1d0cd5b63d2144edf4580dcbccc37be"
+        }
+      },
+      "dependencyClosureHash": "sha256:974f63b1b7d29ba732616b4bc03202a54dbd767c1feedb11db973e2473d47129"
+    },
+    "visual-validation/webgpu-fft-ocean/whitecaps-and-foam.png": {
+      "ownerId": "webgpu-fft-ocean",
+      "url": "https://threejs-skills.com/visual-validation/webgpu-fft-ocean/whitecaps-and-foam.png",
+      "width": 1200,
+      "height": 800,
+      "bytes": 136284,
+      "sourceSha256": "sha256:d14466e48ec6b109efa700ee43e1f5795c2ef0b90f39e0f199164dd1dcf1836d",
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/webgpu-fft-ocean/whitecaps-and-foam.avif",
+          "width": 1200,
+          "height": 800,
+          "bytes": 7434,
+          "encoding": "quality-60",
+          "sha256": "sha256:87fd7140c1d54002360fa668c9790b60b3f0587d269c2f1b9c6021e833b9bff6"
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/webgpu-fft-ocean/whitecaps-and-foam.webp",
+          "width": 1200,
+          "height": 800,
+          "bytes": 9156,
+          "encoding": "quality-80",
+          "sha256": "sha256:8c4a564f310d767765b0a4960145ee5cb9f8acf02de55b1b3f1784aee2799a87"
+        }
+      },
+      "dependencyClosureHash": "sha256:9bfe52dcf9fa82e90279f79964007f7a8af6c0fb61457d6bba5930a5e5371c8f"
+    },
     "visual-validation/webgpu-field-bake/camera.design.png": {
       "ownerId": "webgpu-field-bake",
       "url": "https://threejs-skills.com/visual-validation/webgpu-field-bake/camera.design.png",
       "width": 1200,
       "height": 800,
-      "bytes": 1987682,
-      "sourceSha256": "sha256:8c0f7c40a965110f2d35b92e309af8a0d8cf58835682f7d0711cc11d90e4d5dd",
+      "bytes": 1986961,
+      "sourceSha256": "sha256:926505d9adda6663257f4c9de598d986fad3ef1df132c1d5ae72637328495310",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-field-bake/camera.design.avif",
           "width": 1200,
           "height": 800,
-          "bytes": 43110,
+          "bytes": 43005,
           "encoding": "quality-60",
-          "sha256": "sha256:1c12620b158b89fe552dab19adc6e3c5218f303ab93b85d3c09c6b6b3ad541cf"
+          "sha256": "sha256:5e6766e6a0c19c9beac64d8d0c83b404f185c64061c18afd24df0206426158f5"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-field-bake/camera.design.webp",
           "width": 1200,
           "height": 800,
-          "bytes": 66120,
+          "bytes": 66416,
           "encoding": "quality-80",
-          "sha256": "sha256:4edfc461a03bb5f94bc10fb689a0c7027bcef9826a589d65bd23ace084113b28"
+          "sha256": "sha256:0fbd080b030dced451e19e954e7b735d8d5480e068d21906bcc450f642ce3f81"
         }
       },
-      "dependencyClosureHash": "sha256:19ad856ed670d6b85540aa409adb9b1c97d2915366126e29c4765e8c722a2551"
+      "dependencyClosureHash": "sha256:c864f83b33a895da57174d8af1b9e9fc588608a16ae0486fddf42641188853b9"
     },
     "visual-validation/webgpu-field-bake/camera.far.png": {
       "ownerId": "webgpu-field-bake",
       "url": "https://threejs-skills.com/visual-validation/webgpu-field-bake/camera.far.png",
       "width": 1200,
       "height": 800,
-      "bytes": 2340068,
-      "sourceSha256": "sha256:d19793df8b28ae575e2a1db738330a482c28a9ab5217b71e15dba56be47e2d3b",
+      "bytes": 2339992,
+      "sourceSha256": "sha256:fa29668b48372f68b9d15573d6c6809acf6109f94a4307e8d6a3037128fb76f6",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-field-bake/camera.far.avif",
           "width": 1200,
           "height": 800,
-          "bytes": 76145,
+          "bytes": 76187,
           "encoding": "quality-60",
-          "sha256": "sha256:2aac785adeda4624ece1ab0452e806b1dd72b4f084f111d0bb7012f075bcf5ec"
+          "sha256": "sha256:79277ecd18805207d69cfb0c23c0eeb00ad0fb08bbc963c0341f656b6e999c1f"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-field-bake/camera.far.webp",
           "width": 1200,
           "height": 800,
-          "bytes": 115752,
+          "bytes": 115872,
           "encoding": "quality-80",
-          "sha256": "sha256:bcf31a72f5380d51d63632848e96b92ec5231c694911269ef6f5b0b9006ff5bb"
+          "sha256": "sha256:58c63ca2f15cac60479e3deafae678cc7cad2dde25ab9dafa5120152b4bcf523"
         }
       },
-      "dependencyClosureHash": "sha256:19fd0e00a915d861a78a85dc928b4b693efdc1ba0abc594ef3e0a9dcc3e96ac2"
+      "dependencyClosureHash": "sha256:88c00225cde2da26d1cc2a017a2595c66fd37ca5998c61230e81db08212ff418"
     },
     "visual-validation/webgpu-field-bake/camera.near.png": {
       "ownerId": "webgpu-field-bake",
       "url": "https://threejs-skills.com/visual-validation/webgpu-field-bake/camera.near.png",
       "width": 1200,
       "height": 800,
-      "bytes": 1338399,
-      "sourceSha256": "sha256:5930638e4e0ee585adb7e59f9654c03dacac57be709657e15e564c0d1a795bc7",
+      "bytes": 1337816,
+      "sourceSha256": "sha256:1aeeebd26df1b7c03737efcc2357152d731a8444f1004470d1b2152efa2a138b",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-field-bake/camera.near.avif",
           "width": 1200,
           "height": 800,
-          "bytes": 24334,
+          "bytes": 24259,
           "encoding": "quality-60",
-          "sha256": "sha256:f95b1b1bfe65f9dba87aa0fe0a17e9f491d0c051f9744c909e5df0165c567a90"
+          "sha256": "sha256:e4e4ad919c11ef41c886a2331dd1b56e25417c41629845fa37196da2bf5b5af7"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-field-bake/camera.near.webp",
           "width": 1200,
           "height": 800,
-          "bytes": 36502,
+          "bytes": 36142,
           "encoding": "quality-80",
-          "sha256": "sha256:214e85a7077dd19ceabda9572678c3d07fd0140fdd8193cdcf6edf1a3c42b0b6"
+          "sha256": "sha256:e88f5de3e72f82275e223c5df5395ee1a933f3c874394dab38ef01210a37dcdc"
         }
       },
-      "dependencyClosureHash": "sha256:5af4e7ecf2849188a9e6631e97151378ae25bc28b9d45e3842a942983df22cd0"
+      "dependencyClosureHash": "sha256:2c53c5ea1e5d33fb49904839e186f0d55802172dd48d70f12e1170e0aa9ee03e"
     },
     "visual-validation/webgpu-field-bake/diagnostics.mosaic.png": {
       "ownerId": "webgpu-field-bake",
       "url": "https://threejs-skills.com/visual-validation/webgpu-field-bake/diagnostics.mosaic.png",
       "width": 1200,
       "height": 800,
-      "bytes": 2642760,
-      "sourceSha256": "sha256:4ef9b2517b725e31cc82383d60d7bb847ab823e5b029efbf9436b745a8d93fe0",
+      "bytes": 2642707,
+      "sourceSha256": "sha256:e9ec1098f387eaa32e1aaa0804145eb41006fb7d2ae3150a8c8c58da994bfb65",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-field-bake/diagnostics.mosaic.avif",
           "width": 1200,
           "height": 800,
-          "bytes": 99783,
+          "bytes": 99764,
           "encoding": "quality-60",
-          "sha256": "sha256:0cc3e59ede3effb1926731dfaac753b5f1e26faff911835298d865415ecd92ad"
+          "sha256": "sha256:30873687ce521a9c8eea55286f1d37777ea509b45c55086eeb951fa90f2a9348"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-field-bake/diagnostics.mosaic.webp",
           "width": 1200,
           "height": 800,
-          "bytes": 107010,
+          "bytes": 107202,
           "encoding": "quality-80",
-          "sha256": "sha256:278b4f3a9aba41b08f94298d4e18daf12451f440a0c1e061f0333b63d61c4778"
+          "sha256": "sha256:14bae14575306d9e7ff3cbc6c0974ee612794625311edcadb1e5678825d522e3"
         }
       },
-      "dependencyClosureHash": "sha256:a1e50adc0e47737a4a2034621700976103d173f9af7dd4cc3178dba9cc6af1b3"
+      "dependencyClosureHash": "sha256:26810b9b10873e31a51f7e188af45c6f1178ea0cb6ad0a7b584bb6304613c72b"
     },
     "visual-validation/webgpu-field-bake/final.design.png": {
       "ownerId": "webgpu-field-bake",
       "url": "https://threejs-skills.com/visual-validation/webgpu-field-bake/final.design.png",
       "width": 1200,
       "height": 800,
-      "bytes": 1987682,
-      "sourceSha256": "sha256:8c0f7c40a965110f2d35b92e309af8a0d8cf58835682f7d0711cc11d90e4d5dd",
+      "bytes": 1986961,
+      "sourceSha256": "sha256:926505d9adda6663257f4c9de598d986fad3ef1df132c1d5ae72637328495310",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-field-bake/final.design.avif",
           "width": 1200,
           "height": 800,
-          "bytes": 43110,
+          "bytes": 43005,
           "encoding": "quality-60",
-          "sha256": "sha256:1c12620b158b89fe552dab19adc6e3c5218f303ab93b85d3c09c6b6b3ad541cf"
+          "sha256": "sha256:5e6766e6a0c19c9beac64d8d0c83b404f185c64061c18afd24df0206426158f5"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-field-bake/final.design.webp",
           "width": 1200,
           "height": 800,
-          "bytes": 66120,
+          "bytes": 66416,
           "encoding": "quality-80",
-          "sha256": "sha256:4edfc461a03bb5f94bc10fb689a0c7027bcef9826a589d65bd23ace084113b28"
+          "sha256": "sha256:0fbd080b030dced451e19e954e7b735d8d5480e068d21906bcc450f642ce3f81"
         }
       },
-      "dependencyClosureHash": "sha256:bd42d945b537440887d5d6572a28ec70d5ff0f095409d65b3370f7cc49f698d9"
+      "dependencyClosureHash": "sha256:ffb9fd6f0023f0ad0524168bf19f5fd57b7c564da911a8c4575cf14e05e6684c"
     },
     "visual-validation/webgpu-field-bake/seed-0001.final.png": {
       "ownerId": "webgpu-field-bake",
       "url": "https://threejs-skills.com/visual-validation/webgpu-field-bake/seed-0001.final.png",
       "width": 1200,
       "height": 800,
-      "bytes": 412824,
-      "sourceSha256": "sha256:c7ba44a291b800df3926f4ee75917087d84811321e1480638b34d43debe978e7",
+      "bytes": 411356,
+      "sourceSha256": "sha256:6b157360c28b79e6cadb0e70f8dc2f6e2e2294ef193e7bce9796c711045236b1",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-field-bake/seed-0001.final.avif",
           "width": 1200,
           "height": 800,
-          "bytes": 38685,
+          "bytes": 38624,
           "encoding": "quality-60",
-          "sha256": "sha256:44f56039986d6fcf0d029d4287eaa8acae2bf317f02b7feff6203c18d845099f"
+          "sha256": "sha256:c9ca7762e91e56fcb7c9748309f6fe574b18c6d4805bba63d007d79351d372f2"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-field-bake/seed-0001.final.webp",
           "width": 1200,
           "height": 800,
-          "bytes": 55734,
+          "bytes": 55746,
           "encoding": "quality-80",
-          "sha256": "sha256:b6a30a7ad13ad1c6b7d0cb859baeb750372021f370268b4e37869670b03777aa"
+          "sha256": "sha256:920e6575b0eec2b84bf050c927c5fea784c06c922beea6f18f15fd3aae70545f"
         }
       },
-      "dependencyClosureHash": "sha256:910a3557ed53f4e5ecee089532efd812f5bd59b59c33d155381e749ac964b9af"
+      "dependencyClosureHash": "sha256:ad2e13afd8f5d5c423f949900e46c613c984781da611e13a17018f0e6535c70a"
     },
     "visual-validation/webgpu-field-bake/seed-9e3779b9.final.png": {
       "ownerId": "webgpu-field-bake",
       "url": "https://threejs-skills.com/visual-validation/webgpu-field-bake/seed-9e3779b9.final.png",
       "width": 1200,
       "height": 800,
-      "bytes": 408977,
-      "sourceSha256": "sha256:ac2b8a9f6c7842e66e6a8a604373679fdbd22b3901ea3903fa2f7ac907b933aa",
+      "bytes": 407383,
+      "sourceSha256": "sha256:a31934bd8a6d1a1dd8bf0c931f9f429fbfbc5890fb3996463b25c30d50941377",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-field-bake/seed-9e3779b9.final.avif",
           "width": 1200,
           "height": 800,
-          "bytes": 38437,
+          "bytes": 38588,
           "encoding": "quality-60",
-          "sha256": "sha256:4694945ca00b4991962c4606ee16000858fc2a45409fd69b6022f01b1bf57ba7"
+          "sha256": "sha256:6db117f9c68450380cebd67387e7a07a75f2e0357a48f9465cfa93eb573606d4"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-field-bake/seed-9e3779b9.final.webp",
           "width": 1200,
           "height": 800,
-          "bytes": 55882,
+          "bytes": 55974,
           "encoding": "quality-80",
-          "sha256": "sha256:4ce4c21c60a309a8100ec4542607cd0b2366cb2b8f4a657c56cedc8338086d0d"
+          "sha256": "sha256:85d9df15c136af97f62eb9226e764c318f68dd4c663364533df453664b9428ae"
         }
       },
-      "dependencyClosureHash": "sha256:c97cf3ce7eb304baed34d98133e74ffa419c91dda25511dc8a85e7cd0792d43e"
+      "dependencyClosureHash": "sha256:748da41b2d9f29feef39cb332b3241d555f6ee1d3939681f51d2feca143eb3dc"
     },
     "visual-validation/webgpu-field-bake/temporal.t000.png": {
       "ownerId": "webgpu-field-bake",
       "url": "https://threejs-skills.com/visual-validation/webgpu-field-bake/temporal.t000.png",
       "width": 1200,
       "height": 800,
-      "bytes": 923070,
-      "sourceSha256": "sha256:31436785af6a4bb2d8458abb3c1caff4ed3bde0d945f8a5c147de43f2d6fc809",
+      "bytes": 923217,
+      "sourceSha256": "sha256:3831cc55968120fde00b868ab586f71116a230f163ac6446102083a135a220e4",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-field-bake/temporal.t000.avif",
           "width": 1200,
           "height": 800,
-          "bytes": 12424,
+          "bytes": 12395,
           "encoding": "quality-60",
-          "sha256": "sha256:fa82863335b17ced2158e3914c989c0107e4b94d15cf17cd607f5f5adedb5ce1"
+          "sha256": "sha256:240428d4af93b53bf9e3c8e277b083ad9bd851b5081d53549bc50a138a1e3881"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-field-bake/temporal.t000.webp",
@@ -2940,37 +3237,37 @@
           "height": 800,
           "bytes": 11504,
           "encoding": "quality-80",
-          "sha256": "sha256:37eb8e73c22b4638b9818a8f16c361a0bcd246322b48dce2858c06da61415fd5"
+          "sha256": "sha256:d5016fd79a35f9b67e42518e9fdc957f2fd5a2c8fb78611f7c11dfc4535ec2a0"
         }
       },
-      "dependencyClosureHash": "sha256:3c988676fe5c766d7985e86b2b361f558124d1a2e300c0d46c7d0fcc28ac68e8"
+      "dependencyClosureHash": "sha256:965b1b35d000ea84e848c23d6324e9b03e113100662c9ddb095dcc8ecbdf11fe"
     },
     "visual-validation/webgpu-field-bake/temporal.t001.png": {
       "ownerId": "webgpu-field-bake",
       "url": "https://threejs-skills.com/visual-validation/webgpu-field-bake/temporal.t001.png",
       "width": 1200,
       "height": 800,
-      "bytes": 937509,
-      "sourceSha256": "sha256:422df154e3768de12886b6af85755cb81725dab3e8246f13b22b5ed2d21eeea3",
+      "bytes": 936732,
+      "sourceSha256": "sha256:f997e9824ed3eae7bf2e6d42f9de20b55565b24d1b115c1bdf984fc61311da58",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-field-bake/temporal.t001.avif",
           "width": 1200,
           "height": 800,
-          "bytes": 12249,
+          "bytes": 12246,
           "encoding": "quality-60",
-          "sha256": "sha256:1599c3840625e19b8b1fbc66fe7324cf8afab49cd35f330172b75891feadaa6e"
+          "sha256": "sha256:97a7a565da846982fb2197d1e68730aaf0231445bfa1bb79b11b8f21eb0d77c2"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-field-bake/temporal.t001.webp",
           "width": 1200,
           "height": 800,
-          "bytes": 11348,
+          "bytes": 11360,
           "encoding": "quality-80",
-          "sha256": "sha256:f858d48fd93c5087bc92677288d6f7a06dec05a0dda84d3a52da297281df1e27"
+          "sha256": "sha256:b2d17cf6b594505cbcd666e930f7c06b9df7ca85b3c8ddb744f2cf7786e281bf"
         }
       },
-      "dependencyClosureHash": "sha256:edba31ac0d08cb40516ffe3d77ffb6bcbceaa0aa15f77dab1c2fdac00a989425"
+      "dependencyClosureHash": "sha256:061d447b7e6380518f8354d17c4408a6cbbb68c66cd2f3e87ebb838efa5f854e"
     },
     "visual-validation/webgpu-image-pipeline/bloom.png": {
       "ownerId": "webgpu-image-pipeline",
@@ -3539,6 +3836,60 @@
       },
       "dependencyClosureHash": "sha256:48ac54d982e05158d46e4dec4e08e303d0bd863b785a083e31e59eaa5ee98827"
     },
+    "visual-validation/webgpu-node-gtao/camera.design.png": {
+      "ownerId": "webgpu-node-gtao",
+      "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/camera.design.png",
+      "width": 1200,
+      "height": 800,
+      "bytes": 68272,
+      "sourceSha256": "sha256:b53aaa2631510dec00bedd7d45583168c9967341803e303b8343a75dca754952",
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/camera.design.avif",
+          "width": 1200,
+          "height": 800,
+          "bytes": 2866,
+          "encoding": "quality-60",
+          "sha256": "sha256:5582cfd69836020cbed17a6c47a38c6145e8c88b7aab34d5fdc4b5fd47437fc3"
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/camera.design.webp",
+          "width": 1200,
+          "height": 800,
+          "bytes": 6552,
+          "encoding": "quality-80",
+          "sha256": "sha256:c4491574c0eb9358d778facd602e295d22a7cd405a1dd35a6fd6a86e3e8bd2f5"
+        }
+      },
+      "dependencyClosureHash": "sha256:0a18028d4caa4e18a68590c028b490687dce7189c3153ba8638b8335c47eba4d"
+    },
+    "visual-validation/webgpu-node-gtao/diagnostics.mosaic.png": {
+      "ownerId": "webgpu-node-gtao",
+      "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/diagnostics.mosaic.png",
+      "width": 1200,
+      "height": 800,
+      "bytes": 93689,
+      "sourceSha256": "sha256:cbf1db13a0c86abdbdbf422db8064d6ed5896ca383a4e0852afb2c8a5db5e91b",
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/diagnostics.mosaic.avif",
+          "width": 1200,
+          "height": 800,
+          "bytes": 3298,
+          "encoding": "quality-60",
+          "sha256": "sha256:0a9a1566b8e46f32139a73ff9c7d21cb518e3787ccfc5c1a0468b1a0a81c39ef"
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/diagnostics.mosaic.webp",
+          "width": 1200,
+          "height": 800,
+          "bytes": 4164,
+          "encoding": "quality-80",
+          "sha256": "sha256:c2c2e6e55d552b8cf4fada226e506fd8fa01a421424b6fc12d3fe161050dc60c"
+        }
+      },
+      "dependencyClosureHash": "sha256:1a9661f4c93686369701b35170e78727bf6587c7e0ba1f06ffdccd09df935005"
+    },
     "visual-validation/webgpu-node-gtao/final.design.png": {
       "ownerId": "webgpu-node-gtao",
       "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/final.design.png",
@@ -3566,140 +3917,59 @@
       },
       "dependencyClosureHash": "sha256:b5f517924d461f36fbba513b533f19af0dab6f947805ea91f368f10be31468c6"
     },
-    "visual-validation/webgpu-node-gtao/no-post.design.png": {
+    "visual-validation/webgpu-node-gtao/seed-0001.final.png": {
       "ownerId": "webgpu-node-gtao",
-      "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/no-post.design.png",
+      "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/seed-0001.final.png",
       "width": 1200,
       "height": 800,
-      "bytes": 8672,
-      "sourceSha256": "sha256:6c6b7455fc56d07988a0d3fa0e336d667eb30c22fd000422ca7eb93417b8f2ce",
+      "bytes": 47343,
+      "sourceSha256": "sha256:2a16e0bd787a2a6ee3c20bf746f228fce34caa8d93346359b302ac1f7b957831",
       "formats": {
         "avif": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/no-post.design.avif",
+          "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/seed-0001.final.avif",
           "width": 1200,
           "height": 800,
-          "bytes": 4172,
+          "bytes": 3854,
           "encoding": "quality-60",
-          "sha256": "sha256:e6f951d068151b524ab50e99bc072cd35d7f43e797d88f794b49f289478e3f37"
+          "sha256": "sha256:c28e8e6a19e67ae1288f6c74606c0e367750d60e20ebb3b0d860dea3f2ccc456"
         },
         "webp": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/no-post.design.webp",
+          "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/seed-0001.final.webp",
           "width": 1200,
           "height": 800,
-          "bytes": 2280,
-          "encoding": "lossless",
-          "sha256": "sha256:29483f03d6061b9328f911222ec304129e62eb5ee767f02b5d2c154057642703"
-        }
-      },
-      "dependencyClosureHash": "sha256:47a259d57113f4460946c0c8ff4279b68a294aaae54d5e1e37c21385d6a21a8d"
-    },
-    "visual-validation/webgpu-node-gtao/normal.png": {
-      "ownerId": "webgpu-node-gtao",
-      "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/normal.png",
-      "width": 1200,
-      "height": 800,
-      "bytes": 8240,
-      "sourceSha256": "sha256:66899dc0fa554f9368d17da3cf0e36013d8a3f555c0582faec0af5f62a42829f",
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/normal.avif",
-          "width": 1200,
-          "height": 800,
-          "bytes": 5658,
-          "encoding": "quality-60",
-          "sha256": "sha256:55bf6321dc5b640e3920fff3bc7661d21480db2f179641e13a812b18f97f8274"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/normal.webp",
-          "width": 1200,
-          "height": 800,
-          "bytes": 1804,
-          "encoding": "lossless",
-          "sha256": "sha256:4418f0f82cc21fb1656306cb1eeb298a03852fe95bed2182f61305fcddd54f7f"
-        }
-      },
-      "dependencyClosureHash": "sha256:77f9835db03fba18e89f9a2f503a500c82fe2d031e6b00a3ceb95fba1c858a79"
-    },
-    "visual-validation/webgpu-node-gtao/raw-gtao.png": {
-      "ownerId": "webgpu-node-gtao",
-      "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/raw-gtao.png",
-      "width": 1200,
-      "height": 800,
-      "bytes": 103748,
-      "sourceSha256": "sha256:41e4c6d98e680b424f64d74ac6423909a029a76d5af5b40e9abdd337cb5791af",
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/raw-gtao.avif",
-          "width": 1200,
-          "height": 800,
-          "bytes": 5286,
-          "encoding": "quality-60",
-          "sha256": "sha256:3f9a9162f2a989d116e640797e39ba211b963a0fbf4d6ec8d481942edd975668"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/raw-gtao.webp",
-          "width": 1200,
-          "height": 800,
-          "bytes": 5286,
+          "bytes": 5684,
           "encoding": "quality-80",
-          "sha256": "sha256:d1d484091639f331ec68967c1a76c7b0cf4769f569aaeb8b3e710a315925f325"
+          "sha256": "sha256:0494b19277c939a50d997adf00f7c018437527e54d60390ce46e6e657b33d458"
         }
       },
-      "dependencyClosureHash": "sha256:99b911832633911e30172e7cb3827ecf58f5f5966febb1c5cf8374a88d087ac7"
+      "dependencyClosureHash": "sha256:3b614b77f874bbebc8d0e524decf0151f93409fa044593149f54fe8be8c2ffc9"
     },
-    "visual-validation/webgpu-node-gtao/reconstructed-gtao.png": {
+    "visual-validation/webgpu-node-gtao/temporal.t001.png": {
       "ownerId": "webgpu-node-gtao",
-      "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/reconstructed-gtao.png",
+      "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/temporal.t001.png",
       "width": 1200,
       "height": 800,
-      "bytes": 80604,
-      "sourceSha256": "sha256:c05c9ed305854642257ea056bf9923f3e6f7dda8b17585c70354d99b0a7947ac",
+      "bytes": 51490,
+      "sourceSha256": "sha256:feccbe4e8c1fe85663e4f0488e25dfa00583c49fa3194548d668c86340ecc5b6",
       "formats": {
         "avif": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/reconstructed-gtao.avif",
+          "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/temporal.t001.avif",
           "width": 1200,
           "height": 800,
-          "bytes": 2134,
+          "bytes": 2618,
           "encoding": "quality-60",
-          "sha256": "sha256:144370fe39ccf8c414d86d2a2cb1590037f36b1512b15f358fd87271e52bd88c"
+          "sha256": "sha256:49a4bbac52565c5e7c23dfc1dcbef7d4794a037570ce2dcadaa9ea9b1556ee49"
         },
         "webp": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/reconstructed-gtao.webp",
+          "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/temporal.t001.webp",
           "width": 1200,
           "height": 800,
-          "bytes": 3314,
+          "bytes": 6036,
           "encoding": "quality-80",
-          "sha256": "sha256:87b8c71aedc17a90b99954574ba8722b65cca8d73a6cd623d1e67486c89c9e2e"
+          "sha256": "sha256:bc9aea4fde45a53a0d59a68b9c24773f169cbeff95b51371b084de75fc245b33"
         }
       },
-      "dependencyClosureHash": "sha256:b32a48452e44390b703f1752d5adff7ffceda4a1c330627e9b1aaf268c9568b0"
-    },
-    "visual-validation/webgpu-node-gtao/velocity.png": {
-      "ownerId": "webgpu-node-gtao",
-      "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/velocity.png",
-      "width": 1200,
-      "height": 800,
-      "bytes": 5021,
-      "sourceSha256": "sha256:64a37973240a6b255a61d5abca96d2ba0f417ce8ab4fe73d6829930da72959a2",
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/velocity.avif",
-          "width": 1200,
-          "height": 800,
-          "bytes": 773,
-          "encoding": "quality-60",
-          "sha256": "sha256:17322869424a0d5ae3f769199cf89cfcc412d3e94d057f0135a5f90feab95ef5"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/velocity.webp",
-          "width": 1200,
-          "height": 800,
-          "bytes": 84,
-          "encoding": "lossless",
-          "sha256": "sha256:4c7e34f285a58561308031b9c2fcb534585a2dea9b5c14c31527fa01a96db0a6"
-        }
-      },
-      "dependencyClosureHash": "sha256:0d5734d0c6d3dea540e17550a8310655036ae3f24716ee8a02727c385ca6296c"
+      "dependencyClosureHash": "sha256:2594704eda65a3b89b277249d5be6d866515e646b3e7098d9a10eb4dc11de3eb"
     },
     "visual-validation/webgpu-pooled-effects/diagnostics.mosaic.png": {
       "ownerId": "webgpu-pooled-effects",
@@ -4165,216 +4435,270 @@
       "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/camera.design.png",
       "width": 1200,
       "height": 800,
-      "bytes": 5023,
-      "sourceSha256": "sha256:7b3b3f5cf46c5e6ab5b7c84979a0526562d9c1b6fea4b9f6aa3c0dfd7229e426",
+      "bytes": 466690,
+      "sourceSha256": "sha256:bc54d722365be433fe42139ed88cd8cf22746eb21092a39695affd7ccde693a1",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/camera.design.avif",
           "width": 1200,
           "height": 800,
-          "bytes": 757,
+          "bytes": 40681,
           "encoding": "quality-60",
-          "sha256": "sha256:e24ba54f3702017bcc6b194afea48d1143c3fb99388791b57c0fa95dc36a5dea"
+          "sha256": "sha256:2b835fb83df55fd4f4d56019b23942417b342129e5614a81b25b2f7781d9ae3e"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/camera.design.webp",
           "width": 1200,
           "height": 800,
-          "bytes": 84,
-          "encoding": "lossless",
-          "sha256": "sha256:8d9b372cbbd5248e35059ebfd3930bdea6d50ebc92ed5e288221e9b2b6655397"
+          "bytes": 50766,
+          "encoding": "quality-80",
+          "sha256": "sha256:9b2392c4f4ad6c7359842aa05798dc15555355e65f7b89eec5a2affc4e55df10"
         }
       },
-      "dependencyClosureHash": "sha256:7f193dad88e3a60bc05721f9ff1d0a6cb7a9e4f62abfe6d25eee682ae5054179"
+      "dependencyClosureHash": "sha256:08361e7364085898e7f610f433e06c7c4d9a60a1bee0780bad18ee48d7fc1a53"
+    },
+    "visual-validation/webgpu-quadtree-planet/camera.far.png": {
+      "ownerId": "webgpu-quadtree-planet",
+      "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/camera.far.png",
+      "width": 1200,
+      "height": 800,
+      "bytes": 163437,
+      "sourceSha256": "sha256:19720c92501b2e23a3ff3697030e443484ac36eb186e1bf48b99393b79f1bf2e",
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/camera.far.avif",
+          "width": 1200,
+          "height": 800,
+          "bytes": 16157,
+          "encoding": "quality-60",
+          "sha256": "sha256:dd581d05cc820dd530326af725f8eb2ba5a14a02b303f4292c2ae01b1d32a5a5"
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/camera.far.webp",
+          "width": 1200,
+          "height": 800,
+          "bytes": 17982,
+          "encoding": "quality-80",
+          "sha256": "sha256:ce4c178a12e814642164df0042fee82783046756ece4bf8200c69d62afde97ad"
+        }
+      },
+      "dependencyClosureHash": "sha256:1398a0dd541fade38e2d5ef8094ea8fd1f2a168d955ef8bc26f9e4a578b35439"
     },
     "visual-validation/webgpu-quadtree-planet/camera.near.png": {
       "ownerId": "webgpu-quadtree-planet",
       "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/camera.near.png",
       "width": 1200,
       "height": 800,
-      "bytes": 5023,
-      "sourceSha256": "sha256:7b3b3f5cf46c5e6ab5b7c84979a0526562d9c1b6fea4b9f6aa3c0dfd7229e426",
+      "bytes": 108465,
+      "sourceSha256": "sha256:248c4ee59bde5094695eaf2a2b1d7d942a4bc63f46fc650f68551b263fcfeab3",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/camera.near.avif",
           "width": 1200,
           "height": 800,
-          "bytes": 757,
+          "bytes": 2107,
           "encoding": "quality-60",
-          "sha256": "sha256:e24ba54f3702017bcc6b194afea48d1143c3fb99388791b57c0fa95dc36a5dea"
+          "sha256": "sha256:3cb92a08da41e35aa52f8ab3ac50b61302d0e6054a356ed2c873aa52e145afbf"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/camera.near.webp",
           "width": 1200,
           "height": 800,
-          "bytes": 84,
-          "encoding": "lossless",
-          "sha256": "sha256:8d9b372cbbd5248e35059ebfd3930bdea6d50ebc92ed5e288221e9b2b6655397"
+          "bytes": 2912,
+          "encoding": "quality-80",
+          "sha256": "sha256:14326145c9edbe95d2b5e1f78dffe967702bb2224644a5334d3d2f51836d5724"
         }
       },
-      "dependencyClosureHash": "sha256:5f04fde7cff030560448ee5252433829b8aa281407fb420887d88dff6af32088"
+      "dependencyClosureHash": "sha256:50daf0bd458578d3419dbc770b1319c9a151713140060240296873c22f67279f"
     },
     "visual-validation/webgpu-quadtree-planet/diagnostics.mosaic.png": {
       "ownerId": "webgpu-quadtree-planet",
       "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/diagnostics.mosaic.png",
       "width": 1200,
       "height": 800,
-      "bytes": 5023,
-      "sourceSha256": "sha256:7b3b3f5cf46c5e6ab5b7c84979a0526562d9c1b6fea4b9f6aa3c0dfd7229e426",
+      "bytes": 1089055,
+      "sourceSha256": "sha256:5188373bdc831523e124fe011eb9f105b3e5fd57c408ac992d9aee91728a569b",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/diagnostics.mosaic.avif",
           "width": 1200,
           "height": 800,
-          "bytes": 757,
+          "bytes": 47335,
           "encoding": "quality-60",
-          "sha256": "sha256:e24ba54f3702017bcc6b194afea48d1143c3fb99388791b57c0fa95dc36a5dea"
+          "sha256": "sha256:100ad437b1f4aae993124813a0db989f3978fe3c425abef4d17086818f9593f7"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/diagnostics.mosaic.webp",
           "width": 1200,
           "height": 800,
-          "bytes": 84,
-          "encoding": "lossless",
-          "sha256": "sha256:8d9b372cbbd5248e35059ebfd3930bdea6d50ebc92ed5e288221e9b2b6655397"
+          "bytes": 62492,
+          "encoding": "quality-80",
+          "sha256": "sha256:d327f1dc4286b7e486d90f8717e2a79602f9cf3124d8d74c406fba1c61cb7c88"
         }
       },
-      "dependencyClosureHash": "sha256:74b96cb352e87848cf21c719252629a255b08ca5add34a5e094565d56e49d5a3"
-    },
-    "visual-validation/webgpu-quadtree-planet/field-atlas.design.png": {
-      "ownerId": "webgpu-quadtree-planet",
-      "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/field-atlas.design.png",
-      "width": 1200,
-      "height": 800,
-      "bytes": 5023,
-      "sourceSha256": "sha256:7b3b3f5cf46c5e6ab5b7c84979a0526562d9c1b6fea4b9f6aa3c0dfd7229e426",
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/field-atlas.design.avif",
-          "width": 1200,
-          "height": 800,
-          "bytes": 757,
-          "encoding": "quality-60",
-          "sha256": "sha256:e24ba54f3702017bcc6b194afea48d1143c3fb99388791b57c0fa95dc36a5dea"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/field-atlas.design.webp",
-          "width": 1200,
-          "height": 800,
-          "bytes": 84,
-          "encoding": "lossless",
-          "sha256": "sha256:8d9b372cbbd5248e35059ebfd3930bdea6d50ebc92ed5e288221e9b2b6655397"
-        }
-      },
-      "dependencyClosureHash": "sha256:748495629cf36e33b861fffb690f57d19501ed262208555a92ce413a15f1aaac"
+      "dependencyClosureHash": "sha256:fb19ceda2752d42f17e5b993eba9391f8c51720d83dd48017118b00484187394"
     },
     "visual-validation/webgpu-quadtree-planet/final.design.png": {
       "ownerId": "webgpu-quadtree-planet",
       "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/final.design.png",
       "width": 1200,
       "height": 800,
-      "bytes": 3801,
-      "sourceSha256": "sha256:27e681bc957745f0cd7a7d464fa2de4360c90d8540cf4899ff5dbd4bc64b1103",
+      "bytes": 466690,
+      "sourceSha256": "sha256:bc54d722365be433fe42139ed88cd8cf22746eb21092a39695affd7ccde693a1",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/final.design.avif",
           "width": 1200,
           "height": 800,
-          "bytes": 717,
+          "bytes": 40681,
           "encoding": "quality-60",
-          "sha256": "sha256:3143975cbe44159154e7f80a9be85a6d0e8b4feb6fd0e350a948b983d7a593bd"
+          "sha256": "sha256:2b835fb83df55fd4f4d56019b23942417b342129e5614a81b25b2f7781d9ae3e"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/final.design.webp",
           "width": 1200,
           "height": 800,
-          "bytes": 80,
-          "encoding": "lossless",
-          "sha256": "sha256:b588a70a52c1c6cca2b52b4c5a94b62087ca2080ce427e0ce7f404f7f26049c7"
+          "bytes": 50766,
+          "encoding": "quality-80",
+          "sha256": "sha256:9b2392c4f4ad6c7359842aa05798dc15555355e65f7b89eec5a2affc4e55df10"
         }
       },
-      "dependencyClosureHash": "sha256:f9f18b8e8dfb25739f25d96d641b7fc13f19fb2096dedbf476bbb2bf709998b7"
+      "dependencyClosureHash": "sha256:d6a064f6cfc8c8e91a4f227caad3789b0a7d79f7b12ff2b775e3f184fb07a3fd"
     },
-    "visual-validation/webgpu-quadtree-planet/gas-giant.design.png": {
+    "visual-validation/webgpu-quadtree-planet/no-post.design.png": {
       "ownerId": "webgpu-quadtree-planet",
-      "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/gas-giant.design.png",
+      "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/no-post.design.png",
       "width": 1200,
       "height": 800,
-      "bytes": 5023,
-      "sourceSha256": "sha256:7b3b3f5cf46c5e6ab5b7c84979a0526562d9c1b6fea4b9f6aa3c0dfd7229e426",
+      "bytes": 223473,
+      "sourceSha256": "sha256:2e14d28de879ceec195bdcd62cb7d1e80cbf61e4582f7bd220361d4b2fa53860",
       "formats": {
         "avif": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/gas-giant.design.avif",
+          "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/no-post.design.avif",
           "width": 1200,
           "height": 800,
-          "bytes": 757,
+          "bytes": 22792,
           "encoding": "quality-60",
-          "sha256": "sha256:e24ba54f3702017bcc6b194afea48d1143c3fb99388791b57c0fa95dc36a5dea"
+          "sha256": "sha256:d0d012d66b12810848a0017f00b6b00e52e06e34235e5a6533745530229e87e4"
         },
         "webp": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/gas-giant.design.webp",
+          "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/no-post.design.webp",
           "width": 1200,
           "height": 800,
-          "bytes": 84,
-          "encoding": "lossless",
-          "sha256": "sha256:8d9b372cbbd5248e35059ebfd3930bdea6d50ebc92ed5e288221e9b2b6655397"
+          "bytes": 21720,
+          "encoding": "quality-80",
+          "sha256": "sha256:5cf023e8e3ec1902dd42bdd0de4b0a44904f7e8726ac428b02e0499e7fabed11"
         }
       },
-      "dependencyClosureHash": "sha256:f72eaf098e2cab3fbfa24c067cf73c3c03b0fcf525e64e3271d03de34e4a6929"
+      "dependencyClosureHash": "sha256:230dfa81830c554e1c6967c82c7b6faa9e91767ec3c9eb014f481fcf496bdb76"
     },
-    "visual-validation/webgpu-quadtree-planet/ice-giant.design.png": {
+    "visual-validation/webgpu-quadtree-planet/seed-0001.final.png": {
       "ownerId": "webgpu-quadtree-planet",
-      "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/ice-giant.design.png",
+      "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/seed-0001.final.png",
       "width": 1200,
       "height": 800,
-      "bytes": 5023,
-      "sourceSha256": "sha256:7b3b3f5cf46c5e6ab5b7c84979a0526562d9c1b6fea4b9f6aa3c0dfd7229e426",
+      "bytes": 466690,
+      "sourceSha256": "sha256:bc54d722365be433fe42139ed88cd8cf22746eb21092a39695affd7ccde693a1",
       "formats": {
         "avif": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/ice-giant.design.avif",
+          "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/seed-0001.final.avif",
           "width": 1200,
           "height": 800,
-          "bytes": 757,
+          "bytes": 40681,
           "encoding": "quality-60",
-          "sha256": "sha256:e24ba54f3702017bcc6b194afea48d1143c3fb99388791b57c0fa95dc36a5dea"
+          "sha256": "sha256:2b835fb83df55fd4f4d56019b23942417b342129e5614a81b25b2f7781d9ae3e"
         },
         "webp": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/ice-giant.design.webp",
+          "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/seed-0001.final.webp",
           "width": 1200,
           "height": 800,
-          "bytes": 84,
-          "encoding": "lossless",
-          "sha256": "sha256:8d9b372cbbd5248e35059ebfd3930bdea6d50ebc92ed5e288221e9b2b6655397"
+          "bytes": 50766,
+          "encoding": "quality-80",
+          "sha256": "sha256:9b2392c4f4ad6c7359842aa05798dc15555355e65f7b89eec5a2affc4e55df10"
         }
       },
-      "dependencyClosureHash": "sha256:ad87d6d134f585d8785532ec02195a9dd07f63b96740b7b5ffe892dbb0de9d39"
+      "dependencyClosureHash": "sha256:ce2dc8fc52d04782a48706d01803ae429031febb0eae7ea03dd83c911d2e5fb3"
     },
-    "visual-validation/webgpu-quadtree-planet/transition-mask.design.png": {
+    "visual-validation/webgpu-quadtree-planet/seed-9e3779b9.final.png": {
       "ownerId": "webgpu-quadtree-planet",
-      "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/transition-mask.design.png",
+      "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/seed-9e3779b9.final.png",
       "width": 1200,
       "height": 800,
-      "bytes": 5023,
-      "sourceSha256": "sha256:7b3b3f5cf46c5e6ab5b7c84979a0526562d9c1b6fea4b9f6aa3c0dfd7229e426",
+      "bytes": 490672,
+      "sourceSha256": "sha256:bfc0b85c1498a7e7a05ebe71504e7875250d9f86f1837189aee0d59e9379663e",
       "formats": {
         "avif": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/transition-mask.design.avif",
+          "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/seed-9e3779b9.final.avif",
           "width": 1200,
           "height": 800,
-          "bytes": 757,
+          "bytes": 41217,
           "encoding": "quality-60",
-          "sha256": "sha256:e24ba54f3702017bcc6b194afea48d1143c3fb99388791b57c0fa95dc36a5dea"
+          "sha256": "sha256:77330de76198fcfd9743f32aa5040810a20323027e2ec4e4858d4a4f25305106"
         },
         "webp": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/transition-mask.design.webp",
+          "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/seed-9e3779b9.final.webp",
           "width": 1200,
           "height": 800,
-          "bytes": 84,
-          "encoding": "lossless",
-          "sha256": "sha256:8d9b372cbbd5248e35059ebfd3930bdea6d50ebc92ed5e288221e9b2b6655397"
+          "bytes": 49598,
+          "encoding": "quality-80",
+          "sha256": "sha256:103468c2ff9b14a9910a8e4769a4db65706ec0656cf0c647f887337c6e7a6c9c"
         }
       },
-      "dependencyClosureHash": "sha256:2dc50e9701794dcad7c0bd924deb77612e06e7ea04bdba6fcc3cae8c41778178"
+      "dependencyClosureHash": "sha256:6b0287423e64ca54aa305855ad20ed987b21fbe3c05b7a60216ee04bcbdabe4d"
+    },
+    "visual-validation/webgpu-quadtree-planet/temporal.t000.png": {
+      "ownerId": "webgpu-quadtree-planet",
+      "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/temporal.t000.png",
+      "width": 1200,
+      "height": 800,
+      "bytes": 466690,
+      "sourceSha256": "sha256:bc54d722365be433fe42139ed88cd8cf22746eb21092a39695affd7ccde693a1",
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/temporal.t000.avif",
+          "width": 1200,
+          "height": 800,
+          "bytes": 40681,
+          "encoding": "quality-60",
+          "sha256": "sha256:2b835fb83df55fd4f4d56019b23942417b342129e5614a81b25b2f7781d9ae3e"
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/temporal.t000.webp",
+          "width": 1200,
+          "height": 800,
+          "bytes": 50766,
+          "encoding": "quality-80",
+          "sha256": "sha256:9b2392c4f4ad6c7359842aa05798dc15555355e65f7b89eec5a2affc4e55df10"
+        }
+      },
+      "dependencyClosureHash": "sha256:1a14db361f7ccfd167c5b69a157a8ec022aa52cd15671ff9c22fab4c5e336d3b"
+    },
+    "visual-validation/webgpu-quadtree-planet/temporal.t001.png": {
+      "ownerId": "webgpu-quadtree-planet",
+      "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/temporal.t001.png",
+      "width": 1200,
+      "height": 800,
+      "bytes": 482204,
+      "sourceSha256": "sha256:2ff42a4d6046c9e9971fc616a89880d1383301b8405d65e72322707a346565ff",
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/temporal.t001.avif",
+          "width": 1200,
+          "height": 800,
+          "bytes": 37549,
+          "encoding": "quality-60",
+          "sha256": "sha256:269dc96485f61decaafd8b59093b79e21f81ae25584211499e80e01ec27454f8"
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/temporal.t001.webp",
+          "width": 1200,
+          "height": 800,
+          "bytes": 45420,
+          "encoding": "quality-80",
+          "sha256": "sha256:138f815734a7b89ee08278b4fe5685cfb0befebec67f359cb7dd2d3bd65ed438"
+        }
+      },
+      "dependencyClosureHash": "sha256:1a16248e483a0516b12ca934b4af591d148085a4bd9ab7166f9e159ce2eb6eb9"
     },
     "visual-validation/webgpu-touch-history-frost/camera.design.png": {
       "ownerId": "webgpu-touch-history-frost",

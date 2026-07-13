@@ -13,7 +13,14 @@
 <meta property="og:title" content="Evidence: Weathered World | WebGPU Lab" />
 <meta property="og:description" content="Evidence report for Weathered World: incomplete integration-demo, source hash, Three.js revision, claim verdicts, required proofs, routes, media hashes, and…" />
 <meta property="og:url" content="https://threejs-skills.com/evidence/weathered-world/" />
-<meta name="twitter:card" content="summary" />
+<meta property="og:image" content="https://threejs-skills.com/visual-validation/weathered-world/final.design.png" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="800" />
+<meta property="og:image:alt" content="Weathered World: Primary final composition readback." />
+<meta name="twitter:image" content="https://threejs-skills.com/visual-validation/weathered-world/final.design.png" />
+<meta name="twitter:image:alt" content="Weathered World: Primary final composition readback." />
+<meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Evidence: Weathered World | WebGPU Lab" />
 <meta name="twitter:description" content="Evidence report for Weathered World: incomplete integration-demo, source hash, Three.js revision, claim verdicts, required proofs, routes, media hashes, and…" />
 <style>
@@ -26,7 +33,7 @@
 @media(max-width:480px){.wrap{width:min(100% - 24px,1160px)}.facts{grid-template-columns:1fr}h1{font-size:40px}.claim{align-items:flex-start;flex-direction:column}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 </style>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":["TechArticle","Dataset"],"@id":"https://threejs-skills.com/evidence/weathered-world/#report","name":"Evidence report: Weathered World","description":"Evidence report for Weathered World: incomplete integration-demo, source hash, Three.js revision, claim verdicts, required proofs, routes, media hashes, and…","url":"https://threejs-skills.com/evidence/weathered-world/","inLanguage":"en","isPartOf":{"@id":"https://threejs-skills.com/#software"},"about":["threejs-image-pipeline","weathered-world","Three.js","WebGPU","TSL"]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":["TechArticle","Dataset"],"@id":"https://threejs-skills.com/evidence/weathered-world/#report","name":"Evidence report: Weathered World","description":"Evidence report for Weathered World: incomplete integration-demo, source hash, Three.js revision, claim verdicts, required proofs, routes, media hashes, and…","url":"https://threejs-skills.com/evidence/weathered-world/","inLanguage":"en","isPartOf":{"@id":"https://threejs-skills.com/#software"},"about":["threejs-image-pipeline","weathered-world","Three.js","WebGPU","TSL"],"image":"https://threejs-skills.com/visual-validation/weathered-world/final.design.png"}</script>
 </head>
 <body>
 <header class="site-nav"><div class="wrap"><a href="/">Three.js WebGPU Skill Pack</a><nav aria-label="Primary"><a href="/#skills">Skills</a><a href="/#labs">Labs</a><a href="/evidence/">Evidence</a><a href="/about/">Method</a></nav></div></header>
@@ -35,29 +42,41 @@
   <p><span class="status status--incomplete">incomplete</span></p>
   <h1>Weathered World</h1>
   <p class="lede">This report separates published implementation state from accepted evidence. Every value below comes from the schema-v2 registry, the emitted source manifest, or promoted same-lab artifacts.</p>
-  <div class="actions"><a href="/demos/weathered-world/">Open demo</a><a href="/skills/threejs-image-pipeline.html">Owning skill</a><a href="/demos/weathered-world/source-manifest.json">Published source manifest</a><a href="/demos/registry.json">Registry JSON</a><a href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/integration-labs/weathered-world">Canonical source</a></div>
+  <div class="actions"><a href="/demos/weathered-world/">Open demo</a><a href="/skills/threejs-image-pipeline.html">Owning skill</a><a href="/demos/weathered-world/source-manifest.json">Published source manifest</a><a href="/demos/registry.json">Registry JSON</a><a href="/visual-validation/weathered-world/evidence-summary.json">Promoted evidence summary</a><a href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/integration-labs/weathered-world">Canonical source</a></div>
   <dl class="facts">
     <div><dt>Lab id</dt><dd><code>weathered-world</code></dd></div>
     <div><dt>Kind</dt><dd>Integration Demo</dd></div>
     <div><dt>Owning skill</dt><dd>Image Pipeline</dd></div>
     <div><dt>Execution</dt><dd>rendering</dd></div>
     <div><dt>Three.js</dt><dd>0.185.1</dd></div>
-    <div><dt>Source hash</dt><dd><code>sha256:821894aaaceba1c88b77c0c44096b8615f517db97369be97d10aaabcc2640756</code></dd></div>
-    <div><dt>Published bundle hash</dt><dd><code>sha256:3ec0cf828a1edbf3ec492125e902fb2a362b7f07c653fe98fdc002278053ff4a</code></dd></div>
-    <div><dt>Build revision</dt><dd><code>sha256:83b208ec61a7d8ea1260929095a2bb81138a2c704d4c38524f02888b93407987</code></dd></div>
-    <div><dt>Renderer</dt><dd>Not promoted</dd></div>
-    <div><dt>Backend</dt><dd>Not promoted</dd></div>
+    <div><dt>Source hash</dt><dd><code>sha256:053df36ddef26e9a39d01851fd48f865c0df905393f7fb1a56d3e402736a8a23</code></dd></div>
+    <div><dt>Published bundle hash</dt><dd><code>sha256:c9712648f09264d67a6fc729b7eb8283d09fa295f7d4f4a023fb17a40afc40f3</code></dd></div>
+    <div><dt>Build revision</dt><dd><code>sha256:1e6b394e627f62530067de74268edff55eabade9d23fac107528808e31614555</code></dd></div>
+    <div><dt>Renderer</dt><dd>WebGPURenderer</dd></div>
+    <div><dt>Backend</dt><dd>WebGPU</dd></div>
     <div><dt>Evidence contract</dt><dd>v2</dd></div>
     <div><dt>Tracked release bundle</dt><dd>Absent</dd></div>
   </dl>
 
-  <section class="section" aria-labelledby="claims-title"><h2 id="claims-title">Claim verdicts</h2><div class="claim-grid"><div class="claim"><code>canonicalAcceptance</code><span class="verdict--insufficient-evidence">INSUFFICIENT_EVIDENCE</span></div><div class="claim"><code>hardwarePerformance</code><span class="verdict--not-claimed">NOT_CLAIMED</span></div></div></section>
+  <section class="section" aria-labelledby="claims-title"><h2 id="claims-title">Claim verdicts</h2><div class="claim-grid"><div class="claim"><code>visualCorrectness</code><span class="verdict--pass">PASS</span></div><div class="claim"><code>mechanismCorrectness</code><span class="verdict--insufficient-evidence">INSUFFICIENT_EVIDENCE</span></div><div class="claim"><code>performanceCompliance</code><span class="verdict--not-claimed">NOT_CLAIMED</span></div><div class="claim"><code>gpuAttribution</code><span class="verdict--insufficient-evidence">INSUFFICIENT_EVIDENCE</span></div><div class="claim"><code>lifecycleStability</code><span class="verdict--insufficient-evidence">INSUFFICIENT_EVIDENCE</span></div></div></section>
 
-  <section class="section" aria-labelledby="media-title"><h2 id="media-title">Promoted same-lab media</h2><p class="empty">No same-lab evidence image is promoted for this report. The page intentionally shows status and proof requirements instead of substitute art.</p></section>
+  <section class="section" aria-labelledby="media-title"><h2 id="media-title">Promoted same-lab media</h2><div class="gallery"><figure><picture class="responsive-preview">
+          <source type="image/avif" srcset="/visual-validation/weathered-world/final.design.avif" />
+          <source type="image/webp" srcset="/visual-validation/weathered-world/final.design.webp" />
+          <img data-responsive-preview src="/visual-validation/weathered-world/final.design.png" alt="Weathered World: Primary final composition readback." width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><figcaption><strong>Primary final composition readback.</strong><span>inspected-runtime-evidence-preview · sha256:ac30cba745b73d7c1acd70585bf2daf674f457b94306b62b8a0cacee3dd0afbc</span></figcaption></figure><figure><picture class="responsive-preview">
+          <source type="image/avif" srcset="/visual-validation/weathered-world/no-post.design.avif" />
+          <source type="image/webp" srcset="/visual-validation/weathered-world/no-post.design.webp" />
+          <img data-responsive-preview src="/visual-validation/weathered-world/no-post.design.png" alt="Weathered World: No-post / scene-HDR baseline readback." width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><figcaption><strong>No-post / scene-HDR baseline readback.</strong><span>inspected-runtime-evidence-preview · sha256:6f87a442c87349a1bf255a3575b0a49cfcce4832070a3c54e81b1f427e370454</span></figcaption></figure><figure><picture class="responsive-preview">
+          <source type="image/avif" srcset="/visual-validation/weathered-world/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="/visual-validation/weathered-world/diagnostics.mosaic.webp" />
+          <img data-responsive-preview src="/visual-validation/weathered-world/diagnostics.mosaic.png" alt="Weathered World: Owner-graph diagnostics display readback." width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><figcaption><strong>Owner-graph diagnostics display readback.</strong><span>inspected-runtime-evidence-preview · sha256:5a2bb807ac14c1c8ea871508a350af038a326453fd1494710fd8a1e6fd2f5657</span></figcaption></figure></div></section>
 
   <section class="section" aria-labelledby="requirements-title"><h2 id="requirements-title">Required capability and runtime proof</h2><h3>Capabilities</h3><div class="requirement-grid"><article class="requirement"><header><code>native-webgpu</code><span class="status status--incomplete">incomplete</span></header><p>renderer backend must prove isWebGPUBackend === true</p></article><article class="requirement"><header><code>gpu-timestamps</code><span class="status status--incomplete">incomplete</span></header><p>required before any 60 Hz performance claim</p></article></div><h3 style="margin-top:28px">Runtime proof</h3><div class="requirement-grid"><article class="requirement"><header><code>single-owner-graph</code><span class="status status--incomplete">incomplete</span></header><p>runtime graph and mutation suite implemented; browser evidence pending</p></article><article class="requirement"><header><code>world-signal-readback</code><span class="status status--incomplete">incomplete</span></header><p>aligned render-target readback hook implemented; accepted bundle absent</p></article><article class="requirement"><header><code>atmosphere-cloud-mechanism</code><span class="status status--incomplete">incomplete</span></header><p>corrected source stages require native-WebGPU readback and oracle comparison</p></article><article class="requirement"><header><code>current-adapter-timing</code><span class="status status--incomplete">incomplete</span></header><p>INSUFFICIENT_EVIDENCE</p></article><article class="requirement"><header><code>lifecycle-loop</code><span class="status status--incomplete">incomplete</span></header><p>50-100 cycle evidence not captured</p></article></div></section>
 
-  <section class="section" aria-labelledby="capture-title"><h2 id="capture-title">Capture state</h2><div class="table-wrap"><table><thead><tr><th>Field</th><th>Published value</th></tr></thead><tbody><tr><td>Primary route</td><td><code>/demos/weathered-world/</code></td></tr><tr><td>Cameras</td><td><code>orbit, horizon, surface</code></td></tr><tr><td>Seeds</td><td><code>0x00000001, 0x9e3779b9</code></td></tr><tr><td>Modes</td><td><code>final, no-post, weather-envelope, atmosphere, cloud-optical-depth, ocean, bounded-water, precipitation, wetness, snow, vegetation-wind, shadow-contribution, owner-graph</code></td></tr><tr><td>Capture time</td><td><code>Not present in the promoted report data</code></td></tr><tr><td>Adapter identity</td><td><code>Not promoted</code></td></tr><tr><td>Raw readback hashes</td><td><code>Not promoted</code></td></tr></tbody></table></div></section>
+  <section class="section" aria-labelledby="capture-title"><h2 id="capture-title">Capture state</h2><div class="table-wrap"><table><thead><tr><th>Field</th><th>Published value</th></tr></thead><tbody><tr><td>Primary route</td><td><code>/demos/weathered-world/</code></td></tr><tr><td>Cameras</td><td><code>orbit, horizon, surface</code></td></tr><tr><td>Seeds</td><td><code>0x00000001, 0x9e3779b9</code></td></tr><tr><td>Modes</td><td><code>final, no-post, weather-envelope, atmosphere, cloud-optical-depth, ocean, bounded-water, precipitation, wetness, snow, vegetation-wind, shadow-contribution, owner-graph</code></td></tr><tr><td>Capture time</td><td><code>Not present in the promoted report data</code></td></tr><tr><td>Adapter identity</td><td><code>Not promoted</code></td></tr><tr><td>Raw readback hashes</td><td><code>Not present in the promoted preview summary</code></td></tr></tbody></table></div></section>
 
   <section class="section" aria-labelledby="routes-title"><h2 id="routes-title">Fixed routes</h2><div class="table-wrap"><table><thead><tr><th>Kind</th><th>Id</th><th>Startup state</th><th>Status</th></tr></thead><tbody><tr><td>scenario</td><td><a href="/demos/weathered-world/scenario/world/"><code>world</code></a></td><td><code>{&quot;tier&quot;:&quot;balanced&quot;,&quot;mode&quot;:&quot;final&quot;,&quot;camera&quot;:&quot;horizon&quot;,&quot;seed&quot;:1,&quot;time&quot;:0}</code></td><td>incomplete</td></tr><tr><td>mechanism</td><td><a href="/demos/weathered-world/mechanism/shared-world-units/"><code>shared-world-units</code></a></td><td><code>{&quot;mode&quot;:&quot;owner-graph&quot;}</code></td><td>incomplete</td></tr><tr><td>mechanism</td><td><a href="/demos/weathered-world/mechanism/shared-weather-envelope/"><code>shared-weather-envelope</code></a></td><td><code>{&quot;mode&quot;:&quot;weather-envelope&quot;}</code></td><td>incomplete</td></tr><tr><td>mechanism</td><td><a href="/demos/weathered-world/mechanism/atmosphere-cloud-hdr/"><code>atmosphere-cloud-hdr</code></a></td><td><code>{&quot;mode&quot;:&quot;atmosphere&quot;}</code></td><td>incomplete</td></tr><tr><td>mechanism</td><td><a href="/demos/weathered-world/mechanism/ocean-bounded-water-ownership/"><code>ocean-bounded-water-ownership</code></a></td><td><code>{&quot;mode&quot;:&quot;ocean&quot;}</code></td><td>incomplete</td></tr><tr><td>mechanism</td><td><a href="/demos/weathered-world/mechanism/cloud-opaque-shadow-separation/"><code>cloud-opaque-shadow-separation</code></a></td><td><code>{&quot;mode&quot;:&quot;shadow-contribution&quot;}</code></td><td>incomplete</td></tr><tr><td>mechanism</td><td><a href="/demos/weathered-world/mechanism/owner-graph/"><code>owner-graph</code></a></td><td><code>{&quot;mode&quot;:&quot;owner-graph&quot;}</code></td><td>incomplete</td></tr><tr><td>tier</td><td><a href="/demos/weathered-world/tier/hero/"><code>hero</code></a></td><td><code>{&quot;tier&quot;:&quot;hero&quot;}</code></td><td>incomplete</td></tr><tr><td>tier</td><td><a href="/demos/weathered-world/tier/balanced/"><code>balanced</code></a></td><td><code>{&quot;tier&quot;:&quot;balanced&quot;}</code></td><td>incomplete</td></tr><tr><td>tier</td><td><a href="/demos/weathered-world/tier/budgeted/"><code>budgeted</code></a></td><td><code>{&quot;tier&quot;:&quot;budgeted&quot;}</code></td><td>incomplete</td></tr></tbody></table></div></section>
 
@@ -172,8 +191,8 @@
   ]
 }</pre></details></section>
 
-  <section class="section" aria-labelledby="limitations-title"><h2 id="limitations-title">Limitations</h2><ul class="limitations"><li>No tracked accepted v2 runtime bundle is published for this source hash.</li><li>2 required capability records remain incomplete.</li><li>5 required runtime-proof records remain incomplete.</li><li>No current-hardware performance claim is published without named-adapter timestamp evidence.</li></ul></section>
-  <footer class="site-footer"><span>weathered-world · sha256:821894aaaceb</span><span><a href="/evidence/">All evidence reports</a></span></footer>
+  <section class="section" aria-labelledby="limitations-title"><h2 id="limitations-title">Limitations</h2><ul class="limitations"><li>Correctness capture records native r185 WebGPUBackend with device identity proof.</li><li>GPU timestamps, 50-cycle lifecycle, and full mechanism/tier matrix remain incomplete.</li><li>Named-adapter 60 Hz performance compliance is NOT_CLAIMED.</li></ul></section>
+  <footer class="site-footer"><span>weathered-world · sha256:053df36ddef2</span><span><a href="/evidence/">All evidence reports</a></span></footer>
 </div></main>
 </body>
 </html>

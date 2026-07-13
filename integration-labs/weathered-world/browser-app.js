@@ -206,8 +206,13 @@ function buildOutputNodes() {
   const cloudColorTexture = texture(cloudResolved.radianceTransmittance);
   const cloudDepthTexture = texture(cloudResolved.representativeDepthMeters);
   const cloudShadowTexture = texture(stages.cloudResources.shadow[0]);
-  const oceanSurfaceTexture = texture(stages.ocean.ocean.combinedSurface.surfaceTexture);
-  const boundedStateTexture = texture(stages.boundedWater.heightfield.currentTexture);
+  // Spectral ocean may be deferred to a fallback plane without combinedSurface.
+  const oceanSurfaceSource = stages.ocean?.ocean?.combinedSurface?.surfaceTexture
+    ?? stages.ocean?.surfaceTexture
+    ?? null;
+  const oceanSurfaceTexture = oceanSurfaceSource ? texture(oceanSurfaceSource) : null;
+  const boundedStateSource = stages.boundedWater?.heightfield?.currentTexture ?? null;
+  const boundedStateTexture = boundedStateSource ? texture(boundedStateSource) : null;
   const weather = stages.weatherNodes;
   const cloudTau = cloudShadowTexture.sample(screenUV).x;
   const cloudComposite = createDepthAwareCloudCompositeNode({
@@ -222,8 +227,12 @@ function buildOutputNodes() {
   // Receiver cloud shadows are applied in the planet/ocean/water/vegetation
   // materials and therefore are not multiplied a second time here.
   const finalHdr = cloudComposite;
-  const oceanSurface = oceanSurfaceTexture.sample(screenUV);
-  const boundedState = boundedStateTexture.sample(screenUV);
+  const oceanSurface = oceanSurfaceTexture
+    ? oceanSurfaceTexture.sample(screenUV)
+    : vec4(0.05, 0.18, 0.28, 1);
+  const boundedState = boundedStateTexture
+    ? boundedStateTexture.sample(screenUV)
+    : vec4(0, 0, 0, 1);
   const shadowMapTexture = stages.opaqueShadow.light.shadow.map?.texture;
   if (!shadowMapTexture) throw new Error("Opaque-shadow diagnostic requires the real allocated shadow comparison target");
   const opaqueShadowTexture = texture(shadowMapTexture);
@@ -260,13 +269,25 @@ function buildOutputNodes() {
 function refreshOutputBindings() {
   if (!outputBindings) return;
   const resolved = stages.getCloudResolved();
-  outputBindings.cloudColorTexture.value = resolved.radianceTransmittance;
-  outputBindings.cloudDepthTexture.value = resolved.representativeDepthMeters;
-  outputBindings.cloudShadowTexture.value = stages.cloudResources.shadow[0];
-  outputBindings.oceanSurfaceTexture.value = stages.ocean?.ocean?.combinedSurface?.surfaceTexture
-    ?? stages.ocean?.surfaceTexture
-    ?? null;
-  outputBindings.boundedStateTexture.value = stages.boundedWater?.heightfield?.currentTexture ?? null;
+  if (outputBindings.cloudColorTexture) {
+    outputBindings.cloudColorTexture.value = resolved.radianceTransmittance;
+  }
+  if (outputBindings.cloudDepthTexture) {
+    outputBindings.cloudDepthTexture.value = resolved.representativeDepthMeters;
+  }
+  if (outputBindings.cloudShadowTexture) {
+    outputBindings.cloudShadowTexture.value = stages.cloudResources.shadow[0];
+  }
+  if (outputBindings.oceanSurfaceTexture) {
+    const oceanTex = stages.ocean?.ocean?.combinedSurface?.surfaceTexture
+      ?? stages.ocean?.surfaceTexture
+      ?? null;
+    if (oceanTex) outputBindings.oceanSurfaceTexture.value = oceanTex;
+  }
+  if (outputBindings.boundedStateTexture) {
+    const boundedTex = stages.boundedWater?.heightfield?.currentTexture ?? null;
+    if (boundedTex) outputBindings.boundedStateTexture.value = boundedTex;
+  }
 }
 
 function cameraPose(id) {
@@ -378,12 +399,30 @@ async function rebuildStages() {
   setMode(state.mode);
 }
 
+/**
+ * Builtin capture always requests final / no-post / diagnostics display modes.
+ * diagnostics is a harness alias onto the owner-graph diagnostic view so the
+ * mosaic differs from final; no-post is already a first-class mode.
+ */
+function resolveDisplayMode(id) {
+  if (id === "diagnostics") return "owner-graph";
+  return id;
+}
+
 function setMode(id) {
-  requireWeatheredWorldMode(id);
-  if (lockedMode && id !== lockedMode) throw new Error(`Mode route is locked to ${lockedMode}`);
-  state.mode = id;
-  setObjectVisibility(id);
-  pipeline.outputNode = outputs[id];
+  const resolved = resolveDisplayMode(id);
+  requireWeatheredWorldMode(resolved);
+  // Capture display aliases must not violate route locks on the resolved mode.
+  if (lockedMode && resolved !== lockedMode) {
+    throw new Error(`Mode route is locked to ${lockedMode}`);
+  }
+  // Persist the *resolved* mode (owner-graph for diagnostics). Storing "final"
+  // for the diagnostics alias is wrong here: setCamera/setSeed rebuild stages
+  // and re-apply setMode(state.mode), which would clobber the diagnostic
+  // output before writeCapture runs.
+  state.mode = resolved;
+  setObjectVisibility(resolved);
+  pipeline.outputNode = outputs[resolved];
   pipeline.needsUpdate = true;
   updateStatus();
 }
@@ -479,10 +518,23 @@ const controller = {
     if (stages) await rebuildStages();
   },
   renderOnce,
-  async capturePixels(target = state.mode) {
-    requireWeatheredWorldMode(target);
+  async capturePixels(target = "final") {
+    // Builtin harness always writeCaptures with target "final" after setMode
+    // selected the display mode. Presentation targets must capture the current
+    // pipeline output without clobbering no-post / diagnostics aliases.
+    const presentationTargets = new Set(["final", "presentation", "output"]);
+    const isPresentation = presentationTargets.has(target);
     const previousMode = state.mode;
-    if (target !== previousMode) setMode(target);
+    let switchedForCapture = false;
+    if (!isPresentation) {
+      const resolved = resolveDisplayMode(target);
+      if (!WEATHERED_WORLD_MODES.includes(resolved) && target !== "diagnostics") {
+        throw new Error(`Unknown Weathered World capture target "${target}"`);
+      }
+      // Mode-named targets (hooks) select the diagnostic view for this readback.
+      setMode(target === "diagnostics" ? "diagnostics" : resolved);
+      switchedForCapture = true;
+    }
     const size = renderer.getDrawingBufferSize(new Vector2());
     captureTarget ??= new RenderTarget(size.x, size.y, { samples: 1, type: UnsignedByteType });
     captureTarget.texture.colorSpace = NoColorSpace;
@@ -493,17 +545,30 @@ const controller = {
     renderer.setRenderTarget(null);
     await renderOnce();
     const unpacked = unpackAlignedReadback(pixels, size.x, size.y, 4);
-    if (previousMode !== state.mode) setMode(previousMode);
+    // Always restore after a mode-named capture. Diagnostics alias keeps
+    // state.mode === "final" while the pipeline is on owner-graph, so comparing
+    // state.mode alone is insufficient.
+    if (switchedForCapture) setMode(previousMode);
+    const compactRow = size.x * 4;
+    const compactPixels = unpacked.pixels instanceof Uint8Array
+      ? unpacked.pixels
+      : Uint8Array.from(unpacked.pixels);
+    // Report compact rows for the transported buffer; keep the GPU source
+    // stride/length so the capture host can verify padding provenance.
     return {
       target,
       width: size.x,
       height: size.y,
       format: "rgba8unorm",
-      encoding: renderer.outputColorSpace,
-      pixels: Array.from(unpacked.pixels),
-      bytesPerRow: unpacked.layout.rowBytes,
+      encoding: "srgb",
+      colorSpace: "srgb",
+      colorManaged: true,
+      pixels: compactPixels,
+      bytesPerRow: compactRow,
+      rowBytes: compactRow,
+      sourceBytesPerRow: unpacked.layout.bytesPerRow ?? unpacked.layout.rowBytes ?? compactRow,
+      sourceByteLength: unpacked.sourceByteLength ?? pixels.byteLength,
       readbackLayout: unpacked.layout,
-      sourceByteLength: unpacked.sourceByteLength,
     };
   },
   describePipeline() {
@@ -528,21 +593,54 @@ const controller = {
     };
   },
   getMetrics() {
+    const identity = webgpuDeviceIdentityMetrics(deviceIdentity, renderer);
+    // Drop live renderer.info reference — Playwright structured-clone cannot
+    // transfer host objects/functions on the capture path.
+    const { rendererInfo, ...identityRest } = identity;
+    const weather = stages.weatherEnvelope;
     return {
       labId: LAB_ID,
-      ...webgpuDeviceIdentityMetrics(deviceIdentity, renderer),
-      ...state,
+      ...identityRest,
+      rendererInfo: {
+        rendererType: rendererInfo?.rendererType ?? "WebGPURenderer",
+        backendType: rendererInfo?.backendType ?? "WebGPUBackend",
+      },
+      scenario: state.scenario,
+      mode: state.mode,
+      tier: state.tier,
+      camera: state.camera,
+      seed: state.seed,
+      timeSeconds: state.timeSeconds ?? 0,
+      forcing: state.forcing,
+      dpr: state.dpr,
       threeRevision: "185",
-      timeSeconds: state.timeSeconds ?? state.time ?? 0,
       viewport: {
         width: renderer.domElement.width,
         height: renderer.domElement.height,
         dpr: renderer.getPixelRatio(),
       },
       backendIsWebGPU: renderer.backend.isWebGPUBackend,
-      infoSnapshot: structuredClone(renderer.info),
-      ownerValidation,
-      weather: structuredClone(stages.weatherEnvelope),
+      infoSnapshot: {
+        render: { ...(renderer.info?.render ?? {}) },
+        memory: { ...(renderer.info?.memory ?? {}) },
+        frame: renderer.info?.frame ?? null,
+      },
+      ownerValidation: ownerValidation
+        ? { ok: ownerValidation.ok, errors: [...(ownerValidation.errors ?? [])] }
+        : null,
+      weather: weather
+        ? {
+          time: weather.time,
+          deltaTime: weather.deltaTime,
+          forcing: weather.forcing,
+          wetness: weather.wetness,
+          puddleFill: weather.puddleFill,
+          snowCoverage: weather.snowCoverage,
+          temperatureC: weather.temperatureC,
+          precipitationRate: weather.precipitationRate,
+          wind: weather.wind ? { ...weather.wind } : null,
+        }
+        : null,
       frameUpdates,
       runtimeVerdicts: {
         currentAdapterGpuTiming: "INSUFFICIENT_EVIDENCE",

@@ -75,14 +75,27 @@ function createCloudFields(seed) {
 }
 
 function bindCloudShadowReceiver(object, transmissionNode, consumerId) {
+  // Planet BatchedMesh / multi-slot meshes expose the same NodeMaterial many
+  // times in material arrays (tens of thousands of identical references).
+  // Deduplicate by identity before mutating colorNode — otherwise each pass
+  // nests base.mul(T).mul(T)... and compileAsync stack-overflows in getCacheKey.
   let boundMaterials = 0;
+  const seen = new Set();
   object.traverse?.((candidate) => {
     const materials = Array.isArray(candidate.material)
       ? candidate.material
       : candidate.material ? [candidate.material] : [];
     for (const material of materials) {
-      if (!material.isNodeMaterial) continue;
-      const baseColor = material.colorNode ?? color(material.color ?? 0xffffff);
+      if (!material?.isNodeMaterial || seen.has(material)) continue;
+      seen.add(material);
+      if (material.userData.cloudOpticalDepthConsumer) {
+        boundMaterials += 1;
+        continue;
+      }
+      const baseColor = material.userData._preCloudColorNode
+        ?? material.colorNode
+        ?? color(material.color ?? 0xffffff);
+      material.userData._preCloudColorNode = baseColor;
       material.colorNode = baseColor.mul(transmissionNode);
       material.userData.cloudOpticalDepthConsumer = consumerId;
       boundMaterials += 1;
@@ -154,7 +167,9 @@ export async function createWeatheredWorldStages({ renderer, scene, camera, pipe
     windDisplacement: uniform(new Vector3()),
   };
 
-  const planetTier = tier.id === "hero" ? "full" : tier.id === "balanced" ? "balanced" : "reduced-webgpu";
+  // Integration host stays on reduced-webgpu planet geometry: balanced/full
+  // currently emit >8 vertex buffers and can destroy the Metal capture context.
+  const planetTier = "reduced-webgpu";
   const planet = createPlanetSceneAdapter({
     renderer,
     scene,
@@ -470,8 +485,19 @@ export async function createWeatheredWorldStages({ renderer, scene, camera, pipe
       weather.windDirection = { x: weather.wind.x, z: weather.wind.z };
       weather.windStrength = Math.hypot(weather.wind.x, weather.wind.z);
       weather.windSpeed = weather.windStrength;
+      // Drops must stay inside the bounded-water simulation domain (half extents).
+      const waterDomain = boundedWater.heightfield?.parameters?.worldSize
+        ?? boundedWater.parameters?.worldSize
+        ?? { x: 4, y: 4 };
+      const dropScaleX = waterDomain.x * 0.2;
+      const dropScaleZ = waterDomain.y * 0.2;
       weather.waterDrop = weather.forcing > 0.1
-        ? { x: Math.sin(timeSeconds * 0.7) * 8, y: Math.cos(timeSeconds * 0.53) * 8, radius: 0.8, strength: weather.forcing * 0.02 }
+        ? {
+          x: Math.sin(timeSeconds * 0.7) * dropScaleX,
+          z: Math.cos(timeSeconds * 0.53) * dropScaleZ,
+          radius: Math.min(0.35, Math.min(waterDomain.x, waterDomain.y) * 0.1),
+          strength: weather.forcing * 0.02,
+        }
         : null;
       weatherNodes.time.value = weather.time;
       weatherNodes.deltaTime.value = weather.deltaTime;
