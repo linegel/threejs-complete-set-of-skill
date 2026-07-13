@@ -2,8 +2,11 @@ import {
   abs,
   exp,
   float,
+  Fn,
+  max,
   pass,
   renderOutput,
+  select,
   screenUV,
   texture,
   vec2,
@@ -85,39 +88,45 @@ export function createDepthAwareCloudCompositeNode({
     vec2(-0.5, 0.5).mul(texel),
     vec2(0.5, 0.5).mul(texel),
   ];
-  const radianceTransmittance = vec4(0).toVar();
-  const weightSum = float(0).toVar();
-  for (const offset of offsets) {
-    const sampleUv = uvNode.add(offset).clamp(0, 1);
-    const cloud = cloudResolvedNode
-      ? cloudResolvedNode.sample(sampleUv)
-      : texture(cloudResolvedTexture, sampleUv);
-    const cloudDepth = cloudDepthNode
-      ? cloudDepthNode.sample(sampleUv).x
-      : texture(cloudDepthTexture, sampleUv).x;
-    const depthWeight = exp(
-      abs(sceneDepthMetersNode.sub(cloudDepth)).div(depthSigmaMeters).negate(),
+  const strength = Math.max(0, cloudShadowStrength);
+
+  // Assign/toVar requires an explicit TSL Fn stack on current three/r185.
+  return Fn(() => {
+    const radianceTransmittance = vec4(0).toVar();
+    const weightSum = float(0).toVar();
+    for (const offset of offsets) {
+      const sampleUv = uvNode.add(offset).clamp(0, 1);
+      const cloud = cloudResolvedNode
+        ? cloudResolvedNode.sample(sampleUv)
+        : texture(cloudResolvedTexture, sampleUv);
+      const cloudDepth = cloudDepthNode
+        ? cloudDepthNode.sample(sampleUv).x
+        : texture(cloudDepthTexture, sampleUv).x;
+      const depthWeight = exp(
+        abs(sceneDepthMetersNode.sub(cloudDepth)).div(depthSigmaMeters).negate(),
+      );
+      radianceTransmittance.assign(
+        radianceTransmittance.add(cloud.mul(depthWeight)),
+      );
+      weightSum.assign(weightSum.add(depthWeight));
+    }
+    const resolved = radianceTransmittance.div(max(weightSum, 1e-6));
+    const cloudShadow = exp(
+      max(cloudOpticalDepthNode, 0).mul(-strength),
     );
-    radianceTransmittance.assign(
-      radianceTransmittance.add(cloud.mul(depthWeight)),
+    // surfaceCoverageNode may be a comparison bool (e.g. sceneDepth.lessThan(...)).
+    const surfaceMask = select(surfaceCoverageNode, float(1), float(0));
+    const surfaceCloudShadow = surfaceMask
+      .mul(cloudShadow)
+      .add(float(1).sub(surfaceMask));
+    return vec4(
+      sceneColorNode.rgb
+        .mul(surfaceCloudShadow)
+        .mul(resolved.a.clamp(0, 1))
+        .add(max(resolved.rgb, vec3(0))),
+      sceneColorNode.a,
     );
-    weightSum.assign(weightSum.add(depthWeight));
-  }
-  const resolved = radianceTransmittance.div(weightSum.max(1e-6));
-  const cloudShadow = exp(
-    cloudOpticalDepthNode.max(0).mul(-Math.max(0, cloudShadowStrength)),
-  );
-  const surfaceCloudShadow = surfaceCoverageNode
-    .clamp(0, 1)
-    .mul(cloudShadow)
-    .add(float(1).sub(surfaceCoverageNode.clamp(0, 1)));
-  return vec4(
-    sceneColorNode.rgb
-      .mul(surfaceCloudShadow)
-      .mul(resolved.a.clamp(0, 1))
-      .add(resolved.rgb.max(vec3(0))),
-    sceneColorNode.a,
-  );
+  })();
 }
 
 export function validateCloudCompositeContract(contract) {
