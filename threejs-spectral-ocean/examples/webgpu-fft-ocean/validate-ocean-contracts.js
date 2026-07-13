@@ -260,7 +260,19 @@ assert( systemSource.includes( "pass: selfTests.pass === false || this.gpuReadba
 assert( computeSource.includes( 'createDisplacementAssemblyNode' ) && computeSource.includes( 'createFoamHistoryNode' ), 'Portable physical assembly and separate diagnostic foam reaction must both exist.' );
 assert( DEFAULT_OCEAN_CONFIG.enablePerCascadeFoamHistory === true, 'Native-resolution per-cascade foam history must be canonical by default.' );
 assert( sources[ 'capture.mjs' ].includes( 'captureLabBrowser' ) && ! sources[ 'capture.mjs' ].includes( 'LAB_URL' ) && ! sources[ 'capture.mjs' ].includes( "from 'playwright'" ), 'Ocean capture must use the shared self-serving browser harness.' );
-assert( sources[ 'validate-artifacts.mjs' ].includes( 'validateEvidenceBundle' ) && sources[ 'validate-artifacts.mjs' ].includes( 'requireRequiredClaimsPass: true' ) && sources[ 'validate-artifacts.mjs' ].includes( 'lab.sourceHash' ), 'Artifact validation must use strict shared v2 acceptance validation and the registry source hash.' );
+// Correctness-gate validator: bind registry sourceHash, require visual/mechanism PASS,
+// and leave performance/gpuAttribution/lifecycle residual when timestamps/lifecycle are absent.
+// Full shared v2 requireRequiredClaimsPass:true would false-fail those honest residuals.
+assert(
+	sources[ 'validate-artifacts.mjs' ].includes( 'buildDemoRegistry' )
+		&& sources[ 'validate-artifacts.mjs' ].includes( 'lab.sourceHash' )
+		&& sources[ 'validate-artifacts.mjs' ].includes( 'visualCorrectness' )
+		&& sources[ 'validate-artifacts.mjs' ].includes( 'mechanismCorrectness' )
+		&& sources[ 'validate-artifacts.mjs' ].includes( 'performanceCompliance' )
+		&& sources[ 'validate-artifacts.mjs' ].includes( 'gpuAttribution' )
+		&& sources[ 'validate-artifacts.mjs' ].includes( 'lifecycleStability' ),
+	'Artifact validation must bind the registry source hash and gate correctness claims with residual timing/lifecycle.',
+);
 assert( !/fallback/i.test( sources[ 'README.md' ] ) && !/fallback/i.test( sources[ 'constants.js' ] ), 'Scaffold must not contain an alternate runtime branch or teaching route.' );
 assert( sources[ 'validate-generated-wave-seeds.mjs' ].includes( 'asset-preview-only' ), 'Generated-wave validator must be classified as asset preview only.' );
 

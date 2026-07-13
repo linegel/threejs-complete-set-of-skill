@@ -14,80 +14,270 @@
     {
       "id": "directional-sea",
       "route": "/demos/webgpu-fft-ocean/",
-      "startup": { "mode": "final", "camera": "design" },
+      "startup": {
+        "mode": "final",
+        "camera": "design"
+      },
       "acceptanceStatus": "incomplete"
     }
   ],
   "mechanisms": [
-    { "id": "spectrum-and-fft", "route": "/demos/webgpu-fft-ocean/mechanism/spectrum-and-fft/", "startup": { "mode": "spectrum-fft", "camera": "design" }, "acceptanceStatus": "incomplete" },
-    { "id": "dispersion-and-cascades", "route": "/demos/webgpu-fft-ocean/mechanism/dispersion-and-cascades/", "startup": { "mode": "cascade-bands", "camera": "design" }, "acceptanceStatus": "incomplete" },
-    { "id": "derivatives-and-jacobian", "route": "/demos/webgpu-fft-ocean/mechanism/derivatives-and-jacobian/", "startup": { "mode": "jacobian", "camera": "near" }, "acceptanceStatus": "incomplete" },
-    { "id": "whitecaps-and-foam", "route": "/demos/webgpu-fft-ocean/mechanism/whitecaps-and-foam/", "startup": { "mode": "foam", "camera": "near" }, "acceptanceStatus": "incomplete" },
-    { "id": "above-and-below-surface", "route": "/demos/webgpu-fft-ocean/mechanism/above-and-below-surface/", "startup": { "mode": "underwater-optics", "camera": "underwater" }, "acceptanceStatus": "incomplete" },
-    { "id": "cpu-query-parity", "route": "/demos/webgpu-fft-ocean/mechanism/cpu-query-parity/", "startup": { "mode": "cpu-query", "camera": "design" }, "acceptanceStatus": "incomplete" }
+    {
+      "id": "spectrum-and-fft",
+      "route": "/demos/webgpu-fft-ocean/mechanism/spectrum-and-fft/",
+      "startup": {
+        "mode": "spectrum-fft",
+        "camera": "design"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "dispersion-and-cascades",
+      "route": "/demos/webgpu-fft-ocean/mechanism/dispersion-and-cascades/",
+      "startup": {
+        "mode": "cascade-bands",
+        "camera": "design"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "derivatives-and-jacobian",
+      "route": "/demos/webgpu-fft-ocean/mechanism/derivatives-and-jacobian/",
+      "startup": {
+        "mode": "jacobian",
+        "camera": "near"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "whitecaps-and-foam",
+      "route": "/demos/webgpu-fft-ocean/mechanism/whitecaps-and-foam/",
+      "startup": {
+        "mode": "foam",
+        "camera": "near"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "above-and-below-surface",
+      "route": "/demos/webgpu-fft-ocean/mechanism/above-and-below-surface/",
+      "startup": {
+        "mode": "underwater-optics",
+        "camera": "underwater"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "cpu-query-parity",
+      "route": "/demos/webgpu-fft-ocean/mechanism/cpu-query-parity/",
+      "startup": {
+        "mode": "cpu-query",
+        "camera": "design"
+      },
+      "acceptanceStatus": "incomplete"
+    }
   ],
   "tiers": [
     {
       "id": "ultra",
       "targetClass": "unmeasured-current-adapter",
       "frameTargetMs": null,
-      "resolutionPolicy": { "fftResolution": 512, "dpr": 1 },
-      "mechanismLimits": { "cascadeCount": 3, "packedComplexTransformCount": 4 },
-      "resourceLimits": { "authoredStorageBudgetMiB": 104, "derivedStorageBytes": 106954752 },
+      "resolutionPolicy": {
+        "fftResolution": 512,
+        "dpr": 1
+      },
+      "mechanismLimits": {
+        "cascadeCount": 3,
+        "packedComplexTransformCount": 4
+      },
+      "resourceLimits": {
+        "authoredStorageBudgetMiB": 104,
+        "derivedStorageBytes": 106954752
+      },
       "degradationFromPrevious": [],
-      "preservedInvariants": ["dimensional spectrum", "Hermitian evolution", "explicit inverse-transform convention", "resolved-band geometry/normal parity", "native-resolution per-cascade foam history"],
+      "preservedInvariants": [
+        "dimensional spectrum",
+        "Hermitian evolution",
+        "explicit inverse-transform convention",
+        "resolved-band geometry/normal parity",
+        "native-resolution per-cascade foam history"
+      ],
       "acceptanceStatus": "incomplete"
     },
     {
       "id": "high",
       "targetClass": "unmeasured-current-adapter",
       "frameTargetMs": null,
-      "resolutionPolicy": { "fftResolution": 256, "dpr": 1 },
-      "mechanismLimits": { "cascadeCount": 3, "packedComplexTransformCount": 4 },
-      "resourceLimits": { "authoredStorageBudgetMiB": 28, "derivedStorageBytes": 26738688 },
-      "degradationFromPrevious": ["FFT resolution 512 to 256"],
-      "preservedInvariants": ["dimensional spectrum", "Hermitian evolution", "explicit inverse-transform convention", "resolved-band geometry/normal parity", "native-resolution per-cascade foam history"],
+      "resolutionPolicy": {
+        "fftResolution": 256,
+        "dpr": 1
+      },
+      "mechanismLimits": {
+        "cascadeCount": 3,
+        "packedComplexTransformCount": 4
+      },
+      "resourceLimits": {
+        "authoredStorageBudgetMiB": 28,
+        "derivedStorageBytes": 26738688
+      },
+      "degradationFromPrevious": [
+        "FFT resolution 512 to 256"
+      ],
+      "preservedInvariants": [
+        "dimensional spectrum",
+        "Hermitian evolution",
+        "explicit inverse-transform convention",
+        "resolved-band geometry/normal parity",
+        "native-resolution per-cascade foam history"
+      ],
       "acceptanceStatus": "incomplete"
     },
     {
       "id": "medium",
       "targetClass": "unmeasured-current-adapter",
       "frameTargetMs": null,
-      "resolutionPolicy": { "fftResolution": 256, "dpr": 1 },
-      "mechanismLimits": { "cascadeCount": 2, "packedComplexTransformCount": 4 },
-      "resourceLimits": { "authoredStorageBudgetMiB": 22, "derivedStorageBytes": 17825792 },
-      "degradationFromPrevious": ["cascade count 3 to 2"],
-      "preservedInvariants": ["dimensional spectrum", "Hermitian evolution", "explicit inverse-transform convention", "resolved-band geometry/normal parity", "native-resolution per-cascade foam history"],
+      "resolutionPolicy": {
+        "fftResolution": 256,
+        "dpr": 1
+      },
+      "mechanismLimits": {
+        "cascadeCount": 2,
+        "packedComplexTransformCount": 4
+      },
+      "resourceLimits": {
+        "authoredStorageBudgetMiB": 22,
+        "derivedStorageBytes": 17825792
+      },
+      "degradationFromPrevious": [
+        "cascade count 3 to 2"
+      ],
+      "preservedInvariants": [
+        "dimensional spectrum",
+        "Hermitian evolution",
+        "explicit inverse-transform convention",
+        "resolved-band geometry/normal parity",
+        "native-resolution per-cascade foam history"
+      ],
       "acceptanceStatus": "incomplete"
     },
     {
       "id": "low",
       "targetClass": "unmeasured-current-adapter",
       "frameTargetMs": null,
-      "resolutionPolicy": { "fftResolution": 128, "dpr": 1 },
-      "mechanismLimits": { "cascadeCount": 1, "packedComplexTransformCount": 4 },
-      "resourceLimits": { "authoredStorageBudgetMiB": 8, "derivedStorageBytes": 2228224 },
-      "degradationFromPrevious": ["FFT resolution 256 to 128", "cascade count 2 to 1"],
-      "preservedInvariants": ["dimensional spectrum", "Hermitian evolution", "explicit inverse-transform convention", "resolved-band geometry/normal parity", "native-resolution per-cascade foam history"],
+      "resolutionPolicy": {
+        "fftResolution": 128,
+        "dpr": 1
+      },
+      "mechanismLimits": {
+        "cascadeCount": 1,
+        "packedComplexTransformCount": 4
+      },
+      "resourceLimits": {
+        "authoredStorageBudgetMiB": 8,
+        "derivedStorageBytes": 2228224
+      },
+      "degradationFromPrevious": [
+        "FFT resolution 256 to 128",
+        "cascade count 2 to 1"
+      ],
+      "preservedInvariants": [
+        "dimensional spectrum",
+        "Hermitian evolution",
+        "explicit inverse-transform convention",
+        "resolved-band geometry/normal parity",
+        "native-resolution per-cascade foam history"
+      ],
       "acceptanceStatus": "incomplete"
     }
   ],
-  "modes": ["final", "height", "displacement", "slopes", "jacobian", "foam", "normal", "spectrum-fft", "cascade-bands", "underwater-optics", "cpu-query", "no-post", "diagnostics"],
-  "cameras": ["near", "design", "far", "underwater"],
-  "seeds": [1, 2654435769],
+  "modes": [
+    "final",
+    "height",
+    "displacement",
+    "slopes",
+    "jacobian",
+    "foam",
+    "normal",
+    "spectrum-fft",
+    "cascade-bands",
+    "underwater-optics",
+    "cpu-query",
+    "no-post",
+    "diagnostics"
+  ],
+  "cameras": [
+    "near",
+    "design",
+    "far",
+    "underwater"
+  ],
+  "seeds": [
+    1,
+    2654435769
+  ],
   "capabilityRequirements": [
-    { "id": "native-webgpu", "required": true },
-    { "id": "minimum-four-storage-textures", "required": true, "evidence": "initialized adapter limit" }
+    {
+      "id": "native-webgpu",
+      "required": true,
+      "status": "accepted",
+      "evidence": "Native browser capture-session: nativeWebGPU/backend WebGPU after renderer.init(); GPU FFT fixture suite pass."
+    },
+    {
+      "id": "minimum-four-storage-textures",
+      "required": true,
+      "evidence": "Ocean capabilities gate requires adapter maxStorageTexturesPerShaderStage >= 4; capture initializes full cascade storage layout.",
+      "status": "accepted"
+    }
   ],
   "runtimeProof": [
-    { "id": "renderer-init", "required": true },
-    { "id": "backend-is-webgpu", "required": true },
-    { "id": "mechanism-reachable", "required": true },
-    { "id": "render-or-compute-work", "required": true },
-    { "id": "aligned-readback", "required": true },
-    { "id": "complete-2d-fft-readback", "required": true },
-    { "id": "per-cascade-surface-and-foam-readback", "required": true },
-    { "id": "pages-source-hash", "required": true }
+    {
+      "id": "renderer-init",
+      "required": true,
+      "status": "accepted",
+      "evidence": "createWebGPUFftOcean after await renderer.init(); capture-session records initialized native WebGPU."
+    },
+    {
+      "id": "backend-is-webgpu",
+      "required": true,
+      "status": "accepted",
+      "evidence": "metrics.backend=WebGPU / isWebGPUBackend=true in capture-session and renderer-info.json."
+    },
+    {
+      "id": "mechanism-reachable",
+      "required": true,
+      "status": "accepted",
+      "evidence": "Mechanism debug modes spectrum-fft/jacobian/foam/underwater captured as distinct PNG readbacks."
+    },
+    {
+      "id": "render-or-compute-work",
+      "required": true,
+      "status": "accepted",
+      "evidence": "GPU FFT fixture suite and per-frame compute dispatches recorded; mechanism-metrics.gpuReadback.pass=true."
+    },
+    {
+      "id": "aligned-readback",
+      "required": true,
+      "status": "accepted",
+      "evidence": "Integer 256-byte-aligned RT transport-readbacks for final/diagnostics/seed/temporal captures."
+    },
+    {
+      "id": "complete-2d-fft-readback",
+      "required": true,
+      "status": "accepted",
+      "evidence": "runBrowserGpuReadbackFixtures complete-2d-fft suite pass (textureLoad-based storage stages) recorded in mechanism-metrics.json."
+    },
+    {
+      "id": "per-cascade-surface-and-foam-readback",
+      "required": true,
+      "status": "accepted",
+      "evidence": "whitecaps-and-foam.png + temporal foam frames and cascade surface materialCascades ledger from native capture."
+    },
+    {
+      "id": "pages-source-hash",
+      "required": true,
+      "status": "accepted",
+      "evidence": "evidence-manifest.sourceHash matches demo-registry sourceHash for this capture session."
+    }
   ],
   "evidenceContract": "v2",
   "validationCommand": "node validate-ocean-contracts.js",

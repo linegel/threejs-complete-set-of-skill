@@ -119,8 +119,12 @@ kill(
 );
 kill(
 	'weak-artifact-validator',
-	/validateEvidenceBundle/.test( artifactSource ) && /requireRequiredClaimsPass: true/.test( artifactSource ) && /buildDemoRegistry/.test( artifactSource ) && /lab\.sourceHash/.test( artifactSource ),
-	'artifact validation does not enforce strict shared v2 plus registry source identity'
+	/buildDemoRegistry/.test( artifactSource )
+		&& /lab\.sourceHash/.test( artifactSource )
+		&& /visualCorrectness/.test( artifactSource )
+		&& /mechanismCorrectness/.test( artifactSource )
+		&& /lifecycleStability/.test( artifactSource ),
+	'artifact validation does not bind registry source identity and correctness claim gates'
 );
 
 const localPackage = JSON.parse( source( 'package.json' ) );

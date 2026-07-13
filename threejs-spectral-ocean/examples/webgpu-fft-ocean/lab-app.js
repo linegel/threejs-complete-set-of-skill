@@ -47,12 +47,15 @@ const CAMERA_POSES = Object.freeze( {
 function routeSelection( pathname, searchParams ) {
 	const mechanismMatch = pathname.match( /\/mechanism\/([^/]+)/ );
 	const tierMatch = pathname.match( /\/tier\/([^/]+)/ );
+	// Capture sessions must not run the free animation loop: it races setTime/rebuild
+	// and throws non-finite deltas into pageerror collectors.
+	const captureMode = searchParams.get( 'capture' ) === '1';
 	return {
 		mechanism: mechanismMatch?.[ 1 ] ?? searchParams.get( 'mechanism' ),
 		tier: tierMatch?.[ 1 ] ?? searchParams.get( 'tier' ) ?? 'low',
 		mode: searchParams.get( 'mode' ),
 		seed: searchParams.has( 'seed' ) ? Number( searchParams.get( 'seed' ) ) : 0x00000001,
-		animate: searchParams.get( 'animate' ) !== '0'
+		animate: ! captureMode && searchParams.get( 'animate' ) !== '0'
 	};
 }
 
@@ -288,6 +291,7 @@ export class OceanLabController {
 	}
 
 	async step( deltaSeconds ) {
+		if ( this.disposed ) return;
 		if ( ! Number.isFinite( deltaSeconds ) || deltaSeconds < 0 ) throw new Error( 'Ocean delta must be finite and non-negative.' );
 		this.time += deltaSeconds;
 		await this.ocean.update( this.time, deltaSeconds );
@@ -397,10 +401,12 @@ export class OceanLabController {
 	}
 
 	getMetrics() {
+		const identity = webgpuDeviceIdentityMetrics( this.deviceIdentity, this.renderer );
+		// Do not overwrite identity.backend with a non-string object — backendProven()
+		// stringifies metrics.backend and rejects anything other than "webgpu"/"webgpubackend".
 		return {
 			labId: OCEAN_LAB_MANIFEST.id,
-			...webgpuDeviceIdentityMetrics( this.deviceIdentity, this.renderer ),
-			backend: { isWebGPUBackend: this.renderer.backend?.isWebGPUBackend === true },
+			...identity,
 			isWebGPUBackend: this.renderer.backend?.isWebGPUBackend === true,
 			backendIsWebGPU: this.renderer.backend?.isWebGPUBackend === true,
 			threeRevision: '185',
