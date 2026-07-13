@@ -56,9 +56,14 @@ try {
 
 	}
 	const { chromium } = await import( 'playwright' );
+	// Match capture-lab-browser: Vulkan is Linux-only; Metal is the native WebGPU path on macOS.
+	const launchArgs = [ '--enable-unsafe-webgpu', '--disable-gpu-sandbox' ];
+	if ( process.platform !== 'darwin' ) {
+		launchArgs.splice( 1, 0, '--enable-features=Vulkan,UseSkiaRenderer' );
+	}
 	browser = await chromium.launch( {
 		headless: true,
-		args: [ '--enable-unsafe-webgpu', '--enable-features=Vulkan,UseSkiaRenderer', '--disable-gpu-sandbox' ]
+		args: launchArgs
 	} );
 	const viewport = options.profile === 'performance' ? { width: 1920, height: 1080 } : { width: 1200, height: 800 };
 	const page = await browser.newPage( { viewport, deviceScaleFactor: 1 } );
