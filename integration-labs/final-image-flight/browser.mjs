@@ -93,7 +93,7 @@ try {
   })();
   globalThis.__LAB_READY__ = readiness;
   await readiness;
-  if (status) status.textContent = "Native WebGPU active. Acceptance remains incomplete until the v2 evidence bundle is captured and validated.";
+  if (status) status.textContent = "Native WebGPU active. Correctness evidence accepted (tracked v2 release); hardwarePerformance NOT_CLAIMED without timestamps.";
 } catch (error) {
   globalThis.__LAB_ERROR__ = error;
   if (status) status.textContent = `BLOCKED: ${error.message}`;

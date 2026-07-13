@@ -7,7 +7,7 @@
   "canonicalSource": [
     "integration-labs/final-image-flight/index.html"
   ],
-  "canonicalSourceHash": "sha256:24dfa73d8feadbd219db7edf86484d1ff65c4babde784e104fc4e5741a1685a8",
+  "canonicalSourceHash": "sha256:e0039ddb39a7791ff16eb9cbbe328c6a58a076a7fdc69077232950a4f54dd7e4",
   "threeRevision": "0.185.1",
   "runtime": {
     "renderer": "WebGPURenderer",

@@ -19,7 +19,7 @@ function optionList(select, values, selected) {
 function renderStatus(controller, element, route) {
   const metrics = controller.getMetrics();
   const status = {
-    acceptance: "incomplete — native runtime implemented; evidence not captured",
+    acceptance: "accepted — demo capture + tracked v2 release; hardwarePerformance NOT_CLAIMED",
     route,
     backend: metrics.rendererBackend,
     revision: metrics.threeRevision,

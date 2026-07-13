@@ -7,7 +7,7 @@
   "canonicalSource": [
     "integration-labs/creature-habitat/index.html"
   ],
-  "canonicalSourceHash": "sha256:8f79e695f0d5c7ad60e95e400ac27caab018db33f2b31ed250bd2e324d6295f9",
+  "canonicalSourceHash": "sha256:a4b636f72b858d8bc5ba64756b8a8fd8f9f4d442fc88693e9cba59adfe145210",
   "threeRevision": "0.185.1",
   "runtime": {
     "renderer": "WebGPURenderer",

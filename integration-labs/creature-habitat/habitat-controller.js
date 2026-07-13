@@ -1408,7 +1408,7 @@ export class HabitatController {
     const size = this.renderer?.getSize?.(new Vector2()) ?? null;
     return {
       labId: this.labId,
-      status: "native-webgpu-runtime; acceptance incomplete pending evidence",
+      status: "native-webgpu-runtime; evidence accepted (correctness lane); hardwarePerformance NOT_CLAIMED",
       ...identityMetrics,
       runtimeProfile: this.runtimeProfile ?? "correctness",
       timestampQueriesRequired: this.trackTimestamp === true,

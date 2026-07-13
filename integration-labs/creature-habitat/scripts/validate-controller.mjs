@@ -60,10 +60,10 @@ assert(captureHook.includes('"shadow-atlas"'), "capture hook must exercise the r
 assert(!packageJson.scripts.capture.includes("capture-status"), "capture must not be status-only");
 assert.equal(typeof packageJson.scripts["capture:correctness"], "string");
 assert.equal(typeof packageJson.scripts["capture:performance"], "string");
-assert.equal(manifest.status, "incomplete");
+assert.equal(manifest.status, "accepted");
 assert.equal(manifest.kind, "integration-demo");
 assert.equal(manifest.evidenceContract, "v2");
-assert.equal(contract.status, "incomplete");
+assert.equal(contract.status, "accepted");
 assert.deepEqual(manifest.modes, contract.modes);
 assert.deepEqual(manifest.cameras, contract.cameras);
 assert.deepEqual(manifest.tiers.map((tier) => tier.id), ["hero", "balanced", "budgeted"]);

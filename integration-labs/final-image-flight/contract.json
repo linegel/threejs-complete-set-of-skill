@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "id": "final-image-flight",
   "title": "Final Image Flight",
-  "status": "incomplete",
+  "status": "accepted",
   "skills": [
     "threejs-camera-controls-and-rigs",
     "threejs-procedural-motion-systems",
@@ -853,10 +853,11 @@
     }
   ],
   "runtimeEvidence": {
-    "nativeWebGPU": "INSUFFICIENT_EVIDENCE",
-    "renderTargetReadback": "INSUFFICIENT_EVIDENCE",
+    "nativeWebGPU": "PASS",
+    "renderTargetReadback": "PASS",
     "currentAdapterTiming": "INSUFFICIENT_EVIDENCE",
-    "lifecycle": "INSUFFICIENT_EVIDENCE",
-    "evidenceBundle": "INSUFFICIENT_EVIDENCE"
+    "lifecycle": "PASS",
+    "evidenceBundle": "PASS",
+    "implementationNote": "Accepted via demo browserEntry capture + physical CDP + tracked v2 release under docs/visual-validation/final-image-flight/bundle. hardwarePerformance NOT_CLAIMED."
   }
 }

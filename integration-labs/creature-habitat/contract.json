@@ -2,139 +2,722 @@
   "schemaVersion": 2,
   "id": "creature-habitat",
   "title": "Creature Habitat",
-  "status": "incomplete",
-  "skills": ["threejs-procedural-creatures", "threejs-procedural-vegetation", "threejs-water-optics", "threejs-rain-snow-and-wet-surfaces", "threejs-camera-controls-and-rigs", "threejs-scalable-real-time-shadows", "threejs-image-pipeline"],
-  "modes": ["final", "no-post", "contact-events", "water-ripples", "vegetation-trampling", "culling", "outline", "shadow-parity", "owner-graph"],
-  "cameras": ["subject", "habitat", "population"],
-  "seeds": [1, 2654435769],
+  "status": "accepted",
+  "skills": [
+    "threejs-procedural-creatures",
+    "threejs-procedural-vegetation",
+    "threejs-water-optics",
+    "threejs-rain-snow-and-wet-surfaces",
+    "threejs-camera-controls-and-rigs",
+    "threejs-scalable-real-time-shadows",
+    "threejs-image-pipeline"
+  ],
+  "modes": [
+    "final",
+    "no-post",
+    "diagnostics",
+    "contact-events",
+    "water-ripples",
+    "vegetation-trampling",
+    "culling",
+    "outline",
+    "shadow-parity",
+    "owner-graph"
+  ],
+  "cameras": [
+    "near",
+    "design",
+    "far"
+  ],
+  "seeds": [
+    1,
+    2654435769
+  ],
   "owners": [
-    {"semantic": "renderer", "owner": "threejs-image-pipeline", "exclusive": true},
-    {"semantic": "final-render-pipeline", "owner": "threejs-image-pipeline", "exclusive": true},
-    {"semantic": "tone-map", "owner": "threejs-image-pipeline", "exclusive": true},
-    {"semantic": "output-transform", "owner": "threejs-image-pipeline", "exclusive": true},
-    {"semantic": "quality-governor", "owner": "threejs-image-pipeline", "exclusive": true},
-    {"semantic": "timebase", "owner": "threejs-rain-snow-and-wet-surfaces", "exclusive": true},
-    {"semantic": "camera-jitter", "owner": "threejs-camera-controls-and-rigs", "exclusive": true},
-    {"semantic": "camera-state", "owner": "threejs-camera-controls-and-rigs", "exclusive": true},
-    {"semantic": "world-units-and-wind", "owner": "threejs-rain-snow-and-wet-surfaces", "exclusive": true},
-    {"semantic": "creature-state", "owner": "threejs-procedural-creatures", "exclusive": true},
-    {"semantic": "contact-event-registry", "owner": "threejs-procedural-creatures", "exclusive": true},
-    {"semantic": "vegetation-storage", "owner": "threejs-procedural-vegetation", "exclusive": true},
-    {"semantic": "bounded-water-state", "owner": "threejs-water-optics", "exclusive": true},
-    {"semantic": "weather-state", "owner": "threejs-rain-snow-and-wet-surfaces", "exclusive": true},
-    {"semantic": "shadow-maps", "owner": "threejs-scalable-real-time-shadows", "exclusive": true}
+    {
+      "semantic": "renderer",
+      "owner": "threejs-image-pipeline",
+      "exclusive": true
+    },
+    {
+      "semantic": "final-render-pipeline",
+      "owner": "threejs-image-pipeline",
+      "exclusive": true
+    },
+    {
+      "semantic": "tone-map",
+      "owner": "threejs-image-pipeline",
+      "exclusive": true
+    },
+    {
+      "semantic": "output-transform",
+      "owner": "threejs-image-pipeline",
+      "exclusive": true
+    },
+    {
+      "semantic": "quality-governor",
+      "owner": "threejs-image-pipeline",
+      "exclusive": true
+    },
+    {
+      "semantic": "timebase",
+      "owner": "threejs-rain-snow-and-wet-surfaces",
+      "exclusive": true
+    },
+    {
+      "semantic": "camera-jitter",
+      "owner": "threejs-camera-controls-and-rigs",
+      "exclusive": true
+    },
+    {
+      "semantic": "camera-state",
+      "owner": "threejs-camera-controls-and-rigs",
+      "exclusive": true
+    },
+    {
+      "semantic": "world-units-and-wind",
+      "owner": "threejs-rain-snow-and-wet-surfaces",
+      "exclusive": true
+    },
+    {
+      "semantic": "creature-state",
+      "owner": "threejs-procedural-creatures",
+      "exclusive": true
+    },
+    {
+      "semantic": "contact-event-registry",
+      "owner": "threejs-procedural-creatures",
+      "exclusive": true
+    },
+    {
+      "semantic": "vegetation-storage",
+      "owner": "threejs-procedural-vegetation",
+      "exclusive": true
+    },
+    {
+      "semantic": "bounded-water-state",
+      "owner": "threejs-water-optics",
+      "exclusive": true
+    },
+    {
+      "semantic": "weather-state",
+      "owner": "threejs-rain-snow-and-wet-surfaces",
+      "exclusive": true
+    },
+    {
+      "semantic": "shadow-maps",
+      "owner": "threejs-scalable-real-time-shadows",
+      "exclusive": true
+    }
   ],
   "signals": [
-    {"id": "habitat.world-units", "producer": "threejs-rain-snow-and-wet-surfaces", "consumers": ["threejs-procedural-creatures", "threejs-procedural-vegetation", "threejs-water-optics", "threejs-camera-controls-and-rigs"], "domain": "shared world scale"},
-    {"id": "habitat.wind", "producer": "threejs-rain-snow-and-wet-surfaces", "consumers": ["threejs-procedural-creatures", "threejs-procedural-vegetation", "threejs-water-optics"], "domain": "world-stable wind"},
-    {"id": "creature.pose-and-bounds", "producer": "threejs-procedural-creatures", "consumers": ["threejs-camera-controls-and-rigs", "threejs-scalable-real-time-shadows", "threejs-image-pipeline"], "domain": "current/previous subject state"},
-    {"id": "creature.contact-events", "producer": "threejs-procedural-creatures", "consumers": ["threejs-water-optics", "threejs-procedural-vegetation", "threejs-rain-snow-and-wet-surfaces"], "domain": "bounded touch/ripple/trampling registry"},
-    {"id": "vegetation.static-spawn-storage", "producer": "threejs-procedural-vegetation", "consumers": ["threejs-image-pipeline", "threejs-scalable-real-time-shadows"], "domain": "immutable after initialization"},
-    {"id": "vegetation.deformation", "producer": "threejs-procedural-vegetation", "consumers": ["threejs-scalable-real-time-shadows", "threejs-image-pipeline"], "domain": "visible/shadow shared deformation"},
-    {"id": "water.height-and-ripples", "producer": "threejs-water-optics", "consumers": ["threejs-procedural-creatures", "threejs-image-pipeline"], "domain": "bounded local surface"},
-    {"id": "weather.surface-state", "producer": "threejs-rain-snow-and-wet-surfaces", "consumers": ["threejs-procedural-creatures", "threejs-procedural-vegetation", "threejs-water-optics", "threejs-image-pipeline"], "domain": "wetness/snow/precipitation"},
-    {"id": "creature.outline-mask", "producer": "threejs-procedural-creatures", "consumers": ["threejs-image-pipeline"], "domain": "subject-consistent outline"},
-    {"id": "habitat.shadow-visibility", "producer": "threejs-scalable-real-time-shadows", "consumers": ["threejs-image-pipeline"], "domain": "creature/vegetation shared caster deformation"},
-    {"id": "habitat.scene-hdr", "producer": "threejs-image-pipeline", "consumers": ["threejs-image-pipeline"], "domain": "single final scene-linear signal"}
+    {
+      "id": "habitat.world-units",
+      "producer": "threejs-rain-snow-and-wet-surfaces",
+      "consumers": [
+        "threejs-procedural-creatures",
+        "threejs-procedural-vegetation",
+        "threejs-water-optics",
+        "threejs-camera-controls-and-rigs"
+      ],
+      "domain": "shared world scale"
+    },
+    {
+      "id": "habitat.wind",
+      "producer": "threejs-rain-snow-and-wet-surfaces",
+      "consumers": [
+        "threejs-procedural-creatures",
+        "threejs-procedural-vegetation",
+        "threejs-water-optics"
+      ],
+      "domain": "world-stable wind"
+    },
+    {
+      "id": "creature.pose-and-bounds",
+      "producer": "threejs-procedural-creatures",
+      "consumers": [
+        "threejs-camera-controls-and-rigs",
+        "threejs-scalable-real-time-shadows",
+        "threejs-image-pipeline"
+      ],
+      "domain": "current/previous subject state"
+    },
+    {
+      "id": "creature.contact-events",
+      "producer": "threejs-procedural-creatures",
+      "consumers": [
+        "threejs-water-optics",
+        "threejs-procedural-vegetation",
+        "threejs-rain-snow-and-wet-surfaces"
+      ],
+      "domain": "bounded touch/ripple/trampling registry"
+    },
+    {
+      "id": "vegetation.static-spawn-storage",
+      "producer": "threejs-procedural-vegetation",
+      "consumers": [
+        "threejs-image-pipeline",
+        "threejs-scalable-real-time-shadows"
+      ],
+      "domain": "immutable after initialization"
+    },
+    {
+      "id": "vegetation.deformation",
+      "producer": "threejs-procedural-vegetation",
+      "consumers": [
+        "threejs-scalable-real-time-shadows",
+        "threejs-image-pipeline"
+      ],
+      "domain": "visible/shadow shared deformation"
+    },
+    {
+      "id": "water.height-and-ripples",
+      "producer": "threejs-water-optics",
+      "consumers": [
+        "threejs-procedural-creatures",
+        "threejs-image-pipeline"
+      ],
+      "domain": "bounded local surface"
+    },
+    {
+      "id": "weather.surface-state",
+      "producer": "threejs-rain-snow-and-wet-surfaces",
+      "consumers": [
+        "threejs-procedural-creatures",
+        "threejs-procedural-vegetation",
+        "threejs-water-optics",
+        "threejs-image-pipeline"
+      ],
+      "domain": "wetness/snow/precipitation"
+    },
+    {
+      "id": "creature.outline-mask",
+      "producer": "threejs-procedural-creatures",
+      "consumers": [
+        "threejs-image-pipeline"
+      ],
+      "domain": "subject-consistent outline"
+    },
+    {
+      "id": "habitat.shadow-visibility",
+      "producer": "threejs-scalable-real-time-shadows",
+      "consumers": [
+        "threejs-image-pipeline"
+      ],
+      "domain": "creature/vegetation shared caster deformation"
+    },
+    {
+      "id": "habitat.scene-hdr",
+      "producer": "threejs-image-pipeline",
+      "consumers": [
+        "threejs-image-pipeline"
+      ],
+      "domain": "single final scene-linear signal"
+    }
   ],
   "sceneSubmissions": [
-    {"id": "habitat.primary-lit-scene", "owner": "threejs-image-pipeline", "kind": "creature-vegetation-water-weather-scene", "outputs": ["habitat.scene-hdr"]}
+    {
+      "id": "habitat.primary-lit-scene",
+      "owner": "threejs-image-pipeline",
+      "kind": "creature-vegetation-water-weather-scene",
+      "outputs": [
+        "habitat.scene-hdr"
+      ]
+    }
   ],
   "computeDispatches": [
-    {"id": "habitat.vegetation-static-initialization", "owner": "threejs-procedural-vegetation", "kind": "one-dispatch-per-patch-at-stage-build; zero per-frame vertex-wind compute"},
-    {"id": "habitat.water-heightfield", "owner": "threejs-water-optics", "kind": "fixed-step contact-and-wind ripple propagation plus normal/caustic reconstruction at the selected canonical water tier"},
-    {"id": "habitat.weather-recurrent", "owner": "threejs-rain-snow-and-wet-surfaces", "kind": "tier-gated recurrent rain/snow turbulence compute; analytic tiers dispatch none"},
-    {"id": "habitat.weather-impact-age-spawn", "owner": "threejs-rain-snow-and-wet-surfaces", "kind": "bounded GPU impact-ring age plus receiver-approved sparse spawn"}
+    {
+      "id": "habitat.vegetation-static-initialization",
+      "owner": "threejs-procedural-vegetation",
+      "kind": "one-dispatch-per-patch-at-stage-build; zero per-frame vertex-wind compute"
+    },
+    {
+      "id": "habitat.water-heightfield",
+      "owner": "threejs-water-optics",
+      "kind": "fixed-step contact-and-wind ripple propagation plus normal/caustic reconstruction at the selected canonical water tier"
+    },
+    {
+      "id": "habitat.weather-recurrent",
+      "owner": "threejs-rain-snow-and-wet-surfaces",
+      "kind": "tier-gated recurrent rain/snow turbulence compute; analytic tiers dispatch none"
+    },
+    {
+      "id": "habitat.weather-impact-age-spawn",
+      "owner": "threejs-rain-snow-and-wet-surfaces",
+      "kind": "bounded GPU impact-ring age plus receiver-approved sparse spawn"
+    }
   ],
   "submissionCounts": {
-    "gbufferPrepassCount": {"value": 0, "unit": "scene-submissions", "label": "Authored", "source": "no material-context AO in this flagship"},
-    "litScenePassCount": {"value": 1, "unit": "scene-submissions", "label": "Authored", "source": "single habitat scene"},
-    "sceneSubmissionCount": {"value": 1, "unit": "scene-submissions", "label": "Derived", "source": "zero prepass plus one lit pass"},
-    "fullLitOutputCount": {"value": 1, "unit": "full-lit-outputs", "label": "Authored", "source": "single habitat beauty output"}
+    "gbufferPrepassCount": {
+      "value": 0,
+      "unit": "scene-submissions",
+      "label": "Authored",
+      "source": "no material-context AO in this flagship"
+    },
+    "litScenePassCount": {
+      "value": 1,
+      "unit": "scene-submissions",
+      "label": "Authored",
+      "source": "single habitat scene"
+    },
+    "sceneSubmissionCount": {
+      "value": 1,
+      "unit": "scene-submissions",
+      "label": "Derived",
+      "source": "zero prepass plus one lit pass"
+    },
+    "fullLitOutputCount": {
+      "value": 1,
+      "unit": "full-lit-outputs",
+      "label": "Authored",
+      "source": "single habitat beauty output"
+    }
   },
   "resources": [
-    {"id": "creature-pose-storage", "owner": "threejs-procedural-creatures", "lifetime": "persistent"},
-    {"id": "vegetation-static-storage", "owner": "threejs-procedural-vegetation", "lifetime": "persistent-immutable"},
-    {"id": "bounded-water-state", "owner": "threejs-water-optics", "lifetime": "persistent-ping-pong"},
-    {"id": "canonical-weather-storage", "owner": "threejs-rain-snow-and-wet-surfaces", "lifetime": "persistent precipitation seeds/recurrent state/impact ring plus live wet/snow materials"},
-    {"id": "contact-ring", "owner": "threejs-procedural-creatures", "lifetime": "bounded-persistent; frozen shared snapshots"},
-    {"id": "habitat-primary-mrt", "owner": "threejs-image-pipeline", "lifetime": "output-normal-emissive-velocity-plus-depth"},
-    {"id": "host-directional-shadow", "owner": "threejs-scalable-real-time-shadows", "lifetime": "one real tier-sized shadow map sampled by the shadow-atlas diagnostic"},
-    {"id": "tracked-resource-ledger", "owner": "threejs-image-pipeline", "lifetime": "reconciled resident/transient records plus lower-bound per-frame bandwidth; opaque driver/compiler allocations explicitly excluded"}
+    {
+      "id": "creature-pose-storage",
+      "owner": "threejs-procedural-creatures",
+      "lifetime": "persistent"
+    },
+    {
+      "id": "vegetation-static-storage",
+      "owner": "threejs-procedural-vegetation",
+      "lifetime": "persistent-immutable"
+    },
+    {
+      "id": "bounded-water-state",
+      "owner": "threejs-water-optics",
+      "lifetime": "persistent-ping-pong"
+    },
+    {
+      "id": "canonical-weather-storage",
+      "owner": "threejs-rain-snow-and-wet-surfaces",
+      "lifetime": "persistent precipitation seeds/recurrent state/impact ring plus live wet/snow materials"
+    },
+    {
+      "id": "contact-ring",
+      "owner": "threejs-procedural-creatures",
+      "lifetime": "bounded-persistent; frozen shared snapshots"
+    },
+    {
+      "id": "habitat-primary-mrt",
+      "owner": "threejs-image-pipeline",
+      "lifetime": "output-normal-emissive-velocity-plus-depth"
+    },
+    {
+      "id": "host-directional-shadow",
+      "owner": "threejs-scalable-real-time-shadows",
+      "lifetime": "one real tier-sized shadow map sampled by the shadow-atlas diagnostic"
+    },
+    {
+      "id": "tracked-resource-ledger",
+      "owner": "threejs-image-pipeline",
+      "lifetime": "reconciled resident/transient records plus lower-bound per-frame bandwidth; opaque driver/compiler allocations explicitly excluded"
+    }
   ],
-  "compositionOrder": ["shared weather time/world-units/wind and integrated wet/puddle/snow response update", "creature fixed-step locomotion and frustum culling", "stance-transition contact registry", "identical frozen snapshot fanout to water and vegetation", "scaled bounded-water compute, canonical rain/snow/impact compute, and vegetation uniform response", "host shadow update", "one primary MRT scene", "creature-only emissive-edge outline", "single tone map", "single output transform"],
-  "integrationConstraints": {"contactChannel": "one bounded registry written from creature stance transitions; water and vegetation receive the exact same frozen array identity", "staticSpawnStorage": "touch mutates only bounded touch uniforms and never rewrites immutable vegetation spawn storage; the trampling validation mode compares full-byte runtime hashes after contact without charging the final/performance route", "subjectConsistency": "visible packing, frustum culling, cast/receive shadow deformation, emissive outline mask, and contact/water interaction originate from the same creature-stage instances", "worldState": "worldUnitsPerMeter is exactly 1 and one weather envelope supplies wind/time and integrated response state to creature motion, vegetation deformation, bounded-water forcing, visible rain/snow, wet surfaces, and splashes", "tierExecution": "sceneScale is applied by PassNode.setResolutionScale; waterScale is the derived selected-tier resolution divided by the ultra-tier resolution; exact canonical heightfield and mesh resources are used without private overrides; DPR and shadow size change live renderer resources", "readback": "outline-mask reads the real emissive MRT attachment; shadow-atlas samples the actual allocated host shadow comparison texture into color-managed RGBA8; row stride is integer and 256-byte aligned", "finalOwnership": "one native WebGPURenderer, one RenderPipeline, one renderOutput tone-map/output transform"},
+  "compositionOrder": [
+    "shared weather time/world-units/wind and integrated wet/puddle/snow response update",
+    "creature fixed-step locomotion and frustum culling",
+    "stance-transition contact registry",
+    "identical frozen snapshot fanout to water and vegetation",
+    "scaled bounded-water compute, canonical rain/snow/impact compute, and vegetation uniform response",
+    "host shadow update",
+    "one primary MRT scene",
+    "creature-only emissive-edge outline",
+    "single tone map",
+    "single output transform"
+  ],
+  "integrationConstraints": {
+    "contactChannel": "one bounded registry written from creature stance transitions; water and vegetation receive the exact same frozen array identity",
+    "staticSpawnStorage": "touch mutates only bounded touch uniforms and never rewrites immutable vegetation spawn storage; the trampling validation mode compares full-byte runtime hashes after contact without charging the final/performance route",
+    "subjectConsistency": "visible packing, frustum culling, cast/receive shadow deformation, emissive outline mask, and contact/water interaction originate from the same creature-stage instances",
+    "worldState": "worldUnitsPerMeter is exactly 1 and one weather envelope supplies wind/time and integrated response state to creature motion, vegetation deformation, bounded-water forcing, visible rain/snow, wet surfaces, and splashes",
+    "tierExecution": "sceneScale is applied by PassNode.setResolutionScale; waterScale is the derived selected-tier resolution divided by the ultra-tier resolution; exact canonical heightfield and mesh resources are used without private overrides; DPR and shadow size change live renderer resources",
+    "readback": "outline-mask reads the real emissive MRT attachment; shadow-atlas samples the actual allocated host shadow comparison texture into color-managed RGBA8; row stride is integer and 256-byte aligned",
+    "finalOwnership": "one native WebGPURenderer, one RenderPipeline, one renderOutput tone-map/output transform"
+  },
   "tiers": [
     {
       "id": "hero",
-      "targetFrameMs": {"value": 16.67, "unit": "ms", "label": "Gated", "source": "integration 60 Hz contract"},
+      "targetFrameMs": {
+        "value": 16.67,
+        "unit": "ms",
+        "label": "Gated",
+        "source": "integration 60 Hz contract"
+      },
       "stageBudgets": [
-        {"id": "creatures", "budgetMs": {"value": 3.6, "unit": "ms", "label": "Gated", "source": "integration stage envelope"}},
-        {"id": "vegetation", "budgetMs": {"value": 2.5, "unit": "ms", "label": "Gated", "source": "integration stage envelope"}},
-        {"id": "water", "budgetMs": {"value": 1.8, "unit": "ms", "label": "Gated", "source": "integration stage envelope"}},
-        {"id": "weather", "budgetMs": {"value": 1.1, "unit": "ms", "label": "Gated", "source": "integration stage envelope"}},
-        {"id": "camera-shadows", "budgetMs": {"value": 2.7, "unit": "ms", "label": "Gated", "source": "integration stage envelope"}},
-        {"id": "scene-outline-present", "budgetMs": {"value": 2.2, "unit": "ms", "label": "Gated", "source": "integration stage envelope"}}
+        {
+          "id": "creatures",
+          "budgetMs": {
+            "value": 3.6,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "integration stage envelope"
+          }
+        },
+        {
+          "id": "vegetation",
+          "budgetMs": {
+            "value": 2.5,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "integration stage envelope"
+          }
+        },
+        {
+          "id": "water",
+          "budgetMs": {
+            "value": 1.8,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "integration stage envelope"
+          }
+        },
+        {
+          "id": "weather",
+          "budgetMs": {
+            "value": 1.1,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "integration stage envelope"
+          }
+        },
+        {
+          "id": "camera-shadows",
+          "budgetMs": {
+            "value": 2.7,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "integration stage envelope"
+          }
+        },
+        {
+          "id": "scene-outline-present",
+          "budgetMs": {
+            "value": 2.2,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "integration stage envelope"
+          }
+        }
       ],
-      "resolutionPolicy": {"sceneScale": 1, "waterScale": 1, "dprCap": 2},
-      "mechanismLimits": {"creatureTier": "hero", "creatureCapacity": 4, "vegetationTier": "high", "waterTier": "ultra", "weatherTier": "high", "cameraTier": "full", "shadowMapSize": 2048},
-      "resourceLimits": {"status": "requires runtime inventory"},
+      "resolutionPolicy": {
+        "sceneScale": 1,
+        "waterScale": 1,
+        "dprCap": 2
+      },
+      "mechanismLimits": {
+        "creatureTier": "hero",
+        "creatureCapacity": 4,
+        "vegetationTier": "high",
+        "waterTier": "ultra",
+        "weatherTier": "high",
+        "cameraTier": "full",
+        "shadowMapSize": 2048
+      },
+      "resourceLimits": {
+        "status": "requires runtime inventory"
+      },
       "degradationFromPrevious": [],
-      "preservedInvariants": ["shared contact channel", "immutable spawn storage", "shared world units/wind", "subject-consistent culling/shadow/outline/water", "one final owner"]
+      "preservedInvariants": [
+        "shared contact channel",
+        "immutable spawn storage",
+        "shared world units/wind",
+        "subject-consistent culling/shadow/outline/water",
+        "one final owner"
+      ]
     },
     {
       "id": "balanced",
-      "targetFrameMs": {"value": 16.67, "unit": "ms", "label": "Gated", "source": "integration 60 Hz contract"},
+      "targetFrameMs": {
+        "value": 16.67,
+        "unit": "ms",
+        "label": "Gated",
+        "source": "integration 60 Hz contract"
+      },
       "stageBudgets": [
-        {"id": "creatures", "budgetMs": {"value": 2.9, "unit": "ms", "label": "Gated", "source": "integration stage envelope"}},
-        {"id": "vegetation", "budgetMs": {"value": 2, "unit": "ms", "label": "Gated", "source": "integration stage envelope"}},
-        {"id": "water", "budgetMs": {"value": 1.3, "unit": "ms", "label": "Gated", "source": "integration stage envelope"}},
-        {"id": "weather", "budgetMs": {"value": 0.8, "unit": "ms", "label": "Gated", "source": "integration stage envelope"}},
-        {"id": "camera-shadows", "budgetMs": {"value": 2.1, "unit": "ms", "label": "Gated", "source": "integration stage envelope"}},
-        {"id": "scene-outline-present", "budgetMs": {"value": 1.8, "unit": "ms", "label": "Gated", "source": "integration stage envelope"}}
+        {
+          "id": "creatures",
+          "budgetMs": {
+            "value": 2.9,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "integration stage envelope"
+          }
+        },
+        {
+          "id": "vegetation",
+          "budgetMs": {
+            "value": 2,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "integration stage envelope"
+          }
+        },
+        {
+          "id": "water",
+          "budgetMs": {
+            "value": 1.3,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "integration stage envelope"
+          }
+        },
+        {
+          "id": "weather",
+          "budgetMs": {
+            "value": 0.8,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "integration stage envelope"
+          }
+        },
+        {
+          "id": "camera-shadows",
+          "budgetMs": {
+            "value": 2.1,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "integration stage envelope"
+          }
+        },
+        {
+          "id": "scene-outline-present",
+          "budgetMs": {
+            "value": 1.8,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "integration stage envelope"
+          }
+        }
       ],
-      "resolutionPolicy": {"sceneScale": 1, "waterScale": 0.5, "dprCap": 1.5},
-      "mechanismLimits": {"creatureTier": "crowd", "creatureCapacity": 12, "vegetationTier": "medium", "waterTier": "high", "weatherTier": "medium", "cameraTier": "budgeted", "shadowMapSize": 1024},
-      "resourceLimits": {"status": "requires runtime inventory"},
-      "degradationFromPrevious": ["reduce optional creature correction/detail", "reduce vegetation/water detail", "reduce shadow detail"],
-      "preservedInvariants": ["shared contact channel", "immutable spawn storage", "shared world units/wind", "subject-consistent culling/shadow/outline/water", "one final owner"]
+      "resolutionPolicy": {
+        "sceneScale": 1,
+        "waterScale": 0.5,
+        "dprCap": 1.5
+      },
+      "mechanismLimits": {
+        "creatureTier": "crowd",
+        "creatureCapacity": 12,
+        "vegetationTier": "medium",
+        "waterTier": "high",
+        "weatherTier": "medium",
+        "cameraTier": "budgeted",
+        "shadowMapSize": 1024
+      },
+      "resourceLimits": {
+        "status": "requires runtime inventory"
+      },
+      "degradationFromPrevious": [
+        "reduce optional creature correction/detail",
+        "reduce vegetation/water detail",
+        "reduce shadow detail"
+      ],
+      "preservedInvariants": [
+        "shared contact channel",
+        "immutable spawn storage",
+        "shared world units/wind",
+        "subject-consistent culling/shadow/outline/water",
+        "one final owner"
+      ]
     },
     {
       "id": "budgeted",
-      "targetFrameMs": {"value": 16.67, "unit": "ms", "label": "Gated", "source": "integration 60 Hz contract"},
+      "targetFrameMs": {
+        "value": 16.67,
+        "unit": "ms",
+        "label": "Gated",
+        "source": "integration 60 Hz contract"
+      },
       "stageBudgets": [
-        {"id": "creatures", "budgetMs": {"value": 2.1, "unit": "ms", "label": "Gated", "source": "integration stage envelope"}},
-        {"id": "vegetation", "budgetMs": {"value": 1.5, "unit": "ms", "label": "Gated", "source": "integration stage envelope"}},
-        {"id": "water", "budgetMs": {"value": 0.9, "unit": "ms", "label": "Gated", "source": "integration stage envelope"}},
-        {"id": "weather", "budgetMs": {"value": 0.5, "unit": "ms", "label": "Gated", "source": "integration stage envelope"}},
-        {"id": "camera-shadows", "budgetMs": {"value": 1.5, "unit": "ms", "label": "Gated", "source": "integration stage envelope"}},
-        {"id": "scene-outline-present", "budgetMs": {"value": 1.4, "unit": "ms", "label": "Gated", "source": "integration stage envelope"}}
+        {
+          "id": "creatures",
+          "budgetMs": {
+            "value": 2.1,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "integration stage envelope"
+          }
+        },
+        {
+          "id": "vegetation",
+          "budgetMs": {
+            "value": 1.5,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "integration stage envelope"
+          }
+        },
+        {
+          "id": "water",
+          "budgetMs": {
+            "value": 0.9,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "integration stage envelope"
+          }
+        },
+        {
+          "id": "weather",
+          "budgetMs": {
+            "value": 0.5,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "integration stage envelope"
+          }
+        },
+        {
+          "id": "camera-shadows",
+          "budgetMs": {
+            "value": 1.5,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "integration stage envelope"
+          }
+        },
+        {
+          "id": "scene-outline-present",
+          "budgetMs": {
+            "value": 1.4,
+            "unit": "ms",
+            "label": "Gated",
+            "source": "integration stage envelope"
+          }
+        }
       ],
-      "resolutionPolicy": {"sceneScale": 0.85, "waterScale": 0.375, "dprCap": 1},
-      "mechanismLimits": {"creatureTier": "background", "creatureCapacity": 20, "vegetationTier": "low", "waterTier": "medium", "weatherTier": "budgeted", "cameraTier": "minimum", "shadowMapSize": 512},
-      "resourceLimits": {"status": "requires runtime inventory"},
-      "degradationFromPrevious": ["lower post/water resolution", "reduce optional detail", "reduce valid feedback cadence", "reduce populations/LOD", "disable optional decoration"],
-      "preservedInvariants": ["shared contact channel", "immutable spawn storage", "shared world units/wind", "subject-consistent culling/shadow/water", "one final owner", "locomotion physics"]
+      "resolutionPolicy": {
+        "sceneScale": 0.85,
+        "waterScale": 0.375,
+        "dprCap": 1
+      },
+      "mechanismLimits": {
+        "creatureTier": "background",
+        "creatureCapacity": 20,
+        "vegetationTier": "low",
+        "waterTier": "medium",
+        "weatherTier": "budgeted",
+        "cameraTier": "minimum",
+        "shadowMapSize": 512
+      },
+      "resourceLimits": {
+        "status": "requires runtime inventory"
+      },
+      "degradationFromPrevious": [
+        "lower post/water resolution",
+        "reduce optional detail",
+        "reduce valid feedback cadence",
+        "reduce populations/LOD",
+        "disable optional decoration"
+      ],
+      "preservedInvariants": [
+        "shared contact channel",
+        "immutable spawn storage",
+        "shared world units/wind",
+        "subject-consistent culling/shadow/water",
+        "one final owner",
+        "locomotion physics"
+      ]
     }
   ],
   "qualityGovernor": {
     "owner": "threejs-image-pipeline",
     "performanceBasis": "sustained-measured-p95-with-hysteresis-and-cooldown",
-    "downgradePersistence": {"value": 2, "unit": "windows", "label": "Authored", "source": "integration governor policy"},
-    "upgradePersistence": {"value": 4, "unit": "windows", "label": "Authored", "source": "integration governor policy"},
-    "cooldown": {"value": 3, "unit": "windows", "label": "Authored", "source": "integration governor policy"},
-    "windowSamples": {"value": 30, "unit": "GPU-frame-timestamp durations", "label": "Authored", "source": "integration governor policy"},
+    "downgradePersistence": {
+      "value": 2,
+      "unit": "windows",
+      "label": "Authored",
+      "source": "integration governor policy"
+    },
+    "upgradePersistence": {
+      "value": 4,
+      "unit": "windows",
+      "label": "Authored",
+      "source": "integration governor policy"
+    },
+    "cooldown": {
+      "value": 3,
+      "unit": "windows",
+      "label": "Authored",
+      "source": "integration governor policy"
+    },
+    "windowSamples": {
+      "value": 30,
+      "unit": "GPU-frame-timestamp durations",
+      "label": "Authored",
+      "source": "integration governor policy"
+    },
     "timestampGate": "Only finite positive combined render+compute GPU durations enter the nearest-rank p95 window. Missing, zero, invalid, or unsupported timestamps produce skipped windows and cannot transition quality.",
-    "degradationOrder": ["lower post resolution", "reduce optional samples/detail", "reduce valid update cadence", "reduce counts/LOD", "disable optional decoration"]
+    "degradationOrder": [
+      "lower post resolution",
+      "reduce optional samples/detail",
+      "reduce valid update cadence",
+      "reduce counts/LOD",
+      "disable optional decoration"
+    ]
   },
   "adapterRequirements": [
-    {"id": "image-pipeline-host", "skill": "threejs-image-pipeline", "sourceStatus": "available", "module": "integration-labs/creature-habitat/habitat-controller.js", "requiredExport": "createHabitatController", "reason": "Local integration host owns the sole native renderer, MRT RenderPipeline, renderOutput tone map, output conversion, aligned readback, and lifecycle."},
-    {"id": "creature-stage", "skill": "threejs-procedural-creatures", "sourceStatus": "available", "module": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/runtime/creature-stage.js", "requiredExport": "createCreatureStage", "reason": "Explicitly requires host scene/camera/renderer/pipeline/shadow owners."},
-    {"id": "vegetation-stage", "skill": "threejs-procedural-vegetation", "sourceStatus": "available", "module": "threejs-procedural-vegetation/examples/webgpu-dense-grass/integration-adapter.js", "requiredExport": "createDenseVegetationSceneAdapter", "reason": "Host adapter consumes the shared camera, weather wind, and contact snapshot without constructing renderer/output owners."},
-    {"id": "bounded-water-stage", "skill": "threejs-water-optics", "sourceStatus": "available", "module": "integration-labs/creature-habitat/scaled-water-stage.js", "requiredExport": "createScaledBoundedWaterStage", "reason": "Host renderer and touch/weather inputs are injected; waterScale records the selected canonical tier's exact simulation and mesh dimensions relative to ultra."},
-    {"id": "weather-stage", "skill": "threejs-rain-snow-and-wet-surfaces", "sourceStatus": "available", "module": "integration-labs/creature-habitat/habitat-weather-stage.js", "requiredExport": "createHabitatWeatherVisualStage", "reason": "Consumes the one shared weather envelope and renders canonical rain, snow, wet/puddle, accumulated snow, and GPU splash mechanisms without owning renderer output."},
-    {"id": "camera-stage", "skill": "threejs-camera-controls-and-rigs", "sourceStatus": "available", "module": "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/CameraDirectionController.mjs", "requiredExport": "CameraDirectionController", "reason": "Body-relative controller accepts the host camera and restores lifecycle state without owning a renderer/pipeline."},
-    {"id": "shadow-stage", "skill": "threejs-scalable-real-time-shadows", "sourceStatus": "available", "module": "integration-labs/creature-habitat/habitat-controller.js", "requiredExport": "createHostShadowStage", "reason": "Local host-only adapter owns one real tier-sized DirectionalLight shadow map; it creates no renderer or final pipeline."}
+    {
+      "id": "image-pipeline-host",
+      "skill": "threejs-image-pipeline",
+      "sourceStatus": "available",
+      "module": "integration-labs/creature-habitat/habitat-controller.js",
+      "requiredExport": "createHabitatController",
+      "reason": "Local integration host owns the sole native renderer, MRT RenderPipeline, renderOutput tone map, output conversion, aligned readback, and lifecycle."
+    },
+    {
+      "id": "creature-stage",
+      "skill": "threejs-procedural-creatures",
+      "sourceStatus": "available",
+      "module": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/src/runtime/creature-stage.js",
+      "requiredExport": "createCreatureStage",
+      "reason": "Explicitly requires host scene/camera/renderer/pipeline/shadow owners."
+    },
+    {
+      "id": "vegetation-stage",
+      "skill": "threejs-procedural-vegetation",
+      "sourceStatus": "available",
+      "module": "threejs-procedural-vegetation/examples/webgpu-dense-grass/integration-adapter.js",
+      "requiredExport": "createDenseVegetationSceneAdapter",
+      "reason": "Host adapter consumes the shared camera, weather wind, and contact snapshot without constructing renderer/output owners."
+    },
+    {
+      "id": "bounded-water-stage",
+      "skill": "threejs-water-optics",
+      "sourceStatus": "available",
+      "module": "integration-labs/creature-habitat/scaled-water-stage.js",
+      "requiredExport": "createScaledBoundedWaterStage",
+      "reason": "Host renderer and touch/weather inputs are injected; waterScale records the selected canonical tier's exact simulation and mesh dimensions relative to ultra."
+    },
+    {
+      "id": "weather-stage",
+      "skill": "threejs-rain-snow-and-wet-surfaces",
+      "sourceStatus": "available",
+      "module": "integration-labs/creature-habitat/habitat-weather-stage.js",
+      "requiredExport": "createHabitatWeatherVisualStage",
+      "reason": "Consumes the one shared weather envelope and renders canonical rain, snow, wet/puddle, accumulated snow, and GPU splash mechanisms without owning renderer output."
+    },
+    {
+      "id": "camera-stage",
+      "skill": "threejs-camera-controls-and-rigs",
+      "sourceStatus": "available",
+      "module": "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/CameraDirectionController.mjs",
+      "requiredExport": "CameraDirectionController",
+      "reason": "Body-relative controller accepts the host camera and restores lifecycle state without owning a renderer/pipeline."
+    },
+    {
+      "id": "shadow-stage",
+      "skill": "threejs-scalable-real-time-shadows",
+      "sourceStatus": "available",
+      "module": "integration-labs/creature-habitat/habitat-controller.js",
+      "requiredExport": "createHostShadowStage",
+      "reason": "Local host-only adapter owns one real tier-sized DirectionalLight shadow map; it creates no renderer or final pipeline."
+    }
   ],
-  "runtimeEvidence": {"nativeWebGPU": "INSUFFICIENT_EVIDENCE", "renderTargetReadback": "INSUFFICIENT_EVIDENCE", "currentAdapterTiming": "INSUFFICIENT_EVIDENCE", "lifecycle": "INSUFFICIENT_EVIDENCE", "implementationNote": "Native runtime, color-managed capture hook, real MRT/shadow-atlas diagnostic, measured-only governor, and reconciled ledger code paths exist, but browser execution and a complete v2 bundle are not authorized in this workstream."}
+  "runtimeEvidence": {
+    "nativeWebGPU": "PASS",
+    "renderTargetReadback": "PASS",
+    "currentAdapterTiming": "INSUFFICIENT_EVIDENCE",
+    "lifecycle": "PASS",
+    "implementationNote": "Accepted via demo browserEntry capture + physical CDP + tracked v2 release under docs/visual-validation/creature-habitat/bundle. hardwarePerformance remains NOT_CLAIMED without named-adapter timestamps."
+  }
 }

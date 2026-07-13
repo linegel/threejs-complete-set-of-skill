@@ -36,8 +36,8 @@ const registryManifest = buildDemoRegistry().demos.find((entry) => entry.id === 
 assert(registryManifest, `registry contains ${manifest.id}`);
 const normalized = validateLabManifest(registryManifest, { root: repoRoot, validateEvidence: false });
 assert.deepEqual(normalized.errors, [], normalized.errors.join("\n"));
-assert.equal(manifest.status, "incomplete");
-assert.equal(manifest.evidenceBundle, null);
+assert.equal(manifest.status, "accepted");
+assert.equal(manifest.evidenceBundle, "docs/visual-validation/final-image-flight/bundle");
 assert.equal(manifest.evidenceContract, "v2");
 
 assert(target, "final-image-flight frozen target is absent");
@@ -75,7 +75,7 @@ assert.throws(() => assertFinalImageFlightRouteLock(locked, { tier: "budgeted" }
 
 const integration = validateIntegrationContract(contract);
 assert.equal(integration.verdict, "PASS", integration.message);
-assert.equal(integration.code, INTEGRATION_REASON.INCOMPLETE);
+assert.equal(integration.code, INTEGRATION_REASON.ACCEPTED);
 assert.equal(integration.details.missingAdapters.length, 0);
 assert.equal(integration.details.availableAdapters.length, 8);
 

@@ -611,7 +611,7 @@ export async function createFinalImageFlightLab({
     if (!debugElement) return;
     const graph = describePipeline();
     debugElement.textContent = JSON.stringify({
-      status: "native-WebGPU runtime; acceptance incomplete pending capture",
+      status: "native-WebGPU runtime; evidence accepted (correctness lane); hardwarePerformance NOT_CLAIMED",
       scenario,
       mode,
       tier,
