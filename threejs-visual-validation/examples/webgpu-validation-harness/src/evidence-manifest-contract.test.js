@@ -421,7 +421,7 @@ test( 'requires release, session, hardware, browser, route, and binding identiti
 		[ ( record ) => { record.captureSessions[ 0 ].buildRevision = hash( 'other-build' ); }, /build revision differs/ ],
 		[ ( record ) => { record.captureSessions[ 0 ].threeRevision = '0.184.0'; }, /Three\.js revision differs/ ],
 		[ ( record ) => { record.captureSessions[ 0 ].finishedAt = '2026-07-12T11:59:00Z'; }, /capture interval is invalid/ ],
-		[ ( record ) => { record.captureSessions[ 0 ].routePath = '/demos/another-lab/'; }, /route path differs/ ],
+		[ ( record ) => { record.captureSessions[ 0 ].routePath = '/demos/another-lab/'; }, /route path is not a member of the release route set/ ],
 		[ ( record ) => { record.captureSessions[ 0 ].stateDigest = hash( 'other-state' ); }, /state digest differs/ ],
 		[ ( record ) => { record.promotion.binding.claimVerdicts.visualCorrectness = 'FAIL'; }, /claim verdicts differ/ ],
 		[ ( record ) => { record.captureSessions.find( ( entry ) => entry.profile === 'performance' ).adapterIdentity.digest = hash( 'another-adapter' ); }, /different hardware adapters/ ],
