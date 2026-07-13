@@ -3,6 +3,7 @@ import {
 	PHYSICAL_EVIDENCE_SCHEMA_VERSION,
 	PHYSICAL_ROUTE_PROFILE,
 	numericDatum,
+	requireCaptureTargetResourceFormat,
 	sha256Hex
 } from './physical-evidence-common.js';
 import {
@@ -121,7 +122,7 @@ async function summarizeReadback( capture, resources ) {
 		rowBytes: capture.rowBytes,
 		sourceBytesPerRow: capture.sourceBytesPerRow,
 		format: capture.format,
-		resourceFormat: resources.renderTargets?.find( ( target ) => target.id === 'capture-target' )?.format ?? null,
+		resourceFormat: requireCaptureTargetResourceFormat( resources ),
 		colorManaged: capture.colorManaged,
 		outputColorSpace: capture.outputColorSpace,
 		encoding: capture.encoding,
