@@ -815,8 +815,8 @@ export function createPerformanceEvidenceArtifacts( input ) {
 		timestampResolveCount: performanceTrace === null ? null : M( performanceTrace.timestampResolveCount, 'resolve', `${ sourceIdentity }; batched timestamp resolution count` ),
 		timestampMappingCadence: performanceTrace?.timestampMappingCadence ?? 'not-claimed',
 		gpuSamples: gpuSamples.length === 0 ? null : DA( gpuSamples, 'ms', 'sum of two measured render-context timestamps per sustained frame' ),
-		gpuP50: gpuSamples.length === 0 ? null : D( percentile( gpuSamples, 0.5 ), 'ms', 'p50 of derived sustained frame totals' ),
-		gpuP95: gpuSamples.length === 0 ? null : D( percentile( gpuSamples, 0.95 ), 'ms', 'p95 of derived sustained frame totals' ),
+		gpuP50: gpuSamples.length === 0 ? null : D( percentile( gpuSamples, 0.5 ), 'ms', 'p50 of sums of two measured render-context timestamps per sustained frame' ),
+		gpuP95: gpuSamples.length === 0 ? null : D( percentile( gpuSamples, 0.95 ), 'ms', 'p95 of sums of two measured render-context timestamps per sustained frame' ),
 		gpuStageAttribution: performanceTrace === null ? null : {
 			'scene-mrt': {
 				samples: MA( performanceTrace.gpuStageSamples[ 'scene-mrt' ], 'ms', `${ sourceIdentity }; resolved r185 render-context timestamps` ),
@@ -871,7 +871,7 @@ export function createPerformanceEvidenceArtifacts( input ) {
 				measuredTier: window.measuredTier,
 				resultingTier: window.tier,
 				gpuSamples: DA( window.gpuSamples, 'ms', 'sum of measured render-context timestamps in governor window' ),
-				gpuP95: D( window.gpuP95, 'ms', 'p95 of derived governor frame totals' ),
+				gpuP95: D( window.gpuP95, 'ms', 'p95 of sums of measured render-context timestamps in the governor window' ),
 				timestampRows: window.timestampRows.map( ( row ) => timestampEvidenceRow( row, `governor window ${ window.window } timestamp batch` ) ),
 				lastFrameResolveResidual: D( window.lastFrameResolveResidualMs, 'ms', 'Three r185 final-frame aggregate minus final governor-window stage sum' ),
 				visualError: visualDatum( window.measuredTier, visual.meanRgbByteDifference, 'mean-rgb-byte-difference', window.measuredTier === 'target-performance' ? 'reference tier identity comparison' : 'fixed tier render-target comparison' ),

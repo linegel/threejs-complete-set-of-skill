@@ -306,9 +306,14 @@ test( 'pure performance artifacts preserve measured inputs and derived estimator
 	assert.equal( envelope.browserMainThreadReserve.label, 'Measured' );
 	assert.equal( envelope.compositorGpuReserve.status, 'NOT_CLAIMED' );
 	assert.equal( frameTrace.renderTimestamp.label, 'Derived' );
+	assert.equal( frameTrace.gpuP50.label, 'Derived' );
+	assert.equal( frameTrace.gpuP95.label, 'Derived' );
+	assert.match( frameTrace.gpuP50.source, /measured render-context timestamps/ );
+	assert.match( frameTrace.gpuP95.source, /measured render-context timestamps/ );
 	assert.equal( frameTrace.presentationCadence.label, 'Derived' );
 	assert.match( frameTrace.sustained.cpuSamples.source, /physical-browser performance/ );
 	assert.equal( governor.windows[ 1 ].visualError.label, 'Derived' );
+	assert.match( governor.windows[ 1 ].gpuP95.source, /measured render-context timestamps/ );
 	assert.equal( governor.windows[ 1 ].edgeMaskPixels.label, 'Measured' );
 	assert.equal( governor.finalStableGpuP95.label, 'Derived' );
 	assert.equal( governor.finalStableVisualError.label, 'Derived' );
