@@ -21,6 +21,7 @@ test('shared checked schemas validate the canonical raw manifest and runtime gra
     'physicsIntegration',
     'runtimeGraph',
     'tierVisualEvidence',
+    'trackedReleaseProjection',
   ]);
   assert.deepEqual(validateCheckedJsonSchema(schemas.labManifest, routerManifest), {
     valid: true,

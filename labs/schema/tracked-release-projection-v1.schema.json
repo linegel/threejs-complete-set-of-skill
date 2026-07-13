@@ -1,0 +1,229 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://threejs-skills.com/schemas/tracked-release-projection-v1.json",
+  "title": "Tracked native WebGPU release projection v1",
+  "description": "A compact checkout-verifiable projection of an immutable, fully validated evidence release. Omitted payloads remain exact commitments and are not represented as locally captured bytes.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "projectionKind",
+    "policy",
+    "labId",
+    "skill",
+    "threeRevision",
+    "sourceClosureHash",
+    "buildRevision",
+    "sourceRelease",
+    "sourceClosure",
+    "retainedFiles",
+    "retainedImages",
+    "omittedFiles",
+    "checkoutLimitations",
+    "projectionDigest"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "projectionKind": { "const": "tracked-release-projection-v1" },
+    "policy": { "$ref": "#/$defs/policy" },
+    "labId": { "$ref": "#/$defs/labId" },
+    "skill": { "type": "string", "pattern": "^threejs-[a-z0-9][a-z0-9-]*$" },
+    "threeRevision": { "const": "0.185.1" },
+    "sourceClosureHash": { "$ref": "#/$defs/sha256" },
+    "buildRevision": { "$ref": "#/$defs/sha256" },
+    "sourceRelease": { "$ref": "#/$defs/sourceRelease" },
+    "sourceClosure": { "$ref": "#/$defs/sourceClosure" },
+    "retainedFiles": {
+      "type": "array",
+      "minItems": 13,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/retainedFile" }
+    },
+    "retainedImages": {
+      "type": "array",
+      "minItems": 10,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/retainedImage" }
+    },
+    "omittedFiles": { "$ref": "#/$defs/omittedFiles" },
+    "checkoutLimitations": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/checkoutLimitation" }
+    },
+    "projectionDigest": { "$ref": "#/$defs/sha256" }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "labId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\)(?!.*[\\u0000-\\u001f]).+$"
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "digest"],
+      "properties": {
+        "id": { "const": "native-webgpu-tracked-release-v1" },
+        "digest": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "sourceRelease": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256",
+        "byteLength",
+        "promotionBindingDigest",
+        "candidateBindingDigest",
+        "artifactLedgerDigest",
+        "imageLedgerDigest"
+      ],
+      "properties": {
+        "path": { "const": "evidence-manifest.json" },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "byteLength": { "type": "integer", "minimum": 1 },
+        "promotionBindingDigest": { "$ref": "#/$defs/sha256" },
+        "candidateBindingDigest": { "$ref": "#/$defs/sha256" },
+        "artifactLedgerDigest": { "$ref": "#/$defs/sha256" },
+        "imageLedgerDigest": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "sourceClosureFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repositoryPath", "sha256", "byteLength"],
+      "properties": {
+        "repositoryPath": { "$ref": "#/$defs/relativePath" },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "byteLength": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "sourceClosure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "roots", "files", "threeRevision", "sourceHash", "buildRevision"],
+      "properties": {
+        "algorithm": { "type": "string", "minLength": 1 },
+        "roots": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/relativePath" }
+        },
+        "files": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/sourceClosureFile" }
+        },
+        "threeRevision": { "const": "0.185.1" },
+        "sourceHash": { "$ref": "#/$defs/sha256" },
+        "buildRevision": { "$ref": "#/$defs/sha256" },
+        "registrySourceHash": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "retainedFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "status", "kind", "sha256", "byteLength"],
+      "properties": {
+        "path": { "$ref": "#/$defs/relativePath" },
+        "status": { "const": "captured" },
+        "kind": {
+          "enum": ["normative-json", "supplementary-json", "capture-session-write-ledger"]
+        },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "byteLength": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "imageDerivation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "implementation", "parametersDigest"],
+      "properties": {
+        "method": { "type": "string", "minLength": 1 },
+        "implementation": { "$ref": "#/$defs/relativePath" },
+        "parametersDigest": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "retainedImage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "status", "kind", "role", "mediaType", "sha256", "byteLength"],
+      "properties": {
+        "path": { "allOf": [{ "$ref": "#/$defs/relativePath" }, { "pattern": "\\.png$" }] },
+        "status": { "const": "captured" },
+        "kind": { "enum": ["direct-capture", "derived-image"] },
+        "role": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]*$" },
+        "mediaType": { "const": "image/png" },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "byteLength": { "type": "integer", "minimum": 1 },
+        "derivation": { "$ref": "#/$defs/imageDerivation" },
+        "sourceCaptures": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/relativePath" }
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "kind": { "const": "derived-image" } } },
+          "then": { "required": ["derivation", "sourceCaptures"] }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "direct-capture" } } },
+          "then": { "properties": { "derivation": false, "sourceCaptures": false } }
+        }
+      ]
+    },
+    "omittedKindSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "count", "byteLength"],
+      "properties": {
+        "kind": {
+          "enum": ["supplementary-json", "capture-session-document", "raw-readback", "binary-artifact"]
+        },
+        "count": { "type": "integer", "minimum": 1 },
+        "byteLength": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "omittedFiles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ledgerDigest", "count", "byteLength", "byKind"],
+      "properties": {
+        "ledgerDigest": { "$ref": "#/$defs/sha256" },
+        "count": { "type": "integer", "minimum": 1 },
+        "byteLength": { "type": "integer", "minimum": 1 },
+        "byKind": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/omittedKindSummary" }
+        }
+      }
+    },
+    "checkoutLimitation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "status", "statement", "affectedClaims"],
+      "properties": {
+        "id": { "const": "detached-source-payloads" },
+        "status": { "const": "ACTIVE" },
+        "statement": { "type": "string", "minLength": 1 },
+        "affectedClaims": {
+          "type": "array",
+          "maxItems": 0
+        }
+      }
+    }
+  }
+}

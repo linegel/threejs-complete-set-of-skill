@@ -22,6 +22,10 @@ import {
 } from './evidence-runtime-claims.mjs';
 import { loadCheckedSchemas, validateCheckedJsonSchema } from './checked-json-schema.mjs';
 import { compareRgbaPngs, inspectRgbaPng } from './png-rgba.mjs';
+import {
+  TRACKED_RELEASE_PROJECTION_FILENAME,
+  validateTrackedReleaseProjection,
+} from './tracked-release-projection.mjs';
 
 export const REQUIRED_EVIDENCE_JSON = Object.freeze([
   'visual-contract.json',
@@ -410,7 +414,16 @@ function validateUnifiedV2Bundle(bundleDir, manifest, requireRequiredClaimsPass)
   };
 }
 
-export function validateEvidenceBundle(bundleDir, { requireRequiredClaimsPass = false } = {}) {
+export function validateEvidenceBundle(bundleDir, {
+  requireRequiredClaimsPass = false,
+  repositoryRoot = null,
+} = {}) {
+  if (existsSync(join(bundleDir, TRACKED_RELEASE_PROJECTION_FILENAME))) {
+    return validateTrackedReleaseProjection(bundleDir, {
+      requireRequiredClaimsPass,
+      repositoryRoot,
+    });
+  }
   const manifestPath = artifactPath(bundleDir, 'evidence-manifest.json');
   if (!existsSync(manifestPath)) {
     return {

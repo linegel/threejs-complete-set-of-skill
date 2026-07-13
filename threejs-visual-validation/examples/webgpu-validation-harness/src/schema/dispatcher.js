@@ -2,6 +2,7 @@ import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 import { validateEvidenceBundle as validateSharedEvidenceBundle } from '../../../../../scripts/lib/evidence-v2.mjs';
+import { VALIDATION_HARNESS_REPOSITORY_ROOT } from '../artifact-paths.js';
 import { validateUnifiedV2ArtifactBundle } from '../evidence-bundle-v2.js';
 import { validateArtifactBundle as validateV1ArtifactBundle } from './artifact-schemas.js';
 
@@ -25,7 +26,21 @@ export async function validateVersionedArtifactBundle( artifactDir, options = {}
 
 	if ( version === 2 ) {
 
-		const sharedResult = validateSharedEvidenceBundle( artifactDir, options );
+		const sharedResult = validateSharedEvidenceBundle( artifactDir, {
+			...options,
+			repositoryRoot: options.repositoryRoot ?? VALIDATION_HARNESS_REPOSITORY_ROOT
+		} );
+		if ( sharedResult.protocol === 'tracked-release-projection-v1' ) return Object.freeze( {
+			schemaVersion: 2,
+			protocol: sharedResult.protocol,
+			bundleKind: sharedResult.manifest.bundleKind,
+			publishable: sharedResult.manifest.publishable,
+			canonicalAcceptanceEligible: sharedResult.canonicalAcceptanceEligible,
+			captureProfiles: Object.freeze( sharedResult.manifest.captureSessions.map( ( session ) => session.profile ) ),
+			automationSurfaces: Object.freeze( [ ...new Set( sharedResult.manifest.captureSessions.map( ( session ) => session.automationSurface ) ) ] ),
+			claimVerdicts: Object.freeze( { ...sharedResult.manifest.claimVerdicts } ),
+			validationErrors: Object.freeze( [ ...sharedResult.errors ] )
+		} );
 		if ( sharedResult.protocol === 'legacy-v2' ) return Object.freeze( {
 			schemaVersion: 2,
 			protocol: 'legacy-v2',

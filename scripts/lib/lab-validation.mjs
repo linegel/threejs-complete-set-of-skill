@@ -386,6 +386,7 @@ export function validateLabManifest(manifest, { root = REPO_ROOT, validateEviden
       } else if (validateEvidence) {
         const result = validateEvidenceBundle(join(root, manifest.evidenceBundle), {
           requireRequiredClaimsPass: true,
+          repositoryRoot: root,
         });
         errors.push(...result.errors.map((error) => `evidence: ${error}`));
       }
