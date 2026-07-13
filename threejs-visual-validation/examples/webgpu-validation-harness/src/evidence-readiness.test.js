@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
 
-import { deriveHarnessAcceptanceReadiness, inspectHarnessAcceptanceReadiness } from './evidence-readiness.js';
+import { deriveHarnessAcceptanceReadiness, inspectAdapterClasses, inspectHarnessAcceptanceReadiness } from './evidence-readiness.js';
 
 function input( name, status, message = null ) {
 
@@ -110,5 +110,37 @@ test( 'candidate readiness confines external candidates without a missing root i
 	} );
 	assert.equal( result.inputs.releaseCandidate.status, 'MISSING' );
 	assert.equal( result.accepted, false );
+
+} );
+
+test( 'aggregate readiness checks adapter class per capture profile', () => {
+
+	const sessions = [
+		{ profile: 'correctness', adapterClass: 'software' },
+		{ profile: 'physical-route', adapterClass: 'hardware' },
+		{ profile: 'performance', adapterClass: 'hardware' }
+	];
+	const requirements = {
+		correctness: [ 'hardware', 'software' ],
+		'physical-route': [ 'hardware' ],
+		performance: [ 'hardware' ]
+	};
+	const accepted = inspectAdapterClasses( sessions, requirements );
+	assert.equal( accepted.ready, true );
+	assert.deepEqual( accepted.classesByProfile, {
+		correctness: 'software',
+		'physical-route': 'hardware',
+		performance: 'hardware'
+	} );
+
+	const forged = inspectAdapterClasses(
+		sessions.map( ( session ) => session.profile === 'performance' ? { ...session, adapterClass: 'software' } : session ),
+		requirements
+	);
+	assert.equal( forged.ready, false );
+	assert.match( forged.message, /performance lane adapter class/ );
+	const duplicated = inspectAdapterClasses( [ ...sessions, { ...sessions[ 2 ] } ], requirements );
+	assert.equal( duplicated.ready, false );
+	assert.match( duplicated.message, /performance lane must have exactly one capture session/ );
 
 } );

@@ -45,6 +45,33 @@ function allClaimsPass( verdicts, requiredClaims ) {
 
 }
 
+export function inspectAdapterClasses( captureSessions, requiredByProfile = {} ) {
+
+	const sessionsByProfile = Map.groupBy( captureSessions, ( session ) => session.profile );
+	const classesByProfile = Object.fromEntries( [ ...sessionsByProfile ].map( ( [ profile, sessions ] ) => [
+		profile,
+		sessions.length === 1 ? sessions[ 0 ].adapterClass ?? null : null
+	] ) );
+	for ( const [ profile, allowedClasses ] of Object.entries( requiredByProfile ) ) {
+
+		const sessions = sessionsByProfile.get( profile ) ?? [];
+		if ( sessions.length !== 1 ) return Object.freeze( {
+			ready: false,
+			classesByProfile: Object.freeze( classesByProfile ),
+			message: `The ${ profile } lane must have exactly one capture session; received ${ sessions.length }.`
+		} );
+		const adapterClass = classesByProfile[ profile ] ?? null;
+		if ( allowedClasses.includes( adapterClass ) === false ) return Object.freeze( {
+			ready: false,
+			classesByProfile: Object.freeze( classesByProfile ),
+			message: `The ${ profile } lane adapter class must be one of: ${ allowedClasses.join( ', ' ) }.`
+		} );
+
+	}
+	return Object.freeze( { ready: true, classesByProfile: Object.freeze( classesByProfile ), message: null } );
+
+}
+
 function isWithin( path, parent ) {
 
 	const rel = relative( parent, path );
@@ -87,12 +114,12 @@ async function inspectBundle( input, path, expected ) {
 		if ( expected.publishable !== undefined && validation.publishable !== expected.publishable ) throw new Error( `Expected publishable=${ expected.publishable }, received ${ validation.publishable }.` );
 		const requiredClaims = expected.requiredClaims ?? [];
 		const claimsPass = allClaimsPass( validation.claimVerdicts, requiredClaims );
-		const captureSession = expected.profile
-			? manifest.captureSessions.find( ( session ) => session.profile === expected.profile )
-			: null;
-		const adapterClass = captureSession?.adapterClass ?? null;
-		const allowedAdapterClasses = expected.allowedAdapterClasses ?? [ 'hardware' ];
-		const adapterReady = allowedAdapterClasses.includes( adapterClass );
+		const requiredAdapterClasses = expected.profile
+			? { [ expected.profile ]: expected.allowedAdapterClasses ?? [ 'hardware' ] }
+			: expected.requiredAdapterClassesByProfile ?? {};
+		const adapterInspection = inspectAdapterClasses( manifest.captureSessions, requiredAdapterClasses );
+		const adapterClass = expected.profile ? adapterInspection.classesByProfile[ expected.profile ] ?? null : null;
+		const adapterReady = adapterInspection.ready;
 		const promotionReady = expected.promotionStatuses === undefined || expected.promotionStatuses.includes( manifest.promotion?.status );
 		const status = claimsPass && adapterReady && promotionReady ? expected.readyStatus : 'INSUFFICIENT_EVIDENCE';
 		return inputSummary( input, path, status, {
@@ -102,6 +129,7 @@ async function inspectBundle( input, path, expected ) {
 			captureProfiles: [ ...validation.captureProfiles ],
 			automationSurfaces: [ ...validation.automationSurfaces ],
 			adapterClass,
+			adapterClassesByProfile: { ...adapterInspection.classesByProfile },
 			claimVerdicts: { ...validation.claimVerdicts },
 			promotionStatus: manifest.promotion?.status ?? null,
 			sourceClosureHash: manifest.sourceClosureHash,
@@ -110,7 +138,7 @@ async function inspectBundle( input, path, expected ) {
 			message: claimsPass === false
 				? `Required claims are not all PASS: ${ requiredClaims.filter( ( claim ) => validation.claimVerdicts?.[ claim ] !== 'PASS' ).join( ', ' ) }.`
 				: adapterReady === false
-					? `The ${ expected.profile } lane adapter class must be one of: ${ allowedAdapterClasses.join( ', ' ) }.`
+					? adapterInspection.message
 					: promotionReady === false
 						? `Promotion status ${ manifest.promotion?.status ?? '<missing>' } is not eligible for this input.`
 						: null
@@ -264,6 +292,11 @@ export async function inspectHarnessAcceptanceReadiness( options = {} ) {
 				requiredAutomationSurfaces: [ 'playwright-headless-chromium', 'codex-in-app-browser' ],
 				requiredClaims: REQUIRED_RELEASE_CLAIMS,
 				promotionStatuses: [ 'PENDING_VISUAL_SIGNOFF' ],
+				requiredAdapterClassesByProfile: {
+					correctness: [ 'hardware', 'software' ],
+					'physical-route': [ 'hardware' ],
+					performance: [ 'hardware' ]
+				},
 				readyStatus: 'AWAITING_VISUAL_REVIEW'
 			} ),
 		releaseBundle: await inspectBundle( 'releaseBundle', releasePath, {
@@ -273,6 +306,11 @@ export async function inspectHarnessAcceptanceReadiness( options = {} ) {
 			requiredAutomationSurfaces: [ 'playwright-headless-chromium', 'codex-in-app-browser' ],
 			requiredClaims: REQUIRED_RELEASE_CLAIMS,
 			promotionStatuses: [ 'APPROVED' ],
+			requiredAdapterClassesByProfile: {
+				correctness: [ 'hardware', 'software' ],
+				'physical-route': [ 'hardware' ],
+				performance: [ 'hardware' ]
+			},
 			readyStatus: 'ACCEPTED'
 		} )
 	};
