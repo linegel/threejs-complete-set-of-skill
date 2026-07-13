@@ -106,14 +106,17 @@ async function boot() {
       globalThis.devicePixelRatio || 1,
     );
   };
+  const automatedCapture = new URLSearchParams(globalThis.location.search).get("capture") === "1";
   const resizeObserver = new ResizeObserver(() => { void resize(); });
-  resizeObserver.observe(canvas);
+  // Capture owns exact viewport size via LabController.resize; live resize races
+  // with aligned readback and can dispose GPU buffers mid-mapAsync.
+  if (!automatedCapture) resizeObserver.observe(canvas);
   await resize();
 
   let previousTimestamp = performance.now();
   let busy = false;
   let statusFrame = 0;
-  if (new URLSearchParams(globalThis.location.search).get("capture") !== "1") {
+  if (!automatedCapture) {
     controller.renderer.setAnimationLoop((timestamp) => {
       if (busy) return;
       busy = true;
@@ -138,7 +141,9 @@ async function boot() {
 
   globalThis.addEventListener("beforeunload", () => {
     resizeObserver.disconnect();
-    void controller.dispose();
+    // Never dispose during automated capture: in-flight readback mapAsync must
+    // complete against a live GPU device.
+    if (!automatedCapture) void controller.dispose();
   }, { once: true });
   return controller;
 }

@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 2,
+  "labId": "creature-habitat",
+  "bundleKind": "raw-capture-session",
+  "publishable": false,
+  "sourceHash": "sha256:2bf734fae26a7fef86ab94f0c77707b39f4edbdcad83bbac53f9adc78aa56356",
+  "captureSessionPath": "artifacts/visual-validation/creature-habitat/correctness/capture-session.json",
+  "note": "Pointer to correctness capture session; not a publishable release-bundle."
+}

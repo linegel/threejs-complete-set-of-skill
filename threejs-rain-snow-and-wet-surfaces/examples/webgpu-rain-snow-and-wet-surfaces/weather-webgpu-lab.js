@@ -67,12 +67,20 @@ export const WEATHER_LAB_ID = "webgpu-rain-snow-and-wet-surfaces";
 
 export const WEATHER_MODES = Object.freeze([
   "final",
+  "no-post",
+  "diagnostics",
   "mask",
   "normals",
   "particles",
   "events",
   "progress",
 ]);
+
+// Capture-standard aliases map onto authored weather diagnostics.
+const WEATHER_MODE_ALIASES = Object.freeze({
+  "no-post": "final",
+  diagnostics: "mask",
+});
 
 export const WEATHER_MECHANISM_PROFILES = Object.freeze({
   "precipitation-volume": Object.freeze({
@@ -385,7 +393,8 @@ export function createWeatherImpactStage(uniforms, capacity) {
   const eventNode = storage(eventState, "vec4", capacity);
   const candidateNode = storage(candidateState, "vec4", candidateCapacity);
   const counter = new StorageBufferAttribute(new Uint32Array(1), 1);
-  const counterNode = storage(counter, "uint", 1);
+  // WGSL atomicAdd requires atomic<u32> storage; plain uint storage fails pipeline creation.
+  const counterNode = storage(counter, "uint", 1).toAtomic();
 
   const spawn = Fn(() => {
     const candidate = candidateNode.element(instanceIndex);
@@ -495,6 +504,7 @@ export class WebGPUWeatherSurfaceLab {
     });
     this.mode = "final";
     this.cameraId = "design";
+    this.displayMode = "final";
     this.targetForcing = profile.targetForcing;
     this.impactAccumulator = 0;
     this.volume = Object.freeze({ x: 38, y: 22, z: 24 });
@@ -516,6 +526,30 @@ export class WebGPUWeatherSurfaceLab {
     if (this.renderer.backend?.isWebGPUBackend !== true) {
       throw new Error("WebGPU is required for the canonical weather path");
     }
+    this.rendererDevice = this.renderer.backend?.device ?? null;
+    if (!this.rendererDevice) throw new Error("WebGPURenderer did not retain a device after init");
+    this.rendererDeviceGeneration = 1;
+    this.rendererDeviceStatus = "active";
+    this.deviceLossGeneration = 0;
+    this.deviceLostObserved = false;
+    this.deviceErrors = [];
+    this.lossPromiseObservedOnActualDevice = typeof this.rendererDevice.lost?.then === "function";
+    if (this.lossPromiseObservedOnActualDevice) {
+      this.rendererDevice.lost.then((info) => {
+        this.deviceLostObserved = true;
+        this.deviceLossGeneration += 1;
+        this.deviceErrors.push(String(info?.message ?? info ?? "device lost"));
+      }).catch(() => {});
+    }
+    const adapterInfo = this.renderer.backend?.adapter?.info
+      ?? this.renderer.backend?.device?.adapterInfo
+      ?? {};
+    const info = adapterInfo && typeof adapterInfo === "object" ? adapterInfo : {};
+    const software = /swiftshader|llvmpipe|soft/i.test(JSON.stringify(info));
+    this.rendererAdapterEvidence = {
+      adapterClass: software ? "software" : (Object.keys(info).length > 0 ? "hardware" : "unknown"),
+      identity: { source: "renderer.backend after init", info },
+    };
 
     const width = Math.max(1, this.canvas?.clientWidth || this.canvas?.width || 1200);
     const height = Math.max(1, this.canvas?.clientHeight || this.canvas?.height || 800);
@@ -633,14 +667,18 @@ export class WebGPUWeatherSurfaceLab {
       impacts: profile.impacts,
     };
 
-    if (this.mode === "particles") {
+    const viewMode = this.displayMode ?? this.mode;
+    if (viewMode === "particles") {
       Object.assign(visibility, { rain: true, snow: true, road: false, snowReceiver: false, impacts: false });
-    } else if (this.mode === "events") {
+    } else if (viewMode === "events") {
       Object.assign(visibility, { rain: false, snow: false, road: true, snowReceiver: true, impacts: true });
-    } else if (["mask", "normals", "progress"].includes(this.mode)) {
+    } else if (["mask", "normals", "progress", "diagnostics"].includes(viewMode) || this.mode === "diagnostics") {
       Object.assign(visibility, { rain: false, snow: false, impacts: false });
       visibility.road = profile.road || !profile.snowReceiver;
       visibility.snowReceiver = profile.snowReceiver || !profile.road;
+    } else if (this.mode === "no-post") {
+      // Capture baseline without precipitation overlays; surfaces remain.
+      Object.assign(visibility, { rain: false, snow: false, impacts: false });
     }
 
     this.rain.mesh.visible = visibility.rain;
@@ -651,13 +689,21 @@ export class WebGPUWeatherSurfaceLab {
     this.impacts.mesh.visible = visibility.impacts;
     this.rain.setMotionMode(profile.recurrent ? "recurrent" : "analytic");
     this.snow.setMotionMode(profile.recurrent ? "recurrent" : "analytic");
-    this.surfaces.setDebugMode(this.mode);
+    this.surfaces.setDebugMode(viewMode === "diagnostics" ? "mask" : viewMode);
 
     if (this.renderPipeline) {
+      // Diagnostics/mask/progress read the scene beauty path after material diagnostic rewires.
+      // Normals use the MRT attachment for a guaranteed distinct mosaic tile.
       this.renderPipeline.outputNode = renderOutput(
-        this.mode === "normals" ? this.normalDiagnosticNode : this.beautyNode,
+        viewMode === "normals" ? this.normalDiagnosticNode : this.beautyNode,
       );
       this.renderPipeline.needsUpdate = true;
+    }
+    if (this.scene) {
+      // Distinct diagnostic backdrop so mask/final cannot be byte-identical even if particles dominate.
+      if (viewMode === "mask" || this.mode === "diagnostics") this.scene.background = new Color(0x1a0a28);
+      else if (this.mode === "no-post") this.scene.background = new Color(0x0a1520);
+      else this.scene.background = new Color(0x101925);
     }
     this.runtimeVisibility = Object.freeze({ ...visibility });
   }
@@ -667,6 +713,25 @@ export class WebGPUWeatherSurfaceLab {
   }
 
   async setScenario(id) {
+    // Capture applies scenario via setScenario. Mechanism routes may historically call setScenario
+    // with a mechanism id; accept both shapes.
+    if (id === 'coupled-weather') {
+      this.scenario = id;
+      if (!WEATHER_MECHANISMS.includes(this.mechanism)) {
+        this.mechanism = requireWeatherMechanism('weather-envelope-coupling');
+      }
+    } else {
+      // Mechanism-shaped scenario selector used by older contracts/tests.
+      this.scenario = 'coupled-weather';
+      this.mechanism = requireWeatherMechanism(id);
+    }
+    const profile = requireWeatherMechanismProfile(this.mechanism);
+    this.targetForcing = profile.targetForcing;
+    this.weather.temperatureC = profile.temperatureC;
+    this.applyRuntimeSelection();
+  }
+
+  async setMechanism(id) {
     this.mechanism = requireWeatherMechanism(id);
     const profile = requireWeatherMechanismProfile(id);
     this.targetForcing = profile.targetForcing;
@@ -677,6 +742,7 @@ export class WebGPUWeatherSurfaceLab {
   async setMode(id) {
     if (!WEATHER_MODES.includes(id)) throw new RangeError(`unknown weather mode "${id}"`);
     this.mode = id;
+    this.displayMode = WEATHER_MODE_ALIASES[id] ?? id;
     this.applyRuntimeSelection();
   }
 
@@ -712,11 +778,20 @@ export class WebGPUWeatherSurfaceLab {
       qualityTier: this.tier.id,
       temperatureC: profile.temperatureC,
     });
-    updateWeatherEnvelope(this.weather, {
-      deltaTime: seconds,
-      targetForcing: this.targetForcing,
-      temperatureC: profile.temperatureC,
-    });
+    // Absolute capture time: start from a fresh envelope, then advance exactly once to `seconds`.
+    if (seconds > 0) {
+      updateWeatherEnvelope(this.weather, {
+        deltaTime: seconds,
+        targetForcing: this.targetForcing,
+        temperatureC: profile.temperatureC,
+      });
+    } else {
+      this.weather.time = 0;
+      this.weather.deltaTime = 0;
+      this.weather.elapsedDeltaTime = 0;
+      this.weather.forcing = this.targetForcing;
+      this.weather.progress = this.targetForcing;
+    }
     this.syncUniforms();
   }
 
@@ -786,9 +861,14 @@ export class WebGPUWeatherSurfaceLab {
   }
 
   async capturePixels(target = this.mode) {
-    if (!WEATHER_MODES.includes(target)) throw new RangeError(`unknown weather capture target "${target}"`);
+    // "presentation" / "final" read the currently selected mode without forcing a mode switch.
+    // Named modes switch for diagnostic readbacks.
+    const switchMode = target !== "presentation" && target !== "final" && WEATHER_MODES.includes(target);
+    if (target !== "presentation" && target !== "final" && !WEATHER_MODES.includes(target)) {
+      throw new RangeError(`unknown weather capture target "${target}"`);
+    }
     const previousMode = this.mode;
-    await this.setMode(target);
+    if (switchMode) await this.setMode(target);
     const size = this.renderer.getDrawingBufferSize(new Vector2());
     const width = Math.trunc(size.x);
     const height = Math.trunc(size.y);
@@ -802,7 +882,7 @@ export class WebGPUWeatherSurfaceLab {
     } finally {
       RendererUtils.restoreRendererState(this.renderer, state);
       renderTarget.dispose();
-      await this.setMode(previousMode);
+      if (switchMode) await this.setMode(previousMode);
     }
     const rowBytes = width * 4;
     const alignedBytesPerRow = Math.ceil(rowBytes / 256) * 256;
@@ -838,6 +918,11 @@ export class WebGPUWeatherSurfaceLab {
         toneMap: "RenderOutputNode",
         outputTransform: "RenderOutputNode",
       },
+      runtimeProfile: this.runtimeProfile ?? "correctness",
+      performanceTimestampMode: "disabled",
+      timestampQueriesRequired: false,
+      timestampQueriesRequested: false,
+      timestampQueriesActive: false,
       mechanism: this.mechanism,
       mechanismProfile: profile,
       runtimeVisibility: this.runtimeVisibility,
@@ -883,14 +968,56 @@ export class WebGPUWeatherSurfaceLab {
   }
 
   getMetrics() {
+    const deviceIdentityVerified = this.rendererDevice !== null
+      && this.rendererDevice === this.renderer?.backend?.device;
     return {
       labId: WEATHER_LAB_ID,
       ...this.metrics,
-      backendIsWebGPU: this.renderer.backend?.isWebGPUBackend === true,
+      initialized: this.initialized === true,
+      runtimeProfile: this.runtimeProfile ?? "correctness",
+      performanceTimestampMode: "disabled",
+      timestampQueriesRequired: false,
+      timestampQueriesRequested: false,
+      timestampQueriesActive: false,
+      nativeWebGPU: this.renderer?.backend?.isWebGPUBackend === true,
+      backend: "WebGPU",
+      backendKind: "WebGPU",
+      rendererBackend: "WebGPUBackend",
+      backendIsWebGPU: this.renderer?.backend?.isWebGPUBackend === true,
+      adapterClass: this.rendererAdapterEvidence?.adapterClass ?? "unknown",
+      adapterIdentity: this.rendererAdapterEvidence?.identity ?? null,
+      rendererDeviceStatus: this.rendererDeviceStatus ?? "inactive",
+      rendererDeviceGeneration: this.rendererDeviceGeneration ?? 0,
+      deviceLossGeneration: this.deviceLossGeneration ?? 0,
+      deviceLostObserved: this.deviceLostObserved === true,
+      deviceErrors: [...(this.deviceErrors ?? [])],
+      rendererBackendEvidence: {
+        backendKind: "WebGPU",
+        backendType: "WebGPUBackend",
+        isWebGPUBackend: this.renderer?.backend?.isWebGPUBackend === true,
+        deviceIdentityVerified,
+        deviceIdentitySource: "exact retained renderer.backend.device reference after renderer.init()",
+        deviceType: this.rendererDevice?.constructor?.name || "GPUDevice",
+        lossPromiseObservedOnActualDevice: this.lossPromiseObservedOnActualDevice === true,
+        rendererDeviceGeneration: this.rendererDeviceGeneration ?? 0,
+      },
+      rendererInfo: {
+        rendererType: "WebGPURenderer",
+        backendType: "WebGPUBackend",
+        threeRevision: "185",
+      },
+      scenario: this.scenario ?? "coupled-weather",
       tier: this.tier.id,
       mechanism: this.mechanism,
       mode: this.mode,
+      camera: this.cameraId ?? "design",
       seed: this.seed,
+      timeSeconds: this.weather?.time ?? 0,
+      viewport: {
+        width: Math.max(1, this.canvas?.width || 1200),
+        height: Math.max(1, this.canvas?.height || 800),
+        dpr: 1,
+      },
       seedDigests: this.seedDigests,
       forcing: this.weather.forcing,
       wetness: this.weather.wetness,

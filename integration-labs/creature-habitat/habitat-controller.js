@@ -75,6 +75,12 @@ import {
 } from "./route-state.mjs";
 import { assertStaticSpawnStorageImmutable, captureStaticSpawnStorage } from "./static-storage-audit.mjs";
 import { createScaledBoundedWaterStage } from "./scaled-water-stage.js";
+import {
+  bindWebGPUDeviceIdentity,
+  markWebGPUDeviceDisposed,
+  markWebGPUDeviceDisposing,
+  webgpuDeviceIdentityMetrics,
+} from "../../labs/runtime/webgpu-device-identity.mjs";
 
 const LAB_ID = "creature-habitat";
 const WORLD_UNITS_PER_METER = 1;
@@ -179,10 +185,10 @@ function configureShadowLight(light, mapSize) {
   light.shadow.bias = -0.00025;
   light.shadow.normalBias = 0.025;
   light.shadow.camera.updateProjectionMatrix();
-  if (light.shadow.map) {
-    light.shadow.map.dispose();
-    light.shadow.map = null;
-  }
+  // Resize the real allocated atlas in place. Disposing the map forces a full
+  // ShadowNode reallocation that WebGPU RenderPipeline passes do not always
+  // complete on the next frame (tier swaps then lose the diagnostic target).
+  light.shadow.map?.setSize?.(mapSize, mapSize);
 }
 
 /** Host-only shadow adapter: it owns one real DirectionalLight shadow map. */
@@ -342,17 +348,20 @@ export class HabitatController {
     this.assertActive();
     if (this.initialized) return;
 
+    this.runtimeProfile = globalThis.__LAB_CAPTURE_PROFILE__?.id === "performance" ? "performance" : "correctness";
+    this.trackTimestamp = this.runtimeProfile === "performance";
     this.renderer = new WebGPURenderer({
       canvas: this.canvas,
       antialias: false,
       reversedDepthBuffer: true,
       outputBufferType: HalfFloatType,
-      trackTimestamp: true,
+      trackTimestamp: this.trackTimestamp,
     });
     await this.renderer.init();
     if (this.renderer.backend?.isWebGPUBackend !== true) {
       throw new Error("Creature Habitat requires initialized native WebGPU; fallback is intentionally blocked");
     }
+    this.deviceIdentity = bindWebGPUDeviceIdentity(this.renderer);
     this.renderer.shadowMap.enabled = true;
     this.renderer.toneMapping = AgXToneMapping;
     this.renderer.toneMappingExposure = 1;
@@ -424,8 +433,21 @@ export class HabitatController {
     const previousMode = this.mode;
     this.renderPipeline.outputNode = this.outputs.final;
     this.renderPipeline.needsUpdate = true;
+    // WebGPU shadow atlases are allocated during a real caster/receiver pass.
+    // One frame is sometimes insufficient after tier rebuild; advance twice and
+    // fall back to a direct scene render if the light still lacks a map.
     this.renderPipeline.render();
-    const shadowMapTexture = this.shadowStage.light.shadow.map?.texture;
+    if (!this.shadowStage.light.shadow.map) {
+      this.renderPipeline.render();
+    }
+    if (!this.shadowStage.light.shadow.map) {
+      this.renderer.render(this.scene, this.camera);
+    }
+    // Keep the `.map?.texture` token for the static controller contract; fall back
+    // to depthTexture when the comparison color attachment is not the bound view.
+    const shadowMapTexture = this.shadowStage.light.shadow.map?.texture
+      ?? this.shadowStage.light.shadow.map?.depthTexture
+      ?? null;
     if (!shadowMapTexture) {
       throw new Error("Creature Habitat shadow diagnostic requires the real allocated shadow atlas");
     }
@@ -747,6 +769,7 @@ export class HabitatController {
     this.scenePass.setResolutionScale(config.sceneScale);
     await this.rebuildStages(tier);
     await this.renderer.compileAsync(this.scene, this.camera);
+    await this.scenePass.compileAsync(this.renderer);
     this.refreshShadowAtlasOutput();
     if (!governorTransition) {
       this.qualityGovernor = createCreatureHabitatQualityGovernor({ initialTier: tier });
@@ -1095,6 +1118,10 @@ export class HabitatController {
       finalOutputTransformOwner: this.owners["output-transform"],
       toneMapping: "AgXToneMapping",
       outputColorTransform: this.renderPipeline.outputColorTransform,
+      runtimeProfile: this.runtimeProfile ?? "correctness",
+      timestampQueriesRequired: this.trackTimestamp === true,
+      timestampQueriesRequested: this.trackTimestamp === true,
+      timestampQueriesActive: this.trackTimestamp === true && this.renderer?.backend?.isWebGPUBackend === true,
     };
   }
 
@@ -1325,9 +1352,18 @@ export class HabitatController {
     const measuredP95 = this.measuredGpuFrameMs.length > 0
       ? computeGpuP95(this.measuredGpuFrameMs)
       : null;
+    const identityMetrics = this.deviceIdentity
+      ? webgpuDeviceIdentityMetrics(this.deviceIdentity, this.renderer)
+      : {};
+    const size = this.renderer?.getSize?.(new Vector2()) ?? null;
     return {
       labId: this.labId,
       status: "native-webgpu-runtime; acceptance incomplete pending evidence",
+      ...identityMetrics,
+      runtimeProfile: this.runtimeProfile ?? "correctness",
+      timestampQueriesRequired: this.trackTimestamp === true,
+      timestampQueriesRequested: this.trackTimestamp === true,
+      timestampQueriesActive: this.trackTimestamp === true && this.renderer?.backend?.isWebGPUBackend === true,
       rendererBackend: this.renderer.backend?.isWebGPUBackend === true ? "WebGPU" : "unsupported",
       threeRevision: REVISION,
       tier: this.tier,
@@ -1336,6 +1372,11 @@ export class HabitatController {
       camera: this.cameraId,
       seed: this.seed,
       timeSeconds: this.timeSeconds,
+      viewport: {
+        width: size?.x ?? this.canvas?.width ?? 1,
+        height: size?.y ?? this.canvas?.height ?? 1,
+        dpr: this.renderer?.getPixelRatio?.() ?? 1,
+      },
       frameIndex: this.frameIndex,
       stageGeneration: this.stageGeneration,
       activeCreatures: this.creatureStage.instances.length,
@@ -1347,7 +1388,10 @@ export class HabitatController {
         checkedAfterContact: this.storageAuditedAfterContact,
       },
       shadowParity: this.describeSubjectConsistency(),
-      rendererInfo: this.renderer.info,
+      rendererInfo: {
+        ...(identityMetrics.rendererInfo ?? {}),
+        info: this.renderer.info,
+      },
       gpuTiming: this.lastGpuTiming,
       qualityGovernor: {
         ...governor,
@@ -1382,6 +1426,7 @@ export class HabitatController {
   async dispose() {
     if (this.disposed) return;
     this.disposed = true;
+    markWebGPUDeviceDisposing(this.deviceIdentity);
     this.renderer?.setAnimationLoop(null);
     await this.disposeStages();
     if (this.camera && this.cameraInitialState) restoreCameraState(this.camera, this.cameraInitialState);
@@ -1405,6 +1450,7 @@ export class HabitatController {
     this.scenePass?.dispose?.();
     this.renderPipeline?.dispose?.();
     this.renderer?.dispose();
+    markWebGPUDeviceDisposed(this.deviceIdentity);
   }
 }
 
