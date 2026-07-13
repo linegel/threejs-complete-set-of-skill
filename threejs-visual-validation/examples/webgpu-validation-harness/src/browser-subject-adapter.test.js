@@ -5,6 +5,7 @@ import {
 	BoxGeometry,
 	FloatType,
 	HalfFloatType,
+	NodeUpdateType,
 	PerspectiveCamera,
 	PlaneGeometry,
 	RenderTarget,
@@ -23,6 +24,7 @@ import {
 	assertRendererBackendDeviceIdentity,
 	buildCaptureRecipeEvidenceEnvelope,
 	cloneJsonSafeCaptureEvidence,
+	configureExplicitRenderSubmissionPass,
 	createExclusiveControllerOperationGate,
 	createJoinableControllerDisposal,
 	createValidationResourceLedgerObserver,
@@ -211,6 +213,16 @@ test( 'renderer identity requires the exact device retained by the initialized b
 	assert.equal( assertRendererBackendDeviceIdentity( requestedDevice, requestedDevice ), requestedDevice );
 	assert.throws( () => assertRendererBackendDeviceIdentity( requestedDevice, {} ), /exact requested GPUDevice/ );
 	assert.throws( () => assertRendererBackendDeviceIdentity( requestedDevice, null ), /actual GPUDevice/ );
+
+} );
+
+test( 'manual deterministic renders execute the scene pass once per submission', () => {
+
+	const scenePass = pass( new Scene(), new PerspectiveCamera() );
+	assert.equal( scenePass.updateBeforeType, NodeUpdateType.FRAME );
+	assert.equal( configureExplicitRenderSubmissionPass( scenePass ), scenePass );
+	assert.equal( scenePass.updateBeforeType, NodeUpdateType.RENDER );
+	assert.throws( () => configureExplicitRenderSubmissionPass( {} ), /requires a PassNode/ );
 
 } );
 

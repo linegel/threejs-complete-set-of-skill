@@ -9,6 +9,7 @@ import {
 	Mesh,
 	MeshStandardNodeMaterial,
 	NeutralToneMapping,
+	NodeUpdateType,
 	PerspectiveCamera,
 	PlaneGeometry,
 	RenderPipeline,
@@ -78,6 +79,15 @@ export const timestampResolutionPolicy = Object.freeze( {
 	maximumQueriesPerBatch: 2048,
 	contextsPerFrame: 2
 } );
+
+export function configureExplicitRenderSubmissionPass( passNode ) {
+
+	if ( passNode === null || typeof passNode !== 'object' || typeof passNode.updateBefore !== 'function' ) throw new TypeError( 'Explicit render-submission cadence requires a PassNode.' );
+	passNode.updateBeforeType = NodeUpdateType.RENDER;
+	if ( passNode.updateBeforeType !== NodeUpdateType.RENDER ) throw new Error( 'PassNode did not retain explicit render-submission cadence.' );
+	return passNode;
+
+}
 
 export function parseRenderTimestampUid( uid ) {
 
@@ -924,7 +934,7 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 	const ownedGeometries = [ subject.geometry, ground.geometry, marker.geometry ];
 
 	const renderPipeline = new RenderPipeline( renderer );
-	const scenePass = pass( scene, camera );
+	const scenePass = configureExplicitRenderSubmissionPass( pass( scene, camera ) );
 	scenePass.setMRT( mrt( { output, normal: normalView, emissive } ) );
 
 	const outputNode = scenePass.getTextureNode( 'output' );
