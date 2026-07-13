@@ -23,7 +23,9 @@ import {
   createWebGPUTouchHistoryFrostEffect,
 } from "./frost-surface-effect.js";
 import {
+  FROST_ALL_CAPTURE_RECIPES,
   FROST_CAPTURE_RECIPES,
+  FROST_COVERAGE_PROBE_RECIPES,
   resolveFrostCaptureRecipe,
 } from "./capture-recipes.js";
 import {
@@ -218,7 +220,7 @@ export class WebGPUFrostLab {
     });
     await this.effect.initialize();
     this.renderPipeline = this.effect.renderPipeline;
-    this.captureRecipeSetDigest = await sha256FrostEvidence(FROST_CAPTURE_RECIPES);
+    this.captureRecipeSetDigest = await sha256FrostEvidence(FROST_ALL_CAPTURE_RECIPES);
     this.mode = FROST_DEBUG_VIEW_TO_MODE[this.effect.debugView] ?? "final";
     this.initialized = true;
     return this;
@@ -316,11 +318,14 @@ export class WebGPUFrostLab {
     this.renderPipeline.render();
   }
 
-  async #capturePipelinePixels(pipeline, { target, captureMode = null } = {}) {
+  async #capturePipelinePixels(pipeline, { target, captureMode = null, width = null, height = null } = {}) {
     const size = this.renderer.getDrawingBufferSize(new Vector2());
-    const width = Math.trunc(size.x);
-    const height = Math.trunc(size.y);
-    const renderTarget = new RenderTarget(width, height, {
+    const captureWidth = width ?? Math.trunc(size.x);
+    const captureHeight = height ?? Math.trunc(size.y);
+    if (!Number.isInteger(captureWidth) || !Number.isInteger(captureHeight) || captureWidth <= 0 || captureHeight <= 0) {
+      throw new RangeError("Frost capture target dimensions must be positive integers");
+    }
+    const renderTarget = new RenderTarget(captureWidth, captureHeight, {
       type: UnsignedByteType,
       samples: 1,
       depthBuffer: false,
@@ -332,8 +337,8 @@ export class WebGPUFrostLab {
       rendererDeviceGeneration: this.rendererDeviceGeneration,
       captureTargetId,
       colorTextureUuid: renderTarget.texture.uuid,
-      width,
-      height,
+      width: captureWidth,
+      height: captureHeight,
       format: "rgba8unorm",
       sampleCount: 1,
       depthBuffer: false,
@@ -344,14 +349,14 @@ export class WebGPUFrostLab {
     try {
       this.renderer.setRenderTarget(renderTarget);
       pipeline.render();
-      pixels = await this.renderer.readRenderTargetPixelsAsync(renderTarget, 0, 0, width, height);
+      pixels = await this.renderer.readRenderTargetPixelsAsync(renderTarget, 0, 0, captureWidth, captureHeight);
     } finally {
       RendererUtils.restoreRendererState(this.renderer, state);
       renderTarget.dispose();
     }
-    const rowBytes = width * 4;
+    const rowBytes = captureWidth * 4;
     const alignedBytesPerRow = Math.ceil(rowBytes / 256) * 256;
-    const paddedLength = alignedBytesPerRow * (height - 1) + rowBytes;
+    const paddedLength = alignedBytesPerRow * (captureHeight - 1) + rowBytes;
     const bytesPerRow = pixels.length >= paddedLength ? alignedBytesPerRow : rowBytes;
     if (!Number.isInteger(bytesPerRow) || bytesPerRow < rowBytes) {
       throw new Error(`invalid WebGPU readback stride ${bytesPerRow} for row ${rowBytes}`);
@@ -361,8 +366,8 @@ export class WebGPUFrostLab {
       capture: Object.freeze({
         target,
         ...(captureMode === null ? {} : { captureMode }),
-        width,
-        height,
+        width: captureWidth,
+        height: captureHeight,
         format: "rgba8unorm",
         outputColorSpace: this.renderer.outputColorSpace,
         bytesPerPixel: 4,
@@ -454,6 +459,7 @@ export class WebGPUFrostLab {
       schemaVersion: 1,
       recipeSetDigest: this.captureRecipeSetDigest,
       recipes: FROST_CAPTURE_RECIPES,
+      coverageProbes: FROST_COVERAGE_PROBE_RECIPES,
     });
   }
 
@@ -473,15 +479,16 @@ export class WebGPUFrostLab {
         recipeId: recipe.id,
         snapshot: async () => this.#captureParentSnapshot(),
         execute: async () => {
-          const drawingSize = this.renderer.getDrawingBufferSize(new Vector2());
           const camera = this.camera.clone();
           applyFrostCameraPose(camera, recipe.camera);
+          camera.aspect = recipe.viewport.width / recipe.viewport.height;
+          camera.updateProjectionMatrix();
           scratch = createWebGPUTouchHistoryFrostEffect({
             renderer: this.renderer,
             scene: this.scene,
             camera,
-            width: Math.trunc(drawingSize.x),
-            height: Math.trunc(drawingSize.y),
+            width: recipe.viewport.physicalWidth,
+            height: recipe.viewport.physicalHeight,
             tier: recipe.tier,
             mechanism: recipe.mechanism,
             seed: recipe.seed,
@@ -501,6 +508,8 @@ export class WebGPUFrostLab {
           const readback = await this.#capturePipelinePixels(scratch.renderPipeline, {
             target: recipe.id,
             captureMode: recipe.target,
+            width: recipe.viewport.physicalWidth,
+            height: recipe.viewport.physicalHeight,
           });
           await this.rendererDevice.queue.onSubmittedWorkDone();
           const timeSeconds = recipe.expectedTimeSeconds;
@@ -515,9 +524,11 @@ export class WebGPUFrostLab {
               seed: recipe.seed,
               timeSeconds,
               viewport: Object.freeze({
-                width: readback.capture.width,
-                height: readback.capture.height,
-                dpr: this.renderer.getPixelRatio(),
+                width: recipe.viewport.width,
+                height: recipe.viewport.height,
+                dpr: recipe.viewport.dpr,
+                physicalWidth: readback.capture.width,
+                physicalHeight: readback.capture.height,
               }),
             }),
             execution: Object.freeze({

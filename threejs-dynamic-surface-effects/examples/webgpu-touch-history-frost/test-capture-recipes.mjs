@@ -1,12 +1,15 @@
 import assert from "node:assert/strict";
 
 import {
+  FROST_ALL_CAPTURE_RECIPES,
   FROST_CAPTURE_RECIPES,
   FROST_CAPTURE_RECIPE_IDS,
+  FROST_COVERAGE_PROBE_RECIPES,
   FROST_DIAGNOSTIC_RECIPE_MODES,
   FROST_STANDARD_OUTPUT_PLAN,
   resolveFrostCaptureRecipe,
   validateFrostCaptureRecipes,
+  validateFrostCoverageProbeRecipes,
   validateFrostStandardOutputPlan,
 } from "./capture-recipes.js";
 
@@ -15,6 +18,7 @@ function mutableRecipes() {
 }
 
 assert.equal(validateFrostCaptureRecipes(), true);
+assert.equal(validateFrostCoverageProbeRecipes(), true);
 assert.equal(validateFrostStandardOutputPlan(), true);
 assert.deepEqual(FROST_CAPTURE_RECIPE_IDS, [
   "final.design",
@@ -32,6 +36,20 @@ assert.deepEqual(FROST_CAPTURE_RECIPE_IDS, [
   "temporal.t001",
 ]);
 assert.equal(Object.isFrozen(FROST_CAPTURE_RECIPES), true);
+assert.equal(FROST_ALL_CAPTURE_RECIPES.length, 17);
+assert.deepEqual(FROST_COVERAGE_PROBE_RECIPES.map(({ id }) => id), [
+  "probe.odd-size.final",
+  "probe.dpr-1.final",
+  "probe.dpr-1-5.final",
+  "probe.dpr-2.final",
+]);
+assert.deepEqual(resolveFrostCaptureRecipe("probe.odd-size.final").viewport, {
+  width: 641,
+  height: 359,
+  dpr: 1,
+  physicalWidth: 641,
+  physicalHeight: 359,
+});
 assert.equal(Object.isFrozen(resolveFrostCaptureRecipe("final.design").trace[0].start), true);
 assert.deepEqual(
   FROST_CAPTURE_RECIPE_IDS.slice(2, 6).map((id) => resolveFrostCaptureRecipe(id).target),

@@ -25,6 +25,13 @@ const CAPTURE_TARGETS = Object.freeze([
   "frost-mask-after-pointer",
 ]);
 const CAMERAS = Object.freeze(["near", "design", "far"]);
+const DEFAULT_VIEWPORT = Object.freeze({
+  width: 1200,
+  height: 800,
+  dpr: 1,
+  physicalWidth: 1200,
+  physicalHeight: 800,
+});
 const TRANSACTION = Object.freeze({
   owner: "webgpu-touch-history-frost",
   scope: "controller-owned-history",
@@ -96,6 +103,7 @@ function recipe(id, target, overrides = {}) {
     tier: "balanced",
     camera: overrides.camera ?? "design",
     seed: overrides.seed ?? 0x00000001,
+    viewport: overrides.viewport ?? DEFAULT_VIEWPORT,
     initialTimeSeconds: 0,
     trace,
     initialTraceLength: initialTrace.length,
@@ -123,8 +131,28 @@ const RECIPES = Object.freeze([
   recipe("temporal.t001", "final", { initialTrace: TEMPORAL_BASE_TRACE, temporalTrace: TEMPORAL_ADVANCE }),
 ]);
 
-const RECIPE_BY_ID = new Map(RECIPES.map((entry) => [entry.id, entry]));
-if (RECIPE_BY_ID.size !== RECIPES.length) throw new Error("frost capture recipe IDs must be unique");
+export const FROST_COVERAGE_PROBE_RECIPES = Object.freeze([
+  recipe("probe.odd-size.final", "final", {
+    trace: CAMERA_TRACE,
+    viewport: Object.freeze({ width: 641, height: 359, dpr: 1, physicalWidth: 641, physicalHeight: 359 }),
+  }),
+  recipe("probe.dpr-1.final", "final", {
+    trace: CAMERA_TRACE,
+    viewport: Object.freeze({ width: 400, height: 300, dpr: 1, physicalWidth: 400, physicalHeight: 300 }),
+  }),
+  recipe("probe.dpr-1-5.final", "final", {
+    trace: CAMERA_TRACE,
+    viewport: Object.freeze({ width: 400, height: 300, dpr: 1.5, physicalWidth: 600, physicalHeight: 450 }),
+  }),
+  recipe("probe.dpr-2.final", "final", {
+    trace: CAMERA_TRACE,
+    viewport: Object.freeze({ width: 400, height: 300, dpr: 2, physicalWidth: 800, physicalHeight: 600 }),
+  }),
+]);
+
+export const FROST_ALL_CAPTURE_RECIPES = Object.freeze([...RECIPES, ...FROST_COVERAGE_PROBE_RECIPES]);
+const RECIPE_BY_ID = new Map(FROST_ALL_CAPTURE_RECIPES.map((entry) => [entry.id, entry]));
+if (RECIPE_BY_ID.size !== FROST_ALL_CAPTURE_RECIPES.length) throw new Error("frost capture recipe IDs must be unique");
 
 export const FROST_CAPTURE_RECIPES = RECIPES;
 export const FROST_CAPTURE_RECIPE_IDS = Object.freeze(RECIPES.map(({ id }) => id));
@@ -173,6 +201,18 @@ function validateTraceStep(step, label) {
   }
 }
 
+function validateViewport(viewport, label) {
+  requireExactKeys(viewport, ["width", "height", "dpr", "physicalWidth", "physicalHeight"], label);
+  for (const field of ["width", "height", "physicalWidth", "physicalHeight"]) {
+    if (!Number.isInteger(viewport[field]) || viewport[field] <= 0) throw new Error(`${label}.${field} must be a positive integer`);
+  }
+  if (!Number.isFinite(viewport.dpr) || viewport.dpr <= 0) throw new Error(`${label}.dpr must be positive`);
+  if (viewport.physicalWidth !== viewport.width * viewport.dpr
+    || viewport.physicalHeight !== viewport.height * viewport.dpr) {
+    throw new Error(`${label} physical extent does not equal logical extent times DPR`);
+  }
+}
+
 function pointerDistance(step) {
   return Math.hypot(step.end.x - step.start.x, step.end.y - step.start.y);
 }
@@ -202,7 +242,7 @@ export function validateFrostCaptureRecipes(recipes = FROST_CAPTURE_RECIPES, { r
     const label = `frost capture recipe ${entry?.id ?? index}`;
     requireExactKeys(entry, [
       "schemaVersion", "recipeKind", "id", "filename", "target", "scenario", "camera", "seed",
-      "mechanism", "tier",
+      "mechanism", "tier", "viewport",
       "initialTimeSeconds", "trace", "initialTraceLength", "temporalTraceLength", "expectedTimeSeconds",
       "historySource", "diagnosticModes", "transaction",
     ], label);
@@ -215,6 +255,8 @@ export function validateFrostCaptureRecipes(recipes = FROST_CAPTURE_RECIPES, { r
     if (entry.tier !== "balanced") throw new Error(`${label} does not use the frozen correctness tier`);
     if (!CAMERAS.includes(entry.camera)) throw new Error(`${label} uses unknown camera ${entry.camera}`);
     if (!Number.isInteger(entry.seed) || entry.seed < 0 || entry.seed > 0xffffffff) throw new Error(`${label} seed is not uint32`);
+    validateViewport(entry.viewport, `${label}.viewport`);
+    if (JSON.stringify(entry.viewport) !== JSON.stringify(DEFAULT_VIEWPORT)) throw new Error(`${label} standard viewport drifted`);
     if (entry.initialTimeSeconds !== 0) throw new Error(`${label} must begin from deterministic time zero`);
     if (!Array.isArray(entry.trace)) throw new Error(`${label} pointer trace must be an array`);
     if (entry.trace.length === 0 && entry.id !== "temporal.t000") {
@@ -277,6 +319,28 @@ export function validateFrostCaptureRecipes(recipes = FROST_CAPTURE_RECIPES, { r
   return true;
 }
 
+export function validateFrostCoverageProbeRecipes(probes = FROST_COVERAGE_PROBE_RECIPES) {
+  const expected = [
+    ["probe.odd-size.final", 641, 359, 1, 641, 359],
+    ["probe.dpr-1.final", 400, 300, 1, 400, 300],
+    ["probe.dpr-1-5.final", 400, 300, 1.5, 600, 450],
+    ["probe.dpr-2.final", 400, 300, 2, 800, 600],
+  ];
+  if (!Array.isArray(probes) || probes.length !== expected.length) throw new Error("Frost coverage probes must contain odd-size and three DPR recipes");
+  for (const [index, entry] of probes.entries()) {
+    const [id, width, height, dpr, physicalWidth, physicalHeight] = expected[index];
+    if (entry.id !== id || entry.target !== "final" || entry.mechanism !== "refraction-and-fresnel" || entry.tier !== "balanced") {
+      throw new Error(`Frost coverage probe ${index} identity drifted`);
+    }
+    validateViewport(entry.viewport, `Frost coverage probe ${id}.viewport`);
+    if (JSON.stringify(entry.viewport) !== JSON.stringify({ width, height, dpr, physicalWidth, physicalHeight })) {
+      throw new Error(`Frost coverage probe ${id} extent drifted`);
+    }
+    requireDeepFrozen(entry, `Frost coverage probe ${id}`);
+  }
+  return true;
+}
+
 export function validateFrostStandardOutputPlan(
   plan = FROST_STANDARD_OUTPUT_PLAN,
   { requireFrozen = plan === FROST_STANDARD_OUTPUT_PLAN } = {},
@@ -309,4 +373,5 @@ export function resolveFrostCaptureRecipe(id) {
 }
 
 validateFrostCaptureRecipes();
+validateFrostCoverageProbeRecipes();
 validateFrostStandardOutputPlan();
