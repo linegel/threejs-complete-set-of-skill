@@ -7,8 +7,9 @@ import {
   rgbDifferenceMetrics,
   validateFrostCoverageEvidence,
   validateFrostLifecycleEvidence,
+  validateFrostRouteMatrixEvidence,
 } from "./capture-hook.mjs";
-import { FROST_CAPTURE_RECIPES } from "./capture-recipes.js";
+import { FROST_CAPTURE_RECIPES, FROST_ROUTE_PROBE_RECIPES } from "./capture-recipes.js";
 
 assert.equal(outputPlan.length, 10);
 assert.deepEqual(outputPlan.map(({ filename }) => filename), [
@@ -66,6 +67,7 @@ assert.deepEqual(rgbDifferenceMetrics(source(10, 4), source(20, 4)), {
 });
 assert.throws(() => rgbDifferenceMetrics(source(1, 1), { width: 1, height: 1, data: new Uint8Array(4) }), /equal dimensions/);
 assert.throws(() => validateFrostCoverageEvidence(new Map()), /omits probe.odd-size.final/);
+assert.throws(() => validateFrostRouteMatrixEvidence(new Map()), /omits route.canonical/);
 
 function lifecycleSnapshot(cycle) {
   const digest = `sha256:${String(cycle % 10).repeat(64)}`;
@@ -169,5 +171,47 @@ assert.throws(() => assertFrostRecipeCapture(recipe, {
 const forged = structuredClone(capture);
 forged.evidence.transaction.restoredStateDigest = digest;
 assert.throws(() => assertFrostRecipeCapture(recipe, forged, digest), /did not restore/);
+
+const routeRecords = new Map(FROST_ROUTE_PROBE_RECIPES.map((routeRecipe, index) => {
+  const routeCapture = structuredClone(capture);
+  routeCapture.target = routeRecipe.id;
+  routeCapture.captureMode = routeRecipe.target;
+  routeCapture.width = routeRecipe.viewport.physicalWidth;
+  routeCapture.height = routeRecipe.viewport.physicalHeight;
+  routeCapture.evidence.recipe.id = routeRecipe.id;
+  routeCapture.evidence.recipe.target = routeRecipe.target;
+  routeCapture.evidence.transaction.recipeId = routeRecipe.id;
+  routeCapture.evidence.effectiveState = {
+    ...routeRecipe.route.startup,
+    camera: routeRecipe.camera,
+    seed: routeRecipe.seed,
+    timeSeconds: routeRecipe.expectedTimeSeconds,
+    viewport: routeRecipe.viewport,
+  };
+  routeCapture.evidence.execution.pointerSegmentCount = routeRecipe.trace.length;
+  routeCapture.evidence.execution.computeDispatchDelta = routeRecipe.trace.length;
+  routeCapture.evidence.artifactTarget.width = routeRecipe.viewport.physicalWidth;
+  routeCapture.evidence.artifactTarget.height = routeRecipe.viewport.physicalHeight;
+  routeCapture.evidence.transaction.transactionId = `route-transaction-${index}`;
+  routeCapture.normalized = { compactRgbaSha256: `sha256:${String((index + 3) % 10).repeat(64)}` };
+  const pixels = new Uint8Array(routeCapture.width * routeCapture.height * 4);
+  pixels[1] = 32 + index;
+  pixels[pixels.length - 2] = 255;
+  return [routeRecipe.id, {
+    recipe: routeRecipe,
+    capture: routeCapture,
+    width: routeCapture.width,
+    height: routeCapture.height,
+    data: pixels,
+  }];
+}));
+const routeMatrix = validateFrostRouteMatrixEvidence(routeRecords);
+assert.equal(routeMatrix.verdict, "PASS");
+assert.equal(routeMatrix.routes.length, 10);
+const duplicatedTransaction = structuredClone(routeRecords.get(FROST_ROUTE_PROBE_RECIPES[1].id));
+duplicatedTransaction.capture.evidence.transaction.transactionId = routeMatrix.routes[0].transactionId;
+const duplicateRouteRecords = new Map(routeRecords);
+duplicateRouteRecords.set(FROST_ROUTE_PROBE_RECIPES[1].id, duplicatedTransaction);
+assert.throws(() => validateFrostRouteMatrixEvidence(duplicateRouteRecords), /reused a capture transaction/);
 
 console.log("frost capture hook contract passed");

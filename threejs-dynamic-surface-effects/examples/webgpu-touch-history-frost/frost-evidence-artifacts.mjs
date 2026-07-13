@@ -126,11 +126,12 @@ function runtimeGraph( runtime ) {
 
 }
 
-export function buildFrostNormativeArtifacts( { runtime, captures, visualDifferences, coverageEvidence, lifecycleEvidence } ) {
+export function buildFrostNormativeArtifacts( { runtime, captures, visualDifferences, coverageEvidence, routeMatrixEvidence, lifecycleEvidence } ) {
 
 	requireRecord( runtime, 'Frost runtime snapshot' );
-	if ( ! Array.isArray( captures ) || captures.length !== 17 ) throw new Error( 'Frost normative evidence requires 17 retained recipe captures.' );
-	if ( visualDifferences?.verdict !== 'PASS' || coverageEvidence?.verdict !== 'PASS' || lifecycleEvidence?.verdict !== 'PASS' ) {
+	if ( ! Array.isArray( captures ) || captures.length !== 27 ) throw new Error( 'Frost normative evidence requires 27 retained recipe captures.' );
+	if ( visualDifferences?.verdict !== 'PASS' || coverageEvidence?.verdict !== 'PASS'
+		|| routeMatrixEvidence?.verdict !== 'PASS' || lifecycleEvidence?.verdict !== 'PASS' ) {
 
 		throw new Error( 'Frost normative evidence requires passing visual, extent, and lifecycle classifiers.' );
 
@@ -208,7 +209,7 @@ export function buildFrostNormativeArtifacts( { runtime, captures, visualDiffere
 			targets: targetRecords,
 			accountingScope: 'transactional-capture-targets-only',
 			completeness: 'PARTIAL',
-			trackedRenderTargetBytes: D( targetBytes, 'bytes', 'sum of 17 transactional RGBA8 capture target extents' ),
+			trackedRenderTargetBytes: D( targetBytes, 'bytes', 'sum of 27 transactional RGBA8 capture target extents' ),
 			trackedPeakLiveRenderTargetBytes: D( Math.max( ...targetRecords.map( ( target ) => target.memoryBytes.value ) ), 'bytes', 'one transactional capture target is live at a time' )
 		} ),
 		'storage-resources.json': schema( {
@@ -302,6 +303,17 @@ export function buildFrostNormativeArtifacts( { runtime, captures, visualDiffere
 				renderSubmissions: M( capture.evidence.execution.renderSubmissionDelta, 'submissions', 'isolated recipe execution evidence' ),
 				restorationVerdict: capture.evidence.transaction.restorationVerdict
 			} ) ),
+			transactionalRouteStateMatrix: routeMatrixEvidence.routes.map( ( route, index ) => ( {
+				recipeId: route.recipeId,
+				kind: route.kind,
+				path: route.path,
+				locks: route.locks,
+				startup: route.startup,
+				transactionId: route.transactionId,
+				normalizedRgbaSha256: route.normalizedRgbaSha256,
+				sequence: M( index + 1, 'route-index', 'canonical, mechanism, then tier route order' ),
+				rgbRangeBytes: M( route.rgbRangeBytes, 'rgb-byte-range', `${ route.recipeId } retained native-WebGPU readback` )
+			} ) ),
 			negativeControls: {
 				unknownModeRejected: true,
 				captureParentRestored: captures.every( ( capture ) => capture.evidence.transaction.entryStateDigest === capture.evidence.transaction.restoredStateDigest ),
@@ -315,6 +327,7 @@ export function buildFrostNormativeArtifacts( { runtime, captures, visualDiffere
 			} ) ),
 			metrics: [
 				{ id: 'recipe-count', measured: M( captures.length, 'recipes', 'retained transactional recipe ledger' ) },
+				{ id: 'transactional-route-state-count', measured: M( routeMatrixEvidence.routes.length, 'route-states', 'manifest-shaped transactional GPU state matrix; immutable URL execution is a separate lane' ) },
 				{ id: 'lifecycle-cycle-count', measured: lifecycleEvidence.cycles },
 				{ id: 'odd-size-workgroups', measured: DA( coverageEvidence.probes[ 0 ].workgroupCount, 'workgroups', '641x359 bounds-checked dispatch' ) }
 			],

@@ -5,6 +5,7 @@ import { encodeRgbaPng } from "../../../scripts/lib/png-rgba.mjs";
 import {
   FROST_CAPTURE_RECIPES,
   FROST_COVERAGE_PROBE_RECIPES,
+  FROST_ROUTE_PROBE_RECIPES,
   FROST_STANDARD_OUTPUT_PLAN,
 } from "./capture-recipes.js";
 import { buildFrostNormativeArtifacts } from "./frost-evidence-artifacts.mjs";
@@ -192,6 +193,44 @@ export function validateFrostCoverageEvidence(retained) {
     probes: Object.freeze(records),
     dprSweep: Object.freeze(records.slice(1).map(({ viewport }) => viewport.dpr)),
   });
+}
+
+export function validateFrostRouteMatrixEvidence(retained) {
+  if (!(retained instanceof Map)) throw new TypeError("Frost route-matrix validation requires retained recipe captures");
+  const routes = FROST_ROUTE_PROBE_RECIPES.map((recipe) => {
+    const record = retained.get(recipe.id);
+    if (!record) throw new Error(`Frost route-matrix evidence omits ${recipe.id}`);
+    const { capture, data } = record;
+    assertFrostRecipeCapture(recipe, capture, capture.evidence?.recipe?.setDigest);
+    if (!(data instanceof Uint8Array) || data.byteLength !== capture.width * capture.height * 4) {
+      throw new Error(`${recipe.id} retained route pixels do not match the captured extent`);
+    }
+    const state = capture.evidence?.effectiveState;
+    if (JSON.stringify({
+      scenario: state?.scenario,
+      mechanism: state?.mechanism,
+      tier: state?.tier,
+      mode: state?.mode,
+    }) !== JSON.stringify(recipe.route.startup)) {
+      throw new Error(`${recipe.id} runtime state drifted from its fixed route startup contract`);
+    }
+    const range = rgbRange({ data });
+    if (range < 2) throw new Error(`${recipe.id} retained route readback is blank or effectively constant`);
+    return Object.freeze({
+      recipeId: recipe.id,
+      kind: recipe.route.kind,
+      path: recipe.route.path,
+      locks: recipe.route.locks,
+      startup: recipe.route.startup,
+      transactionId: capture.evidence.transaction.transactionId,
+      normalizedRgbaSha256: capture.normalized.compactRgbaSha256,
+      rgbRangeBytes: range,
+    });
+  });
+  if (new Set(routes.map(({ transactionId }) => transactionId)).size !== routes.length) {
+    throw new Error("Frost fixed routes reused a capture transaction");
+  }
+  return Object.freeze({ verdict: "PASS", routes: Object.freeze(routes) });
 }
 
 async function retainRecipeCapture(session, recipe, recipeSetDigest) {
@@ -533,10 +572,13 @@ export async function captureLab(session) {
   if (JSON.stringify(description.coverageProbes?.map(({ id }) => id)) !== JSON.stringify(FROST_COVERAGE_PROBE_RECIPES.map(({ id }) => id))) {
     throw new Error("Frost controller coverage-probe inventory drifted from the hook contract");
   }
+  if (JSON.stringify(description.routeProbes?.map(({ id }) => id)) !== JSON.stringify(FROST_ROUTE_PROBE_RECIPES.map(({ id }) => id))) {
+    throw new Error("Frost controller route-probe inventory drifted from the hook contract");
+  }
 
   const retained = new Map();
   const captures = [];
-  for (const recipe of [...FROST_CAPTURE_RECIPES, ...FROST_COVERAGE_PROBE_RECIPES]) {
+  for (const recipe of [...FROST_CAPTURE_RECIPES, ...FROST_COVERAGE_PROBE_RECIPES, ...FROST_ROUTE_PROBE_RECIPES]) {
     const record = await retainRecipeCapture(session, recipe, description.recipeSetDigest);
     retained.set(recipe.id, record);
     captures.push(Object.freeze({
@@ -554,6 +596,7 @@ export async function captureLab(session) {
   const mosaicOutput = await writeDerivedMosaic(session, mosaic);
   const visualDifferences = validateFrostVisualDifferences(retained);
   const coverageEvidence = validateFrostCoverageEvidence(retained);
+  const routeMatrixEvidence = validateFrostRouteMatrixEvidence(retained);
   const lifecycleEvidence = validateFrostLifecycleEvidence(await session.controllerCall("runLifecycleProfile", 50));
   const capturesWithEvidence = [...retained.values()].map((record) => ({
     target: record.capture.target,
@@ -566,6 +609,7 @@ export async function captureLab(session) {
     captures: capturesWithEvidence,
     visualDifferences,
     coverageEvidence,
+    routeMatrixEvidence,
     lifecycleEvidence,
   });
   for (const [path, artifact] of Object.entries(normativeArtifacts)) {
@@ -577,6 +621,7 @@ export async function captureLab(session) {
     standardOutputs: Object.freeze([mosaicOutput]),
     visualDifferences,
     coverageEvidence,
+    routeMatrixEvidence,
     lifecycleEvidence,
     normativeArtifacts: Object.freeze(Object.keys(normativeArtifacts)),
   });

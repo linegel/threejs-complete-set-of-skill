@@ -44,7 +44,7 @@ const runtime = {
 	}
 };
 
-const captures = Array.from( { length: 17 }, ( _, index ) => ( {
+const captures = Array.from( { length: 27 }, ( _, index ) => ( {
 	target: `recipe-${ index }`,
 	width: index === 13 ? 641 : 1200,
 	height: index === 13 ? 359 : 800,
@@ -107,18 +107,34 @@ const coverageEvidence = {
 	verdict: 'PASS',
 	probes: [ { boundsChecked: true, workgroupCount: [ 81, 45, 1 ] } ]
 };
+const routeMatrixEvidence = {
+	verdict: 'PASS',
+	routes: Array.from( { length: 10 }, ( _, index ) => ( {
+		recipeId: `route-${ index }`,
+		kind: index === 0 ? 'canonical' : ( index < 7 ? 'mechanism' : 'tier' ),
+		path: `/route-${ index }/`,
+		locks: { scenario: true, mechanism: index > 0 && index < 7, tier: index >= 7 },
+		startup: { scenario: 'touch-history-frost', mechanism: 'refraction-and-fresnel', tier: 'balanced', mode: 'final' },
+		transactionId: `frost-capture-${ index + 18 }`,
+		normalizedRgbaSha256: digest,
+		rgbRangeBytes: 64
+	} ) )
+};
 
-const artifacts = buildFrostNormativeArtifacts( { runtime, captures, visualDifferences, coverageEvidence, lifecycleEvidence } );
+const artifacts = buildFrostNormativeArtifacts( {
+	runtime, captures, visualDifferences, coverageEvidence, routeMatrixEvidence, lifecycleEvidence
+} );
 assert.deepEqual( Object.keys( artifacts ), FROST_NORMATIVE_JSON_PATHS );
 assert.equal( artifacts[ 'pipeline-graph.json' ].computeDispatches[ 0 ].workgroups.values[ 0 ], 150 );
 assert.equal( artifacts[ 'storage-resources.json' ].totalResidentBytes.value, 15360000 );
 assert.equal( artifacts[ 'leak-loop.json' ].cycleSnapshots.length, 50 );
 assert.equal( artifacts[ 'mechanism-metrics.json' ].verdict, 'PASS' );
+assert.equal( artifacts[ 'mechanism-metrics.json' ].transactionalRouteStateMatrix.length, 10 );
 
 const brokenLifecycle = structuredClone( lifecycleEvidence );
 brokenLifecycle.cycleSnapshots[ 4 ].retainedStorageBytes.value = 1;
 assert.throws( () => buildFrostNormativeArtifacts( {
-	 runtime, captures, visualDifferences, coverageEvidence, lifecycleEvidence: brokenLifecycle
+	 runtime, captures, visualDifferences, coverageEvidence, routeMatrixEvidence, lifecycleEvidence: brokenLifecycle
 } ), /retained lab-owned GPU resources/ );
 
 console.log( 'frost normative evidence artifact contract passed' );
