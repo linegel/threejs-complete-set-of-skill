@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:90cea079d9500880a0b47101c7c482c4e4f0edd66aa26ea8b4c3b651c76ed1f8",
+  "buildRevision": "sha256:9604d026ef9d2587eb04fd6d788c18cdcd5a5b0b442d9f1f908ea48f55dcf65f",
   "demoKinds": [
     "canonical-lab",
     "mechanism-demo",
@@ -333,13 +333,13 @@
   ],
   "counts": {
     "skills": 27,
-    "demos": 89,
+    "demos": 90,
     "primary": 41,
     "acceptedPrimary": 2,
-    "secondary": 48,
+    "secondary": 49,
     "integrations": 10,
     "flagships": 5,
-    "fixedRoutes": 516,
+    "fixedRoutes": 517,
     "requiredCapabilities": 90,
     "requiredRuntimeProofs": 224
   },
@@ -376,7 +376,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "npm --prefix threejs-ambient-contact-shading/examples/webgpu-node-gtao run validate",
-      "sourceHash": "sha256:3988c97c8f133bbcc603801edc9861c78c5a662bf1ce9b34d1f386f78825b1ec",
+      "sourceHash": "sha256:44e3ce0133b283234dc5484e345e6f34d9fa85a291912fd8f9dfbe38a6fbe7c6",
       "proxyStatus": {
         "limitation": "The docs page uses live contact-visibility geometry, not the production GTAONode path. The production skill remains RenderPipeline pass/MRT depth-normal sharing with material-context AO composition.",
         "canonicalLabId": "webgpu-node-gtao"
@@ -660,7 +660,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "node threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/cameraValidation.mjs",
-      "sourceHash": "sha256:5a504aa3308d3115552d4695f0aaf48434cabe2e391cd52c62d9be6fbf8be7d8",
+      "sourceHash": "sha256:289aa1e6346c03c19adcb4bf23bc54af4dbb8162780be317f649151a33a19106",
       "proxyStatus": {
         "limitation": "The docs page demonstrates pose ownership and projection changes, not the full storage-buffer floating-origin path. The production skill remains camera contract, control lifecycle, post/depth ownership, and replay validation across frame rates.",
         "canonicalLabId": "webgpu-camera-rig"
@@ -1085,7 +1085,7 @@
         "validateQuick": "npm --prefix integration-labs/creature-habitat run validate:quick",
         "validateFull": "npm --prefix integration-labs/creature-habitat run validate:full"
       },
-      "sourceHash": "sha256:db56dd3ea92e51ab3466af47d13fd377bf27c4e8f2e85efc96d2bf1a5c2383e4",
+      "sourceHash": "sha256:d4ae2155904160d1a1cb523815e6c6ba789333960c1f42c63ae52b595bc08abc",
       "proxyStatus": null,
       "notes": [
         "Native composition and local adapters are implemented. Status stays incomplete until authorized browser capture records v2 images, resource ledgers, current-adapter timing, and lifecycle evidence.",
@@ -1388,7 +1388,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "npm --prefix threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline run validate",
-      "sourceHash": "sha256:427e087ccd0548581a35b21f00e0f6aba2afcef8dacaced02f8f38aaeda0f4ac",
+      "sourceHash": "sha256:0e1e378e7f8a4ead810465fd4440fd6e02293cf50f64762ce54d23968b7dbc11",
       "proxyStatus": {
         "limitation": "The docs page simulates the meter state in live scene controls for readability. The production skill remains compute-reduced HDR luminance, storage-buffer exposure, explicit tone mapping, and post-tone-map LUT sampling.",
         "canonicalLabId": "webgpu-exposure-color-pipeline"
@@ -1899,7 +1899,7 @@
         "validateQuick": "npm --prefix integration-labs/final-image-flight run validate:quick",
         "validateFull": "npm --prefix integration-labs/final-image-flight run validate:full"
       },
-      "sourceHash": "sha256:7cd9ba75fa32d872b77218d7482be199eb414ea2939c65943063fe8dba23a6c2",
+      "sourceHash": "sha256:8a8b0798dc2b215f6ee764a31a7c0522f945a911df11b3c3e29f64062cf78a0f",
       "proxyStatus": null,
       "notes": [
         "This integration is a real host-owned native-WebGPU implementation, not the generic integration dashboard.",
@@ -1978,7 +1978,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "npm --prefix threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost run validate:generated-assets",
-      "sourceHash": "sha256:81a87fcc387fe5946e44f4d9504ce881b0721d1db066fe6a116abe73cd40d92f",
+      "sourceHash": "sha256:80302d9858202755db73ba8648a245c0102a8fabfce2230fa4751870df1cc949",
       "proxyStatus": {
         "limitation": "Generated crystal maps are reduced-tier static inputs. The production frost path remains StorageTexture history, reduced blur, and TSL refraction.",
         "canonicalLabId": "webgpu-touch-history-frost"
@@ -2023,7 +2023,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "npm --prefix threejs-image-pipeline/examples/webgpu-image-pipeline run validate",
-      "sourceHash": "sha256:3dab91c32b99ce77c76377b935ab2ad11cae91665052901ec23dc1a7ae7e7236",
+      "sourceHash": "sha256:572af684dfd10f65af75bc0ebec7aecfe8835c0ebb434f3026407fa724c5d143",
       "proxyStatus": {
         "limitation": "The docs page visualizes the signal contract with live panels rather than allocating production MRT targets. The production skill remains one RenderPipeline, one pass/MRT producer, and one tone-map/output conversion owner.",
         "canonicalLabId": "webgpu-image-pipeline"
@@ -2316,7 +2316,7 @@
         "validateQuick": "npm --prefix threejs-ambient-contact-shading/examples/integration-image-pipeline-ao run validate:quick",
         "validateFull": "npm --prefix threejs-ambient-contact-shading/examples/integration-image-pipeline-ao run validate:full"
       },
-      "sourceHash": "sha256:537c8cde485213d8791dc4aa2085082bd473f1bba8ed9e50e2fb622d91504dbe",
+      "sourceHash": "sha256:b4a3b815eebdd9f2e5bd4f3dfd3ba4d4da36653d46b351387d16197b838fe67c",
       "proxyStatus": null,
       "notes": [
         "Status remains incomplete until authorized native-WebGPU captures, current-adapter timestamps, and lifecycle evidence exist.",
@@ -2539,7 +2539,7 @@
         "validateQuick": "npm --prefix threejs-rain-snow-and-wet-surfaces/examples/integration-precipitation-image-pipeline run validate:quick",
         "validateFull": "npm --prefix threejs-rain-snow-and-wet-surfaces/examples/integration-precipitation-image-pipeline run validate:full"
       },
-      "sourceHash": "sha256:5de5585573eafd9df333f25b0e7f13d31ae6254f4eb7bdadbc7c958040b58bdf",
+      "sourceHash": "sha256:8a7bff55a8821a5d9fd7252e49147f8d847069a268152d1d36d36ca8210e20df",
       "proxyStatus": null,
       "executionClass": "rendering",
       "flagship": false,
@@ -2781,7 +2781,7 @@
         "validateQuick": "npm --prefix threejs-dynamic-surface-effects/examples/integration-temporal-surface run validate:quick",
         "validateFull": "npm --prefix threejs-dynamic-surface-effects/examples/integration-temporal-surface run validate:full"
       },
-      "sourceHash": "sha256:f3f47206aa6c750cc28690d364ad97847fb87523e2ed3477c71f310c44b2f26c",
+      "sourceHash": "sha256:0d126354bc6e1197e750daaec9aa362dd8824b560ca02d3dda8047638b104d00",
       "proxyStatus": null,
       "executionClass": "rendering",
       "flagship": false,
@@ -3068,7 +3068,7 @@
         "validateQuick": "npm --prefix threejs-bloom/examples/node-selective-bloom run validate:quick",
         "validateFull": "npm --prefix threejs-bloom/examples/node-selective-bloom run validate:full"
       },
-      "sourceHash": "sha256:43fc293261413ff04a42a2bf4b6e7fea038dc07fcf946ec55746579377b7b925",
+      "sourceHash": "sha256:6bc76090a3e769c991fd4d7297cf003f4f60ec25a0828588913a464a4f5cacb6",
       "proxyStatus": null,
       "executionClass": "rendering",
       "flagship": false,
@@ -3263,7 +3263,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "node threejs-particles-trails-and-effects/examples/webgpu-pooled-effects/validate-effects.mjs",
-      "sourceHash": "sha256:02200f2842cf1f2df66ff2d9b97dd4217f10200bcdcf47c84c4c085a9327e3df",
+      "sourceHash": "sha256:2f04ff542bca2fa889359539ca5ba106004c1df69ef3863cafed16ec0567d874",
       "proxyStatus": {
         "limitation": "The docs page uses instanced visual particles and authored shells rather than the full compute dense-swap storage path. The production skill remains GPU-resident pools, deterministic spawn packets, dense compaction, MRT emissive, and bloom-disabled proof.",
         "canonicalLabId": "webgpu-pooled-effects"
@@ -3663,7 +3663,7 @@
         "validateQuick": "npm --prefix integration-labs/procedural-district run validate:quick",
         "validateFull": "npm --prefix integration-labs/procedural-district run validate:full"
       },
-      "sourceHash": "sha256:919817c6e63f8af0ae09c27c4f84ad73bed0780f02d8814d7775275d0fbb9721",
+      "sourceHash": "sha256:cf9d81621bc88a5286e1efb14839d55580ccc7e4d7e308edcdbbee0b72b2a9a7",
       "proxyStatus": null,
       "notes": [
         "All host adapters are executable; acceptance remains incomplete until real native-WebGPU readbacks, current-adapter timestamps, image metrics, and lifecycle evidence pass."
@@ -4021,7 +4021,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "npm --prefix threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces run validate:generated-assets",
-      "sourceHash": "sha256:77cd5c258b2b8d9f34456aa525e0868de6abd77fe8b467d169ed7b3c44b05731",
+      "sourceHash": "sha256:f3e8615a51dd5fbc8fc98cc0620c2c0bb5926a1d7152d7abe4f8e74aa8915421",
       "proxyStatus": {
         "limitation": "The rain streaks in this docs demo are visual context, not the high-tier storage-instanced precipitation path. Dynamic compute/event ripples remain the high-tier skill implementation.",
         "canonicalLabId": "webgpu-rain-snow-and-wet-surfaces"
@@ -4367,7 +4367,7 @@
         "validateQuick": "npm --prefix integration-labs/relativistic-space-shot run validate:quick",
         "validateFull": "npm --prefix integration-labs/relativistic-space-shot run validate:full"
       },
-      "sourceHash": "sha256:5fe1522e9185fbdff551194ad251caeb878b925459a9a59cd10d0bcc4995d89f",
+      "sourceHash": "sha256:0e4266b674abbd53a9ba87ae0cdf8c4b791a0ccfd75a7f49f5155ae38809ab2b",
       "proxyStatus": null,
       "notes": [
         "Real native-WebGPU composition is implemented. Acceptance remains incomplete until current-adapter v2 capture, timing, lifecycle, and manual visual inspection are available.",
@@ -4683,7 +4683,7 @@
         "validateQuick": "npm --prefix threejs-choose-skills/examples/router-manifest-lab run validate:quick",
         "validateFull": "npm --prefix threejs-choose-skills/examples/router-manifest-lab run validate:full"
       },
-      "sourceHash": "sha256:3caec204577db9315960f65d6064c8148bb666e3be242bfda304207af617cf1d",
+      "sourceHash": "sha256:0685dda9dbce9e09c2cc90ea5af002b0301c80883cf705fcbace99769c2af2d9",
       "proxyStatus": null,
       "nonRenderingScenarioSuite": true,
       "executionClass": "non-rendering",
@@ -4725,7 +4725,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "node threejs-bloom/examples/node-selective-bloom/validate-node-selective-bloom.mjs",
-      "sourceHash": "sha256:72f75ea0ab70b992cd2df352affc3e7facf0d9bff0f7ae6e4b00a531c548499e",
+      "sourceHash": "sha256:9f33c9be127486e4a7935d998b4b60f4cb4d3572fa9c67bc168799450d0a7129",
       "proxyStatus": {
         "limitation": "The live page uses additive response geometry for interaction and mode switching. The production skill remains MRT emissive output feeding BloomNode inside one RenderPipeline output path.",
         "canonicalLabId": "node-selective-bloom"
@@ -5196,7 +5196,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "npm --prefix threejs-black-holes-and-space-effects/examples/tsl-curved-ray run validate:generated-assets",
-      "sourceHash": "sha256:b9b84d2dbeda7aeebe9ff223b6f8b88d757a61416a1facda982917fce8095b98",
+      "sourceHash": "sha256:e35f1bfc0c3023c1da92c26445d90cc0ab866ddec484c9b68b4e3b5ddaded5c0",
       "proxyStatus": {
         "limitation": "Generated star tiles are distant/background-tier inputs. The production space path remains bounded adaptive ray integration and final-direction environment lookup.",
         "canonicalLabId": "tsl-curved-ray"
@@ -5614,7 +5614,7 @@
         "validateQuick": "npm --prefix threejs-procedural-vegetation/examples/structured-ash-growth run validate:quick",
         "validateFull": "npm --prefix threejs-procedural-vegetation/examples/structured-ash-growth run validate:full"
       },
-      "sourceHash": "sha256:047eef14e678046964839d0403d5d409e7604613b720c07c4d47b89e2b4c2509",
+      "sourceHash": "sha256:86409e913d84c6a1c3f66d32bac75052a16c7be3722359c1d1375863aa10a2c2",
       "proxyStatus": null,
       "notes": [
         "Status remains incomplete until native-WebGPU images, shadow-atlas parity, lifecycle, and timing evidence are captured.",
@@ -5953,7 +5953,7 @@
         "validateQuick": "npm run validate:quick",
         "validateFull": "npm run validate:full"
       },
-      "sourceHash": "sha256:88f02b547cf8c5ad93a38e88b1a3bc1fe8de1185524820c282eec39e9bc3bde8",
+      "sourceHash": "sha256:b4ecb20dac90bb699272aff5ba0039017adb3fec6cd10a3b286f140c08e75dd1",
       "proxyStatus": null,
       "executionClass": "rendering",
       "flagship": false,
@@ -6369,7 +6369,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "node threejs-visual-validation/examples/webgpu-validation-harness/src/validate.js",
-      "sourceHash": "sha256:657f5bb669166fc4014d470e3a93b7623ebd34c1439f845a05f2c6b1e65f38dd",
+      "sourceHash": "sha256:7f994be2e77f7f7ebbf8a92981ab017547c5098ba3a5950dd39bb4c941ac6d9a",
       "proxyStatus": {
         "limitation": "The docs page visualizes the evidence bundle and diagnostic obligations; the canonical harness writes the JSON/PNG artifact contract. Production validation still requires rendered captures, target/storage inventories, timing labels, leak loops, and explicit accept/withhold decisions.",
         "canonicalLabId": "webgpu-validation-harness"
@@ -6446,7 +6446,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "npm --prefix threejs-water-optics/examples/webgpu-bounded-water run validate:generated-assets",
-      "sourceHash": "sha256:18fe35f71a46ac8218484b4911479ed020241a31eef0b587f05cf835f3149026",
+      "sourceHash": "sha256:99d33baec0468bcd38b0d0d50bdaec7c0bc3acf797632b56a0a75c129add6f4c",
       "proxyStatus": {
         "limitation": "Generated caustic textures are reduced-tier source data. The production path remains compute differential-area caustics in the water skill.",
         "canonicalLabId": "webgpu-bounded-water"
@@ -6566,6 +6566,38 @@
       },
       "sourceHashInputs": [
         "threejs-water-optics/examples/interactive-pool-volume"
+      ]
+    },
+    {
+      "schemaVersion": 2,
+      "id": "water-optics-sparse-saint-venant-fixture",
+      "skill": "threejs-water-optics",
+      "threeRevision": "0.185.1",
+      "kind": "contract-fixture",
+      "status": "secondary",
+      "canonicalSource": [
+        "threejs-water-optics/examples/sparse-saint-venant"
+      ],
+      "browserEntry": null,
+      "publishPath": null,
+      "scenarios": [],
+      "mechanisms": [],
+      "tiers": [],
+      "modes": [],
+      "cameras": [],
+      "seeds": [],
+      "capabilityRequirements": [],
+      "runtimeProof": [],
+      "evidenceContract": "none",
+      "evidenceBundle": null,
+      "validationCommand": null,
+      "sourceHash": "sha256:311af8c95d1411df7dc1a3e81fa6e55d2221040c113f76699affadf6f7fd22fb",
+      "proxyStatus": {
+        "limitation": "Source or contract fixture without an accepted native-WebGPU browser/evidence contract.",
+        "canonicalLabId": null
+      },
+      "sourceHashInputs": [
+        "threejs-water-optics/examples/sparse-saint-venant"
       ]
     },
     {
@@ -6846,7 +6878,7 @@
         "validateQuick": "npm --prefix integration-labs/weathered-world run validate:quick",
         "validateFull": "npm --prefix integration-labs/weathered-world run validate:full"
       },
-      "sourceHash": "sha256:fae24d4abbc31231ef68b7e3f32e3cb638722dee89e8dab4ec603fba7b900bfd",
+      "sourceHash": "sha256:77f20a61d1e5482f16644a0f63be5cfa3d54069d1ebe3bf8eaba7cc4ce28ad73",
       "proxyStatus": null,
       "notes": [
         "The atmosphere and cloud stages now contain the corrected live-input, bounded-domain, persistent-history, sampled-depth, radiometric, and source-level composition paths.",
@@ -7178,7 +7210,7 @@
         "validateQuick": "npm run validate:quick",
         "validateFull": "npm run validate:full"
       },
-      "sourceHash": "sha256:d1725ac7a36db55bb8e4252ef996224586bdecbd81c958a208cd1a266b610050",
+      "sourceHash": "sha256:d03eb6482423722e66fc9baf7ae112357e0847d5fd9a495b9232ce5f6357c469",
       "proxyStatus": null,
       "notes": [
         "browser WebGPU execution and state readback are not captured",
@@ -7878,7 +7910,7 @@
         "validateQuick": "npm --prefix threejs-camera-controls-and-rigs/examples/webgpu-camera-rig run validate:quick",
         "validateFull": "npm --prefix threejs-camera-controls-and-rigs/examples/webgpu-camera-rig run validate:full"
       },
-      "sourceHash": "sha256:0c8ffe846a14c2d90827588d3cd21df62a3808015e18f179da46df02cfab51b3",
+      "sourceHash": "sha256:6c13d2e6af130dd5150d4609bc379272faa06f2454b29e178e07a2d517741c43",
       "proxyStatus": null,
       "executionClass": "rendering",
       "flagship": false,
@@ -8250,7 +8282,7 @@
         "validateQuick": "npm --prefix threejs-procedural-vegetation/examples/webgpu-dense-grass run validate:quick",
         "validateFull": "npm --prefix threejs-procedural-vegetation/examples/webgpu-dense-grass run validate:full"
       },
-      "sourceHash": "sha256:6203a4de2601015034bba82f5910ca7997bbfe786526d925290f577ac4839111",
+      "sourceHash": "sha256:65c5425dbc4f32f334414337af8a6ddf0e3839b81afd373bf89cd4248e261bc4",
       "proxyStatus": null,
       "notes": [
         "Status remains incomplete until a native-WebGPU v2 evidence bundle is captured on the current adapter.",
@@ -8510,7 +8542,7 @@
         "validateQuick": "npm run validate:quick",
         "validateFull": "npm run validate:full"
       },
-      "sourceHash": "sha256:6030ee02f228505590a3a9c61ed20a8fc2955e63d64396fe6c098d18e82a5759",
+      "sourceHash": "sha256:955a3d061630e31f8ff0b0044afc1aac19ea592ddce1f575187cefcffb1c5b7e",
       "proxyStatus": null,
       "executionClass": "rendering",
       "flagship": false,
@@ -9357,7 +9389,7 @@
         "validateQuick": "npm run validate:quick",
         "validateFull": "npm run validate:full"
       },
-      "sourceHash": "sha256:3f4e180bd7ed3802f25020df37f654d2e8359b39b16271f28664ad7d8d144bbc",
+      "sourceHash": "sha256:6b75d2e1dd48f351bedad007ed46f3c614e3c5657f3a66aba077a7abcc5aa1ec",
       "proxyStatus": null,
       "executionClass": "rendering",
       "flagship": false,
@@ -10192,7 +10224,7 @@
         "validateQuick": "npm --prefix threejs-ambient-contact-shading/examples/webgpu-node-gtao run validate:quick",
         "validateFull": "npm --prefix threejs-ambient-contact-shading/examples/webgpu-node-gtao run validate:full"
       },
-      "sourceHash": "sha256:1f8f4fbc0e5e0f8be6eb8e1a38bcf095de1afe3447c57bf27c4c9f3a0374d450",
+      "sourceHash": "sha256:f0f327086dd86d726da53d8f1fb71f11ef909f03888233b21e564a3c2322dba2",
       "proxyStatus": null,
       "executionClass": "rendering",
       "flagship": false,
@@ -10495,7 +10527,7 @@
         }
       ],
       "evidenceContract": "v2",
-      "evidenceBundle": "artifacts/visual-validation/webgpu-object-sculptor-corpus/correctness",
+      "evidenceBundle": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/artifacts/visual-validation/webgpu-object-sculptor-corpus/correctness",
       "validationCommand": "npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run validate:quick",
       "commands": {
         "check": "npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run check",
@@ -10506,7 +10538,7 @@
         "validateQuick": "npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run validate:quick",
         "validateFull": "npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run validate:full"
       },
-      "sourceHash": "sha256:2582f4d5a92771dbacc95d2e027afab49e30a1ea0719974b6ea0330d22b6e5d1",
+      "sourceHash": "sha256:e264a53ac8b16a32c316d3583469cdc9f01754da04a0cf96a82536df1ef78801",
       "proxyStatus": null,
       "notes": [
         "Deep multi-subject, route, physics, workload, provenance, and visual-acceptance metadata is owned by corpus.contract.json.",
@@ -10824,7 +10856,7 @@
         "validateQuick": "npm run validate:quick",
         "validateFull": "npm run validate:full"
       },
-      "sourceHash": "sha256:acc472f7c027972d668998d5087a5d42534983271f7c156af24af4ec1a4e0ffb",
+      "sourceHash": "sha256:8e90319cc7b170c06c76bf61fab6f286c8d2d87811cb9fa054f9d121c324ef5c",
       "proxyStatus": null,
       "executionClass": "rendering",
       "flagship": false,
@@ -10938,6 +10970,11 @@
           "startup": {
             "scenario": "genome-variation"
           }
+        },
+        {
+          "id": "coastal-crab",
+          "route": "mechanism/coastal-crab/",
+          "startup": {}
         }
       ],
       "tiers": [
@@ -11120,7 +11157,7 @@
         "validateQuick": "npm --prefix threejs-procedural-creatures/examples/webgpu-procedural-creature-lab run validate:quick",
         "validateFull": "npm --prefix threejs-procedural-creatures/examples/webgpu-procedural-creature-lab run validate:full"
       },
-      "sourceHash": "sha256:51332e75fbc3bff2394d6a1b848edec2a2be14c9ea2472f03e7b80b97d70ad65",
+      "sourceHash": "sha256:37569e54b6d546281ab8ad1504aa4ec30cc542bba050071f574ecf206e9a6aea",
       "proxyStatus": null,
       "executionClass": "rendering",
       "flagship": false,
@@ -12089,7 +12126,7 @@
       "evidenceContract": "v2",
       "evidenceBundle": null,
       "validationCommand": "node validate.js",
-      "sourceHash": "sha256:9e552daa3e86398238544b5eaf98af3400ead574a5c65629db4ae6291200b114",
+      "sourceHash": "sha256:112d5f98b8f1c75967ed0991c5df8663fbba1394d92c0f380cece2e27f33eb21",
       "proxyStatus": null,
       "executionClass": "rendering",
       "flagship": false,
@@ -12517,6 +12554,8 @@
       "status": "incomplete",
       "canonicalSource": [
         "threejs-image-pipeline/examples/webgpu-image-pipeline/canonical-main.js",
+        "threejs-image-pipeline/examples/webgpu-image-pipeline/canonical-browser-app.js",
+        "threejs-image-pipeline/examples/webgpu-image-pipeline/lab-identity.js",
         "threejs-image-pipeline/examples/webgpu-temporal-history"
       ],
       "browserEntry": "threejs-image-pipeline/examples/webgpu-temporal-history/index.html",
@@ -12612,7 +12651,7 @@
         "validateQuick": "npm run validate:quick",
         "validateFull": "npm run validate:full"
       },
-      "sourceHash": "sha256:432b825e938de8915f5e3d442fd6a41f288a7975870af1ba51d96698ee88ef0f",
+      "sourceHash": "sha256:cac6f3eaf0a89c5eafc184d4d0437c71d4ce867d7111884767a72b7f4bcc3379",
       "proxyStatus": null,
       "executionClass": "rendering",
       "flagship": false,
@@ -12624,6 +12663,7 @@
         "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/stage.js",
         "threejs-image-pipeline/examples/webgpu-image-pipeline/canonical-browser-app.js",
         "threejs-image-pipeline/examples/webgpu-image-pipeline/canonical-main.js",
+        "threejs-image-pipeline/examples/webgpu-image-pipeline/lab-identity.js",
         "threejs-image-pipeline/examples/webgpu-temporal-history"
       ]
     },
@@ -12792,6 +12832,8 @@
       ],
       "modes": [
         "final",
+        "no-post",
+        "diagnostics",
         "scene-color",
         "vertical-blur",
         "horizontal-blur",
@@ -12878,12 +12920,13 @@
       "evidenceContract": "v2",
       "evidenceBundle": null,
       "validationCommand": "node validate-temporal-surface.js",
-      "sourceHash": "sha256:e541d9f92d87a2d58a4658fa3ef2e1dd49fa0ffd64ca1d9bd9f651dee5ada385",
+      "sourceHash": "sha256:a5b6a15399f2135a3cc37b4e35b82578b9e793f7575dafe400ba61055a8a86c4",
       "proxyStatus": null,
       "executionClass": "rendering",
       "flagship": false,
       "dependencyLabIds": [],
       "sourceHashInputs": [
+        "labs/runtime/lifecycle-profile.mjs",
         "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost"
       ]
     },
@@ -13355,19 +13398,16 @@
         },
         {
           "id": "release",
-          "targetClass": "current-adapter-release",
-          "frameTargetMs": {
-            "value": 16.67,
-            "unit": "ms",
-            "label": "Gated",
-            "source": "60 Hz current-adapter release target"
-          },
+          "targetClass": "current-adapter-release-aggregation",
+          "frameTargetMs": null,
           "resolutionPolicy": {
             "scenePassScale": 1,
             "dprCap": 1
           },
           "mechanismLimits": {
-            "allClaimClassesResolved": true
+            "releaseAggregation": true,
+            "performanceEvidenceTier": "target-performance",
+            "governorEvidenceTier": "governor-stress"
           },
           "resourceLimits": {
             "lifecycleCyclesMinimum": 50,
@@ -13414,7 +13454,7 @@
         {
           "id": "timestamp-query",
           "required": false,
-          "evidence": "Required only by target-performance and release GPU-attribution claims",
+          "evidence": "Required by target-performance and governor-stress; release aggregates their joined hardware evidence",
           "status": "incomplete"
         }
       ],
@@ -13456,7 +13496,7 @@
         "validateQuick": "npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run validate:quick",
         "validateFull": "npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run validate:full"
       },
-      "sourceHash": "sha256:80c4faee8e9e77412b80556a29bf7e9016751eb72487dc46c4bcb639da70c604",
+      "sourceHash": "sha256:2653ac72112a6447fa0a855ca2a6b02ef8765f99bb58650efe1921b426e0b54c",
       "proxyStatus": null,
       "notes": [
         "Current-adapter browser capture and lifecycle evidence remain incomplete; no runtime acceptance is claimed."
@@ -13465,6 +13505,7 @@
       "flagship": false,
       "dependencyLabIds": [],
       "sourceHashInputs": [
+        "labs/runtime/lifecycle-profile.mjs",
         "threejs-visual-validation/examples/webgpu-validation-harness"
       ]
     },
@@ -13754,7 +13795,7 @@
         "validateQuick": "npm --prefix threejs-procedural-vegetation/examples/webgpu-vegetation-integration run validate:quick",
         "validateFull": "npm --prefix threejs-procedural-vegetation/examples/webgpu-vegetation-integration run validate:full"
       },
-      "sourceHash": "sha256:31984441062514cab7c0c7fa5a3156d32290c6f981b3e4ce4aa250de7031da6f",
+      "sourceHash": "sha256:99b0f5beeac419323ae163d3961943d4d1a48a60f0070a00e57ab85f6161b35c",
       "proxyStatus": null,
       "notes": [
         "The browser entry is a native-WebGPU host proof with one renderer, one RenderPipeline, one tone map, and one output conversion.",
@@ -14480,6 +14521,11 @@
       "type": "inferred-secondary",
       "path": "threejs-water-optics/examples/interactive-pool-volume",
       "canonicalDir": "threejs-water-optics/examples/interactive-pool-volume"
+    },
+    "water-optics-sparse-saint-venant-fixture": {
+      "type": "inferred-secondary",
+      "path": "threejs-water-optics/examples/sparse-saint-venant",
+      "canonicalDir": "threejs-water-optics/examples/sparse-saint-venant"
     },
     "water-integration-surface": {
       "type": "provider-registry",
