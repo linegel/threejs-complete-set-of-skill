@@ -8,6 +8,7 @@ import {
   normalizedPreviewClaimVerdicts,
   pngDimensions,
   resolveWithin,
+  selectRuntimeEvidencePreviews,
   visualizeRgba16Float,
 } from '../../scripts/promote-runtime-evidence.mjs';
 import { encodeRgbaPng } from '../../scripts/lib/png-rgba.mjs';
@@ -83,4 +84,12 @@ test('runtime evidence extracts native backend and bounded claims from capture s
   });
   delete session.hookResult.lifecycleEvidence;
   assert.equal(normalizedPreviewClaimVerdicts(session).lifecycleStability, 'INSUFFICIENT_EVIDENCE');
+});
+
+test('runtime evidence promotion selects explicit labs and rejects filter drift', () => {
+  const config = { schemaVersion: 1, previews: [ { labId: 'alpha' }, { labId: 'beta' } ] };
+  assert.deepEqual(selectRuntimeEvidencePreviews(config, ['beta']), [{ labId: 'beta' }]);
+  assert.deepEqual(selectRuntimeEvidencePreviews(config), config.previews);
+  assert.throws(() => selectRuntimeEvidencePreviews(config, ['missing']), /has no labs/);
+  assert.throws(() => selectRuntimeEvidencePreviews(config, ['alpha', 'alpha']), /duplicates/);
 });

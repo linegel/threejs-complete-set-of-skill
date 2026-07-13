@@ -185,14 +185,26 @@ function imageOutput(config, artifactDirectory, outputDirectory) {
   };
 }
 
-export function promoteRuntimeEvidence(configPath = DEFAULT_CONFIG) {
+export function selectRuntimeEvidencePreviews(config, labIds = []) {
+	if ( config?.schemaVersion !== 1 || ! Array.isArray( config.previews ) ) throw new Error( 'runtime evidence preview config must use schemaVersion 1' );
+	if ( ! Array.isArray( labIds ) ) throw new TypeError( 'runtime evidence lab filter must be an array' );
+	if ( labIds.length === 0 ) return config.previews;
+	const requested = new Set( labIds );
+	if ( requested.size !== labIds.length ) throw new Error( 'runtime evidence lab filter contains duplicates' );
+	const selected = config.previews.filter( ( preview ) => requested.has( preview.labId ) );
+	const found = new Set( selected.map( ( preview ) => preview.labId ) );
+	const missing = labIds.filter( ( labId ) => found.has( labId ) === false );
+	if ( missing.length > 0 ) throw new Error( `runtime evidence preview config has no labs: ${ missing.join( ', ' ) }` );
+	return selected;
+}
+
+export function promoteRuntimeEvidence(configPath = DEFAULT_CONFIG, { labIds = [] } = {}) {
   const config = readJson(configPath);
-  if (config.schemaVersion !== 1 || !Array.isArray(config.previews)) throw new Error('runtime evidence preview config must use schemaVersion 1');
   const registry = buildDemoRegistry();
   const demos = new Map(registry.demos.map((demo) => [demo.id, demo]));
   const summaries = [];
 
-  for (const preview of config.previews) {
+  for (const preview of selectRuntimeEvidencePreviews(config, labIds)) {
     const demo = demos.get(preview.labId);
     if (!demo || !PRIMARY_DEMO_KINDS.includes(demo.kind)) throw new Error(`${preview.labId} is not a primary demo`);
     if (demo.status !== preview.expectedAcceptanceStatus) throw new Error(`${preview.labId} status drift: ${demo.status} !== ${preview.expectedAcceptanceStatus}`);
@@ -244,6 +256,18 @@ export function promoteRuntimeEvidence(configPath = DEFAULT_CONFIG) {
 
 const invokedPath = process.argv[1] ? resolve(process.argv[1]) : null;
 if (invokedPath && invokedPath === fileURLToPath(import.meta.url)) {
-  const summaries = promoteRuntimeEvidence(process.argv[2] ? resolve(process.argv[2]) : DEFAULT_CONFIG);
+  const args = process.argv.slice(2);
+  const labIds = [];
+  let configPath = DEFAULT_CONFIG;
+  for (let index = 0; index < args.length; index += 1) {
+    if (args[index] === '--lab') {
+      const labId = args[index + 1];
+      if (!labId || labId.startsWith('--')) throw new Error('--lab requires a lab ID');
+      labIds.push(labId);
+      index += 1;
+    } else if (configPath === DEFAULT_CONFIG) configPath = resolve(args[index]);
+    else throw new Error(`unexpected runtime evidence promotion argument ${args[index]}`);
+  }
+  const summaries = promoteRuntimeEvidence(configPath, { labIds });
   console.log(`Promoted ${summaries.length} inspected runtime evidence preview bundle(s).`);
 }
