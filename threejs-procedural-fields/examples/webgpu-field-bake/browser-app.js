@@ -785,10 +785,14 @@ async function createApp() {
       values[outputIndex * 4 + 2],
       values[outputIndex * 4 + 3],
     ]);
+    // Clone the vec4 for decoded.gpu. capture-lab-browser.controllerCall uses a
+    // WeakSet cycle filter on JSON.stringify; a shared array reference with
+    // rawGpuRecords[index] is dropped as a second visit and arrives offline as
+    // undefined, breaking validate-field-contract's decoded.gpu deepEqual.
     const decodedRecords = acceptedIndices.map((cellIndex, outputIndex) => ({
       outputIndex,
       cpuAcceptedCellIndex: cellIndex,
-      gpu: rawGpuRecords[outputIndex],
+      gpu: rawGpuRecords[outputIndex].slice(),
     }));
     const masks = rawGpuRecords.map((record) => record[2]);
     const rawGpuW = rawGpuRecords.map((record) => record[3]);
