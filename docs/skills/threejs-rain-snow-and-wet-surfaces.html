@@ -9,7 +9,7 @@
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-rain-snow-and-wet-surfaces.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b" />
+<meta name="skill-pack-build-revision" content="sha256:1e6b394e627f62530067de74268edff55eabade9d23fac107528808e31614555" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -17,18 +17,24 @@
 <link rel="manifest" href="../site.webmanifest" />
 <link rel="alternate" type="text/plain" href="https://threejs-skills.com/llms.txt" title="LLM-readable skill catalog" />
 <link rel="alternate" type="application/json" href="https://threejs-skills.com/skills.json" title="Machine-readable skill catalog" />
-
+<link rel="preload" as="image" href="../visual-validation/integration-precipitation-image-pipeline/final.design.avif" type="image/avif" fetchpriority="high" />
 <meta property="og:type" content="article" />
 <meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
 <meta property="og:title" content="Rain, Snow, and Wet Surfaces | Three.js WebGPU Skill" />
 <meta property="og:description" content="Build coupled WebGPU/TSL rain, snow, and wet-surface systems in Three.js. Use for compute-driven falling snow, rain streaks, snow accumulation, model snow…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-rain-snow-and-wet-surfaces.html" />
-<meta property="article:modified_time" content="2026-07-11T12:53:58+03:00" />
+<meta property="article:modified_time" content="2026-07-13T16:04:34+03:00" />
 <meta property="article:published_time" content="2026-07-04T23:30:21+03:00" />
 <meta property="article:section" content="Worlds and Environments" />
-
-<meta name="twitter:card" content="summary" />
+<meta property="og:image" content="https://threejs-skills.com/visual-validation/integration-precipitation-image-pipeline/final.design.png" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="800" />
+<meta property="og:image:alt" content="Precipitation/image-pipeline integration presentation for Rain, Snow, and Wet Surfaces" />
+<meta name="twitter:image" content="https://threejs-skills.com/visual-validation/integration-precipitation-image-pipeline/final.design.png" />
+<meta name="twitter:image:alt" content="Precipitation/image-pipeline integration presentation for Rain, Snow, and Wet Surfaces" />
+<meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Rain, Snow, and Wet Surfaces | Three.js WebGPU Skill" />
 <meta name="twitter:description" content="Build coupled WebGPU/TSL rain, snow, and wet-surface systems in Three.js. Use for compute-driven falling snow, rain streaks, snow accumulation, model snow…" />
 <script type="application/ld+json">
@@ -62,8 +68,13 @@
     "@type": "WebPage",
     "@id": "https://threejs-skills.com/skills/threejs-rain-snow-and-wet-surfaces.html"
    },
+   "image": [
+    "https://threejs-skills.com/seo/article/threejs-rain-snow-and-wet-surfaces-1x1.png",
+    "https://threejs-skills.com/seo/article/threejs-rain-snow-and-wet-surfaces-4x3.png",
+    "https://threejs-skills.com/seo/article/threejs-rain-snow-and-wet-surfaces-16x9.png"
+   ],
    "datePublished": "2026-07-04T23:30:21+03:00",
-   "dateModified": "2026-07-11T12:53:58+03:00",
+   "dateModified": "2026-07-13T16:04:34+03:00",
    "author": {
     "@id": "https://threejs-skills.com/#publisher"
    },
@@ -273,19 +284,25 @@ a.chip:active{scale:.96}
 </nav></div></div>
 
 <main id="main-content" tabindex="-1">
-<header class="">
+<header class="skill-hero">
+  <picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/integration-precipitation-image-pipeline/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/integration-precipitation-image-pipeline/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/integration-precipitation-image-pipeline/final.design.png" alt="" class="skill-hero-bg" aria-hidden="true" width="1200" height="800" fetchpriority="high" decoding="async" />
+        </picture>
   <div class="wrap">
     <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Worlds and Environments</a></li><li aria-current="page">Rain, Snow, and Wet Surfaces</li></ol></nav>
     <h1 style="view-transition-name:skill-threejs-rain-snow-and-wet-surfaces">Rain, Snow, and Wet Surfaces</h1>
     <p class="lede">Build coupled WebGPU/TSL rain, snow, and wet-surface systems in Three.js. Use for compute-driven falling snow, rain streaks, snow accumulation, model snow caps, wet asphalt puddles, procedural or generated ripple normals, splash flipbooks, shared weather envelopes, and surface wetness or coverage transitions.</p>
+    <p class="hero-evidence-caption">Image: Precipitation/image-pipeline integration presentation. Source lab: integration-precipitation-image-pipeline.</p>
     <div class="meta-row">
       <span class="chip a">$threejs-rain-snow-and-wet-surfaces</span>
-      <span class="chip">2 primary implementations</span>
+      <span class="chip">2 primary targets</span>
 <span class="chip">3 flagships</span>
 <span class="chip">1 secondary surface</span>
       <span class="chip">native evidence pending</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-11T12:53:58+03:00">2026-07-11</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/9ee91ebcf9f3bf4753c0a1b4401a05c6977116eb">commit 9ee91eb ↗</a>
+      <span class="chip">Latest skill update <time datetime="2026-07-13T16:04:34+03:00">2026-07-13</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/7936bbef8b5e32ceb0db3d9dcef48e08ccdccb4f">commit 7936bbe ↗</a>
       <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-rain-snow-and-wet-surfaces/SKILL.md">SKILL.md on GitHub ↗</a>
       <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-rain-snow-and-wet-surfaces/SKILL.md">raw (for agents) ↗</a>
     </div>
@@ -294,14 +311,14 @@ a.chip:active{scale:.96}
 
 
   <section class="section" id="primary-implementations" aria-labelledby="primary-implementations-title"><div class="wrap">
-    <h2 id="primary-implementations-title">Primary implementation surface</h2>
-    <p class="sub">These routes are generated from canonical source. Their exact status remains separate from implementation availability.</p>
+    <h2 id="primary-implementations-title">Primary target surface</h2>
+    <p class="sub">These rendering routes are generated from canonical source. Native-WebGPU acceptance remains separate from entrypoint availability.</p>
     <div class="grid">
       <a class="card" href="../demos/webgpu-rain-snow-and-wet-surfaces/">
         <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="webgpu-rain-snow-and-wet-surfaces">
     <span class="primary-evidence-label">Canonical capture</span>
     <strong>Runtime evidence pending</strong>
-    <span><code>9e552daa3e86</code> source hash</span>
+    <span><code>6bccc892e96e</code> source hash</span>
     <span>10 fixed states · 8 runtime proof requirements</span>
   </span>
         <span class="card-head"><span class="card-kind">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
@@ -310,12 +327,11 @@ a.chip:active{scale:.96}
         <span class="card-meta">Open published implementation →</span>
       </a>
       <a class="card" href="../demos/integration-precipitation-image-pipeline/">
-        <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="integration-precipitation-image-pipeline">
-    <span class="primary-evidence-label">Canonical capture</span>
-    <strong>Runtime evidence pending</strong>
-    <span><code>5de5585573ea</code> source hash</span>
-    <span>9 fixed states · 3 runtime proof requirements</span>
-  </span>
+        <span class="card-preview-wrap" data-preview-for="integration-precipitation-image-pipeline" data-preview-source="integration-precipitation-image-pipeline" data-preview-classification="inspected-runtime-evidence-preview"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/integration-precipitation-image-pipeline/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/integration-precipitation-image-pipeline/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/integration-precipitation-image-pipeline/final.design.png" alt="Precipitation/image-pipeline integration presentation for Integration Precipitation Image Pipeline" class="card-preview" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><span class="media-caption">Precipitation/image-pipeline integration presentation</span></span>
         <span class="card-head"><span class="card-kind">Integration</span><span class="status status--pending">Evidence pending</span></span>
         <h3>Integration Precipitation Image Pipeline</h3>
         <p>2 fixed scenarios, 4 mechanism routes, and 3 locked tiers.</p>
@@ -332,7 +348,7 @@ a.chip:active{scale:.96}
         <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="weathered-world">
     <span class="primary-evidence-label">Canonical capture</span>
     <strong>Runtime evidence pending</strong>
-    <span><code>26e74c4ec93d</code> source hash</span>
+    <span><code>053df36ddef2</code> source hash</span>
     <span>10 fixed states · 5 runtime proof requirements</span>
   </span>
         <span class="card-head"><span class="card-kind">Planetary environment</span><span class="status status--pending">Evidence pending</span></span>
@@ -340,12 +356,11 @@ a.chip:active{scale:.96}
         <span class="card-meta">6 mechanisms · 3 locked tiers</span>
       </a>
       <a class="card" href="../demos/procedural-district/">
-        <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="procedural-district">
-    <span class="primary-evidence-label">Canonical capture</span>
-    <strong>Runtime evidence pending</strong>
-    <span><code>919817c6e63f</code> source hash</span>
-    <span>10 fixed states · 4 runtime proof requirements</span>
-  </span>
+        <span class="card-preview-wrap" data-preview-for="procedural-district" data-preview-source="procedural-district" data-preview-classification="inspected-runtime-evidence-preview"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/procedural-district/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/procedural-district/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/procedural-district/final.design.png" alt="Procedural district integration presentation for Procedural District" class="card-preview" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><span class="media-caption">Procedural district integration presentation</span></span>
         <span class="card-head"><span class="card-kind">Authored procedural world</span><span class="status status--pending">Evidence pending</span></span>
         <h3>Procedural District</h3>
         <span class="card-meta">6 mechanisms · 3 locked tiers</span>
@@ -354,7 +369,7 @@ a.chip:active{scale:.96}
         <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="creature-habitat">
     <span class="primary-evidence-label">Canonical capture</span>
     <strong>Runtime evidence pending</strong>
-    <span><code>25111e22bb87</code> source hash</span>
+    <span><code>8bf88a88d649</code> source hash</span>
     <span>9 fixed states · 5 runtime proof requirements</span>
   </span>
         <span class="card-head"><span class="card-kind">Actors and environment</span><span class="status status--pending">Evidence pending</span></span>
@@ -389,15 +404,100 @@ ring: $h(r,t) = A\,e^{-\gamma t}\cos(kr - \omega t)$, baked or generated as norm
 
   <div class="section" id="validation"><div class="wrap">
     <h2>Preview and evidence ledger</h2>
-    <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; canonical acceptance still requires render-target readback and a schema-v2 bundle.</p>
-    <div class="evidence-ledger"><span class="status status--pending">Canonical runtime evidence pending</span><code>0 published images</code></div>
-
-    <div class="primary-evidence-panel" data-evidence-state="incomplete"><span class="primary-evidence-label">Same-lab evidence</span><strong>No runtime image promoted</strong><span>The page remains image-free until this skill's own lab supplies hash-bound pixels.</span></div>
+    <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; rendering acceptance still requires same-lab readback and a schema-v2 bundle.</p>
+    <div class="evidence-ledger"><span class="status status--pending">Canonical runtime evidence pending</span><code>10 published images</code></div>
+<div class="runtime-evidence-disclosures">
+      <article class="runtime-evidence-disclosure" data-acceptance-status="incomplete">
+        <div class="runtime-evidence-head"><div><code>Native WebGPU runtime evidence preview</code><h3>Integration Precipitation Image Pipeline</h3></div><span class="status status--pending">Evidence pending</span></div>
+        <dl><div><dt>visualCorrectness</dt><dd data-verdict="INSUFFICIENT_EVIDENCE">INSUFFICIENT_EVIDENCE</dd></div><div><dt>mechanismCorrectness</dt><dd data-verdict="INSUFFICIENT_EVIDENCE">INSUFFICIENT_EVIDENCE</dd></div><div><dt>performanceCompliance</dt><dd data-verdict="NOT_CLAIMED">NOT_CLAIMED</dd></div><div><dt>gpuAttribution</dt><dd data-verdict="NOT_CLAIMED">NOT_CLAIMED</dd></div><div><dt>lifecycleStability</dt><dd data-verdict="INSUFFICIENT_EVIDENCE">INSUFFICIENT_EVIDENCE</dd></div></dl>
+        <ul><li>Host-owned native WebGPU capture proves backend identity and multi-color final/wetness/particles presentation readbacks on the current source hash.</li><li>Primary dependencies webgpu-rain-snow-and-wet-surfaces and webgpu-image-pipeline are not both formally accepted, so integration acceptance remains incomplete.</li><li>Named-adapter GPU timestamps are not claimed.</li></ul>
+      </article></div>
+    <div class="gallery">
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="integration-precipitation-image-pipeline" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/integration-precipitation-image-pipeline/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/integration-precipitation-image-pipeline/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/integration-precipitation-image-pipeline/final.design.png" alt="Rain, Snow, and Wet Surfaces: Precipitation/image-pipeline integration presentation" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Precipitation/image-pipeline integration presentation</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="integration-precipitation-image-pipeline" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/integration-precipitation-image-pipeline/no-post.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/integration-precipitation-image-pipeline/no-post.design.webp" />
+          <img data-responsive-preview src="../visual-validation/integration-precipitation-image-pipeline/no-post.design.png" alt="Rain, Snow, and Wet Surfaces: Wetness / no-post diagnostic presentation (multi-color scene)." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Wetness / no-post diagnostic presentation (multi-color scene).</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="integration-precipitation-image-pipeline" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/integration-precipitation-image-pipeline/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="../visual-validation/integration-precipitation-image-pipeline/diagnostics.mosaic.webp" />
+          <img data-responsive-preview src="../visual-validation/integration-precipitation-image-pipeline/diagnostics.mosaic.png" alt="Rain, Snow, and Wet Surfaces: Particles / diagnostic presentation (multi-color scene)." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Particles / diagnostic presentation (multi-color scene).</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="integration-precipitation-image-pipeline" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/integration-precipitation-image-pipeline/camera.near.avif" />
+          <source type="image/webp" srcset="../visual-validation/integration-precipitation-image-pipeline/camera.near.webp" />
+          <img data-responsive-preview src="../visual-validation/integration-precipitation-image-pipeline/camera.near.png" alt="Rain, Snow, and Wet Surfaces: Near camera presentation." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Near camera presentation.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="integration-precipitation-image-pipeline" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/integration-precipitation-image-pipeline/camera.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/integration-precipitation-image-pipeline/camera.design.webp" />
+          <img data-responsive-preview src="../visual-validation/integration-precipitation-image-pipeline/camera.design.png" alt="Rain, Snow, and Wet Surfaces: Design camera presentation." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Design camera presentation.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="integration-precipitation-image-pipeline" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/integration-precipitation-image-pipeline/camera.far.avif" />
+          <source type="image/webp" srcset="../visual-validation/integration-precipitation-image-pipeline/camera.far.webp" />
+          <img data-responsive-preview src="../visual-validation/integration-precipitation-image-pipeline/camera.far.png" alt="Rain, Snow, and Wet Surfaces: Far camera presentation." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Far camera presentation.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="integration-precipitation-image-pipeline" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/integration-precipitation-image-pipeline/seed-0001.final.avif" />
+          <source type="image/webp" srcset="../visual-validation/integration-precipitation-image-pipeline/seed-0001.final.webp" />
+          <img data-responsive-preview src="../visual-validation/integration-precipitation-image-pipeline/seed-0001.final.png" alt="Rain, Snow, and Wet Surfaces: Baseline seed presentation." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Baseline seed presentation.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="integration-precipitation-image-pipeline" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/integration-precipitation-image-pipeline/seed-9e3779b9.final.avif" />
+          <source type="image/webp" srcset="../visual-validation/integration-precipitation-image-pipeline/seed-9e3779b9.final.webp" />
+          <img data-responsive-preview src="../visual-validation/integration-precipitation-image-pipeline/seed-9e3779b9.final.png" alt="Rain, Snow, and Wet Surfaces: Stress seed presentation." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Stress seed presentation.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="integration-precipitation-image-pipeline" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/integration-precipitation-image-pipeline/temporal.t000.avif" />
+          <source type="image/webp" srcset="../visual-validation/integration-precipitation-image-pipeline/temporal.t000.webp" />
+          <img data-responsive-preview src="../visual-validation/integration-precipitation-image-pipeline/temporal.t000.png" alt="Rain, Snow, and Wet Surfaces: Temporal t0 presentation." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Temporal t0 presentation.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="integration-precipitation-image-pipeline" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/integration-precipitation-image-pipeline/temporal.t001.avif" />
+          <source type="image/webp" srcset="../visual-validation/integration-precipitation-image-pipeline/temporal.t001.webp" />
+          <img data-responsive-preview src="../visual-validation/integration-precipitation-image-pipeline/temporal.t001.png" alt="Rain, Snow, and Wet Surfaces: Temporal t1 presentation." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Temporal t1 presentation.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure></div>
   </div></div>
 
 <div class="section" id="skill-text"><div class="wrap">
   <h2>The full skill</h2>
-  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
+  <p class="sub">The complete SKILL.md as loaded by agents, rendered verbatim.</p>
   <div class="skilltext"><h2>Rain, Snow, and Wet Surfaces</h2>
 <p>Treat weather as one coupled GPU system: a shared weather envelope drives
 precipitation particles, surface masks, normals, roughness, residue, lighting,
@@ -776,8 +876,8 @@ owner owns integrated wetness/coverage; surface materials only consume it.</p>
 </main>
 
 <div class="wrap"><footer>
-  <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
-  <span style="font-size:13px">Three r185.1 · 41 working implementations · build <code>6c7881ab7386</code></span><br/>
+  <span>Three.js WebGPU Skill Pack: TSL, procedural graphics, and visual validation.<br/>
+  <span style="font-size:13px">Three r185.1 · 41 primary targets · 6 accepted · build <code>1e6b394e627f</code></span><br/>
   <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
   <span><a href="https://threejs-skills.com/about/">About &amp; methodology</a> · <a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/llms.txt">For coding agents</a></span>
 </footer></div>

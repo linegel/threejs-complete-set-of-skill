@@ -4,7 +4,7 @@
   "skill": "threejs-rain-snow-and-wet-surfaces",
   "threeRevision": "0.185.1",
   "kind": "canonical-lab",
-  "status": "incomplete",
+  "status": "accepted",
   "canonicalSource": [
     "precipitation-system.js",
     "weather-webgpu-lab.js",
@@ -23,39 +23,39 @@
         "scenario": "coupled-weather",
         "tier": "medium"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     }
   ],
   "mechanisms": [
     {
       "id": "precipitation-volume",
       "route": "/demos/webgpu-rain-snow-and-wet-surfaces/mechanism/precipitation-volume/",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "analytic-vs-recurrent",
       "route": "/demos/webgpu-rain-snow-and-wet-surfaces/mechanism/analytic-vs-recurrent/",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "wet-road-and-puddles",
       "route": "/demos/webgpu-rain-snow-and-wet-surfaces/mechanism/wet-road-and-puddles/",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "impact-and-splashes",
       "route": "/demos/webgpu-rain-snow-and-wet-surfaces/mechanism/impact-and-splashes/",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "snow-accumulation-and-caps",
       "route": "/demos/webgpu-rain-snow-and-wet-surfaces/mechanism/snow-accumulation-and-caps/",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "weather-envelope-coupling",
       "route": "/demos/webgpu-rain-snow-and-wet-surfaces/mechanism/weather-envelope-coupling/",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     }
   ],
   "tiers": [
@@ -84,7 +84,7 @@
         "integrated-surface-state",
         "single-field-snow-normal"
       ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "medium",
@@ -114,7 +114,7 @@
         "integrated-surface-state",
         "single-field-snow-normal"
       ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "budgeted",
@@ -145,7 +145,7 @@
         "integrated-surface-state",
         "single-field-snow-normal"
       ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     }
   ],
   "modes": [
@@ -172,19 +172,19 @@
       "id": "native-webgpu",
       "required": true,
       "evidence": "renderer backend gate after initialization",
-      "status": "incomplete"
+      "status": "accepted"
     },
     {
       "id": "storage-buffer",
       "required": true,
       "evidence": "immutable and recurrent storage-backed instance resources",
-      "status": "incomplete"
+      "status": "accepted"
     },
     {
       "id": "compute",
       "required": true,
       "evidence": "recurrent weather and bounded impact dispatch graph",
-      "status": "incomplete"
+      "status": "accepted"
     }
   ],
   "runtimeProof": [
@@ -192,53 +192,60 @@
       "id": "renderer-init",
       "required": true,
       "evidence": "await renderer.init() in canonical browser controller",
-      "status": "incomplete"
+      "status": "accepted"
     },
     {
       "id": "backend-is-webgpu",
       "required": true,
       "evidence": "renderer.backend.isWebGPUBackend === true",
-      "status": "incomplete"
+      "status": "accepted"
     },
     {
       "id": "mechanism-reachable",
       "required": true,
       "evidence": "fixed mechanism routes change live visibility, material graph reachability, receiver work, and compute dispatch selection",
-      "status": "incomplete"
+      "status": "accepted"
     },
     {
       "id": "world-stable-impact-receivers",
       "required": true,
       "evidence": "camera-independent world-cell scheduler queries registered upward/visible/unoccluded receivers before GPU event upload",
-      "status": "incomplete"
+      "status": "accepted"
     },
     {
       "id": "runtime-seed-rebuild",
       "required": true,
       "evidence": "setSeed replaces precipitation seed/recurrent/impact storage and scheduler state",
-      "status": "incomplete"
+      "status": "accepted"
     },
     {
       "id": "resource-derived-diagnostics",
       "required": true,
       "evidence": "normal diagnostics consume the live MRT attachment; masks/events/particles consume live material or storage nodes",
-      "status": "incomplete"
+      "status": "accepted"
     },
     {
       "id": "aligned-readback",
       "required": true,
       "evidence": "capturePixels derives integer 256-byte-aligned row stride",
-      "status": "incomplete"
+      "status": "accepted"
     },
     {
       "id": "current-adapter-timing",
       "required": false,
       "evidence": "required before any performance acceptance",
       "status": "incomplete"
+    },
+    {
+      "id": "render-or-compute-work",
+      "required": true,
+      "evidence": "unified-v2 approved release: correctness capture + CDP Chrome hardware physical-route review + offline visual signoff",
+      "status": "accepted"
     }
   ],
   "evidenceContract": "v2",
   "validationCommand": "node validate.js",
   "sourceHash": null,
-  "proxyStatus": null
+  "proxyStatus": null,
+  "evidenceBundle": "docs/visual-validation/webgpu-rain-snow-and-wet-surfaces/bundle"
 }

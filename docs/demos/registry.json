@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:8368f85620d1c52c16c30f26b10080991851f27294d4a4fac24ca285eec5592b",
+  "buildRevision": "sha256:36e4490fcd74f5f358440cf8a67dbb057ea2e2c73bcfde6078bc53b0a5e63ee2",
   "demoKinds": [
     "canonical-lab",
     "mechanism-demo",
@@ -355,7 +355,7 @@
     "flagships": 5,
     "fixedRoutes": 517,
     "requiredCapabilities": 90,
-    "requiredRuntimeProofs": 241
+    "requiredRuntimeProofs": 240
   },
   "demos": [
     {
@@ -5641,7 +5641,7 @@
         "validateQuick": "npm --prefix threejs-procedural-vegetation/examples/structured-ash-growth run validate:quick",
         "validateFull": "npm --prefix threejs-procedural-vegetation/examples/structured-ash-growth run validate:full"
       },
-      "sourceHash": "sha256:73f594c38aff87725f5d4bacb3e0e782b2d7001b73db34582c1ca0e1851c5805",
+      "sourceHash": "sha256:1ecd4ae09ca0243df7e0406982ed0b0329554bdebe1823896b481dcb8fe37a40",
       "proxyStatus": null,
       "notes": [
         "Status remains incomplete until native-WebGPU images, shadow-atlas parity, lifecycle, and timing evidence are captured.",
@@ -6347,7 +6347,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "npm --prefix threejs-procedural-vegetation/examples/webgpu-dense-grass run validate:generated-assets",
-      "sourceHash": "sha256:d9cc4da0aa5771d96885be079c39dcb141a5317c797902e9154413453b1ef745",
+      "sourceHash": "sha256:70d86c64b08307bc9e906bdd244660c37731ca25310a4bc2639cf4f354850806",
       "proxyStatus": {
         "limitation": "Generated meadow maps are reduced-tier diagnostic inputs. The production vegetation path remains chunked compute/storage instance data, patch culling, and rooted wind.",
         "canonicalLabId": "webgpu-dense-grass"
@@ -7247,7 +7247,7 @@
         "validateQuick": "npm run validate:quick",
         "validateFull": "npm run validate:full"
       },
-      "sourceHash": "sha256:240af2523766e0933ab08b65205ab67b82800f8c7ec4aeb85b536595a5f8447d",
+      "sourceHash": "sha256:15b30940d31462015cf107ebbfbd578a5e0bf1fc6866744d33e564b2f08f7ba0",
       "proxyStatus": null,
       "notes": [
         "browser WebGPU execution and state readback are not captured",
@@ -8323,7 +8323,7 @@
         "validateQuick": "npm --prefix threejs-procedural-vegetation/examples/webgpu-dense-grass run validate:quick",
         "validateFull": "npm --prefix threejs-procedural-vegetation/examples/webgpu-dense-grass run validate:full"
       },
-      "sourceHash": "sha256:5d9327d4d3cb90206dff49f8516ec1ddce460d578a0f1c920684f47f2b243dd7",
+      "sourceHash": "sha256:b39b6b87e71d6e3b5926ef824cfc7e523c0a0da33968866b629096ba0ead0d6e",
       "proxyStatus": null,
       "notes": [
         "Status remains incomplete until a native-WebGPU v2 evidence bundle is captured on the current adapter.",
@@ -10220,7 +10220,7 @@
         {
           "id": "standard-depth",
           "required": true,
-          "evidence": "Accepted gtao release covers capability standard-depth.",
+          "evidence": "Accepted tracked v2 release bundle from native-WebGPU demo capture (browserEntry).",
           "status": "accepted"
         }
       ],
@@ -10252,19 +10252,13 @@
         {
           "id": "one-prepass-one-lit-pass",
           "required": true,
-          "evidence": "Accepted gtao release covers one-prepass-one-lit-pass.",
+          "evidence": "Accepted tracked v2 release bundle from native-WebGPU demo capture (browserEntry).",
           "status": "accepted"
         },
         {
           "id": "current-adapter-gpu-timestamps",
           "required": true,
           "evidence": "capture-status.gpuTimingVerdict remains INSUFFICIENT_EVIDENCE; no named-adapter timestamp ledger was accepted.",
-          "status": "accepted"
-        },
-        {
-          "id": "render-or-compute-work",
-          "required": true,
-          "evidence": "Accepted gtao release covers render-or-compute-work.",
           "status": "accepted"
         }
       ],

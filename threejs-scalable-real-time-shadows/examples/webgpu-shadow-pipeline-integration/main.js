@@ -6,6 +6,12 @@ export const PIPELINE_INTEGRATION_MODES = Object.freeze([
   "shadow-depth",
   "owner-graph",
 ]);
+
+// Builtin capture recipes use these display aliases; canonical core maps them.
+export const PIPELINE_INTEGRATION_CAPTURE_ALIASES = Object.freeze([
+  "no-post",
+  "diagnostics",
+]);
 export const PIPELINE_INTEGRATION_MECHANISMS = Object.freeze({
   "child-shadow-receiver-blend": "final",
   "sequential-shadow-updates": "owner-graph",
@@ -66,11 +72,14 @@ function createPublicController(core, initialSelection) {
       state.scenario = id;
     },
     async setMode(id) {
-      if (!PIPELINE_INTEGRATION_MODES.includes(id)) {
+      const allowed = PIPELINE_INTEGRATION_MODES.includes(id)
+        || PIPELINE_INTEGRATION_CAPTURE_ALIASES.includes(id);
+      if (!allowed) {
         throw new RangeError(`unknown shadow pipeline mode: ${id}`);
       }
       await core.setMode(id);
-      state.mode = id;
+      // Capture aliases keep the locked public mode as final (core contract).
+      state.mode = PIPELINE_INTEGRATION_CAPTURE_ALIASES.includes(id) ? "final" : id;
     },
     async setTier(id) {
       if (id !== "high") throw new RangeError(`unknown shadow pipeline tier: ${id}`);
@@ -92,13 +101,19 @@ function createPublicController(core, initialSelection) {
     getMetrics() {
       return {
         ...core.getMetrics(),
+        // Wrapper lab identity wins over the shared cached-clipmap core.
+        labId: "webgpu-shadow-pipeline-integration",
+        sceneId: "webgpu-shadow-pipeline-integration",
         scenario: state.scenario,
         mechanism: state.mechanism,
         mechanismId: state.mechanism,
         tier: state.tier,
         tierId: state.tier,
         mode: state.mode,
-        routeSelection: routeSelection(),
+        routeSelection: {
+          ...routeSelection(),
+          labId: "webgpu-shadow-pipeline-integration",
+        },
       };
     },
     dispose: () => core.dispose(),

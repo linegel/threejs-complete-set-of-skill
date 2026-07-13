@@ -13,6 +13,12 @@ export const ARCHITECTURE_BENCH_MODES = Object.freeze([
   "owner-graph",
 ]);
 
+// Builtin capture recipes use these display aliases; canonical core maps them.
+export const ARCHITECTURE_BENCH_CAPTURE_ALIASES = Object.freeze([
+  "no-post",
+  "diagnostics",
+]);
+
 const scenarioByMechanism = Object.freeze(Object.fromEntries(
   Object.entries(ARCHITECTURE_SCENARIOS).map(([scenario, value]) => [value.mechanism, scenario]),
 ));
@@ -82,11 +88,14 @@ function createPublicController(core, initialSelection) {
       }
     },
     async setMode(id) {
-      if (!ARCHITECTURE_BENCH_MODES.includes(id)) {
+      const allowed = ARCHITECTURE_BENCH_MODES.includes(id)
+        || ARCHITECTURE_BENCH_CAPTURE_ALIASES.includes(id);
+      if (!allowed) {
         throw new RangeError(`unknown shadow architecture mode: ${id}`);
       }
       await core.setMode(id);
-      state.mode = id;
+      // Capture aliases keep the locked public mode as final (core contract).
+      state.mode = ARCHITECTURE_BENCH_CAPTURE_ALIASES.includes(id) ? "final" : id;
     },
     async setTier(id) {
       if (id !== "high") throw new RangeError(`unknown shadow architecture tier: ${id}`);
@@ -108,13 +117,19 @@ function createPublicController(core, initialSelection) {
     getMetrics() {
       return {
         ...core.getMetrics(),
+        // Wrapper lab identity wins over the shared cached-clipmap core.
+        labId: "webgpu-shadow-architecture-bench",
+        sceneId: "webgpu-shadow-architecture-bench",
         scenario: state.scenario,
         mechanism: state.mechanism,
         mechanismId: state.mechanism,
         tier: state.tier,
         tierId: state.tier,
         mode: state.mode,
-        routeSelection: routeSelection(),
+        routeSelection: {
+          ...routeSelection(),
+          labId: "webgpu-shadow-architecture-bench",
+        },
       };
     },
     dispose: () => core.dispose(),

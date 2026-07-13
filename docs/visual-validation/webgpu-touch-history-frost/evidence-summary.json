@@ -17,7 +17,24 @@
     "renderer": "WebGPURenderer",
     "backend": "WebGPU",
     "isWebGPUBackend": true,
-    "threeRevision": "0.185.1"
+    "threeRevision": "0.185.1",
+    "nativeWebGPU": true,
+    "initialized": true,
+    "adapterClass": "hardware",
+    "adapterIdentity": {
+      "source": "renderer.backend.device.adapterInfo",
+      "isFallbackAdapter": false,
+      "info": {
+        "vendor": "apple",
+        "architecture": "metal-3"
+      }
+    },
+    "deviceIdentity": {
+      "verified": true,
+      "source": "exact retained renderer.backend.device reference after renderer.init()",
+      "deviceType": "GPUDevice",
+      "generation": 1
+    }
   },
   "claimVerdicts": {
     "visualCorrectness": "PASS",

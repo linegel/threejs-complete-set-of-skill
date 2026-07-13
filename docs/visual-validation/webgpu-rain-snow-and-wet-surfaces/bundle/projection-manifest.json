@@ -1,0 +1,388 @@
+{
+  "schemaVersion": 1,
+  "projectionKind": "tracked-release-projection-v1",
+  "policy": {
+    "id": "native-webgpu-tracked-release-v1",
+    "digest": "sha256:e349900d79da27cb5570ea959707f741e03ea7e206d85a717a1129b27268f6a4"
+  },
+  "labId": "webgpu-rain-snow-and-wet-surfaces",
+  "skill": "threejs-rain-snow-and-wet-surfaces",
+  "threeRevision": "0.185.1",
+  "sourceClosureHash": "sha256:6bccc892e96e099bb776969a9c27c14df04050467bfa3b6abfdd8e3b4b440de4",
+  "buildRevision": "sha256:5e66effd310931856fae613dd6e51c3c9085c625563667e170b158d0b18c85c5",
+  "sourceRelease": {
+    "path": "evidence-manifest.json",
+    "sha256": "sha256:25bd6c3c576e11b1f8c5ed1d67286ba495e94b522effff8935541f9a3456cd7c",
+    "byteLength": 33055,
+    "promotionBindingDigest": "sha256:87bf5aeb595597c6142229c22bad7f745d84d2e27f9c22d576dd9cc945631673",
+    "candidateBindingDigest": "sha256:04811850560a4b27f80bc53e10d6a1af58c016219cd42af3edcb725a3068c0a4",
+    "artifactLedgerDigest": "sha256:559b926f89c9de35b6b9ddfc1250852316075da5ff30d3c333dbe5bfa40eee3b",
+    "imageLedgerDigest": "sha256:00b082134c2fa62ea8b65aa64b8a0e386be4e36201261ca6fbee3689e30e3a16"
+  },
+  "sourceClosure": {
+    "algorithm": "demo-registry-transitive-source-closure-v2",
+    "roots": [
+      "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces"
+    ],
+    "files": [
+      {
+        "repositoryPath": "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/capture-status.mjs",
+        "sha256": "sha256:db5924f48a9e64bf813b28361a763ba904a34104b58b0740c493ee47ea4fbb60",
+        "byteLength": 319
+      },
+      {
+        "repositoryPath": "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/generated-ripples-browser.mjs",
+        "sha256": "sha256:66d95bf08967d08827a283cf205b7640c8b7abd744f29734c78b40daf29eb19c",
+        "byteLength": 11384
+      },
+      {
+        "repositoryPath": "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/generated-ripples.html",
+        "sha256": "sha256:e23e1b215c39812c9f4847405394004b8d904cf49d7b3c1e8f8f21e69ace0dbf",
+        "byteLength": 617
+      },
+      {
+        "repositoryPath": "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/index.html",
+        "sha256": "sha256:2d9ccdb62733b0c1d05241ee561635be7b9430f791ab518da4e98011b3a99aac",
+        "byteLength": 2137
+      },
+      {
+        "repositoryPath": "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/main.js",
+        "sha256": "sha256:787fdd8cfe011ef011f6a45cdc1791fac19ccaf2f8b078e0b45f41a446a6a365",
+        "byteLength": 2840
+      },
+      {
+        "repositoryPath": "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/mechanism/analytic-vs-recurrent/index.html",
+        "sha256": "sha256:667dbf5a6afee830a0fc5b47665ba1df17afd9cfdb3e671c56e4fbbec3ef25ba",
+        "byteLength": 531
+      },
+      {
+        "repositoryPath": "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/mechanism/impact-and-splashes/index.html",
+        "sha256": "sha256:c8e53580c1bfe8c333d3798a6ea3daa190a73c00b5c9f5382241fcb6f62b85ff",
+        "byteLength": 511
+      },
+      {
+        "repositoryPath": "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/mechanism/precipitation-volume/index.html",
+        "sha256": "sha256:8275905f530867a2473fa21992ee5041969f12f9762691a487974940bdf48abe",
+        "byteLength": 512
+      },
+      {
+        "repositoryPath": "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/mechanism/snow-accumulation-and-caps/index.html",
+        "sha256": "sha256:b45e51db9e8f09f0bd3ae21efa1338322e8e5a3f500d96c00cc35822832a214e",
+        "byteLength": 518
+      },
+      {
+        "repositoryPath": "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/mechanism/weather-envelope-coupling/index.html",
+        "sha256": "sha256:e2683fa66ec99b66a97633510b9bb1b8c77ea848adee8748cde71e3502148756",
+        "byteLength": 517
+      },
+      {
+        "repositoryPath": "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/mechanism/wet-road-and-puddles/index.html",
+        "sha256": "sha256:49d4899ea10513c963c36e96a0b5c483a048a16d3ed5c151684a7991aad8c573",
+        "byteLength": 512
+      },
+      {
+        "repositoryPath": "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/package-lock.json",
+        "sha256": "sha256:3e2554d4c65246cf710095fc773307f4decf05e32a3abb69daf3a3644e32b680",
+        "byteLength": 1924
+      },
+      {
+        "repositoryPath": "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/package.json",
+        "sha256": "sha256:3a268302c33b05a8fbe37bea0479aed83d0de95f9227447965c930efbdb51fa3",
+        "byteLength": 1026
+      },
+      {
+        "repositoryPath": "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/precipitation-system.js",
+        "sha256": "sha256:ce40afec1f35dc662c36cc32e036c270ed509d3702b3c7e2e0afd2c0ee2586b0",
+        "byteLength": 23368
+      },
+      {
+        "repositoryPath": "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/README.md",
+        "sha256": "sha256:40160038f06f1930738ed7ed912ea84e555864ba96f9963ea55e5eac97bd4fb6",
+        "byteLength": 4021
+      },
+      {
+        "repositoryPath": "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/receiver-liquid-inventory.js",
+        "sha256": "sha256:ddf079c1afc060aae410c8fd96e8b4749cc492449cdf9efb572ab318f141f785",
+        "byteLength": 13098
+      },
+      {
+        "repositoryPath": "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/route-wrapper.js",
+        "sha256": "sha256:09f1d83edb9065ca35607a60f71f132b3ed4fcbc798d800c5adf229907e549da",
+        "byteLength": 1556
+      },
+      {
+        "repositoryPath": "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/test-mutations.mjs",
+        "sha256": "sha256:dbb67fcc4837b1e9071b3af6905eec06e43b5ecf4ee331839374b366bae879c9",
+        "byteLength": 3714
+      },
+      {
+        "repositoryPath": "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/test-receiver-liquid-inventory.mjs",
+        "sha256": "sha256:7bf5f343deb84f7e2d93de098c35249b29b9925e3e056bff90628f67608b4a02",
+        "byteLength": 5675
+      },
+      {
+        "repositoryPath": "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/test-runtime-contracts.mjs",
+        "sha256": "sha256:9b4ec88f4d09b6c9f2681b21e92caeb4d9f0055baf4be05cab6766dea2f49e2f",
+        "byteLength": 8376
+      },
+      {
+        "repositoryPath": "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/tier/budgeted/index.html",
+        "sha256": "sha256:f8f824968f34a2faa512dcb463a515fb62befc3d804ba830ba35f31df2f90e55",
+        "byteLength": 513
+      },
+      {
+        "repositoryPath": "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/tier/high/index.html",
+        "sha256": "sha256:5b9b509f8069ed208bf642a2259b4d7cede28a8621c12b5942bb673a09856bce",
+        "byteLength": 509
+      },
+      {
+        "repositoryPath": "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/tier/medium/index.html",
+        "sha256": "sha256:637d38129e714dd41a06cba6c8122b6afea424cc20c151599dd88ab99358f4fc",
+        "byteLength": 511
+      },
+      {
+        "repositoryPath": "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/validate-generated-ripples.mjs",
+        "sha256": "sha256:0ea9f11634634f563dc5f1c7635fda237bee91daa0aa20521aece0e6bbcecc51",
+        "byteLength": 15659
+      },
+      {
+        "repositoryPath": "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/validate.js",
+        "sha256": "sha256:b227b9c55a556ac4f4a7a02bd6c1030ddb21e9b24db7a0def937dbd2b23dce34",
+        "byteLength": 13159
+      },
+      {
+        "repositoryPath": "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/weather-webgpu-lab.js",
+        "sha256": "sha256:dd3a900ef233c686cc2e771fbd39031c5ee1e245b53f0a676ab61f15468ab7cc",
+        "byteLength": 39059
+      }
+    ],
+    "threeRevision": "0.185.1",
+    "sourceHash": "sha256:6bccc892e96e099bb776969a9c27c14df04050467bfa3b6abfdd8e3b4b440de4",
+    "buildRevision": "sha256:5e66effd310931856fae613dd6e51c3c9085c625563667e170b158d0b18c85c5"
+  },
+  "retainedFiles": [
+    {
+      "path": "visual-contract.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:e90b71c7cac6b9438c3d78f1b17ff3a874a04cc455acbaf4c85fddba66c8e835",
+      "byteLength": 903
+    },
+    {
+      "path": "renderer-info.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:f0c477922eb81cff1bfe6fe6e997b75f33b23c2af9b7f3dd761a0824d7274562",
+      "byteLength": 470
+    },
+    {
+      "path": "pipeline-graph.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:e749c5f809121f635aed4792f3c6d2f5dc5c5a56f837ae09eea5f436c6fd4bed",
+      "byteLength": 942
+    },
+    {
+      "path": "performance-envelope.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:62e1abb57e217febce5044e04788aae2967a749c9dd5c70432f279fc3c45e507",
+      "byteLength": 634
+    },
+    {
+      "path": "frame-trace.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:61e2604f805c8759b4999cc2b6ef8e27ea9446acb8902d2b4f38c58f787479e7",
+      "byteLength": 280
+    },
+    {
+      "path": "quality-governor.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:f187a1358b9b033580853d04a26f10a2061e1a921980c421e170579cba1bf775",
+      "byteLength": 259
+    },
+    {
+      "path": "render-targets.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:e760dff8adc39c0684381f53f8731713fd05ce412443b570c40600fab8816f1b",
+      "byteLength": 10830
+    },
+    {
+      "path": "storage-resources.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:579719a4f114bada5939fff4c4a645ac178e5b40a8f18de1cfb9532f02a92486",
+      "byteLength": 333
+    },
+    {
+      "path": "resident-resources.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:6fc1377d8131845b579a304b535bc8832ac8ad8663760f592519d1c3ab76a856",
+      "byteLength": 1329
+    },
+    {
+      "path": "bandwidth-model.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:e921c52741c0a3b03c5a02ac0b1337262a182750cd76a01d10c49323c047a034",
+      "byteLength": 956
+    },
+    {
+      "path": "visual-errors.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:f4b2464fc52bef50bc4fdd264442c77fe07b680905d615eb5be53d0d84a8ff9c",
+      "byteLength": 752
+    },
+    {
+      "path": "leak-loop.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:5f751939f648e72db57f6e2f7e09d3d26dc679c9bc8d57fdbc1642193b398384",
+      "byteLength": 131677
+    },
+    {
+      "path": "mechanism-metrics.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:9b3ff30e26654de5250cf7281d7ebbf2eac6502dd21c759c66853b9940fa8266",
+      "byteLength": 4671
+    },
+    {
+      "path": "capture-write-ledger.json",
+      "status": "captured",
+      "kind": "capture-session-write-ledger",
+      "sha256": "sha256:c658324a7e74218dda081aa013df01fe9dc9962221c366ea68c64763e10a7e7e",
+      "byteLength": 10663
+    },
+    {
+      "path": "sessions/physical-route.write-ledger.json",
+      "status": "captured",
+      "kind": "capture-session-write-ledger",
+      "sha256": "sha256:2a3bb50a4822f53135ff0b2cfc32d1b8723ccc63237d6e01e731b57e0fbc34cd",
+      "byteLength": 1985
+    }
+  ],
+  "retainedImages": [
+    {
+      "path": "final.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "final.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:0acf38d817ccfea4b83645f05c7db4cda300cbfcb58708132c115c3a5889c1d8",
+      "byteLength": 84559
+    },
+    {
+      "path": "no-post.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "no-post.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:372d7e9302afb7f5a196a458dd288bf0f2e151bbb0cee25d10eed871613e6961",
+      "byteLength": 8589
+    },
+    {
+      "path": "diagnostics.mosaic.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "diagnostics.mosaic",
+      "mediaType": "image/png",
+      "sha256": "sha256:7fc8cab332edabd371f099cfdd31e61efc52a15fa58098db981a902a110e6110",
+      "byteLength": 10731
+    },
+    {
+      "path": "camera.near.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.near",
+      "mediaType": "image/png",
+      "sha256": "sha256:ece9e4458d3981d99a00500f00fd31ac3ba267311278d1de15d0f025f6bd7af9",
+      "byteLength": 58494
+    },
+    {
+      "path": "camera.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:0acf38d817ccfea4b83645f05c7db4cda300cbfcb58708132c115c3a5889c1d8",
+      "byteLength": 84559
+    },
+    {
+      "path": "camera.far.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.far",
+      "mediaType": "image/png",
+      "sha256": "sha256:db7ca8ec8be8e6b0e22440dbb683ae10976223e9bad45ddddebc0b551e5054ec",
+      "byteLength": 81901
+    },
+    {
+      "path": "seed-0001.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "seed-0001.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:0acf38d817ccfea4b83645f05c7db4cda300cbfcb58708132c115c3a5889c1d8",
+      "byteLength": 84559
+    },
+    {
+      "path": "seed-9e3779b9.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "seed-9e3779b9.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:e9c9ac1d32fa53fc67862b8255728a4a405d984fc48f5e9c7924149d871aea1e",
+      "byteLength": 86270
+    },
+    {
+      "path": "temporal.t000.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "temporal.t000",
+      "mediaType": "image/png",
+      "sha256": "sha256:0acf38d817ccfea4b83645f05c7db4cda300cbfcb58708132c115c3a5889c1d8",
+      "byteLength": 84559
+    },
+    {
+      "path": "temporal.t001.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "temporal.t001",
+      "mediaType": "image/png",
+      "sha256": "sha256:c464cb4490acdfb50f8213b5758016db7dd9e50bc81de98f11d19d3534f6f3dd",
+      "byteLength": 85835
+    }
+  ],
+  "omittedFiles": {
+    "ledgerDigest": "sha256:3546c19dd7850edc2f69befaca78301785270b68da5bc0b5ddbaf46385cfe040",
+    "count": 3,
+    "byteLength": 99376,
+    "byKind": [
+      {
+        "kind": "capture-session-document",
+        "count": 2,
+        "byteLength": 95788
+      },
+      {
+        "kind": "supplementary-json",
+        "count": 1,
+        "byteLength": 3588
+      }
+    ]
+  },
+  "checkoutLimitations": [
+    {
+      "id": "detached-source-payloads",
+      "status": "ACTIVE",
+      "statement": "Raw readbacks and capture-session transcript bytes are omitted from the tracked projection. Checkout validation verifies their approved hash and byte-length commitments, not the detached bytes themselves.",
+      "affectedClaims": []
+    }
+  ],
+  "projectionDigest": "sha256:75a7c5a4ddb9ed2e482a753764bad6bdbe58e5856da8c88ac7bca4e9dd2fcf6b"
+}

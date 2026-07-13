@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 2,
+  "threeRevision": "0.185.1",
+  "renderer": "WebGPURenderer",
+  "backend": {
+    "name": "WebGPU",
+    "isWebGPUBackend": true
+  },
+  "captureProfile": "correctness",
+  "adapterClass": "unknown",
+  "initializationState": "initialized",
+  "deviceIdentityVerified": true,
+  "deviceLostObserved": false,
+  "uncapturedErrors": [],
+  "deviceErrors": [],
+  "timestampSupport": {
+    "requested": false,
+    "active": false,
+    "required": false
+  }
+}

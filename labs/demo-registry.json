@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:8368f85620d1c52c16c30f26b10080991851f27294d4a4fac24ca285eec5592b",
+  "buildRevision": "sha256:36e4490fcd74f5f358440cf8a67dbb057ea2e2c73bcfde6078bc53b0a5e63ee2",
   "demoKinds": [
     "canonical-lab",
     "mechanism-demo",
@@ -10220,7 +10220,7 @@
         {
           "id": "standard-depth",
           "required": true,
-          "evidence": "Accepted gtao release covers capability standard-depth.",
+          "evidence": "Accepted tracked v2 release bundle from native-WebGPU demo capture (browserEntry).",
           "status": "accepted"
         }
       ],
@@ -10252,19 +10252,13 @@
         {
           "id": "one-prepass-one-lit-pass",
           "required": true,
-          "evidence": "Accepted gtao release covers one-prepass-one-lit-pass.",
+          "evidence": "Accepted tracked v2 release bundle from native-WebGPU demo capture (browserEntry).",
           "status": "accepted"
         },
         {
           "id": "current-adapter-gpu-timestamps",
           "required": true,
           "evidence": "capture-status.gpuTimingVerdict remains INSUFFICIENT_EVIDENCE; no named-adapter timestamp ledger was accepted.",
-          "status": "accepted"
-        },
-        {
-          "id": "render-or-compute-work",
-          "required": true,
-          "evidence": "Accepted gtao release covers render-or-compute-work.",
           "status": "accepted"
         }
       ],

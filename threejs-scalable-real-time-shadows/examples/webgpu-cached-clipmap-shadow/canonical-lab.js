@@ -581,11 +581,20 @@ export async function createCanonicalShadowLab({
 
   async function capturePixels(target = "final", capture = {}) {
     assertLive();
-    if (!MODES.includes(target)) throw new RangeError(`unknown capture target: ${target}`);
+    // Builtin capture writes final/no-post/diagnostics after setMode(...).
+    // "final" and "presentation" read the currently selected output without
+    // forcing a mode switch (same contract as rain/frost controllers).
+    const presentationTargets = new Set(["final", "presentation"]);
+    const isPresentation = presentationTargets.has(target);
+    if (!isPresentation && !MODES.includes(target) && target !== "no-post" && target !== "diagnostics") {
+      throw new RangeError(`unknown capture target: ${target}`);
+    }
     const captureWidth = capture.width ?? 1200;
     const captureHeight = capture.height ?? 800;
     const previousMode = state.mode;
-    setOutputForMode(target);
+    // Preserve the locked public mode for presentation aliases when switching.
+    const previousRequested = state.requestedMode;
+    if (!isPresentation) setOutputForMode(target);
     const renderTarget = new RenderTarget(captureWidth, captureHeight, {
       depthBuffer: false,
       stencilBuffer: false,
@@ -616,18 +625,17 @@ export async function createCanonicalShadowLab({
         bytesPerRow: layout.bytesPerRow,
         sourceBytesPerRow: layout.sourceBytesPerRow,
         sourceByteLength: raw.byteLength,
-        bytesPerPixel: 4,
         sourceElementBytes: 1,
-        format: "rgba8unorm",
         colorManaged: true,
-        outputColorSpace: renderer.outputColorSpace,
         pixels: compactAlignedRgbaRows(raw, captureWidth, captureHeight),
         source: "render-target-readback",
       };
     } finally {
       if (rendererState) RendererUtils.restoreRendererState(renderer, rendererState);
       renderTarget.dispose();
-      setOutputForMode(previousMode);
+      if (!isPresentation) {
+        setOutputForMode(previousMode === "final" ? (previousRequested ?? "final") : previousMode);
+      }
     }
   }
 

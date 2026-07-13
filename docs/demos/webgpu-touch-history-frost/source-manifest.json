@@ -39,8 +39,10 @@
     "docs/demos/assets/three.tsl--5AYqKVA.js",
     "docs/demos/assets/three.webgpu-Dss1ekdK.js"
   ],
-  "publishedBundleHash": "sha256:2499bcb963aa6426558c397ac3e80f8b09c2186daba3e151b2579b5038bd9a99",
+  "publishedBundleHash": "sha256:ba883dba08f33c61c31c6bcd27531b3d6249ed1816a1c192ce537fab37069aa2",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:3be70bc106d34b144e8dba1d3606db6b25b84025be5054ef4bb6e83ca230d1a7",
-  "evidenceBundleId": "bundle"
+  "buildRevision": "sha256:36e4490fcd74f5f358440cf8a67dbb057ea2e2c73bcfde6078bc53b0a5e63ee2",
+  "evidenceBundleId": "bundle",
+  "skill": "threejs-dynamic-surface-effects",
+  "publishPath": "/demos/webgpu-touch-history-frost/"
 }
