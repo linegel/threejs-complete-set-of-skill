@@ -20,7 +20,11 @@ import {
 	validateHardwarePerformanceSession,
 	validatePhysicalRouteSession
 } from './physical-session-validator.js';
-import { finalizeImportedPhysicalRecord, loadVerifiedImportedPhysicalRecord } from './verified-physical-record.js';
+import {
+	finalizeImportedPhysicalRecord,
+	loadVerifiedImportedPhysicalRecord,
+	verifyImportedPhysicalRecordBytes
+} from './verified-physical-record.js';
 import { createValidationHarnessReleaseArtifactProjector } from './release-evidence-projection.js';
 import { classifyGovernorTrace, classifyGpuStageAttribution, classifyPerformanceTrace } from './runtime-v2-bundle.js';
 
@@ -1060,7 +1064,9 @@ test( 'verified physical wrapper loader preserves exact bytes and recomputes bot
 	for ( const fixture of [ physical, performance ] ) {
 
 		const verified = await loadVerifiedImportedPhysicalRecord( fixture.path, { expectedProfile: fixture.wrapper.record.profile } );
+		const byteVerified = verifyImportedPhysicalRecordBytes( fixture.bytes, { expectedProfile: fixture.wrapper.record.profile } );
 		assert.deepEqual( verified.sourceBytes, fixture.bytes );
+		assert.deepEqual( byteVerified, Object.fromEntries( Object.entries( verified ).filter( ( [ key ] ) => key !== 'path' ) ) );
 		assert.equal( verified.recordSha256, fixture.wrapper.recordSha256 );
 		assert.deepEqual( verified.laneReference, fixture.wrapper.laneReference );
 		assert.equal( verified.servedLedgerSha256, fixture.wrapper.record.serving.ledgerSha256 );
@@ -1070,6 +1076,37 @@ test( 'verified physical wrapper loader preserves exact bytes and recomputes bot
 		assert.equal( cliValidation.sourceDocumentSha256, verified.sourceDocumentSha256 );
 
 	}
+
+} );
+
+test( 'verified physical wrapper bytes reject non-JSON and caller-forged summaries', async () => {
+
+	assert.throws( () => verifyImportedPhysicalRecordBytes( Buffer.from( 'not JSON' ) ), /invalid JSON/ );
+	assert.throws( () => verifyImportedPhysicalRecordBytes( 'not bytes' ), /Uint8Array/ );
+	const baseline = await importedWrapper( baseSession( 'physical-route', PHYSICAL_ROUTE_PLAN ) );
+	const mutations = [
+		[ 'stale validation', ( value ) => { value.validation = { valid: true, profile: 'physical-route', routeCount: 999 }; }, /validation summary/ ],
+		[ 'stale record hash', ( value ) => { value.recordSha256 = HASH_D; }, /recordSha256/ ],
+		[ 'stale lane reference', ( value ) => { value.laneReference.sessionId = 'forged'; }, /laneReference/ ]
+	];
+	for ( const [ name, mutate, pattern ] of mutations ) {
+
+		const wrapper = structuredClone( baseline.wrapper );
+		mutate( wrapper );
+		assert.throws(
+			() => verifyImportedPhysicalRecordBytes( Buffer.from( `${ JSON.stringify( wrapper, null, 2 ) }\n` ) ),
+			pattern,
+			name
+		);
+
+	}
+	const staleLedgerRecord = structuredClone( baseline.wrapper.record );
+	staleLedgerRecord.serving.ledgerSha256 = HASH_D;
+	const staleLedgerWrapper = finalizeImportedPhysicalRecord( staleLedgerRecord );
+	assert.throws(
+		() => verifyImportedPhysicalRecordBytes( Buffer.from( `${ JSON.stringify( staleLedgerWrapper, null, 2 ) }\n` ) ),
+		/served-byte ledger hash/
+	);
 
 } );
 

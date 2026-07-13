@@ -41,10 +41,10 @@ export function finalizeImportedPhysicalRecord( record ) {
 
 }
 
-export async function loadVerifiedImportedPhysicalRecord( path, options = {} ) {
+export function verifyImportedPhysicalRecordBytes( input, options = {} ) {
 
-	if ( typeof path !== 'string' || path.length === 0 || isAbsolute( path ) === false ) throw new Error( 'Finalized physical evidence requires an absolute record path.' );
-	const sourceBytes = await readFile( path );
+	if ( ! ( input instanceof Uint8Array ) ) throw new Error( 'Finalized physical evidence wrapper bytes must be a Uint8Array.' );
+	const sourceBytes = Buffer.from( input );
 	let wrapper;
 	try {
 
@@ -70,7 +70,6 @@ export async function loadVerifiedImportedPhysicalRecord( path, options = {} ) {
 	const servedLedgerSha256 = sha256( servedLedgerBytes );
 	if ( record.serving.ledgerSha256 !== servedLedgerSha256 ) throw new Error( 'Imported served-byte ledger hash no longer binds its exact entry population.' );
 	return {
-		path,
 		sourceBytes,
 		sourceDocumentSha256: sha256( sourceBytes ),
 		sourceDocumentByteLength: sourceBytes.byteLength,
@@ -81,6 +80,17 @@ export async function loadVerifiedImportedPhysicalRecord( path, options = {} ) {
 		servedLedgerBytes,
 		servedLedgerSha256,
 		servedLedgerByteLength: servedLedgerBytes.byteLength
+	};
+
+}
+
+export async function loadVerifiedImportedPhysicalRecord( path, options = {} ) {
+
+	if ( typeof path !== 'string' || path.length === 0 || isAbsolute( path ) === false ) throw new Error( 'Finalized physical evidence requires an absolute record path.' );
+	const sourceBytes = await readFile( path );
+	return {
+		path,
+		...verifyImportedPhysicalRecordBytes( sourceBytes, options )
 	};
 
 }
