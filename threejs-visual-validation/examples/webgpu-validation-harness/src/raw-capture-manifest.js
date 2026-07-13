@@ -4,6 +4,11 @@ import { join } from 'node:path';
 
 import { assertCheckedJsonSchema, loadCheckedEvidenceSchemas } from './checked-json-schema.js';
 import { CORRECTNESS_CAPTURE_RECIPES } from './correctness-capture-recipes.js';
+import {
+	CORRECTNESS_SESSION_PATH,
+	CORRECTNESS_WRITE_LEDGER_PATH,
+	createCorrectnessWriteLedger
+} from './correctness-write-ledger.js';
 import { validateUnifiedV2ArtifactBundle } from './evidence-bundle-v2.js';
 import {
 	NORMATIVE_JSON_PATHS,
@@ -27,8 +32,8 @@ const SESSION_SUPPLEMENTAL_JSON_PATHS = Object.freeze( [ 'capture-boundary.json'
 const RAW_IMAGE_PATHS = Object.freeze( [ ...STANDARD_IMAGE_PATHS, ...SUPPLEMENTAL_NORMATIVE_IMAGE_PATHS ] );
 const DIRECT_RECIPE_IMAGE_PATHS = Object.freeze( CORRECTNESS_CAPTURE_RECIPES.map( ( recipe ) => recipe.capture.filename ) );
 const MANIFEST_PATH = 'evidence-manifest.json';
-const SESSION_PATH = 'capture-session.json';
-const WRITE_LEDGER_PATH = 'capture-write-ledger.json';
+const SESSION_PATH = CORRECTNESS_SESSION_PATH;
+const WRITE_LEDGER_PATH = CORRECTNESS_WRITE_LEDGER_PATH;
 
 function sha256( bytes ) {
 
@@ -449,24 +454,14 @@ export async function finalizeRawCorrectnessCapture( session, outputDir ) {
 	const sourceClosureHash = requireSha256( finalizedSession.sourceClosureHash ?? finalizedSession.sourceHash, 'capture source closure hash' );
 	const suffix = sourceClosureHash.slice( 'sha256:'.length, 'sha256:'.length + 16 );
 	const sessionId = `${ finalizedSession.labId }:correctness:${ suffix }`;
-	const finalizedWrites = finalizedSession.artifactWrites.map( ( record ) => record.path === SESSION_PATH ? {
-		sequence: record.sequence,
+	const writeLedger = createCorrectnessWriteLedger( finalizedSession, {
+		kind: 'capture-session-document',
 		path: SESSION_PATH,
-		kind: 'capture-session-record',
-		contentBinding: 'finalized-file-hash-for-offline-promotion',
 		sha256: finalizedSessionBinding.sha256,
 		byteLength: finalizedSessionBinding.byteLength
-	} : jsonSafe( record ) );
-	const writeLedgerDocument = {
-		schemaVersion: 2,
-		labId: finalizedSession.labId,
-		sessionId,
-		profile: finalizedSession.profile,
-		sourceClosureHash,
-		buildRevision: finalizedSession.buildRevision,
-		entries: finalizedWrites
-	};
-	const writeLedgerBytes = jsonBytes( writeLedgerDocument );
+	} );
+	if ( writeLedger.sessionId !== sessionId ) throw new Error( 'Correctness write-ledger session identity changed during raw manifest assembly.' );
+	const writeLedgerBytes = writeLedger.bytes;
 	await writeFile( join( outputDir, WRITE_LEDGER_PATH ), writeLedgerBytes );
 	const writeLedgerBinding = {
 		kind: 'capture-session-write-ledger',
