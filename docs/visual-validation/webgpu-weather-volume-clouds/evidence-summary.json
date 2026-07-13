@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 1,
+  "labId": "webgpu-weather-volume-clouds",
+  "classification": "inspected-runtime-evidence-preview",
+  "acceptanceStatus": "accepted",
+  "evidenceBundleId": "bundle",
+  "canonicalSource": [
+    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds"
+  ],
+  "canonicalSourceHash": "sha256:b83999fb74b8fa55414b46e601f8ee2c6f2ecd0882a06e112f92cc8f563e1899",
+  "threeRevision": "0.185.1",
+  "runtime": {
+    "renderer": "WebGPURenderer",
+    "backend": "WebGPU",
+    "isWebGPUBackend": true,
+    "threeRevision": "0.185.1"
+  },
+  "claimVerdicts": {
+    "visualCorrectness": "PASS",
+    "mechanismCorrectness": "PASS",
+    "performanceCompliance": "NOT_CLAIMED",
+    "gpuAttribution": "NOT_CLAIMED",
+    "lifecycleStability": "PASS",
+    "visualError": "PASS"
+  },
+  "primaryImage": "final.design.png",
+  "primaryImageLabel": "Weather volume clouds native WebGPU readback",
+  "images": [
+    {
+      "file": "final.design.png",
+      "meaning": "Final design presentation",
+      "source": "final.design.png",
+      "sourceSha256": "sha256:78978c32c107a234119b5c29245c9c55820c170823717c4cb5eb47065ec38a81",
+      "outputSha256": "sha256:78978c32c107a234119b5c29245c9c55820c170823717c4cb5eb47065ec38a81",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "no-post.design.png",
+      "meaning": "No-post / baseline presentation",
+      "source": "no-post.design.png",
+      "sourceSha256": "sha256:5ecddd77ca3357ee874e68b9f8075362fc0ae5a403343a32de840475f1e2ac99",
+      "outputSha256": "sha256:5ecddd77ca3357ee874e68b9f8075362fc0ae5a403343a32de840475f1e2ac99",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "diagnostics.mosaic.png",
+      "meaning": "Diagnostics mosaic",
+      "source": "diagnostics.mosaic.png",
+      "sourceSha256": "sha256:d5bec9adcddfffb12181c04b52c6d0373707c2b89904ecebedd9c8a702d5b9e2",
+      "outputSha256": "sha256:d5bec9adcddfffb12181c04b52c6d0373707c2b89904ecebedd9c8a702d5b9e2",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "camera.near.png",
+      "meaning": "Near camera",
+      "source": "camera.near.png",
+      "sourceSha256": "sha256:af94d433411a498be64c9291e32787974bbe56ba7ff7b1d0e34d531a9cbbe26d",
+      "outputSha256": "sha256:af94d433411a498be64c9291e32787974bbe56ba7ff7b1d0e34d531a9cbbe26d",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "camera.design.png",
+      "meaning": "Design camera",
+      "source": "camera.design.png",
+      "sourceSha256": "sha256:78978c32c107a234119b5c29245c9c55820c170823717c4cb5eb47065ec38a81",
+      "outputSha256": "sha256:78978c32c107a234119b5c29245c9c55820c170823717c4cb5eb47065ec38a81",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "camera.far.png",
+      "meaning": "Far camera",
+      "source": "camera.far.png",
+      "sourceSha256": "sha256:ebd345fb7b207e0b9ea7c70fd164b2c4e81c7d4c498bb9a1622bdc8ab77a0918",
+      "outputSha256": "sha256:ebd345fb7b207e0b9ea7c70fd164b2c4e81c7d4c498bb9a1622bdc8ab77a0918",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "seed-0001.final.png",
+      "meaning": "Representative seed final",
+      "source": "seed-0001.final.png",
+      "sourceSha256": "sha256:78978c32c107a234119b5c29245c9c55820c170823717c4cb5eb47065ec38a81",
+      "outputSha256": "sha256:78978c32c107a234119b5c29245c9c55820c170823717c4cb5eb47065ec38a81",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "seed-9e3779b9.final.png",
+      "meaning": "Stress seed final",
+      "source": "seed-9e3779b9.final.png",
+      "sourceSha256": "sha256:3652da68eeaeaaca0ebd243268eddfcabacf6df84f279424183ad1292a4086b2",
+      "outputSha256": "sha256:3652da68eeaeaaca0ebd243268eddfcabacf6df84f279424183ad1292a4086b2",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "temporal.t000.png",
+      "meaning": "Temporal t0",
+      "source": "temporal.t000.png",
+      "sourceSha256": "sha256:78978c32c107a234119b5c29245c9c55820c170823717c4cb5eb47065ec38a81",
+      "outputSha256": "sha256:78978c32c107a234119b5c29245c9c55820c170823717c4cb5eb47065ec38a81",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "temporal.t001.png",
+      "meaning": "Temporal t1",
+      "source": "temporal.t001.png",
+      "sourceSha256": "sha256:6eab5d0ae42e5a85abe1477e3fa65f7b6e12730f55e5a6b1f0ec7a731bd3e377",
+      "outputSha256": "sha256:6eab5d0ae42e5a85abe1477e3fa65f7b6e12730f55e5a6b1f0ec7a731bd3e377",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    }
+  ],
+  "limitations": [
+    "Performance and GPU attribution remain NOT_CLAIMED unless a hardware performance lane is present.",
+    "Promoted media are native-WebGPU correctness readbacks bound by the accepted release-bundle ledger."
+  ]
+}

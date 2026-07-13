@@ -1,0 +1,61 @@
+{
+  "entries": [
+    {
+      "at": "2026-07-13T12:42:10.803Z",
+      "method": "GET",
+      "requestUrl": "/index.html?physicalReview=1",
+      "redirected": false,
+      "fallback": false,
+      "transformed": false,
+      "status": 200,
+      "resolvedPath": "index.html",
+      "query": "physicalReview=1",
+      "sha256": "sha256:cb696cb3901fc110c183943307273d0694489de5da2371a719db629ea99bf1df",
+      "byteLength": 7697,
+      "responseKind": "exact-prebuilt-byte"
+    },
+    {
+      "at": "2026-07-13T12:42:10.827Z",
+      "method": "GET",
+      "requestUrl": "/assets/app-D7RpxZJ-.js",
+      "redirected": false,
+      "fallback": false,
+      "transformed": false,
+      "status": 200,
+      "resolvedPath": "assets/app-D7RpxZJ-.js",
+      "query": "",
+      "sha256": "sha256:19f8b7bd2cefef61c936b7b230c03bde9868738a80b3061230d0b1fead865f9f",
+      "byteLength": 907208,
+      "responseKind": "exact-prebuilt-byte"
+    },
+    {
+      "at": "2026-07-13T12:42:10.866Z",
+      "method": "GET",
+      "requestUrl": "/assets/tower-ship-reference-D3qlgi5o.png",
+      "redirected": false,
+      "fallback": false,
+      "transformed": false,
+      "status": 200,
+      "resolvedPath": "assets/tower-ship-reference-D3qlgi5o.png",
+      "query": "",
+      "sha256": "sha256:14414456e014ef6c743005d3877351100d54fe5a4e68592eb13601647b014d57",
+      "byteLength": 2680191,
+      "responseKind": "exact-prebuilt-byte"
+    },
+    {
+      "at": "2026-07-13T12:42:11.044Z",
+      "method": "GET",
+      "requestUrl": "/favicon.ico",
+      "redirected": false,
+      "fallback": false,
+      "transformed": false,
+      "status": 404,
+      "reason": "missing-exact-static-route",
+      "resolvedPath": "favicon.ico",
+      "responseKind": "missing-exact-static-route"
+    }
+  ],
+  "ledgerSha256": "sha256:a19b57fa7aeb986668e4184aed355d9467aeaf160e63d14f27d4e715e4163e3a",
+  "documentSha256": "sha256:710423bddfa64234960019f97f1f2016f66867a74d4de7c8276172002c749a1d",
+  "byteLength": 1345
+}

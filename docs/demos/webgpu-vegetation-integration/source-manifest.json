@@ -4,11 +4,7 @@
   "kind": "integration-demo",
   "status": "incomplete",
   "canonicalSource": [
-    "threejs-procedural-vegetation/examples/webgpu-vegetation-integration/browser-lab.js",
-    "threejs-procedural-vegetation/examples/webgpu-vegetation-integration/route-contract.js",
-    "threejs-procedural-vegetation/examples/webgpu-vegetation-integration/vegetation-integration.js",
-    "threejs-procedural-vegetation/examples/webgpu-dense-grass/integration-adapter.js",
-    "threejs-procedural-vegetation/examples/structured-ash-growth/ash-scene.js"
+    "threejs-procedural-vegetation/examples/webgpu-vegetation-integration"
   ],
   "sourceHashInputs": [
     "labs/runtime/strict-lab-controller.mjs",
@@ -27,46 +23,46 @@
     "threejs-procedural-vegetation/examples/webgpu-vegetation-integration"
   ],
   "browserEntry": "threejs-procedural-vegetation/examples/webgpu-vegetation-integration/index.html",
-  "sourceHash": "sha256:31984441062514cab7c0c7fa5a3156d32290c6f981b3e4ce4aa250de7031da6f",
+  "sourceHash": "sha256:8a87d3f3d13fec679b92809ee861d339bf5727a1774906d7723c2378afd5c615",
   "publishedHashInputs": [
     "docs/demos/webgpu-vegetation-integration",
     "docs/demos/assets/ash-CJFpracT.png",
-    "docs/demos/assets/ash-scene-BFhrLeuM.js",
+    "docs/demos/assets/ash-scene-BR4irOUd.js",
     "docs/demos/assets/bark-color-BZZMY0gm.jpg",
     "docs/demos/assets/bark-normal-TBmAUNgD.jpg",
     "docs/demos/assets/bark-roughness-BvhmIB3z.jpg",
-    "docs/demos/assets/dense-grass-system-DLdt83Sf.js",
-    "docs/demos/assets/index-Dvj_KpxX2.js",
-    "docs/demos/assets/integration-adapter-DJwgA3KT.js",
-    "docs/demos/assets/lab.manifest-o7Z92kw4.json",
+    "docs/demos/assets/dense-grass-system-CmVTxhFW.js",
+    "docs/demos/assets/index-CICHRocQ2.js",
+    "docs/demos/assets/integration-adapter-CBZChN7k.js",
+    "docs/demos/assets/lab.manifest-5XLVKbmP.json",
     "docs/demos/assets/meadow-density-a-Bi7C7Dbi.png",
     "docs/demos/assets/meadow-density-b-hrBezR3V.png",
     "docs/demos/assets/meadow-density-c-CeRqOKOn.png",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/strict-lab-controller-DqIV3RB2.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+    "docs/demos/assets/strict-lab-controller-DNVc3YrR.js",
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js"
   ],
   "emittedAssetDependencies": [
     "docs/demos/assets/ash-CJFpracT.png",
-    "docs/demos/assets/ash-scene-BFhrLeuM.js",
+    "docs/demos/assets/ash-scene-BR4irOUd.js",
     "docs/demos/assets/bark-color-BZZMY0gm.jpg",
     "docs/demos/assets/bark-normal-TBmAUNgD.jpg",
     "docs/demos/assets/bark-roughness-BvhmIB3z.jpg",
-    "docs/demos/assets/dense-grass-system-DLdt83Sf.js",
-    "docs/demos/assets/index-Dvj_KpxX2.js",
-    "docs/demos/assets/integration-adapter-DJwgA3KT.js",
-    "docs/demos/assets/lab.manifest-o7Z92kw4.json",
+    "docs/demos/assets/dense-grass-system-CmVTxhFW.js",
+    "docs/demos/assets/index-CICHRocQ2.js",
+    "docs/demos/assets/integration-adapter-CBZChN7k.js",
+    "docs/demos/assets/lab.manifest-5XLVKbmP.json",
     "docs/demos/assets/meadow-density-a-Bi7C7Dbi.png",
     "docs/demos/assets/meadow-density-b-hrBezR3V.png",
     "docs/demos/assets/meadow-density-c-CeRqOKOn.png",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/strict-lab-controller-DqIV3RB2.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+    "docs/demos/assets/strict-lab-controller-DNVc3YrR.js",
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js"
   ],
-  "publishedBundleHash": "sha256:ca1af0f0d9674fbd85e6eb4a30ba4ac421e233c32318f8824b5eca651ce2bdc0",
+  "publishedBundleHash": "sha256:8cae6aa0be8567027bc2d156b3f0a4ec14d5a7acae86b88ffa578953da734d69",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b",
-  "evidenceBundleId": null
+  "buildRevision": "sha256:8368f85620d1c52c16c30f26b10080991851f27294d4a4fac24ca285eec5592b",
+  "evidenceBundleId": "bundle"
 }

@@ -1,0 +1,61 @@
+{
+  "entries": [
+    {
+      "at": "2026-07-13T13:34:16.696Z",
+      "method": "GET",
+      "requestUrl": "/index.html?physicalReview=1",
+      "redirected": false,
+      "fallback": false,
+      "transformed": false,
+      "status": 200,
+      "resolvedPath": "index.html",
+      "query": "physicalReview=1",
+      "sha256": "sha256:25e463d4947e41049d7a6ef81a54691d570700fb74175498dc05e8389e003ce6",
+      "byteLength": 1018,
+      "responseKind": "exact-prebuilt-byte"
+    },
+    {
+      "at": "2026-07-13T13:34:16.740Z",
+      "method": "GET",
+      "requestUrl": "/assets/index-BagnAxXK.js",
+      "redirected": false,
+      "fallback": false,
+      "transformed": false,
+      "status": 200,
+      "resolvedPath": "assets/index-BagnAxXK.js",
+      "query": "",
+      "sha256": "sha256:0675e760f09e86ebf1f7de46cb1be755842dfb9692be35ffd157d16b06310cdd",
+      "byteLength": 918208,
+      "responseKind": "exact-prebuilt-byte"
+    },
+    {
+      "at": "2026-07-13T13:34:16.806Z",
+      "method": "GET",
+      "requestUrl": "/assets/lab.manifest-BIz_-5p2.json",
+      "redirected": false,
+      "fallback": false,
+      "transformed": false,
+      "status": 200,
+      "resolvedPath": "assets/lab.manifest-BIz_-5p2.json",
+      "query": "",
+      "sha256": "sha256:3c4c697ecabf686488ff0fb73a1c09858b6db41e3e99bfa2d46b67906cddf672",
+      "byteLength": 8749,
+      "responseKind": "exact-prebuilt-byte"
+    },
+    {
+      "at": "2026-07-13T13:34:16.810Z",
+      "method": "GET",
+      "requestUrl": "/favicon.ico",
+      "redirected": false,
+      "fallback": false,
+      "transformed": false,
+      "status": 404,
+      "reason": "missing-exact-static-route",
+      "resolvedPath": "favicon.ico",
+      "responseKind": "missing-exact-static-route"
+    }
+  ],
+  "ledgerSha256": "sha256:a2b7fbdadf3b8d2e7b024b33b59fe96de05659e22fcb0dcb153fa9c079994127",
+  "documentSha256": "sha256:cb423823d13d5c78d9f1aa65202b41c0a176d07d0d25660bca016ff3c1ddb55a",
+  "byteLength": 1332
+}

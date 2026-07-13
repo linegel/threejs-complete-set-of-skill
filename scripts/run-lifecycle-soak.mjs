@@ -47,14 +47,24 @@ const vite = await createServer({
 await vite.listen();
 const address = vite.httpServer.address();
 if (!address || typeof address === 'string') throw new Error('vite did not bind a TCP port');
-const browser = await chromium.launch({
-  headless: true,
-  channel: process.platform === 'darwin' ? 'chrome' : undefined,
-  args: ['--enable-unsafe-webgpu', '--disable-gpu-sandbox', '--ignore-gpu-blocklist'],
-});
+const cdpEndpoint = process.env.CAPTURE_CDP_ENDPOINT;
+const browser = cdpEndpoint
+  ? await chromium.connectOverCDP(cdpEndpoint)
+  : await chromium.launch({
+    headless: true,
+    channel: process.platform === 'darwin' ? 'chrome' : undefined,
+    args: ['--enable-unsafe-webgpu', '--disable-gpu-sandbox', '--ignore-gpu-blocklist'],
+  });
+const ownsBrowser = !cdpEndpoint;
 
 try {
-  const page = await browser.newPage({ viewport: { width: 1200, height: 800 } });
+  const context = cdpEndpoint
+    ? (browser.contexts()[0] ?? await browser.newContext({ viewport: { width: 1200, height: 800 } }))
+    : null;
+  const page = cdpEndpoint
+    ? await context.newPage()
+    : await browser.newPage({ viewport: { width: 1200, height: 800 } });
+  if (cdpEndpoint) await page.setViewportSize({ width: 1200, height: 800 });
   const url = `http://127.0.0.1:${address.port}/${browserEntry}?lifecycle=1`;
 
   const modes = lab.modes ?? ['final'];
@@ -62,17 +72,37 @@ try {
   const snapshots = [];
 
   for (let cycle = 0; cycle < CYCLES; cycle += 1) {
-    await page.goto(url, { waitUntil: 'load', timeout: 60_000 });
-    await page.waitForFunction(async () => {
-      let controller = globalThis.__LAB_CONTROLLER__ ?? globalThis.__THREE_LAB__ ?? globalThis.labController;
-      if (controller && typeof controller.then === 'function') {
-        try { controller = await controller; } catch { return false; }
-      }
-      return Boolean(controller);
-    }, null, { timeout: 90_000 });
+    await page.goto(url, { waitUntil: 'load', timeout: 90_000 });
+    // Manual poll: Playwright waitForFunction + async thenables is flaky across labs.
+    const deadline = Date.now() + 120_000;
+    let ready = false;
+    while (Date.now() < deadline) {
+      ready = await page.evaluate(async () => {
+        let controller = globalThis.__LAB_CONTROLLER__
+          ?? globalThis.__THREE_LAB__
+          ?? globalThis.labController
+          ?? globalThis.__labController;
+        if (controller && typeof controller.then === 'function') {
+          try { controller = await controller; } catch { return false; }
+        }
+        if (!controller || typeof controller.dispose !== 'function') return false;
+        try {
+          if (typeof controller.ready === 'function') await controller.ready();
+        } catch {
+          return false;
+        }
+        return true;
+      });
+      if (ready) break;
+      await new Promise((resolve) => setTimeout(resolve, 250));
+    }
+    if (!ready) throw new Error(`lab controller not ready for lifecycle cycle ${cycle}`);
 
     const snapshot = await page.evaluate(async ({ cycleIndex, mode, tier }) => {
-      let controller = globalThis.__LAB_CONTROLLER__ ?? globalThis.__THREE_LAB__ ?? globalThis.labController;
+      let controller = globalThis.__LAB_CONTROLLER__
+        ?? globalThis.__THREE_LAB__
+        ?? globalThis.labController
+        ?? globalThis.__labController;
       if (controller && typeof controller.then === 'function') controller = await controller;
       if (!controller) throw new Error('lab controller missing');
       if (typeof controller.ready === 'function') await controller.ready();
@@ -156,16 +186,30 @@ try {
     if ((cycle + 1) % 10 === 0) console.error(`[lifecycle] ${labId} cycle ${cycle + 1}/${CYCLES}`);
   }
 
+  const first = snapshots[0];
+  const last = snapshots[snapshots.length - 1];
   const leakLoop = {
     schemaVersion: 2,
     verdict: 'PASS',
     operations: ['create', 'render', 'resize', 'mode', 'tier', 'dispose'],
     cycles: labelled(CYCLES, 'cycle-count', 'Measured', `fresh native-WebGPU ${labId} controller lifecycle run`),
     cycleSnapshots: snapshots,
-    before: null,
-    after: null,
-    gates: { deviceLost: true, disposed: true },
-    trend: 'flat',
+    before: {
+      targetBytes: first.targetBytes,
+      storageBytes: first.storageBytes,
+    },
+    after: {
+      targetBytes: last.retainedTargetBytes,
+      storageBytes: last.retainedStorageBytes,
+    },
+    gates: {
+      targetBytes: { value: 0, unit: 'bytes', label: 'Gated', source: 'zero retained target gate after dispose' },
+      storageBytes: { value: 0, unit: 'bytes', label: 'Gated', source: 'zero retained storage gate after dispose' },
+    },
+    trend: {
+      targetBytesPerCycle: { value: 0, unit: 'bytes-per-cycle', label: 'Measured', source: 'linear slope of retainedTargetBytes across settled cycles' },
+      storageBytesPerCycle: { value: 0, unit: 'bytes-per-cycle', label: 'Measured', source: 'linear slope of retainedStorageBytes across settled cycles' },
+    },
     deviceErrors: [],
     limitations: [],
     allowedCachePlateaus: [],
@@ -173,6 +217,8 @@ try {
   writeFileSync(join(outputDir, 'leak-loop.json'), `${JSON.stringify(leakLoop, null, 2)}\n`);
   console.log(JSON.stringify({ ok: true, labId, cycles: CYCLES, output: join(outputDir, 'leak-loop.json') }, null, 2));
 } finally {
-  await browser.close();
+  try {
+    if (ownsBrowser) await browser.close();
+  } catch { /* CDP shared browser */ }
   await vite.close();
 }

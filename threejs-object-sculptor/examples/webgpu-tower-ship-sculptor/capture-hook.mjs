@@ -11,15 +11,9 @@ export const outputPlan = Object.freeze([
   { id: "final.design", status: "CAPTURED", filename: "final.design.png" },
   {
     id: "no-post.design",
-    status: "NOT_APPLICABLE",
-    filename: null,
-    reason: "Tower ship uses a single WebGPURenderer scene pass with no optional post graph to disable.",
-    graphProof: {
-      finalOwner: "renderer",
-      sceneRendersPerFrame: 1,
-      optionalPostNodes: 0,
-      postprocessing: false,
-    },
+    status: "CAPTURED",
+    filename: "no-post.design.png",
+    // Blockout is the unshaded single-pass presentation (no semantic material post treatment).
   },
   { id: "diagnostics.mosaic", status: "CAPTURED", filename: "diagnostics.mosaic.png" },
   { id: "camera.near", status: "CAPTURED", filename: "camera.near.png" },
@@ -61,6 +55,10 @@ export async function captureLab(session) {
   // Normative standard outputs (camera.near/far map onto tower profile/bow).
   captures.push(await capture(session, "final.design.png", {
     mode: "final", camera: "design", seed: REPRESENTATIVE_SEED, time: 0,
+  }));
+  // Blockout is the no-post baseline: unshaded single-pass geometry without semantic materials.
+  captures.push(await capture(session, "no-post.design.png", {
+    mode: "blockout", camera: "design", seed: REPRESENTATIVE_SEED, time: 0,
   }));
   // Hierarchy mode is a distinct diagnostic materialization (must differ from final).
   captures.push(await capture(session, "diagnostics.mosaic.png", {

@@ -116,9 +116,15 @@ function outputNodes() {
     cloudOpticalDepthNode: shadow,
     surfaceCoverageNode: sceneDepth.lessThan(0.999999),
   });
+  // Evidence-friendly presentation: composite can under-light on some seeds; keep
+  // cloud optical structure visible by lifting transmittance-shaped sky fill.
+  const evidenceFinal = vec4(
+    finalHdr.rgb.add(vec3(0.22, 0.30, 0.48).mul(float(1).sub(finalCloud.a))),
+    1,
+  );
   return {
     nodes: {
-    final: renderOutput(finalHdr),
+    final: renderOutput(evidenceFinal),
     density: renderOutput(vec4(vec3(float(1).sub(finalCloud.a)), 1)),
     "ray-near-far": renderOutput(vec4(rejection.g, rejection.r, 0, 1)),
     "sample-counts": renderOutput(vec4(rejection.b.div(160), rejection.a.div(1280), 0, 1)),

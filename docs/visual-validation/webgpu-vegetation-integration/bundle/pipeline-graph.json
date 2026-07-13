@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 2,
+  "owners": {
+    "renderer": "threejs-procedural-vegetation",
+    "scenePass": "webgpu-vegetation-integration",
+    "finalPipeline": "webgpu-vegetation-integration",
+    "toneMap": "vegetation-host-pipeline",
+    "outputTransform": "vegetation-host-pipeline"
+  },
+  "signals": [
+    {
+      "id": "output",
+      "producer": "webgpu-vegetation-integration",
+      "consumers": [
+        "presentation"
+      ],
+      "reachable": true
+    }
+  ],
+  "sceneSubmissions": [
+    {
+      "id": "shared-scene-pass",
+      "owner": "webgpu-vegetation-integration",
+      "kind": "lit-scene",
+      "submissionCount": {
+        "value": 1,
+        "unit": "submissions-per-frame",
+        "label": "Measured",
+        "source": "LabController.describePipeline"
+      }
+    }
+  ],
+  "computeDispatches": [],
+  "resources": [],
+  "finalToneMapOwner": "vegetation-host-pipeline",
+  "finalOutputTransformOwner": "vegetation-host-pipeline"
+}

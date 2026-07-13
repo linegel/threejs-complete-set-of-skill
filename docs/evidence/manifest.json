@@ -871,7 +871,7 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:b72dcd7e8c872bab2bac451975c788be8b0c51bce2b5a4f816fd1a3a423cf979"
+      "htmlSha256": "sha256:b70d2f5567522a992862536a9192ca6f7db9abc4848e4f1954817ceaf4b21c49"
     },
     {
       "labId": "webgpu-object-sculptor-corpus",

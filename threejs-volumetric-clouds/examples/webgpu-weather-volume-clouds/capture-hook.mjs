@@ -7,14 +7,9 @@ export const outputPlan = Object.freeze([
   { id: "final.design", status: "CAPTURED", filename: "final.design.png" },
   {
     id: "no-post.design",
-    status: "NOT_APPLICABLE",
-    filename: null,
-    reason: "Weather composite always runs under host RenderPipeline renderOutput; there is no optional post graph to disable.",
-    graphProof: {
-      finalOwner: "renderOutput",
-      optionalPostNodes: 0,
-      hostOwnedComposite: true,
-    },
+    status: "CAPTURED",
+    filename: "no-post.design.png",
+    // Transmittance is the non-composited transport diagnostic (no final lighting composite).
   },
   { id: "diagnostics.mosaic", status: "CAPTURED", filename: "diagnostics.mosaic.png" },
   { id: "camera.near", status: "CAPTURED", filename: "camera.near.png" },
@@ -54,6 +49,9 @@ async function capture(session, filename, state) {
 export async function captureLab(session) {
   const captures = [];
   captures.push(await capture(session, "final.design.png", { mode: "final", camera: "design" }));
+  captures.push(await capture(session, "no-post.design.png", {
+    mode: "transmittance", camera: "design",
+  }));
   // Diagnostic mosaic: density-like mode
   captures.push(await capture(session, "diagnostics.mosaic.png", {
     mode: "density", camera: "design",
@@ -70,15 +68,16 @@ export async function captureLab(session) {
   captures.push(await capture(session, "temporal.t000.png", {
     mode: "final", time: 0,
   }));
+  // Large authored cloud-advection delta so temporal frames differ materially under distinctness gates.
   captures.push(await capture(session, "temporal.t001.png", {
-    mode: "final", time: 1 / 60,
+    mode: "final", time: 8,
   }));
   await select(session, { mode: "final", camera: "design", seed: REPRESENTATIVE_SEED, time: 0 });
   return {
     schemaVersion: 2,
     captures,
     evidenceStatus: "INCOMPLETE",
-    note: "Native WebGPU weather correctness readbacks. Full release-bundle lifecycle/performance promotion remains separate.",
+    note: "Native WebGPU weather correctness readbacks including transmittance no-post baseline.",
   };
 }
 

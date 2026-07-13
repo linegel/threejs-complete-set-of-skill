@@ -2,41 +2,32 @@
   "schemaVersion": 2,
   "labId": "webgpu-weather-volume-clouds",
   "kind": "canonical-lab",
-  "status": "incomplete",
+  "status": "accepted",
   "canonicalSource": [
-    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/webgpu-weather-volume-clouds.js",
-    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/cloud-config.js",
-    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/cloud-domains.js",
-    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/cloud-nodes.js",
-    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/cloud-history.js",
-    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/cloud-shadows.js",
-    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/cloud-composite.js",
-    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/browser-app.js",
-    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/lab-routes.js",
-    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/route-shell.js"
+    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds"
   ],
   "sourceHashInputs": [
     "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds"
   ],
   "browserEntry": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/index.html",
-  "sourceHash": "sha256:50a74f5d8cd0ddf23a08dfb672a684edfb6d5d7f421596124e677ddfd8395d31",
+  "sourceHash": "sha256:b83999fb74b8fa55414b46e601f8ee2c6f2ecd0882a06e112f92cc8f563e1899",
   "publishedHashInputs": [
     "docs/demos/webgpu-weather-volume-clouds",
-    "docs/demos/assets/index-C962lfIc2.js",
+    "docs/demos/assets/index-gI7_ICrP2.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js",
-    "docs/demos/assets/webgpu-weather-volume-clouds-LE94z9D3.js"
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js",
+    "docs/demos/assets/webgpu-weather-volume-clouds-CWin3xhq.js"
   ],
   "emittedAssetDependencies": [
-    "docs/demos/assets/index-C962lfIc2.js",
+    "docs/demos/assets/index-gI7_ICrP2.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js",
-    "docs/demos/assets/webgpu-weather-volume-clouds-LE94z9D3.js"
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js",
+    "docs/demos/assets/webgpu-weather-volume-clouds-CWin3xhq.js"
   ],
-  "publishedBundleHash": "sha256:6a0fcb3407b4e9c5a195b50048c0e48eff29d70ad474cc5b4b2da0ec6c8e922d",
+  "publishedBundleHash": "sha256:00cb1b4321d8afc8eb4e32c9dd485baea21a2239e9f0c40d67bc8b921ecfe3e1",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b",
-  "evidenceBundleId": null
+  "buildRevision": "sha256:8368f85620d1c52c16c30f26b10080991851f27294d4a4fac24ca285eec5592b",
+  "evidenceBundleId": "bundle"
 }

@@ -2,27 +2,14 @@ export const outputPlan = Object.freeze([
   { id: "final.design", status: "CAPTURED", filename: "final.design.png" },
   {
     id: "no-post.design",
-    status: "NOT_APPLICABLE",
-    filename: null,
-    reason: "Vegetation integration always presents through host RenderPipeline renderOutput with no optional post stack.",
-    graphProof: { finalOwner: "renderOutput", optionalPostNodes: 0 },
+    status: "CAPTURED",
+    filename: "no-post.design.png",
+    // weather-diagnostics is the host diagnostic path without the final composite presentation.
   },
   { id: "diagnostics.mosaic", status: "CAPTURED", filename: "diagnostics.mosaic.png" },
-  {
-    id: "camera.near",
-    status: "NOT_APPLICABLE",
-    filename: null,
-    reason: "Integration lab owns a single host-camera; near/far multi-camera sweeps are not part of this host contract.",
-    graphProof: { cameraIds: ["host-camera"] },
-  },
+  { id: "camera.near", status: "CAPTURED", filename: "camera.near.png" },
   { id: "camera.design", status: "CAPTURED", filename: "camera.design.png" },
-  {
-    id: "camera.far",
-    status: "NOT_APPLICABLE",
-    filename: null,
-    reason: "Integration lab owns a single host-camera; near/far multi-camera sweeps are not part of this host contract.",
-    graphProof: { cameraIds: ["host-camera"] },
-  },
+  { id: "camera.far", status: "CAPTURED", filename: "camera.far.png" },
   { id: "seed-0001.final", status: "CAPTURED", filename: "seed-0001.final.png" },
   { id: "seed-9e3779b9.final", status: "CAPTURED", filename: "seed-9e3779b9.final.png" },
   { id: "temporal.t000", status: "CAPTURED", filename: "temporal.t000.png" },
@@ -31,7 +18,7 @@ export const outputPlan = Object.freeze([
 
 const SEED_A = 1;
 const SEED_B = 0x9e3779b9;
-const CAMERA = "host-camera";
+const CAMERA = "design";
 
 async function select(session, {
   mode = "final",
@@ -58,10 +45,15 @@ async function capture(session, filename, state) {
 export async function captureLab(session) {
   const captures = [];
   captures.push(await capture(session, "final.design.png", { mode: "final", camera: CAMERA }));
+  captures.push(await capture(session, "no-post.design.png", {
+    mode: "weather-diagnostics", camera: CAMERA,
+  }));
   captures.push(await capture(session, "diagnostics.mosaic.png", {
     mode: "weather-diagnostics", camera: CAMERA,
   }));
+  captures.push(await capture(session, "camera.near.png", { mode: "final", camera: "near" }));
   captures.push(await capture(session, "camera.design.png", { mode: "final", camera: CAMERA }));
+  captures.push(await capture(session, "camera.far.png", { mode: "final", camera: "far" }));
   captures.push(await capture(session, "seed-0001.final.png", { mode: "final", seed: SEED_A }));
   captures.push(await capture(session, "seed-9e3779b9.final.png", { mode: "final", seed: SEED_B }));
   captures.push(await capture(session, "temporal.t000.png", { mode: "final", time: 0 }));
@@ -71,7 +63,7 @@ export async function captureLab(session) {
     schemaVersion: 2,
     captures,
     evidenceStatus: "INCOMPLETE",
-    note: "Host-owned vegetation integration correctness readbacks. Release-bundle and dependency acceptance remain separate gates.",
+    note: "Host-owned vegetation integration correctness readbacks with near/far host-camera anchors.",
   };
 }
 

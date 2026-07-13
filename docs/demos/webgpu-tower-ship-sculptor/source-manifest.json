@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "labId": "webgpu-tower-ship-sculptor",
   "kind": "canonical-lab",
-  "status": "incomplete",
+  "status": "accepted",
   "canonicalSource": [
     "threejs-object-sculptor/examples/webgpu-tower-ship-sculptor"
   ],
@@ -11,28 +11,28 @@
     "threejs-object-sculptor/examples/webgpu-tower-ship-sculptor"
   ],
   "browserEntry": "threejs-object-sculptor/examples/webgpu-tower-ship-sculptor/index.html",
-  "sourceHash": "sha256:092f816d582ddd4ac6066b756e315f14efa98551ea619db1966e5a19319a314e",
+  "sourceHash": "sha256:7865ac08c4e28a3d873f7296f0c422b276e3a2a3503bb28511b416109c925c5e",
   "publishedHashInputs": [
     "docs/demos/webgpu-tower-ship-sculptor",
-    "docs/demos/assets/OrbitControls-CJtJSLBE.js",
+    "docs/demos/assets/OrbitControls-BPue_ISR.js",
     "docs/demos/assets/aligned-readback-XAnJComS.js",
-    "docs/demos/assets/index-BfXWRIR82.js",
+    "docs/demos/assets/index-WA3-uWsI2.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js",
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js",
     "docs/demos/assets/tower-ship-reference-D3qlgi5o.png"
   ],
   "emittedAssetDependencies": [
-    "docs/demos/assets/OrbitControls-CJtJSLBE.js",
+    "docs/demos/assets/OrbitControls-BPue_ISR.js",
     "docs/demos/assets/aligned-readback-XAnJComS.js",
-    "docs/demos/assets/index-BfXWRIR82.js",
+    "docs/demos/assets/index-WA3-uWsI2.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js",
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js",
     "docs/demos/assets/tower-ship-reference-D3qlgi5o.png"
   ],
-  "publishedBundleHash": "sha256:2d03948cd4ca2048019d7c3a5830b19093a9ced04864dba945489ef62016a5d3",
+  "publishedBundleHash": "sha256:82743a77c4f79db0aa857d41d4b3b78734af5715efdba40894a9093af95ef261",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b",
-  "evidenceBundleId": null
+  "buildRevision": "sha256:8368f85620d1c52c16c30f26b10080991851f27294d4a4fac24ca285eec5592b",
+  "evidenceBundleId": "bundle"
 }

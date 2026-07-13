@@ -209,10 +209,21 @@ async function createLab() {
       await buildIntegration();
     },
     async setCamera(id) {
-      if (id !== "host-camera") throw new Error(`unknown vegetation integration camera "${id}"`);
+      // host-camera/design share the authored host framing; near/far are distance anchors
+      // for standard evidence image contracts on this single-camera host.
+      const known = new Set(["host-camera", "design", "near", "far"]);
+      if (!known.has(id)) throw new Error(`unknown vegetation integration camera "${id}"`);
       cameraId = id;
-      camera.position.set(115 * WORLD_UNITS_PER_METER, 24 * WORLD_UNITS_PER_METER, 54 * WORLD_UNITS_PER_METER);
-      camera.lookAt(0, 24 * WORLD_UNITS_PER_METER, 0);
+      const scale = WORLD_UNITS_PER_METER;
+      if (id === "near") {
+        camera.position.set(48 * scale, 12 * scale, 22 * scale);
+      } else if (id === "far") {
+        camera.position.set(210 * scale, 42 * scale, 96 * scale);
+      } else {
+        // host-camera and design share the authored host framing
+        camera.position.set(115 * scale, 24 * scale, 54 * scale);
+      }
+      camera.lookAt(0, 24 * scale, 0);
       camera.updateMatrixWorld(true);
       integration.update({ time: elapsed, contacts: contactsForScenario() });
     },

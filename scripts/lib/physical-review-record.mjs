@@ -64,8 +64,9 @@ export function validatePhysicalReviewRecord(record, options = {}) {
     throw new Error('physical review schema identity is invalid');
   }
   requireString(record.labId, 'labId');
-  if (record.profile !== 'physical-route' || record.automationSurface !== 'codex-in-app-browser') {
-    throw new Error('physical review must come from the Codex in-app Browser physical-route lane');
+  const allowedPhysicalSurfaces = new Set(['codex-in-app-browser', 'playwright-cdp-chrome']);
+  if (record.profile !== 'physical-route' || !allowedPhysicalSurfaces.has(record.automationSurface)) {
+    throw new Error('physical review must come from Codex in-app Browser or CDP-attached Chrome physical-route lane');
   }
   if (record.publishable !== false) throw new Error('raw physical reviews are nonpublishable promotion inputs');
   requireHash(record.sourceClosureHash, 'sourceClosureHash');

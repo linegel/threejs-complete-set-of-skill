@@ -628,10 +628,26 @@ function populateColliderConstructionInputs(runtime) {
   }
 }
 
+function mulberry32(seed) {
+  let t = seed >>> 0;
+  return () => {
+    t += 0x6d2b79f5;
+    let r = Math.imul(t ^ (t >>> 15), 1 | t);
+    r ^= r + Math.imul(r ^ (r >>> 7), 61 | r);
+    return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
 export function createTowerShip({ tier = "full", seed = 1 } = {}) {
   if (!TOWER_SHIP_TIERS.includes(tier)) throw new RangeError(`Unknown tier "${tier}"`);
   const limits = TIER_LIMITS[tier];
   const materials = makeMaterials();
+  const random = mulberry32(seed >>> 0);
+  // Seed must change the design-camera silhouette: sail yaw, mast lean, and lantern pitch.
+  const seedSailYaw = (random() - 0.5) * 0.55;
+  const seedMastLeanZ = (random() - 0.5) * 0.12;
+  const seedTowerOffsetX = (random() - 0.5) * 0.9;
+  const seedLanternLift = random() * 0.45;
   const root = new THREE.Group();
   const runtime = {
     seed,
@@ -673,7 +689,7 @@ export function createTowerShip({ tier = "full", seed = 1 } = {}) {
   }
 
   const tower = pivot(runtime, "tower", root, { destructionGroup: "tower" });
-  tower.position.x = -0.6;
+  tower.position.x = -0.6 + seedTowerOffsetX;
   addCabinTier(runtime, "cabin-lower", tower, materials, 5.25, 2.05, 3.15, 3.72, limits);
   socket(runtime, "lower-cabin-top", tower, [0, 4.78, 0]);
   addRoof(runtime, "roof-lower", tower, materials, 6.65, 4.2, 4.78, limits);
@@ -684,6 +700,7 @@ export function createTowerShip({ tier = "full", seed = 1 } = {}) {
   socket(runtime, "mast-step", root, [1.65, 2.45, -0.35]);
   const mast = pivot(runtime, "mast", root, { destructionGroup: "mast-rig" });
   mast.position.set(1.65, 2.45, -0.35);
+  mast.rotation.z = seedMastLeanZ;
   cylinderBetween(runtime, "mast-pole", [0, 0, 0], [0, 9.65, 0], 0.17, materials.darkWood, limits.cylinder, mast, "rig");
   const crown = socket(runtime, "mast-crown", mast, [0, 9.65, 0]);
   const mastFinial = mesh(runtime, "mast-finial", new THREE.SphereGeometry(0.25, limits.cylinder, Math.max(4, limits.cylinder / 2)), materials.metal, { parent: mast, group: "rig" });
@@ -692,7 +709,7 @@ export function createTowerShip({ tier = "full", seed = 1 } = {}) {
   sailPivot.position.set(0.1, 2.2, 0);
   socket(runtime, "sail-luff", mast, [0.1, 2.2, 0]);
   const sailSurface = mesh(runtime, "sail-surface", buildSailGeometry(), materials.sail, { parent: sailPivot, group: "rig", destructionGroup: "sail" });
-  sailSurface.rotation.y = -0.08;
+  sailSurface.rotation.y = -0.08 + seedSailYaw;
   runtime.sail = sailPivot;
   for (let row = 0; row <= 7; row += 1) {
     const v = row / 7;
@@ -721,6 +738,9 @@ export function createTowerShip({ tier = "full", seed = 1 } = {}) {
   }
   const details = addDeckDetails(runtime, root, materials, limits);
   runtime.lanterns = [...runtime.nodes.values()].filter((value) => value.name.startsWith("lantern-") && !value.name.startsWith("lantern-body") && !value.name.startsWith("lantern-chain"));
+  for (const lantern of runtime.lanterns) {
+    lantern.position.y += seedLanternLift;
+  }
 
   const worldSocket = socket(runtime, "camera-interest", root, [0, 4.2, 0]);
   worldSocket.visible = false;

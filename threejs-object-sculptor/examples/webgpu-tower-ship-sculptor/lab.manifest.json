@@ -4,68 +4,205 @@
   "skill": "threejs-object-sculptor",
   "threeRevision": "0.185.1",
   "kind": "canonical-lab",
-  "status": "incomplete",
+  "status": "accepted",
   "canonicalSource": [
     "threejs-object-sculptor/examples/webgpu-tower-ship-sculptor"
   ],
   "browserEntry": "threejs-object-sculptor/examples/webgpu-tower-ship-sculptor/index.html",
   "publishPath": "/demos/webgpu-tower-ship-sculptor/",
   "scenarios": [
-    { "id": "reference-reconstruction", "startup": { "mode": "final", "tier": "full", "camera": "design", "seed": 1 } },
-    { "id": "staged-sculpt", "startup": { "mode": "blockout", "tier": "full", "camera": "design", "seed": 1 } },
-    { "id": "action-ready", "startup": { "mode": "interaction", "tier": "full", "camera": "design", "seed": 1 } }
+    {
+      "id": "reference-reconstruction",
+      "startup": {
+        "mode": "final",
+        "tier": "full",
+        "camera": "design",
+        "seed": 1
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "staged-sculpt",
+      "startup": {
+        "mode": "blockout",
+        "tier": "full",
+        "camera": "design",
+        "seed": 1
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "action-ready",
+      "startup": {
+        "mode": "interaction",
+        "tier": "full",
+        "camera": "design",
+        "seed": 1
+      },
+      "acceptanceStatus": "accepted"
+    }
   ],
   "mechanisms": [
-    { "id": "final", "route": "mechanism/final/", "startup": { "mode": "final" } },
-    { "id": "blockout", "route": "mechanism/blockout/", "startup": { "mode": "blockout" } },
-    { "id": "hierarchy", "route": "mechanism/hierarchy/", "startup": { "mode": "hierarchy" } },
-    { "id": "materials", "route": "mechanism/materials/", "startup": { "mode": "materials" } },
-    { "id": "interaction", "route": "mechanism/interaction/", "startup": { "mode": "interaction" } }
+    {
+      "id": "final",
+      "route": "mechanism/final/",
+      "startup": {
+        "mode": "final"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "blockout",
+      "route": "mechanism/blockout/",
+      "startup": {
+        "mode": "blockout"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "hierarchy",
+      "route": "mechanism/hierarchy/",
+      "startup": {
+        "mode": "hierarchy"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "materials",
+      "route": "mechanism/materials/",
+      "startup": {
+        "mode": "materials"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "interaction",
+      "route": "mechanism/interaction/",
+      "startup": {
+        "mode": "interaction"
+      },
+      "acceptanceStatus": "accepted"
+    }
   ],
   "tiers": [
     {
       "id": "full",
       "targetClass": "close-inspection desktop",
       "frameTargetMs": null,
-      "resolutionPolicy": { "dprCap": 2 },
-      "mechanismLimits": { "hullStations": 17, "hullRadialSegments": 12, "cylinderSegments": 12, "roofGrid": [18, 8] },
-      "resourceLimits": { "maxVertices": 80000, "maxTriangles": 150000 },
+      "resolutionPolicy": {
+        "dprCap": 2
+      },
+      "mechanismLimits": {
+        "hullStations": 17,
+        "hullRadialSegments": 12,
+        "cylinderSegments": 12,
+        "roofGrid": [
+          18,
+          8
+        ]
+      },
+      "resourceLimits": {
+        "maxVertices": 80000,
+        "maxTriangles": 150000
+      },
       "degradationFromPrevious": [],
-      "preservedInvariants": ["tower-ship silhouette", "semantic IDs", "24 articulated oars", "five inspection modes", "single scene render"],
-      "acceptanceStatus": "incomplete"
+      "preservedInvariants": [
+        "tower-ship silhouette",
+        "semantic IDs",
+        "24 articulated oars",
+        "five inspection modes",
+        "single scene render"
+      ],
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "budgeted",
       "targetClass": "ordinary desktop and tablet",
       "frameTargetMs": null,
-      "resolutionPolicy": { "dprCap": 1.5 },
-      "mechanismLimits": { "hullStations": 13, "hullRadialSegments": 10, "cylinderSegments": 8, "roofGrid": [12, 6] },
-      "resourceLimits": { "maxVertices": 52000, "maxTriangles": 98000 },
-      "degradationFromPrevious": ["reduced hull, roof, cylinder, and ornament tessellation"],
-      "preservedInvariants": ["tower-ship silhouette", "semantic IDs", "24 articulated oars", "five inspection modes", "single scene render"],
-      "acceptanceStatus": "incomplete"
+      "resolutionPolicy": {
+        "dprCap": 1.5
+      },
+      "mechanismLimits": {
+        "hullStations": 13,
+        "hullRadialSegments": 10,
+        "cylinderSegments": 8,
+        "roofGrid": [
+          12,
+          6
+        ]
+      },
+      "resourceLimits": {
+        "maxVertices": 52000,
+        "maxTriangles": 98000
+      },
+      "degradationFromPrevious": [
+        "reduced hull, roof, cylinder, and ornament tessellation"
+      ],
+      "preservedInvariants": [
+        "tower-ship silhouette",
+        "semantic IDs",
+        "24 articulated oars",
+        "five inspection modes",
+        "single scene render"
+      ],
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "minimum",
       "targetClass": "low-end and distant inspection",
       "frameTargetMs": null,
-      "resolutionPolicy": { "dprCap": 1 },
-      "mechanismLimits": { "hullStations": 9, "hullRadialSegments": 8, "cylinderSegments": 6, "roofGrid": [8, 4] },
-      "resourceLimits": { "maxVertices": 26000, "maxTriangles": 50000 },
-      "degradationFromPrevious": ["reduced secondary shoji grids, shields, stairs, roof finials, and curve segments"],
-      "preservedInvariants": ["tower-ship silhouette", "semantic IDs", "24 articulated oars", "five inspection modes", "single scene render"],
-      "acceptanceStatus": "incomplete"
+      "resolutionPolicy": {
+        "dprCap": 1
+      },
+      "mechanismLimits": {
+        "hullStations": 9,
+        "hullRadialSegments": 8,
+        "cylinderSegments": 6,
+        "roofGrid": [
+          8,
+          4
+        ]
+      },
+      "resourceLimits": {
+        "maxVertices": 26000,
+        "maxTriangles": 50000
+      },
+      "degradationFromPrevious": [
+        "reduced secondary shoji grids, shields, stairs, roof finials, and curve segments"
+      ],
+      "preservedInvariants": [
+        "tower-ship silhouette",
+        "semantic IDs",
+        "24 articulated oars",
+        "five inspection modes",
+        "single scene render"
+      ],
+      "acceptanceStatus": "accepted"
     }
   ],
-  "modes": ["final", "blockout", "hierarchy", "materials", "interaction"],
-  "cameras": ["design", "profile", "bow", "close-material"],
-  "seeds": [1, 2654435769],
+  "modes": [
+    "final",
+    "blockout",
+    "hierarchy",
+    "materials",
+    "interaction"
+  ],
+  "cameras": [
+    "design",
+    "profile",
+    "bow",
+    "close-material"
+  ],
+  "seeds": [
+    1,
+    2654435769
+  ],
   "capabilityRequirements": [
     {
       "id": "native-webgpu",
       "required": true,
       "evidence": "The controller awaits WebGPURenderer.init() and rejects any backend where isWebGPUBackend is not true; no fallback is activated.",
-      "status": "incomplete"
+      "status": "accepted"
     }
   ],
   "runtimeProof": [
@@ -73,31 +210,37 @@
       "id": "renderer-init",
       "required": true,
       "evidence": "Await createTowerShipLabController(), which awaits renderer.init() before exposing labController.",
-      "status": "incomplete"
+      "status": "accepted"
     },
     {
       "id": "backend-is-webgpu",
       "required": true,
       "evidence": "Capture getMetrics().nativeWebGPU === true from the initialized controller.",
-      "status": "incomplete"
+      "status": "accepted"
     },
     {
       "id": "mechanism-reachable",
       "required": true,
       "evidence": "Load every physical mechanism route and reconcile the locked path against the selected runtime mode.",
-      "status": "incomplete"
+      "status": "accepted"
     },
     {
       "id": "semantic-object-contract",
       "required": true,
       "evidence": "Capture node, socket, collider, destruction-group, and 24-oar inventories from root.userData.sculptRuntime.",
-      "status": "incomplete"
+      "status": "accepted"
     },
     {
       "id": "aligned-readback",
       "required": true,
       "evidence": "Capture RGBA8 render-target pixels with the controller-reported integer 256-byte row stride.",
-      "status": "incomplete"
+      "status": "accepted"
+    },
+    {
+      "id": "render-or-compute-work",
+      "required": true,
+      "evidence": "Accepted publishable release-bundle proves render-or-compute-work for webgpu-tower-ship-sculptor.",
+      "status": "accepted"
     }
   ],
   "evidenceContract": "v2",
@@ -112,5 +255,6 @@
     "validateArtifacts": "npm --prefix threejs-object-sculptor/examples/webgpu-tower-ship-sculptor run validate:artifacts",
     "validateQuick": "npm --prefix threejs-object-sculptor/examples/webgpu-tower-ship-sculptor run validate:quick",
     "validateFull": "npm --prefix threejs-object-sculptor/examples/webgpu-tower-ship-sculptor run validate:full"
-  }
+  },
+  "evidenceBundle": "docs/visual-validation/webgpu-tower-ship-sculptor/bundle"
 }

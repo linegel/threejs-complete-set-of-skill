@@ -1,0 +1,428 @@
+{
+  "schemaVersion": 1,
+  "projectionKind": "tracked-release-projection-v1",
+  "policy": {
+    "id": "native-webgpu-tracked-release-v1",
+    "digest": "sha256:e349900d79da27cb5570ea959707f741e03ea7e206d85a717a1129b27268f6a4"
+  },
+  "labId": "webgpu-weather-volume-clouds",
+  "skill": "threejs-volumetric-clouds",
+  "threeRevision": "0.185.1",
+  "sourceClosureHash": "sha256:b83999fb74b8fa55414b46e601f8ee2c6f2ecd0882a06e112f92cc8f563e1899",
+  "buildRevision": "sha256:f596c20387d7de3c1e26834ca45d9542730a2c6b4b6efc98ec043fcf046c5ab1",
+  "sourceRelease": {
+    "path": "evidence-manifest.json",
+    "sha256": "sha256:0043be530525be780fd27854675d93bc6de3af84cd3e59e6ca7b5bb1f7260904",
+    "byteLength": 34195,
+    "promotionBindingDigest": "sha256:a63c0ccb8287b2ca39eff7c02453e1962d3a1dfe44b6744c47916af68bb3a09b",
+    "candidateBindingDigest": "sha256:d45c1bbc1aa1a689df065ebb18069b30b5bafbd1717da47a8b26a30b0725427e",
+    "artifactLedgerDigest": "sha256:4178a97f439991a24693c9380f656284f2f060ccba7fb9b54d5d56b5dd4fab07",
+    "imageLedgerDigest": "sha256:231e690de19dfc689048b5f4d505a9d1198339a60cdead0d53577dc8a65a6b84"
+  },
+  "sourceClosure": {
+    "algorithm": "demo-registry-transitive-source-closure-v2",
+    "roots": [
+      "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds"
+    ],
+    "files": [
+      {
+        "repositoryPath": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/browser-app.js",
+        "sha256": "sha256:360be338abb70fc1cc2dac1197cda9641ac21312f0c2568171d4d7ee8394faa7",
+        "byteLength": 17408
+      },
+      {
+        "repositoryPath": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/capture-hook.mjs",
+        "sha256": "sha256:cf19e3a4beae09bea3c7772771063d2a4a5aade5f40a3641bb3a1c3397235bc3",
+        "byteLength": 3428
+      },
+      {
+        "repositoryPath": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/capture.mjs",
+        "sha256": "sha256:c1f1ae13bc25b58353522859e0763e4faa6dfe0672c862b648098040611bb27e",
+        "byteLength": 5898
+      },
+      {
+        "repositoryPath": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/check.mjs",
+        "sha256": "sha256:206689b59e10f029005dc66e9fb61fd3dc2b95ac53dd1a1c3fc28d44bdb3c9f7",
+        "byteLength": 545
+      },
+      {
+        "repositoryPath": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/cloud-composite.js",
+        "sha256": "sha256:40d1ed1a50fa35e47be1943d728b264b433ff4dc71fec7b4e817384f2e6f8cff",
+        "byteLength": 4775
+      },
+      {
+        "repositoryPath": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/cloud-config.js",
+        "sha256": "sha256:d4d38b89f4eb48aa9caab02eb92f9c6249717810192ea703f8e44780df4a08b1",
+        "byteLength": 23726
+      },
+      {
+        "repositoryPath": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/cloud-domains.js",
+        "sha256": "sha256:d0bbd9b5eac3b24a656fec6b9120545296bcb49d62465704bf954e1e8554d5dc",
+        "byteLength": 5675
+      },
+      {
+        "repositoryPath": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/cloud-history.js",
+        "sha256": "sha256:e0cdf1098d2818e3cd482d82dedf41b98fb0fc05678479f29161320ec927c0ad",
+        "byteLength": 13627
+      },
+      {
+        "repositoryPath": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/cloud-nodes.js",
+        "sha256": "sha256:9654c9cdeafc402004efef0125fa61262634efa250730d953e5d55f77a589c41",
+        "byteLength": 29997
+      },
+      {
+        "repositoryPath": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/cloud-shadows.js",
+        "sha256": "sha256:210a2eb54efd80d507d3de0b18dfac220870974600f776231584e5b3bf8e3e09",
+        "byteLength": 8367
+      },
+      {
+        "repositoryPath": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/generated-weather-maps-browser.mjs",
+        "sha256": "sha256:5f0c416b33a82a1d9d19497d2019e452856541382f15225c25a49356f1b444f0",
+        "byteLength": 10446
+      },
+      {
+        "repositoryPath": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/generated-weather-maps.html",
+        "sha256": "sha256:08623a67d3f652fd65d9dec0f8f91ca32a7a997c7180db017c1f02b8b6851e70",
+        "byteLength": 611
+      },
+      {
+        "repositoryPath": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/index.html",
+        "sha256": "sha256:e2bdd7a6788d06ae3c4e4a752ba36da94bc2e697fa5bac115d1ed6256b3a7a7e",
+        "byteLength": 879
+      },
+      {
+        "repositoryPath": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/lab-routes.js",
+        "sha256": "sha256:f8890395ff0b235318122eaee4aa98f5fd357c3799dbe37b40d3aabe819d479d",
+        "byteLength": 2599
+      },
+      {
+        "repositoryPath": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/mechanism/atmosphere-composition/index.html",
+        "sha256": "sha256:110795b7720c35b00ffbb9d02e59ee45d3f331347d5a2153070093c548fb1c2d",
+        "byteLength": 821
+      },
+      {
+        "repositoryPath": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/mechanism/cloud-shadows/index.html",
+        "sha256": "sha256:0f3d4815632784fdf951e8de071a326efdf055d0f38ea6ad6dfe3413f7cfc3c7",
+        "byteLength": 811
+      },
+      {
+        "repositoryPath": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/mechanism/density-and-bounds/index.html",
+        "sha256": "sha256:4249f33089ec7ba3b3c6893b51bf025388ad75ff28681abf785b2960200e0721",
+        "byteLength": 813
+      },
+      {
+        "repositoryPath": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/mechanism/failure-diagnostics/index.html",
+        "sha256": "sha256:5bea04beaad78f8041ddb9cfc1fa22ebe3fe065a92c62afd2629471e52336170",
+        "byteLength": 815
+      },
+      {
+        "repositoryPath": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/mechanism/flagship-transport/index.html",
+        "sha256": "sha256:a51fce62c69ad9fdc73fbd3dea8e9fe84f39d475c290e6e7651273e9d97714a5",
+        "byteLength": 813
+      },
+      {
+        "repositoryPath": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/mechanism/temporal-and-upsample/index.html",
+        "sha256": "sha256:4fdf36b205911c2da30a7dc1ab65232928659b14574af44a56958a13c06c4893",
+        "byteLength": 819
+      },
+      {
+        "repositoryPath": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/mechanism/tier-benchmark/index.html",
+        "sha256": "sha256:4dda10a6728d825d4ddb5f23cd36abccf28229f13e0434a76c1b4dda756aa178",
+        "byteLength": 805
+      },
+      {
+        "repositoryPath": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/package-lock.json",
+        "sha256": "sha256:d4452abad913f38de6d2110f2328b2621ec30fb468c57393c05e4fdeee25fc57",
+        "byteLength": 1917
+      },
+      {
+        "repositoryPath": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/package.json",
+        "sha256": "sha256:966e27127ab52213a01ca01dcc1522cc0a0b046ffe881b6a92955bec0a5ae803",
+        "byteLength": 738
+      },
+      {
+        "repositoryPath": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/README.md",
+        "sha256": "sha256:116103f4ccb7c62c443550a23da6345ab33ad03e46223a0cc07ec44290d211ea",
+        "byteLength": 6349
+      },
+      {
+        "repositoryPath": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/route-shell.js",
+        "sha256": "sha256:40354f60419d010f4daba0021f5f7cbbda3cca9a78b265f6abf86e2da4369901",
+        "byteLength": 207
+      },
+      {
+        "repositoryPath": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/test-mutations.mjs",
+        "sha256": "sha256:4bbedc8cbd31940ddb64bfe7c21ab0f15980eff66ff95c2d347add2594cf2018",
+        "byteLength": 6862
+      },
+      {
+        "repositoryPath": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/tier/default/index.html",
+        "sha256": "sha256:8662da7cce056003649be33df3e245882a421640685ce66d322e1b1172c217a2",
+        "byteLength": 791
+      },
+      {
+        "repositoryPath": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/tier/high/index.html",
+        "sha256": "sha256:7eb4f18ea1578c9bc6b1e6ea30b601be883c3c85e3808bb6186cd66b7a6cd957",
+        "byteLength": 785
+      },
+      {
+        "repositoryPath": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/tier/mobile/index.html",
+        "sha256": "sha256:5100beab65c3af4ca21c67e1d2d1fb24480bd0c4e5f534699486fa5b59cb4191",
+        "byteLength": 789
+      },
+      {
+        "repositoryPath": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/tier/ultra/index.html",
+        "sha256": "sha256:aaae5887e7cfc08140205ecbbc03812419181a1d9c6c909b098c19d43254a1a4",
+        "byteLength": 787
+      },
+      {
+        "repositoryPath": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/validate-artifacts.mjs",
+        "sha256": "sha256:fb0562cf0172bd86aa1d2b43456df88d0f19d26f9582e8b3890b45b088c8d328",
+        "byteLength": 4654
+      },
+      {
+        "repositoryPath": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/validate-generated-weather-maps.mjs",
+        "sha256": "sha256:2772b2e9c8734abfddc2ed999259f2abeb3bcb917828c4b4aa5bdcc1ef312148",
+        "byteLength": 15435
+      },
+      {
+        "repositoryPath": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/validation.js",
+        "sha256": "sha256:eb7509f424b62129e15dbe0c887babf2fb504f7dde3bc8391a321d6ccfb88653",
+        "byteLength": 19736
+      },
+      {
+        "repositoryPath": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/webgpu-weather-volume-clouds.js",
+        "sha256": "sha256:a52b802200a8da9d487f77620631deee044e4a853f19b2e9be0233a1a2696162",
+        "byteLength": 18363
+      }
+    ],
+    "threeRevision": "0.185.1",
+    "sourceHash": "sha256:b83999fb74b8fa55414b46e601f8ee2c6f2ecd0882a06e112f92cc8f563e1899",
+    "buildRevision": "sha256:f596c20387d7de3c1e26834ca45d9542730a2c6b4b6efc98ec043fcf046c5ab1"
+  },
+  "retainedFiles": [
+    {
+      "path": "visual-contract.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:f546e9fd101d241ea24b58a8622c7a3886e15b2359a2f9729e75a9e2c04e347d",
+      "byteLength": 884
+    },
+    {
+      "path": "renderer-info.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:ce98dc437ff1e48283efdd61f5f63f5c0cc95934b77e56c419199c8db5c3b599",
+      "byteLength": 466
+    },
+    {
+      "path": "pipeline-graph.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:2ecae47d1aab2e2717ead10b0e763521de3e83a8ecdff7282ef627eb7ce27526",
+      "byteLength": 897
+    },
+    {
+      "path": "performance-envelope.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:62e1abb57e217febce5044e04788aae2967a749c9dd5c70432f279fc3c45e507",
+      "byteLength": 634
+    },
+    {
+      "path": "frame-trace.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:61e2604f805c8759b4999cc2b6ef8e27ea9446acb8902d2b4f38c58f787479e7",
+      "byteLength": 280
+    },
+    {
+      "path": "quality-governor.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:5268ff6c418b0bd1dfffc1115112985ed3f3cf4f7870c48504086253a701a0ad",
+      "byteLength": 271
+    },
+    {
+      "path": "render-targets.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:5adc8c1dd308ebd316e6b018e48a5871a5485776c9e321f51e098cb06cda66bf",
+      "byteLength": 10690
+    },
+    {
+      "path": "storage-resources.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:579719a4f114bada5939fff4c4a645ac178e5b40a8f18de1cfb9532f02a92486",
+      "byteLength": 333
+    },
+    {
+      "path": "resident-resources.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:6fc1377d8131845b579a304b535bc8832ac8ad8663760f592519d1c3ab76a856",
+      "byteLength": 1329
+    },
+    {
+      "path": "bandwidth-model.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:e921c52741c0a3b03c5a02ac0b1337262a182750cd76a01d10c49323c047a034",
+      "byteLength": 956
+    },
+    {
+      "path": "visual-errors.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:f4b2464fc52bef50bc4fdd264442c77fe07b680905d615eb5be53d0d84a8ff9c",
+      "byteLength": 752
+    },
+    {
+      "path": "leak-loop.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:097f3da7ca2b86c0095a4a6657b80a405e03dc010d3dd0d413dbbb1fbb832f2d",
+      "byteLength": 131926
+    },
+    {
+      "path": "mechanism-metrics.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:84cf2fd3ae53a8313ce2aef646303ad1ca304ba22f774ce02fb2cd9764fcd3b2",
+      "byteLength": 4666
+    },
+    {
+      "path": "capture-write-ledger.json",
+      "status": "captured",
+      "kind": "capture-session-write-ledger",
+      "sha256": "sha256:aa995707f7311fdc3b94f7d9b0a613021f82722e6126813fe3574d9b82081c79",
+      "byteLength": 10668
+    },
+    {
+      "path": "sessions/physical-route.write-ledger.json",
+      "status": "captured",
+      "kind": "capture-session-write-ledger",
+      "sha256": "sha256:7efe82b3623e92b88fea8d1e44f5db4433096df784e5c068760f542b897573d7",
+      "byteLength": 1999
+    }
+  ],
+  "retainedImages": [
+    {
+      "path": "final.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "final.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:78978c32c107a234119b5c29245c9c55820c170823717c4cb5eb47065ec38a81",
+      "byteLength": 156107
+    },
+    {
+      "path": "no-post.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "no-post.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:5ecddd77ca3357ee874e68b9f8075362fc0ae5a403343a32de840475f1e2ac99",
+      "byteLength": 60858
+    },
+    {
+      "path": "diagnostics.mosaic.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "diagnostics.mosaic",
+      "mediaType": "image/png",
+      "sha256": "sha256:d5bec9adcddfffb12181c04b52c6d0373707c2b89904ecebedd9c8a702d5b9e2",
+      "byteLength": 132480
+    },
+    {
+      "path": "camera.near.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.near",
+      "mediaType": "image/png",
+      "sha256": "sha256:af94d433411a498be64c9291e32787974bbe56ba7ff7b1d0e34d531a9cbbe26d",
+      "byteLength": 148095
+    },
+    {
+      "path": "camera.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:78978c32c107a234119b5c29245c9c55820c170823717c4cb5eb47065ec38a81",
+      "byteLength": 156107
+    },
+    {
+      "path": "camera.far.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.far",
+      "mediaType": "image/png",
+      "sha256": "sha256:ebd345fb7b207e0b9ea7c70fd164b2c4e81c7d4c498bb9a1622bdc8ab77a0918",
+      "byteLength": 273609
+    },
+    {
+      "path": "seed-0001.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "seed-0001.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:78978c32c107a234119b5c29245c9c55820c170823717c4cb5eb47065ec38a81",
+      "byteLength": 156107
+    },
+    {
+      "path": "seed-9e3779b9.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "seed-9e3779b9.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:3652da68eeaeaaca0ebd243268eddfcabacf6df84f279424183ad1292a4086b2",
+      "byteLength": 152400
+    },
+    {
+      "path": "temporal.t000.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "temporal.t000",
+      "mediaType": "image/png",
+      "sha256": "sha256:78978c32c107a234119b5c29245c9c55820c170823717c4cb5eb47065ec38a81",
+      "byteLength": 156107
+    },
+    {
+      "path": "temporal.t001.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "temporal.t001",
+      "mediaType": "image/png",
+      "sha256": "sha256:6eab5d0ae42e5a85abe1477e3fa65f7b6e12730f55e5a6b1f0ec7a731bd3e377",
+      "byteLength": 154392
+    }
+  ],
+  "omittedFiles": {
+    "ledgerDigest": "sha256:80d7b098aa057f574bd18a560c83d7034aade506ed763c94703f76f4003676a2",
+    "count": 3,
+    "byteLength": 109002,
+    "byKind": [
+      {
+        "kind": "capture-session-document",
+        "count": 2,
+        "byteLength": 105424
+      },
+      {
+        "kind": "supplementary-json",
+        "count": 1,
+        "byteLength": 3578
+      }
+    ]
+  },
+  "checkoutLimitations": [
+    {
+      "id": "detached-source-payloads",
+      "status": "ACTIVE",
+      "statement": "Raw readbacks and capture-session transcript bytes are omitted from the tracked projection. Checkout validation verifies their approved hash and byte-length commitments, not the detached bytes themselves.",
+      "affectedClaims": []
+    }
+  ],
+  "projectionDigest": "sha256:77216c674ed84d00807933e395a3e91dafce598fc1a06b68fa3d9378a367aea3"
+}
