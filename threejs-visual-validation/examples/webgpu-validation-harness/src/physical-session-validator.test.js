@@ -12,6 +12,7 @@ import { assertLabelledNumerics } from './numeric-evidence.js';
 import { createRuntimeGovernorTrace, createRuntimePerformanceTrace } from './physical-performance-trace.js';
 import { projectValidationHarnessPerformanceEvidence } from './performance-evidence-projection.js';
 import { projectValidationHarnessPerformanceResources } from './performance-resource-projection.js';
+import { correctnessLaneReference, physicalLaneReference } from './physical-lane-join.js';
 import { validatePhysicalEvidenceRecordFile } from './physical-validate-record.js';
 import {
 	hashPhysicalRecord,
@@ -20,6 +21,7 @@ import {
 	validatePhysicalRouteSession
 } from './physical-session-validator.js';
 import { finalizeImportedPhysicalRecord, loadVerifiedImportedPhysicalRecord } from './verified-physical-record.js';
+import { createValidationHarnessReleaseArtifactProjector } from './release-evidence-projection.js';
 import { classifyGovernorTrace, classifyGpuStageAttribution, classifyPerformanceTrace } from './runtime-v2-bundle.js';
 
 const HASH_A = `sha256:${ 'a'.repeat( 64 ) }`;
@@ -833,6 +835,100 @@ test( 'offline resource projection preserves correctness artifacts and adds boun
 		correctnessIdentity,
 		correctnessArtifacts: timestampedCorrectnessArtifacts
 	} ), /retain timestampSupport=false/ );
+
+} );
+
+test( 'release artifact projector requires the strict three-lane join and projects all hardware evidence', async () => {
+
+	const correctnessRecord = correctnessCaptureSession();
+	const correctnessSession = boundArtifact( 'sessions/correctness.capture-session.json', correctnessRecord, 'capture-session-document' );
+	const physicalImport = await importedWrapper( baseSession( 'physical-route', PHYSICAL_ROUTE_PLAN ), { filename: 'physical-route.json' } );
+	const performanceImport = await importedWrapper( performanceSession(), { filename: 'performance.json' } );
+	const verifiedPhysical = await loadVerifiedImportedPhysicalRecord( physicalImport.path, { expectedProfile: 'physical-route' } );
+	const verifiedPerformance = await loadVerifiedImportedPhysicalRecord( performanceImport.path, { expectedProfile: 'performance' } );
+	const strictJoin = {
+		schemaVersion: 1,
+		publishable: false,
+		rawEvidenceManifestFinalized: true,
+		rewriteRawEvidenceManifest: false,
+		rawBundleDirectory: '/external/raw-correctness',
+		releaseBundleDirectory: '/external/release-candidate',
+		performanceClaims: true,
+		correctness: correctnessLaneReference( correctnessRecord, correctnessSession.ledgerEntry.sha256 ),
+		physicalRoute: physicalLaneReference( verifiedPhysical.record, verifiedPhysical.sourceDocumentSha256 ),
+		hardwarePerformance: physicalLaneReference( verifiedPerformance.record, verifiedPerformance.sourceDocumentSha256 )
+	};
+	const tierInput = boundArtifact( 'tier-visual-evidence.json', tierVisualResourceEvidence(), 'supplementary-json' );
+	const correctnessInputs = correctnessProjectionArtifacts();
+	const artifacts = Object.fromEntries( Object.entries( correctnessInputs ).map( ( [ path, input ] ) => [ path, JSON.parse( input.bytes ) ] ) );
+	const artifactBindings = Object.fromEntries( Object.entries( correctnessInputs ).map( ( [ path, input ] ) => [ path, {
+		canonicalJson: input.bytes.toString( 'utf8' ),
+		ledgerEntry: input.ledgerEntry
+	} ] ) );
+	const rawManifest = {
+		sourceClosureHash: HASH_A,
+		buildRevision: HASH_B,
+		threeRevision: '0.185.1',
+		captureSessions: [ { profile: 'correctness', document: { sha256: correctnessSession.ledgerEntry.sha256 } } ]
+	};
+	const genericLaneJoin = {
+		performanceClaims: true,
+		claimVerdicts: { performanceCompliance: 'PASS', gpuAttribution: 'PASS' }
+	};
+	const projector = createValidationHarnessReleaseArtifactProjector( {
+		evidenceLaneJoin: strictJoin,
+		verifiedPerformance,
+		tierVisualEvidenceBytes: tierInput.bytes,
+		tierVisualEvidenceLedgerEntry: tierInput.ledgerEntry
+	} );
+	const result = projector( { artifacts, artifactBindings, rawManifest, laneJoin: genericLaneJoin } );
+	assert.deepEqual( Object.keys( result ).sort(), [
+		'bandwidth-model.json',
+		'frame-trace.json',
+		'performance-envelope.json',
+		'quality-governor.json',
+		'render-targets.json',
+		'renderer-info.json',
+		'resident-resources.json'
+	] );
+	assert.equal( result[ 'frame-trace.json' ].gpuTimingAvailable, true );
+	assert.equal( result[ 'quality-governor.json' ].verdict, 'PASS' );
+	assert.equal( result[ 'renderer-info.json' ].performanceLane.adapterClass, 'hardware' );
+	assert.equal( Object.isFrozen( result ), true );
+	assert.throws( () => projector( {
+		artifacts,
+		artifactBindings,
+		rawManifest,
+		laneJoin: { ...genericLaneJoin, performanceClaims: false }
+	} ), /does not carry the strict hardware performance verdicts/ );
+	assert.throws( () => projector( {
+		artifacts,
+		artifactBindings,
+		rawManifest: {
+			...rawManifest,
+			captureSessions: [ { profile: 'correctness', document: { sha256: HASH_D } } ]
+		},
+		laneJoin: genericLaneJoin
+	} ), /correctness session document differs/ );
+	assert.throws( () => projector( {
+		artifacts: {
+			...artifacts,
+			'renderer-info.json': { ...artifacts[ 'renderer-info.json' ], timestampSupport: true }
+		},
+		artifactBindings,
+		rawManifest,
+		laneJoin: genericLaneJoin
+	} ), /differs from its assembler-bound canonical bytes/ );
+	const mismatchedProjector = createValidationHarnessReleaseArtifactProjector( {
+		evidenceLaneJoin: {
+			...strictJoin,
+			hardwarePerformance: physicalLaneReference( verifiedPerformance.record, HASH_D )
+		},
+		verifiedPerformance,
+		tierVisualEvidenceBytes: tierInput.bytes,
+		tierVisualEvidenceLedgerEntry: tierInput.ledgerEntry
+	} );
+	assert.throws( () => mismatchedProjector( { artifacts, artifactBindings, rawManifest, laneJoin: genericLaneJoin } ), /hardware session differs/ );
 
 } );
 

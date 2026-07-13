@@ -156,6 +156,7 @@ async function createArtifactProjections({ correctnessDirectory, rawManifest, la
     .filter((entry) => entry.status === 'captured')
     .map((entry) => [entry.path, entry]));
   const artifacts = {};
+  const artifactBindings = {};
   for (const path of projectablePaths) {
     const entry = capturedFiles.get(path);
     if (!entry) continue;
@@ -165,9 +166,14 @@ async function createArtifactProjections({ correctnessDirectory, rawManifest, la
     } catch (error) {
       throw new Error(`projectable evidence artifact is not valid JSON: ${path}`, { cause: error });
     }
+    artifactBindings[path] = {
+      canonicalJson: bytes.toString('utf8'),
+      ledgerEntry: structuredClone(entry),
+    };
   }
   const projected = await projectEvidenceArtifacts(deepFreeze({
     artifacts,
+    artifactBindings,
     rawManifest: structuredClone(rawManifest),
     laneJoin: structuredClone(laneJoin),
   }));

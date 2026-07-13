@@ -184,9 +184,12 @@ test('offline assembler applies bounded JSON projections and owns their final ha
     outputDirectory,
     physicalRoute: reviewedRoute(),
     limitations: [],
-    projectEvidenceArtifacts({ artifacts, rawManifest, laneJoin }) {
+    projectEvidenceArtifacts({ artifacts, artifactBindings, rawManifest, laneJoin }) {
       assert.equal(Object.isFrozen(artifacts), true);
       assert.equal(Object.isFrozen(artifacts['renderer-info.json']), true);
+      assert.equal(Object.isFrozen(artifactBindings), true);
+      assert.equal(Object.isFrozen(artifactBindings['renderer-info.json'].ledgerEntry), true);
+      assert.equal(JSON.parse(artifactBindings['renderer-info.json'].canonicalJson).renderer, 'WebGPURenderer');
       assert.equal(Object.isFrozen(rawManifest), true);
       assert.equal(Object.isFrozen(laneJoin), true);
       return {
