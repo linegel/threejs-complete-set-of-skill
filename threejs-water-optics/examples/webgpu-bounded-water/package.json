@@ -2,7 +2,7 @@
   "type": "module",
   "scripts": {
     "check": "node --check *.js && node --check *.mjs && node -e \"JSON.parse(require('node:fs').readFileSync('lab.manifest.json','utf8'))\"",
-    "validate:unit": "node validate-water-contracts.mjs",
+    "validate:unit": "node validate-water-contracts.mjs && node test-water-route-selector.mjs",
     "test:mutations": "node test-mutations.mjs",
     "capture": "node capture.mjs",
     "validate:artifacts": "node validate-artifacts.mjs",

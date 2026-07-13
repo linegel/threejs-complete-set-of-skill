@@ -47,3 +47,8 @@ export {
 export { BOUNDED_WATER_LAB_MANIFEST } from "./lab-manifest.js";
 export { createBoundedWaterStage, WATER_PHYSICS_INTEGRATION_BOUNDARY } from "./integration-stage.js";
 export { depositReceiverCaustics, validateRefractedRaySample } from "./optical-oracles.js";
+export {
+  WATER_ROUTE_CANDIDATES,
+  WATER_ROUTE_SCORE_AXES,
+  selectWaterArchitecture,
+} from "./water-route-selector.js";
