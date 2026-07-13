@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:302efdcae877cbedba44ae503a8dccaf081443a41c85f141b8b73cd6507e435e",
+  "buildRevision": "sha256:cfb1f13dd59f3f7ee5965c63fbb8fd958655b1de331513d5eec8fede76d5b9f0",
   "demoKinds": [
     "canonical-lab",
     "mechanism-demo",
@@ -713,7 +713,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "npm --prefix threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds run validate:generated-assets",
-      "sourceHash": "sha256:258aa19a26f74a143ea29d014286f1b1214632dd8cd481392e8ac7a132f86982",
+      "sourceHash": "sha256:94af11fd845d6d9548d819fa836b773b5a53f76e566d10ef06a8c0fb01a17a44",
       "proxyStatus": {
         "limitation": "Generated weather maps are reduced-tier diagnostic inputs. The production cloud path remains bounded raymarch, temporal reprojection, and cloud-shadow storage products.",
         "canonicalLabId": "webgpu-weather-volume-clouds"
@@ -2553,7 +2553,7 @@
         "validateQuick": "npm --prefix threejs-rain-snow-and-wet-surfaces/examples/integration-precipitation-image-pipeline run validate:quick",
         "validateFull": "npm --prefix threejs-rain-snow-and-wet-surfaces/examples/integration-precipitation-image-pipeline run validate:full"
       },
-      "sourceHash": "sha256:57fa21726e6ecfd7df6177d4549b29665113ce326a03771ffd9aa4b71df5d40b",
+      "sourceHash": "sha256:7493e81f66d3f1baf848f9d22cff443725229157220b6fc2616cf800dcf03a96",
       "proxyStatus": null,
       "executionClass": "rendering",
       "flagship": false,
@@ -3158,7 +3158,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "npm --prefix threejs-spectral-ocean/examples/webgpu-fft-ocean run validate:generated-assets",
-      "sourceHash": "sha256:dd2b4f021e02a4f04f54e2da4a5cdbe075f2c30223768ebf3325732df46a1663",
+      "sourceHash": "sha256:72706fc246f44c57fc9b220d4952187729090e09a0f263184df5912c98ceecb0",
       "proxyStatus": {
         "limitation": "Generated wave seeds are reduced-tier preview/debug inputs. The production ocean path remains compute FFT cascades, derivative maps, and persistent foam history.",
         "canonicalLabId": "webgpu-fft-ocean"
@@ -3280,7 +3280,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "node threejs-particles-trails-and-effects/examples/webgpu-pooled-effects/validate-effects.mjs",
-      "sourceHash": "sha256:80d234882d50751cd75eedd34c69d0c30490ad82dfabcc06a830ac25bd5bec41",
+      "sourceHash": "sha256:1ef48fbe0b9d497c5d9a17bf865dfa23f4876f38b747e0d3c1e80c5f88849609",
       "proxyStatus": {
         "limitation": "The docs page uses instanced visual particles and authored shells rather than the full compute dense-swap storage path. The production skill remains GPU-resident pools, deterministic spawn packets, dense compaction, MRT emissive, and bloom-disabled proof.",
         "canonicalLabId": "webgpu-pooled-effects"
@@ -6893,7 +6893,7 @@
         "validateQuick": "npm --prefix integration-labs/weathered-world run validate:quick",
         "validateFull": "npm --prefix integration-labs/weathered-world run validate:full"
       },
-      "sourceHash": "sha256:232bd2ec348d88403ff3749d73369223cbd32232c72017f0f0714f583870913c",
+      "sourceHash": "sha256:821894aaaceba1c88b77c0c44096b8615f517db97369be97d10aaabcc2640756",
       "proxyStatus": null,
       "notes": [
         "The atmosphere and cloud stages now contain the corrected live-input, bounded-domain, persistent-history, sampled-depth, radiometric, and source-level composition paths.",
@@ -8878,7 +8878,7 @@
         "validateQuick": "npm run validate:quick",
         "validateFull": "npm run validate:full"
       },
-      "sourceHash": "sha256:4c4cea49735bdb37a4b02fe7d9653c141c3b7184495a9c1ade281854c93b4f55",
+      "sourceHash": "sha256:8271f72726852ba8bf0568d3eedede86f7b6d14e80beeb718a00d4b3a9adedf4",
       "proxyStatus": null,
       "notes": [
         "browser WebGPU execution and readback are not captured",
@@ -10898,7 +10898,7 @@
         "validateQuick": "npm run validate:quick",
         "validateFull": "npm run validate:full"
       },
-      "sourceHash": "sha256:d10906b91e1c4c23361358fb309e6ec055e2cb8301571855fe70b099d8fd78b5",
+      "sourceHash": "sha256:c1cfa5fb0841304840abfd5345fcbfeca96f981778f28c7dd86db982ac2a75d0",
       "proxyStatus": null,
       "executionClass": "rendering",
       "flagship": false,
@@ -13218,7 +13218,7 @@
         }
       ],
       "evidenceContract": "v2",
-      "evidenceBundle": null,
+      "evidenceBundle": "docs/visual-validation/webgpu-tower-ship-sculptor/bundle",
       "validationCommand": "npm --prefix threejs-object-sculptor/examples/webgpu-tower-ship-sculptor run validate:unit",
       "commands": {
         "check": "npm --prefix threejs-object-sculptor/examples/webgpu-tower-ship-sculptor run check",
@@ -13229,7 +13229,7 @@
         "validateQuick": "npm --prefix threejs-object-sculptor/examples/webgpu-tower-ship-sculptor run validate:quick",
         "validateFull": "npm --prefix threejs-object-sculptor/examples/webgpu-tower-ship-sculptor run validate:full"
       },
-      "sourceHash": "sha256:743375bba06853dc303c25096496cf7036d381d16dd355e6f199cb689ae9ed87",
+      "sourceHash": "sha256:7865ac08c4e28a3d873f7296f0c422b276e3a2a3503bb28511b416109c925c5e",
       "proxyStatus": null,
       "executionClass": "rendering",
       "flagship": false,
@@ -13815,7 +13815,10 @@
         "contact-diagnostics"
       ],
       "cameras": [
-        "host-camera"
+        "host-camera",
+        "design",
+        "near",
+        "far"
       ],
       "seeds": [
         1,
@@ -13873,7 +13876,7 @@
         "validateQuick": "npm --prefix threejs-procedural-vegetation/examples/webgpu-vegetation-integration run validate:quick",
         "validateFull": "npm --prefix threejs-procedural-vegetation/examples/webgpu-vegetation-integration run validate:full"
       },
-      "sourceHash": "sha256:b9acb78a9d16bd807683aee0629203255e16afe7c8bb1c22d393db127e0aa8e5",
+      "sourceHash": "sha256:9ee74ea7b52cd1893d3f42ebef14440d72f0592f9a96256deaada618f315180c",
       "proxyStatus": null,
       "notes": [
         "The browser entry is a native-WebGPU host proof with one renderer, one RenderPipeline, one tone map, and one output conversion.",
@@ -14212,7 +14215,7 @@
         "validateQuick": "npm run validate:quick",
         "validateFull": "npm run validate:full"
       },
-      "sourceHash": "sha256:3f19053bfc7600e042bbaa57ee89c4893107546fa1798dbfabcc3c3add18f69c",
+      "sourceHash": "sha256:5dffc5fb45691e26863056485d1eba37a184e049d3364dcb0aad84cb7dafd6d8",
       "proxyStatus": null,
       "notes": [
         "Generated weather-map pages remain generated-asset previews and are not canonical mechanism evidence.",

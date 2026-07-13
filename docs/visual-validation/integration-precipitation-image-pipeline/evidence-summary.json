@@ -14,7 +14,7 @@
     "threejs-rain-snow-and-wet-surfaces/examples/integration-precipitation-image-pipeline/test-mutations.mjs",
     "README.md"
   ],
-  "canonicalSourceHash": "sha256:57fa21726e6ecfd7df6177d4549b29665113ce326a03771ffd9aa4b71df5d40b",
+  "canonicalSourceHash": "sha256:7493e81f66d3f1baf848f9d22cff443725229157220b6fc2616cf800dcf03a96",
   "threeRevision": "0.185.1",
   "runtime": {
     "renderer": "WebGPURenderer",
@@ -116,8 +116,8 @@
       "file": "temporal.t000.png",
       "meaning": "Temporal t0 presentation.",
       "source": "temporal.t000.png",
-      "sourceSha256": "sha256:81702bd0221dd9188ad77d1399eadda48e986d8ed1fe4548f2aaf8046f8befed",
-      "outputSha256": "sha256:81702bd0221dd9188ad77d1399eadda48e986d8ed1fe4548f2aaf8046f8befed",
+      "sourceSha256": "sha256:1fa23efc906bddba717f3585a53daed79216723eeb940804ad42ac8fba7437b5",
+      "outputSha256": "sha256:1fa23efc906bddba717f3585a53daed79216723eeb940804ad42ac8fba7437b5",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
@@ -126,8 +126,8 @@
       "file": "temporal.t001.png",
       "meaning": "Temporal t1 presentation.",
       "source": "temporal.t001.png",
-      "sourceSha256": "sha256:8356a88102063ddbc92fb0ef9adf66c661db35d08454b6952293b3661ca29491",
-      "outputSha256": "sha256:8356a88102063ddbc92fb0ef9adf66c661db35d08454b6952293b3661ca29491",
+      "sourceSha256": "sha256:f84ad7472321eedbe321b77746825b8c3015ee34fcd9bf31461bdb22ae52c440",
+      "outputSha256": "sha256:f84ad7472321eedbe321b77746825b8c3015ee34fcd9bf31461bdb22ae52c440",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"

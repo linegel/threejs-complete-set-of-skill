@@ -2,136 +2,71 @@
   "schemaVersion": 1,
   "previews": [
     {
-      "labId": "webgpu-quadtree-planet",
-      "expectedAcceptanceStatus": "incomplete",
-      "artifactDirectory": "artifacts/visual-validation/webgpu-quadtree-planet/correctness",
-      "backendProof": "renderer-info.json",
-      "claimVerdicts": "capture-status.json",
-      "primaryImage": "final.design.png",
-      "primaryImageLabel": "Quadtree planet final render-target readback",
-      "limitations": [
-        "Lab-owned WebGPU capturePixels path produced 1200x800 presentation PNGs for final, patch-level, transition-mask, field-atlas, and giant body modes.",
-        "Final presentation currently compresses to a near-black frame under the solid-body design camera; diagnostic modes contain more non-zero content.",
-        "No accepted GPU timestamp or full v2 evidence-manifest bundle is claimed."
-      ],
-      "images": [
-        {
-          "source": "final.design.png",
-          "output": "final.design.png",
-          "encoding": "png-copy",
-          "meaning": "Final solid-body presentation readback."
-        },
-        {
-          "source": "diagnostics.mosaic.png",
-          "output": "diagnostics.mosaic.png",
-          "encoding": "png-copy",
-          "meaning": "Patch-level diagnostic presentation (capture alias for diagnostics)."
-        },
-        {
-          "source": "images/transition-mask.design.png",
-          "output": "transition-mask.design.png",
-          "encoding": "png-copy",
-          "meaning": "Transition-mask diagnostic readback."
-        },
-        {
-          "source": "images/field-atlas.design.png",
-          "output": "field-atlas.design.png",
-          "encoding": "png-copy",
-          "meaning": "Field-atlas diagnostic readback."
-        },
-        {
-          "source": "images/gas-giant.design.png",
-          "output": "gas-giant.design.png",
-          "encoding": "png-copy",
-          "meaning": "Gas-giant body-mode readback."
-        },
-        {
-          "source": "images/ice-giant.design.png",
-          "output": "ice-giant.design.png",
-          "encoding": "png-copy",
-          "meaning": "Ice-giant body-mode readback."
-        },
-        {
-          "source": "camera.near.png",
-          "output": "camera.near.png",
-          "encoding": "png-copy",
-          "meaning": "Near camera presentation readback."
-        },
-        {
-          "source": "camera.design.png",
-          "output": "camera.design.png",
-          "encoding": "png-copy",
-          "meaning": "Design camera presentation readback."
-        }
-      ]
-    },
-    {
       "labId": "webgpu-procedural-timelines",
       "expectedAcceptanceStatus": "incomplete",
       "artifactDirectory": "artifacts/visual-validation/webgpu-procedural-timelines/correctness",
       "backendProof": "capture-session.json",
-      "claimVerdicts": "capture-session.json",
+      "claimVerdicts": "evidence-manifest.json",
       "primaryImage": "final.design.png",
-      "primaryImageLabel": "Procedural timelines final presentation readback",
+      "primaryImageLabel": "Procedural timelines correctness presentation",
       "limitations": [
-        "Correctness capture produced presentation, camera, seed, temporal, and mechanism diagnostic PNGs plus storage-buffer readbacks under native WebGPU.",
-        "Capture status remains incomplete; current-adapter GPU timestamps are not accepted as performance evidence.",
-        "No full v2 accepted evidence-manifest is claimed from this correctness session."
+        "Current-source correctness capture assembles raw-capture-session evidence-manifest and validate:artifacts PASS.",
+        "GPU timestamps NOT_CLAIMED; lifecycle INSUFFICIENT_EVIDENCE; not a publishable release-bundle."
       ],
       "images": [
         {
           "source": "final.design.png",
           "output": "final.design.png",
           "encoding": "png-copy",
-          "meaning": "Final presentation readback."
+          "meaning": "Final presentation."
         },
         {
           "source": "diagnostics.mosaic.png",
           "output": "diagnostics.mosaic.png",
           "encoding": "png-copy",
-          "meaning": "Diagnostic mosaic of normal/emissive/velocity panels."
+          "meaning": "Diagnostic mosaic."
         },
         {
           "source": "diagnostic.normal.png",
           "output": "diagnostic.normal.png",
           "encoding": "png-copy",
-          "meaning": "Normal diagnostic readback."
+          "meaning": "Normal diagnostic."
         },
         {
           "source": "diagnostic.emissive.png",
           "output": "diagnostic.emissive.png",
           "encoding": "png-copy",
-          "meaning": "Emissive diagnostic readback."
+          "meaning": "Emissive diagnostic."
         },
         {
           "source": "diagnostic.velocity.png",
           "output": "diagnostic.velocity.png",
           "encoding": "png-copy",
-          "meaning": "Velocity diagnostic readback."
+          "meaning": "Velocity diagnostic."
         },
         {
           "source": "camera.design.png",
           "output": "camera.design.png",
           "encoding": "png-copy",
-          "meaning": "Design camera presentation."
+          "meaning": "Design camera."
         },
         {
           "source": "mechanism.launch-and-staging.png",
           "output": "mechanism.launch-and-staging.png",
           "encoding": "png-copy",
-          "meaning": "Launch-and-staging mechanism diagnostic."
+          "meaning": "Launch-and-staging mechanism."
         },
         {
           "source": "mechanism.spin-docking.png",
           "output": "mechanism.spin-docking.png",
           "encoding": "png-copy",
-          "meaning": "Spin-docking mechanism diagnostic."
+          "meaning": "Spin-docking mechanism."
         },
         {
           "source": "mechanism.compute-storage.png",
           "output": "mechanism.compute-storage.png",
           "encoding": "png-copy",
-          "meaning": "Compute-storage mechanism diagnostic."
+          "meaning": "Compute-storage mechanism."
         }
       ]
     },
@@ -1091,6 +1026,179 @@
           "output": "diagnostics.mosaic.png",
           "encoding": "png-copy",
           "meaning": "Diagnostics / mechanism display readback."
+        }
+      ]
+    },
+    {
+      "labId": "webgpu-fft-ocean",
+      "expectedAcceptanceStatus": "incomplete",
+      "artifactDirectory": "artifacts/visual-validation/webgpu-fft-ocean/correctness",
+      "backendProof": "renderer-info.json",
+      "claimVerdicts": "evidence-manifest.json",
+      "primaryImage": "final.design.png",
+      "primaryImageLabel": "FFT ocean final presentation readback",
+      "limitations": [
+        "Native WebGPU capture proves complete 2D FFT fixture readbacks, cascade surface modes, and foam temporal frames.",
+        "Named-adapter GPU timestamps, lifecycle soak, and release-bundle acceptance remain residual."
+      ],
+      "images": [
+        {
+          "source": "final.design.png",
+          "output": "final.design.png",
+          "encoding": "png-copy",
+          "meaning": "Final ocean presentation after spectral FFT path."
+        },
+        {
+          "source": "no-post.design.png",
+          "output": "no-post.design.png",
+          "encoding": "png-copy",
+          "meaning": "No-post ocean presentation baseline."
+        },
+        {
+          "source": "diagnostics.mosaic.png",
+          "output": "diagnostics.mosaic.png",
+          "encoding": "png-copy",
+          "meaning": "Diagnostics mosaic mode readback."
+        },
+        {
+          "source": "spectrum-and-fft.png",
+          "output": "spectrum-and-fft.png",
+          "encoding": "png-copy",
+          "meaning": "Spectrum/FFT mechanism diagnostic."
+        },
+        {
+          "source": "whitecaps-and-foam.png",
+          "output": "whitecaps-and-foam.png",
+          "encoding": "png-copy",
+          "meaning": "Whitecaps and foam mechanism diagnostic."
+        },
+        {
+          "source": "above-and-below-surface.png",
+          "output": "above-and-below-surface.png",
+          "encoding": "png-copy",
+          "meaning": "Underwater optics camera diagnostic."
+        },
+        {
+          "source": "camera.near.png",
+          "output": "camera.near.png",
+          "encoding": "png-copy",
+          "meaning": "Near camera ocean frame."
+        },
+        {
+          "source": "seed-9e3779b9.final.png",
+          "output": "seed-9e3779b9.final.png",
+          "encoding": "png-copy",
+          "meaning": "Stress seed final ocean frame."
+        }
+      ]
+    },
+    {
+      "labId": "webgpu-node-gtao",
+      "expectedAcceptanceStatus": "incomplete",
+      "artifactDirectory": "artifacts/visual-validation/webgpu-node-gtao/correctness",
+      "backendProof": "capture-session.json",
+      "claimVerdicts": "evidence-manifest.json",
+      "primaryImage": "final.design.png",
+      "primaryImageLabel": "GTAO correctness presentation readback",
+      "limitations": [
+        "Current-source correctness capture validates (structuralVerdict PASS) with assembled raw-capture-session evidence-manifest.",
+        "visualCorrectness remains INSUFFICIENT_EVIDENCE; GPU timestamps and lifecycle are NOT_CLAIMED/INSUFFICIENT_EVIDENCE.",
+        "Not a publishable release-bundle; canonical acceptance remains incomplete."
+      ],
+      "images": [
+        {
+          "source": "final.design.png",
+          "output": "final.design.png",
+          "encoding": "png-copy",
+          "meaning": "Final AO-applied presentation."
+        },
+        {
+          "source": "diagnostics.mosaic.png",
+          "output": "diagnostics.mosaic.png",
+          "encoding": "png-copy",
+          "meaning": "Raw-AO diagnostic presentation."
+        },
+        {
+          "source": "camera.design.png",
+          "output": "camera.design.png",
+          "encoding": "png-copy",
+          "meaning": "Design camera presentation."
+        },
+        {
+          "source": "seed-0001.final.png",
+          "output": "seed-0001.final.png",
+          "encoding": "png-copy",
+          "meaning": "Baseline seed on moving-occluder."
+        },
+        {
+          "source": "temporal.t001.png",
+          "output": "temporal.t001.png",
+          "encoding": "png-copy",
+          "meaning": "Temporal sample after 0.35s motion."
+        }
+      ]
+    },
+    {
+      "labId": "webgpu-pooled-effects",
+      "expectedAcceptanceStatus": "incomplete",
+      "artifactDirectory": "artifacts/visual-validation/webgpu-pooled-effects/correctness",
+      "backendProof": "renderer-info.json",
+      "claimVerdicts": "evidence-manifest.json",
+      "primaryImage": "final.design.png",
+      "primaryImageLabel": "Pooled effects correctness presentation",
+      "limitations": [
+        "Current-source correctness capture validates under lab validate:artifacts with legacy-v2 evidence-manifest bound to canonical sourceHash.",
+        "Mechanism/visual claims remain INSUFFICIENT_EVIDENCE; GPU timestamps NOT_CLAIMED.",
+        "Not a publishable release-bundle."
+      ],
+      "images": [
+        {
+          "source": "final.design.png",
+          "output": "final.design.png",
+          "encoding": "png-copy",
+          "meaning": "Final pooled-effects presentation."
+        },
+        {
+          "source": "no-post.design.png",
+          "output": "no-post.design.png",
+          "encoding": "png-copy",
+          "meaning": "No-post baseline."
+        },
+        {
+          "source": "diagnostics.mosaic.png",
+          "output": "diagnostics.mosaic.png",
+          "encoding": "png-copy",
+          "meaning": "Diagnostic mosaic."
+        },
+        {
+          "source": "mechanism.impact-sparks.png",
+          "output": "mechanism.impact-sparks.png",
+          "encoding": "png-copy",
+          "meaning": "Impact-sparks mechanism."
+        },
+        {
+          "source": "mechanism.debris-dissolve.png",
+          "output": "mechanism.debris-dissolve.png",
+          "encoding": "png-copy",
+          "meaning": "Debris-dissolve mechanism."
+        },
+        {
+          "source": "mechanism.gpu-pool-and-compaction.png",
+          "output": "mechanism.gpu-pool-and-compaction.png",
+          "encoding": "png-copy",
+          "meaning": "GPU pool compaction mechanism."
+        },
+        {
+          "source": "tier.ultra.png",
+          "output": "tier.ultra.png",
+          "encoding": "png-copy",
+          "meaning": "Ultra tier frame."
+        },
+        {
+          "source": "tier.medium.png",
+          "output": "tier.medium.png",
+          "encoding": "png-copy",
+          "meaning": "Medium tier frame."
         }
       ]
     }

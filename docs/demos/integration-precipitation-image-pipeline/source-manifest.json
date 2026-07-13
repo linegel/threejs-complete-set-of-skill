@@ -21,7 +21,7 @@
     "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/weather-webgpu-lab.js"
   ],
   "browserEntry": "threejs-rain-snow-and-wet-surfaces/examples/integration-precipitation-image-pipeline/index.html",
-  "sourceHash": "sha256:57fa21726e6ecfd7df6177d4549b29665113ce326a03771ffd9aa4b71df5d40b",
+  "sourceHash": "sha256:7493e81f66d3f1baf848f9d22cff443725229157220b6fc2616cf800dcf03a96",
   "publishedHashInputs": [
     "docs/demos/integration-precipitation-image-pipeline",
     "docs/demos/assets/index-CeCbRQns.js",
@@ -43,6 +43,6 @@
   ],
   "publishedBundleHash": "sha256:6e0616b2a87418535dcf18fc76b57f9bee64bee4a09760c3e6d2c067fb503c4e",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:302efdcae877cbedba44ae503a8dccaf081443a41c85f141b8b73cd6507e435e",
+  "buildRevision": "sha256:49ab4c316e51d9bb267cb0cda243b6d6c4dd9af8afa65d1c469737eaa2a18260",
   "evidenceBundleId": null
 }

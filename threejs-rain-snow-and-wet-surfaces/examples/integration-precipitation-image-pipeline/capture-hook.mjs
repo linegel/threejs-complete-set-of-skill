@@ -16,10 +16,12 @@ export const outputPlan = Object.freeze([
 const BASELINE_SEED = 0x00000001;
 const STRESS_SEED = 0x9e3779b9;
 // Weather must be advanced so wetness/particles are visible; pure t=0 after
-// reset is nearly empty. Use final-mode temporal pairs so frames are real
-// multi-color scene readbacks, not solid weather-diagnostic fills.
-const TEMPORAL_T0 = 2.0;
-const TEMPORAL_T1 = 2.0 + 1 / 60;
+// reset is nearly empty. Use final-mode frames at well-separated times so
+// temporal pairs are multi-color scene readbacks that differ from each other
+// (not solid diagnostic fills, not duplicates of final.design).
+const DESIGN_TIME = 2.0;
+const TEMPORAL_T0 = 1.0;
+const TEMPORAL_T1 = 3.0;
 
 async function select(session, {
   mode = "final",
@@ -43,17 +45,17 @@ export async function captureLab(session) {
     captures.push({ filename, ...(await session.writeCapture(filename, "presentation")) });
   }
 
-  await capture("final.design.png", { mode: "final", time: TEMPORAL_T0 });
+  await capture("final.design.png", { mode: "final", time: DESIGN_TIME });
   // Wetness shows real road geometry/material response (not a solid diagnostic fill).
-  await capture("no-post.design.png", { mode: "wetness", time: TEMPORAL_T0 });
-  // Particles mode is a multi-color scene diagnostic (rain/snow instances).
-  await capture("diagnostics.mosaic.png", { mode: "particles", time: TEMPORAL_T0 });
-  await capture("camera.near.png", { camera: "near", mode: "final", time: TEMPORAL_T0 });
-  await capture("camera.design.png", { camera: "design", mode: "final", time: TEMPORAL_T0 });
-  await capture("camera.far.png", { camera: "far", mode: "final", time: TEMPORAL_T0 });
-  await capture("seed-0001.final.png", { seed: BASELINE_SEED, mode: "final", time: TEMPORAL_T0 });
-  await capture("seed-9e3779b9.final.png", { seed: STRESS_SEED, mode: "final", time: TEMPORAL_T0 });
-  // Temporal pair: same final presentation at two times after weather has run.
+  await capture("no-post.design.png", { mode: "wetness", time: DESIGN_TIME });
+  // Particles mode is a multi-color scene diagnostic (rain/snow instances over the host scene).
+  await capture("diagnostics.mosaic.png", { mode: "particles", time: DESIGN_TIME });
+  await capture("camera.near.png", { camera: "near", mode: "final", time: DESIGN_TIME });
+  await capture("camera.design.png", { camera: "design", mode: "final", time: DESIGN_TIME });
+  await capture("camera.far.png", { camera: "far", mode: "final", time: DESIGN_TIME });
+  await capture("seed-0001.final.png", { seed: BASELINE_SEED, mode: "final", time: DESIGN_TIME });
+  await capture("seed-9e3779b9.final.png", { seed: STRESS_SEED, mode: "final", time: DESIGN_TIME });
+  // Temporal pair: final presentation at two well-separated times (must differ from each other and from final.design).
   await capture("temporal.t000.png", { mode: "final", time: TEMPORAL_T0 });
   await capture("temporal.t001.png", { mode: "final", time: TEMPORAL_T1 });
 

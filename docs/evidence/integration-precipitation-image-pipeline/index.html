@@ -49,9 +49,9 @@
     <div><dt>Owning skill</dt><dd>Rain, Snow, and Wet Surfaces</dd></div>
     <div><dt>Execution</dt><dd>rendering</dd></div>
     <div><dt>Three.js</dt><dd>0.185.1</dd></div>
-    <div><dt>Source hash</dt><dd><code>sha256:57fa21726e6ecfd7df6177d4549b29665113ce326a03771ffd9aa4b71df5d40b</code></dd></div>
+    <div><dt>Source hash</dt><dd><code>sha256:7493e81f66d3f1baf848f9d22cff443725229157220b6fc2616cf800dcf03a96</code></dd></div>
     <div><dt>Published bundle hash</dt><dd><code>sha256:6e0616b2a87418535dcf18fc76b57f9bee64bee4a09760c3e6d2c067fb503c4e</code></dd></div>
-    <div><dt>Build revision</dt><dd><code>sha256:302efdcae877cbedba44ae503a8dccaf081443a41c85f141b8b73cd6507e435e</code></dd></div>
+    <div><dt>Build revision</dt><dd><code>sha256:49ab4c316e51d9bb267cb0cda243b6d6c4dd9af8afa65d1c469737eaa2a18260</code></dd></div>
     <div><dt>Renderer</dt><dd>WebGPURenderer</dd></div>
     <div><dt>Backend</dt><dd>WebGPU</dd></div>
     <div><dt>Evidence contract</dt><dd>v2</dd></div>
@@ -96,11 +96,11 @@
           <source type="image/avif" srcset="/visual-validation/integration-precipitation-image-pipeline/temporal.t000.avif" />
           <source type="image/webp" srcset="/visual-validation/integration-precipitation-image-pipeline/temporal.t000.webp" />
           <img data-responsive-preview src="/visual-validation/integration-precipitation-image-pipeline/temporal.t000.png" alt="Integration Precipitation Image Pipeline: Temporal t0 presentation." width="1200" height="800" loading="lazy" decoding="async" />
-        </picture><figcaption><strong>Temporal t0 presentation.</strong><span>inspected-runtime-evidence-preview · sha256:81702bd0221dd9188ad77d1399eadda48e986d8ed1fe4548f2aaf8046f8befed</span></figcaption></figure><figure><picture class="responsive-preview">
+        </picture><figcaption><strong>Temporal t0 presentation.</strong><span>inspected-runtime-evidence-preview · sha256:1fa23efc906bddba717f3585a53daed79216723eeb940804ad42ac8fba7437b5</span></figcaption></figure><figure><picture class="responsive-preview">
           <source type="image/avif" srcset="/visual-validation/integration-precipitation-image-pipeline/temporal.t001.avif" />
           <source type="image/webp" srcset="/visual-validation/integration-precipitation-image-pipeline/temporal.t001.webp" />
           <img data-responsive-preview src="/visual-validation/integration-precipitation-image-pipeline/temporal.t001.png" alt="Integration Precipitation Image Pipeline: Temporal t1 presentation." width="1200" height="800" loading="lazy" decoding="async" />
-        </picture><figcaption><strong>Temporal t1 presentation.</strong><span>inspected-runtime-evidence-preview · sha256:8356a88102063ddbc92fb0ef9adf66c661db35d08454b6952293b3661ca29491</span></figcaption></figure></div></section>
+        </picture><figcaption><strong>Temporal t1 presentation.</strong><span>inspected-runtime-evidence-preview · sha256:f84ad7472321eedbe321b77746825b8c3015ee34fcd9bf31461bdb22ae52c440</span></figcaption></figure></div></section>
 
   <section class="section" aria-labelledby="requirements-title"><h2 id="requirements-title">Required capability and runtime proof</h2><h3>Capabilities</h3><div class="requirement-grid"><article class="requirement"><header><code>host-native-webgpu</code><span class="status status--accepted">accepted</span></header><p>artifacts/visual-validation/integration-precipitation-image-pipeline/correctness/capture-session.json finalRuntime.metrics.rendererBackendEvidence.isWebGPUBackend === true</p></article><article class="requirement"><header><code>host-primary-scene-pass</code><span class="status status--accepted">accepted</span></header><p>validate-integration.mjs proves single host scenePass identity</p></article><article class="requirement"><header><code>storage-buffer-compute</code><span class="status status--accepted">accepted</span></header><p>validate-integration.mjs proves weather recurrence and impact storage dispatches</p></article></div><h3 style="margin-top:28px">Runtime proof</h3><div class="requirement-grid"><article class="requirement"><header><code>host-owner-identity</code><span class="status status--accepted">accepted</span></header><p>validate-integration.mjs + test-mutations.mjs prove single renderer/pipeline/scenePass/toneMap/output owner graph</p></article><article class="requirement"><header><code>shared-weather-identity</code><span class="status status--accepted">accepted</span></header><p>validate-integration.mjs proves all consumers receive identical host weather signal nodes</p></article><article class="requirement"><header><code>native-browser-evidence</code><span class="status status--accepted">accepted</span></header><p>correctness capture-session + presentation readbacks prove native WebGPU host init, backend identity, and aligned presentation readback on current source hash</p></article></div></section>
 
@@ -183,7 +183,7 @@
 }</pre></details></section>
 
   <section class="section" aria-labelledby="limitations-title"><h2 id="limitations-title">Limitations</h2><ul class="limitations"><li>Host-owned native WebGPU capture proves backend identity and multi-color final/wetness/particles presentation readbacks on the current source hash.</li><li>Primary dependencies webgpu-rain-snow-and-wet-surfaces and webgpu-image-pipeline are not both formally accepted, so integration acceptance remains incomplete.</li><li>Named-adapter GPU timestamps are not claimed.</li></ul></section>
-  <footer class="site-footer"><span>integration-precipitation-image-pipeline · sha256:57fa21726e6e</span><span><a href="/evidence/">All evidence reports</a></span></footer>
+  <footer class="site-footer"><span>integration-precipitation-image-pipeline · sha256:7493e81f66d3</span><span><a href="/evidence/">All evidence reports</a></span></footer>
 </div></main>
 </body>
 </html>

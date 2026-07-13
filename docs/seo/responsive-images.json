@@ -871,54 +871,54 @@
       "url": "https://threejs-skills.com/visual-validation/integration-precipitation-image-pipeline/temporal.t000.png",
       "width": 1200,
       "height": 800,
-      "bytes": 120368,
-      "sourceSha256": "sha256:81702bd0221dd9188ad77d1399eadda48e986d8ed1fe4548f2aaf8046f8befed",
+      "bytes": 98753,
+      "sourceSha256": "sha256:1fa23efc906bddba717f3585a53daed79216723eeb940804ad42ac8fba7437b5",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/integration-precipitation-image-pipeline/temporal.t000.avif",
           "width": 1200,
           "height": 800,
-          "bytes": 37416,
+          "bytes": 35656,
           "encoding": "quality-60",
-          "sha256": "sha256:0a003e8e0191a38dc9d4f901c999e46c6cc16ab27e171d1eb3933a3efe7fc094"
+          "sha256": "sha256:0fbb0713b6bb8f4102d982680c0a6d49ccaf9104ba78dd146193a4fe75dfbfda"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/integration-precipitation-image-pipeline/temporal.t000.webp",
           "width": 1200,
           "height": 800,
-          "bytes": 67478,
+          "bytes": 50366,
           "encoding": "lossless",
-          "sha256": "sha256:e0e8aed0e50f84891be8182dbe011af4670391ed47ffc9bb3e97d2631e205ffb"
+          "sha256": "sha256:4545fdd10e11b2d6ec71b8d8df4c303c7cf46a989192ab7b9142318243420fe0"
         }
       },
-      "dependencyClosureHash": "sha256:0c08f99d87eba85dee7a0ef6a7aef10652ccad29307e6c81fcaabb72c2a5bf27"
+      "dependencyClosureHash": "sha256:f59893a6ff219c90e5cc55aaaa2010ad72274295616c79d28f6ec3b3a93eec11"
     },
     "visual-validation/integration-precipitation-image-pipeline/temporal.t001.png": {
       "ownerId": "integration-precipitation-image-pipeline",
       "url": "https://threejs-skills.com/visual-validation/integration-precipitation-image-pipeline/temporal.t001.png",
       "width": 1200,
       "height": 800,
-      "bytes": 120490,
-      "sourceSha256": "sha256:8356a88102063ddbc92fb0ef9adf66c661db35d08454b6952293b3661ca29491",
+      "bytes": 134619,
+      "sourceSha256": "sha256:f84ad7472321eedbe321b77746825b8c3015ee34fcd9bf31461bdb22ae52c440",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/integration-precipitation-image-pipeline/temporal.t001.avif",
           "width": 1200,
           "height": 800,
-          "bytes": 36768,
+          "bytes": 37744,
           "encoding": "quality-60",
-          "sha256": "sha256:32511b053efe80c3f4e49f93d153510f4396db5565ebe4015324fbe52d62d889"
+          "sha256": "sha256:1afe6d3ead79c109edd87722ecad09c68b1449d088b00423fd6963629d622722"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/integration-precipitation-image-pipeline/temporal.t001.webp",
           "width": 1200,
           "height": 800,
-          "bytes": 67380,
+          "bytes": 77472,
           "encoding": "lossless",
-          "sha256": "sha256:520435cc6e2a99c2755ff2cc0d997a9d8ea3c5daa5fd498150def528a992e451"
+          "sha256": "sha256:0e09fef72845992a1293894350fb504b402eb6947752677e5da8fb408f98c05d"
         }
       },
-      "dependencyClosureHash": "sha256:60a478f46edbb1017c16a7718955681484a9277c8bb9297d81863971fa20a2b0"
+      "dependencyClosureHash": "sha256:061799f5ebbf930e8402939d58d7e3bac02378ece39538e66a241dc728fd16ac"
     },
     "visual-validation/integration-temporal-surface/camera.design.png": {
       "ownerId": "integration-temporal-surface",
@@ -2248,11 +2248,38 @@
       "url": "https://threejs-skills.com/visual-validation/webgpu-bounded-water/diagnostics.mosaic.png",
       "width": 1200,
       "height": 800,
+      "bytes": 25244,
+      "sourceSha256": "sha256:7fadd03180503a088b93d96bfe4729c96ff5c7eb77023c94786eb25438d65fa7",
+      "formats": {
+        "avif": {
+          "url": "https://threejs-skills.com/visual-validation/webgpu-bounded-water/diagnostics.mosaic.avif",
+          "width": 1200,
+          "height": 800,
+          "bytes": 4262,
+          "encoding": "quality-60",
+          "sha256": "sha256:722dee319beb4bea514bccd7d6150f5764199f59137a2de0e0bd5478edcf3fb7"
+        },
+        "webp": {
+          "url": "https://threejs-skills.com/visual-validation/webgpu-bounded-water/diagnostics.mosaic.webp",
+          "width": 1200,
+          "height": 800,
+          "bytes": 11760,
+          "encoding": "quality-80",
+          "sha256": "sha256:7e35be2c523e024b3f45c3ded9ed50b6998823fb8618421ecb1fc80d47bd06ad"
+        }
+      },
+      "dependencyClosureHash": "sha256:4a159e535f4d2da216ebbcb2cc448b2e8c6d0dac47245c6bf8ecded713a12095"
+    },
+    "visual-validation/webgpu-bounded-water/final.design.png": {
+      "ownerId": "webgpu-bounded-water",
+      "url": "https://threejs-skills.com/visual-validation/webgpu-bounded-water/final.design.png",
+      "width": 1200,
+      "height": 800,
       "bytes": 61039,
       "sourceSha256": "sha256:67d078ffa4e630f423da4b5033061a936787cd8cdf1d83fb237acfad51f43eb0",
       "formats": {
         "avif": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-bounded-water/diagnostics.mosaic.avif",
+          "url": "https://threejs-skills.com/visual-validation/webgpu-bounded-water/final.design.avif",
           "width": 1200,
           "height": 800,
           "bytes": 7166,
@@ -2260,7 +2287,7 @@
           "sha256": "sha256:dc2c609847296ee8d149f111fc6060af09a4d6edc42512f610e0987cb4e53fbf"
         },
         "webp": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-bounded-water/diagnostics.mosaic.webp",
+          "url": "https://threejs-skills.com/visual-validation/webgpu-bounded-water/final.design.webp",
           "width": 1200,
           "height": 800,
           "bytes": 13932,
@@ -2268,34 +2295,7 @@
           "sha256": "sha256:841eb8d27ddc582268a3e718751d8e6adfcdf0a75cdb2911e7b57b2808511183"
         }
       },
-      "dependencyClosureHash": "sha256:8e358fd1fe22d7bdd521cbcc62b5525ee8ce82f1827e0cf49e08a28b61b69545"
-    },
-    "visual-validation/webgpu-bounded-water/final.design.png": {
-      "ownerId": "webgpu-bounded-water",
-      "url": "https://threejs-skills.com/visual-validation/webgpu-bounded-water/final.design.png",
-      "width": 1200,
-      "height": 800,
-      "bytes": 51750,
-      "sourceSha256": "sha256:69bc692add85b6e56868997a3109ebdae075f26396918eecd0c9ec860fb0af6c",
-      "formats": {
-        "avif": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-bounded-water/final.design.avif",
-          "width": 1200,
-          "height": 800,
-          "bytes": 6560,
-          "encoding": "quality-60",
-          "sha256": "sha256:82084aca746414a0086f59e6bb33d5e942ae149c83d5269fcff6622ba865b153"
-        },
-        "webp": {
-          "url": "https://threejs-skills.com/visual-validation/webgpu-bounded-water/final.design.webp",
-          "width": 1200,
-          "height": 800,
-          "bytes": 14642,
-          "encoding": "quality-80",
-          "sha256": "sha256:62135d9a788ef6966f3bdee81115859e5ab928242dee82f21b6b78b2c803995d"
-        }
-      },
-      "dependencyClosureHash": "sha256:a70acdc828ef41edcf43d4b191eb0ea1d2912b271dc60f5465abe698a15cb355"
+      "dependencyClosureHash": "sha256:9f0ba670f8339e7349a35397574a81b2c77003c05aaf5935dbf42b89e4caff59"
     },
     "visual-validation/webgpu-bounded-water/no-post.design.png": {
       "ownerId": "webgpu-bounded-water",
@@ -2572,8 +2572,8 @@
       "url": "https://threejs-skills.com/visual-validation/webgpu-exposure-color-pipeline/final.design.png",
       "width": 1200,
       "height": 800,
-      "bytes": 25880,
-      "sourceSha256": "sha256:fe08f16a1076862bc019175eb990eef3ba275871605efc10d70cdb73c3802f42",
+      "bytes": 15875,
+      "sourceSha256": "sha256:1003b1f0e1b51f2beba12d50c307590dde8a82040278c96054317b5aab5f8c2f",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-exposure-color-pipeline/final.design.avif",
@@ -2592,15 +2592,15 @@
           "sha256": "sha256:2f6e2e85ed9f1f6461bcd359729208f9eb17fb75ec31528627b6165ef78ae238"
         }
       },
-      "dependencyClosureHash": "sha256:9cbba6d5df9927cb527a13cdcadf078f73515708b49b3c1dd4c5714c5b418514"
+      "dependencyClosureHash": "sha256:459855c39fea988ddccd944fa847ad6ff9d64a715b6e63686af3f8b2b79f1f18"
     },
     "visual-validation/webgpu-exposure-color-pipeline/histogram-percentiles.png": {
       "ownerId": "webgpu-exposure-color-pipeline",
       "url": "https://threejs-skills.com/visual-validation/webgpu-exposure-color-pipeline/histogram-percentiles.png",
       "width": 1200,
       "height": 800,
-      "bytes": 10308,
-      "sourceSha256": "sha256:e2e1431f129d4e83296185f43d3bfe6e9cb908bb616a0b43661c9e422b2fb8ad",
+      "bytes": 8458,
+      "sourceSha256": "sha256:8883f7415180a8851a8687f071597b77305905fe7b54fc46405284e2895ebe46",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-exposure-color-pipeline/histogram-percentiles.avif",
@@ -2619,15 +2619,15 @@
           "sha256": "sha256:6592c54d86729ab36f338d8d886797114424ea98a17266bbd174f6086e298551"
         }
       },
-      "dependencyClosureHash": "sha256:e4fbfb933845930998300efe3c621c1eaf5e296b80f13b63239e28d4f168f0ec"
+      "dependencyClosureHash": "sha256:be0102962b9aad61652ec1e169ab011d230804efd9c65a19e59602593c2725ac"
     },
     "visual-validation/webgpu-exposure-color-pipeline/lut.png": {
       "ownerId": "webgpu-exposure-color-pipeline",
       "url": "https://threejs-skills.com/visual-validation/webgpu-exposure-color-pipeline/lut.png",
       "width": 1200,
       "height": 800,
-      "bytes": 9108,
-      "sourceSha256": "sha256:5f461c04d8de208879e522a3df53ad28a9952993d22e7a9f943f986700846a61",
+      "bytes": 6651,
+      "sourceSha256": "sha256:bd5bfa042981a64aa62176f6908d5474a4bb3698797d9157c54609a3273eda99",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-exposure-color-pipeline/lut.avif",
@@ -2646,15 +2646,15 @@
           "sha256": "sha256:a7f3f920a98e671a05c49bac90a22e5fd0ac163eeeef362e49f884b1cbeb7e51"
         }
       },
-      "dependencyClosureHash": "sha256:064ddbe098d6bb50151eb46b0b6a9ae6ada627259a316161437eadf3e9e80199"
+      "dependencyClosureHash": "sha256:b5d8e2483a6e20757364106696192b8ed5bacb3727221c6d0724b27b67e68cb1"
     },
     "visual-validation/webgpu-exposure-color-pipeline/meter-mask.png": {
       "ownerId": "webgpu-exposure-color-pipeline",
       "url": "https://threejs-skills.com/visual-validation/webgpu-exposure-color-pipeline/meter-mask.png",
       "width": 1200,
       "height": 800,
-      "bytes": 6714,
-      "sourceSha256": "sha256:0ba25f69d6905f2c637ba7b09aa3f1ea39b2f87fa3f9314d3fc4c295c4b52092",
+      "bytes": 5992,
+      "sourceSha256": "sha256:c7f122376aa740b7ceffa2067cfca803b0cf703a1aa9ecc062ff98a5d57a0281",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-exposure-color-pipeline/meter-mask.avif",
@@ -2673,15 +2673,15 @@
           "sha256": "sha256:bec88976d3ccce600934b4ff52979147c11c697c83ec512defeb2ed1570f31c0"
         }
       },
-      "dependencyClosureHash": "sha256:3fcb23fcccc38702e17018cf41d8889ffb3361d4244aa60a4fe0d6d371c50760"
+      "dependencyClosureHash": "sha256:21b4c839790a054692ff624430de0b5855a8330d5fe2a458efbbe95d98319275"
     },
     "visual-validation/webgpu-exposure-color-pipeline/meter-source.png": {
       "ownerId": "webgpu-exposure-color-pipeline",
       "url": "https://threejs-skills.com/visual-validation/webgpu-exposure-color-pipeline/meter-source.png",
       "width": 1200,
       "height": 800,
-      "bytes": 10387,
-      "sourceSha256": "sha256:0b4b2630aaacd5c9439b988f3908a982ed9aadae9d133eb205523cd8df6c92d4",
+      "bytes": 7683,
+      "sourceSha256": "sha256:7c513e0be06667e07a89ee90ef99f7f1a86f20d9250ef1d71ee26310adaf7e8a",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-exposure-color-pipeline/meter-source.avif",
@@ -2700,15 +2700,15 @@
           "sha256": "sha256:7fe9764ed69cfc3b399524d6953f6011a6acd6d1112e5fabcc82e722bc5cd5cb"
         }
       },
-      "dependencyClosureHash": "sha256:82b22979d96a6a3c5c715ce98efa89bd78c5c07bac39b45e714ee80c26fde622"
+      "dependencyClosureHash": "sha256:0164f4e6bfe25713d0da5ed4e6335619a2365a8497dd6eea73b0c33e01ea5a96"
     },
     "visual-validation/webgpu-exposure-color-pipeline/tone-map.png": {
       "ownerId": "webgpu-exposure-color-pipeline",
       "url": "https://threejs-skills.com/visual-validation/webgpu-exposure-color-pipeline/tone-map.png",
       "width": 1200,
       "height": 800,
-      "bytes": 9427,
-      "sourceSha256": "sha256:0be426a3713547e6469d4452988f0fed36f5a6a71a48dcde9b3c62ea4589dd33",
+      "bytes": 6911,
+      "sourceSha256": "sha256:99c714eb76f436a075a15d536aa047d2b36d00f6071cd3364b81110e74df6613",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-exposure-color-pipeline/tone-map.avif",
@@ -2727,7 +2727,7 @@
           "sha256": "sha256:6688be243614a4051f6db63d8c7a6e766bcb0ae0a7945f8af24adb2398310783"
         }
       },
-      "dependencyClosureHash": "sha256:88f041699eb8a66ecfebf51b6769a49acf1b488eb6df83cbf3f70ab3ba34370a"
+      "dependencyClosureHash": "sha256:42c03d1479feaf957f295ae95b7cf2ad925eafd3ed330b8cf488cf6cdeb2523f"
     },
     "visual-validation/webgpu-field-bake/camera.design.png": {
       "ownerId": "webgpu-field-bake",
@@ -3544,27 +3544,27 @@
       "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/final.design.png",
       "width": 1200,
       "height": 800,
-      "bytes": 23795,
-      "sourceSha256": "sha256:229a832f57a02ac66dff5360e190a8c1e8525f82de7c2de613672f37703c73e1",
+      "bytes": 40369,
+      "sourceSha256": "sha256:2d0757b7421b10f221ee7ff1d3ca83c2602ff3090524158b081e850dd6c8397b",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/final.design.avif",
           "width": 1200,
           "height": 800,
-          "bytes": 2478,
+          "bytes": 2606,
           "encoding": "quality-60",
-          "sha256": "sha256:720b0d93daa7b90f44a47ecec2af12eeb6a79c7c4c0469a930873a394054779d"
+          "sha256": "sha256:c5538ac7583c58e2aaedf9ef1bb00f0f4ef6580d656bd655c0c6e5e9db1d0772"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-node-gtao/final.design.webp",
           "width": 1200,
           "height": 800,
-          "bytes": 6008,
+          "bytes": 6204,
           "encoding": "quality-80",
-          "sha256": "sha256:cb2c002522099a8ecb1e9f0a67847fad732b9e4cd3e3d7986af5ca33933d2cde"
+          "sha256": "sha256:fc3b064f02ea3fd192fb8f8fef9402a778a4dfcf04cd5f971f8268f1b34a91b4"
         }
       },
-      "dependencyClosureHash": "sha256:ebb43bd168d26d8b7a4abb7f391478a821a5fd9df5f46747a224bf8e4ab5512c"
+      "dependencyClosureHash": "sha256:b5f517924d461f36fbba513b533f19af0dab6f947805ea91f368f10be31468c6"
     },
     "visual-validation/webgpu-node-gtao/no-post.design.png": {
       "ownerId": "webgpu-node-gtao",
@@ -3706,16 +3706,16 @@
       "url": "https://threejs-skills.com/visual-validation/webgpu-pooled-effects/diagnostics.mosaic.png",
       "width": 1200,
       "height": 800,
-      "bytes": 193783,
-      "sourceSha256": "sha256:c900f7b9f448d8a0161931fc8e4cfbfbb43003c0a3cc5de3b40c47eb8a9834b2",
+      "bytes": 226855,
+      "sourceSha256": "sha256:7a8aa484e817e225f4aa3d1ac0377e400fc80210235ad6f32545aa32d0dad753",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-pooled-effects/diagnostics.mosaic.avif",
           "width": 1200,
           "height": 800,
-          "bytes": 7549,
+          "bytes": 7798,
           "encoding": "quality-60",
-          "sha256": "sha256:51b35bfd3b36a287c1ab1a34a6d27d1e2740feb789747af1b7ff6e2d299a49e3"
+          "sha256": "sha256:91debcf8bd2cbdde7d3b5b6059f3b3c7ca8c4667ae91eb36f9c77bb316af240c"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-pooled-effects/diagnostics.mosaic.webp",
@@ -3726,23 +3726,23 @@
           "sha256": "sha256:0f2f760692eee263b57434f2ef8fea1a58d7d7077729f17c833143e14ae3cd4e"
         }
       },
-      "dependencyClosureHash": "sha256:0ccc050076e9a96b92c0bb1e6215615a00c538e3aa750c88bb22e8d920b55346"
+      "dependencyClosureHash": "sha256:f4e8707ddd9a39d08c4dd48e3c00cb823648a6c78eab3eddceb8605405400ce6"
     },
     "visual-validation/webgpu-pooled-effects/final.design.png": {
       "ownerId": "webgpu-pooled-effects",
       "url": "https://threejs-skills.com/visual-validation/webgpu-pooled-effects/final.design.png",
       "width": 1200,
       "height": 800,
-      "bytes": 408083,
-      "sourceSha256": "sha256:d4203a21b8a29b9fe0fe78c763ec19303c962be074d3352bba113d88e8b6ac30",
+      "bytes": 478364,
+      "sourceSha256": "sha256:7421b703583d7e678e745397292185573c5ac0969056e9ce76aef9333ebab190",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-pooled-effects/final.design.avif",
           "width": 1200,
           "height": 800,
-          "bytes": 5990,
+          "bytes": 6239,
           "encoding": "quality-60",
-          "sha256": "sha256:96c476cdae449a2a0a2bf5a2d02bc4a8199a4a6a734dbd955573cce838b5a4cc"
+          "sha256": "sha256:7c0fa9cb5d78b15098218d5a00c9df8349f26df69226355cee363bf615a90e42"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-pooled-effects/final.design.webp",
@@ -3753,23 +3753,23 @@
           "sha256": "sha256:db183c8bea5d84248e9827ca45705e25431c8021c9c04b9bb119fada2451456e"
         }
       },
-      "dependencyClosureHash": "sha256:24940651d34af07abb1251449988465c993802d8e7ef453b704cb4498cf9ed1f"
+      "dependencyClosureHash": "sha256:730a81fb795997a741461c07d1fc4af68fb68255deae6982012aaeee987e2fc1"
     },
     "visual-validation/webgpu-pooled-effects/mechanism.debris-dissolve.png": {
       "ownerId": "webgpu-pooled-effects",
       "url": "https://threejs-skills.com/visual-validation/webgpu-pooled-effects/mechanism.debris-dissolve.png",
       "width": 1200,
       "height": 800,
-      "bytes": 37774,
-      "sourceSha256": "sha256:66857d1d12a77d8228e7446e412564c69c9ad37f1b7c34c3c2e3bafbea8a84d8",
+      "bytes": 43742,
+      "sourceSha256": "sha256:83e28a7525fbc1e2772f693ce40935a5cf6f876c99ad9bb1477959ce098bb7ad",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-pooled-effects/mechanism.debris-dissolve.avif",
           "width": 1200,
           "height": 800,
-          "bytes": 1823,
+          "bytes": 2072,
           "encoding": "quality-60",
-          "sha256": "sha256:d189c5ffed53d8d3b00e82663b1afa73cb056f528f7bd8d3b822b709517a8262"
+          "sha256": "sha256:7ee833d2e9c0a500b936bb5514a0aef6a02ef8a8a3b0b5e85f5a027889855c5b"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-pooled-effects/mechanism.debris-dissolve.webp",
@@ -3780,23 +3780,23 @@
           "sha256": "sha256:367d9795bf2e5ba8fc3e26d1b24a91ad2f2026d9361484c8108866f55c69a0c8"
         }
       },
-      "dependencyClosureHash": "sha256:a6c1b8a2783c07744e9bd7173547c8ddae675f3ef581234a589f5bfdb4d3388b"
+      "dependencyClosureHash": "sha256:9699d9e5120e110baefe66472cec28eaffaa759cd206eb89b724a6c6bec0df87"
     },
     "visual-validation/webgpu-pooled-effects/mechanism.gpu-pool-and-compaction.png": {
       "ownerId": "webgpu-pooled-effects",
       "url": "https://threejs-skills.com/visual-validation/webgpu-pooled-effects/mechanism.gpu-pool-and-compaction.png",
       "width": 1200,
       "height": 800,
-      "bytes": 37774,
-      "sourceSha256": "sha256:66857d1d12a77d8228e7446e412564c69c9ad37f1b7c34c3c2e3bafbea8a84d8",
+      "bytes": 43742,
+      "sourceSha256": "sha256:83e28a7525fbc1e2772f693ce40935a5cf6f876c99ad9bb1477959ce098bb7ad",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-pooled-effects/mechanism.gpu-pool-and-compaction.avif",
           "width": 1200,
           "height": 800,
-          "bytes": 1823,
+          "bytes": 2072,
           "encoding": "quality-60",
-          "sha256": "sha256:d189c5ffed53d8d3b00e82663b1afa73cb056f528f7bd8d3b822b709517a8262"
+          "sha256": "sha256:7ee833d2e9c0a500b936bb5514a0aef6a02ef8a8a3b0b5e85f5a027889855c5b"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-pooled-effects/mechanism.gpu-pool-and-compaction.webp",
@@ -3807,23 +3807,23 @@
           "sha256": "sha256:367d9795bf2e5ba8fc3e26d1b24a91ad2f2026d9361484c8108866f55c69a0c8"
         }
       },
-      "dependencyClosureHash": "sha256:40233e877eca1e74f96e48e9dd145336cbe2d2fe408f5ed7aa4870a3b992982a"
+      "dependencyClosureHash": "sha256:224d308e8cc22bb1ae2bbcd17e3aaecf7368b2e6a5f5526818ae7fa6432fcfac"
     },
     "visual-validation/webgpu-pooled-effects/mechanism.impact-sparks.png": {
       "ownerId": "webgpu-pooled-effects",
       "url": "https://threejs-skills.com/visual-validation/webgpu-pooled-effects/mechanism.impact-sparks.png",
       "width": 1200,
       "height": 800,
-      "bytes": 37354,
-      "sourceSha256": "sha256:c6e7d4570de68e065eb563d3caa1c9f8e6ac3ff20956c5ac8c43414e603071ee",
+      "bytes": 43374,
+      "sourceSha256": "sha256:f521442a6aad187deb2568a6548ce8ace4bdfd2bc59aa59d581522c77329c937",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-pooled-effects/mechanism.impact-sparks.avif",
           "width": 1200,
           "height": 800,
-          "bytes": 1736,
+          "bytes": 1985,
           "encoding": "quality-60",
-          "sha256": "sha256:85fde66db0ddb21e4b2f9ace7984e6c4e4890153e4bb5bcff4ddcdb97706d9f7"
+          "sha256": "sha256:eb7890cc1a47b12cfddd8953c8af0fe2c41430f3c83171549bfea6137ca0e455"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-pooled-effects/mechanism.impact-sparks.webp",
@@ -3834,23 +3834,23 @@
           "sha256": "sha256:60b5b25058ee38ea6ebb4a6a79856013b625f3ec000125282ff92cf27ba7c970"
         }
       },
-      "dependencyClosureHash": "sha256:afdb8827096cdc59b67f87bae655b587d39ef0174ce4c9a21df7e331f126ebe4"
+      "dependencyClosureHash": "sha256:b745e3a5654cad655c7316a6b7d8ccde5c3e9cca50bed59aa5566518169b609a"
     },
     "visual-validation/webgpu-pooled-effects/no-post.design.png": {
       "ownerId": "webgpu-pooled-effects",
       "url": "https://threejs-skills.com/visual-validation/webgpu-pooled-effects/no-post.design.png",
       "width": 1200,
       "height": 800,
-      "bytes": 59849,
-      "sourceSha256": "sha256:4fd5d0fc4f2bccf5ba1d20f182dfab9ab32884c9ff861d1fe5c05d9eb1b59fbb",
+      "bytes": 69337,
+      "sourceSha256": "sha256:f0b4e77840a2e45638ec965bc524bd2b7e826ee737d483f120f5514d0d94721a",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-pooled-effects/no-post.design.avif",
           "width": 1200,
           "height": 800,
-          "bytes": 3820,
+          "bytes": 4069,
           "encoding": "quality-60",
-          "sha256": "sha256:7e95729f7f196a9062503b565bd4bac022180346d1cdf1ab7f247f28121811b3"
+          "sha256": "sha256:1c2220e02ec55d38edea9fe6b368372fd7ca4b9020d97d9eecd1d3b816594b7e"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-pooled-effects/no-post.design.webp",
@@ -3861,23 +3861,23 @@
           "sha256": "sha256:495272c57625ca4d5417e89bf5824b4e2cb6a80a3b69ffd67c78b5c6c6a2e1ba"
         }
       },
-      "dependencyClosureHash": "sha256:94cf5cb6eccf2b67cf4473a15471706ff2d3fdf0496b9c763f043978c1cd6f12"
+      "dependencyClosureHash": "sha256:27f7ca2c0376ef8fce1e6bcfc7cf827a132d3cd38ae219e4412105f99c93d71e"
     },
     "visual-validation/webgpu-pooled-effects/tier.medium.png": {
       "ownerId": "webgpu-pooled-effects",
       "url": "https://threejs-skills.com/visual-validation/webgpu-pooled-effects/tier.medium.png",
       "width": 1200,
       "height": 800,
-      "bytes": 436421,
-      "sourceSha256": "sha256:64962dc911980fcfc5ae573ab11b96345cff9d7d581f3c5a4f81c582dcecbd82",
+      "bytes": 515069,
+      "sourceSha256": "sha256:fab014e5f85b0d316efe3e387f9ba93f18e28499d4c6e0f51cd9b622dc4d28b4",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-pooled-effects/tier.medium.avif",
           "width": 1200,
           "height": 800,
-          "bytes": 5819,
+          "bytes": 6068,
           "encoding": "quality-60",
-          "sha256": "sha256:fd5eb1baa3f5b3a44d950c2b942acb9ab1e3d35c517e0e4cb994fffc6195d538"
+          "sha256": "sha256:1c3ae3d2e7b44dbc20802931aaa69e7bfe4e9ccbea7cc10d9d5481cc8eb9e810"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-pooled-effects/tier.medium.webp",
@@ -3888,23 +3888,23 @@
           "sha256": "sha256:26cad7b61bf5dcfe382ce88491977aa95c083f5492b00f91909d55068e8fe20e"
         }
       },
-      "dependencyClosureHash": "sha256:e6b5491bca90be8c4a3a55938ffb96be76d296f15de7c2ee8787c2ae99a57d9d"
+      "dependencyClosureHash": "sha256:b7d09f47461c322854c7b49b36f9d07d41936ab432e4191e735e400306e6463b"
     },
     "visual-validation/webgpu-pooled-effects/tier.ultra.png": {
       "ownerId": "webgpu-pooled-effects",
       "url": "https://threejs-skills.com/visual-validation/webgpu-pooled-effects/tier.ultra.png",
       "width": 1200,
       "height": 800,
-      "bytes": 354728,
-      "sourceSha256": "sha256:6e72065f015556a2668fd79a7be43fa6395584e4374e5280eeb38029917c40f8",
+      "bytes": 411249,
+      "sourceSha256": "sha256:9da1e7147c80102fb1f81c353d33c51fc64c9f81d7df418a42e838b6e36c305a",
       "formats": {
         "avif": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-pooled-effects/tier.ultra.avif",
           "width": 1200,
           "height": 800,
-          "bytes": 6186,
+          "bytes": 6435,
           "encoding": "quality-60",
-          "sha256": "sha256:778013e2918e30b4584c70ec72c55cf62f1320f7f6558bb398a66ac4d4dfa3e0"
+          "sha256": "sha256:5ea94776a0800b7fee16b4618dd5508ca7cae98a7c147ab6b87dd5e2e31e9d22"
         },
         "webp": {
           "url": "https://threejs-skills.com/visual-validation/webgpu-pooled-effects/tier.ultra.webp",
@@ -3915,7 +3915,7 @@
           "sha256": "sha256:040ac993ea577af15868d66eedf251c541f076bcdb1f3cbe8aa2361e2748a444"
         }
       },
-      "dependencyClosureHash": "sha256:8400c11e9ba060d18ee588cae00db759c580826b86210bd7d056d7bd353cad46"
+      "dependencyClosureHash": "sha256:0db1208cc6d9fbea4c6c63fc07c5a6e038bf37483c3b22641c300ae349167728"
     },
     "visual-validation/webgpu-procedural-timelines/camera.design.png": {
       "ownerId": "webgpu-procedural-timelines",
