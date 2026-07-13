@@ -12,6 +12,7 @@ import {
 import {
   basename,
   dirname,
+  isAbsolute,
   join,
   resolve,
 } from 'node:path';
@@ -20,6 +21,7 @@ import {
   canonicalSha256,
   createReleasePromotionBinding,
   NORMATIVE_JSON_PATHS,
+  routeSetDigest,
   routeStateDigest,
   STANDARD_IMAGE_PATHS,
 } from './evidence-manifest-contract.mjs';
@@ -44,6 +46,25 @@ function sha256(bytes) {
 
 function binding(path, bytes, kind) {
   return { kind, path, sha256: sha256(bytes), byteLength: bytes.byteLength };
+}
+
+function requireBundlePath(path, label) {
+  if (typeof path !== 'string' || path.length === 0 || path.includes('\0') || isAbsolute(path)) {
+    throw new Error(`${label} must be a confined bundle-relative path`);
+  }
+  const normalized = path.replaceAll('\\', '/');
+  if (normalized !== path || normalized.split('/').some((segment) => segment === '.' || segment === '..' || segment.length === 0)) {
+    throw new Error(`${label} must be a confined normalized bundle-relative path`);
+  }
+  return path;
+}
+
+function requireRoutePath(path, label) {
+  if (typeof path !== 'string' || path.length < 2 || !path.startsWith('/') || path.includes('\0') || path.includes('\\')) {
+    throw new Error(`${label} must be a normalized root-relative URL path`);
+  }
+  if (path.includes('//') || path.includes('/./') || path.split('/').some((segment) => segment === '..')) throw new Error(`${label} is not normalized`);
+  return path;
 }
 
 function capturedFile(reference) {
@@ -148,6 +169,92 @@ async function copyBoundArtifact(sourceDirectory, stagingDirectory, entry, proje
   await writeFile(destination, bytes, { flag: 'wx' });
 }
 
+function normalizeReleaseRoutes(rawRoute, routes) {
+  if (!Array.isArray(routes)) throw new TypeError('prepared release routes must be an array');
+  const ordered = [];
+  const byPath = new Map();
+  for (const candidate of [rawRoute, ...routes]) {
+    const route = structuredClone(requireObject(candidate, 'prepared release route'));
+    requireRoutePath(route.path, 'prepared release route path');
+    const digest = routeStateDigest(route);
+    if (route.stateDigest !== undefined && route.stateDigest !== digest) throw new Error(`prepared release route ${route.path} has a stale state digest`);
+    route.stateDigest = digest;
+    const previous = byPath.get(route.path);
+    if (previous !== undefined) {
+      if (canonicalSha256(previous) !== canonicalSha256(route)) throw new Error(`prepared release route ${route.path} has conflicting locked states`);
+      continue;
+    }
+    byPath.set(route.path, route);
+    ordered.push(route);
+  }
+  return ordered;
+}
+
+function normalizeSupplementaryArtifacts(artifacts, occupiedPaths) {
+  if (!Array.isArray(artifacts)) throw new TypeError('prepared supplementary artifacts must be an array');
+  const permittedKinds = new Set(['supplementary-json', 'capture-session-document', 'capture-session-write-ledger']);
+  const normalized = [];
+  const references = new Map();
+  for (const [index, artifact] of artifacts.entries()) {
+    requireObject(artifact, `prepared supplementary artifact ${index}`);
+    const path = requireBundlePath(artifact.path, `prepared supplementary artifact ${index} path`);
+    if (occupiedPaths.has(path) || references.has(path)) throw new Error(`prepared supplementary artifact collides with ${path}`);
+    if (!permittedKinds.has(artifact.kind)) throw new Error(`prepared supplementary artifact ${path} has unsupported kind ${artifact.kind}`);
+    if (!(artifact.bytes instanceof Uint8Array)) throw new TypeError(`prepared supplementary artifact ${path} bytes must be a Uint8Array`);
+    const bytes = Buffer.from(artifact.bytes);
+    const reference = binding(path, bytes, artifact.kind);
+    normalized.push({ bytes, reference });
+    references.set(path, reference);
+  }
+  return { normalized, references };
+}
+
+function sameBinding(left, right) {
+  return left?.path === right.path
+    && left?.kind === right.kind
+    && left?.sha256 === right.sha256
+    && left?.byteLength === right.byteLength;
+}
+
+function normalizeAdditionalSessions(sessions, routeSet, supplementaryReferences) {
+  if (!Array.isArray(sessions)) throw new TypeError('prepared capture sessions must be an array');
+  const routes = new Map(routeSet.map((route) => [route.path, route]));
+  return sessions.map((candidate, index) => {
+    const session = structuredClone(requireObject(candidate, `prepared capture session ${index}`));
+    const documentPath = session.documentPath ?? session.document?.path;
+    const writeLedgerPath = session.writeLedgerPath ?? session.writeLedger?.path;
+    const document = supplementaryReferences.get(documentPath);
+    const writeLedger = supplementaryReferences.get(writeLedgerPath);
+    if (document?.kind !== 'capture-session-document') throw new Error(`prepared capture session ${index} document is not an exact supplementary capture document`);
+    if (writeLedger?.kind !== 'capture-session-write-ledger') throw new Error(`prepared capture session ${index} write ledger is not an exact supplementary capture ledger`);
+    if (session.document !== undefined && !sameBinding(session.document, document)) throw new Error(`prepared capture session ${index} document binding is stale`);
+    if (session.writeLedger !== undefined && !sameBinding(session.writeLedger, writeLedger)) throw new Error(`prepared capture session ${index} write-ledger binding is stale`);
+    const route = routes.get(session.routePath);
+    if (route === undefined) throw new Error(`prepared capture session ${index} route is not in the release route set`);
+    const routeDigest = canonicalSha256(route);
+    if (session.routeDigest !== undefined && session.routeDigest !== routeDigest) throw new Error(`prepared capture session ${index} route digest is stale`);
+    if (session.stateDigest !== undefined && session.stateDigest !== route.stateDigest) throw new Error(`prepared capture session ${index} state digest is stale`);
+    let boundRouteSetDigest;
+    if (session.routeSetPaths !== undefined) {
+      if (!Array.isArray(session.routeSetPaths)) throw new TypeError(`prepared capture session ${index} routeSetPaths must be an array`);
+      const boundRoutes = session.routeSetPaths.map((path) => routes.get(path));
+      if (boundRoutes.some((value) => value === undefined)) throw new Error(`prepared capture session ${index} route set contains an unknown route`);
+      boundRouteSetDigest = routeSetDigest(boundRoutes);
+      if (session.routeSetDigest !== undefined && session.routeSetDigest !== boundRouteSetDigest) throw new Error(`prepared capture session ${index} route-set digest is stale`);
+    }
+    delete session.documentPath;
+    delete session.writeLedgerPath;
+    return {
+      ...session,
+      routeDigest,
+      stateDigest: route.stateDigest,
+      ...(boundRouteSetDigest === undefined ? {} : { routeSetDigest: boundRouteSetDigest }),
+      document,
+      writeLedger,
+    };
+  });
+}
+
 async function createArtifactProjections({ correctnessDirectory, rawManifest, laneJoin, projectEvidenceArtifacts }) {
   if (projectEvidenceArtifacts === null) return new Map();
   if (typeof projectEvidenceArtifacts !== 'function') throw new TypeError('projectEvidenceArtifacts must be a function or null');
@@ -198,62 +305,37 @@ async function createArtifactProjections({ correctnessDirectory, rawManifest, la
   return replacements;
 }
 
-export async function assemblePendingReleaseBundle({
+export async function assemblePreparedReleaseBundle({
   correctnessDirectory,
-  physicalReviewPath,
-  servedLedgerPath,
-  laneJoinPath,
   outputDirectory,
-  physicalRoute,
-  limitations,
-  projectEvidenceArtifacts = null,
+  prepareReleaseInputs,
 }) {
   if (existsSync(outputDirectory)) throw new Error(`release output already exists: ${outputDirectory}`);
+  if (typeof prepareReleaseInputs !== 'function') throw new TypeError('prepareReleaseInputs must be a function');
   const correctness = validateEvidenceBundle(correctnessDirectory);
   if (!correctness.valid || correctness.manifest?.bundleKind !== 'raw-capture-session') {
     throw new AggregateError(correctness.errors.map((message) => new Error(message)), 'correctness input is not a valid raw capture bundle');
   }
   const raw = correctness.manifest;
-  const physicalBytes = await readFile(physicalReviewPath);
-  const physicalWrapper = JSON.parse(physicalBytes);
-  const servedBytes = await readFile(servedLedgerPath);
-  const servedLedger = JSON.parse(servedBytes);
-  const laneJoinBytes = await readFile(laneJoinPath);
-  const laneJoin = JSON.parse(laneJoinBytes);
-  validateEvidenceLaneJoin(laneJoin);
-  const { joinSha256, ...laneJoinBody } = laneJoin;
-  if (joinSha256 !== canonicalSha256(laneJoinBody)) throw new Error('lane join canonical hash is invalid');
-  if (laneJoin.labId !== raw.labId || laneJoin.sourceClosureHash !== raw.sourceClosureHash || laneJoin.buildRevision !== raw.buildRevision) {
-    throw new Error('lane join identity differs from the correctness bundle');
-  }
-  if (physicalWrapper.record?.labId !== raw.labId
-    || physicalWrapper.record?.sourceClosureHash !== raw.sourceClosureHash
-    || physicalWrapper.record?.buildRevision !== raw.buildRevision) {
-    throw new Error('physical review identity differs from the correctness bundle');
-  }
-  const correctnessSession = raw.captureSessions[0];
-  if (laneJoin.lanes.correctness.sessionId !== correctnessSession.sessionId
-    || laneJoin.lanes.correctness.documentSha256 !== correctnessSession.document.sha256
-    || laneJoin.lanes.correctness.writeLedgerSha256 !== correctnessSession.writeLedger.sha256
-    || laneJoin.lanes.correctness.routeDigest !== correctnessSession.routeDigest
-    || laneJoin.lanes.correctness.stateDigest !== correctnessSession.stateDigest) {
-    throw new Error('lane join correctness reference differs from the raw capture session');
-  }
-  if (laneJoin.lanes.physicalRoute.recordSha256 !== physicalWrapper.recordSha256
-    || laneJoin.lanes.physicalRoute.routeDigest !== canonicalSha256(physicalWrapper.record.route)
-    || laneJoin.lanes.physicalRoute.servedLedgerSha256 !== physicalWrapper.record.immutableBuild.servedLedgerHash
-    || servedLedger.ledgerSha256 !== physicalWrapper.record.immutableBuild.servedLedgerHash) {
-    throw new Error('lane join physical reference differs from the reviewed record or served ledger');
-  }
+  const prepared = requireObject(await prepareReleaseInputs(deepFreeze({
+    rawManifest: structuredClone(raw),
+  })), 'prepared release inputs');
+  const routeSet = normalizeReleaseRoutes(raw.route, prepared.routes ?? []);
+  const releaseLimitations = structuredClone(prepared.limitations ?? []);
+  const claimVerdicts = structuredClone(requireObject(prepared.claimVerdicts, 'prepared release claim verdicts'));
+  const occupiedPaths = new Set([
+    ...raw.files.map((entry) => entry.path),
+    ...raw.images.map((entry) => entry.path),
+    'evidence-manifest.json',
+  ]);
+  const supplementary = normalizeSupplementaryArtifacts(prepared.supplementaryArtifacts ?? [], occupiedPaths);
+  const additionalSessions = normalizeAdditionalSessions(prepared.captureSessions ?? [], routeSet, supplementary.references);
   const artifactProjections = await createArtifactProjections({
     correctnessDirectory,
     rawManifest: raw,
-    laneJoin,
-    projectEvidenceArtifacts,
+    laneJoin: prepared.projectionContext ?? null,
+    projectEvidenceArtifacts: prepared.projectEvidenceArtifacts ?? null,
   });
-  const route = structuredClone(physicalRoute);
-  route.stateDigest = routeStateDigest(route);
-  const releaseLimitations = structuredClone(limitations);
   const parent = resolve(dirname(outputDirectory));
   await mkdir(parent, { recursive: true });
   const staging = await mkdtemp(join(parent, `.${basename(outputDirectory)}.staging-`));
@@ -263,24 +345,12 @@ export async function assemblePendingReleaseBundle({
     await copyBoundArtifact(correctnessDirectory, staging, entry, artifactProjections.get(entry.path)?.bytes ?? null);
   }
   for (const entry of raw.images) if (entry.status === 'captured') await copyBoundArtifact(correctnessDirectory, staging, entry);
-
-  const physicalDocument = binding('sessions/physical-route.capture-session.json', physicalBytes, 'capture-session-document');
-  const physicalLedger = binding('sessions/physical-route.write-ledger.json', servedBytes, 'capture-session-write-ledger');
-  const joinedLedger = binding('lane-join.json', laneJoinBytes, 'supplementary-json');
-  for (const [reference, bytes] of [[physicalDocument, physicalBytes], [physicalLedger, servedBytes], [joinedLedger, laneJoinBytes]]) {
-    const destination = join(staging, reference.path);
+  for (const artifact of supplementary.normalized) {
+    const destination = join(staging, artifact.reference.path);
     await mkdir(dirname(destination), { recursive: true });
-    await writeFile(destination, bytes, { flag: 'wx' });
+    await writeFile(destination, artifact.bytes, { flag: 'wx' });
   }
-  const physicalSession = physicalSessionReference({
-    wrapper: physicalWrapper,
-    route,
-    document: physicalDocument,
-    writeLedger: physicalLedger,
-  });
-  const routeSet = raw.route.path === route.path && raw.route.stateDigest === route.stateDigest
-    ? [structuredClone(raw.route)]
-    : [structuredClone(raw.route), route];
+
   const projectedFiles = raw.files.map((entry) => artifactProjections.get(entry.path)?.entry ?? structuredClone(entry));
   const manifest = {
     ...structuredClone(raw),
@@ -289,13 +359,11 @@ export async function assemblePendingReleaseBundle({
     publishable: false,
     routeSet,
     limitations: releaseLimitations,
-    claimVerdicts: structuredClone(laneJoin.claimVerdicts),
-    captureSessions: [structuredClone(raw.captureSessions[0]), physicalSession],
+    claimVerdicts,
+    captureSessions: [structuredClone(raw.captureSessions[0]), ...additionalSessions],
     files: orderByRequiredPrefix([
       ...projectedFiles,
-      capturedFile(physicalDocument),
-      capturedFile(physicalLedger),
-      capturedFile(joinedLedger),
+      ...supplementary.normalized.map(({ reference }) => capturedFile(reference)),
     ], NORMATIVE_JSON_PATHS, 'release file ledger'),
     images: orderByRequiredPrefix(structuredClone(raw.images), STANDARD_IMAGE_PATHS, 'release image ledger'),
     promotion: null,
@@ -314,4 +382,76 @@ export async function assemblePendingReleaseBundle({
   }
   await rename(staging, outputDirectory);
   return Object.freeze({ outputDirectory, manifest, validation });
+}
+
+export async function assemblePendingReleaseBundle({
+  correctnessDirectory,
+  physicalReviewPath,
+  servedLedgerPath,
+  laneJoinPath,
+  outputDirectory,
+  physicalRoute,
+  limitations,
+  projectEvidenceArtifacts = null,
+}) {
+  return assemblePreparedReleaseBundle({
+    correctnessDirectory,
+    outputDirectory,
+    prepareReleaseInputs: async ({ rawManifest: raw }) => {
+      const physicalBytes = await readFile(physicalReviewPath);
+      const physicalWrapper = JSON.parse(physicalBytes);
+      const servedBytes = await readFile(servedLedgerPath);
+      const servedLedger = JSON.parse(servedBytes);
+      const laneJoinBytes = await readFile(laneJoinPath);
+      const laneJoin = JSON.parse(laneJoinBytes);
+      validateEvidenceLaneJoin(laneJoin);
+      const { joinSha256, ...laneJoinBody } = laneJoin;
+      if (joinSha256 !== canonicalSha256(laneJoinBody)) throw new Error('lane join canonical hash is invalid');
+      if (laneJoin.labId !== raw.labId || laneJoin.sourceClosureHash !== raw.sourceClosureHash || laneJoin.buildRevision !== raw.buildRevision) {
+        throw new Error('lane join identity differs from the correctness bundle');
+      }
+      if (physicalWrapper.record?.labId !== raw.labId
+        || physicalWrapper.record?.sourceClosureHash !== raw.sourceClosureHash
+        || physicalWrapper.record?.buildRevision !== raw.buildRevision) {
+        throw new Error('physical review identity differs from the correctness bundle');
+      }
+      const correctnessSession = raw.captureSessions[0];
+      if (laneJoin.lanes.correctness.sessionId !== correctnessSession.sessionId
+        || laneJoin.lanes.correctness.documentSha256 !== correctnessSession.document.sha256
+        || laneJoin.lanes.correctness.writeLedgerSha256 !== correctnessSession.writeLedger.sha256
+        || laneJoin.lanes.correctness.routeDigest !== correctnessSession.routeDigest
+        || laneJoin.lanes.correctness.stateDigest !== correctnessSession.stateDigest) {
+        throw new Error('lane join correctness reference differs from the raw capture session');
+      }
+      if (laneJoin.lanes.physicalRoute.recordSha256 !== physicalWrapper.recordSha256
+        || laneJoin.lanes.physicalRoute.routeDigest !== canonicalSha256(physicalWrapper.record.route)
+        || laneJoin.lanes.physicalRoute.servedLedgerSha256 !== physicalWrapper.record.immutableBuild.servedLedgerHash
+        || servedLedger.ledgerSha256 !== physicalWrapper.record.immutableBuild.servedLedgerHash) {
+        throw new Error('lane join physical reference differs from the reviewed record or served ledger');
+      }
+      const route = structuredClone(physicalRoute);
+      route.stateDigest = routeStateDigest(route);
+      const physicalDocument = binding('sessions/physical-route.capture-session.json', physicalBytes, 'capture-session-document');
+      const physicalLedger = binding('sessions/physical-route.write-ledger.json', servedBytes, 'capture-session-write-ledger');
+      const physicalSession = physicalSessionReference({
+        wrapper: physicalWrapper,
+        route,
+        document: physicalDocument,
+        writeLedger: physicalLedger,
+      });
+      return {
+        routes: [route],
+        limitations: structuredClone(limitations),
+        claimVerdicts: structuredClone(laneJoin.claimVerdicts),
+        captureSessions: [physicalSession],
+        supplementaryArtifacts: [
+          { path: physicalDocument.path, kind: physicalDocument.kind, bytes: physicalBytes },
+          { path: physicalLedger.path, kind: physicalLedger.kind, bytes: servedBytes },
+          { path: 'lane-join.json', kind: 'supplementary-json', bytes: laneJoinBytes },
+        ],
+        projectionContext: laneJoin,
+        projectEvidenceArtifacts,
+      };
+    },
+  });
 }

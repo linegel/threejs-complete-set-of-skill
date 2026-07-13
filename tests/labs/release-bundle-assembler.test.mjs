@@ -7,7 +7,10 @@ import { test } from 'node:test';
 import { numericDatum, NumericLabel } from '../../labs/runtime/numeric-evidence.mjs';
 import { canonicalSha256 } from '../../scripts/lib/evidence-manifest-contract.mjs';
 import { createEvidenceLaneJoin } from '../../scripts/lib/evidence-lane-join.mjs';
-import { assemblePendingReleaseBundle } from '../../scripts/lib/release-bundle-assembler.mjs';
+import {
+  assemblePendingReleaseBundle,
+  assemblePreparedReleaseBundle,
+} from '../../scripts/lib/release-bundle-assembler.mjs';
 import { validateEvidenceBundle } from '../../scripts/lib/evidence-v2.mjs';
 import {
   createUnifiedReleaseBundleFixture,
@@ -133,6 +136,105 @@ function writeInputs(root, rawManifest, review) {
   writeFileSync(laneJoinPath, `${JSON.stringify(laneJoin, null, 2)}\n`);
   return { physicalReviewPath, servedLedgerPath, laneJoinPath };
 }
+
+function preparedPhysicalSession(raw, route, overrides = {}) {
+  return {
+    sessionId: 'webgpu-validation-harness:physical-route:prepared-fixture',
+    profile: 'physical-route',
+    automationSurface: 'codex-in-app-browser',
+    adapterClass: 'hardware',
+    adapterIdentity: { kind: 'gpu-adapter', digest: canonicalSha256('prepared adapter') },
+    deviceIdentity: { kind: 'gpu-device', digest: canonicalSha256('prepared device') },
+    browserIdentity: { kind: 'browser', digest: canonicalSha256('prepared browser') },
+    osIdentity: { kind: 'operating-system', digest: canonicalSha256('prepared os') },
+    refreshIdentity: { kind: 'display-refresh', digest: canonicalSha256('prepared refresh') },
+    colorIdentity: { kind: 'color-pipeline', digest: canonicalSha256('prepared color') },
+    limitationsDigest: canonicalSha256([]),
+    threeRevision: raw.threeRevision,
+    sourceClosureHash: raw.sourceClosureHash,
+    buildRevision: raw.buildRevision,
+    startedAt: '2026-07-13T02:00:00Z',
+    finishedAt: '2026-07-13T02:01:00Z',
+    routePath: route.path,
+    routeSetPaths: [raw.route.path, route.path],
+    documentPath: 'sessions/prepared-physical.capture-session.json',
+    writeLedgerPath: 'sessions/prepared-physical.write-ledger.json',
+    rendererInitialized: true,
+    isWebGPUBackend: true,
+    timestampQuerySupported: false,
+    ...overrides,
+  };
+}
+
+function preparedReleaseInputs(raw, overrides = {}) {
+  const route = reviewedRoute();
+  const documentBytes = Buffer.from('{"profile":"physical-route","exact":true}\n');
+  const ledgerBytes = Buffer.from('[{"path":"index.html","sha256":"fixture"}]');
+  return {
+    routes: [route],
+    limitations: [],
+    claimVerdicts: {
+      visualCorrectness: 'PASS',
+      mechanismCorrectness: 'PASS',
+      performanceCompliance: 'NOT_CLAIMED',
+      gpuAttribution: 'NOT_CLAIMED',
+      lifecycleStability: 'PASS',
+      visualError: 'PASS',
+    },
+    captureSessions: [preparedPhysicalSession(raw, route)],
+    supplementaryArtifacts: [
+      { path: 'sessions/prepared-physical.capture-session.json', kind: 'capture-session-document', bytes: documentBytes },
+      { path: 'sessions/prepared-physical.write-ledger.json', kind: 'capture-session-write-ledger', bytes: ledgerBytes },
+      { path: 'strict-lane-join.json', kind: 'supplementary-json', bytes: Buffer.from('{"schemaVersion":1}\n') },
+    ],
+    ...overrides,
+  };
+}
+
+test('prepared assembler owns route, session, and exact supplementary bindings', async () => {
+  const { directory, manifest } = makeRawCorrectnessBundle();
+  const root = mkdtempSync(join(tmpdir(), 'release-prepared-input-'));
+  const outputDirectory = join(root, 'release');
+  const result = await assemblePreparedReleaseBundle({
+    correctnessDirectory: directory,
+    outputDirectory,
+    prepareReleaseInputs({ rawManifest }) {
+      assert.equal(Object.isFrozen(rawManifest), true);
+      return preparedReleaseInputs(rawManifest);
+    },
+  });
+  assert.equal(result.validation.valid, true, result.validation.errors.join('\n'));
+  const session = result.manifest.captureSessions.find((entry) => entry.profile === 'physical-route');
+  assert.deepEqual(session.routeSetPaths, [manifest.route.path, reviewedRoute().path]);
+  assert.match(session.routeSetDigest, /^sha256:[a-f0-9]{64}$/);
+  assert.equal(session.routeDigest, canonicalSha256(result.manifest.routeSet.find((route) => route.path === reviewedRoute().path)));
+  assert.equal(session.document.sha256, result.manifest.files.find((entry) => entry.path === session.document.path).sha256);
+  assert.equal(readFileSync(join(outputDirectory, session.document.path), 'utf8'), '{"profile":"physical-route","exact":true}\n');
+  assert.equal(result.manifest.files.find((entry) => entry.path === 'strict-lane-join.json').kind, 'supplementary-json');
+});
+
+test('prepared assembler rejects unconfined, colliding, stale, and unknown inputs', async () => {
+  const { directory, manifest } = makeRawCorrectnessBundle();
+  const mutations = [
+    ['unconfined path', (value) => { value.supplementaryArtifacts[0].path = '../escaped.json'; }, /confined normalized bundle-relative path/],
+    ['captured-file collision', (value) => { value.supplementaryArtifacts[0].path = 'renderer-info.json'; }, /collides/],
+    ['unsupported kind', (value) => { value.supplementaryArtifacts[0].kind = 'normative-json'; }, /unsupported kind/],
+    ['stale document binding', (value) => {
+      value.captureSessions[0].document = { kind: 'capture-session-document', path: value.captureSessions[0].documentPath, sha256: canonicalSha256('wrong'), byteLength: 1 };
+    }, /document binding is stale/],
+    ['unknown route', (value) => { value.captureSessions[0].routePath = '/demos/webgpu-validation-harness/unknown/'; }, /route is not in the release route set/],
+  ];
+  for (const [name, mutate, pattern] of mutations) {
+    const root = mkdtempSync(join(tmpdir(), `release-prepared-${name.replaceAll(' ', '-')}-`));
+    const inputs = preparedReleaseInputs(manifest);
+    mutate(inputs);
+    await assert.rejects(() => assemblePreparedReleaseBundle({
+      correctnessDirectory: directory,
+      outputDirectory: join(root, 'release'),
+      prepareReleaseInputs: () => inputs,
+    }), pattern, name);
+  }
+});
 
 test('offline assembler creates a validated nonpublishable multi-route release candidate', async () => {
   const { directory, manifest } = makeRawCorrectnessBundle();
