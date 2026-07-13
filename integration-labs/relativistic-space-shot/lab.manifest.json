@@ -222,8 +222,8 @@
     {
       "id": "native-webgpu",
       "required": true,
-      "evidence": "browser path initializes WebGPURenderer; correctness capture session not yet hash-bound (shader/runtime capture still failing under full integration load)",
-      "status": "incomplete"
+      "evidence": "artifacts/visual-validation/relativistic-space-shot/correctness/capture-session.json proves isWebGPUBackend === true",
+      "status": "accepted"
     },
     {
       "id": "gpu-timestamps",
@@ -236,13 +236,13 @@
     {
       "id": "single-owner-graph",
       "required": true,
-      "evidence": "browser-free graph and mutation validation pass; runtime capture incomplete",
-      "status": "incomplete"
+      "evidence": "browser-free graph validation + correctness capture-session native WebGPU presentation readbacks for current source hash",
+      "status": "accepted"
     },
     {
       "id": "curved-ray-particle-readback",
       "required": true,
-      "evidence": "aligned readback path implemented; full correctness capture not yet published for current source hash",
+      "evidence": "presentation capture published; mechanism diagnostic modes deferred due to TSL WGSL assignment bug",
       "status": "incomplete"
     },
     {

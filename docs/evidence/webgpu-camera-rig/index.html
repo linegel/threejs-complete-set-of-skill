@@ -13,7 +13,14 @@
 <meta property="og:title" content="Evidence: WebGPU Camera Rig | WebGPU Lab" />
 <meta property="og:description" content="Evidence report for WebGPU Camera Rig: incomplete canonical-lab, source hash, Three.js revision, claim verdicts, required proofs, routes, media hashes, and…" />
 <meta property="og:url" content="https://threejs-skills.com/evidence/webgpu-camera-rig/" />
-<meta name="twitter:card" content="summary" />
+<meta property="og:image" content="https://threejs-skills.com/visual-validation/webgpu-camera-rig/final.design.png" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="800" />
+<meta property="og:image:alt" content="WebGPU Camera Rig: Primary final readback." />
+<meta name="twitter:image" content="https://threejs-skills.com/visual-validation/webgpu-camera-rig/final.design.png" />
+<meta name="twitter:image:alt" content="WebGPU Camera Rig: Primary final readback." />
+<meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Evidence: WebGPU Camera Rig | WebGPU Lab" />
 <meta name="twitter:description" content="Evidence report for WebGPU Camera Rig: incomplete canonical-lab, source hash, Three.js revision, claim verdicts, required proofs, routes, media hashes, and…" />
 <style>
@@ -26,7 +33,7 @@
 @media(max-width:480px){.wrap{width:min(100% - 24px,1160px)}.facts{grid-template-columns:1fr}h1{font-size:40px}.claim{align-items:flex-start;flex-direction:column}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 </style>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":["TechArticle","Dataset"],"@id":"https://threejs-skills.com/evidence/webgpu-camera-rig/#report","name":"Evidence report: WebGPU Camera Rig","description":"Evidence report for WebGPU Camera Rig: incomplete canonical-lab, source hash, Three.js revision, claim verdicts, required proofs, routes, media hashes, and…","url":"https://threejs-skills.com/evidence/webgpu-camera-rig/","inLanguage":"en","isPartOf":{"@id":"https://threejs-skills.com/#software"},"about":["threejs-camera-controls-and-rigs","webgpu-camera-rig","Three.js","WebGPU","TSL"]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":["TechArticle","Dataset"],"@id":"https://threejs-skills.com/evidence/webgpu-camera-rig/#report","name":"Evidence report: WebGPU Camera Rig","description":"Evidence report for WebGPU Camera Rig: incomplete canonical-lab, source hash, Three.js revision, claim verdicts, required proofs, routes, media hashes, and…","url":"https://threejs-skills.com/evidence/webgpu-camera-rig/","inLanguage":"en","isPartOf":{"@id":"https://threejs-skills.com/#software"},"about":["threejs-camera-controls-and-rigs","webgpu-camera-rig","Three.js","WebGPU","TSL"],"image":"https://threejs-skills.com/visual-validation/webgpu-camera-rig/final.design.png"}</script>
 </head>
 <body>
 <header class="site-nav"><div class="wrap"><a href="/">Three.js WebGPU Skill Pack</a><nav aria-label="Primary"><a href="/#skills">Skills</a><a href="/#labs">Labs</a><a href="/evidence/">Evidence</a><a href="/about/">Method</a></nav></div></header>
@@ -35,7 +42,7 @@
   <p><span class="status status--incomplete">incomplete</span></p>
   <h1>WebGPU Camera Rig</h1>
   <p class="lede">This report separates published implementation state from accepted evidence. Every value below comes from the schema-v2 registry, the emitted source manifest, or promoted same-lab artifacts.</p>
-  <div class="actions"><a href="/demos/webgpu-camera-rig/">Open demo</a><a href="/skills/threejs-camera-controls-and-rigs.html">Owning skill</a><a href="/demos/webgpu-camera-rig/source-manifest.json">Published source manifest</a><a href="/demos/registry.json">Registry JSON</a><a href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-camera-controls-and-rigs">Canonical source</a></div>
+  <div class="actions"><a href="/demos/webgpu-camera-rig/">Open demo</a><a href="/skills/threejs-camera-controls-and-rigs.html">Owning skill</a><a href="/demos/webgpu-camera-rig/source-manifest.json">Published source manifest</a><a href="/demos/registry.json">Registry JSON</a><a href="/visual-validation/webgpu-camera-rig/evidence-summary.json">Promoted evidence summary</a><a href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-camera-controls-and-rigs">Canonical source</a></div>
   <dl class="facts">
     <div><dt>Lab id</dt><dd><code>webgpu-camera-rig</code></dd></div>
     <div><dt>Kind</dt><dd>Canonical Lab</dd></div>
@@ -43,21 +50,33 @@
     <div><dt>Execution</dt><dd>rendering</dd></div>
     <div><dt>Three.js</dt><dd>0.185.1</dd></div>
     <div><dt>Source hash</dt><dd><code>sha256:28e26085a6ee74008be35c435dcfa22faf9edc39914ee08da147380332807275</code></dd></div>
-    <div><dt>Published bundle hash</dt><dd><code>sha256:2983ed1657a10a3ad06e573fe866c90438dbdcd944374f47b2cc09de9ac1473c</code></dd></div>
-    <div><dt>Build revision</dt><dd><code>sha256:b9a3789cce08ca979f23b56d5ce0c4132c720aa24f80bf479959a88ec14bd9c2</code></dd></div>
-    <div><dt>Renderer</dt><dd>Not promoted</dd></div>
-    <div><dt>Backend</dt><dd>Not promoted</dd></div>
+    <div><dt>Published bundle hash</dt><dd><code>sha256:ccfc69beef152768c8950786df486b8b667cadaad877b9b1d2192f061bfd034c</code></dd></div>
+    <div><dt>Build revision</dt><dd><code>sha256:06ebbcef0b894baacf8b130c802f1637ee4bfbf7555090f0d41df435dabc84d8</code></dd></div>
+    <div><dt>Renderer</dt><dd>WebGPURenderer</dd></div>
+    <div><dt>Backend</dt><dd>WebGPU</dd></div>
     <div><dt>Evidence contract</dt><dd>v2</dd></div>
     <div><dt>Tracked release bundle</dt><dd>Absent</dd></div>
   </dl>
 
-  <section class="section" aria-labelledby="claims-title"><h2 id="claims-title">Claim verdicts</h2><div class="claim-grid"><div class="claim"><code>canonicalAcceptance</code><span class="verdict--insufficient-evidence">INSUFFICIENT_EVIDENCE</span></div><div class="claim"><code>hardwarePerformance</code><span class="verdict--not-claimed">NOT_CLAIMED</span></div></div></section>
+  <section class="section" aria-labelledby="claims-title"><h2 id="claims-title">Claim verdicts</h2><div class="claim-grid"><div class="claim"><code>visualCorrectness</code><span class="verdict--pass">PASS</span></div><div class="claim"><code>mechanismCorrectness</code><span class="verdict--insufficient-evidence">INSUFFICIENT_EVIDENCE</span></div><div class="claim"><code>performanceCompliance</code><span class="verdict--not-claimed">NOT_CLAIMED</span></div><div class="claim"><code>gpuAttribution</code><span class="verdict--insufficient-evidence">INSUFFICIENT_EVIDENCE</span></div><div class="claim"><code>lifecycleStability</code><span class="verdict--insufficient-evidence">INSUFFICIENT_EVIDENCE</span></div></div></section>
 
-  <section class="section" aria-labelledby="media-title"><h2 id="media-title">Promoted same-lab media</h2><p class="empty">No same-lab evidence image is promoted for this report. The page intentionally shows status and proof requirements instead of substitute art.</p></section>
+  <section class="section" aria-labelledby="media-title"><h2 id="media-title">Promoted same-lab media</h2><div class="gallery"><figure><picture class="responsive-preview">
+          <source type="image/avif" srcset="/visual-validation/webgpu-camera-rig/final.design.avif" />
+          <source type="image/webp" srcset="/visual-validation/webgpu-camera-rig/final.design.webp" />
+          <img data-responsive-preview src="/visual-validation/webgpu-camera-rig/final.design.png" alt="WebGPU Camera Rig: Primary final readback." width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><figcaption><strong>Primary final readback.</strong><span>inspected-runtime-evidence-preview · sha256:81c0e2ff26eeb2a8df7d94643100e5a083c525cad5ccf08a24fbd70633b20a94</span></figcaption></figure><figure><picture class="responsive-preview">
+          <source type="image/avif" srcset="/visual-validation/webgpu-camera-rig/no-post.design.avif" />
+          <source type="image/webp" srcset="/visual-validation/webgpu-camera-rig/no-post.design.webp" />
+          <img data-responsive-preview src="/visual-validation/webgpu-camera-rig/no-post.design.png" alt="WebGPU Camera Rig: No-post / alternate display path readback." width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><figcaption><strong>No-post / alternate display path readback.</strong><span>inspected-runtime-evidence-preview · sha256:4f5b2d3c49e03828aae5fec0d999514858ec3c7b84c8c787781b6146edf8a39b</span></figcaption></figure><figure><picture class="responsive-preview">
+          <source type="image/avif" srcset="/visual-validation/webgpu-camera-rig/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="/visual-validation/webgpu-camera-rig/diagnostics.mosaic.webp" />
+          <img data-responsive-preview src="/visual-validation/webgpu-camera-rig/diagnostics.mosaic.png" alt="WebGPU Camera Rig: Diagnostics / mechanism display readback." width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><figcaption><strong>Diagnostics / mechanism display readback.</strong><span>inspected-runtime-evidence-preview · sha256:fb57544e5a65619372d33cc043c28a7225e9c9f6b8152e3bbe0e11c2fba4f2b1</span></figcaption></figure></div></section>
 
   <section class="section" aria-labelledby="requirements-title"><h2 id="requirements-title">Required capability and runtime proof</h2><h3>Capabilities</h3><div class="requirement-grid"><article class="requirement"><header><code>native-webgpu</code><span class="status status--incomplete">incomplete</span></header><p>No capability evidence is recorded.</p></article><article class="requirement"><header><code>storage-buffer</code><span class="status status--incomplete">incomplete</span></header><p>No capability evidence is recorded.</p></article></div><h3 style="margin-top:28px">Runtime proof</h3><div class="requirement-grid"><article class="requirement"><header><code>renderer-init</code><span class="status status--incomplete">incomplete</span></header><p>No runtime evidence is recorded.</p></article><article class="requirement"><header><code>backend-is-webgpu</code><span class="status status--incomplete">incomplete</span></header><p>No runtime evidence is recorded.</p></article><article class="requirement"><header><code>mechanism-reachable</code><span class="status status--incomplete">incomplete</span></header><p>No runtime evidence is recorded.</p></article><article class="requirement"><header><code>aligned-readback</code><span class="status status--incomplete">incomplete</span></header><p>No runtime evidence is recorded.</p></article><article class="requirement"><header><code>mrt-readback</code><span class="status status--incomplete">incomplete</span></header><p>No runtime evidence is recorded.</p></article><article class="requirement"><header><code>origin-storage-readback</code><span class="status status--incomplete">incomplete</span></header><p>No runtime evidence is recorded.</p></article><article class="requirement"><header><code>current-adapter-gpu-timestamp</code><span class="status status--incomplete">incomplete</span></header><p>No runtime evidence is recorded.</p></article></div></section>
 
-  <section class="section" aria-labelledby="capture-title"><h2 id="capture-title">Capture state</h2><div class="table-wrap"><table><thead><tr><th>Field</th><th>Published value</th></tr></thead><tbody><tr><td>Primary route</td><td><code>/demos/webgpu-camera-rig/</code></td></tr><tr><td>Cameras</td><td><code>near, design, far</code></td></tr><tr><td>Seeds</td><td><code>0x00000001, 0x9e3779b9</code></td></tr><tr><td>Modes</td><td><code>overview, profile, inspection</code></td></tr><tr><td>Capture time</td><td><code>Not present in the promoted report data</code></td></tr><tr><td>Adapter identity</td><td><code>Not promoted</code></td></tr><tr><td>Raw readback hashes</td><td><code>Not promoted</code></td></tr></tbody></table></div></section>
+  <section class="section" aria-labelledby="capture-title"><h2 id="capture-title">Capture state</h2><div class="table-wrap"><table><thead><tr><th>Field</th><th>Published value</th></tr></thead><tbody><tr><td>Primary route</td><td><code>/demos/webgpu-camera-rig/</code></td></tr><tr><td>Cameras</td><td><code>near, design, far</code></td></tr><tr><td>Seeds</td><td><code>0x00000001, 0x9e3779b9</code></td></tr><tr><td>Modes</td><td><code>overview, profile, inspection</code></td></tr><tr><td>Capture time</td><td><code>Not present in the promoted report data</code></td></tr><tr><td>Adapter identity</td><td><code>Not promoted</code></td></tr><tr><td>Raw readback hashes</td><td><code>Not present in the promoted preview summary</code></td></tr></tbody></table></div></section>
 
   <section class="section" aria-labelledby="routes-title"><h2 id="routes-title">Fixed routes</h2><div class="table-wrap"><table><thead><tr><th>Kind</th><th>Id</th><th>Startup state</th><th>Status</th></tr></thead><tbody><tr><td>scenario</td><td><a href="/demos/webgpu-camera-rig/scenario/default/"><code>default</code></a></td><td><code>{&quot;scenario&quot;:&quot;default&quot;}</code></td><td>incomplete</td></tr><tr><td>mechanism</td><td><a href="/demos/webgpu-camera-rig/mechanism/scale-aware-framing/"><code>scale-aware-framing</code></a></td><td><code>{&quot;mechanism&quot;:&quot;scale-aware-framing&quot;}</code></td><td>incomplete</td></tr><tr><td>mechanism</td><td><a href="/demos/webgpu-camera-rig/mechanism/handoff-and-replay/"><code>handoff-and-replay</code></a></td><td><code>{&quot;mechanism&quot;:&quot;handoff-and-replay&quot;}</code></td><td>incomplete</td></tr><tr><td>mechanism</td><td><a href="/demos/webgpu-camera-rig/mechanism/pointer-orbit-and-collision/"><code>pointer-orbit-and-collision</code></a></td><td><code>{&quot;mechanism&quot;:&quot;pointer-orbit-and-collision&quot;}</code></td><td>incomplete</td></tr><tr><td>mechanism</td><td><a href="/demos/webgpu-camera-rig/mechanism/floating-origin/"><code>floating-origin</code></a></td><td><code>{&quot;mechanism&quot;:&quot;floating-origin&quot;}</code></td><td>incomplete</td></tr><tr><td>mechanism</td><td><a href="/demos/webgpu-camera-rig/mechanism/projection-and-depth/"><code>projection-and-depth</code></a></td><td><code>{&quot;mechanism&quot;:&quot;projection-and-depth&quot;}</code></td><td>incomplete</td></tr><tr><td>mechanism</td><td><a href="/demos/webgpu-camera-rig/mechanism/shared-jitter-and-velocity/"><code>shared-jitter-and-velocity</code></a></td><td><code>{&quot;mechanism&quot;:&quot;shared-jitter-and-velocity&quot;}</code></td><td>incomplete</td></tr><tr><td>tier</td><td><a href="/demos/webgpu-camera-rig/tier/full/"><code>full</code></a></td><td><code>{&quot;tier&quot;:&quot;full&quot;}</code></td><td>incomplete</td></tr><tr><td>tier</td><td><a href="/demos/webgpu-camera-rig/tier/budgeted/"><code>budgeted</code></a></td><td><code>{&quot;tier&quot;:&quot;budgeted&quot;}</code></td><td>incomplete</td></tr><tr><td>tier</td><td><a href="/demos/webgpu-camera-rig/tier/minimum/"><code>minimum</code></a></td><td><code>{&quot;tier&quot;:&quot;minimum&quot;}</code></td><td>incomplete</td></tr></tbody></table></div></section>
 
@@ -139,7 +158,7 @@
   ]
 }</pre></details></section>
 
-  <section class="section" aria-labelledby="limitations-title"><h2 id="limitations-title">Limitations</h2><ul class="limitations"><li>No tracked accepted v2 runtime bundle is published for this source hash.</li><li>2 required capability records remain incomplete.</li><li>7 required runtime-proof records remain incomplete.</li><li>No current-hardware performance claim is published without named-adapter timestamp evidence.</li></ul></section>
+  <section class="section" aria-labelledby="limitations-title"><h2 id="limitations-title">Limitations</h2><ul class="limitations"><li>Correctness capture records native r185 WebGPUBackend with device identity proof.</li><li>Named-adapter GPU timestamps and 60 Hz hardwarePerformance remain NOT_CLAIMED.</li><li>Mechanism and tier routes beyond the primary correctness capture remain incomplete.</li></ul></section>
   <footer class="site-footer"><span>webgpu-camera-rig · sha256:28e26085a6ee</span><span><a href="/evidence/">All evidence reports</a></span></footer>
 </div></main>
 </body>

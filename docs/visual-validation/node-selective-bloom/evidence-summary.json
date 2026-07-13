@@ -29,8 +29,8 @@
       "file": "final.design.png",
       "meaning": "Final color-managed presentation readback.",
       "source": "final.design.png",
-      "sourceSha256": "sha256:dbcb9a0884d856d7b7cec3383a93e5e39b15a6388948c6fb44f0d7e51e09e054",
-      "outputSha256": "sha256:dbcb9a0884d856d7b7cec3383a93e5e39b15a6388948c6fb44f0d7e51e09e054",
+      "sourceSha256": "sha256:81991f1083db33d7b34c62b45b9fd295e832a0a0a1a60c0b22a4bb54d9c8f2d5",
+      "outputSha256": "sha256:81991f1083db33d7b34c62b45b9fd295e832a0a0a1a60c0b22a4bb54d9c8f2d5",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
@@ -39,8 +39,8 @@
       "file": "no-post.design.png",
       "meaning": "No-post / diagnostic baseline presentation.",
       "source": "no-post.design.png",
-      "sourceSha256": "sha256:0f8b2b0f201088e97a7239583f350a0ec2eceff2636e2e07b342efafc4ea49d7",
-      "outputSha256": "sha256:0f8b2b0f201088e97a7239583f350a0ec2eceff2636e2e07b342efafc4ea49d7",
+      "sourceSha256": "sha256:c79305bf766213104920e4b03bc454168f45462e3164296353eb0624e970139a",
+      "outputSha256": "sha256:c79305bf766213104920e4b03bc454168f45462e3164296353eb0624e970139a",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
@@ -49,8 +49,8 @@
       "file": "diagnostics.mosaic.png",
       "meaning": "Mechanism/owner diagnostic presentation.",
       "source": "diagnostics.mosaic.png",
-      "sourceSha256": "sha256:b186cdc5c6099506c6a2c216942bbf6dbcda9ab61276385a3994cccaa59d0430",
-      "outputSha256": "sha256:b186cdc5c6099506c6a2c216942bbf6dbcda9ab61276385a3994cccaa59d0430",
+      "sourceSha256": "sha256:eff61693ad7a3f1739c184568862e7905f09ed6b2d652d6bf3ee5719ddf2ef6b",
+      "outputSha256": "sha256:eff61693ad7a3f1739c184568862e7905f09ed6b2d652d6bf3ee5719ddf2ef6b",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
@@ -59,8 +59,8 @@
       "file": "camera.near.png",
       "meaning": "Near camera presentation.",
       "source": "camera.near.png",
-      "sourceSha256": "sha256:8b6e462f6807e8dabc13fa455ee8c8d6e3d41c015f0ebcdcc33cc3821efe4a95",
-      "outputSha256": "sha256:8b6e462f6807e8dabc13fa455ee8c8d6e3d41c015f0ebcdcc33cc3821efe4a95",
+      "sourceSha256": "sha256:821a3750dc164e73102c6f673778ffa13f4c678c74b9ba7fe0973d5a583eaeb3",
+      "outputSha256": "sha256:821a3750dc164e73102c6f673778ffa13f4c678c74b9ba7fe0973d5a583eaeb3",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
@@ -69,8 +69,8 @@
       "file": "camera.design.png",
       "meaning": "Design camera presentation.",
       "source": "camera.design.png",
-      "sourceSha256": "sha256:dbcb9a0884d856d7b7cec3383a93e5e39b15a6388948c6fb44f0d7e51e09e054",
-      "outputSha256": "sha256:dbcb9a0884d856d7b7cec3383a93e5e39b15a6388948c6fb44f0d7e51e09e054",
+      "sourceSha256": "sha256:81991f1083db33d7b34c62b45b9fd295e832a0a0a1a60c0b22a4bb54d9c8f2d5",
+      "outputSha256": "sha256:81991f1083db33d7b34c62b45b9fd295e832a0a0a1a60c0b22a4bb54d9c8f2d5",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
@@ -79,8 +79,8 @@
       "file": "camera.far.png",
       "meaning": "Far camera presentation.",
       "source": "camera.far.png",
-      "sourceSha256": "sha256:458f43ced8c10e23b42bef66eea23cacc18adec4b0c70e89aff81c3280b56271",
-      "outputSha256": "sha256:458f43ced8c10e23b42bef66eea23cacc18adec4b0c70e89aff81c3280b56271",
+      "sourceSha256": "sha256:bd292a10d94984fd0ffd77da43f64b6000aa41fa6805e675793eac0868a8513b",
+      "outputSha256": "sha256:bd292a10d94984fd0ffd77da43f64b6000aa41fa6805e675793eac0868a8513b",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
@@ -89,8 +89,8 @@
       "file": "seed-0001.final.png",
       "meaning": "Baseline seed presentation.",
       "source": "seed-0001.final.png",
-      "sourceSha256": "sha256:dbcb9a0884d856d7b7cec3383a93e5e39b15a6388948c6fb44f0d7e51e09e054",
-      "outputSha256": "sha256:dbcb9a0884d856d7b7cec3383a93e5e39b15a6388948c6fb44f0d7e51e09e054",
+      "sourceSha256": "sha256:81991f1083db33d7b34c62b45b9fd295e832a0a0a1a60c0b22a4bb54d9c8f2d5",
+      "outputSha256": "sha256:81991f1083db33d7b34c62b45b9fd295e832a0a0a1a60c0b22a4bb54d9c8f2d5",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
@@ -99,36 +99,36 @@
       "file": "seed-9e3779b9.final.png",
       "meaning": "Stress seed presentation.",
       "source": "seed-9e3779b9.final.png",
-      "sourceSha256": "sha256:dbcb9a0884d856d7b7cec3383a93e5e39b15a6388948c6fb44f0d7e51e09e054",
-      "outputSha256": "sha256:dbcb9a0884d856d7b7cec3383a93e5e39b15a6388948c6fb44f0d7e51e09e054",
+      "sourceSha256": "sha256:81991f1083db33d7b34c62b45b9fd295e832a0a0a1a60c0b22a4bb54d9c8f2d5",
+      "outputSha256": "sha256:81991f1083db33d7b34c62b45b9fd295e832a0a0a1a60c0b22a4bb54d9c8f2d5",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     },
     {
       "file": "temporal.t000.png",
-      "meaning": "Temporal t=0 presentation.",
+      "meaning": "Temporal t0 presentation.",
       "source": "temporal.t000.png",
-      "sourceSha256": "sha256:dbcb9a0884d856d7b7cec3383a93e5e39b15a6388948c6fb44f0d7e51e09e054",
-      "outputSha256": "sha256:dbcb9a0884d856d7b7cec3383a93e5e39b15a6388948c6fb44f0d7e51e09e054",
+      "sourceSha256": "sha256:81991f1083db33d7b34c62b45b9fd295e832a0a0a1a60c0b22a4bb54d9c8f2d5",
+      "outputSha256": "sha256:81991f1083db33d7b34c62b45b9fd295e832a0a0a1a60c0b22a4bb54d9c8f2d5",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     },
     {
       "file": "temporal.t001.png",
-      "meaning": "Temporal t=1/60 presentation.",
+      "meaning": "Temporal t1 presentation.",
       "source": "temporal.t001.png",
-      "sourceSha256": "sha256:dbcb9a0884d856d7b7cec3383a93e5e39b15a6388948c6fb44f0d7e51e09e054",
-      "outputSha256": "sha256:dbcb9a0884d856d7b7cec3383a93e5e39b15a6388948c6fb44f0d7e51e09e054",
+      "sourceSha256": "sha256:81991f1083db33d7b34c62b45b9fd295e832a0a0a1a60c0b22a4bb54d9c8f2d5",
+      "outputSha256": "sha256:81991f1083db33d7b34c62b45b9fd295e832a0a0a1a60c0b22a4bb54d9c8f2d5",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     }
   ],
   "limitations": [
-    "Native WebGPU correctness capture proves isWebGPUBackend and aligned presentation readbacks for the current source hash.",
-    "Bloom mechanism quantitative gates and GPU timestamps remain INSUFFICIENT_EVIDENCE / NOT_CLAIMED.",
-    "No approved unified-v2 release bundle is published; formal acceptance is incomplete."
+    "Native WebGPU correctness capture proves isWebGPUBackend, renderer init, mechanism-reachable presentation modes, and aligned presentation readbacks for the current source hash.",
+    "BloomNode physical target inventory and named-adapter GPU timestamps remain incomplete.",
+    "No approved unified-v2 release bundle; formal lab acceptance remains incomplete."
   ]
 }

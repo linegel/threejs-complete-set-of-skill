@@ -216,7 +216,7 @@
       "id": "native-webgpu",
       "required": true,
       "evidence": "correctness capture-session proves isWebGPUBackend === true on r185",
-      "status": "incomplete"
+      "status": "accepted"
     },
     {
       "id": "gpu-timestamps",
@@ -229,8 +229,8 @@
     {
       "id": "single-owner-graph",
       "required": true,
-      "evidence": "unit/mutation suites prove owner graph; browser presentation capture bound to current hash",
-      "status": "incomplete"
+      "evidence": "unit/mutation suites + correctness capture-session prove single-owner graph with native WebGPU presentation readbacks",
+      "status": "accepted"
     },
     {
       "id": "field-storage-readback",

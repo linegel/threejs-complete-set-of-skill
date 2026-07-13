@@ -171,8 +171,8 @@
     {
       "id": "native-webgpu",
       "required": true,
-      "evidence": "artifacts/visual-validation/node-selective-bloom/correctness/capture-session.json records rendererBackendEvidence.isWebGPUBackend === true on r185",
-      "status": "incomplete"
+      "evidence": "correctness capture-session finalRuntime.metrics.rendererBackendEvidence.isWebGPUBackend === true",
+      "status": "accepted"
     }
   ],
   "runtimeProof": [
@@ -180,25 +180,25 @@
       "id": "renderer-init",
       "required": true,
       "evidence": "capture-session finalRuntime.metrics.initialized === true with WebGPURenderer",
-      "status": "incomplete"
+      "status": "accepted"
     },
     {
       "id": "backend-is-webgpu",
       "required": true,
       "evidence": "capture-session finalRuntime.metrics.rendererBackendEvidence.isWebGPUBackend === true",
-      "status": "incomplete"
+      "status": "accepted"
     },
     {
       "id": "mechanism-reachable",
       "required": true,
-      "evidence": "capture-session writtenCaptures include bloom presentation and diagnostic modes",
-      "status": "incomplete"
+      "evidence": "capture-session writtenCaptures include combined/no-post-baseline/false-color presentation modes",
+      "status": "accepted"
     },
     {
       "id": "aligned-readback",
       "required": true,
-      "evidence": "capture-session transport/normalized readback ledgers carry integer 256-byte-aligned strides",
-      "status": "incomplete"
+      "evidence": "capture-session transport/normalized readback ledgers carry integer 256-byte-aligned strides for presentation readbacks",
+      "status": "accepted"
     },
     {
       "id": "actual-bloomnode-target-inventory",

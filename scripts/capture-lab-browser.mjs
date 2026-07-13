@@ -2097,14 +2097,22 @@ export async function captureLabBrowser({
     page.on('console', (message) => {
       if (message.type() === 'error') {
         const location = message.location();
-        consoleErrors.push(`${message.text()}${location.url ? ` (${location.url}:${location.lineNumber}:${location.columnNumber})` : ''}`);
+        const text = message.text();
+        // Browsers always request /favicon.ico; Vite MPA capture roots do not
+        // ship one. Do not poison the error ledger with that benign 404.
+        if (/favicon\.ico/i.test(text) || /favicon\.ico/i.test(location.url ?? '')) return;
+        consoleErrors.push(`${text}${location.url ? ` (${location.url}:${location.lineNumber}:${location.columnNumber})` : ''}`);
       }
     });
     page.on('requestfailed', (request) => {
+      if (/favicon\.ico/i.test(request.url())) return;
       requestErrors.push(`${request.method()} ${request.url()}: ${request.failure()?.errorText ?? 'request failed'}`);
     });
     page.on('response', (response) => {
-      if (response.status() >= 400) requestErrors.push(`${response.status()} ${response.request().method()} ${response.url()}`);
+      if (response.status() >= 400) {
+        if (/favicon\.ico/i.test(response.url())) return;
+        requestErrors.push(`${response.status()} ${response.request().method()} ${response.url()}`);
+      }
     });
     page.on('crash', () => pageErrors.push('page crashed'));
     await page.goto(url, { waitUntil: 'load', timeout: 60_000 });

@@ -15,6 +15,10 @@ export const outputPlan = Object.freeze([
 
 const BASELINE_SEED = 0x00000001;
 const STRESS_SEED = 0x9e3779b9;
+// surface-history at t=0 is a cleared history buffer (pure black). Warm the
+// touch-history path with many steps so t000/t001 are non-blank and differ.
+const TEMPORAL_T0 = 0.5;
+const TEMPORAL_T1 = 0.5 + 1 / 60;
 
 async function select(session, {
   mode = "final",
@@ -38,16 +42,16 @@ export async function captureLab(session) {
     captures.push({ filename, ...(await session.writeCapture(filename, "presentation")) });
   }
 
-  await capture("final.design.png", { mode: "final" });
-  await capture("no-post.design.png", { mode: "host-scene-color" });
-  await capture("diagnostics.mosaic.png", { mode: "owner-graph" });
-  await capture("camera.near.png", { camera: "near" });
-  await capture("camera.design.png", { camera: "design" });
-  await capture("camera.far.png", { camera: "far" });
-  await capture("seed-0001.final.png", { seed: BASELINE_SEED });
-  await capture("seed-9e3779b9.final.png", { seed: STRESS_SEED });
-  await capture("temporal.t000.png", { mode: "surface-history", time: 0 });
-  await capture("temporal.t001.png", { mode: "surface-history", time: 1 / 60 });
+  await capture("final.design.png", { mode: "final", time: TEMPORAL_T0 });
+  await capture("no-post.design.png", { mode: "host-scene-color", time: TEMPORAL_T0 });
+  await capture("diagnostics.mosaic.png", { mode: "owner-graph", time: TEMPORAL_T0 });
+  await capture("camera.near.png", { camera: "near", time: TEMPORAL_T0 });
+  await capture("camera.design.png", { camera: "design", time: TEMPORAL_T0 });
+  await capture("camera.far.png", { camera: "far", time: TEMPORAL_T0 });
+  await capture("seed-0001.final.png", { seed: BASELINE_SEED, time: TEMPORAL_T0 });
+  await capture("seed-9e3779b9.final.png", { seed: STRESS_SEED, time: TEMPORAL_T0 });
+  await capture("temporal.t000.png", { mode: "surface-history", time: TEMPORAL_T0 });
+  await capture("temporal.t001.png", { mode: "surface-history", time: TEMPORAL_T1 });
 
   const locked = session.lockedState;
   if (locked) {

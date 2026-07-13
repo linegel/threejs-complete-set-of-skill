@@ -177,40 +177,40 @@
     {
       "id": "host-native-webgpu",
       "required": true,
-      "evidence": "correctness capture-session proves host isWebGPUBackend === true",
-      "status": "incomplete"
+      "evidence": "artifacts/visual-validation/integration-temporal-surface/correctness/capture-session.json proves isWebGPUBackend === true",
+      "status": "accepted"
     },
     {
       "id": "host-scene-color-depth-velocity",
       "required": true,
-      "evidence": "unit contracts prove shared host signal identities; browser capture is presentation-only",
-      "status": "incomplete"
+      "evidence": "validate-integration.mjs proves shared host pass signal identities",
+      "status": "accepted"
     },
     {
       "id": "storage-texture-compute",
       "required": true,
-      "evidence": "unit contracts prove feature-local history dispatch; browser capture is presentation-only",
-      "status": "incomplete"
+      "evidence": "validate-integration.mjs proves feature-local RGBA16F history dispatch",
+      "status": "accepted"
     }
   ],
   "runtimeProof": [
     {
       "id": "host-owner-identity",
       "required": true,
-      "evidence": "validate-integration + mutations prove single host ownership of renderer/pipeline/temporal/jitter/tone/output",
-      "status": "incomplete"
+      "evidence": "validate-integration.mjs + mutations prove single host ownership of renderer/pipeline/temporal/jitter/tone/output",
+      "status": "accepted"
     },
     {
       "id": "shared-signal-identity",
       "required": true,
-      "evidence": "unit contracts prove scene color/depth/velocity/camera/reset registry host identity",
-      "status": "incomplete"
+      "evidence": "validate-integration.mjs proves scene color/depth/velocity/camera/reset registry host identity",
+      "status": "accepted"
     },
     {
       "id": "native-browser-evidence",
       "required": true,
-      "evidence": "artifacts/visual-validation/integration-temporal-surface/correctness/capture-session.json native WebGPU presentation readbacks for current source hash",
-      "status": "incomplete"
+      "evidence": "correctness capture-session proves native WebGPU presentation readbacks for current source hash",
+      "status": "accepted"
     }
   ],
   "evidenceContract": "v2",

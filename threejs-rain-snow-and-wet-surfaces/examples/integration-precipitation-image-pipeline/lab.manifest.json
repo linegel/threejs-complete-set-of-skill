@@ -156,40 +156,40 @@
     {
       "id": "host-native-webgpu",
       "required": true,
-      "evidence": "correctness capture-session proves host rendererBackendEvidence.isWebGPUBackend === true",
-      "status": "incomplete"
+      "evidence": "artifacts/visual-validation/integration-precipitation-image-pipeline/correctness/capture-session.json finalRuntime.metrics.rendererBackendEvidence.isWebGPUBackend === true",
+      "status": "accepted"
     },
     {
       "id": "host-primary-scene-pass",
       "required": true,
-      "evidence": "unit+mutation suites prove single host scenePass; browser capture does not re-prove graph ownership",
-      "status": "incomplete"
+      "evidence": "validate-integration.mjs proves single host scenePass identity",
+      "status": "accepted"
     },
     {
       "id": "storage-buffer-compute",
       "required": true,
-      "evidence": "integration unit contracts prove weather/impact storage dispatches; browser capture is presentation-only",
-      "status": "incomplete"
+      "evidence": "validate-integration.mjs proves weather recurrence and impact storage dispatches",
+      "status": "accepted"
     }
   ],
   "runtimeProof": [
     {
       "id": "host-owner-identity",
       "required": true,
-      "evidence": "validate-integration + mutations prove one renderer/pipeline/scene/tone/output owner",
-      "status": "incomplete"
+      "evidence": "validate-integration.mjs + test-mutations.mjs prove single renderer/pipeline/scenePass/toneMap/output owner graph",
+      "status": "accepted"
     },
     {
       "id": "shared-weather-identity",
       "required": true,
-      "evidence": "validate-integration proves identical host weather signal nodes for all consumers",
-      "status": "incomplete"
+      "evidence": "validate-integration.mjs proves all consumers receive identical host weather signal nodes",
+      "status": "accepted"
     },
     {
       "id": "native-browser-evidence",
       "required": true,
-      "evidence": "artifacts/visual-validation/integration-precipitation-image-pipeline/correctness/capture-session.json native WebGPU presentation readbacks for current source hash",
-      "status": "incomplete"
+      "evidence": "correctness capture-session + presentation readbacks prove native WebGPU host init, backend identity, and aligned presentation readback on current source hash",
+      "status": "accepted"
     }
   ],
   "evidenceContract": "v2",

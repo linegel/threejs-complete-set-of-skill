@@ -14,7 +14,7 @@
     "threejs-dynamic-surface-effects/examples/integration-temporal-surface/test-mutations.mjs",
     "README.md"
   ],
-  "canonicalSourceHash": "sha256:9b7d7b773f386cc43ed1ab4540001e1f375242ee9ab70f7f8fe56ee91a480a51",
+  "canonicalSourceHash": "sha256:410742b902f2cff8a6219f419b48877ce69901ddbf20022d9c491b02782997b8",
   "threeRevision": "0.185.1",
   "runtime": {
     "renderer": "WebGPURenderer",
@@ -36,8 +36,8 @@
       "file": "final.design.png",
       "meaning": "Final color-managed presentation readback.",
       "source": "final.design.png",
-      "sourceSha256": "sha256:45ae50ad0b5daac4e44eaa9609225e295c85c3f6fb2b2a904b2cf13327d40b52",
-      "outputSha256": "sha256:45ae50ad0b5daac4e44eaa9609225e295c85c3f6fb2b2a904b2cf13327d40b52",
+      "sourceSha256": "sha256:86c1b5e02583fc922a2bfb689d61655d7c51681fc2fdcaa3036efe3454a896ee",
+      "outputSha256": "sha256:86c1b5e02583fc922a2bfb689d61655d7c51681fc2fdcaa3036efe3454a896ee",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
@@ -46,8 +46,8 @@
       "file": "no-post.design.png",
       "meaning": "No-post / diagnostic baseline presentation.",
       "source": "no-post.design.png",
-      "sourceSha256": "sha256:fb1e765f5b3fd3b46d5f8913429116a11f963903fdb63298c71903ff01b74663",
-      "outputSha256": "sha256:fb1e765f5b3fd3b46d5f8913429116a11f963903fdb63298c71903ff01b74663",
+      "sourceSha256": "sha256:840ae4dafba75a42ce23b81b2497b174c57e9393a2fa4f17ae424143aa2e7494",
+      "outputSha256": "sha256:840ae4dafba75a42ce23b81b2497b174c57e9393a2fa4f17ae424143aa2e7494",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
@@ -66,8 +66,8 @@
       "file": "camera.near.png",
       "meaning": "Near camera presentation.",
       "source": "camera.near.png",
-      "sourceSha256": "sha256:0ec8fb2070214306f6f03218f0deedb6c85a62011119a44ee1c5d0db2b079d8e",
-      "outputSha256": "sha256:0ec8fb2070214306f6f03218f0deedb6c85a62011119a44ee1c5d0db2b079d8e",
+      "sourceSha256": "sha256:60191189b13e9a08caab06c3f82926f364e2ea6d00947223ded00f108e01300c",
+      "outputSha256": "sha256:60191189b13e9a08caab06c3f82926f364e2ea6d00947223ded00f108e01300c",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
@@ -76,8 +76,8 @@
       "file": "camera.design.png",
       "meaning": "Design camera presentation.",
       "source": "camera.design.png",
-      "sourceSha256": "sha256:45ae50ad0b5daac4e44eaa9609225e295c85c3f6fb2b2a904b2cf13327d40b52",
-      "outputSha256": "sha256:45ae50ad0b5daac4e44eaa9609225e295c85c3f6fb2b2a904b2cf13327d40b52",
+      "sourceSha256": "sha256:86c1b5e02583fc922a2bfb689d61655d7c51681fc2fdcaa3036efe3454a896ee",
+      "outputSha256": "sha256:86c1b5e02583fc922a2bfb689d61655d7c51681fc2fdcaa3036efe3454a896ee",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
@@ -86,8 +86,8 @@
       "file": "camera.far.png",
       "meaning": "Far camera presentation.",
       "source": "camera.far.png",
-      "sourceSha256": "sha256:fb87dfecc22e7faf15b71ec763c1e6a6eb2ff75d33b62b026c015c5676e537ca",
-      "outputSha256": "sha256:fb87dfecc22e7faf15b71ec763c1e6a6eb2ff75d33b62b026c015c5676e537ca",
+      "sourceSha256": "sha256:99d92a49112cacffe44a720dbf71498c002daf547c4e0b02849629dbe7a07522",
+      "outputSha256": "sha256:99d92a49112cacffe44a720dbf71498c002daf547c4e0b02849629dbe7a07522",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
@@ -96,8 +96,8 @@
       "file": "seed-0001.final.png",
       "meaning": "Baseline seed presentation.",
       "source": "seed-0001.final.png",
-      "sourceSha256": "sha256:45ae50ad0b5daac4e44eaa9609225e295c85c3f6fb2b2a904b2cf13327d40b52",
-      "outputSha256": "sha256:45ae50ad0b5daac4e44eaa9609225e295c85c3f6fb2b2a904b2cf13327d40b52",
+      "sourceSha256": "sha256:86c1b5e02583fc922a2bfb689d61655d7c51681fc2fdcaa3036efe3454a896ee",
+      "outputSha256": "sha256:86c1b5e02583fc922a2bfb689d61655d7c51681fc2fdcaa3036efe3454a896ee",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
@@ -106,36 +106,36 @@
       "file": "seed-9e3779b9.final.png",
       "meaning": "Stress seed presentation.",
       "source": "seed-9e3779b9.final.png",
-      "sourceSha256": "sha256:45ae50ad0b5daac4e44eaa9609225e295c85c3f6fb2b2a904b2cf13327d40b52",
-      "outputSha256": "sha256:45ae50ad0b5daac4e44eaa9609225e295c85c3f6fb2b2a904b2cf13327d40b52",
+      "sourceSha256": "sha256:4c8863d4d1c0d981bf7ff7da486041a3db39597d815301b0ba28d020ed17f81e",
+      "outputSha256": "sha256:4c8863d4d1c0d981bf7ff7da486041a3db39597d815301b0ba28d020ed17f81e",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     },
     {
       "file": "temporal.t000.png",
-      "meaning": "Temporal t=0 presentation.",
+      "meaning": "Temporal t0 presentation.",
       "source": "temporal.t000.png",
-      "sourceSha256": "sha256:27e681bc957745f0cd7a7d464fa2de4360c90d8540cf4899ff5dbd4bc64b1103",
-      "outputSha256": "sha256:27e681bc957745f0cd7a7d464fa2de4360c90d8540cf4899ff5dbd4bc64b1103",
+      "sourceSha256": "sha256:add72af5b9b8cc0cf958c0d2a80d5cb1bd8fdcd3159e9fb9561a8e4642282b9d",
+      "outputSha256": "sha256:add72af5b9b8cc0cf958c0d2a80d5cb1bd8fdcd3159e9fb9561a8e4642282b9d",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     },
     {
       "file": "temporal.t001.png",
-      "meaning": "Temporal t=1/60 presentation.",
+      "meaning": "Temporal t1 presentation.",
       "source": "temporal.t001.png",
-      "sourceSha256": "sha256:a2d92d4ffaddcf13846c71a9b0675796369ff97fd60918f48d57d495faf9b706",
-      "outputSha256": "sha256:a2d92d4ffaddcf13846c71a9b0675796369ff97fd60918f48d57d495faf9b706",
+      "sourceSha256": "sha256:8a3f802ef0e8c346eec2068d222b50fff69b42d5e6fdfcba08349fdd347fde54",
+      "outputSha256": "sha256:8a3f802ef0e8c346eec2068d222b50fff69b42d5e6fdfcba08349fdd347fde54",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     }
   ],
   "limitations": [
-    "Host temporal integration native WebGPU capture proves backend identity and presentation readbacks on the current source hash.",
+    "Host temporal integration native WebGPU capture proves backend identity and non-blank warmed surface-history temporal readbacks on the current source hash.",
     "Primary dependencies (frost, image-pipeline, temporal-history) block formal integration acceptance.",
-    "Mechanism quantitative gates and named-adapter timestamps remain incomplete."
+    "Named-adapter GPU timestamps remain incomplete."
   ]
 }

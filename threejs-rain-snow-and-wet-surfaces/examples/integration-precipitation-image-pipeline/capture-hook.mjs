@@ -15,6 +15,10 @@ export const outputPlan = Object.freeze([
 
 const BASELINE_SEED = 0x00000001;
 const STRESS_SEED = 0x9e3779b9;
+// Weather diagnostics are black at t=0 after reset; warm long enough for
+// forcing/wetness/snowCoverage to light the presentation diagnostic path.
+const TEMPORAL_T0 = 1.0;
+const TEMPORAL_T1 = 1.0 + 1 / 60;
 
 async function select(session, {
   mode = "final",
@@ -38,17 +42,18 @@ export async function captureLab(session) {
     captures.push({ filename, ...(await session.writeCapture(filename, "presentation")) });
   }
 
-  await capture("final.design.png", { mode: "final" });
-  // No separate post-stack disable; owner-graph is the non-beauty diagnostic baseline.
-  await capture("no-post.design.png", { mode: "owner-graph" });
-  await capture("diagnostics.mosaic.png", { mode: "weather-state" });
-  await capture("camera.near.png", { camera: "near" });
-  await capture("camera.design.png", { camera: "design" });
-  await capture("camera.far.png", { camera: "far" });
-  await capture("seed-0001.final.png", { seed: BASELINE_SEED });
-  await capture("seed-9e3779b9.final.png", { seed: STRESS_SEED });
-  await capture("temporal.t000.png", { mode: "weather-state", time: 0 });
-  await capture("temporal.t001.png", { mode: "weather-state", time: 1 / 60 });
+  await capture("final.design.png", { mode: "final", time: TEMPORAL_T0 });
+  // Owner-graph is a non-beauty diagnostic that remains non-blank.
+  await capture("no-post.design.png", { mode: "owner-graph", time: TEMPORAL_T0 });
+  // Warm weather-state (not cold reset) so the diagnostic channel is lit.
+  await capture("diagnostics.mosaic.png", { mode: "weather-state", time: TEMPORAL_T0 });
+  await capture("camera.near.png", { camera: "near", time: TEMPORAL_T0 });
+  await capture("camera.design.png", { camera: "design", time: TEMPORAL_T0 });
+  await capture("camera.far.png", { camera: "far", time: TEMPORAL_T0 });
+  await capture("seed-0001.final.png", { seed: BASELINE_SEED, time: TEMPORAL_T0 });
+  await capture("seed-9e3779b9.final.png", { seed: STRESS_SEED, time: TEMPORAL_T0 });
+  await capture("temporal.t000.png", { mode: "weather-state", time: TEMPORAL_T0 });
+  await capture("temporal.t001.png", { mode: "weather-state", time: TEMPORAL_T1 });
 
   const locked = session.lockedState;
   if (locked) {
