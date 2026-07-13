@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 2,
+  "owners": {
+    "renderer": "threejs-black-holes-and-space-effects",
+    "scenePass": "tsl-curved-ray",
+    "finalPipeline": "tsl-curved-ray",
+    "toneMap": "renderOutput",
+    "outputTransform": "renderOutput"
+  },
+  "signals": [
+    {
+      "id": "output",
+      "producer": "tsl-curved-ray",
+      "consumers": [
+        "presentation"
+      ],
+      "reachable": true
+    }
+  ],
+  "sceneSubmissions": [
+    {
+      "id": "shared-scene-pass",
+      "owner": "tsl-curved-ray",
+      "kind": "lit-scene",
+      "submissionCount": {
+        "value": 1,
+        "unit": "submissions-per-frame",
+        "label": "Measured",
+        "source": "LabController.describePipeline"
+      }
+    }
+  ],
+  "computeDispatches": [],
+  "resources": [],
+  "finalToneMapOwner": "renderOutput",
+  "finalOutputTransformOwner": "renderOutput"
+}

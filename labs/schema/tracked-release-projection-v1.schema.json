@@ -41,7 +41,8 @@
     },
     "retainedImages": {
       "type": "array",
-      "minItems": 10,
+      "description": "All captured standard (and extra) images retained in the tracked checkout. Structural N/A slots (e.g. no-post when the graph has no optional post stage) are omitted because they have no bytes; nine retained images is valid when one standard slot is N/A.",
+      "minItems": 9,
       "uniqueItems": true,
       "items": { "$ref": "#/$defs/retainedImage" }
     },

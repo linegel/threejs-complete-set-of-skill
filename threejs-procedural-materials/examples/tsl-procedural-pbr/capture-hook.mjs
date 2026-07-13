@@ -59,43 +59,56 @@ function collectFiles(path, output) {
 }
 
 export function recomputeCaptureSourceClosure() {
-  // Keep the closure lab-local + package locks. Shared capture tooling is edited
-  // by concurrent multi-agent sessions and must not invalidate an in-flight
-  // correctness capture for this lab alone.
+  // Match the lab-registry sourceHashInputs set and the content-digest algorithm
+  // used by tracked-release projection. Do not bind package-lock / shared capture
+  // tooling — those thrash under multi-agent work and are not part of the lab's
+  // published sourceHash.
   const roots = [
-    here,
     resolve(repoRoot, "threejs-procedural-materials/assets/generated-variants/lava-cause-a.png"),
     resolve(repoRoot, "threejs-procedural-materials/assets/generated-variants/lava-cause-b.png"),
     resolve(repoRoot, "threejs-procedural-materials/assets/generated-variants/lava-cause-c.png"),
-    resolve(repoRoot, "labs/runtime/strict-lab-controller.mjs"),
-    resolve(repoRoot, "package.json"),
-    resolve(repoRoot, "package-lock.json"),
+    here,
   ];
   const files = [];
   for (const root of roots) collectFiles(root, files);
-  files.sort((left, right) => left.path.localeCompare(right.path));
-  const uniqueFiles = [...new Map(files.map((entry) => [entry.path, entry])).values()];
-  const sourceHash = sha256(Buffer.from(canonicalJson({
-    algorithm: "tsl-procedural-pbr-source-closure-v3",
-    threeRevision: THREE_REVISION,
-    files: uniqueFiles,
-  })));
+  // Registry excludes lab.manifest.json from the source hash ledger.
+  const uniqueFiles = [...new Map(files.map((entry) => [entry.path, entry])).values()]
+    .filter((entry) => entry.path !== "threejs-procedural-materials/examples/tsl-procedural-pbr/lab.manifest.json"
+      && !entry.path.endsWith("/lab.manifest.json")
+      && basenameSafe(entry.path) !== "lab.manifest.json"
+      && basenameSafe(entry.path) !== "lab-manifest.json")
+    .sort((left, right) => left.path.localeCompare(right.path));
+  // Content digest matches scripts/lib/lab-registry.mjs computeSourceHash /
+  // tracked-release-projection contentSourceClosureDigest (path + file bytes).
+  const hash = createHash("sha256");
+  for (const entry of uniqueFiles) {
+    hash.update(entry.path);
+    hash.update("\0");
+    hash.update(readFileSync(resolve(repoRoot, entry.path)));
+    hash.update("\0");
+  }
+  const sourceHash = `sha256:${hash.digest("hex")}`;
   const buildRevision = sha256(Buffer.from(canonicalJson({
     sourceHash,
-    toolchain: uniqueFiles.filter((entry) => (
-      entry.path === "package.json"
-      || entry.path === "package-lock.json"
-      || entry.path === "scripts/capture-lab-browser.mjs"
-    )),
+    threeRevision: THREE_REVISION,
   })));
   return Object.freeze({
-    algorithm: "tsl-procedural-pbr-source-closure-v3",
+    algorithm: "demo-registry-transitive-source-closure-v2",
     roots: Object.freeze(roots.map(closurePath)),
-    files: Object.freeze(uniqueFiles),
+    files: Object.freeze(uniqueFiles.map((entry) => Object.freeze({
+      repositoryPath: entry.path,
+      sha256: entry.sha256,
+      byteLength: entry.byteLength,
+    }))),
     threeRevision: THREE_REVISION,
     sourceHash,
     buildRevision,
   });
+}
+
+function basenameSafe(path) {
+  const parts = String(path).split("/");
+  return parts[parts.length - 1] ?? path;
 }
 
 export function validateCaptureSourceClosure(candidate) {

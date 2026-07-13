@@ -1,0 +1,382 @@
+{
+  "schemaVersion": 1,
+  "projectionKind": "tracked-release-projection-v1",
+  "policy": {
+    "id": "native-webgpu-tracked-release-v1",
+    "digest": "sha256:e349900d79da27cb5570ea959707f741e03ea7e206d85a717a1129b27268f6a4"
+  },
+  "labId": "semantic-mesh-writer",
+  "skill": "threejs-procedural-geometry",
+  "threeRevision": "0.185.1",
+  "sourceClosureHash": "sha256:29d2b3162053692b6582029c67743f09e8ea8f0087e44190b1fb6c3c782ac5da",
+  "buildRevision": "sha256:a20e115183c797027f6f68cb914547a2bbcd38b89ef4e3f0eaeb3dfb06117b30",
+  "sourceRelease": {
+    "path": "evidence-manifest.json",
+    "sha256": "sha256:053c1f3c8280c00d329eef4507d16b2f234dce8405e445312b8208730d21bce6",
+    "byteLength": 25634,
+    "promotionBindingDigest": "sha256:bd37d7669b397115b024b64515425086983ea68a1cee5419674fec0f766ac530",
+    "candidateBindingDigest": "sha256:b95fd5495cd10c0af37d1c3ffc036886ec46d3bd06bedb2211741e28df96d1f6",
+    "artifactLedgerDigest": "sha256:b459665987cf4e8df078bf9ace2bdc0180860a859313dd3a46c7d458e2bc7e23",
+    "imageLedgerDigest": "sha256:56a734d76d5c7119c15c1dc73fd4d874a6aee646309519658e8786b463a48ca0"
+  },
+  "sourceClosure": {
+    "algorithm": "demo-registry-transitive-source-closure-v2",
+    "roots": [
+      "threejs-procedural-geometry/examples/semantic-mesh-writer"
+    ],
+    "files": [
+      {
+        "repositoryPath": "threejs-procedural-geometry/examples/semantic-mesh-writer/app.js",
+        "sha256": "sha256:cb7496ac9869025723e3f3126a719e2e2087968297a09bfd81d8824c3b8cac8d",
+        "byteLength": 3639
+      },
+      {
+        "repositoryPath": "threejs-procedural-geometry/examples/semantic-mesh-writer/batching-demo.js",
+        "sha256": "sha256:3b8390c2b138dbceb5e2ecd8b39d031bf81232818710232869ee536c83ed946f",
+        "byteLength": 19281
+      },
+      {
+        "repositoryPath": "threejs-procedural-geometry/examples/semantic-mesh-writer/branch-rings.js",
+        "sha256": "sha256:8652e63b55e94de763ae8defa59d653fbeac7833deefda7c19c3a06403b0d029",
+        "byteLength": 15044
+      },
+      {
+        "repositoryPath": "threejs-procedural-geometry/examples/semantic-mesh-writer/capture-hook.mjs",
+        "sha256": "sha256:c7a5c6cd04a6fe53c1e153e723b221341323be4649b2e192f78d160c0fcb5e0d",
+        "byteLength": 5776
+      },
+      {
+        "repositoryPath": "threejs-procedural-geometry/examples/semantic-mesh-writer/dynamic-component-fixture.js",
+        "sha256": "sha256:97153e72556f3a075c91de27778eb0823498287c13d852d467448dbd57dd97e7",
+        "byteLength": 3838
+      },
+      {
+        "repositoryPath": "threejs-procedural-geometry/examples/semantic-mesh-writer/dynamic-updates.js",
+        "sha256": "sha256:1bde277d58e150816a70a42e098826749ac993e05ad6b5db59abfe49e1a6cf39",
+        "byteLength": 12358
+      },
+      {
+        "repositoryPath": "threejs-procedural-geometry/examples/semantic-mesh-writer/evidence-status.mjs",
+        "sha256": "sha256:b298146837e01d525449b22001f4b9b0aed947c335f41ecb7646c541375dfafa",
+        "byteLength": 306
+      },
+      {
+        "repositoryPath": "threejs-procedural-geometry/examples/semantic-mesh-writer/frame-profile.js",
+        "sha256": "sha256:1a65dc9b3152e8a5bcfec3e681aed61b70c422d875a565db221498db7148e505",
+        "byteLength": 16172
+      },
+      {
+        "repositoryPath": "threejs-procedural-geometry/examples/semantic-mesh-writer/index.html",
+        "sha256": "sha256:a4ac69353f9b3b35d89d30790e170087ad69ccc915f45623703e45b4ef34006b",
+        "byteLength": 1068
+      },
+      {
+        "repositoryPath": "threejs-procedural-geometry/examples/semantic-mesh-writer/indirect-fixture.js",
+        "sha256": "sha256:e6fd21726158d211f6c01edef7afa52c449c5c439c97e684341edd51ab4bd440",
+        "byteLength": 11437
+      },
+      {
+        "repositoryPath": "threejs-procedural-geometry/examples/semantic-mesh-writer/lab-controller.js",
+        "sha256": "sha256:dd83c9d3030aa464ed088b519206ceada5d89657dc619bb5cc63c3e0fc543867",
+        "byteLength": 41407
+      },
+      {
+        "repositoryPath": "threejs-procedural-geometry/examples/semantic-mesh-writer/lod-presets.js",
+        "sha256": "sha256:cef503dcc9f4b5d4e16ee47273f1fff841533d08fb677e8e5eb550e1f4ab0d59",
+        "byteLength": 5779
+      },
+      {
+        "repositoryPath": "threejs-procedural-geometry/examples/semantic-mesh-writer/mechanism/batching-comparison/index.html",
+        "sha256": "sha256:4d938fcfa237ad1a3cfc499f1379cb761f029381806906c6d80c0f21a6a12ee1",
+        "byteLength": 1103
+      },
+      {
+        "repositoryPath": "threejs-procedural-geometry/examples/semantic-mesh-writer/mechanism/branch-rings/index.html",
+        "sha256": "sha256:ee0c7ae4207bc8319f4bd5b95a9ef523341f215321d6b4621cfd40b8f1b95ca3",
+        "byteLength": 1089
+      },
+      {
+        "repositoryPath": "threejs-procedural-geometry/examples/semantic-mesh-writer/mechanism/dynamic-updates/index.html",
+        "sha256": "sha256:e6b43f436577ccc15d279b1ec3df9f7c0a622b8134412179e526c0fd538dd98a",
+        "byteLength": 1095
+      },
+      {
+        "repositoryPath": "threejs-procedural-geometry/examples/semantic-mesh-writer/mechanism/frame-and-rail-profile/index.html",
+        "sha256": "sha256:472198e28f1d26a1f0e39d3ad7743452daff3e246369217de803844dafa20ccc",
+        "byteLength": 1109
+      },
+      {
+        "repositoryPath": "threejs-procedural-geometry/examples/semantic-mesh-writer/mechanism/indirect-draw/index.html",
+        "sha256": "sha256:1384971321888a2b4947a1584029fc6154c37348dccf92e42183090a2dc2cea4",
+        "byteLength": 1091
+      },
+      {
+        "repositoryPath": "threejs-procedural-geometry/examples/semantic-mesh-writer/mechanism/semantic-groups-and-materials/index.html",
+        "sha256": "sha256:0e6af2091dd4897bfa63ef80f62e046a4b96ba88fcd9fb4cef6f48a363912adf",
+        "byteLength": 1123
+      },
+      {
+        "repositoryPath": "threejs-procedural-geometry/examples/semantic-mesh-writer/mesh-writer.js",
+        "sha256": "sha256:c4ef0740efcc9a4c71f719b754e761d4b57919c80b061905d91b2a33e20a2255",
+        "byteLength": 12669
+      },
+      {
+        "repositoryPath": "threejs-procedural-geometry/examples/semantic-mesh-writer/package.json",
+        "sha256": "sha256:62896568cd9cb83ba144adf7e5c3f89103bf907d0e8dc736151a0e22f02de360",
+        "byteLength": 1064
+      },
+      {
+        "repositoryPath": "threejs-procedural-geometry/examples/semantic-mesh-writer/readback-layout.js",
+        "sha256": "sha256:fec42519a99acf5932fa2f929ad87ec9b8f881ae4bbee9e46c31f42e04230885",
+        "byteLength": 3562
+      },
+      {
+        "repositoryPath": "threejs-procedural-geometry/examples/semantic-mesh-writer/README.md",
+        "sha256": "sha256:9c18ffac5d8eb55eb6abc6af8e8398c5a9cb7d18dedc3a5dd596110f4e1304f7",
+        "byteLength": 1370
+      },
+      {
+        "repositoryPath": "threejs-procedural-geometry/examples/semantic-mesh-writer/tangents.js",
+        "sha256": "sha256:ad91cb7d44893b2853806bd9eddbd889db009093c2867c7e228e2a22aca39e59",
+        "byteLength": 10391
+      },
+      {
+        "repositoryPath": "threejs-procedural-geometry/examples/semantic-mesh-writer/test-mutations.js",
+        "sha256": "sha256:59854f1d9c7cb482b67785f037d6e99f2d21e9924e77b3662597b2b81e4ae3c0",
+        "byteLength": 23570
+      },
+      {
+        "repositoryPath": "threejs-procedural-geometry/examples/semantic-mesh-writer/tier/crowd/index.html",
+        "sha256": "sha256:2a7a7aa24b0c5671d72061b04739c5d4cc930bd2b9212d934089cc54c937e57a",
+        "byteLength": 1075
+      },
+      {
+        "repositoryPath": "threejs-procedural-geometry/examples/semantic-mesh-writer/tier/hero/index.html",
+        "sha256": "sha256:43c33818800c3ee5534d4bf0b57786ccbd91174d1ceb88f3e1aba47ab7d60720",
+        "byteLength": 1073
+      },
+      {
+        "repositoryPath": "threejs-procedural-geometry/examples/semantic-mesh-writer/tier/standard/index.html",
+        "sha256": "sha256:40262992efa04fdf04333f6822f6a2f9b38f12a131d87c60a5c0fa370db5e19a",
+        "byteLength": 1081
+      },
+      {
+        "repositoryPath": "threejs-procedural-geometry/examples/semantic-mesh-writer/validate-geometry.js",
+        "sha256": "sha256:6d34a8a4d3ccf74d25b92bc48c6d42ffba33ce7fbe1b8821f26bb240e4b2837c",
+        "byteLength": 34018
+      },
+      {
+        "repositoryPath": "threejs-procedural-geometry/examples/semantic-mesh-writer/validate-routes.mjs",
+        "sha256": "sha256:082aaa023453fa09a4c9c23d0857038b391a019fd40c5be44669334667e910ff",
+        "byteLength": 2895
+      }
+    ],
+    "threeRevision": "0.185.1",
+    "sourceHash": "sha256:29d2b3162053692b6582029c67743f09e8ea8f0087e44190b1fb6c3c782ac5da",
+    "buildRevision": "sha256:a20e115183c797027f6f68cb914547a2bbcd38b89ef4e3f0eaeb3dfb06117b30"
+  },
+  "retainedFiles": [
+    {
+      "path": "visual-contract.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:08b139849685f0c58fc3a49056189be29adff75a292e673f59494aa15256bcf9",
+      "byteLength": 870
+    },
+    {
+      "path": "renderer-info.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:ce98dc437ff1e48283efdd61f5f63f5c0cc95934b77e56c419199c8db5c3b599",
+      "byteLength": 466
+    },
+    {
+      "path": "pipeline-graph.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:4b33704a54a03e6e5b661cb5429978be47a8aab4eeedfd234d3f83feea0739fb",
+      "byteLength": 867
+    },
+    {
+      "path": "performance-envelope.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:62e1abb57e217febce5044e04788aae2967a749c9dd5c70432f279fc3c45e507",
+      "byteLength": 634
+    },
+    {
+      "path": "frame-trace.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:61e2604f805c8759b4999cc2b6ef8e27ea9446acb8902d2b4f38c58f787479e7",
+      "byteLength": 280
+    },
+    {
+      "path": "quality-governor.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:b3289b52fcafb5700ae1e96de3003e5c5f0da298e3eac1a161718a6837958188",
+      "byteLength": 258
+    },
+    {
+      "path": "render-targets.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:a39ede4a9c5932c3b8d78f64fc09e16b8ea44177f4b1c573d6c1e487c3cbd807",
+      "byteLength": 9613
+    },
+    {
+      "path": "storage-resources.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:579719a4f114bada5939fff4c4a645ac178e5b40a8f18de1cfb9532f02a92486",
+      "byteLength": 333
+    },
+    {
+      "path": "resident-resources.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:cd0553ae12a5f01c0d5068bd532309cd2e4566c5b2112363d7a05b5930ed0ce0",
+      "byteLength": 1303
+    },
+    {
+      "path": "bandwidth-model.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:e921c52741c0a3b03c5a02ac0b1337262a182750cd76a01d10c49323c047a034",
+      "byteLength": 956
+    },
+    {
+      "path": "visual-errors.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:f4b2464fc52bef50bc4fdd264442c77fe07b680905d615eb5be53d0d84a8ff9c",
+      "byteLength": 752
+    },
+    {
+      "path": "leak-loop.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:ca3ea16475928a12188e303b2c65e77dc641f4fab1404418d973a294f4277249",
+      "byteLength": 131833
+    },
+    {
+      "path": "mechanism-metrics.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:e1c4cf0570244110150acf4a50554157b0e2728c1ae40985c7f33aa7127ba86c",
+      "byteLength": 4333
+    },
+    {
+      "path": "capture-write-ledger.json",
+      "status": "captured",
+      "kind": "capture-session-write-ledger",
+      "sha256": "sha256:8b429a2ecff21c1b275310a41eccf8970c7864ff701bf71545fe61bcf6a6b67d",
+      "byteLength": 9943
+    }
+  ],
+  "retainedImages": [
+    {
+      "path": "final.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "final.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:25e4dcdec14ee25435c8d2ea4747ad4d1b87d8a84418a0e9ab7c994f824b06ed",
+      "byteLength": 8167
+    },
+    {
+      "path": "diagnostics.mosaic.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "diagnostics.mosaic",
+      "mediaType": "image/png",
+      "sha256": "sha256:88faa93f6726c7cac946ae6e97476ba0ba41d81dafbf6ab961f72b02bfc21f64",
+      "byteLength": 39466
+    },
+    {
+      "path": "camera.near.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.near",
+      "mediaType": "image/png",
+      "sha256": "sha256:2fc404d38eeacb44de432ab7cd433a109203cb97ac6046bd5b1e7a0e277f90a9",
+      "byteLength": 53431
+    },
+    {
+      "path": "camera.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:0f7b2818e53e26481e72c46815331159fd9e4251f601db78a2e50324650e1bf9",
+      "byteLength": 27423
+    },
+    {
+      "path": "camera.far.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.far",
+      "mediaType": "image/png",
+      "sha256": "sha256:b682895ee2d5e2f9474a0d9653ec8d3de4047bcf8d50437e790b3b4903df6650",
+      "byteLength": 16752
+    },
+    {
+      "path": "seed-0001.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "seed-0001.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:3ea2d9877c9761161731e17162bc0cbad8d8b22a286aff0716d17ef12023367a",
+      "byteLength": 21583
+    },
+    {
+      "path": "seed-9e3779b9.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "seed-9e3779b9.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:45d9bf116e5e02a9d94dab632ff5a889c6e9df420a2948cd6775c6cf60cec810",
+      "byteLength": 20987
+    },
+    {
+      "path": "temporal.t000.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "temporal.t000",
+      "mediaType": "image/png",
+      "sha256": "sha256:a91c32bf61cce5de17bd00f3cbd3d8127c03353b9b59482eea5025dd9c7595bf",
+      "byteLength": 27390
+    },
+    {
+      "path": "temporal.t001.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "temporal.t001",
+      "mediaType": "image/png",
+      "sha256": "sha256:2fef5ef61d656fa61352e1eb9eff77196bfbc3760f291ed8d4e40d4fd21ca10f",
+      "byteLength": 27495
+    }
+  ],
+  "omittedFiles": {
+    "ledgerDigest": "sha256:2d05f475eaf00ec65a3aea870d7005f512c4ee00062477596bd48c5732051a8d",
+    "count": 1,
+    "byteLength": 186703,
+    "byKind": [
+      {
+        "kind": "capture-session-document",
+        "count": 1,
+        "byteLength": 186703
+      }
+    ]
+  },
+  "checkoutLimitations": [
+    {
+      "id": "detached-source-payloads",
+      "status": "ACTIVE",
+      "statement": "Raw readbacks and capture-session transcript bytes are omitted from the tracked projection. Checkout validation verifies their approved hash and byte-length commitments, not the detached bytes themselves.",
+      "affectedClaims": []
+    }
+  ],
+  "projectionDigest": "sha256:5889d40237e4a53c94d9149e86e8891d435170c4e23bba0bbbe31342542016ec"
+}

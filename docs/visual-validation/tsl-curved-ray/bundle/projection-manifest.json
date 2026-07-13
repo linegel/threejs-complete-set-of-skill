@@ -1,0 +1,411 @@
+{
+  "schemaVersion": 1,
+  "projectionKind": "tracked-release-projection-v1",
+  "policy": {
+    "id": "native-webgpu-tracked-release-v1",
+    "digest": "sha256:e349900d79da27cb5570ea959707f741e03ea7e206d85a717a1129b27268f6a4"
+  },
+  "labId": "tsl-curved-ray",
+  "skill": "threejs-black-holes-and-space-effects",
+  "threeRevision": "0.185.1",
+  "sourceClosureHash": "sha256:c0bee8cf5535d232c7af888c5ef3a7313b27afc656742ed271a5a49c36c780c2",
+  "buildRevision": "sha256:c0bee8cf5535d232c7af888c5ef3a7313b27afc656742ed271a5a49c36c780c2",
+  "sourceRelease": {
+    "path": "evidence-manifest.json",
+    "sha256": "sha256:bec8b7426342c86672566f3562639b7b2ef8b5ba66831d790d53196de6917df3",
+    "byteLength": 25271,
+    "promotionBindingDigest": "sha256:816c890b2836ca6ab90deee70c368916f6a4d5abea3a4009bf7918989a1e3f56",
+    "candidateBindingDigest": "sha256:c18b810d5c2669fcf4ffb1fc81cac35f9250295398a9324c8a355fc77ccacd4b",
+    "artifactLedgerDigest": "sha256:6384691737276b81d99bce5a853953ea1752a0d3d2869bd8cc95e96f7a07bc7d",
+    "imageLedgerDigest": "sha256:ae182ff853355307ee5a703fdfccc5bc4047c137e37a40ae0f3b832666ca70e4"
+  },
+  "sourceClosure": {
+    "algorithm": "demo-registry-transitive-source-closure-v2",
+    "roots": [
+      "threejs-black-holes-and-space-effects/examples/tsl-curved-ray"
+    ],
+    "files": [
+      {
+        "repositoryPath": "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/capture.mjs",
+        "sha256": "sha256:1deca25d3532214e87e607cab3ccf9ca772a7515fefe635bc885112c4cd9b73c",
+        "byteLength": 30172
+      },
+      {
+        "repositoryPath": "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/curved-ray-accretion.js",
+        "sha256": "sha256:72c3f0647bb5ffa6a8dfbf52722614621d455ecef9b8995fd0f747342b79fec8",
+        "byteLength": 41844
+      },
+      {
+        "repositoryPath": "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/generated-starfields-browser.mjs",
+        "sha256": "sha256:b42f6f9810594bc5c01689823aa18e1850d50c55483921e3817287db91701c9f",
+        "byteLength": 10299
+      },
+      {
+        "repositoryPath": "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/generated-starfields.html",
+        "sha256": "sha256:f5a566f997ffca4040dadd4e18ac85944d7c08d5853f05776006b65ddc5148b5",
+        "byteLength": 612
+      },
+      {
+        "repositoryPath": "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/index.html",
+        "sha256": "sha256:12cc0ca6e889582d383ce91f495d544ab0300a4b135ea012813ae126d48937aa",
+        "byteLength": 1867
+      },
+      {
+        "repositoryPath": "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/main.mjs",
+        "sha256": "sha256:352aab5ad2cfd3aa0cf5bc99ed49ce3e1a2103a43cff8a5c8038c9576c16d8dd",
+        "byteLength": 3969
+      },
+      {
+        "repositoryPath": "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/mechanism/accretion-disk/index.html",
+        "sha256": "sha256:1183c18ef4c06710c4316988ba72bb2d539b541cc126aed79775c439661c6dee",
+        "byteLength": 1241
+      },
+      {
+        "repositoryPath": "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/mechanism/ellis-wormhole/index.html",
+        "sha256": "sha256:7293a21dd160c0adbbf7c27958b878e662bbcf8e7cf31fb91c32b20269c60464",
+        "byteLength": 1239
+      },
+      {
+        "repositoryPath": "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/mechanism/integration-convergence/index.html",
+        "sha256": "sha256:7945f6d8d348def9d29b505fa889bb97439b76de37b40269406dc0c1bd12411c",
+        "byteLength": 1256
+      },
+      {
+        "repositoryPath": "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/mechanism/lens-cache/index.html",
+        "sha256": "sha256:cf3564a8ca5ed8187599284e5630dc41713a8f9848cf06dbf23d24a04100870f",
+        "byteLength": 1226
+      },
+      {
+        "repositoryPath": "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/mechanism/schwarzschild-lensing/index.html",
+        "sha256": "sha256:a1d2a0b0e230e790ced31b06ae65b3594dba7d1430c0a0a0f972a6b850541788",
+        "byteLength": 1256
+      },
+      {
+        "repositoryPath": "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/mechanism/temporal-reconstruction/index.html",
+        "sha256": "sha256:961276a4e5041b84cf6c892da57b57db911242a9218e4ae299c38d234b0105c0",
+        "byteLength": 1262
+      },
+      {
+        "repositoryPath": "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/package-lock.json",
+        "sha256": "sha256:cc3ece61300150134b7fdd7b6508bea9bd4e865db2eab8a640940f1236fc73d8",
+        "byteLength": 1903
+      },
+      {
+        "repositoryPath": "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/package.json",
+        "sha256": "sha256:7e05dcac414529432231d51c8039d3895e6541c161ed706b5a1d1d821037ee4c",
+        "byteLength": 1852
+      },
+      {
+        "repositoryPath": "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/README.md",
+        "sha256": "sha256:9b6190d7bc1b8ffcbca4c6b9761e1113cda9779150e098d9546191da0bdd80a6",
+        "byteLength": 5012
+      },
+      {
+        "repositoryPath": "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/route-wrappers.test.mjs",
+        "sha256": "sha256:0c2868950c5aa26e64222a8bcdec4d9d5d098a865618faa96db221c35234d5b6",
+        "byteLength": 3698
+      },
+      {
+        "repositoryPath": "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/space-browser.mjs",
+        "sha256": "sha256:3f544ce9f2aa26b7db316fad29538dcda9c3e91ad319f4544421a9d4ce0b7a75",
+        "byteLength": 1010
+      },
+      {
+        "repositoryPath": "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/space-gpu-probes.js",
+        "sha256": "sha256:c99632e101f4e873079fb883e336b8627d81180ddb0ce83c2a9bf4a9c54f0a5b",
+        "byteLength": 17591
+      },
+      {
+        "repositoryPath": "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/space-integrators.js",
+        "sha256": "sha256:53459ac2dc85fbdc82f274f17981d0f6dd14c9b83cef964ca69bf62746095017",
+        "byteLength": 13330
+      },
+      {
+        "repositoryPath": "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/space-integrators.mutations.test.mjs",
+        "sha256": "sha256:8135973571dd45ec8c47170a681ad2943f394afd37623cf1772a849a5223a7b9",
+        "byteLength": 1474
+      },
+      {
+        "repositoryPath": "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/space-integrators.test.mjs",
+        "sha256": "sha256:8b868de1e3522f8e5104d401fe1e482aa11eee0af2c33e6253ae8d9342e878b7",
+        "byteLength": 13815
+      },
+      {
+        "repositoryPath": "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/space-lab.mjs",
+        "sha256": "sha256:a6ad2da3613a5b4525fcbfd5fabf5cbbeaafe21b9f0b8ff6e70013c88d60c7ff",
+        "byteLength": 22716
+      },
+      {
+        "repositoryPath": "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/space-transfer-stage.js",
+        "sha256": "sha256:e580ed9a0d7dfc75c00e22a2ca7446a3e83ce808f50073c94177de4317747aa7",
+        "byteLength": 39616
+      },
+      {
+        "repositoryPath": "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/tier/background/index.html",
+        "sha256": "sha256:d854afd08f0113d0d55c44f22ce322a97857f95cbd266c4065f6d82f795c64d5",
+        "byteLength": 1227
+      },
+      {
+        "repositoryPath": "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/tier/distant/index.html",
+        "sha256": "sha256:aaedc6437b7fb859672b9dee919fd68ff0c884d0068374034a790c2d7dae9539",
+        "byteLength": 1218
+      },
+      {
+        "repositoryPath": "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/tier/hero/index.html",
+        "sha256": "sha256:4c6bb07a53480edd8f9e7f8a78b67bd9a7a1c8fa3c8f32e89963360bd6e85799",
+        "byteLength": 1209
+      },
+      {
+        "repositoryPath": "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/tier/standard/index.html",
+        "sha256": "sha256:fee97797a139c65afc6263dd9a2e2f9a84d90f87eb1ad590b79da6fa44ea8163",
+        "byteLength": 1221
+      },
+      {
+        "repositoryPath": "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/validate-artifacts.mjs",
+        "sha256": "sha256:ab5c3bf5453b8cdacbb522ba64e447955ded7841736ad095d36b573865e0f6c1",
+        "byteLength": 2817
+      },
+      {
+        "repositoryPath": "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/validate-curved-ray-contracts.mjs",
+        "sha256": "sha256:e0d3504effd01c3279718276b351c161cf190e311cdefa93df1a7ebeadd9bd35",
+        "byteLength": 7612
+      },
+      {
+        "repositoryPath": "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/validate-generated-starfields.mjs",
+        "sha256": "sha256:8c6cfb9904c5cec883716222155d0c863329db3c6c552bbd97959aeeed6956ad",
+        "byteLength": 15758
+      },
+      {
+        "repositoryPath": "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/validate-temporal-history.mjs",
+        "sha256": "sha256:763e60087d61f3443efc09b305924af80f975de902e9f96d4f4a3c3ba4cc4443",
+        "byteLength": 6088
+      },
+      {
+        "repositoryPath": "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/validate-transform-contracts.mjs",
+        "sha256": "sha256:4c86ddefb2998a21723a312da61f4873f898df80a8d9f06d0d32dc1c1e397219",
+        "byteLength": 3605
+      },
+      {
+        "repositoryPath": "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/validate-wormhole-reference-rays.mjs",
+        "sha256": "sha256:d750c313d220ac8b0a57daea477faf16131c6df85328c0b1fbf97e376ddc7426",
+        "byteLength": 17783
+      }
+    ],
+    "threeRevision": "0.185.1",
+    "sourceHash": "sha256:c0bee8cf5535d232c7af888c5ef3a7313b27afc656742ed271a5a49c36c780c2",
+    "buildRevision": "sha256:c0bee8cf5535d232c7af888c5ef3a7313b27afc656742ed271a5a49c36c780c2"
+  },
+  "retainedFiles": [
+    {
+      "path": "visual-contract.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:937bef50dedd323e6e43f7200652a56e228f0c9d8653abdb846e83f52127ca5f",
+      "byteLength": 868
+    },
+    {
+      "path": "renderer-info.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:6c626449acb76adc5e7d41975aa5782cd2fa8376d8a1b563f0ee45d1c096b179",
+      "byteLength": 467
+    },
+    {
+      "path": "pipeline-graph.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:db5b1701ee1edb191878a29d555e588149e2671872c73d6d647ca28a6574dc48",
+      "byteLength": 853
+    },
+    {
+      "path": "performance-envelope.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:62e1abb57e217febce5044e04788aae2967a749c9dd5c70432f279fc3c45e507",
+      "byteLength": 634
+    },
+    {
+      "path": "frame-trace.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:61e2604f805c8759b4999cc2b6ef8e27ea9446acb8902d2b4f38c58f787479e7",
+      "byteLength": 280
+    },
+    {
+      "path": "quality-governor.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:8ba04cc2b7412c93550f005126f5c50f8970b54d004018656eddb6bc39a82ea6",
+      "byteLength": 278
+    },
+    {
+      "path": "render-targets.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:fb49fce3f1b9886213dc312a27935fef810de7f03b236f3ba063d67981dd5e01",
+      "byteLength": 20042
+    },
+    {
+      "path": "storage-resources.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:579719a4f114bada5939fff4c4a645ac178e5b40a8f18de1cfb9532f02a92486",
+      "byteLength": 333
+    },
+    {
+      "path": "resident-resources.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:bbf993e1ec3ccc2f6450f52ae8a7afcffe8fbd467b1a7e99d1a4e07106e6ca73",
+      "byteLength": 1627
+    },
+    {
+      "path": "bandwidth-model.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:e921c52741c0a3b03c5a02ac0b1337262a182750cd76a01d10c49323c047a034",
+      "byteLength": 956
+    },
+    {
+      "path": "visual-errors.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:f4b2464fc52bef50bc4fdd264442c77fe07b680905d615eb5be53d0d84a8ff9c",
+      "byteLength": 752
+    },
+    {
+      "path": "leak-loop.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:0c2f3ea9ce1db7677d4bac876a5c6e066a48fa04b38147acee93963ffa46f012",
+      "byteLength": 131844
+    },
+    {
+      "path": "mechanism-metrics.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:0e10da9789dbd62d959484d5ee2a6be486c5d6f489910fbf45fa2b36383fd744",
+      "byteLength": 7805
+    },
+    {
+      "path": "capture-write-ledger.json",
+      "status": "captured",
+      "kind": "capture-session-write-ledger",
+      "sha256": "sha256:e708a3f101ed2cdc1acb4fa448a34a04022455de73a1f4667edf316d207df2d0",
+      "byteLength": 3323
+    }
+  ],
+  "retainedImages": [
+    {
+      "path": "final.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "final.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:6450a65b23832148c3d4f5d9a7967f9684e7a6ae87280d6f037bc5c8764262d4",
+      "byteLength": 179199
+    },
+    {
+      "path": "no-post.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "no-post.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:1527de74bc89e9a41a6f8b5c523ecde9ce6fb377e32ba45162595ea2549271c8",
+      "byteLength": 176764
+    },
+    {
+      "path": "diagnostics.mosaic.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "diagnostics.mosaic",
+      "mediaType": "image/png",
+      "sha256": "sha256:00a65cf006742059275c05c3c7574dff6d26c647cbb38198ab61f43998403079",
+      "byteLength": 229219
+    },
+    {
+      "path": "camera.near.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.near",
+      "mediaType": "image/png",
+      "sha256": "sha256:5fe5823e12f90374b6c57f10498f98c7ac7fc400b3084172da879e7262d3c487",
+      "byteLength": 436253
+    },
+    {
+      "path": "camera.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:6450a65b23832148c3d4f5d9a7967f9684e7a6ae87280d6f037bc5c8764262d4",
+      "byteLength": 179199
+    },
+    {
+      "path": "camera.far.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.far",
+      "mediaType": "image/png",
+      "sha256": "sha256:54f716d81493d4f943be4e9f9d983c881ec0ddffe8cd94343770b84afea8b57b",
+      "byteLength": 56370
+    },
+    {
+      "path": "seed-0001.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "seed-0001.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:6450a65b23832148c3d4f5d9a7967f9684e7a6ae87280d6f037bc5c8764262d4",
+      "byteLength": 179199
+    },
+    {
+      "path": "seed-9e3779b9.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "seed-9e3779b9.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:efb94abbeee73453a26efa87f5bffc040fca12dd55f0135dc60efee1cad64a0d",
+      "byteLength": 177984
+    },
+    {
+      "path": "temporal.t000.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "temporal.t000",
+      "mediaType": "image/png",
+      "sha256": "sha256:6450a65b23832148c3d4f5d9a7967f9684e7a6ae87280d6f037bc5c8764262d4",
+      "byteLength": 179199
+    },
+    {
+      "path": "temporal.t001.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "temporal.t001",
+      "mediaType": "image/png",
+      "sha256": "sha256:5fe5823e12f90374b6c57f10498f98c7ac7fc400b3084172da879e7262d3c487",
+      "byteLength": 436253
+    }
+  ],
+  "omittedFiles": {
+    "ledgerDigest": "sha256:b21de030e90cefa96c56a80a5bc040f213dfa2d9c7d61e659fb850f209267b1a",
+    "count": 1,
+    "byteLength": 21873,
+    "byKind": [
+      {
+        "kind": "capture-session-document",
+        "count": 1,
+        "byteLength": 21873
+      }
+    ]
+  },
+  "checkoutLimitations": [
+    {
+      "id": "detached-source-payloads",
+      "status": "ACTIVE",
+      "statement": "Raw readbacks and capture-session transcript bytes are omitted from the tracked projection. Checkout validation verifies their approved hash and byte-length commitments, not the detached bytes themselves.",
+      "affectedClaims": []
+    }
+  ],
+  "projectionDigest": "sha256:d528471e5f03940904e230899459da908b6d20d5efc1f74abf43ce34d8979134"
+}

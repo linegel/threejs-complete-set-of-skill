@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 2,
+  "textures": [],
+  "geometry": [],
+  "buffers": [],
+  "histories": [],
+  "staging": [
+    "transient WebGPU readback staging; opaque byte residency not claimed"
+  ],
+  "readback": [
+    "camera.design.png",
+    "camera.far.png",
+    "camera.near.png",
+    "diagnostics.mosaic.png",
+    "final.design.png",
+    "mechanism.ellis-wormhole.png",
+    "mechanism.integration-convergence.png",
+    "mechanism.lens-cache.png",
+    "mechanism.schwarzschild-lensing.png",
+    "mechanism.temporal-reconstruction.png",
+    "no-post.design.png",
+    "seed-0001.final.png",
+    "seed-9e3779b9.final.png",
+    "temporal.t000.png",
+    "temporal.t001.png",
+    "tier.background.png",
+    "tier.distant.png",
+    "tier.hero.png",
+    "tier.standard.png"
+  ],
+  "pipelineEstimate": null,
+  "accountingScope": "transactional-capture-targets-only",
+  "completeness": "PARTIAL",
+  "inventoryCompleteness": "PARTIAL",
+  "labOwnedNonTargetResources": [],
+  "opaqueRendererInternalResidency": {
+    "verdict": "NOT_CLAIMED",
+    "reason": "Exact Three.js renderer-internal pipeline and cache byte residency is unavailable."
+  },
+  "trackedRenderTargetBytes": {
+    "value": 72960000,
+    "unit": "bytes",
+    "label": "Derived",
+    "source": "sum of transactional capture targets"
+  },
+  "trackedPeakLiveRenderTargetBytes": {
+    "value": 3840000,
+    "unit": "bytes",
+    "label": "Derived",
+    "source": "one transactional capture target is live at a time"
+  },
+  "uploadChurnPerFrame": {
+    "value": 0,
+    "unit": "bytes",
+    "label": "Derived",
+    "source": "correctness capture does not measure upload churn"
+  }
+}

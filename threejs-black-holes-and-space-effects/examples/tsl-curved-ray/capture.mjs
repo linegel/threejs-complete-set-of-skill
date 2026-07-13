@@ -400,20 +400,27 @@ const server = staticServer();
 const port = await listen(server);
 let browser;
 try {
-  browser = await chromium.launch({
-    headless: true,
-    channel: process.platform === "darwin" ? "chrome" : undefined,
-    args: [
-      "--enable-unsafe-webgpu",
-      "--disable-gpu-sandbox",
-      "--ignore-gpu-blocklist",
-      ...(process.platform === "darwin" ? ["--use-angle=metal"] : ["--enable-features=Vulkan,UseSkiaRenderer"]),
-    ],
-  });
-  const page = await browser.newPage({
+  const cdpEndpoint = process.env.CAPTURE_CDP_ENDPOINT;
+  if (typeof cdpEndpoint === "string" && cdpEndpoint.length > 0) {
+    browser = await chromium.connectOverCDP(cdpEndpoint);
+  } else {
+    browser = await chromium.launch({
+      headless: true,
+      channel: process.platform === "darwin" ? "chrome" : undefined,
+      args: [
+        "--enable-unsafe-webgpu",
+        "--disable-gpu-sandbox",
+        "--ignore-gpu-blocklist",
+        ...(process.platform === "darwin" ? ["--use-angle=metal"] : ["--enable-features=Vulkan,UseSkiaRenderer"]),
+      ],
+    });
+  }
+  const context = browser.contexts()[0] ?? await browser.newContext({
     viewport: { width: captureViewport.width, height: captureViewport.height },
     deviceScaleFactor: captureViewport.dpr,
   });
+  const page = await context.newPage();
+  await page.setViewportSize({ width: captureViewport.width, height: captureViewport.height });
   const pageErrors = [];
   page.on("pageerror", (error) => pageErrors.push(String(error.stack ?? error)));
   page.on("console", (message) => {

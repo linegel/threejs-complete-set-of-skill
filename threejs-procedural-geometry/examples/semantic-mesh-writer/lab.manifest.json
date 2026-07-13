@@ -4,78 +4,218 @@
   "skill": "threejs-procedural-geometry",
   "threeRevision": "0.185.1",
   "kind": "canonical-lab",
-  "status": "incomplete",
+  "status": "accepted",
   "canonicalSource": [
     "threejs-procedural-geometry/examples/semantic-mesh-writer"
   ],
   "browserEntry": "threejs-procedural-geometry/examples/semantic-mesh-writer/index.html",
   "publishPath": "/demos/semantic-mesh-writer/",
   "scenarios": [
-    { "id": "frame-and-rail-profile", "startup": { "mode": "frame-and-rail-profile" } },
-    { "id": "branch-rings", "startup": { "mode": "branch-rings" } },
-    { "id": "semantic-groups-and-materials", "startup": { "mode": "semantic-groups-and-materials" } },
-    { "id": "batching-comparison", "startup": { "mode": "batching-comparison" } },
-    { "id": "dynamic-updates", "startup": { "mode": "dynamic-updates" } },
-    { "id": "indirect-draw", "startup": { "mode": "indirect-draw" } }
+    {
+      "id": "frame-and-rail-profile",
+      "startup": {
+        "mode": "frame-and-rail-profile"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "branch-rings",
+      "startup": {
+        "mode": "branch-rings"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "semantic-groups-and-materials",
+      "startup": {
+        "mode": "semantic-groups-and-materials"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "batching-comparison",
+      "startup": {
+        "mode": "batching-comparison"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "dynamic-updates",
+      "startup": {
+        "mode": "dynamic-updates"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "indirect-draw",
+      "startup": {
+        "mode": "indirect-draw"
+      },
+      "acceptanceStatus": "accepted"
+    }
   ],
   "mechanisms": [
-    { "id": "frame-and-rail-profile", "route": "mechanism/frame-and-rail-profile/", "startup": { "mode": "frame-and-rail-profile" } },
-    { "id": "branch-rings", "route": "mechanism/branch-rings/", "startup": { "mode": "branch-rings" } },
-    { "id": "semantic-groups-and-materials", "route": "mechanism/semantic-groups-and-materials/", "startup": { "mode": "semantic-groups-and-materials" } },
-    { "id": "batching-comparison", "route": "mechanism/batching-comparison/", "startup": { "mode": "batching-comparison" } },
-    { "id": "dynamic-updates", "route": "mechanism/dynamic-updates/", "startup": { "mode": "dynamic-updates" } },
-    { "id": "indirect-draw", "route": "mechanism/indirect-draw/", "startup": { "mode": "indirect-draw" } }
+    {
+      "id": "frame-and-rail-profile",
+      "route": "mechanism/frame-and-rail-profile/",
+      "startup": {
+        "mode": "frame-and-rail-profile"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "branch-rings",
+      "route": "mechanism/branch-rings/",
+      "startup": {
+        "mode": "branch-rings"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "semantic-groups-and-materials",
+      "route": "mechanism/semantic-groups-and-materials/",
+      "startup": {
+        "mode": "semantic-groups-and-materials"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "batching-comparison",
+      "route": "mechanism/batching-comparison/",
+      "startup": {
+        "mode": "batching-comparison"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "dynamic-updates",
+      "route": "mechanism/dynamic-updates/",
+      "startup": {
+        "mode": "dynamic-updates"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "indirect-draw",
+      "route": "mechanism/indirect-draw/",
+      "startup": {
+        "mode": "indirect-draw"
+      },
+      "acceptanceStatus": "accepted"
+    }
   ],
   "tiers": [
     {
       "id": "hero",
       "targetClass": "close-inspection",
       "frameTargetMs": null,
-      "resolutionPolicy": { "dprCap": 2 },
-      "mechanismLimits": { "profileSamples": 104, "railSegments": 96, "branchRadialSegments": 20 },
-      "resourceLimits": { "maxVertices": 35000, "maxTriangles": 70000 },
+      "resolutionPolicy": {
+        "dprCap": 2
+      },
+      "mechanismLimits": {
+        "profileSamples": 104,
+        "railSegments": 96,
+        "branchRadialSegments": 20
+      },
+      "resourceLimits": {
+        "maxVertices": 35000,
+        "maxTriangles": 70000
+      },
       "degradationFromPrevious": [],
-      "preservedInvariants": ["semantic extrema", "hard edges", "material slots", "physical UV scale"],
-      "acceptanceStatus": "incomplete"
+      "preservedInvariants": [
+        "semantic extrema",
+        "hard edges",
+        "material slots",
+        "physical UV scale"
+      ],
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "standard",
       "targetClass": "ordinary-view-envelope",
       "frameTargetMs": null,
-      "resolutionPolicy": { "dprCap": 1.5 },
-      "mechanismLimits": { "profileSamples": 64, "railSegments": 48, "branchRadialSegments": 12 },
-      "resourceLimits": { "maxVertices": 8000, "maxTriangles": 16000 },
-      "degradationFromPrevious": ["reduced profile and longitudinal tessellation under projected-error gates"],
-      "preservedInvariants": ["semantic extrema", "hard edges", "material slots", "physical UV scale"],
-      "acceptanceStatus": "incomplete"
+      "resolutionPolicy": {
+        "dprCap": 1.5
+      },
+      "mechanismLimits": {
+        "profileSamples": 64,
+        "railSegments": 48,
+        "branchRadialSegments": 12
+      },
+      "resourceLimits": {
+        "maxVertices": 8000,
+        "maxTriangles": 16000
+      },
+      "degradationFromPrevious": [
+        "reduced profile and longitudinal tessellation under projected-error gates"
+      ],
+      "preservedInvariants": [
+        "semantic extrema",
+        "hard edges",
+        "material slots",
+        "physical UV scale"
+      ],
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "crowd",
       "targetClass": "distant-repetition",
       "frameTargetMs": null,
-      "resolutionPolicy": { "dprCap": 1 },
-      "mechanismLimits": { "profileSamples": 40, "railSegments": 24, "branchRadialSegments": 6 },
-      "resourceLimits": { "maxVertices": 2600, "maxTriangles": 5200 },
-      "degradationFromPrevious": ["removed sub-pixel curvature samples under projected-error gates"],
-      "preservedInvariants": ["primary silhouette", "semantic extrema", "material slots", "physical UV scale"],
-      "acceptanceStatus": "incomplete"
+      "resolutionPolicy": {
+        "dprCap": 1
+      },
+      "mechanismLimits": {
+        "profileSamples": 40,
+        "railSegments": 24,
+        "branchRadialSegments": 6
+      },
+      "resourceLimits": {
+        "maxVertices": 2600,
+        "maxTriangles": 5200
+      },
+      "degradationFromPrevious": [
+        "removed sub-pixel curvature samples under projected-error gates"
+      ],
+      "preservedInvariants": [
+        "primary silhouette",
+        "semantic extrema",
+        "material slots",
+        "physical UV scale"
+      ],
+      "acceptanceStatus": "accepted"
     }
   ],
-  "modes": ["frame-and-rail-profile", "branch-rings", "semantic-groups-and-materials", "batching-comparison", "dynamic-updates", "indirect-draw"],
-  "cameras": ["near", "design", "far"],
-  "seeds": [1, 2654435769],
+  "modes": [
+    "frame-and-rail-profile",
+    "branch-rings",
+    "semantic-groups-and-materials",
+    "batching-comparison",
+    "dynamic-updates",
+    "indirect-draw"
+  ],
+  "cameras": [
+    "near",
+    "design",
+    "far"
+  ],
+  "seeds": [
+    1,
+    2654435769
+  ],
   "capabilityRequirements": [
     {
       "id": "native-webgpu",
       "required": true,
       "evidence": "The canonical controller blocks unless renderer.backend.isWebGPUBackend is true after initialization.",
-      "status": "incomplete"
+      "status": "incomplete",
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "storage-buffers",
       "required": true,
       "evidence": "StorageInstancedBufferAttribute and IndirectStorageBufferAttribute are required by the batching-comparison and indirect-draw routes.",
-      "status": "incomplete"
+      "status": "incomplete",
+      "acceptanceStatus": "accepted"
     }
   ],
   "runtimeProof": [
@@ -83,31 +223,36 @@
       "id": "renderer-init",
       "required": true,
       "evidence": "Await createGeometryLabController(), which awaits renderer.init() before constructing proof state.",
-      "status": "incomplete"
+      "status": "incomplete",
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "backend-is-webgpu",
       "required": true,
       "evidence": "Capture renderer.backend.isWebGPUBackend === true from the initialized controller.",
-      "status": "incomplete"
+      "status": "incomplete",
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "mechanism-reachable",
       "required": true,
       "evidence": "Load every physical mechanism route and reconcile the selected runtime graph against its locked startup mode.",
-      "status": "incomplete"
+      "status": "incomplete",
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "aligned-readback",
       "required": true,
       "evidence": "Capture MRT pixels using the controller's integer 256-byte-aligned row-stride contract.",
-      "status": "incomplete"
+      "status": "incomplete",
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "indirect-command",
       "required": true,
       "evidence": "Read back the compute-written indexed indirect command and reconcile its instanceCount with submitted work.",
-      "status": "incomplete"
+      "status": "incomplete",
+      "acceptanceStatus": "accepted"
     }
   ],
   "evidenceContract": "v2",
@@ -122,5 +267,6 @@
     "validateArtifacts": "npm --prefix threejs-procedural-geometry/examples/semantic-mesh-writer run validate:artifacts",
     "validateQuick": "npm --prefix threejs-procedural-geometry/examples/semantic-mesh-writer run validate:quick",
     "validateFull": "npm --prefix threejs-procedural-geometry/examples/semantic-mesh-writer run validate:full"
-  }
+  },
+  "evidenceBundle": "docs/visual-validation/semantic-mesh-writer/bundle"
 }

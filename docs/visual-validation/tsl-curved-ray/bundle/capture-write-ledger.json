@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 2,
+  "labId": "tsl-curved-ray",
+  "profile": "correctness",
+  "records": [
+    {
+      "path": "camera.design.png",
+      "sha256": "sha256:6450a65b23832148c3d4f5d9a7967f9684e7a6ae87280d6f037bc5c8764262d4",
+      "byteLength": 179199
+    },
+    {
+      "path": "camera.far.png",
+      "sha256": "sha256:54f716d81493d4f943be4e9f9d983c881ec0ddffe8cd94343770b84afea8b57b",
+      "byteLength": 56370
+    },
+    {
+      "path": "camera.near.png",
+      "sha256": "sha256:5fe5823e12f90374b6c57f10498f98c7ac7fc400b3084172da879e7262d3c487",
+      "byteLength": 436253
+    },
+    {
+      "path": "diagnostics.mosaic.png",
+      "sha256": "sha256:00a65cf006742059275c05c3c7574dff6d26c647cbb38198ab61f43998403079",
+      "byteLength": 229219
+    },
+    {
+      "path": "final.design.png",
+      "sha256": "sha256:6450a65b23832148c3d4f5d9a7967f9684e7a6ae87280d6f037bc5c8764262d4",
+      "byteLength": 179199
+    },
+    {
+      "path": "mechanism.ellis-wormhole.png",
+      "sha256": "sha256:96d18de6e8cce9084c1f53d55f3b4127e57d6f70799a590b8a3fd91ec3cdabc9",
+      "byteLength": 5687
+    },
+    {
+      "path": "mechanism.integration-convergence.png",
+      "sha256": "sha256:96d18de6e8cce9084c1f53d55f3b4127e57d6f70799a590b8a3fd91ec3cdabc9",
+      "byteLength": 5687
+    },
+    {
+      "path": "mechanism.lens-cache.png",
+      "sha256": "sha256:bfaa664f4a653862dbfd6192f9b2b3eee2e2902f6e61070de5954733ac43b4f3",
+      "byteLength": 8186
+    },
+    {
+      "path": "mechanism.schwarzschild-lensing.png",
+      "sha256": "sha256:96d18de6e8cce9084c1f53d55f3b4127e57d6f70799a590b8a3fd91ec3cdabc9",
+      "byteLength": 5687
+    },
+    {
+      "path": "mechanism.temporal-reconstruction.png",
+      "sha256": "sha256:bfaa664f4a653862dbfd6192f9b2b3eee2e2902f6e61070de5954733ac43b4f3",
+      "byteLength": 8186
+    },
+    {
+      "path": "no-post.design.png",
+      "sha256": "sha256:1527de74bc89e9a41a6f8b5c523ecde9ce6fb377e32ba45162595ea2549271c8",
+      "byteLength": 176764
+    },
+    {
+      "path": "seed-0001.final.png",
+      "sha256": "sha256:6450a65b23832148c3d4f5d9a7967f9684e7a6ae87280d6f037bc5c8764262d4",
+      "byteLength": 179199
+    },
+    {
+      "path": "seed-9e3779b9.final.png",
+      "sha256": "sha256:efb94abbeee73453a26efa87f5bffc040fca12dd55f0135dc60efee1cad64a0d",
+      "byteLength": 177984
+    },
+    {
+      "path": "temporal.t000.png",
+      "sha256": "sha256:6450a65b23832148c3d4f5d9a7967f9684e7a6ae87280d6f037bc5c8764262d4",
+      "byteLength": 179199
+    },
+    {
+      "path": "temporal.t001.png",
+      "sha256": "sha256:5fe5823e12f90374b6c57f10498f98c7ac7fc400b3084172da879e7262d3c487",
+      "byteLength": 436253
+    },
+    {
+      "path": "tier.background.png",
+      "sha256": "sha256:14cd24547550b9e91eb03ab99d546ca5f0da90a05ef131effb00ad086564d434",
+      "byteLength": 33314
+    },
+    {
+      "path": "tier.distant.png",
+      "sha256": "sha256:796fff94fecc127c0a0889931da82ffcfc6474331b0e0d4159354196aa86fe3a",
+      "byteLength": 22207
+    },
+    {
+      "path": "tier.hero.png",
+      "sha256": "sha256:f5440747c7d74cb119de86f00f8d87001ebaa15fa464d9d4b18a99e807c59b12",
+      "byteLength": 216761
+    },
+    {
+      "path": "tier.standard.png",
+      "sha256": "sha256:6450a65b23832148c3d4f5d9a7967f9684e7a6ae87280d6f037bc5c8764262d4",
+      "byteLength": 179199
+    }
+  ]
+}

@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "labId": "semantic-mesh-writer",
+  "classification": "inspected-runtime-evidence-preview",
+  "acceptanceStatus": "accepted",
+  "evidenceBundleId": "docs/visual-validation/semantic-mesh-writer/bundle",
+  "canonicalSource": [
+    "threejs-procedural-geometry/examples/semantic-mesh-writer"
+  ],
+  "canonicalSourceHash": "sha256:29d2b3162053692b6582029c67743f09e8ea8f0087e44190b1fb6c3c782ac5da",
+  "threeRevision": "0.185.1",
+  "runtime": {
+    "isWebGPUBackend": true,
+    "adapterClass": "hardware",
+    "automationSurface": "playwright-headless-chromium"
+  },
+  "claimVerdicts": {
+    "visualCorrectness": "PASS",
+    "mechanismCorrectness": "PASS",
+    "performanceCompliance": "NOT_CLAIMED",
+    "gpuAttribution": "NOT_CLAIMED",
+    "lifecycleStability": "PASS",
+    "visualError": "PASS"
+  },
+  "primaryImage": "final.design.png",
+  "primaryImageLabel": "final design",
+  "images": [
+    {
+      "file": "final.design.png",
+      "meaning": "final design",
+      "classification": "promoted-release-capture",
+      "outputSha256": "sha256:25e4dcdec14ee25435c8d2ea4747ad4d1b87d8a84418a0e9ab7c994f824b06ed",
+      "width": 1200,
+      "height": 800
+    },
+    {
+      "file": "diagnostics.mosaic.png",
+      "meaning": "diagnostics mosaic",
+      "classification": "promoted-release-capture",
+      "outputSha256": "sha256:88faa93f6726c7cac946ae6e97476ba0ba41d81dafbf6ab961f72b02bfc21f64",
+      "width": 1200,
+      "height": 800
+    },
+    {
+      "file": "camera.near.png",
+      "meaning": "camera near",
+      "classification": "promoted-release-capture",
+      "outputSha256": "sha256:2fc404d38eeacb44de432ab7cd433a109203cb97ac6046bd5b1e7a0e277f90a9",
+      "width": 1200,
+      "height": 800
+    },
+    {
+      "file": "camera.design.png",
+      "meaning": "camera design",
+      "classification": "promoted-release-capture",
+      "outputSha256": "sha256:0f7b2818e53e26481e72c46815331159fd9e4251f601db78a2e50324650e1bf9",
+      "width": 1200,
+      "height": 800
+    },
+    {
+      "file": "camera.far.png",
+      "meaning": "camera far",
+      "classification": "promoted-release-capture",
+      "outputSha256": "sha256:b682895ee2d5e2f9474a0d9653ec8d3de4047bcf8d50437e790b3b4903df6650",
+      "width": 1200,
+      "height": 800
+    },
+    {
+      "file": "seed-0001.final.png",
+      "meaning": "seed-0001 final",
+      "classification": "promoted-release-capture",
+      "outputSha256": "sha256:3ea2d9877c9761161731e17162bc0cbad8d8b22a286aff0716d17ef12023367a",
+      "width": 1200,
+      "height": 800
+    },
+    {
+      "file": "seed-9e3779b9.final.png",
+      "meaning": "seed-9e3779b9 final",
+      "classification": "promoted-release-capture",
+      "outputSha256": "sha256:45d9bf116e5e02a9d94dab632ff5a889c6e9df420a2948cd6775c6cf60cec810",
+      "width": 1200,
+      "height": 800
+    },
+    {
+      "file": "temporal.t000.png",
+      "meaning": "temporal t000",
+      "classification": "promoted-release-capture",
+      "outputSha256": "sha256:a91c32bf61cce5de17bd00f3cbd3d8127c03353b9b59482eea5025dd9c7595bf",
+      "width": 1200,
+      "height": 800
+    },
+    {
+      "file": "temporal.t001.png",
+      "meaning": "temporal t001",
+      "classification": "promoted-release-capture",
+      "outputSha256": "sha256:2fef5ef61d656fa61352e1eb9eff77196bfbc3760f291ed8d4e40d4fd21ca10f",
+      "width": 1200,
+      "height": 800
+    }
+  ],
+  "limitations": [
+    "Performance and GPU attribution remain NOT_CLAIMED without named-hardware timestamps.",
+    "Evidence captures were produced from the live lab browserEntry demo surface."
+  ]
+}

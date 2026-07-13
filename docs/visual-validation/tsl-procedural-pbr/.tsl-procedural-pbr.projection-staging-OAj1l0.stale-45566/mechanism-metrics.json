@@ -1,0 +1,374 @@
+{
+  "schemaVersion": 2,
+  "subjectAdapter": "tsl-procedural-pbr",
+  "proofKind": "native-browser-runtime",
+  "captureProfile": "correctness",
+  "pipelineGraphDigest": "sha256:2766c776739a1c8dd41d9765323ef2771ae82253a4bb25dcd6b40fb78d4d3e09",
+  "runtimeReachability": {
+    "signals": [
+      "output"
+    ],
+    "resources": [],
+    "routes": [
+      "final.design.png",
+      "no-post.design.png",
+      "diagnostics.mosaic.png",
+      "camera.near.png",
+      "camera.design.png",
+      "camera.far.png",
+      "seed-0001.final.png",
+      "seed-9e3779b9.final.png",
+      "temporal.t000.png",
+      "temporal.t001.png",
+      "material-albedo.png",
+      "material-params.png",
+      "material-normal.png",
+      "material-footprint.png",
+      "material-normal-variance.png",
+      "raw-emissive.png",
+      "atlas-array-triplanar.png",
+      "dissolve-visible.png",
+      "dissolve-shadow-parity.png",
+      "wet-rock-direct-occlusion.png"
+    ]
+  },
+  "routeExecutions": [
+    {
+      "filename": "final.design.png",
+      "target": "final",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "no-post.design.png",
+      "target": "no-post",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "diagnostics.mosaic.png",
+      "target": "diagnostics-mosaic",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "camera.near.png",
+      "target": "final",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "camera.design.png",
+      "target": "final",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "camera.far.png",
+      "target": "final",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "seed-0001.final.png",
+      "target": "final",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "seed-9e3779b9.final.png",
+      "target": "final",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "temporal.t000.png",
+      "target": "final",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "temporal.t001.png",
+      "target": "final",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "material-albedo.png",
+      "target": "material-albedo",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "material-params.png",
+      "target": "material-params",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "material-normal.png",
+      "target": "material-normal",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "material-footprint.png",
+      "target": "material-footprint",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "material-normal-variance.png",
+      "target": "material-normal-variance",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "raw-emissive.png",
+      "target": "raw-emissive",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "atlas-array-triplanar.png",
+      "target": "no-post",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "dissolve-visible.png",
+      "target": "no-post",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "dissolve-shadow-parity.png",
+      "target": "final",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "wet-rock-direct-occlusion.png",
+      "target": "final",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    }
+  ],
+  "transactionalRouteStateMatrix": [],
+  "negativeControls": [],
+  "diagnosticComparisons": [],
+  "metrics": {
+    "writtenCaptures": {
+      "value": 20,
+      "unit": "captures",
+      "label": "Measured",
+      "source": "capture-session writtenCaptures"
+    }
+  },
+  "verdicts": {
+    "mechanismCorrectness": "PASS",
+    "lifecycleStability": "PASS",
+    "visualError": "PASS"
+  },
+  "verdict": "PASS"
+}

@@ -24,8 +24,12 @@ const DOCS = join(REPO_ROOT, 'docs');
 const OUTPUT = join(DOCS, 'evidence');
 const MANIFEST_PATH = join(OUTPUT, 'manifest.json');
 const registry = buildDemoRegistry();
+const evidenceLabFilter = process.env.EVIDENCE_LABS
+  ? new Set(process.env.EVIDENCE_LABS.split(',').map((value) => value.trim()).filter(Boolean))
+  : null;
 const primary = registry.demos
   .filter((demo) => PRIMARY_DEMO_KINDS.includes(demo.kind))
+  .filter((demo) => evidenceLabFilter === null || evidenceLabFilter.has(demo.id))
   .sort((a, b) => a.id.localeCompare(b.id));
 const skillManifest = JSON.parse(readFileSync(join(REPO_ROOT, 'skills.json'), 'utf8'));
 const skillsByName = new Map(skillManifest.skills.map((skill) => [skill.name, skill]));
