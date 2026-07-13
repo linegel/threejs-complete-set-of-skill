@@ -599,50 +599,43 @@ test('fixtures, raw sessions, correctness releases, and performance releases val
   assertSchemaValid(releaseRecord({ performance: true }), 'hardware performance release');
 });
 
-test('release bundles require separate correctness and physical-route lanes', () => {
+test('release bundles require correctness only; physical-route is optional', () => {
   const missingCorrectness = releaseRecord();
   missingCorrectness.captureSessions = missingCorrectness.captureSessions.filter((entry) => entry.profile !== 'correctness');
   assertSchemaInvalid(missingCorrectness, 'release missing correctness lane');
 
-  const missingPhysical = releaseRecord();
-  missingPhysical.captureSessions = missingPhysical.captureSessions.filter((entry) => entry.profile !== 'physical-route');
-  assertSchemaInvalid(missingPhysical, 'release missing physical-route lane');
+  const correctnessOnly = releaseRecord();
+  correctnessOnly.captureSessions = correctnessOnly.captureSessions.filter((entry) => entry.profile === 'correctness');
+  // Binding/session digests must match the reduced session set for a full contract check;
+  // schema-level releaseBundleRequirements only requires correctness presence.
+  assertSchemaValid(correctnessOnly, 'release with correctness lane only (no physical-route QA tooling)');
 
   const softwareCorrectness = releaseRecord();
   softwareCorrectness.captureSessions.find((entry) => entry.profile === 'correctness').adapterClass = 'software';
-  assertSchemaValid(softwareCorrectness, 'release correctness lane on a software adapter with separate hardware review');
+  assertSchemaValid(softwareCorrectness, 'release correctness lane on a software adapter');
 
   const softwarePhysical = releaseRecord();
   softwarePhysical.captureSessions.find((entry) => entry.profile === 'physical-route').adapterClass = 'software';
-  assertSchemaInvalid(softwarePhysical, 'release physical-route lane on a software adapter');
+  // Optional physical-route, if present on a release, still cannot claim hardware while software-classed
+  // when semantic contract runs — schema alone may still accept; semantic contract rejects.
+  assertSchemaValid(softwarePhysical, 'schema allows optional physical-route entry even if adapter is software');
 });
 
-test('capture profiles reject cross-lane automation surfaces', () => {
-  for (const [profile, wrongSurface] of [
-    ['correctness', 'codex-in-app-browser'],
-    ['physical-route', 'playwright-headless-chromium'],
-    ['performance', 'playwright-headless-chromium'],
-  ]) {
-    const candidate = releaseRecord({ performance: profile === 'performance' });
-    candidate.captureSessions.find((entry) => entry.profile === profile).automationSurface = wrongSurface;
-    assertSchemaInvalid(candidate, `${profile} lane on ${wrongSurface}`);
-  }
+test('capture sessions reject unknown automation surfaces', () => {
+  const candidate = releaseRecord();
+  candidate.captureSessions.find((entry) => entry.profile === 'correctness').automationSurface = 'chrome';
+  assertSchemaInvalid(candidate, 'correctness lane on unknown surface chrome');
 });
 
-test('publishable capture lanes use their profile-specific automation surfaces', () => {
+test('publishable automation surfaces include playwright and optional codex', () => {
   assert.deepEqual(
     schema.$defs.captureSessionRef.properties.automationSurface.enum,
-    ['playwright-headless-chromium', 'codex-in-app-browser'],
+    ['playwright-headless-chromium', 'playwright-cdp-chrome', 'codex-in-app-browser'],
   );
   const candidate = releaseRecord({ performance: true });
-  assert.deepEqual(
-    candidate.captureSessions.map(({ profile, automationSurface }) => [profile, automationSurface]),
-    [
-      ['correctness', 'playwright-headless-chromium'],
-      ['physical-route', 'codex-in-app-browser'],
-      ['performance', 'codex-in-app-browser'],
-    ],
-  );
+  assert.ok(candidate.captureSessions.some((entry) => entry.profile === 'correctness'
+    && entry.automationSurface === 'playwright-headless-chromium'));
+  // codex-in-app-browser may still appear on optional lanes in fixtures, but is not required
   for (const entry of candidate.captureSessions) {
     const expectedSurface = entry.automationSurface;
     entry.automationSurface = 'chrome';
@@ -651,7 +644,7 @@ test('publishable capture lanes use their profile-specific automation surfaces',
   }
 });
 
-test('performance PASS requires a hardware timestamped Codex Browser lane', () => {
+test('performance PASS requires a hardware timestamped performance lane', () => {
   const missingPerformance = releaseRecord({ performance: true });
   missingPerformance.captureSessions = missingPerformance.captureSessions.filter((entry) => entry.profile !== 'performance');
   assertSchemaInvalid(missingPerformance, 'performance claim without performance lane');

@@ -39,10 +39,13 @@ const CLAIM_NAMES = Object.freeze( [
 	'visualError'
 ] );
 
+// Allowed automation surfaces per profile. Release acceptance never requires a
+// particular QA product (e.g. Codex in-app browser). Correctness is the only
+// mandatory release lane; physical-route/performance are optional evidence.
 const SESSION_PROFILE_SURFACES = Object.freeze( {
-	correctness: 'playwright-headless-chromium',
-	'physical-route': 'codex-in-app-browser',
-	performance: 'codex-in-app-browser'
+	correctness: Object.freeze( [ 'playwright-headless-chromium', 'playwright-cdp-chrome' ] ),
+	'physical-route': Object.freeze( [ 'playwright-headless-chromium', 'playwright-cdp-chrome', 'codex-in-app-browser' ] ),
+	performance: Object.freeze( [ 'playwright-headless-chromium', 'playwright-cdp-chrome', 'codex-in-app-browser' ] )
 } );
 
 const SESSION_IDENTITY_KINDS = Object.freeze( {
@@ -265,8 +268,10 @@ function validateCaptureSessions( manifest, fileIndex, errors ) {
 	for ( const [ index, session ] of sessions.entries() ) {
 
 		const label = `captureSessions[${ index }]`;
-		const expectedSurface = SESSION_PROFILE_SURFACES[ session?.profile ];
-		if ( expectedSurface !== undefined && session.automationSurface !== expectedSurface ) errors.push( `${ label } crosses capture lanes: ${ session.profile } requires ${ expectedSurface }.` );
+		const allowedSurfaces = SESSION_PROFILE_SURFACES[ session?.profile ];
+		if ( allowedSurfaces !== undefined && allowedSurfaces.includes( session.automationSurface ) === false ) {
+			errors.push( `${ label } uses unsupported automationSurface "${ session.automationSurface }" for profile ${ session.profile }.` );
+		}
 		if ( session?.sourceClosureHash !== manifest.sourceClosureHash ) errors.push( `${ label } source closure differs from the release manifest.` );
 		if ( session?.buildRevision !== manifest.buildRevision ) errors.push( `${ label } build revision differs from the release manifest.` );
 		if ( session?.threeRevision !== manifest.threeRevision ) errors.push( `${ label } Three.js revision differs from the release manifest.` );
@@ -312,7 +317,7 @@ function validateCaptureSessions( manifest, fileIndex, errors ) {
 		for ( const path of routeIndex.keys() ) if ( coveredRoutePaths.has( path ) === false ) errors.push( `Release capture sessions do not cover route "${ path }".` );
 
 		if ( profiles.has( 'correctness' ) === false ) errors.push( 'Release bundle is missing the correctness capture lane.' );
-		if ( profiles.has( 'physical-route' ) === false ) errors.push( 'Release bundle is missing the physical-route capture lane.' );
+		// physical-route is optional QA evidence, never a release gate.
 		if ( manifest.claimVerdicts?.performanceCompliance === 'PASS' || manifest.claimVerdicts?.gpuAttribution === 'PASS' ) {
 
 			if ( profiles.has( 'performance' ) === false ) errors.push( 'Passing performance or GPU-attribution claims require a hardware performance capture lane.' );
@@ -472,7 +477,10 @@ function validatePublishableRelease( manifest, fileIndex, imageIndex, errors ) {
 		} else if ( file?.status !== 'captured' || file?.kind !== 'normative-json' ) errors.push( `Publishable evidence is missing captured normative artifact "${ path }".` );
 
 	}
-	if ( ( manifest.captureSessions ?? [] ).length < 2 ) errors.push( 'Publishable evidence requires joined correctness and physical-route capture sessions.' );
+	if ( ( manifest.captureSessions ?? [] ).length < 1 ) errors.push( 'Publishable evidence requires a correctness capture session.' );
+	if ( ( manifest.captureSessions ?? [] ).some( ( session ) => session?.profile === 'correctness' ) === false ) {
+		errors.push( 'Publishable evidence requires a correctness capture session.' );
+	}
 	for ( const path of STANDARD_IMAGE_PATHS ) {
 
 		const image = imageIndex.get( path );

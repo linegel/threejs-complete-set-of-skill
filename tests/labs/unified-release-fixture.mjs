@@ -12,6 +12,7 @@ import {
   artifactLedgerDigest,
   canonicalSha256,
   captureSessionSetDigest,
+  createReleasePromotionBinding,
   imageLedgerDigest,
   manifestCoreDigest,
   NORMATIVE_JSON_PATHS,
@@ -437,28 +438,16 @@ function writeImages(directory) {
 }
 
 export function rebindFixturePromotion(manifest) {
-  const binding = {
-    manifestCoreDigest: manifestCoreDigest(manifest),
-    sourceClosureHash: manifest.sourceClosureHash,
-    buildRevision: manifest.buildRevision,
-    threeRevision: manifest.threeRevision,
-    route: structuredClone(manifest.route),
-    routeDigest: canonicalSha256(manifest.route),
-    limitations: structuredClone(manifest.limitations),
-    limitationsDigest: canonicalSha256(manifest.limitations),
-    claimVerdicts: structuredClone(manifest.claimVerdicts),
-    claimVerdictsDigest: canonicalSha256(manifest.claimVerdicts),
-    captureSessions: structuredClone(manifest.captureSessions),
-    captureSessionSetDigest: captureSessionSetDigest(manifest.captureSessions),
-    artifactLedgerDigest: artifactLedgerDigest(manifest.files),
-    imageLedgerDigest: imageLedgerDigest(manifest.images),
-  };
-  if (Object.hasOwn(manifest, 'routeSet')) {
-    binding.routeSet = structuredClone(manifest.routeSet);
-    binding.routeSetDigest = routeSetDigest(manifest.routeSet);
-  }
+  // Candidate binding is reconstructed with publishable=false (pre-signoff).
+  const candidateProjection = structuredClone(manifest);
+  candidateProjection.publishable = false;
+  const candidateBinding = createReleasePromotionBinding(candidateProjection);
+  // Promoted binding uses the final publishable manifest state.
+  const binding = createReleasePromotionBinding(manifest);
   const visualSignoff = {
     status: 'APPROVED',
+    candidateBinding: structuredClone(candidateBinding),
+    candidateBindingDigest: canonicalSha256(candidateBinding),
     reviewer: 'fixture-graphics-reviewer',
     reviewedAt: '2026-07-12T12:02:00Z',
     reviewedImages: manifest.images

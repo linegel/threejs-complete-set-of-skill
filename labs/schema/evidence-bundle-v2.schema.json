@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://linegel.github.io/threejs-complete-set-of-skill/schemas/evidence-bundle-v2.json",
   "title": "Native WebGPU evidence release bundle v2 manifest",
-  "description": "Strict lab-general manifest for raw capture-session records, contract fixtures, and release bundles that join immutable capture lanes without relabeling them.",
+  "description": "Strict lab-general manifest for raw capture-session records, contract fixtures, and release bundles that join immutable capture lanes without relabeling them. Release bundles require a correctness capture session only. Optional physical-route/performance lanes may be attached but are never mandated by tooling identity. QA automation product names (e.g. Codex in-app browser) are not release gates.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -24,8 +24,12 @@
     "promotion"
   ],
   "properties": {
-    "schemaVersion": { "const": 2 },
-    "labId": { "$ref": "#/$defs/labId" },
+    "schemaVersion": {
+      "const": 2
+    },
+    "labId": {
+      "$ref": "#/$defs/labId"
+    },
     "bundleId": {
       "type": "string",
       "minLength": 1,
@@ -34,42 +38,76 @@
     },
     "bundleKind": {
       "type": "string",
-      "enum": ["raw-capture-session", "release-bundle", "contract-fixture"]
+      "enum": [
+        "raw-capture-session",
+        "release-bundle",
+        "contract-fixture"
+      ]
     },
-    "publishable": { "type": "boolean" },
+    "publishable": {
+      "type": "boolean"
+    },
     "skill": {
       "type": "string",
       "pattern": "^threejs-[a-z0-9][a-z0-9-]*$"
     },
-    "threeRevision": { "const": "0.185.1" },
-    "sourceClosureHash": { "$ref": "#/$defs/sha256" },
-    "buildRevision": { "$ref": "#/$defs/sha256" },
-    "route": { "$ref": "#/$defs/route" },
+    "threeRevision": {
+      "const": "0.185.1"
+    },
+    "sourceClosureHash": {
+      "$ref": "#/$defs/sha256"
+    },
+    "buildRevision": {
+      "$ref": "#/$defs/sha256"
+    },
+    "route": {
+      "$ref": "#/$defs/route"
+    },
     "routeSet": {
       "type": "array",
       "minItems": 1,
       "uniqueItems": true,
-      "items": { "$ref": "#/$defs/route" }
+      "items": {
+        "$ref": "#/$defs/route"
+      }
     },
-    "limitations": { "$ref": "#/$defs/limitations" },
-    "claimVerdicts": { "$ref": "#/$defs/claimVerdicts" },
+    "limitations": {
+      "$ref": "#/$defs/limitations"
+    },
+    "claimVerdicts": {
+      "$ref": "#/$defs/claimVerdicts"
+    },
     "captureSessions": {
       "type": "array",
       "uniqueItems": true,
-      "items": { "$ref": "#/$defs/captureSessionRef" }
+      "items": {
+        "$ref": "#/$defs/captureSessionRef"
+      }
     },
     "files": {
       "type": "array",
       "minItems": 1,
       "uniqueItems": true,
-      "items": { "$ref": "#/$defs/fileEntry" },
+      "items": {
+        "$ref": "#/$defs/fileEntry"
+      },
       "contains": {
         "type": "object",
-        "required": ["path", "status", "kind"],
+        "required": [
+          "path",
+          "status",
+          "kind"
+        ],
         "properties": {
-          "path": { "const": "evidence-manifest.json" },
-          "status": { "const": "self-excluded" },
-          "kind": { "const": "evidence-manifest" }
+          "path": {
+            "const": "evidence-manifest.json"
+          },
+          "status": {
+            "const": "self-excluded"
+          },
+          "kind": {
+            "const": "evidence-manifest"
+          }
         }
       },
       "minContains": 1,
@@ -78,54 +116,106 @@
     "images": {
       "type": "array",
       "uniqueItems": true,
-      "items": { "$ref": "#/$defs/imageEntry" }
+      "items": {
+        "$ref": "#/$defs/imageEntry"
+      }
     },
-    "promotion": { "$ref": "#/$defs/promotion" }
+    "promotion": {
+      "$ref": "#/$defs/promotion"
+    }
   },
   "allOf": [
     {
       "if": {
-        "required": ["bundleKind"],
-        "properties": { "bundleKind": { "const": "contract-fixture" } }
+        "required": [
+          "bundleKind"
+        ],
+        "properties": {
+          "bundleKind": {
+            "const": "contract-fixture"
+          }
+        }
       },
-      "then": { "$ref": "#/$defs/contractFixtureRequirements" }
+      "then": {
+        "$ref": "#/$defs/contractFixtureRequirements"
+      }
     },
     {
       "if": {
-        "required": ["bundleKind"],
-        "properties": { "bundleKind": { "const": "raw-capture-session" } }
+        "required": [
+          "bundleKind"
+        ],
+        "properties": {
+          "bundleKind": {
+            "const": "raw-capture-session"
+          }
+        }
       },
-      "then": { "$ref": "#/$defs/rawCaptureRequirements" }
+      "then": {
+        "$ref": "#/$defs/rawCaptureRequirements"
+      }
     },
     {
       "if": {
-        "required": ["bundleKind"],
-        "properties": { "bundleKind": { "const": "release-bundle" } }
+        "required": [
+          "bundleKind"
+        ],
+        "properties": {
+          "bundleKind": {
+            "const": "release-bundle"
+          }
+        }
       },
-      "then": { "$ref": "#/$defs/releaseBundleRequirements" }
+      "then": {
+        "$ref": "#/$defs/releaseBundleRequirements"
+      }
     },
     {
       "if": {
-        "required": ["publishable"],
-        "properties": { "publishable": { "const": true } }
+        "required": [
+          "publishable"
+        ],
+        "properties": {
+          "publishable": {
+            "const": true
+          }
+        }
       },
-      "then": { "$ref": "#/$defs/publishableReleaseRequirements" }
+      "then": {
+        "$ref": "#/$defs/publishableReleaseRequirements"
+      }
     },
     {
       "if": {
-        "required": ["promotion"],
+        "required": [
+          "promotion"
+        ],
         "properties": {
           "promotion": {
             "type": "object",
-            "required": ["status"],
-            "properties": { "status": { "const": "APPROVED" } }
+            "required": [
+              "status"
+            ],
+            "properties": {
+              "status": {
+                "const": "APPROVED"
+              }
+            }
           }
         }
       },
       "then": {
         "allOf": [
-          { "properties": { "publishable": { "const": true } } },
-          { "$ref": "#/$defs/publishableReleaseRequirements" }
+          {
+            "properties": {
+              "publishable": {
+                "const": true
+              }
+            }
+          },
+          {
+            "$ref": "#/$defs/publishableReleaseRequirements"
+          }
         ]
       }
     }
@@ -151,7 +241,12 @@
     },
     "verdict": {
       "type": "string",
-      "enum": ["PASS", "FAIL", "INSUFFICIENT_EVIDENCE", "NOT_CLAIMED"]
+      "enum": [
+        "PASS",
+        "FAIL",
+        "INSUFFICIENT_EVIDENCE",
+        "NOT_CLAIMED"
+      ]
     },
     "claimName": {
       "type": "string",
@@ -175,30 +270,63 @@
         "lifecycleStability"
       ],
       "properties": {
-        "visualCorrectness": { "$ref": "#/$defs/verdict" },
-        "mechanismCorrectness": { "$ref": "#/$defs/verdict" },
-        "performanceCompliance": { "$ref": "#/$defs/verdict" },
-        "gpuAttribution": { "$ref": "#/$defs/verdict" },
-        "lifecycleStability": { "$ref": "#/$defs/verdict" },
-        "visualError": { "$ref": "#/$defs/verdict" }
+        "visualCorrectness": {
+          "$ref": "#/$defs/verdict"
+        },
+        "mechanismCorrectness": {
+          "$ref": "#/$defs/verdict"
+        },
+        "performanceCompliance": {
+          "$ref": "#/$defs/verdict"
+        },
+        "gpuAttribution": {
+          "$ref": "#/$defs/verdict"
+        },
+        "lifecycleStability": {
+          "$ref": "#/$defs/verdict"
+        },
+        "visualError": {
+          "$ref": "#/$defs/verdict"
+        }
       }
     },
     "numericEvidence": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["value", "unit", "label", "source"],
+      "required": [
+        "value",
+        "unit",
+        "label",
+        "source"
+      ],
       "properties": {
-        "value": { "type": "number" },
-        "unit": { "type": "string", "minLength": 1 },
+        "value": {
+          "type": "number"
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        },
         "label": {
           "type": "string",
-          "enum": ["Authored", "Derived", "Measured", "Gated"]
+          "enum": [
+            "Authored",
+            "Derived",
+            "Measured",
+            "Gated"
+          ]
         },
-        "source": { "type": "string", "minLength": 1 }
+        "source": {
+          "type": "string",
+          "minLength": 1
+        }
       }
     },
     "nullableStateId": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "pattern": "^[a-z0-9][a-z0-9-]*$"
     },
     "route": {
@@ -216,99 +344,180 @@
         "stateDigest"
       ],
       "properties": {
-        "path": { "$ref": "#/$defs/demoRoutePath" },
-        "scenario": { "$ref": "#/$defs/nullableStateId" },
-        "mechanism": { "$ref": "#/$defs/nullableStateId" },
-        "mode": { "$ref": "#/$defs/nullableStateId" },
-        "tier": { "$ref": "#/$defs/nullableStateId" },
-        "camera": { "$ref": "#/$defs/nullableStateId" },
+        "path": {
+          "$ref": "#/$defs/demoRoutePath"
+        },
+        "scenario": {
+          "$ref": "#/$defs/nullableStateId"
+        },
+        "mechanism": {
+          "$ref": "#/$defs/nullableStateId"
+        },
+        "mode": {
+          "$ref": "#/$defs/nullableStateId"
+        },
+        "tier": {
+          "$ref": "#/$defs/nullableStateId"
+        },
+        "camera": {
+          "$ref": "#/$defs/nullableStateId"
+        },
         "seed": {
           "type": "string",
           "pattern": "^0x[a-f0-9]{8}$"
         },
-        "timeSeconds": { "$ref": "#/$defs/numericEvidence" },
-        "stateDigest": { "$ref": "#/$defs/sha256" }
+        "timeSeconds": {
+          "$ref": "#/$defs/numericEvidence"
+        },
+        "stateDigest": {
+          "$ref": "#/$defs/sha256"
+        }
       }
     },
     "limitation": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "status", "statement", "affectedClaims"],
+      "required": [
+        "id",
+        "status",
+        "statement",
+        "affectedClaims"
+      ],
       "properties": {
-        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        },
         "status": {
           "type": "string",
-          "enum": ["ACTIVE", "RESOLVED", "NOT_APPLICABLE"]
+          "enum": [
+            "ACTIVE",
+            "RESOLVED",
+            "NOT_APPLICABLE"
+          ]
         },
-        "statement": { "type": "string", "minLength": 1 },
+        "statement": {
+          "type": "string",
+          "minLength": 1
+        },
         "affectedClaims": {
           "type": "array",
           "uniqueItems": true,
-          "items": { "$ref": "#/$defs/claimName" }
+          "items": {
+            "$ref": "#/$defs/claimName"
+          }
         }
       }
     },
     "limitations": {
       "type": "array",
       "uniqueItems": true,
-      "items": { "$ref": "#/$defs/limitation" }
+      "items": {
+        "$ref": "#/$defs/limitation"
+      }
     },
     "adapterClass": {
       "type": "string",
-      "enum": ["hardware", "software", "unknown"]
+      "enum": [
+        "hardware",
+        "software",
+        "unknown"
+      ]
     },
     "adapterIdentityRef": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind", "digest"],
+      "required": [
+        "kind",
+        "digest"
+      ],
       "properties": {
-        "kind": { "const": "gpu-adapter" },
-        "digest": { "$ref": "#/$defs/sha256" }
+        "kind": {
+          "const": "gpu-adapter"
+        },
+        "digest": {
+          "$ref": "#/$defs/sha256"
+        }
       }
     },
     "browserIdentityRef": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind", "digest"],
+      "required": [
+        "kind",
+        "digest"
+      ],
       "properties": {
-        "kind": { "const": "browser" },
-        "digest": { "$ref": "#/$defs/sha256" }
+        "kind": {
+          "const": "browser"
+        },
+        "digest": {
+          "$ref": "#/$defs/sha256"
+        }
       }
     },
     "deviceIdentityRef": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind", "digest"],
+      "required": [
+        "kind",
+        "digest"
+      ],
       "properties": {
-        "kind": { "const": "gpu-device" },
-        "digest": { "$ref": "#/$defs/sha256" }
+        "kind": {
+          "const": "gpu-device"
+        },
+        "digest": {
+          "$ref": "#/$defs/sha256"
+        }
       }
     },
     "osIdentityRef": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind", "digest"],
+      "required": [
+        "kind",
+        "digest"
+      ],
       "properties": {
-        "kind": { "const": "operating-system" },
-        "digest": { "$ref": "#/$defs/sha256" }
+        "kind": {
+          "const": "operating-system"
+        },
+        "digest": {
+          "$ref": "#/$defs/sha256"
+        }
       }
     },
     "refreshIdentityRef": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind", "digest"],
+      "required": [
+        "kind",
+        "digest"
+      ],
       "properties": {
-        "kind": { "const": "display-refresh" },
-        "digest": { "$ref": "#/$defs/sha256" }
+        "kind": {
+          "const": "display-refresh"
+        },
+        "digest": {
+          "$ref": "#/$defs/sha256"
+        }
       }
     },
     "colorIdentityRef": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind", "digest"],
+      "required": [
+        "kind",
+        "digest"
+      ],
       "properties": {
-        "kind": { "const": "color-pipeline" },
-        "digest": { "$ref": "#/$defs/sha256" }
+        "kind": {
+          "const": "color-pipeline"
+        },
+        "digest": {
+          "$ref": "#/$defs/sha256"
+        }
       }
     },
     "dateTime": {
@@ -319,23 +528,51 @@
     "sessionDocumentRef": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind", "path", "sha256", "byteLength"],
+      "required": [
+        "kind",
+        "path",
+        "sha256",
+        "byteLength"
+      ],
       "properties": {
-        "kind": { "const": "capture-session-document" },
-        "path": { "$ref": "#/$defs/relativePath" },
-        "sha256": { "$ref": "#/$defs/sha256" },
-        "byteLength": { "type": "integer", "minimum": 1 }
+        "kind": {
+          "const": "capture-session-document"
+        },
+        "path": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "byteLength": {
+          "type": "integer",
+          "minimum": 1
+        }
       }
     },
     "sessionWriteLedgerRef": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind", "path", "sha256", "byteLength"],
+      "required": [
+        "kind",
+        "path",
+        "sha256",
+        "byteLength"
+      ],
       "properties": {
-        "kind": { "const": "capture-session-write-ledger" },
-        "path": { "$ref": "#/$defs/relativePath" },
-        "sha256": { "$ref": "#/$defs/sha256" },
-        "byteLength": { "type": "integer", "minimum": 1 }
+        "kind": {
+          "const": "capture-session-write-ledger"
+        },
+        "path": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "byteLength": {
+          "type": "integer",
+          "minimum": 1
+        }
       }
     },
     "captureSessionRef": {
@@ -376,80 +613,139 @@
         },
         "profile": {
           "type": "string",
-          "enum": ["correctness", "physical-route", "performance"]
+          "enum": [
+            "correctness",
+            "physical-route",
+            "performance"
+          ]
         },
         "automationSurface": {
           "type": "string",
-          "enum": ["playwright-headless-chromium", "codex-in-app-browser"]
+          "enum": [
+            "playwright-headless-chromium",
+            "playwright-cdp-chrome",
+            "codex-in-app-browser"
+          ]
         },
-        "adapterClass": { "$ref": "#/$defs/adapterClass" },
-        "adapterIdentity": { "$ref": "#/$defs/adapterIdentityRef" },
-        "deviceIdentity": { "$ref": "#/$defs/deviceIdentityRef" },
-        "browserIdentity": { "$ref": "#/$defs/browserIdentityRef" },
-        "osIdentity": { "$ref": "#/$defs/osIdentityRef" },
-        "refreshIdentity": { "$ref": "#/$defs/refreshIdentityRef" },
-        "colorIdentity": { "$ref": "#/$defs/colorIdentityRef" },
-        "limitationsDigest": { "$ref": "#/$defs/sha256" },
-        "threeRevision": { "const": "0.185.1" },
-        "sourceClosureHash": { "$ref": "#/$defs/sha256" },
-        "buildRevision": { "$ref": "#/$defs/sha256" },
-        "startedAt": { "$ref": "#/$defs/dateTime" },
-        "finishedAt": { "$ref": "#/$defs/dateTime" },
-        "routePath": { "$ref": "#/$defs/demoRoutePath" },
-        "routeDigest": { "$ref": "#/$defs/sha256" },
-        "stateDigest": { "$ref": "#/$defs/sha256" },
+        "adapterClass": {
+          "$ref": "#/$defs/adapterClass"
+        },
+        "adapterIdentity": {
+          "$ref": "#/$defs/adapterIdentityRef"
+        },
+        "deviceIdentity": {
+          "$ref": "#/$defs/deviceIdentityRef"
+        },
+        "browserIdentity": {
+          "$ref": "#/$defs/browserIdentityRef"
+        },
+        "osIdentity": {
+          "$ref": "#/$defs/osIdentityRef"
+        },
+        "refreshIdentity": {
+          "$ref": "#/$defs/refreshIdentityRef"
+        },
+        "colorIdentity": {
+          "$ref": "#/$defs/colorIdentityRef"
+        },
+        "limitationsDigest": {
+          "$ref": "#/$defs/sha256"
+        },
+        "threeRevision": {
+          "const": "0.185.1"
+        },
+        "sourceClosureHash": {
+          "$ref": "#/$defs/sha256"
+        },
+        "buildRevision": {
+          "$ref": "#/$defs/sha256"
+        },
+        "startedAt": {
+          "$ref": "#/$defs/dateTime"
+        },
+        "finishedAt": {
+          "$ref": "#/$defs/dateTime"
+        },
+        "routePath": {
+          "$ref": "#/$defs/demoRoutePath"
+        },
+        "routeDigest": {
+          "$ref": "#/$defs/sha256"
+        },
+        "stateDigest": {
+          "$ref": "#/$defs/sha256"
+        },
         "routeSetPaths": {
           "type": "array",
           "minItems": 1,
           "uniqueItems": true,
-          "items": { "$ref": "#/$defs/demoRoutePath" }
+          "items": {
+            "$ref": "#/$defs/demoRoutePath"
+          }
         },
-        "routeSetDigest": { "$ref": "#/$defs/sha256" },
-        "document": { "$ref": "#/$defs/sessionDocumentRef" },
-        "writeLedger": { "$ref": "#/$defs/sessionWriteLedgerRef" },
-        "rendererInitialized": { "const": true },
-        "isWebGPUBackend": { "const": true },
-        "timestampQuerySupported": { "type": "boolean" }
+        "routeSetDigest": {
+          "$ref": "#/$defs/sha256"
+        },
+        "document": {
+          "$ref": "#/$defs/sessionDocumentRef"
+        },
+        "writeLedger": {
+          "$ref": "#/$defs/sessionWriteLedgerRef"
+        },
+        "rendererInitialized": {
+          "const": true
+        },
+        "isWebGPUBackend": {
+          "const": true
+        },
+        "timestampQuerySupported": {
+          "type": "boolean"
+        }
       },
       "allOf": [
         {
-          "if": { "required": ["routeSetPaths"] },
-          "then": { "required": ["routeSetDigest"] }
-        },
-        {
-          "if": { "required": ["routeSetDigest"] },
-          "then": { "required": ["routeSetPaths"] }
-        },
-        {
           "if": {
-            "required": ["profile"],
-            "properties": { "profile": { "const": "correctness" } }
+            "required": [
+              "routeSetPaths"
+            ]
           },
           "then": {
-            "properties": {
-              "automationSurface": { "const": "playwright-headless-chromium" }
-            }
+            "required": [
+              "routeSetDigest"
+            ]
           }
         },
         {
           "if": {
-            "required": ["profile"],
-            "properties": { "profile": { "const": "physical-route" } }
+            "required": [
+              "routeSetDigest"
+            ]
           },
           "then": {
-            "properties": {
-              "automationSurface": { "const": "codex-in-app-browser" }
-            }
+            "required": [
+              "routeSetPaths"
+            ]
           }
         },
         {
           "if": {
-            "required": ["profile"],
-            "properties": { "profile": { "const": "performance" } }
+            "required": [
+              "profile"
+            ],
+            "properties": {
+              "profile": {
+                "const": "correctness"
+              }
+            }
           },
           "then": {
             "properties": {
-              "automationSurface": { "const": "codex-in-app-browser" }
+              "automationSurface": {
+                "enum": [
+                  "playwright-headless-chromium",
+                  "playwright-cdp-chrome"
+                ]
+              }
             }
           }
         }
@@ -458,12 +754,22 @@
     "fileEntry": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["path", "status", "kind"],
+      "required": [
+        "path",
+        "status",
+        "kind"
+      ],
       "properties": {
-        "path": { "$ref": "#/$defs/relativePath" },
+        "path": {
+          "$ref": "#/$defs/relativePath"
+        },
         "status": {
           "type": "string",
-          "enum": ["captured", "not-applicable", "self-excluded"]
+          "enum": [
+            "captured",
+            "not-applicable",
+            "self-excluded"
+          ]
         },
         "kind": {
           "type": "string",
@@ -477,47 +783,92 @@
             "evidence-manifest"
           ]
         },
-        "sha256": { "$ref": "#/$defs/sha256" },
-        "byteLength": { "type": "integer", "minimum": 1 },
-        "reason": { "type": "string", "minLength": 1 }
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "byteLength": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
       },
       "allOf": [
         {
           "if": {
-            "required": ["status"],
-            "properties": { "status": { "const": "captured" } }
+            "required": [
+              "status"
+            ],
+            "properties": {
+              "status": {
+                "const": "captured"
+              }
+            }
           },
           "then": {
-            "required": ["sha256", "byteLength"],
+            "required": [
+              "sha256",
+              "byteLength"
+            ],
             "properties": {
-              "kind": { "not": { "const": "evidence-manifest" } }
+              "kind": {
+                "not": {
+                  "const": "evidence-manifest"
+                }
+              }
             }
           }
         },
         {
           "if": {
-            "required": ["status"],
-            "properties": { "status": { "const": "not-applicable" } }
+            "required": [
+              "status"
+            ],
+            "properties": {
+              "status": {
+                "const": "not-applicable"
+              }
+            }
           },
           "then": {
-            "required": ["reason"],
+            "required": [
+              "reason"
+            ],
             "properties": {
               "sha256": false,
               "byteLength": false,
-              "kind": { "not": { "const": "evidence-manifest" } }
+              "kind": {
+                "not": {
+                  "const": "evidence-manifest"
+                }
+              }
             }
           }
         },
         {
           "if": {
-            "required": ["status"],
-            "properties": { "status": { "const": "self-excluded" } }
+            "required": [
+              "status"
+            ],
+            "properties": {
+              "status": {
+                "const": "self-excluded"
+              }
+            }
           },
           "then": {
-            "required": ["reason"],
+            "required": [
+              "reason"
+            ],
             "properties": {
-              "path": { "const": "evidence-manifest.json" },
-              "kind": { "const": "evidence-manifest" },
+              "path": {
+                "const": "evidence-manifest.json"
+              },
+              "kind": {
+                "const": "evidence-manifest"
+              },
               "sha256": false,
               "byteLength": false
             }
@@ -525,11 +876,21 @@
         },
         {
           "if": {
-            "required": ["kind"],
-            "properties": { "kind": { "const": "evidence-manifest" } }
+            "required": [
+              "kind"
+            ],
+            "properties": {
+              "kind": {
+                "const": "evidence-manifest"
+              }
+            }
           },
           "then": {
-            "properties": { "status": { "const": "self-excluded" } }
+            "properties": {
+              "status": {
+                "const": "self-excluded"
+              }
+            }
           }
         }
       ]
@@ -537,81 +898,157 @@
     "imageDerivation": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["method", "implementation", "parametersDigest"],
+      "required": [
+        "method",
+        "implementation",
+        "parametersDigest"
+      ],
       "properties": {
-        "method": { "type": "string", "minLength": 1 },
-        "implementation": { "$ref": "#/$defs/relativePath" },
-        "parametersDigest": { "$ref": "#/$defs/sha256" }
+        "method": {
+          "type": "string",
+          "minLength": 1
+        },
+        "implementation": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "parametersDigest": {
+          "$ref": "#/$defs/sha256"
+        }
       }
     },
     "notApplicableImageProof": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["reason", "pipelineGraphPath", "pipelineGraphDigest"],
+      "required": [
+        "reason",
+        "pipelineGraphPath",
+        "pipelineGraphDigest"
+      ],
       "properties": {
-        "reason": { "type": "string", "minLength": 1 },
-        "pipelineGraphPath": { "const": "pipeline-graph.json" },
-        "pipelineGraphDigest": { "$ref": "#/$defs/sha256" }
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pipelineGraphPath": {
+          "const": "pipeline-graph.json"
+        },
+        "pipelineGraphDigest": {
+          "$ref": "#/$defs/sha256"
+        }
       }
     },
     "imageEntry": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["path", "status", "kind", "role"],
+      "required": [
+        "path",
+        "status",
+        "kind",
+        "role"
+      ],
       "properties": {
         "path": {
           "allOf": [
-            { "$ref": "#/$defs/relativePath" },
-            { "pattern": "\\.png$" }
+            {
+              "$ref": "#/$defs/relativePath"
+            },
+            {
+              "pattern": "\\.png$"
+            }
           ]
         },
         "status": {
           "type": "string",
-          "enum": ["captured", "not-applicable"]
+          "enum": [
+            "captured",
+            "not-applicable"
+          ]
         },
         "kind": {
           "type": "string",
-          "enum": ["direct-capture", "derived-image", "not-applicable"]
+          "enum": [
+            "direct-capture",
+            "derived-image",
+            "not-applicable"
+          ]
         },
         "role": {
           "type": "string",
           "pattern": "^[a-z0-9][a-z0-9.-]*$"
         },
-        "mediaType": { "const": "image/png" },
-        "sha256": { "$ref": "#/$defs/sha256" },
-        "byteLength": { "type": "integer", "minimum": 1 },
-        "derivation": { "$ref": "#/$defs/imageDerivation" },
+        "mediaType": {
+          "const": "image/png"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "byteLength": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "derivation": {
+          "$ref": "#/$defs/imageDerivation"
+        },
         "sourceCaptures": {
           "type": "array",
           "minItems": 1,
           "uniqueItems": true,
-          "items": { "$ref": "#/$defs/relativePath" }
+          "items": {
+            "$ref": "#/$defs/relativePath"
+          }
         },
-        "notApplicableProof": { "$ref": "#/$defs/notApplicableImageProof" }
+        "notApplicableProof": {
+          "$ref": "#/$defs/notApplicableImageProof"
+        }
       },
       "allOf": [
         {
           "if": {
-            "required": ["status"],
-            "properties": { "status": { "const": "captured" } }
+            "required": [
+              "status"
+            ],
+            "properties": {
+              "status": {
+                "const": "captured"
+              }
+            }
           },
           "then": {
-            "required": ["mediaType", "sha256", "byteLength"],
+            "required": [
+              "mediaType",
+              "sha256",
+              "byteLength"
+            ],
             "properties": {
-              "kind": { "enum": ["direct-capture", "derived-image"] },
+              "kind": {
+                "enum": [
+                  "direct-capture",
+                  "derived-image"
+                ]
+              },
               "notApplicableProof": false
             }
           }
         },
         {
           "if": {
-            "required": ["status"],
-            "properties": { "status": { "const": "not-applicable" } }
+            "required": [
+              "status"
+            ],
+            "properties": {
+              "status": {
+                "const": "not-applicable"
+              }
+            }
           },
           "then": {
-            "required": ["notApplicableProof"],
+            "required": [
+              "notApplicableProof"
+            ],
             "properties": {
-              "kind": { "const": "not-applicable" },
+              "kind": {
+                "const": "not-applicable"
+              },
               "mediaType": false,
               "sha256": false,
               "byteLength": false,
@@ -622,20 +1059,39 @@
         },
         {
           "if": {
-            "required": ["status", "kind"],
+            "required": [
+              "status",
+              "kind"
+            ],
             "properties": {
-              "status": { "const": "captured" },
-              "kind": { "const": "derived-image" }
+              "status": {
+                "const": "captured"
+              },
+              "kind": {
+                "const": "derived-image"
+              }
             }
           },
-          "then": { "required": ["derivation", "sourceCaptures"] }
+          "then": {
+            "required": [
+              "derivation",
+              "sourceCaptures"
+            ]
+          }
         },
         {
           "if": {
-            "required": ["status", "kind"],
+            "required": [
+              "status",
+              "kind"
+            ],
             "properties": {
-              "status": { "const": "captured" },
-              "kind": { "const": "direct-capture" }
+              "status": {
+                "const": "captured"
+              },
+              "kind": {
+                "const": "direct-capture"
+              }
             }
           },
           "then": {
@@ -667,100 +1123,233 @@
         "imageLedgerDigest"
       ],
       "properties": {
-        "manifestCoreDigest": { "$ref": "#/$defs/sha256" },
-        "sourceClosureHash": { "$ref": "#/$defs/sha256" },
-        "buildRevision": { "$ref": "#/$defs/sha256" },
-        "threeRevision": { "const": "0.185.1" },
-        "route": { "$ref": "#/$defs/route" },
-        "routeDigest": { "$ref": "#/$defs/sha256" },
+        "manifestCoreDigest": {
+          "$ref": "#/$defs/sha256"
+        },
+        "sourceClosureHash": {
+          "$ref": "#/$defs/sha256"
+        },
+        "buildRevision": {
+          "$ref": "#/$defs/sha256"
+        },
+        "threeRevision": {
+          "const": "0.185.1"
+        },
+        "route": {
+          "$ref": "#/$defs/route"
+        },
+        "routeDigest": {
+          "$ref": "#/$defs/sha256"
+        },
         "routeSet": {
           "type": "array",
           "minItems": 1,
           "uniqueItems": true,
-          "items": { "$ref": "#/$defs/route" }
+          "items": {
+            "$ref": "#/$defs/route"
+          }
         },
-        "routeSetDigest": { "$ref": "#/$defs/sha256" },
-        "limitations": { "$ref": "#/$defs/limitations" },
-        "limitationsDigest": { "$ref": "#/$defs/sha256" },
-        "claimVerdicts": { "$ref": "#/$defs/claimVerdicts" },
-        "claimVerdictsDigest": { "$ref": "#/$defs/sha256" },
+        "routeSetDigest": {
+          "$ref": "#/$defs/sha256"
+        },
+        "limitations": {
+          "$ref": "#/$defs/limitations"
+        },
+        "limitationsDigest": {
+          "$ref": "#/$defs/sha256"
+        },
+        "claimVerdicts": {
+          "$ref": "#/$defs/claimVerdicts"
+        },
+        "claimVerdictsDigest": {
+          "$ref": "#/$defs/sha256"
+        },
         "captureSessions": {
           "type": "array",
-          "minItems": 2,
+          "minItems": 1,
           "uniqueItems": true,
-          "items": { "$ref": "#/$defs/captureSessionRef" }
+          "items": {
+            "$ref": "#/$defs/captureSessionRef"
+          }
         },
-        "captureSessionSetDigest": { "$ref": "#/$defs/sha256" },
-        "artifactLedgerDigest": { "$ref": "#/$defs/sha256" },
-        "imageLedgerDigest": { "$ref": "#/$defs/sha256" }
+        "captureSessionSetDigest": {
+          "$ref": "#/$defs/sha256"
+        },
+        "artifactLedgerDigest": {
+          "$ref": "#/$defs/sha256"
+        },
+        "imageLedgerDigest": {
+          "$ref": "#/$defs/sha256"
+        }
       }
     },
     "visualSignoffNotReviewed": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["status", "reviewer", "reviewedAt", "reviewDigest", "reviewedImages", "notes"],
+      "required": [
+        "status",
+        "reviewer",
+        "reviewedAt",
+        "reviewDigest",
+        "reviewedImages",
+        "notes"
+      ],
       "properties": {
-        "status": { "const": "NOT_REVIEWED" },
-        "reviewer": { "type": "null" },
-        "reviewedAt": { "type": "null" },
-        "reviewDigest": { "type": "null" },
-        "reviewedImages": { "type": "array", "maxItems": 0 },
-        "notes": { "type": "array", "maxItems": 0 }
+        "status": {
+          "const": "NOT_REVIEWED"
+        },
+        "reviewer": {
+          "type": "null"
+        },
+        "reviewedAt": {
+          "type": "null"
+        },
+        "reviewDigest": {
+          "type": "null"
+        },
+        "reviewedImages": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "notes": {
+          "type": "array",
+          "maxItems": 0
+        }
       }
     },
     "visualSignoffPending": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["status", "reviewer", "reviewedAt", "reviewDigest", "reviewedImages", "notes"],
+      "required": [
+        "status",
+        "reviewer",
+        "reviewedAt",
+        "reviewDigest",
+        "reviewedImages",
+        "notes"
+      ],
       "properties": {
-        "status": { "const": "PENDING" },
-        "reviewer": { "type": "null" },
-        "reviewedAt": { "type": "null" },
-        "reviewDigest": { "type": "null" },
-        "reviewedImages": { "type": "array", "maxItems": 0 },
-        "notes": { "type": "array", "maxItems": 0 }
+        "status": {
+          "const": "PENDING"
+        },
+        "reviewer": {
+          "type": "null"
+        },
+        "reviewedAt": {
+          "type": "null"
+        },
+        "reviewDigest": {
+          "type": "null"
+        },
+        "reviewedImages": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "notes": {
+          "type": "array",
+          "maxItems": 0
+        }
       }
     },
-    "reviewedAt": { "$ref": "#/$defs/dateTime" },
+    "reviewedAt": {
+      "$ref": "#/$defs/dateTime"
+    },
     "reviewedImages": {
       "type": "array",
       "minItems": 1,
       "uniqueItems": true,
-      "items": { "$ref": "#/$defs/relativePath" }
+      "items": {
+        "$ref": "#/$defs/relativePath"
+      }
     },
     "reviewNotes": {
       "type": "array",
       "minItems": 1,
-      "items": { "type": "string", "minLength": 1 }
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
     },
     "visualSignoffApproved": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["status", "candidateBinding", "candidateBindingDigest", "reviewer", "reviewedAt", "reviewDigest", "reviewedImages", "notes"],
+      "required": [
+        "status",
+        "candidateBinding",
+        "candidateBindingDigest",
+        "reviewer",
+        "reviewedAt",
+        "reviewDigest",
+        "reviewedImages",
+        "notes"
+      ],
       "properties": {
-        "status": { "const": "APPROVED" },
-        "candidateBinding": { "$ref": "#/$defs/promotionBinding" },
-        "candidateBindingDigest": { "$ref": "#/$defs/sha256" },
-        "reviewer": { "type": "string", "minLength": 1 },
-        "reviewedAt": { "$ref": "#/$defs/reviewedAt" },
-        "reviewDigest": { "$ref": "#/$defs/sha256" },
-        "reviewedImages": { "$ref": "#/$defs/reviewedImages" },
-        "notes": { "$ref": "#/$defs/reviewNotes" }
+        "status": {
+          "const": "APPROVED"
+        },
+        "candidateBinding": {
+          "$ref": "#/$defs/promotionBinding"
+        },
+        "candidateBindingDigest": {
+          "$ref": "#/$defs/sha256"
+        },
+        "reviewer": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reviewedAt": {
+          "$ref": "#/$defs/reviewedAt"
+        },
+        "reviewDigest": {
+          "$ref": "#/$defs/sha256"
+        },
+        "reviewedImages": {
+          "$ref": "#/$defs/reviewedImages"
+        },
+        "notes": {
+          "$ref": "#/$defs/reviewNotes"
+        }
       }
     },
     "visualSignoffRejected": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["status", "candidateBinding", "candidateBindingDigest", "reviewer", "reviewedAt", "reviewDigest", "reviewedImages", "notes"],
+      "required": [
+        "status",
+        "candidateBinding",
+        "candidateBindingDigest",
+        "reviewer",
+        "reviewedAt",
+        "reviewDigest",
+        "reviewedImages",
+        "notes"
+      ],
       "properties": {
-        "status": { "const": "REJECTED" },
-        "candidateBinding": { "$ref": "#/$defs/promotionBinding" },
-        "candidateBindingDigest": { "$ref": "#/$defs/sha256" },
-        "reviewer": { "type": "string", "minLength": 1 },
-        "reviewedAt": { "$ref": "#/$defs/reviewedAt" },
-        "reviewDigest": { "$ref": "#/$defs/sha256" },
-        "reviewedImages": { "$ref": "#/$defs/reviewedImages" },
-        "notes": { "$ref": "#/$defs/reviewNotes" }
+        "status": {
+          "const": "REJECTED"
+        },
+        "candidateBinding": {
+          "$ref": "#/$defs/promotionBinding"
+        },
+        "candidateBindingDigest": {
+          "$ref": "#/$defs/sha256"
+        },
+        "reviewer": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reviewedAt": {
+          "$ref": "#/$defs/reviewedAt"
+        },
+        "reviewDigest": {
+          "$ref": "#/$defs/sha256"
+        },
+        "reviewedImages": {
+          "$ref": "#/$defs/reviewedImages"
+        },
+        "notes": {
+          "$ref": "#/$defs/reviewNotes"
+        }
       }
     },
     "promotion": {
@@ -768,147 +1357,322 @@
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["status", "binding", "bindingDigest", "visualSignoff"],
+          "required": [
+            "status",
+            "binding",
+            "bindingDigest",
+            "visualSignoff"
+          ],
           "properties": {
-            "status": { "const": "NOT_ELIGIBLE" },
-            "binding": { "type": "null" },
-            "bindingDigest": { "type": "null" },
-            "visualSignoff": { "$ref": "#/$defs/visualSignoffNotReviewed" }
+            "status": {
+              "const": "NOT_ELIGIBLE"
+            },
+            "binding": {
+              "type": "null"
+            },
+            "bindingDigest": {
+              "type": "null"
+            },
+            "visualSignoff": {
+              "$ref": "#/$defs/visualSignoffNotReviewed"
+            }
           }
         },
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["status", "binding", "bindingDigest", "visualSignoff"],
+          "required": [
+            "status",
+            "binding",
+            "bindingDigest",
+            "visualSignoff"
+          ],
           "properties": {
-            "status": { "const": "PENDING_VISUAL_SIGNOFF" },
-            "binding": { "$ref": "#/$defs/promotionBinding" },
-            "bindingDigest": { "$ref": "#/$defs/sha256" },
-            "visualSignoff": { "$ref": "#/$defs/visualSignoffPending" }
+            "status": {
+              "const": "PENDING_VISUAL_SIGNOFF"
+            },
+            "binding": {
+              "$ref": "#/$defs/promotionBinding"
+            },
+            "bindingDigest": {
+              "$ref": "#/$defs/sha256"
+            },
+            "visualSignoff": {
+              "$ref": "#/$defs/visualSignoffPending"
+            }
           }
         },
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["status", "binding", "bindingDigest", "visualSignoff"],
+          "required": [
+            "status",
+            "binding",
+            "bindingDigest",
+            "visualSignoff"
+          ],
           "properties": {
-            "status": { "const": "APPROVED" },
-            "binding": { "$ref": "#/$defs/promotionBinding" },
-            "bindingDigest": { "$ref": "#/$defs/sha256" },
-            "visualSignoff": { "$ref": "#/$defs/visualSignoffApproved" }
+            "status": {
+              "const": "APPROVED"
+            },
+            "binding": {
+              "$ref": "#/$defs/promotionBinding"
+            },
+            "bindingDigest": {
+              "$ref": "#/$defs/sha256"
+            },
+            "visualSignoff": {
+              "$ref": "#/$defs/visualSignoffApproved"
+            }
           }
         },
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["status", "binding", "bindingDigest", "visualSignoff"],
+          "required": [
+            "status",
+            "binding",
+            "bindingDigest",
+            "visualSignoff"
+          ],
           "properties": {
-            "status": { "const": "REJECTED" },
-            "binding": { "$ref": "#/$defs/promotionBinding" },
-            "bindingDigest": { "$ref": "#/$defs/sha256" },
-            "visualSignoff": { "$ref": "#/$defs/visualSignoffRejected" }
+            "status": {
+              "const": "REJECTED"
+            },
+            "binding": {
+              "$ref": "#/$defs/promotionBinding"
+            },
+            "bindingDigest": {
+              "$ref": "#/$defs/sha256"
+            },
+            "visualSignoff": {
+              "$ref": "#/$defs/visualSignoffRejected"
+            }
           }
         }
       ]
     },
     "selfManifestEntry": {
       "type": "object",
-      "required": ["path", "status", "kind"],
+      "required": [
+        "path",
+        "status",
+        "kind"
+      ],
       "properties": {
-        "path": { "const": "evidence-manifest.json" },
-        "status": { "const": "self-excluded" },
-        "kind": { "const": "evidence-manifest" }
+        "path": {
+          "const": "evidence-manifest.json"
+        },
+        "status": {
+          "const": "self-excluded"
+        },
+        "kind": {
+          "const": "evidence-manifest"
+        }
       }
     },
     "capturedNormativeFile": {
       "type": "object",
-      "required": ["status", "kind"],
+      "required": [
+        "status",
+        "kind"
+      ],
       "properties": {
-        "status": { "const": "captured" },
-        "kind": { "const": "normative-json" }
+        "status": {
+          "const": "captured"
+        },
+        "kind": {
+          "const": "normative-json"
+        }
       }
     },
     "releaseFiles": {
       "type": "array",
-      "minItems": 18,
+      "minItems": 16,
       "prefixItems": [
         {
           "allOf": [
-            { "$ref": "#/$defs/capturedNormativeFile" },
-            { "properties": { "path": { "const": "visual-contract.json" } } }
-          ]
-        },
-        { "$ref": "#/$defs/selfManifestEntry" },
-        {
-          "allOf": [
-            { "$ref": "#/$defs/capturedNormativeFile" },
-            { "properties": { "path": { "const": "renderer-info.json" } } }
-          ]
-        },
-        {
-          "allOf": [
-            { "$ref": "#/$defs/capturedNormativeFile" },
-            { "properties": { "path": { "const": "pipeline-graph.json" } } }
+            {
+              "$ref": "#/$defs/capturedNormativeFile"
+            },
+            {
+              "properties": {
+                "path": {
+                  "const": "visual-contract.json"
+                }
+              }
+            }
           ]
         },
         {
-          "allOf": [
-            { "$ref": "#/$defs/capturedNormativeFile" },
-            { "properties": { "path": { "const": "performance-envelope.json" } } }
-          ]
+          "$ref": "#/$defs/selfManifestEntry"
         },
         {
           "allOf": [
-            { "$ref": "#/$defs/capturedNormativeFile" },
-            { "properties": { "path": { "const": "frame-trace.json" } } }
-          ]
-        },
-        {
-          "allOf": [
-            { "$ref": "#/$defs/capturedNormativeFile" },
-            { "properties": { "path": { "const": "quality-governor.json" } } }
+            {
+              "$ref": "#/$defs/capturedNormativeFile"
+            },
+            {
+              "properties": {
+                "path": {
+                  "const": "renderer-info.json"
+                }
+              }
+            }
           ]
         },
         {
           "allOf": [
-            { "$ref": "#/$defs/capturedNormativeFile" },
-            { "properties": { "path": { "const": "render-targets.json" } } }
+            {
+              "$ref": "#/$defs/capturedNormativeFile"
+            },
+            {
+              "properties": {
+                "path": {
+                  "const": "pipeline-graph.json"
+                }
+              }
+            }
           ]
         },
         {
           "allOf": [
-            { "$ref": "#/$defs/capturedNormativeFile" },
-            { "properties": { "path": { "const": "storage-resources.json" } } }
+            {
+              "$ref": "#/$defs/capturedNormativeFile"
+            },
+            {
+              "properties": {
+                "path": {
+                  "const": "performance-envelope.json"
+                }
+              }
+            }
           ]
         },
         {
           "allOf": [
-            { "$ref": "#/$defs/capturedNormativeFile" },
-            { "properties": { "path": { "const": "resident-resources.json" } } }
+            {
+              "$ref": "#/$defs/capturedNormativeFile"
+            },
+            {
+              "properties": {
+                "path": {
+                  "const": "frame-trace.json"
+                }
+              }
+            }
           ]
         },
         {
           "allOf": [
-            { "$ref": "#/$defs/capturedNormativeFile" },
-            { "properties": { "path": { "const": "bandwidth-model.json" } } }
+            {
+              "$ref": "#/$defs/capturedNormativeFile"
+            },
+            {
+              "properties": {
+                "path": {
+                  "const": "quality-governor.json"
+                }
+              }
+            }
           ]
         },
         {
           "allOf": [
-            { "$ref": "#/$defs/capturedNormativeFile" },
-            { "properties": { "path": { "const": "visual-errors.json" } } }
+            {
+              "$ref": "#/$defs/capturedNormativeFile"
+            },
+            {
+              "properties": {
+                "path": {
+                  "const": "render-targets.json"
+                }
+              }
+            }
           ]
         },
         {
           "allOf": [
-            { "$ref": "#/$defs/capturedNormativeFile" },
-            { "properties": { "path": { "const": "leak-loop.json" } } }
+            {
+              "$ref": "#/$defs/capturedNormativeFile"
+            },
+            {
+              "properties": {
+                "path": {
+                  "const": "storage-resources.json"
+                }
+              }
+            }
           ]
         },
         {
           "allOf": [
-            { "$ref": "#/$defs/capturedNormativeFile" },
-            { "properties": { "path": { "const": "mechanism-metrics.json" } } }
+            {
+              "$ref": "#/$defs/capturedNormativeFile"
+            },
+            {
+              "properties": {
+                "path": {
+                  "const": "resident-resources.json"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/capturedNormativeFile"
+            },
+            {
+              "properties": {
+                "path": {
+                  "const": "bandwidth-model.json"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/capturedNormativeFile"
+            },
+            {
+              "properties": {
+                "path": {
+                  "const": "visual-errors.json"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/capturedNormativeFile"
+            },
+            {
+              "properties": {
+                "path": {
+                  "const": "leak-loop.json"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/capturedNormativeFile"
+            },
+            {
+              "properties": {
+                "path": {
+                  "const": "mechanism-metrics.json"
+                }
+              }
+            }
           ]
         }
       ],
@@ -916,10 +1680,17 @@
         {
           "contains": {
             "type": "object",
-            "required": ["status", "kind"],
+            "required": [
+              "status",
+              "kind"
+            ],
             "properties": {
-              "status": { "const": "captured" },
-              "kind": { "const": "capture-session-document" }
+              "status": {
+                "const": "captured"
+              },
+              "kind": {
+                "const": "capture-session-document"
+              }
             }
           },
           "minContains": 2
@@ -927,10 +1698,17 @@
         {
           "contains": {
             "type": "object",
-            "required": ["status", "kind"],
+            "required": [
+              "status",
+              "kind"
+            ],
             "properties": {
-              "status": { "const": "captured" },
-              "kind": { "const": "capture-session-write-ledger" }
+              "status": {
+                "const": "captured"
+              },
+              "kind": {
+                "const": "capture-session-write-ledger"
+              }
             }
           },
           "minContains": 2
@@ -941,44 +1719,139 @@
       "type": "array",
       "minItems": 10,
       "prefixItems": [
-        { "properties": { "path": { "const": "final.design.png" } } },
-        { "properties": { "path": { "const": "no-post.design.png" } } },
-        { "properties": { "path": { "const": "diagnostics.mosaic.png" } } },
-        { "properties": { "path": { "const": "camera.near.png" } } },
-        { "properties": { "path": { "const": "camera.design.png" } } },
-        { "properties": { "path": { "const": "camera.far.png" } } },
-        { "properties": { "path": { "const": "seed-0001.final.png" } } },
-        { "properties": { "path": { "const": "seed-9e3779b9.final.png" } } },
-        { "properties": { "path": { "const": "temporal.t000.png" } } },
-        { "properties": { "path": { "const": "temporal.t001.png" } } }
+        {
+          "properties": {
+            "path": {
+              "const": "final.design.png"
+            }
+          }
+        },
+        {
+          "properties": {
+            "path": {
+              "const": "no-post.design.png"
+            }
+          }
+        },
+        {
+          "properties": {
+            "path": {
+              "const": "diagnostics.mosaic.png"
+            }
+          }
+        },
+        {
+          "properties": {
+            "path": {
+              "const": "camera.near.png"
+            }
+          }
+        },
+        {
+          "properties": {
+            "path": {
+              "const": "camera.design.png"
+            }
+          }
+        },
+        {
+          "properties": {
+            "path": {
+              "const": "camera.far.png"
+            }
+          }
+        },
+        {
+          "properties": {
+            "path": {
+              "const": "seed-0001.final.png"
+            }
+          }
+        },
+        {
+          "properties": {
+            "path": {
+              "const": "seed-9e3779b9.final.png"
+            }
+          }
+        },
+        {
+          "properties": {
+            "path": {
+              "const": "temporal.t000.png"
+            }
+          }
+        },
+        {
+          "properties": {
+            "path": {
+              "const": "temporal.t001.png"
+            }
+          }
+        }
       ]
     },
     "contractFixtureRequirements": {
       "type": "object",
       "properties": {
-        "publishable": { "const": false },
-        "captureSessions": { "type": "array", "maxItems": 0 },
+        "publishable": {
+          "const": false
+        },
+        "captureSessions": {
+          "type": "array",
+          "maxItems": 0
+        },
         "claimVerdicts": {
           "type": "object",
           "properties": {
-            "visualCorrectness": { "not": { "const": "PASS" } },
-            "mechanismCorrectness": { "not": { "const": "PASS" } },
-            "performanceCompliance": { "not": { "const": "PASS" } },
-            "gpuAttribution": { "not": { "const": "PASS" } },
-            "lifecycleStability": { "not": { "const": "PASS" } },
-            "visualError": { "not": { "const": "PASS" } }
+            "visualCorrectness": {
+              "not": {
+                "const": "PASS"
+              }
+            },
+            "mechanismCorrectness": {
+              "not": {
+                "const": "PASS"
+              }
+            },
+            "performanceCompliance": {
+              "not": {
+                "const": "PASS"
+              }
+            },
+            "gpuAttribution": {
+              "not": {
+                "const": "PASS"
+              }
+            },
+            "lifecycleStability": {
+              "not": {
+                "const": "PASS"
+              }
+            },
+            "visualError": {
+              "not": {
+                "const": "PASS"
+              }
+            }
           }
         },
         "promotion": {
           "type": "object",
-          "properties": { "status": { "const": "NOT_ELIGIBLE" } }
+          "properties": {
+            "status": {
+              "const": "NOT_ELIGIBLE"
+            }
+          }
         }
       }
     },
     "rawCaptureRequirements": {
       "type": "object",
       "properties": {
-        "publishable": { "const": false },
+        "publishable": {
+          "const": false
+        },
         "captureSessions": {
           "type": "array",
           "minItems": 1,
@@ -986,49 +1859,60 @@
         },
         "promotion": {
           "type": "object",
-          "properties": { "status": { "const": "NOT_ELIGIBLE" } }
+          "properties": {
+            "status": {
+              "const": "NOT_ELIGIBLE"
+            }
+          }
         }
       }
     },
     "releaseBundleRequirements": {
       "type": "object",
+      "description": "Release bundles require a correctness capture only. Optional physical-route/performance lanes may be attached. QA product names (e.g. Codex in-app browser) are never release gates.",
       "properties": {
         "captureSessions": {
           "type": "array",
-          "minItems": 2,
+          "minItems": 1,
           "allOf": [
             {
               "contains": {
                 "type": "object",
-                "required": ["profile", "automationSurface"],
+                "required": [
+                  "profile",
+                  "automationSurface"
+                ],
                 "properties": {
-                  "profile": { "const": "correctness" },
-                  "automationSurface": { "const": "playwright-headless-chromium" }
-                }
-              },
-              "minContains": 1
-            },
-            {
-              "contains": {
-                "type": "object",
-                "required": ["profile", "automationSurface", "adapterClass"],
-                "properties": {
-                  "profile": { "const": "physical-route" },
-                  "automationSurface": { "const": "codex-in-app-browser" },
-                  "adapterClass": { "const": "hardware" }
+                  "profile": {
+                    "const": "correctness"
+                  },
+                  "automationSurface": {
+                    "enum": [
+                      "playwright-headless-chromium",
+                      "playwright-cdp-chrome"
+                    ]
+                  }
                 }
               },
               "minContains": 1
             }
           ]
         },
-        "files": { "$ref": "#/$defs/releaseFiles" },
-        "images": { "$ref": "#/$defs/releaseImages" },
+        "files": {
+          "$ref": "#/$defs/releaseFiles"
+        },
+        "images": {
+          "$ref": "#/$defs/releaseImages"
+        },
         "promotion": {
           "type": "object",
           "properties": {
             "status": {
-              "enum": ["PENDING_VISUAL_SIGNOFF", "APPROVED", "REJECTED"]
+              "enum": [
+                "PENDING_VISUAL_SIGNOFF",
+                "APPROVED",
+                "REJECTED"
+              ]
             }
           }
         }
@@ -1036,12 +1920,20 @@
       "allOf": [
         {
           "if": {
-            "required": ["claimVerdicts"],
+            "required": [
+              "claimVerdicts"
+            ],
             "properties": {
               "claimVerdicts": {
                 "type": "object",
-                "required": ["performanceCompliance"],
-                "properties": { "performanceCompliance": { "const": "PASS" } }
+                "required": [
+                  "performanceCompliance"
+                ],
+                "properties": {
+                  "performanceCompliance": {
+                    "const": "PASS"
+                  }
+                }
               }
             }
           },
@@ -1049,18 +1941,38 @@
             "properties": {
               "claimVerdicts": {
                 "type": "object",
-                "properties": { "gpuAttribution": { "const": "PASS" } }
+                "properties": {
+                  "gpuAttribution": {
+                    "const": "PASS"
+                  }
+                }
               },
               "captureSessions": {
                 "type": "array",
                 "contains": {
                   "type": "object",
-                  "required": ["profile", "automationSurface", "adapterClass", "timestampQuerySupported"],
+                  "required": [
+                    "profile",
+                    "adapterClass",
+                    "timestampQuerySupported"
+                  ],
                   "properties": {
-                    "profile": { "const": "performance" },
-                    "automationSurface": { "const": "codex-in-app-browser" },
-                    "adapterClass": { "const": "hardware" },
-                    "timestampQuerySupported": { "const": true }
+                    "profile": {
+                      "const": "performance"
+                    },
+                    "adapterClass": {
+                      "const": "hardware"
+                    },
+                    "timestampQuerySupported": {
+                      "const": true
+                    },
+                    "automationSurface": {
+                      "enum": [
+                        "playwright-headless-chromium",
+                        "playwright-cdp-chrome",
+                        "codex-in-app-browser"
+                      ]
+                    }
                   }
                 },
                 "minContains": 1
@@ -1073,23 +1985,39 @@
     "publishableReleaseRequirements": {
       "type": "object",
       "properties": {
-        "bundleKind": { "const": "release-bundle" },
-        "publishable": { "const": true },
+        "bundleKind": {
+          "const": "release-bundle"
+        },
+        "publishable": {
+          "const": true
+        },
         "claimVerdicts": {
           "type": "object",
           "properties": {
-            "visualCorrectness": { "const": "PASS" },
-            "mechanismCorrectness": { "const": "PASS" },
-            "lifecycleStability": { "const": "PASS" }
+            "visualCorrectness": {
+              "const": "PASS"
+            },
+            "mechanismCorrectness": {
+              "const": "PASS"
+            },
+            "lifecycleStability": {
+              "const": "PASS"
+            }
           }
         },
         "promotion": {
           "type": "object",
           "properties": {
-            "status": { "const": "APPROVED" },
+            "status": {
+              "const": "APPROVED"
+            },
             "visualSignoff": {
               "type": "object",
-              "properties": { "status": { "const": "APPROVED" } }
+              "properties": {
+                "status": {
+                  "const": "APPROVED"
+                }
+              }
             }
           }
         }
@@ -1100,8 +2028,14 @@
             "properties": {
               "claimVerdicts": {
                 "type": "object",
-                "required": ["performanceCompliance"],
-                "properties": { "performanceCompliance": { "const": "PASS" } }
+                "required": [
+                  "performanceCompliance"
+                ],
+                "properties": {
+                  "performanceCompliance": {
+                    "const": "PASS"
+                  }
+                }
               }
             }
           },
@@ -1109,7 +2043,11 @@
             "properties": {
               "claimVerdicts": {
                 "type": "object",
-                "properties": { "gpuAttribution": { "const": "PASS" } }
+                "properties": {
+                  "gpuAttribution": {
+                    "const": "PASS"
+                  }
+                }
               },
               "captureSessions": {
                 "type": "array",
@@ -1117,15 +2055,26 @@
                   "type": "object",
                   "required": [
                     "profile",
-                    "automationSurface",
                     "adapterClass",
                     "timestampQuerySupported"
                   ],
                   "properties": {
-                    "profile": { "const": "performance" },
-                    "automationSurface": { "const": "codex-in-app-browser" },
-                    "adapterClass": { "const": "hardware" },
-                    "timestampQuerySupported": { "const": true }
+                    "profile": {
+                      "const": "performance"
+                    },
+                    "adapterClass": {
+                      "const": "hardware"
+                    },
+                    "timestampQuerySupported": {
+                      "const": true
+                    },
+                    "automationSurface": {
+                      "enum": [
+                        "playwright-headless-chromium",
+                        "playwright-cdp-chrome",
+                        "codex-in-app-browser"
+                      ]
+                    }
                   }
                 },
                 "minContains": 1
@@ -1137,8 +2086,12 @@
               "claimVerdicts": {
                 "type": "object",
                 "properties": {
-                  "performanceCompliance": { "const": "NOT_CLAIMED" },
-                  "gpuAttribution": { "const": "NOT_CLAIMED" }
+                  "performanceCompliance": {
+                    "const": "NOT_CLAIMED"
+                  },
+                  "gpuAttribution": {
+                    "const": "NOT_CLAIMED"
+                  }
                 }
               }
             }
@@ -1149,7 +2102,9 @@
             "properties": {
               "claimVerdicts": {
                 "type": "object",
-                "required": ["visualError"]
+                "required": [
+                  "visualError"
+                ]
               }
             }
           },
@@ -1157,7 +2112,11 @@
             "properties": {
               "claimVerdicts": {
                 "type": "object",
-                "properties": { "visualError": { "const": "PASS" } }
+                "properties": {
+                  "visualError": {
+                    "const": "PASS"
+                  }
+                }
               }
             }
           }
