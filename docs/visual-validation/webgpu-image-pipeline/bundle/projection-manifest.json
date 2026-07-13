@@ -1,0 +1,443 @@
+{
+  "schemaVersion": 1,
+  "projectionKind": "tracked-release-projection-v1",
+  "policy": {
+    "id": "native-webgpu-tracked-release-v1",
+    "digest": "sha256:e349900d79da27cb5570ea959707f741e03ea7e206d85a717a1129b27268f6a4"
+  },
+  "labId": "webgpu-image-pipeline",
+  "skill": "threejs-image-pipeline",
+  "threeRevision": "0.185.1",
+  "sourceClosureHash": "sha256:1abae9bb29b9f64aa5cd70ae7c916d0c0371304da94e7a6190630834b311c0ec",
+  "buildRevision": "sha256:e0ccf0b3667f6fc93b583742c886d36cafd23fc75f739e01f467b3697c1f6e85",
+  "sourceRelease": {
+    "path": "evidence-manifest.json",
+    "sha256": "sha256:91ff284a06c4bc84502c8eca9f50187e4cdc8df1a8ee9b0148fcab083b353916",
+    "byteLength": 34035,
+    "promotionBindingDigest": "sha256:ca13d72bfe453c9839965a97b8f3d97c01f502500c26b8be941dea3efee0bae6",
+    "candidateBindingDigest": "sha256:2a3fb72c4ab2f4d5dc02d788b8ec2cf11fd53b1111d8e8082e729be5c70b8b82",
+    "artifactLedgerDigest": "sha256:fb664733e3fa74fffa315f0daf16e20e556e9092c133b68952fc25abf209f3a8",
+    "imageLedgerDigest": "sha256:d14bd3207d8324d03b175c32ac1774a941a563be8357ee732d79102f548afb2e"
+  },
+  "sourceClosure": {
+    "algorithm": "demo-registry-transitive-source-closure-v2",
+    "roots": [
+      "labs/runtime/webgpu-device-identity.mjs",
+      "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/constants.js",
+      "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/exposure-nodes.js",
+      "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/lut.js",
+      "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/stage.js",
+      "threejs-image-pipeline/examples/webgpu-image-pipeline"
+    ],
+    "files": [
+      {
+        "repositoryPath": "labs/runtime/webgpu-device-identity.mjs",
+        "sha256": "sha256:4bc6eb92755516473bc39b488c0bcfd419e5f23800c497bc44bbf3d07d509bfe",
+        "byteLength": 4095
+      },
+      {
+        "repositoryPath": "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/constants.js",
+        "sha256": "sha256:c597508504c9dcc354c43519cd13dd1f1e755bf5b04903fb0d45b03927a5e222",
+        "byteLength": 13102
+      },
+      {
+        "repositoryPath": "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/exposure-nodes.js",
+        "sha256": "sha256:62e423c0ab0e89a323152d4a045a401de0475bc1690a610b391079b473a00df7",
+        "byteLength": 20045
+      },
+      {
+        "repositoryPath": "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/lut.js",
+        "sha256": "sha256:3849e09438871c392123052ca16939d8723d90cad695c4d3c2bf688d6d6e9ada",
+        "byteLength": 6788
+      },
+      {
+        "repositoryPath": "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/stage.js",
+        "sha256": "sha256:e21008e5206440b79315bfc65c4bfa583a459bbe7ccfea9ebec4cf64d96f35c6",
+        "byteLength": 7816
+      },
+      {
+        "repositoryPath": "threejs-image-pipeline/examples/webgpu-image-pipeline/artifact-config.js",
+        "sha256": "sha256:98f003f3507043af9c4207551ca5b2c8eabae12f5cb3db2eab8f3ce91a8fdbe2",
+        "byteLength": 2671
+      },
+      {
+        "repositoryPath": "threejs-image-pipeline/examples/webgpu-image-pipeline/browser-app.js",
+        "sha256": "sha256:54e7af0c2fcfbc1233996b56b576bb8639b1c1ca6581a9c637f93aa458024ae1",
+        "byteLength": 32595
+      },
+      {
+        "repositoryPath": "threejs-image-pipeline/examples/webgpu-image-pipeline/canonical-browser-app.js",
+        "sha256": "sha256:9a35b7b0041bcfa87b4ad34b1201d92bca5bb6a397b626726c9aa5e29d5567d6",
+        "byteLength": 7201
+      },
+      {
+        "repositoryPath": "threejs-image-pipeline/examples/webgpu-image-pipeline/canonical-capture.mjs",
+        "sha256": "sha256:c95fff9bfb442c8d42e198c6da29f268d762e60e34bd4fb76e0e7aef50ee6880",
+        "byteLength": 10355
+      },
+      {
+        "repositoryPath": "threejs-image-pipeline/examples/webgpu-image-pipeline/canonical-main.js",
+        "sha256": "sha256:37aa132cbeeb0b5a1b53a8eda4624f83f8512b33272126c4e1382fd4a9801565",
+        "byteLength": 17568
+      },
+      {
+        "repositoryPath": "threejs-image-pipeline/examples/webgpu-image-pipeline/capture-hook.mjs",
+        "sha256": "sha256:33c23f46b9c28b2794995a99cdf627df7db93c1e22be39ef08ad94082fa4b47b",
+        "byteLength": 3900
+      },
+      {
+        "repositoryPath": "threejs-image-pipeline/examples/webgpu-image-pipeline/capture.mjs",
+        "sha256": "sha256:e586de38298cd53dad393d9540f69a775a2527e14730444602d6e6907f75246e",
+        "byteLength": 9890
+      },
+      {
+        "repositoryPath": "threejs-image-pipeline/examples/webgpu-image-pipeline/composeFinalGraph.js",
+        "sha256": "sha256:f875353218fb0f8d59cf0d8dece4fa2cb0553f84b71d35beeb7010063d1c87e5",
+        "byteLength": 2255
+      },
+      {
+        "repositoryPath": "threejs-image-pipeline/examples/webgpu-image-pipeline/index.html",
+        "sha256": "sha256:259e43d2cc4670559f5acc50e8f7e9b2a00a24141908c775503ef905023cf6de",
+        "byteLength": 1241
+      },
+      {
+        "repositoryPath": "threejs-image-pipeline/examples/webgpu-image-pipeline/lab-identity.js",
+        "sha256": "sha256:338920ea0eaf34eb9b8d0326500eb8df594cc2cbe6058ebf4c8909743860bcec",
+        "byteLength": 362
+      },
+      {
+        "repositoryPath": "threejs-image-pipeline/examples/webgpu-image-pipeline/main.js",
+        "sha256": "sha256:62c254aa687ad825878600a12b9e30023e19cd1649fead0a6cc9e3c25d6f032c",
+        "byteLength": 10300
+      },
+      {
+        "repositoryPath": "threejs-image-pipeline/examples/webgpu-image-pipeline/mechanism/ao-bloom-exposure-order/index.html",
+        "sha256": "sha256:8636bf18ab4c5963c93c447ba12f61743cdbd506e2f3b74d92f0fe779091865c",
+        "byteLength": 1041
+      },
+      {
+        "repositoryPath": "threejs-image-pipeline/examples/webgpu-image-pipeline/mechanism/diagnostic-extra-pass/index.html",
+        "sha256": "sha256:7fb0709bc6c54ebfc0c24725c25f4a2179215730163c6ce16d94dc7117b1143d",
+        "byteLength": 1020
+      },
+      {
+        "repositoryPath": "threejs-image-pipeline/examples/webgpu-image-pipeline/mechanism/output-and-color-ownership/index.html",
+        "sha256": "sha256:f27c0fe57ccb1cfdcecb5135d60a59d6ab63450007388d6fb317b36716e1b590",
+        "byteLength": 1022
+      },
+      {
+        "repositoryPath": "threejs-image-pipeline/examples/webgpu-image-pipeline/mechanism/resource-budget/index.html",
+        "sha256": "sha256:07582abefa67504093eab0a8f652010122f9123fbded9243ffd1d347325d23d6",
+        "byteLength": 990
+      },
+      {
+        "repositoryPath": "threejs-image-pipeline/examples/webgpu-image-pipeline/mechanism/signal-inspector/index.html",
+        "sha256": "sha256:c988037674c67f1393789edc34cb148576bb8480ef8935f5df7e18ff848bc6c8",
+        "byteLength": 994
+      },
+      {
+        "repositoryPath": "threejs-image-pipeline/examples/webgpu-image-pipeline/mechanism/temporal-velocity-and-history/index.html",
+        "sha256": "sha256:380ad70a5837c52205d52b826a32deac1c90e2315c83acab5ad6fef67da77c6c",
+        "byteLength": 1043
+      },
+      {
+        "repositoryPath": "threejs-image-pipeline/examples/webgpu-image-pipeline/package-lock.json",
+        "sha256": "sha256:eefb284f21574fa647d12441d950d21873fe514ad3ae592c5b5e9521ba374be4",
+        "byteLength": 1967
+      },
+      {
+        "repositoryPath": "threejs-image-pipeline/examples/webgpu-image-pipeline/package.json",
+        "sha256": "sha256:22737e8e135da756a90815fbccaa84572607fc085e6bab01621d18c169967547",
+        "byteLength": 1353
+      },
+      {
+        "repositoryPath": "threejs-image-pipeline/examples/webgpu-image-pipeline/pipelineConfig.js",
+        "sha256": "sha256:fdc61ddddf1a546d3b9ceb77646ea800bad8ed2eccb9dd9c8bf292abe22fe29a",
+        "byteLength": 10633
+      },
+      {
+        "repositoryPath": "threejs-image-pipeline/examples/webgpu-image-pipeline/README.md",
+        "sha256": "sha256:b9628d40f5fcdb02fb2f47a6aed0f2a41936b5b1b038a4f9610f6eb2c3768989",
+        "byteLength": 9381
+      },
+      {
+        "repositoryPath": "threejs-image-pipeline/examples/webgpu-image-pipeline/route-wrapper.js",
+        "sha256": "sha256:0fc468add57785d42971ca7735bc9e57ae238acf5dac6ccd99b1a7ee74a42ba7",
+        "byteLength": 492
+      },
+      {
+        "repositoryPath": "threejs-image-pipeline/examples/webgpu-image-pipeline/stage.js",
+        "sha256": "sha256:ba961ffa6ee7dfd56a156154a6d053c146849ecffbe18f25932ae62a98d45bfc",
+        "byteLength": 6614
+      },
+      {
+        "repositoryPath": "threejs-image-pipeline/examples/webgpu-image-pipeline/tier/debug/index.html",
+        "sha256": "sha256:fc9e423955d124db7b91406724de884e1ba7e4313d976c457e2405c7d20a13f1",
+        "byteLength": 961
+      },
+      {
+        "repositoryPath": "threejs-image-pipeline/examples/webgpu-image-pipeline/tier/full/index.html",
+        "sha256": "sha256:611372dcd5407f368c8d9f432593252d5cbe26824b6c1b64bca2d243de27dcf3",
+        "byteLength": 958
+      },
+      {
+        "repositoryPath": "threejs-image-pipeline/examples/webgpu-image-pipeline/tier/reduced/index.html",
+        "sha256": "sha256:1e7130572f83fc009ce4929dd774980f211de9dbf01056b23691979f95fecf1a",
+        "byteLength": 967
+      },
+      {
+        "repositoryPath": "threejs-image-pipeline/examples/webgpu-image-pipeline/validate-canonical-artifacts.mjs",
+        "sha256": "sha256:94cfe32f38870843da6d61ad67056008ec7f1952be5dbee765ccacffe6b1ac01",
+        "byteLength": 13551
+      },
+      {
+        "repositoryPath": "threejs-image-pipeline/examples/webgpu-image-pipeline/validate-canonical.mjs",
+        "sha256": "sha256:c7346502ebc3f2c684089063905e8beb614341d0a9827b4845c6c8f339db4d2d",
+        "byteLength": 7381
+      },
+      {
+        "repositoryPath": "threejs-image-pipeline/examples/webgpu-image-pipeline/validate-image-pipeline-artifacts.mjs",
+        "sha256": "sha256:e321c4f9b7c7225358e34eb3e4fe78f95bc41c58e2339c1df3b17256f566ef25",
+        "byteLength": 15409
+      },
+      {
+        "repositoryPath": "threejs-image-pipeline/examples/webgpu-image-pipeline/validate-routes.mjs",
+        "sha256": "sha256:8ecfb5c15f87c7ef10b6610c3d13abd00caa9d13e89f120b3ed7fa3a47bed324",
+        "byteLength": 5488
+      },
+      {
+        "repositoryPath": "threejs-image-pipeline/examples/webgpu-image-pipeline/validateImagePipelineConfig.js",
+        "sha256": "sha256:2f1ab365dd8a7b3b7b9783b5d0da9bb60115796697549875d8ea0dd9d35037eb",
+        "byteLength": 17403
+      }
+    ],
+    "threeRevision": "0.185.1",
+    "sourceHash": "sha256:1abae9bb29b9f64aa5cd70ae7c916d0c0371304da94e7a6190630834b311c0ec",
+    "buildRevision": "sha256:e0ccf0b3667f6fc93b583742c886d36cafd23fc75f739e01f467b3697c1f6e85"
+  },
+  "retainedFiles": [
+    {
+      "path": "visual-contract.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:12fb2e6197f64300369f458a68cc8f0769f5bbd0a9324cd707f1b11170632d90",
+      "byteLength": 867
+    },
+    {
+      "path": "renderer-info.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:ce98dc437ff1e48283efdd61f5f63f5c0cc95934b77e56c419199c8db5c3b599",
+      "byteLength": 466
+    },
+    {
+      "path": "pipeline-graph.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:78f42f9361485fe79477ffe86899f9725d1daaf6cdf5f9ec49681a16fa98f069",
+      "byteLength": 956
+    },
+    {
+      "path": "performance-envelope.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:62e1abb57e217febce5044e04788aae2967a749c9dd5c70432f279fc3c45e507",
+      "byteLength": 634
+    },
+    {
+      "path": "frame-trace.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:61e2604f805c8759b4999cc2b6ef8e27ea9446acb8902d2b4f38c58f787479e7",
+      "byteLength": 280
+    },
+    {
+      "path": "quality-governor.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:5683ed24c8ea3d63cbc0cdd07f2b243c35d1b59be0be51c48059f5ff0e22425d",
+      "byteLength": 257
+    },
+    {
+      "path": "render-targets.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:9ab5da34df52ffc998817bdfb4081e5ad3720acff05e5c0425d6f1ecf3e29f16",
+      "byteLength": 10590
+    },
+    {
+      "path": "storage-resources.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:579719a4f114bada5939fff4c4a645ac178e5b40a8f18de1cfb9532f02a92486",
+      "byteLength": 333
+    },
+    {
+      "path": "resident-resources.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:6fc1377d8131845b579a304b535bc8832ac8ad8663760f592519d1c3ab76a856",
+      "byteLength": 1329
+    },
+    {
+      "path": "bandwidth-model.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:e921c52741c0a3b03c5a02ac0b1337262a182750cd76a01d10c49323c047a034",
+      "byteLength": 956
+    },
+    {
+      "path": "visual-errors.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:f4b2464fc52bef50bc4fdd264442c77fe07b680905d615eb5be53d0d84a8ff9c",
+      "byteLength": 752
+    },
+    {
+      "path": "leak-loop.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:367e06290fcf858bd2fa415f1d4ffc955dcd918affe3f289ca276fcbbc201577",
+      "byteLength": 131919
+    },
+    {
+      "path": "mechanism-metrics.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:cf67867f6e020201617e1b9c099c1a2999fecaef174a71eb2a76ab16a7e6a275",
+      "byteLength": 4729
+    },
+    {
+      "path": "capture-write-ledger.json",
+      "status": "captured",
+      "kind": "capture-session-write-ledger",
+      "sha256": "sha256:05cdaf94ab89b8aef3abecbd562f19e25fb8206e362c51ad60255ddbd6bb436d",
+      "byteLength": 10659
+    },
+    {
+      "path": "sessions/physical-route.write-ledger.json",
+      "status": "captured",
+      "kind": "capture-session-write-ledger",
+      "sha256": "sha256:2d3beaba7589c72c4da2a89a08d8c5022f602e24a219e1364aa8a2a13b2e2cf7",
+      "byteLength": 2020
+    }
+  ],
+  "retainedImages": [
+    {
+      "path": "final.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "final.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:d51976bc09cf8e830f7c9c7d70745a74b50d036b7cd3b5f23fde230eac69b28e",
+      "byteLength": 104888
+    },
+    {
+      "path": "no-post.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "no-post.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:9c3c4570a6d5b49921a9e19935a8871aaf8a2bc1126881e451e091a38bc073ce",
+      "byteLength": 10866
+    },
+    {
+      "path": "diagnostics.mosaic.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "diagnostics.mosaic",
+      "mediaType": "image/png",
+      "sha256": "sha256:7af681740a632c0c63f400f6920235e639aaaffceabd834015927b22ac0f459f",
+      "byteLength": 27280
+    },
+    {
+      "path": "camera.near.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.near",
+      "mediaType": "image/png",
+      "sha256": "sha256:21a7a30550a8ff91df1706fccfd4bf6c19ad247e46c8e225f6221b369718da60",
+      "byteLength": 130017
+    },
+    {
+      "path": "camera.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:0aee9b848ada996eba1c4037fd41f423d00fa01d6ef29d529d140936d369482c",
+      "byteLength": 108599
+    },
+    {
+      "path": "camera.far.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.far",
+      "mediaType": "image/png",
+      "sha256": "sha256:3a7ed03d1594cd9e0b3c5f327c42ebb89ce53e9ed778a770dbfc08b60ec10d3e",
+      "byteLength": 89114
+    },
+    {
+      "path": "seed-0001.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "seed-0001.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:f6ca134b4a88e7ccbecb6fa192658ce61e9c8583e029479e81ecaeccead89123",
+      "byteLength": 109281
+    },
+    {
+      "path": "seed-9e3779b9.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "seed-9e3779b9.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:49ffb25262c1c73fe516336671a0db52b33a4aa531c77ca96d3ec5c06094a8fc",
+      "byteLength": 109313
+    },
+    {
+      "path": "temporal.t000.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "temporal.t000",
+      "mediaType": "image/png",
+      "sha256": "sha256:1d8e7ece19bb56ab8607c04072e3c20c5b1b88c1b91834c6d58966a2b6cf77e0",
+      "byteLength": 108270
+    },
+    {
+      "path": "temporal.t001.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "temporal.t001",
+      "mediaType": "image/png",
+      "sha256": "sha256:4ef25eccb97e7c9e5c862d255df672cc8d4a84f5e67939758c02c64859623aaf",
+      "byteLength": 106431
+    }
+  ],
+  "omittedFiles": {
+    "ledgerDigest": "sha256:dc8f4050bdada3ab1218fb71223023125cf5d9b268f5e24ac0d398d01357b453",
+    "count": 3,
+    "byteLength": 130755,
+    "byKind": [
+      {
+        "kind": "capture-session-document",
+        "count": 2,
+        "byteLength": 127191
+      },
+      {
+        "kind": "supplementary-json",
+        "count": 1,
+        "byteLength": 3564
+      }
+    ]
+  },
+  "checkoutLimitations": [
+    {
+      "id": "detached-source-payloads",
+      "status": "ACTIVE",
+      "statement": "Raw readbacks and capture-session transcript bytes are omitted from the tracked projection. Checkout validation verifies their approved hash and byte-length commitments, not the detached bytes themselves.",
+      "affectedClaims": []
+    }
+  ],
+  "projectionDigest": "sha256:2eb6004b81009a267163357ef8a166139a559c6e950a465a14799f2d885a0bac"
+}

@@ -5,7 +5,7 @@
   "skill": "threejs-procedural-vegetation",
   "threeRevision": "0.185.1",
   "kind": "integration-demo",
-  "status": "incomplete",
+  "status": "accepted",
   "canonicalSource": [
     "threejs-procedural-vegetation/examples/webgpu-vegetation-integration"
   ],
@@ -18,7 +18,7 @@
       "startup": {
         "scenario": "weathered-world-host"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "creature-habitat-host",
@@ -26,7 +26,7 @@
       "startup": {
         "scenario": "creature-habitat-host"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     }
   ],
   "mechanisms": [
@@ -36,7 +36,7 @@
       "startup": {
         "mode": "owner-graph"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "shared-weather",
@@ -44,7 +44,7 @@
       "startup": {
         "mode": "weather-diagnostics"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "shared-contacts",
@@ -52,7 +52,7 @@
       "startup": {
         "mode": "contact-diagnostics"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     }
   ],
   "tiers": [
@@ -105,7 +105,7 @@
         "one output transform",
         "shared weather and units"
       ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "balanced",
@@ -158,7 +158,7 @@
         "one output transform",
         "shared weather and units"
       ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "budgeted",
@@ -212,7 +212,7 @@
         "one output transform",
         "shared weather and units"
       ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     }
   ],
   "modes": [
@@ -236,13 +236,13 @@
       "id": "native-webgpu",
       "required": true,
       "evidence": "host renderer backend contract",
-      "status": "incomplete"
+      "status": "accepted"
     },
     {
       "id": "host-pipeline",
       "required": true,
       "evidence": "pipeline/tone/output share one injected owner id",
-      "status": "incomplete"
+      "status": "accepted"
     }
   ],
   "runtimeProof": [
@@ -250,55 +250,55 @@
       "id": "owner-graph",
       "required": true,
       "evidence": "validate-integration.mjs duplicate-owner mutations",
-      "status": "incomplete"
+      "status": "accepted"
     },
     {
       "id": "shared-world-units",
       "required": true,
       "evidence": "planet and terrain unit equality gate",
-      "status": "incomplete"
+      "status": "accepted"
     },
     {
       "id": "shared-weather",
       "required": true,
       "evidence": "same host weather object drives dense grass and Ash",
-      "status": "incomplete"
+      "status": "accepted"
     },
     {
       "id": "shared-contacts",
       "required": true,
       "evidence": "host contacts update dense touch channel without static topology regeneration",
-      "status": "incomplete"
+      "status": "accepted"
     },
     {
       "id": "renderer-init",
       "required": true,
       "evidence": "Accepted publishable release-bundle proves renderer-init for webgpu-vegetation-integration.",
-      "status": "incomplete"
+      "status": "accepted"
     },
     {
       "id": "backend-is-webgpu",
       "required": true,
       "evidence": "Accepted publishable release-bundle proves backend-is-webgpu for webgpu-vegetation-integration.",
-      "status": "incomplete"
+      "status": "accepted"
     },
     {
       "id": "mechanism-reachable",
       "required": true,
       "evidence": "Accepted publishable release-bundle proves mechanism-reachable for webgpu-vegetation-integration.",
-      "status": "incomplete"
+      "status": "accepted"
     },
     {
       "id": "render-or-compute-work",
       "required": true,
       "evidence": "Accepted publishable release-bundle proves render-or-compute-work for webgpu-vegetation-integration.",
-      "status": "incomplete"
+      "status": "accepted"
     },
     {
       "id": "aligned-readback",
       "required": true,
       "evidence": "Accepted publishable release-bundle proves aligned-readback for webgpu-vegetation-integration.",
-      "status": "incomplete"
+      "status": "accepted"
     }
   ],
   "evidenceContract": "v2",

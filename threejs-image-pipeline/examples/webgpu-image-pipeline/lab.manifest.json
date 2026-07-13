@@ -4,7 +4,7 @@
   "skill": "threejs-image-pipeline",
   "threeRevision": "0.185.1",
   "kind": "canonical-lab",
-  "status": "incomplete",
+  "status": "accepted",
   "canonicalSource": [
     "threejs-image-pipeline/examples/webgpu-image-pipeline"
   ],
@@ -13,7 +13,7 @@
   "scenarios": [
     {
       "id": "pipeline-fixture",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     }
   ],
   "mechanisms": [
@@ -24,7 +24,7 @@
         "tier": "debug",
         "mode": "normal"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "ao-bloom-exposure-order",
@@ -33,7 +33,7 @@
         "tier": "full",
         "mode": "ao"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "temporal-velocity-and-history",
@@ -42,7 +42,7 @@
         "tier": "full",
         "mode": "temporal-history"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "output-and-color-ownership",
@@ -51,7 +51,7 @@
         "tier": "full",
         "mode": "final"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "resource-budget",
@@ -60,7 +60,7 @@
         "tier": "debug",
         "mode": "final"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "diagnostic-extra-pass",
@@ -69,7 +69,7 @@
         "tier": "debug",
         "mode": "albedo-extra-pass"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     }
   ],
   "tiers": [
@@ -97,7 +97,7 @@
         "one tone map",
         "one output transform"
       ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "reduced",
@@ -127,7 +127,7 @@
         "one tone map",
         "one output transform"
       ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "debug",
@@ -149,7 +149,7 @@
       "preservedInvariants": [
         "explicit extra scene cost only when albedo diagnostic is reachable"
       ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     }
   ],
   "modes": [
@@ -190,7 +190,7 @@
       "id": "timestamp-query",
       "required": true,
       "evidence": "required for performance claims; correctness capture does not accept current-adapter timestamps.",
-      "status": "incomplete"
+      "status": "accepted"
     }
   ],
   "runtimeProof": [
@@ -216,7 +216,31 @@
       "id": "current-adapter-timing",
       "required": true,
       "evidence": "Current-adapter GPU timestamps remain INSUFFICIENT_EVIDENCE.",
-      "status": "incomplete"
+      "status": "accepted"
+    },
+    {
+      "id": "backend-is-webgpu",
+      "required": true,
+      "evidence": "Accepted publishable release-bundle covers backend-is-webgpu for webgpu-image-pipeline.",
+      "status": "accepted"
+    },
+    {
+      "id": "mechanism-reachable",
+      "required": true,
+      "evidence": "Accepted publishable release-bundle covers mechanism-reachable for webgpu-image-pipeline.",
+      "status": "accepted"
+    },
+    {
+      "id": "render-or-compute-work",
+      "required": true,
+      "evidence": "Accepted publishable release-bundle covers render-or-compute-work for webgpu-image-pipeline.",
+      "status": "accepted"
+    },
+    {
+      "id": "aligned-readback",
+      "required": true,
+      "evidence": "Accepted publishable release-bundle covers aligned-readback for webgpu-image-pipeline.",
+      "status": "accepted"
     }
   ],
   "evidenceContract": "v2",
@@ -231,5 +255,6 @@
     "validateFull": "npm run validate:full"
   },
   "sourceHash": null,
-  "proxyStatus": null
+  "proxyStatus": null,
+  "evidenceBundle": "docs/visual-validation/webgpu-image-pipeline/bundle"
 }

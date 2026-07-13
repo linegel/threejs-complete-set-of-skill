@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "labId": "webgpu-image-pipeline",
   "classification": "inspected-runtime-evidence-preview",
-  "acceptanceStatus": "incomplete",
-  "evidenceBundleId": "webgpu-image-pipeline-v2",
+  "acceptanceStatus": "accepted",
+  "evidenceBundleId": "bundle",
   "canonicalSource": [
     "threejs-image-pipeline/examples/webgpu-image-pipeline"
   ],
@@ -11,106 +11,124 @@
   "threeRevision": "0.185.1",
   "runtime": {
     "renderer": "WebGPURenderer",
-    "backend": "WebGPUBackend",
+    "backend": "WebGPU",
     "isWebGPUBackend": true,
-    "threeRevision": null,
-    "nativeWebGPU": false,
-    "initialized": false,
-    "adapterClass": null,
-    "adapterIdentity": null,
-    "deviceIdentity": null
+    "threeRevision": "0.185.1"
   },
   "claimVerdicts": {
-    "mechanismCorrectness": "INSUFFICIENT_EVIDENCE",
-    "performanceCompliance": "INSUFFICIENT_EVIDENCE",
-    "lifecycleStability": "INSUFFICIENT_EVIDENCE"
+    "visualCorrectness": "PASS",
+    "mechanismCorrectness": "PASS",
+    "performanceCompliance": "NOT_CLAIMED",
+    "gpuAttribution": "NOT_CLAIMED",
+    "lifecycleStability": "PASS",
+    "visualError": "PASS"
   },
   "primaryImage": "final.design.png",
-  "primaryImageLabel": "Final image-pipeline render-target readback",
+  "primaryImageLabel": "Image pipeline native WebGPU readback",
   "images": [
     {
       "file": "final.design.png",
-      "meaning": "Final composed output after the single tone map and output transform.",
-      "source": "images/final.design.png",
-      "sourceSha256": "sha256:40fe6a9b4022d2838260a7dd31bf9d26f6b3e4961801b37430d9f4295b6dcca9",
-      "outputSha256": "sha256:40fe6a9b4022d2838260a7dd31bf9d26f6b3e4961801b37430d9f4295b6dcca9",
+      "meaning": "Final design presentation",
+      "source": "final.design.png",
+      "sourceSha256": "sha256:d51976bc09cf8e830f7c9c7d70745a74b50d036b7cd3b5f23fde230eac69b28e",
+      "outputSha256": "sha256:d51976bc09cf8e830f7c9c7d70745a74b50d036b7cd3b5f23fde230eac69b28e",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     },
     {
       "file": "no-post.design.png",
-      "meaning": "Readable scene baseline without the post stack.",
-      "source": "images/no-post.design.png",
-      "sourceSha256": "sha256:4613c3a4337dfaf74d74d69fa3fb261212b93e1b66f4a5cd8904e43484881a78",
-      "outputSha256": "sha256:4613c3a4337dfaf74d74d69fa3fb261212b93e1b66f4a5cd8904e43484881a78",
+      "meaning": "No-post / baseline presentation",
+      "source": "no-post.design.png",
+      "sourceSha256": "sha256:9c3c4570a6d5b49921a9e19935a8871aaf8a2bc1126881e451e091a38bc073ce",
+      "outputSha256": "sha256:9c3c4570a6d5b49921a9e19935a8871aaf8a2bc1126881e451e091a38bc073ce",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     },
     {
       "file": "diagnostics.mosaic.png",
-      "meaning": "Mosaic assembled from live diagnostic graph outputs.",
-      "source": "images/diagnostics.mosaic.png",
-      "sourceSha256": "sha256:1819175ad2c93f4b688c44f29ff975f20d517f8dc2f573362c74d31aae615c4b",
-      "outputSha256": "sha256:1819175ad2c93f4b688c44f29ff975f20d517f8dc2f573362c74d31aae615c4b",
+      "meaning": "Diagnostics mosaic",
+      "source": "diagnostics.mosaic.png",
+      "sourceSha256": "sha256:7af681740a632c0c63f400f6920235e639aaaffceabd834015927b22ac0f459f",
+      "outputSha256": "sha256:7af681740a632c0c63f400f6920235e639aaaffceabd834015927b22ac0f459f",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     },
     {
-      "file": "normal.png",
-      "meaning": "Shared normal signal readback.",
-      "source": "images/normal.png",
-      "sourceSha256": "sha256:317126f75c6f6c3d57610c7329d0a847b90aa5b352b7e8cb986e06b09cb66705",
-      "outputSha256": "sha256:317126f75c6f6c3d57610c7329d0a847b90aa5b352b7e8cb986e06b09cb66705",
+      "file": "camera.near.png",
+      "meaning": "Near camera",
+      "source": "camera.near.png",
+      "sourceSha256": "sha256:21a7a30550a8ff91df1706fccfd4bf6c19ad247e46c8e225f6221b369718da60",
+      "outputSha256": "sha256:21a7a30550a8ff91df1706fccfd4bf6c19ad247e46c8e225f6221b369718da60",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     },
     {
-      "file": "emissive.png",
-      "meaning": "Shared emissive signal readback.",
-      "source": "images/emissive.png",
-      "sourceSha256": "sha256:43a75957c1b3cba9e70b12f51aa5b70c887e2f261a8d795ca1a78d9ff3883a85",
-      "outputSha256": "sha256:43a75957c1b3cba9e70b12f51aa5b70c887e2f261a8d795ca1a78d9ff3883a85",
+      "file": "camera.design.png",
+      "meaning": "Design camera",
+      "source": "camera.design.png",
+      "sourceSha256": "sha256:0aee9b848ada996eba1c4037fd41f423d00fa01d6ef29d529d140936d369482c",
+      "outputSha256": "sha256:0aee9b848ada996eba1c4037fd41f423d00fa01d6ef29d529d140936d369482c",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     },
     {
-      "file": "bloom.png",
-      "meaning": "BloomNode diagnostic readback.",
-      "source": "images/bloom.png",
-      "sourceSha256": "sha256:8544bff67aee8473b42309c740dcd088b621c4754f880c68495da7af3ecdb0ca",
-      "outputSha256": "sha256:8544bff67aee8473b42309c740dcd088b621c4754f880c68495da7af3ecdb0ca",
+      "file": "camera.far.png",
+      "meaning": "Far camera",
+      "source": "camera.far.png",
+      "sourceSha256": "sha256:3a7ed03d1594cd9e0b3c5f327c42ebb89ce53e9ed778a770dbfc08b60ec10d3e",
+      "outputSha256": "sha256:3a7ed03d1594cd9e0b3c5f327c42ebb89ce53e9ed778a770dbfc08b60ec10d3e",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     },
     {
-      "file": "velocity.moving-positive-x.png",
-      "meaning": "Moving-velocity fixture with expected positive NDC X sign.",
-      "source": "images/velocity.moving-positive-x.png",
-      "sourceSha256": "sha256:f2ebc4dc58e95dbd78e31e034769bc259bdfe8a7547ef537b2bce215af56d04e",
-      "outputSha256": "sha256:f2ebc4dc58e95dbd78e31e034769bc259bdfe8a7547ef537b2bce215af56d04e",
+      "file": "seed-0001.final.png",
+      "meaning": "Representative seed final",
+      "source": "seed-0001.final.png",
+      "sourceSha256": "sha256:f6ca134b4a88e7ccbecb6fa192658ce61e9c8583e029479e81ecaeccead89123",
+      "outputSha256": "sha256:f6ca134b4a88e7ccbecb6fa192658ce61e9c8583e029479e81ecaeccead89123",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     },
     {
-      "file": "temporal.history.png",
-      "meaning": "Temporal history target before camera-cut reset.",
-      "source": "images/temporal.history.png",
-      "sourceSha256": "sha256:570eb48d52d9e88161c771af93d62b923b4ab7965aff0d63a87e64dceebffddf",
-      "outputSha256": "sha256:570eb48d52d9e88161c771af93d62b923b4ab7965aff0d63a87e64dceebffddf",
+      "file": "seed-9e3779b9.final.png",
+      "meaning": "Stress seed final",
+      "source": "seed-9e3779b9.final.png",
+      "sourceSha256": "sha256:49ffb25262c1c73fe516336671a0db52b33a4aa531c77ca96d3ec5c06094a8fc",
+      "outputSha256": "sha256:49ffb25262c1c73fe516336671a0db52b33a4aa531c77ca96d3ec5c06094a8fc",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "temporal.t000.png",
+      "meaning": "Temporal t0",
+      "source": "temporal.t000.png",
+      "sourceSha256": "sha256:1d8e7ece19bb56ab8607c04072e3c20c5b1b88c1b91834c6d58966a2b6cf77e0",
+      "outputSha256": "sha256:1d8e7ece19bb56ab8607c04072e3c20c5b1b88c1b91834c6d58966a2b6cf77e0",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "temporal.t001.png",
+      "meaning": "Temporal t1",
+      "source": "temporal.t001.png",
+      "sourceSha256": "sha256:4ef25eccb97e7c9e5c862d255df672cc8d4a84f5e67939758c02c64859623aaf",
+      "outputSha256": "sha256:4ef25eccb97e7c9e5c862d255df672cc8d4a84f5e67939758c02c64859623aaf",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     }
   ],
   "limitations": [
-    "Signal, velocity, temporal-reset, and diagnostic readbacks passed the lab artifact validator.",
-    "Current-adapter GPU timestamp and lifecycle evidence remain INSUFFICIENT_EVIDENCE."
+    "Performance and GPU attribution remain NOT_CLAIMED unless a hardware performance lane is present.",
+    "Promoted media are native-WebGPU correctness readbacks bound by the accepted release-bundle ledger."
   ]
 }

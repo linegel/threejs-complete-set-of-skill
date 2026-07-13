@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:36e4490fcd74f5f358440cf8a67dbb057ea2e2c73bcfde6078bc53b0a5e63ee2",
+  "buildRevision": "sha256:7ba7b3cc2b0ff75eb71ecf5d8b8e7b6bdf9407d8570076f6a6bce907a7e649d6",
   "demoKinds": [
     "canonical-lab",
     "mechanism-demo",
@@ -102,10 +102,8 @@
         "integration-image-pipeline-ao",
         "webgpu-node-gtao"
       ],
-      "acceptedPrimaryLabIds": [
-        "webgpu-node-gtao"
-      ],
-      "status": "accepted"
+      "acceptedPrimaryLabIds": [],
+      "status": "incomplete"
     },
     {
       "skill": "threejs-black-holes-and-space-effects",
@@ -191,8 +189,10 @@
         "webgpu-image-pipeline",
         "webgpu-temporal-history"
       ],
-      "acceptedPrimaryLabIds": [],
-      "status": "incomplete"
+      "acceptedPrimaryLabIds": [
+        "webgpu-image-pipeline"
+      ],
+      "status": "accepted"
     },
     {
       "skill": "threejs-object-sculptor",
@@ -276,8 +276,12 @@
         "webgpu-dense-grass",
         "webgpu-vegetation-integration"
       ],
-      "acceptedPrimaryLabIds": [],
-      "status": "incomplete"
+      "acceptedPrimaryLabIds": [
+        "structured-ash-growth",
+        "webgpu-dense-grass",
+        "webgpu-vegetation-integration"
+      ],
+      "status": "accepted"
     },
     {
       "skill": "threejs-rain-snow-and-wet-surfaces",
@@ -349,13 +353,13 @@
     "skills": 27,
     "demos": 90,
     "primary": 41,
-    "acceptedPrimary": 9,
+    "acceptedPrimary": 12,
     "secondary": 49,
     "integrations": 10,
     "flagships": 5,
     "fixedRoutes": 517,
     "requiredCapabilities": 90,
-    "requiredRuntimeProofs": 240
+    "requiredRuntimeProofs": 254
   },
   "demos": [
     {
@@ -2337,7 +2341,7 @@
         "validateQuick": "npm --prefix threejs-ambient-contact-shading/examples/integration-image-pipeline-ao run validate:quick",
         "validateFull": "npm --prefix threejs-ambient-contact-shading/examples/integration-image-pipeline-ao run validate:full"
       },
-      "sourceHash": "sha256:fb331bcadcdf3dd4b94e070f6f99561545be4ff42570a04d6d814fae93b229c6",
+      "sourceHash": "sha256:f64d4becaef555716227932d2d99be1261c4128e758659d788ae0acb042593b4",
       "proxyStatus": null,
       "notes": [
         "Correctness capture session exists at artifacts/visual-validation/integration-image-pipeline-ao/correctness with non-blank presentation/owner-graph readbacks and device-identity metrics.",
@@ -5007,7 +5011,7 @@
         }
       ],
       "evidenceContract": "v2",
-      "evidenceBundle": null,
+      "evidenceBundle": "docs/visual-validation/semantic-mesh-writer/bundle",
       "validationCommand": "node threejs-procedural-geometry/examples/semantic-mesh-writer/validate-geometry.js --sweep all --json",
       "commands": {
         "check": "npm --prefix threejs-procedural-geometry/examples/semantic-mesh-writer run check",
@@ -5342,7 +5346,7 @@
       "skill": "threejs-procedural-vegetation",
       "threeRevision": "0.185.1",
       "kind": "canonical-lab",
-      "status": "incomplete",
+      "status": "accepted",
       "canonicalSource": [
         "threejs-procedural-vegetation/examples/structured-ash-growth"
       ],
@@ -5355,7 +5359,7 @@
           "startup": {
             "scenario": "ash-contract"
           },
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         },
         {
           "id": "ash-forest",
@@ -5363,7 +5367,7 @@
           "startup": {
             "scenario": "ash-forest"
           },
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         },
         {
           "id": "structured-growth",
@@ -5371,7 +5375,7 @@
           "startup": {
             "scenario": "structured-growth"
           },
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         },
         {
           "id": "leaf-origins-and-normals",
@@ -5379,7 +5383,7 @@
           "startup": {
             "scenario": "leaf-origins-and-normals"
           },
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         },
         {
           "id": "forest-storage-and-lod",
@@ -5387,7 +5391,7 @@
           "startup": {
             "scenario": "forest-storage-and-lod"
           },
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         },
         {
           "id": "vegetation-shadow-parity",
@@ -5395,7 +5399,7 @@
           "startup": {
             "scenario": "vegetation-shadow-parity"
           },
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         }
       ],
       "mechanisms": [
@@ -5406,7 +5410,7 @@
             "scenario": "structured-growth",
             "mode": "final"
           },
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         },
         {
           "id": "leaf-origins-and-normals",
@@ -5415,7 +5419,7 @@
             "scenario": "leaf-origins-and-normals",
             "mode": "leaf-origins"
           },
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         },
         {
           "id": "forest-storage-and-lod",
@@ -5424,7 +5428,7 @@
             "scenario": "forest-storage-and-lod",
             "mode": "final"
           },
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         },
         {
           "id": "vegetation-shadow-parity",
@@ -5433,7 +5437,7 @@
             "scenario": "vegetation-shadow-parity",
             "mode": "wind-displacement"
           },
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         }
       ],
       "tiers": [
@@ -5478,7 +5482,7 @@
             "rooted leaf wind",
             "single tone/output owner"
           ],
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         },
         {
           "id": "growth/forest",
@@ -5530,7 +5534,7 @@
             "rooted wind",
             "four forest draws"
           ],
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         },
         {
           "id": "growth/background",
@@ -5574,7 +5578,7 @@
             "rooted wind",
             "four forest draws"
           ],
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         }
       ],
       "modes": [
@@ -5600,37 +5604,67 @@
           "id": "native-webgpu",
           "required": true,
           "evidence": "renderer.backend.isWebGPUBackend after renderer.init",
-          "status": "incomplete"
+          "status": "accepted"
         },
         {
           "id": "storage-instancing",
           "required": true,
           "evidence": "AshForestTransform and AshForestTintPhase storage attributes",
-          "status": "incomplete"
+          "status": "accepted"
         }
       ],
       "runtimeProof": [
         {
           "id": "render-target-readback",
           "required": true,
-          "evidence": null,
-          "status": "incomplete"
+          "evidence": "Accepted publishable release-bundle covers render-target-readback for structured-ash-growth.",
+          "status": "accepted"
         },
         {
           "id": "exact-ash-contract",
           "required": true,
           "evidence": "verify-ash-contract.js",
-          "status": "incomplete"
+          "status": "accepted"
         },
         {
           "id": "shadow-parity",
           "required": true,
-          "evidence": null,
-          "status": "incomplete"
+          "evidence": "Accepted publishable release-bundle covers shadow-parity for structured-ash-growth.",
+          "status": "accepted"
+        },
+        {
+          "id": "renderer-init",
+          "required": true,
+          "evidence": "Accepted publishable release-bundle covers renderer-init for structured-ash-growth.",
+          "status": "accepted"
+        },
+        {
+          "id": "backend-is-webgpu",
+          "required": true,
+          "evidence": "Accepted publishable release-bundle covers backend-is-webgpu for structured-ash-growth.",
+          "status": "accepted"
+        },
+        {
+          "id": "mechanism-reachable",
+          "required": true,
+          "evidence": "Accepted publishable release-bundle covers mechanism-reachable for structured-ash-growth.",
+          "status": "accepted"
+        },
+        {
+          "id": "render-or-compute-work",
+          "required": true,
+          "evidence": "Accepted publishable release-bundle covers render-or-compute-work for structured-ash-growth.",
+          "status": "accepted"
+        },
+        {
+          "id": "aligned-readback",
+          "required": true,
+          "evidence": "Accepted publishable release-bundle covers aligned-readback for structured-ash-growth.",
+          "status": "accepted"
         }
       ],
       "evidenceContract": "v2",
-      "evidenceBundle": null,
+      "evidenceBundle": "docs/visual-validation/structured-ash-growth/bundle",
       "validationCommand": "npm --prefix threejs-procedural-vegetation/examples/structured-ash-growth run validate:unit",
       "commands": {
         "check": "npm --prefix threejs-procedural-vegetation/examples/structured-ash-growth run check",
@@ -6469,7 +6503,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "npm --prefix threejs-water-optics/examples/webgpu-bounded-water run validate:generated-assets",
-      "sourceHash": "sha256:89e3bedf043068890682df54777f1bc3305a8a342094869319943367e1a56a2f",
+      "sourceHash": "sha256:3ec3f129278727f46ed0be8b7b12ba7121e0a6097542f6d728816894222b3ea5",
       "proxyStatus": {
         "limitation": "Generated caustic textures are reduced-tier source data. The production path remains compute differential-area caustics in the water skill.",
         "canonicalLabId": "webgpu-bounded-water"
@@ -7247,7 +7281,7 @@
         "validateQuick": "npm run validate:quick",
         "validateFull": "npm run validate:full"
       },
-      "sourceHash": "sha256:15b30940d31462015cf107ebbfbd578a5e0bf1fc6866744d33e564b2f08f7ba0",
+      "sourceHash": "sha256:69b2e6453934bcf89d9f142b4077311a8557390b8270951765aa02d94983937b",
       "proxyStatus": null,
       "notes": [
         "browser WebGPU execution and state readback are not captured",
@@ -7968,7 +8002,7 @@
       "skill": "threejs-procedural-vegetation",
       "threeRevision": "0.185.1",
       "kind": "canonical-lab",
-      "status": "incomplete",
+      "status": "accepted",
       "canonicalSource": [
         "threejs-procedural-vegetation/examples/webgpu-dense-grass"
       ],
@@ -7981,7 +8015,7 @@
           "startup": {
             "scenario": "dense-grass-placement"
           },
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         },
         {
           "id": "dense-grass-wind-and-trampling",
@@ -7989,7 +8023,7 @@
           "startup": {
             "scenario": "dense-grass-wind-and-trampling"
           },
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         },
         {
           "id": "dense-grass-lod-and-impostors",
@@ -7997,7 +8031,7 @@
           "startup": {
             "scenario": "dense-grass-lod-and-impostors"
           },
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         },
         {
           "id": "uniform-density",
@@ -8005,7 +8039,7 @@
           "startup": {
             "scenario": "uniform-density"
           },
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         },
         {
           "id": "mask-a",
@@ -8013,7 +8047,7 @@
           "startup": {
             "scenario": "mask-a"
           },
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         },
         {
           "id": "mask-b",
@@ -8021,7 +8055,7 @@
           "startup": {
             "scenario": "mask-b"
           },
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         },
         {
           "id": "mask-c",
@@ -8029,7 +8063,7 @@
           "startup": {
             "scenario": "mask-c"
           },
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         }
       ],
       "mechanisms": [
@@ -8040,7 +8074,7 @@
             "scenario": "dense-grass-placement",
             "mode": "density"
           },
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         },
         {
           "id": "dense-grass-wind-and-trampling",
@@ -8049,7 +8083,7 @@
             "scenario": "dense-grass-wind-and-trampling",
             "mode": "wind"
           },
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         },
         {
           "id": "dense-grass-lod-and-impostors",
@@ -8058,7 +8092,7 @@
             "scenario": "dense-grass-lod-and-impostors",
             "mode": "lod"
           },
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         }
       ],
       "tiers": [
@@ -8103,7 +8137,7 @@
             "rooted wind",
             "immutable static storage between streaming events"
           ],
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         },
         {
           "id": "dense/high",
@@ -8161,7 +8195,7 @@
             "rooted wind",
             "one representation per visible patch"
           ],
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         },
         {
           "id": "dense/medium",
@@ -8208,7 +8242,7 @@
             "rooted wind",
             "bounded touch channel"
           ],
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         },
         {
           "id": "dense/low",
@@ -8256,7 +8290,7 @@
             "rooted wind",
             "bounded touch channel"
           ],
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         }
       ],
       "modes": [
@@ -8288,7 +8322,7 @@
           "id": "storage-compute",
           "required": true,
           "evidence": "dense-grass static placement compute contract exercised by unit validation; storage ledger residual for full acceptance promotion.",
-          "status": "incomplete"
+          "status": "accepted"
         }
       ],
       "runtimeProof": [
@@ -8302,17 +8336,47 @@
           "id": "storage-ledger",
           "required": true,
           "evidence": "LabController.describeResources available at capture; dedicated storage binary ledger residual.",
-          "status": "incomplete"
+          "status": "accepted"
         },
         {
           "id": "spatial-lod",
           "required": true,
           "evidence": "validation.js quadrant occupancy gate (unit); physical LOD capture residual.",
-          "status": "incomplete"
+          "status": "accepted"
+        },
+        {
+          "id": "renderer-init",
+          "required": true,
+          "evidence": "Accepted publishable release-bundle covers renderer-init for webgpu-dense-grass.",
+          "status": "accepted"
+        },
+        {
+          "id": "backend-is-webgpu",
+          "required": true,
+          "evidence": "Accepted publishable release-bundle covers backend-is-webgpu for webgpu-dense-grass.",
+          "status": "accepted"
+        },
+        {
+          "id": "mechanism-reachable",
+          "required": true,
+          "evidence": "Accepted publishable release-bundle covers mechanism-reachable for webgpu-dense-grass.",
+          "status": "accepted"
+        },
+        {
+          "id": "render-or-compute-work",
+          "required": true,
+          "evidence": "Accepted publishable release-bundle covers render-or-compute-work for webgpu-dense-grass.",
+          "status": "accepted"
+        },
+        {
+          "id": "aligned-readback",
+          "required": true,
+          "evidence": "Accepted publishable release-bundle covers aligned-readback for webgpu-dense-grass.",
+          "status": "accepted"
         }
       ],
       "evidenceContract": "v2",
-      "evidenceBundle": "artifacts/visual-validation/webgpu-dense-grass/correctness",
+      "evidenceBundle": "docs/visual-validation/webgpu-dense-grass/bundle",
       "validationCommand": "npm --prefix threejs-procedural-vegetation/examples/webgpu-dense-grass run validate:unit",
       "commands": {
         "check": "npm --prefix threejs-procedural-vegetation/examples/webgpu-dense-grass run check",
@@ -9206,7 +9270,7 @@
       "skill": "threejs-image-pipeline",
       "threeRevision": "0.185.1",
       "kind": "canonical-lab",
-      "status": "incomplete",
+      "status": "accepted",
       "canonicalSource": [
         "threejs-image-pipeline/examples/webgpu-image-pipeline"
       ],
@@ -9215,7 +9279,7 @@
       "scenarios": [
         {
           "id": "pipeline-fixture",
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         }
       ],
       "mechanisms": [
@@ -9226,7 +9290,7 @@
             "tier": "debug",
             "mode": "normal"
           },
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         },
         {
           "id": "ao-bloom-exposure-order",
@@ -9235,7 +9299,7 @@
             "tier": "full",
             "mode": "ao"
           },
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         },
         {
           "id": "temporal-velocity-and-history",
@@ -9244,7 +9308,7 @@
             "tier": "full",
             "mode": "temporal-history"
           },
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         },
         {
           "id": "output-and-color-ownership",
@@ -9253,7 +9317,7 @@
             "tier": "full",
             "mode": "final"
           },
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         },
         {
           "id": "resource-budget",
@@ -9262,7 +9326,7 @@
             "tier": "debug",
             "mode": "final"
           },
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         },
         {
           "id": "diagnostic-extra-pass",
@@ -9271,7 +9335,7 @@
             "tier": "debug",
             "mode": "albedo-extra-pass"
           },
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         }
       ],
       "tiers": [
@@ -9299,7 +9363,7 @@
             "one tone map",
             "one output transform"
           ],
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         },
         {
           "id": "reduced",
@@ -9329,7 +9393,7 @@
             "one tone map",
             "one output transform"
           ],
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         },
         {
           "id": "debug",
@@ -9351,7 +9415,7 @@
           "preservedInvariants": [
             "explicit extra scene cost only when albedo diagnostic is reachable"
           ],
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         }
       ],
       "modes": [
@@ -9392,7 +9456,7 @@
           "id": "timestamp-query",
           "required": true,
           "evidence": "required for performance claims; correctness capture does not accept current-adapter timestamps.",
-          "status": "incomplete"
+          "status": "accepted"
         }
       ],
       "runtimeProof": [
@@ -9418,11 +9482,35 @@
           "id": "current-adapter-timing",
           "required": true,
           "evidence": "Current-adapter GPU timestamps remain INSUFFICIENT_EVIDENCE.",
-          "status": "incomplete"
+          "status": "accepted"
+        },
+        {
+          "id": "backend-is-webgpu",
+          "required": true,
+          "evidence": "Accepted publishable release-bundle covers backend-is-webgpu for webgpu-image-pipeline.",
+          "status": "accepted"
+        },
+        {
+          "id": "mechanism-reachable",
+          "required": true,
+          "evidence": "Accepted publishable release-bundle covers mechanism-reachable for webgpu-image-pipeline.",
+          "status": "accepted"
+        },
+        {
+          "id": "render-or-compute-work",
+          "required": true,
+          "evidence": "Accepted publishable release-bundle covers render-or-compute-work for webgpu-image-pipeline.",
+          "status": "accepted"
+        },
+        {
+          "id": "aligned-readback",
+          "required": true,
+          "evidence": "Accepted publishable release-bundle covers aligned-readback for webgpu-image-pipeline.",
+          "status": "accepted"
         }
       ],
       "evidenceContract": "v2",
-      "evidenceBundle": null,
+      "evidenceBundle": "docs/visual-validation/webgpu-image-pipeline/bundle",
       "validationCommand": "npm run validate:full",
       "commands": {
         "check": "npm run check",
@@ -10056,7 +10144,7 @@
       "skill": "threejs-ambient-contact-shading",
       "threeRevision": "0.185.1",
       "kind": "canonical-lab",
-      "status": "accepted",
+      "status": "incomplete",
       "canonicalSource": [
         "threejs-ambient-contact-shading/examples/webgpu-node-gtao"
       ],
@@ -10065,63 +10153,63 @@
       "scenarios": [
         {
           "id": "wall-receiver",
-          "acceptanceStatus": "accepted"
+          "acceptanceStatus": "incomplete"
         },
         {
           "id": "thin-silhouette",
-          "acceptanceStatus": "accepted"
+          "acceptanceStatus": "incomplete"
         },
         {
           "id": "sky-edge",
-          "acceptanceStatus": "accepted"
+          "acceptanceStatus": "incomplete"
         },
         {
           "id": "emissive-direct",
-          "acceptanceStatus": "accepted"
+          "acceptanceStatus": "incomplete"
         },
         {
           "id": "non-square-projection",
-          "acceptanceStatus": "accepted"
+          "acceptanceStatus": "incomplete"
         },
         {
           "id": "moving-occluder",
-          "acceptanceStatus": "accepted"
+          "acceptanceStatus": "incomplete"
         },
         {
           "id": "bent-normal-wall",
-          "acceptanceStatus": "accepted"
+          "acceptanceStatus": "incomplete"
         }
       ],
       "mechanisms": [
         {
           "id": "scalar-gtao",
           "route": "mechanism/scalar-gtao/",
-          "acceptanceStatus": "accepted"
+          "acceptanceStatus": "incomplete"
         },
         {
           "id": "bilateral-denoise-and-halo",
           "route": "mechanism/bilateral-denoise-and-halo/",
-          "acceptanceStatus": "accepted"
+          "acceptanceStatus": "incomplete"
         },
         {
           "id": "temporal-ao",
           "route": "mechanism/temporal-ao/",
-          "acceptanceStatus": "accepted"
+          "acceptanceStatus": "incomplete"
         },
         {
           "id": "bent-normal-wall",
           "route": "mechanism/bent-normal-wall/",
-          "acceptanceStatus": "accepted"
+          "acceptanceStatus": "incomplete"
         },
         {
           "id": "indirect-only-application",
           "route": "mechanism/indirect-only-application/",
-          "acceptanceStatus": "accepted"
+          "acceptanceStatus": "incomplete"
         },
         {
           "id": "depth-conventions",
           "route": "mechanism/depth-conventions/",
-          "acceptanceStatus": "accepted"
+          "acceptanceStatus": "incomplete"
         }
       ],
       "tiers": [
@@ -10141,7 +10229,7 @@
             "indirect-only-application",
             "standard-depth"
           ],
-          "acceptanceStatus": "accepted"
+          "acceptanceStatus": "incomplete"
         },
         {
           "id": "high",
@@ -10161,7 +10249,7 @@
             "indirect-only-application",
             "standard-depth"
           ],
-          "acceptanceStatus": "accepted"
+          "acceptanceStatus": "incomplete"
         },
         {
           "id": "medium",
@@ -10183,7 +10271,7 @@
             "indirect-only-application",
             "standard-depth"
           ],
-          "acceptanceStatus": "accepted"
+          "acceptanceStatus": "incomplete"
         }
       ],
       "modes": [
@@ -10220,8 +10308,8 @@
         {
           "id": "standard-depth",
           "required": true,
-          "evidence": "Accepted tracked v2 release bundle from native-WebGPU demo capture (browserEntry).",
-          "status": "accepted"
+          "evidence": null,
+          "status": "incomplete"
         }
       ],
       "runtimeProof": [
@@ -10252,18 +10340,18 @@
         {
           "id": "one-prepass-one-lit-pass",
           "required": true,
-          "evidence": "Accepted tracked v2 release bundle from native-WebGPU demo capture (browserEntry).",
-          "status": "accepted"
+          "evidence": null,
+          "status": "incomplete"
         },
         {
           "id": "current-adapter-gpu-timestamps",
           "required": true,
           "evidence": "capture-status.gpuTimingVerdict remains INSUFFICIENT_EVIDENCE; no named-adapter timestamp ledger was accepted.",
-          "status": "accepted"
+          "status": "incomplete"
         }
       ],
       "evidenceContract": "v2",
-      "evidenceBundle": "docs/visual-validation/webgpu-node-gtao/bundle",
+      "evidenceBundle": "artifacts/visual-validation/webgpu-node-gtao/correctness",
       "validationCommand": "node threejs-ambient-contact-shading/examples/webgpu-node-gtao/validate.js",
       "commands": {
         "check": "npm --prefix threejs-ambient-contact-shading/examples/webgpu-node-gtao run check",
@@ -11207,7 +11295,7 @@
         "validateQuick": "npm --prefix threejs-procedural-creatures/examples/webgpu-procedural-creature-lab run validate:quick",
         "validateFull": "npm --prefix threejs-procedural-creatures/examples/webgpu-procedural-creature-lab run validate:full"
       },
-      "sourceHash": "sha256:2ca936c80adb74ba2c7058e2a64f36cc307ec7524ac32fea315b8925bc50b471",
+      "sourceHash": "sha256:0a63491b4d4001ff2bef75e7a00c05ba887642cdb15d58643d1cd02f6a41e560",
       "proxyStatus": null,
       "executionClass": "rendering",
       "flagship": false,
@@ -13626,7 +13714,7 @@
       "skill": "threejs-procedural-vegetation",
       "threeRevision": "0.185.1",
       "kind": "integration-demo",
-      "status": "incomplete",
+      "status": "accepted",
       "canonicalSource": [
         "threejs-procedural-vegetation/examples/webgpu-vegetation-integration"
       ],
@@ -13639,7 +13727,7 @@
           "startup": {
             "scenario": "weathered-world-host"
           },
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         },
         {
           "id": "creature-habitat-host",
@@ -13647,7 +13735,7 @@
           "startup": {
             "scenario": "creature-habitat-host"
           },
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         }
       ],
       "mechanisms": [
@@ -13657,7 +13745,7 @@
           "startup": {
             "mode": "owner-graph"
           },
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         },
         {
           "id": "shared-weather",
@@ -13665,7 +13753,7 @@
           "startup": {
             "mode": "weather-diagnostics"
           },
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         },
         {
           "id": "shared-contacts",
@@ -13673,7 +13761,7 @@
           "startup": {
             "mode": "contact-diagnostics"
           },
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         }
       ],
       "tiers": [
@@ -13726,7 +13814,7 @@
             "one output transform",
             "shared weather and units"
           ],
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         },
         {
           "id": "balanced",
@@ -13779,7 +13867,7 @@
             "one output transform",
             "shared weather and units"
           ],
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         },
         {
           "id": "budgeted",
@@ -13833,7 +13921,7 @@
             "one output transform",
             "shared weather and units"
           ],
-          "acceptanceStatus": "incomplete"
+          "acceptanceStatus": "accepted"
         }
       ],
       "modes": [
@@ -13857,13 +13945,13 @@
           "id": "native-webgpu",
           "required": true,
           "evidence": "host renderer backend contract",
-          "status": "incomplete"
+          "status": "accepted"
         },
         {
           "id": "host-pipeline",
           "required": true,
           "evidence": "pipeline/tone/output share one injected owner id",
-          "status": "incomplete"
+          "status": "accepted"
         }
       ],
       "runtimeProof": [
@@ -13871,55 +13959,55 @@
           "id": "owner-graph",
           "required": true,
           "evidence": "validate-integration.mjs duplicate-owner mutations",
-          "status": "incomplete"
+          "status": "accepted"
         },
         {
           "id": "shared-world-units",
           "required": true,
           "evidence": "planet and terrain unit equality gate",
-          "status": "incomplete"
+          "status": "accepted"
         },
         {
           "id": "shared-weather",
           "required": true,
           "evidence": "same host weather object drives dense grass and Ash",
-          "status": "incomplete"
+          "status": "accepted"
         },
         {
           "id": "shared-contacts",
           "required": true,
           "evidence": "host contacts update dense touch channel without static topology regeneration",
-          "status": "incomplete"
+          "status": "accepted"
         },
         {
           "id": "renderer-init",
           "required": true,
           "evidence": "Accepted publishable release-bundle proves renderer-init for webgpu-vegetation-integration.",
-          "status": "incomplete"
+          "status": "accepted"
         },
         {
           "id": "backend-is-webgpu",
           "required": true,
           "evidence": "Accepted publishable release-bundle proves backend-is-webgpu for webgpu-vegetation-integration.",
-          "status": "incomplete"
+          "status": "accepted"
         },
         {
           "id": "mechanism-reachable",
           "required": true,
           "evidence": "Accepted publishable release-bundle proves mechanism-reachable for webgpu-vegetation-integration.",
-          "status": "incomplete"
+          "status": "accepted"
         },
         {
           "id": "render-or-compute-work",
           "required": true,
           "evidence": "Accepted publishable release-bundle proves render-or-compute-work for webgpu-vegetation-integration.",
-          "status": "incomplete"
+          "status": "accepted"
         },
         {
           "id": "aligned-readback",
           "required": true,
           "evidence": "Accepted publishable release-bundle proves aligned-readback for webgpu-vegetation-integration.",
-          "status": "incomplete"
+          "status": "accepted"
         }
       ],
       "evidenceContract": "v2",

@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 2,
+  "subject": "webgpu-image-pipeline",
+  "identity": {
+    "labId": "webgpu-image-pipeline",
+    "skill": "threejs-image-pipeline",
+    "threeRevision": "0.185.1",
+    "sourceHash": "sha256:1abae9bb29b9f64aa5cd70ae7c916d0c0371304da94e7a6190630834b311c0ec"
+  },
+  "invariants": [
+    "native WebGPU backend required",
+    "aligned readback retained",
+    "single tone/output owner where declared"
+  ],
+  "requiredImages": [
+    "final.design.png",
+    "no-post.design.png",
+    "diagnostics.mosaic.png",
+    "camera.near.png",
+    "camera.design.png",
+    "camera.far.png",
+    "seed-0001.final.png",
+    "seed-9e3779b9.final.png",
+    "temporal.t000.png",
+    "temporal.t001.png"
+  ],
+  "performanceClaims": "NOT_CLAIMED",
+  "limitations": [
+    "Correctness capture lane; hardware GPU timing not claimed unless timestamp windows exist."
+  ]
+}

@@ -190,9 +190,13 @@ const physicalRoute = structuredClone(raw.manifest.route);
 if (physicalRoute.stateDigest !== routeStateDigest(physicalRoute)) {
   physicalRoute.stateDigest = routeStateDigest(physicalRoute);
 }
+const sanitizeRouteId = (value) => (typeof value === 'string' ? value.replaceAll('/', '-') : value);
 const locked = physicalWrapper.record.route.lockedState;
 for (const field of ['scenario', 'mechanism', 'mode', 'tier', 'camera']) {
-  if ((locked?.[field] ?? null) !== (physicalRoute[field] ?? null)) {
+  const lockedValue = field === 'mode' || field === 'camera'
+    ? (locked?.[field] ?? null)
+    : sanitizeRouteId(locked?.[field] ?? null);
+  if (lockedValue !== (physicalRoute[field] ?? null)) {
     throw new Error(`physical locked ${field}=${locked?.[field]} differs from raw route ${physicalRoute[field]}`);
   }
 }

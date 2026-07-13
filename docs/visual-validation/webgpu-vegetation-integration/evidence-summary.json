@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "labId": "webgpu-vegetation-integration",
   "classification": "inspected-runtime-evidence-preview",
-  "acceptanceStatus": "incomplete",
+  "acceptanceStatus": "accepted",
   "evidenceBundleId": "bundle",
   "canonicalSource": [
     "threejs-procedural-vegetation/examples/webgpu-vegetation-integration"
@@ -24,7 +24,7 @@
     "visualError": "PASS"
   },
   "primaryImage": "final.design.png",
-  "primaryImageLabel": "Vegetation integration capture (deps not accepted)",
+  "primaryImageLabel": "Vegetation host integration native WebGPU readback",
   "images": [
     {
       "file": "final.design.png",

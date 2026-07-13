@@ -1,0 +1,398 @@
+{
+  "schemaVersion": 1,
+  "projectionKind": "tracked-release-projection-v1",
+  "policy": {
+    "id": "native-webgpu-tracked-release-v1",
+    "digest": "sha256:e349900d79da27cb5570ea959707f741e03ea7e206d85a717a1129b27268f6a4"
+  },
+  "labId": "structured-ash-growth",
+  "skill": "threejs-procedural-vegetation",
+  "threeRevision": "0.185.1",
+  "sourceClosureHash": "sha256:1ecd4ae09ca0243df7e0406982ed0b0329554bdebe1823896b481dcb8fe37a40",
+  "buildRevision": "sha256:a20e115183c797027f6f68cb914547a2bbcd38b89ef4e3f0eaeb3dfb06117b30",
+  "sourceRelease": {
+    "path": "evidence-manifest.json",
+    "sha256": "sha256:7874aaa597d55876494427a7ffebbced4b3aa62bbe2be72261f580eccd45198a",
+    "byteLength": 34060,
+    "promotionBindingDigest": "sha256:cefeb41b6634884dde28f917e4f22c389ecbc2621ded197fb8d4db65334b39e5",
+    "candidateBindingDigest": "sha256:1ad36bbd89e7d19a8cb9eb9b369c319ff3c88e49bfe4ccfd6596a5f8c787ea08",
+    "artifactLedgerDigest": "sha256:b660c263ece3ca2256829cc0910ec1c0b8c5e3680279cc873f36579d1b8422ff",
+    "imageLedgerDigest": "sha256:e8738e9bfbfbb38530e78004c243a85c555f26e538fb5898151b97decb1eafee"
+  },
+  "sourceClosure": {
+    "algorithm": "demo-registry-transitive-source-closure-v2",
+    "roots": [
+      "labs/runtime/strict-lab-controller.mjs",
+      "threejs-procedural-vegetation/assets/structured-ash-growth/ash.png",
+      "threejs-procedural-vegetation/assets/structured-ash-growth/bark-color.jpg",
+      "threejs-procedural-vegetation/assets/structured-ash-growth/bark-normal.jpg",
+      "threejs-procedural-vegetation/assets/structured-ash-growth/bark-roughness.jpg",
+      "threejs-procedural-vegetation/examples/structured-ash-growth"
+    ],
+    "files": [
+      {
+        "repositoryPath": "labs/runtime/strict-lab-controller.mjs",
+        "sha256": "sha256:7a749aa63f9e18547141c8b7f2213b7d7e9ae87006527bcb6a4829f31a6176e7",
+        "byteLength": 2844
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/assets/structured-ash-growth/ash.png",
+        "sha256": "sha256:5ec987db3829a839856c32c79b18a33a78f209e911cad55c65abfb77f30e2d29",
+        "byteLength": 181423
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/assets/structured-ash-growth/bark-color.jpg",
+        "sha256": "sha256:2a7e8c742aa0110057d7a3ff0e8ec193c26ef23b77bc778fb9258c0e41b29474",
+        "byteLength": 831490
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/assets/structured-ash-growth/bark-normal.jpg",
+        "sha256": "sha256:d7a275aa573a701d8814d7378abd8ea227f651ae6da33f8c57a6b862419e621e",
+        "byteLength": 1270807
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/assets/structured-ash-growth/bark-roughness.jpg",
+        "sha256": "sha256:2c0829e7a04b78234357ac6eb93173667fab9191c4340343ce88dddfcca1e6fd",
+        "byteLength": 397062
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/structured-ash-growth/ash-preset.js",
+        "sha256": "sha256:b86851244e667ce12962848b3f5dab3fbe91d256f5d011fe4e0d65912146bd92",
+        "byteLength": 663
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/structured-ash-growth/ash-scene.js",
+        "sha256": "sha256:0a09725d46b7f0fab5f0b77623e17edc52a0cfddbf34d8cab275636041b2319c",
+        "byteLength": 19369
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/structured-ash-growth/browser-lab.js",
+        "sha256": "sha256:49693e4de5cf847dbb3ef7640a0ccdc6b6cb08ea568fc0e6ef9f8000f66fd7d4",
+        "byteLength": 16566
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/structured-ash-growth/capture-hook.mjs",
+        "sha256": "sha256:fa89ed7e142105c486fb2ff6de3ad738afa33c8514b5865a525cedd56b88bb55",
+        "byteLength": 4380
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/structured-ash-growth/capture.mjs",
+        "sha256": "sha256:c139e8d432c69b1f2e911056ef2799daa607cc883f682072c3dbf24a9be1c6a7",
+        "byteLength": 599
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/structured-ash-growth/index.html",
+        "sha256": "sha256:0c61089dddf618433f36fb4e3b6ab22ef596cf32ac88fd21c8c7547a3dde0ba4",
+        "byteLength": 984
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/structured-ash-growth/mechanism/forest-storage-and-lod/index.html",
+        "sha256": "sha256:9789c2b303e627ec4f029d1a458773806b7c5418bbab1503b2b36e89c5d2964f",
+        "byteLength": 665
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/structured-ash-growth/mechanism/leaf-origins-and-normals/index.html",
+        "sha256": "sha256:57fe02d2cf524d72c990a45d8ae14fb72b5cea63949d483b16594a08c1094882",
+        "byteLength": 669
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/structured-ash-growth/mechanism/structured-growth/index.html",
+        "sha256": "sha256:298f3c3e94f058bb8a9135a96ae421f464a388b442d2fef26cbe6f5e2dd2217a",
+        "byteLength": 655
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/structured-ash-growth/mechanism/vegetation-shadow-parity/index.html",
+        "sha256": "sha256:6128c133f6774968c900713b02827ba0fab12c95f2f956fc474c6a53f78ce8e4",
+        "byteLength": 658
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/structured-ash-growth/package.json",
+        "sha256": "sha256:7493d1a8f3cb12f3dd19d6cd29991706befc49e7ca42ff15af64941345b2766e",
+        "byteLength": 584
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/structured-ash-growth/route-contract.js",
+        "sha256": "sha256:d77f5d5b202e00073e42d616093f3ebb4a20122501d589647d0466d4dfce7da2",
+        "byteLength": 1314
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/structured-ash-growth/route-wrapper.css",
+        "sha256": "sha256:76f81bfb3c43649ab332c55d27bac3b5704521dca9d571e875ce1fc6de1eb97a",
+        "byteLength": 256
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/structured-ash-growth/tier/growth/background/index.html",
+        "sha256": "sha256:15057be055d1edfdd9960c339574c38ef6b9336277650034a250304f7d8edb76",
+        "byteLength": 655
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/structured-ash-growth/tier/growth/forest/index.html",
+        "sha256": "sha256:487264c208b74bd9a447079c521a14a3ef6379af56917548d46c79dc93b8342b",
+        "byteLength": 647
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/structured-ash-growth/tier/growth/hero/index.html",
+        "sha256": "sha256:366791d8dca4efd8e6e30724a871013a8f110c4993d33ee59258332c656b9058",
+        "byteLength": 643
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/structured-ash-growth/tree-system.js",
+        "sha256": "sha256:496d9cb4e67c262abdfd3bc1ae95b44b7b3502912fbd0f736ac39741a460a810",
+        "byteLength": 18008
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/structured-ash-growth/validate-artifacts.mjs",
+        "sha256": "sha256:0bf5402148f71a47fe90f76a23d0aa78667f74634ecf3905e3f0054b39fdc7d3",
+        "byteLength": 503
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/structured-ash-growth/validate-mutations.mjs",
+        "sha256": "sha256:c1e5b8bee563da05f8974a62832d8cb887cb2cc40254ba3874dc0cb093b3bea4",
+        "byteLength": 2534
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/structured-ash-growth/validate-routes.mjs",
+        "sha256": "sha256:d6c86857add790b73a0d41b49e40a40f76374017d30437175d7f129687beab5d",
+        "byteLength": 2901
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/structured-ash-growth/validate-runtime-contracts.mjs",
+        "sha256": "sha256:433b00c9578513da4e39d305c1f06f30efcbb8b226cfd6fa7f98ca98f3ef19e2",
+        "byteLength": 4649
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/structured-ash-growth/verify-ash-contract.js",
+        "sha256": "sha256:dbc5aceda494a7cfd1665d343b3bb61ab36e2ce02ea1281cb40b781f2af5c308",
+        "byteLength": 3331
+      }
+    ],
+    "threeRevision": "0.185.1",
+    "sourceHash": "sha256:1ecd4ae09ca0243df7e0406982ed0b0329554bdebe1823896b481dcb8fe37a40",
+    "buildRevision": "sha256:a20e115183c797027f6f68cb914547a2bbcd38b89ef4e3f0eaeb3dfb06117b30"
+  },
+  "retainedFiles": [
+    {
+      "path": "visual-contract.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:90af3798a24765237a2bb597da9ca1a97680e45ec8621070eafef9acdb43bae0",
+      "byteLength": 874
+    },
+    {
+      "path": "renderer-info.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:ce98dc437ff1e48283efdd61f5f63f5c0cc95934b77e56c419199c8db5c3b599",
+      "byteLength": 466
+    },
+    {
+      "path": "pipeline-graph.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:b396d6e34930fb36f3b18a988814bcece154063a2ac3295d25c3daff95abdb43",
+      "byteLength": 873
+    },
+    {
+      "path": "performance-envelope.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:62e1abb57e217febce5044e04788aae2967a749c9dd5c70432f279fc3c45e507",
+      "byteLength": 634
+    },
+    {
+      "path": "frame-trace.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:61e2604f805c8759b4999cc2b6ef8e27ea9446acb8902d2b4f38c58f787479e7",
+      "byteLength": 280
+    },
+    {
+      "path": "quality-governor.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:bbc096e4bdade21e336f1584d53785b774fdfe39eedefa54d525cdb97cc05867",
+      "byteLength": 282
+    },
+    {
+      "path": "render-targets.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:d00c5a5f03f4e7e03bef8b74e35a36f88625dd4625aaf2487c4ede415002872c",
+      "byteLength": 10660
+    },
+    {
+      "path": "storage-resources.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:579719a4f114bada5939fff4c4a645ac178e5b40a8f18de1cfb9532f02a92486",
+      "byteLength": 333
+    },
+    {
+      "path": "resident-resources.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:6fc1377d8131845b579a304b535bc8832ac8ad8663760f592519d1c3ab76a856",
+      "byteLength": 1329
+    },
+    {
+      "path": "bandwidth-model.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:e921c52741c0a3b03c5a02ac0b1337262a182750cd76a01d10c49323c047a034",
+      "byteLength": 956
+    },
+    {
+      "path": "visual-errors.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:f4b2464fc52bef50bc4fdd264442c77fe07b680905d615eb5be53d0d84a8ff9c",
+      "byteLength": 752
+    },
+    {
+      "path": "leak-loop.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:d433254fe8a71a1a997ffb838a11a7dcb3d50b694306cbbb6fbf4b677fd634e1",
+      "byteLength": 131665
+    },
+    {
+      "path": "mechanism-metrics.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:cd509d2ef24b12b18d92815965a5f9415e0b73846c2c5de45d412a41d5f924a4",
+      "byteLength": 4659
+    },
+    {
+      "path": "capture-write-ledger.json",
+      "status": "captured",
+      "kind": "capture-session-write-ledger",
+      "sha256": "sha256:9d68c7155ccd48bc71c6f1cad0f325de3352e8df602bb366c24d4463d679dd7c",
+      "byteLength": 10657
+    },
+    {
+      "path": "sessions/physical-route.write-ledger.json",
+      "status": "captured",
+      "kind": "capture-session-write-ledger",
+      "sha256": "sha256:03e542147ccaf339fe005c8bf41ab5c50c3dee49a3e74d513b4a8e41e4732bc7",
+      "byteLength": 3861
+    }
+  ],
+  "retainedImages": [
+    {
+      "path": "final.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "final.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:27f59a971e8ed20ce88301b7bee674f2b078ed05e262b380ba464707597ece3c",
+      "byteLength": 81256
+    },
+    {
+      "path": "no-post.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "no-post.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:8bf443f5762c94b32a33fc00b55f5e7b03e1f6e0a5f5f0d647fb044bc45a277f",
+      "byteLength": 29970
+    },
+    {
+      "path": "diagnostics.mosaic.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "diagnostics.mosaic",
+      "mediaType": "image/png",
+      "sha256": "sha256:dfca4241ba07e15a6a9fefa58726420f075e6afd433d2fd7049543601bcfc21b",
+      "byteLength": 173350
+    },
+    {
+      "path": "camera.near.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.near",
+      "mediaType": "image/png",
+      "sha256": "sha256:aaaa21a862ef18851722542720e302516283102e3dfc68b67938a1d7d59f9a74",
+      "byteLength": 145269
+    },
+    {
+      "path": "camera.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:27f59a971e8ed20ce88301b7bee674f2b078ed05e262b380ba464707597ece3c",
+      "byteLength": 81256
+    },
+    {
+      "path": "camera.far.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.far",
+      "mediaType": "image/png",
+      "sha256": "sha256:09e0bbd47b331d5baeb7dd4b8081f89f0e44106feee42114c5cb5ce7ed9001d9",
+      "byteLength": 39465
+    },
+    {
+      "path": "seed-0001.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "seed-0001.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:aaaa21a862ef18851722542720e302516283102e3dfc68b67938a1d7d59f9a74",
+      "byteLength": 145269
+    },
+    {
+      "path": "seed-9e3779b9.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "seed-9e3779b9.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:f68002316668305abee54df52cb189c6bb9bd21ea8f4ac6397cf99d75fd300f6",
+      "byteLength": 19964
+    },
+    {
+      "path": "temporal.t000.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "temporal.t000",
+      "mediaType": "image/png",
+      "sha256": "sha256:14bc68b34d55a1d45c7c2e50b236a01f65fbce00ec1cb1d5c6acf798abdc9cbc",
+      "byteLength": 312714
+    },
+    {
+      "path": "temporal.t001.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "temporal.t001",
+      "mediaType": "image/png",
+      "sha256": "sha256:e2e8c5781ee2f850c6059a7ff4b50cfe3f06183c608dc4b7e567af06f07ec169",
+      "byteLength": 312844
+    }
+  ],
+  "omittedFiles": {
+    "ledgerDigest": "sha256:30c51f3f087f822bee4cc9543ceeb2b2ddb74178e58e6f6e61400dde2282ea6d",
+    "count": 3,
+    "byteLength": 107248,
+    "byKind": [
+      {
+        "kind": "capture-session-document",
+        "count": 2,
+        "byteLength": 103684
+      },
+      {
+        "kind": "supplementary-json",
+        "count": 1,
+        "byteLength": 3564
+      }
+    ]
+  },
+  "checkoutLimitations": [
+    {
+      "id": "detached-source-payloads",
+      "status": "ACTIVE",
+      "statement": "Raw readbacks and capture-session transcript bytes are omitted from the tracked projection. Checkout validation verifies their approved hash and byte-length commitments, not the detached bytes themselves.",
+      "affectedClaims": []
+    }
+  ],
+  "projectionDigest": "sha256:183799eddb62b76247bbdc7b74340c136a1867113e69d7eccfa454d662967247"
+}

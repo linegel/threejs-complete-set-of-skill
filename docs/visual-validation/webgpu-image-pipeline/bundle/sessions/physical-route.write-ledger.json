@@ -1,0 +1,61 @@
+{
+  "entries": [
+    {
+      "at": "2026-07-13T14:00:12.518Z",
+      "method": "GET",
+      "requestUrl": "/index.html?physicalReview=1",
+      "redirected": false,
+      "fallback": false,
+      "transformed": false,
+      "status": 200,
+      "resolvedPath": "index.html",
+      "query": "physicalReview=1",
+      "sha256": "sha256:3d7b5acd489749f5219bb6e08b26dee863b6f370bf3aacf0280d5d1f980fbe2a",
+      "byteLength": 1366,
+      "responseKind": "exact-prebuilt-byte"
+    },
+    {
+      "at": "2026-07-13T14:00:12.527Z",
+      "method": "GET",
+      "requestUrl": "/assets/modulepreload-polyfill-Dezn_h7o.js",
+      "redirected": false,
+      "fallback": false,
+      "transformed": false,
+      "status": 200,
+      "resolvedPath": "assets/modulepreload-polyfill-Dezn_h7o.js",
+      "query": "",
+      "sha256": "sha256:785597bca2e7dd97a652a20a197c077079e635a5663433448e0e1d9fd8c98a64",
+      "byteLength": 698,
+      "responseKind": "exact-prebuilt-byte"
+    },
+    {
+      "at": "2026-07-13T14:00:12.527Z",
+      "method": "GET",
+      "requestUrl": "/assets/canonical-browser-app-CgarAtxI.js",
+      "redirected": false,
+      "fallback": false,
+      "transformed": false,
+      "status": 200,
+      "resolvedPath": "assets/canonical-browser-app-CgarAtxI.js",
+      "query": "",
+      "sha256": "sha256:40fd0c3a810921d6473a6f088bf390c5717a44232abdfa691d671e461e0ab6c7",
+      "byteLength": 1353676,
+      "responseKind": "exact-prebuilt-byte"
+    },
+    {
+      "at": "2026-07-13T14:00:12.582Z",
+      "method": "GET",
+      "requestUrl": "/favicon.ico",
+      "redirected": false,
+      "fallback": false,
+      "transformed": false,
+      "status": 404,
+      "reason": "missing-exact-static-route",
+      "resolvedPath": "favicon.ico",
+      "responseKind": "missing-exact-static-route"
+    }
+  ],
+  "ledgerSha256": "sha256:a83b3796eaee18e0124041b73204dbc93885606ef336ea27d36eb788651f7f55",
+  "documentSha256": "sha256:8ff6e4b792e08084a69c8e43f3df3e049259b82ba1c50941be7e43afcb991bdc",
+  "byteLength": 1380
+}

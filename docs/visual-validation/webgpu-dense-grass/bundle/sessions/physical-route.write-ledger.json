@@ -1,0 +1,61 @@
+{
+  "entries": [
+    {
+      "at": "2026-07-13T13:51:50.313Z",
+      "method": "GET",
+      "requestUrl": "/index.html?physicalReview=1",
+      "redirected": false,
+      "fallback": false,
+      "transformed": false,
+      "status": 200,
+      "resolvedPath": "index.html",
+      "query": "physicalReview=1",
+      "sha256": "sha256:2ecbc79216068c168ee497cb6434c6782df0a048bfd0878744037505e9f1c401",
+      "byteLength": 1007,
+      "responseKind": "exact-prebuilt-byte"
+    },
+    {
+      "at": "2026-07-13T13:51:50.332Z",
+      "method": "GET",
+      "requestUrl": "/assets/browser-lab-DzJxdQJQ.js",
+      "redirected": false,
+      "fallback": false,
+      "transformed": false,
+      "status": 200,
+      "resolvedPath": "assets/browser-lab-DzJxdQJQ.js",
+      "query": "",
+      "sha256": "sha256:0d32c1e60b41d28602bf8e2613a098b6a18038d147b04fadf2053c0ba7659443",
+      "byteLength": 893276,
+      "responseKind": "exact-prebuilt-byte"
+    },
+    {
+      "at": "2026-07-13T13:51:50.364Z",
+      "method": "GET",
+      "requestUrl": "/assets/lab.manifest-B1VOikmf.json",
+      "redirected": false,
+      "fallback": false,
+      "transformed": false,
+      "status": 200,
+      "resolvedPath": "assets/lab.manifest-B1VOikmf.json",
+      "query": "",
+      "sha256": "sha256:fe78d08c23e5e9342db1acf30b9ea6f4f7bfba1af55e0df7df381adf01033a10",
+      "byteLength": 10729,
+      "responseKind": "exact-prebuilt-byte"
+    },
+    {
+      "at": "2026-07-13T13:51:50.367Z",
+      "method": "GET",
+      "requestUrl": "/favicon.ico",
+      "redirected": false,
+      "fallback": false,
+      "transformed": false,
+      "status": 404,
+      "reason": "missing-exact-static-route",
+      "resolvedPath": "favicon.ico",
+      "responseKind": "missing-exact-static-route"
+    }
+  ],
+  "ledgerSha256": "sha256:9b60c8c88ca52637726752f0abe7e5966a5a1247c3a400d6ba6fa4db230199b6",
+  "documentSha256": "sha256:2560a1a56c15a448cdd2b0f35491ea236d6a4079d4d16c5ac8f3807d84b5b9d8",
+  "byteLength": 1345
+}

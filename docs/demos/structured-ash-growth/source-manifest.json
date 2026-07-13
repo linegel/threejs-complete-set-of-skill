@@ -2,12 +2,9 @@
   "schemaVersion": 2,
   "labId": "structured-ash-growth",
   "kind": "canonical-lab",
-  "status": "incomplete",
+  "status": "accepted",
   "canonicalSource": [
-    "threejs-procedural-vegetation/examples/structured-ash-growth/browser-lab.js",
-    "threejs-procedural-vegetation/examples/structured-ash-growth/ash-scene.js",
-    "threejs-procedural-vegetation/examples/structured-ash-growth/tree-system.js",
-    "threejs-procedural-vegetation/examples/structured-ash-growth/route-contract.js"
+    "threejs-procedural-vegetation/examples/structured-ash-growth"
   ],
   "sourceHashInputs": [
     "labs/runtime/strict-lab-controller.mjs",
@@ -18,36 +15,36 @@
     "threejs-procedural-vegetation/examples/structured-ash-growth"
   ],
   "browserEntry": "threejs-procedural-vegetation/examples/structured-ash-growth/index.html",
-  "sourceHash": "sha256:047eef14e678046964839d0403d5d409e7604613b720c07c4d47b89e2b4c2509",
+  "sourceHash": "sha256:1ecd4ae09ca0243df7e0406982ed0b0329554bdebe1823896b481dcb8fe37a40",
   "publishedHashInputs": [
     "docs/demos/structured-ash-growth",
     "docs/demos/assets/ash-CJFpracT.png",
-    "docs/demos/assets/ash-scene-BFhrLeuM.js",
+    "docs/demos/assets/ash-scene-BR4irOUd.js",
     "docs/demos/assets/bark-color-BZZMY0gm.jpg",
     "docs/demos/assets/bark-normal-TBmAUNgD.jpg",
     "docs/demos/assets/bark-roughness-BvhmIB3z.jpg",
-    "docs/demos/assets/index-DzWbUIT_.js",
-    "docs/demos/assets/lab.manifest-CwzYjeyv.json",
+    "docs/demos/assets/index-BMJDhipF.js",
+    "docs/demos/assets/lab.manifest-BqAMP9vC.json",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/strict-lab-controller-DqIV3RB2.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+    "docs/demos/assets/strict-lab-controller-DNVc3YrR.js",
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js"
   ],
   "emittedAssetDependencies": [
     "docs/demos/assets/ash-CJFpracT.png",
-    "docs/demos/assets/ash-scene-BFhrLeuM.js",
+    "docs/demos/assets/ash-scene-BR4irOUd.js",
     "docs/demos/assets/bark-color-BZZMY0gm.jpg",
     "docs/demos/assets/bark-normal-TBmAUNgD.jpg",
     "docs/demos/assets/bark-roughness-BvhmIB3z.jpg",
-    "docs/demos/assets/index-DzWbUIT_.js",
-    "docs/demos/assets/lab.manifest-CwzYjeyv.json",
+    "docs/demos/assets/index-BMJDhipF.js",
+    "docs/demos/assets/lab.manifest-BqAMP9vC.json",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/strict-lab-controller-DqIV3RB2.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+    "docs/demos/assets/strict-lab-controller-DNVc3YrR.js",
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js"
   ],
-  "publishedBundleHash": "sha256:56d149bb31919d711805dd105690af9e8b4998157f18ab83ad2fbd51feb1d9d5",
+  "publishedBundleHash": "sha256:bedd73f7e5b0537c80c97d3dbd4489a34ea60259beb481d3fa750a861ebc517b",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b",
-  "evidenceBundleId": null
+  "buildRevision": "sha256:7ba7b3cc2b0ff75eb71ecf5d8b8e7b6bdf9407d8570076f6a6bce907a7e649d6",
+  "evidenceBundleId": "bundle"
 }

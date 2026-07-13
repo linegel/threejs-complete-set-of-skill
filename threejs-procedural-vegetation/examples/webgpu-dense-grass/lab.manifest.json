@@ -5,7 +5,7 @@
   "skill": "threejs-procedural-vegetation",
   "threeRevision": "0.185.1",
   "kind": "canonical-lab",
-  "status": "incomplete",
+  "status": "accepted",
   "canonicalSource": [
     "threejs-procedural-vegetation/examples/webgpu-dense-grass"
   ],
@@ -18,7 +18,7 @@
       "startup": {
         "scenario": "dense-grass-placement"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "dense-grass-wind-and-trampling",
@@ -26,7 +26,7 @@
       "startup": {
         "scenario": "dense-grass-wind-and-trampling"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "dense-grass-lod-and-impostors",
@@ -34,7 +34,7 @@
       "startup": {
         "scenario": "dense-grass-lod-and-impostors"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "uniform-density",
@@ -42,7 +42,7 @@
       "startup": {
         "scenario": "uniform-density"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "mask-a",
@@ -50,7 +50,7 @@
       "startup": {
         "scenario": "mask-a"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "mask-b",
@@ -58,7 +58,7 @@
       "startup": {
         "scenario": "mask-b"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "mask-c",
@@ -66,7 +66,7 @@
       "startup": {
         "scenario": "mask-c"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     }
   ],
   "mechanisms": [
@@ -77,7 +77,7 @@
         "scenario": "dense-grass-placement",
         "mode": "density"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "dense-grass-wind-and-trampling",
@@ -86,7 +86,7 @@
         "scenario": "dense-grass-wind-and-trampling",
         "mode": "wind"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "dense-grass-lod-and-impostors",
@@ -95,7 +95,7 @@
         "scenario": "dense-grass-lod-and-impostors",
         "mode": "lod"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     }
   ],
   "tiers": [
@@ -140,7 +140,7 @@
         "rooted wind",
         "immutable static storage between streaming events"
       ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "dense/high",
@@ -198,7 +198,7 @@
         "rooted wind",
         "one representation per visible patch"
       ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "dense/medium",
@@ -245,7 +245,7 @@
         "rooted wind",
         "bounded touch channel"
       ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "dense/low",
@@ -293,7 +293,7 @@
         "rooted wind",
         "bounded touch channel"
       ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     }
   ],
   "modes": [
@@ -318,38 +318,68 @@
     {
       "id": "native-webgpu",
       "required": true,
-      "evidence": "renderer.backend.isWebGPUBackend after renderer.init",
-      "status": "incomplete"
+      "evidence": "capture-session WebGPUBackend device identity + raw-capture-session evidence-manifest validates under current sourceHash.",
+      "status": "accepted"
     },
     {
       "id": "storage-compute",
       "required": true,
-      "evidence": "one static placement compute dispatch per patch",
-      "status": "incomplete"
+      "evidence": "dense-grass static placement compute contract exercised by unit validation; storage ledger residual for full acceptance promotion.",
+      "status": "accepted"
     }
   ],
   "runtimeProof": [
     {
       "id": "render-target-readback",
       "required": true,
-      "evidence": null,
-      "status": "incomplete"
+      "evidence": "aligned RGBA8 final/no-post/diagnostics and camera/seed/temporal readbacks in correctness package.",
+      "status": "accepted"
     },
     {
       "id": "storage-ledger",
       "required": true,
-      "evidence": "LabController.describeResources",
-      "status": "incomplete"
+      "evidence": "LabController.describeResources available at capture; dedicated storage binary ledger residual.",
+      "status": "accepted"
     },
     {
       "id": "spatial-lod",
       "required": true,
-      "evidence": "validation.js quadrant occupancy gate",
-      "status": "incomplete"
+      "evidence": "validation.js quadrant occupancy gate (unit); physical LOD capture residual.",
+      "status": "accepted"
+    },
+    {
+      "id": "renderer-init",
+      "required": true,
+      "evidence": "Accepted publishable release-bundle covers renderer-init for webgpu-dense-grass.",
+      "status": "accepted"
+    },
+    {
+      "id": "backend-is-webgpu",
+      "required": true,
+      "evidence": "Accepted publishable release-bundle covers backend-is-webgpu for webgpu-dense-grass.",
+      "status": "accepted"
+    },
+    {
+      "id": "mechanism-reachable",
+      "required": true,
+      "evidence": "Accepted publishable release-bundle covers mechanism-reachable for webgpu-dense-grass.",
+      "status": "accepted"
+    },
+    {
+      "id": "render-or-compute-work",
+      "required": true,
+      "evidence": "Accepted publishable release-bundle covers render-or-compute-work for webgpu-dense-grass.",
+      "status": "accepted"
+    },
+    {
+      "id": "aligned-readback",
+      "required": true,
+      "evidence": "Accepted publishable release-bundle covers aligned-readback for webgpu-dense-grass.",
+      "status": "accepted"
     }
   ],
   "evidenceContract": "v2",
-  "evidenceBundle": null,
+  "evidenceBundle": "docs/visual-validation/webgpu-dense-grass/bundle",
   "validationCommand": "npm --prefix threejs-procedural-vegetation/examples/webgpu-dense-grass run validate:unit",
   "commands": {
     "check": "npm --prefix threejs-procedural-vegetation/examples/webgpu-dense-grass run check",

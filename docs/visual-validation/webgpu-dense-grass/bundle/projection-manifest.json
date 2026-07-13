@@ -1,0 +1,413 @@
+{
+  "schemaVersion": 1,
+  "projectionKind": "tracked-release-projection-v1",
+  "policy": {
+    "id": "native-webgpu-tracked-release-v1",
+    "digest": "sha256:e349900d79da27cb5570ea959707f741e03ea7e206d85a717a1129b27268f6a4"
+  },
+  "labId": "webgpu-dense-grass",
+  "skill": "threejs-procedural-vegetation",
+  "threeRevision": "0.185.1",
+  "sourceClosureHash": "sha256:b39b6b87e71d6e3b5926ef824cfc7e523c0a0da33968866b629096ba0ead0d6e",
+  "buildRevision": "sha256:daf7da5bfbe4bfce1ea1b559e89857623ad1f45ff2ca36107709a9b0d65bec23",
+  "sourceRelease": {
+    "path": "evidence-manifest.json",
+    "sha256": "sha256:84eff39c5c27a281ead62eca9a847985c7644c87ea48a0d56fd9965e101e0e7c",
+    "byteLength": 34084,
+    "promotionBindingDigest": "sha256:f63fc93837da1ab2407179ba5874cc10813c5e7f828cd887d50b890076331c3e",
+    "candidateBindingDigest": "sha256:effeeac922bc2995c8b24c28d50a2f4c1b664f37c765168e160e9e9305f3d05a",
+    "artifactLedgerDigest": "sha256:b8aff1e24cdbdf6894e52d2a37cd36b887fc5f23281971f5a2661031b52f677e",
+    "imageLedgerDigest": "sha256:b847112d458bbf4ab1e6c7acfe14fffac94f256f0d220af8308d8c6b65f59c65"
+  },
+  "sourceClosure": {
+    "algorithm": "demo-registry-transitive-source-closure-v2",
+    "roots": [
+      "labs/runtime/strict-lab-controller.mjs",
+      "labs/runtime/webgpu-device-identity.mjs",
+      "threejs-procedural-vegetation/assets/generated-variants/meadow-density-a.png",
+      "threejs-procedural-vegetation/assets/generated-variants/meadow-density-b.png",
+      "threejs-procedural-vegetation/assets/generated-variants/meadow-density-c.png",
+      "threejs-procedural-vegetation/examples/webgpu-dense-grass"
+    ],
+    "files": [
+      {
+        "repositoryPath": "labs/runtime/strict-lab-controller.mjs",
+        "sha256": "sha256:7a749aa63f9e18547141c8b7f2213b7d7e9ae87006527bcb6a4829f31a6176e7",
+        "byteLength": 2844
+      },
+      {
+        "repositoryPath": "labs/runtime/webgpu-device-identity.mjs",
+        "sha256": "sha256:4bc6eb92755516473bc39b488c0bcfd419e5f23800c497bc44bbf3d07d509bfe",
+        "byteLength": 4095
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/assets/generated-variants/meadow-density-a.png",
+        "sha256": "sha256:16be5e94f617e89e3c90c075314be15005eff35d6df2866da843d115f073987d",
+        "byteLength": 181987
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/assets/generated-variants/meadow-density-b.png",
+        "sha256": "sha256:72684330ae273a356c9b61c3dc6fda04c782358a2a9b189ece1ae2db1aebb58f",
+        "byteLength": 177179
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/assets/generated-variants/meadow-density-c.png",
+        "sha256": "sha256:9afd8b23bf8939bd820974376eda6ec47827f96f3eff86a43def86921e449676",
+        "byteLength": 192126
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/webgpu-dense-grass/browser-lab.js",
+        "sha256": "sha256:41204ef4cb279c31569e6e98a1d9534db3c4116f18c1d0325d9da48d5d033408",
+        "byteLength": 15008
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/webgpu-dense-grass/capture.mjs",
+        "sha256": "sha256:c5c6c0846ce9a1a87280aab5aee2bee633fad5460621b11c0b74faad14e70940",
+        "byteLength": 479
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/webgpu-dense-grass/dense-grass-system.js",
+        "sha256": "sha256:dc7cb716c353d7837adc864ed0687ae6ddfb6d1fcf38a98d4fd159236307ccb1",
+        "byteLength": 53719
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/webgpu-dense-grass/generated-meadow-density-browser.mjs",
+        "sha256": "sha256:b013972f70039f0a87b6e13e57f3ea47ba62c208986cde8e058519f91448330b",
+        "byteLength": 11151
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/webgpu-dense-grass/generated-meadow-density.html",
+        "sha256": "sha256:0abaa6932fe5616aff135c274c46a957ca7d7da560d321a0a744545f40db490a",
+        "byteLength": 616
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/webgpu-dense-grass/index.html",
+        "sha256": "sha256:9a0acfc01404e4b7bf00028e665d33856f890329548372805caa90ca3d939561",
+        "byteLength": 978
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/webgpu-dense-grass/index.js",
+        "sha256": "sha256:e143f52fa68cd0695aeb0196ac80b1ad19b63b37bb84286b5d0b79fcf125d6ff",
+        "byteLength": 679
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/webgpu-dense-grass/integration-adapter.js",
+        "sha256": "sha256:8975f2ce1f970e3c4bf099c411f074eccbe2c0e2733a7d312d52b683c70d26b1",
+        "byteLength": 2242
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/webgpu-dense-grass/mechanism/dense-grass-lod-and-impostors/index.html",
+        "sha256": "sha256:8e8fd195d7d7801b4985253f85c8290fcb2feae33a42bb20159d8d75fcb22b9e",
+        "byteLength": 675
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/webgpu-dense-grass/mechanism/dense-grass-placement/index.html",
+        "sha256": "sha256:f9d3243bbee244512cff0f6c6da30e405e6d27a811a7f76a7b7f7eef34ba7ff6",
+        "byteLength": 659
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/webgpu-dense-grass/mechanism/dense-grass-wind-and-trampling/index.html",
+        "sha256": "sha256:fd139f2248ce5a026b8a4d6238e5f317aa28006a96156c867ff7a78e6f58dcf5",
+        "byteLength": 677
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/webgpu-dense-grass/package-lock.json",
+        "sha256": "sha256:c2d44866411b7e2ba5f01384a339fc335d9dc4eaa68bf6117b07d2e60e3d1cf7",
+        "byteLength": 1909
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/webgpu-dense-grass/package.json",
+        "sha256": "sha256:6b7919de81f24a713c1ae86fcb6f727dd8bee7a73cf1b1f55fea914f67847ebe",
+        "byteLength": 787
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/webgpu-dense-grass/README.md",
+        "sha256": "sha256:a48b2d4c749fae24ff433964454be491fb15881062b17f6f84724c3c1570552e",
+        "byteLength": 5573
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/webgpu-dense-grass/route-contract.js",
+        "sha256": "sha256:45289874bec1f56ab0c176daebacb138a60e4a856bde157f4dd28a9d9e875707",
+        "byteLength": 1399
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/webgpu-dense-grass/route-wrapper.css",
+        "sha256": "sha256:a17c576a43993ae7e83637e48468c02088c3ee306b9f1450ee7d44d70a36f1f3",
+        "byteLength": 256
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/webgpu-dense-grass/tier/dense/high/index.html",
+        "sha256": "sha256:c9fab83c2aa72ba9575172183628f9aaa666ad810bbd58bb9cb328e7d12ce19d",
+        "byteLength": 650
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/webgpu-dense-grass/tier/dense/low/index.html",
+        "sha256": "sha256:64c33b81a6dfc049005b7628b1a1a35d441ef66b87dd047a66f9c0ae9fd43c84",
+        "byteLength": 648
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/webgpu-dense-grass/tier/dense/medium/index.html",
+        "sha256": "sha256:f400bbec8be8984c6889b947d14c0620c5732627f1c946800cd203ba9b2fbbe4",
+        "byteLength": 654
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/webgpu-dense-grass/tier/dense/ultra/index.html",
+        "sha256": "sha256:82e5e7eba290cb388935d2c1a5d798e15bc23b4355ecd4a7f9a7a345a38dee21",
+        "byteLength": 652
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/webgpu-dense-grass/validate-artifacts.mjs",
+        "sha256": "sha256:fdfec3059668b1075ca276788c6fb9ad341c80406ed4269d5f8fcffb5ab17258",
+        "byteLength": 497
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/webgpu-dense-grass/validate-generated-meadow-density.mjs",
+        "sha256": "sha256:8556ed917ff8832958290a4aeff962653944fdb4dfa41c1516c11dcfc5065d60",
+        "byteLength": 15461
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/webgpu-dense-grass/validate-mutations.mjs",
+        "sha256": "sha256:376a19ef170c3f147799c0b0028025d6b23936b2be0458319cff6a74b566cd32",
+        "byteLength": 2461
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/webgpu-dense-grass/validate-routes.mjs",
+        "sha256": "sha256:7cbc7914b85edb7ff95b37c8e2559d3195ec98c6677ca45ca6b88ef75e824f0b",
+        "byteLength": 3014
+      },
+      {
+        "repositoryPath": "threejs-procedural-vegetation/examples/webgpu-dense-grass/validation.js",
+        "sha256": "sha256:4cc34e76029e9045a813618675f1f5d06f35060cd9c97ad61b9aad3c3476231b",
+        "byteLength": 11069
+      }
+    ],
+    "threeRevision": "0.185.1",
+    "sourceHash": "sha256:b39b6b87e71d6e3b5926ef824cfc7e523c0a0da33968866b629096ba0ead0d6e",
+    "buildRevision": "sha256:daf7da5bfbe4bfce1ea1b559e89857623ad1f45ff2ca36107709a9b0d65bec23"
+  },
+  "retainedFiles": [
+    {
+      "path": "visual-contract.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:6b01bfc13f5acf44d529945ad6b1a6bf58f32cfaa02791b91ec036c6ce3f25b9",
+      "byteLength": 868
+    },
+    {
+      "path": "renderer-info.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:ce98dc437ff1e48283efdd61f5f63f5c0cc95934b77e56c419199c8db5c3b599",
+      "byteLength": 466
+    },
+    {
+      "path": "pipeline-graph.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:46dcb828ae2758be5c46def0a5122c56f9c765d8ca084bfdbd99087735170592",
+      "byteLength": 861
+    },
+    {
+      "path": "performance-envelope.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:62e1abb57e217febce5044e04788aae2967a749c9dd5c70432f279fc3c45e507",
+      "byteLength": 634
+    },
+    {
+      "path": "frame-trace.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:61e2604f805c8759b4999cc2b6ef8e27ea9446acb8902d2b4f38c58f787479e7",
+      "byteLength": 280
+    },
+    {
+      "path": "quality-governor.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:088cbc1a32903e0ae55fd375efbc65c99a2895ee306b3b4d9b19ac2f35517b7a",
+      "byteLength": 291
+    },
+    {
+      "path": "render-targets.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:04c75cb83a5305bea391ad012aca1e197be3a75febfc9bd5c2c23a7b94148787",
+      "byteLength": 10630
+    },
+    {
+      "path": "storage-resources.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:579719a4f114bada5939fff4c4a645ac178e5b40a8f18de1cfb9532f02a92486",
+      "byteLength": 333
+    },
+    {
+      "path": "resident-resources.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:6fc1377d8131845b579a304b535bc8832ac8ad8663760f592519d1c3ab76a856",
+      "byteLength": 1329
+    },
+    {
+      "path": "bandwidth-model.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:e921c52741c0a3b03c5a02ac0b1337262a182750cd76a01d10c49323c047a034",
+      "byteLength": 956
+    },
+    {
+      "path": "visual-errors.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:f4b2464fc52bef50bc4fdd264442c77fe07b680905d615eb5be53d0d84a8ff9c",
+      "byteLength": 752
+    },
+    {
+      "path": "leak-loop.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:0c3558b1db8b4678e2d32feedda6cbae1ee5bc312784a561ad1e862b4fdde76b",
+      "byteLength": 131662
+    },
+    {
+      "path": "mechanism-metrics.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:b86a7b64769f5f2c168cd6ed5ac746434237fdd177f7094a887d0e9529e7b414",
+      "byteLength": 4656
+    },
+    {
+      "path": "capture-write-ledger.json",
+      "status": "captured",
+      "kind": "capture-session-write-ledger",
+      "sha256": "sha256:f109f49a2d85f28fc5705a65f21b6e79900f4fe6cc8f7cd79de10c32405f1f9d",
+      "byteLength": 10628
+    },
+    {
+      "path": "sessions/physical-route.write-ledger.json",
+      "status": "captured",
+      "kind": "capture-session-write-ledger",
+      "sha256": "sha256:0bf39aa3661a2d253f8833cec92b2a5c7e4b41dedf2b71f59b611e1f258d3cf8",
+      "byteLength": 1985
+    }
+  ],
+  "retainedImages": [
+    {
+      "path": "final.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "final.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:d2853b312941465d0cdde2c3a7c2cd0a0d686b0c98d08072bc5e2bf8691da26b",
+      "byteLength": 478500
+    },
+    {
+      "path": "no-post.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "no-post.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:e93c535465c75e5ac0583d258aa495d48db888f209ae724c1e4b2f40a5871068",
+      "byteLength": 476216
+    },
+    {
+      "path": "diagnostics.mosaic.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "diagnostics.mosaic",
+      "mediaType": "image/png",
+      "sha256": "sha256:23ccd499f088d5bec21367b57b63a52a1ba5f2b8a237b95379567b76ede9fa60",
+      "byteLength": 348012
+    },
+    {
+      "path": "camera.near.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.near",
+      "mediaType": "image/png",
+      "sha256": "sha256:0403712f236afcd14ee11d3798aa9c8d90b69e2d7a4df8f64cf96c7e3c849779",
+      "byteLength": 567426
+    },
+    {
+      "path": "camera.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:d2853b312941465d0cdde2c3a7c2cd0a0d686b0c98d08072bc5e2bf8691da26b",
+      "byteLength": 478500
+    },
+    {
+      "path": "camera.far.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.far",
+      "mediaType": "image/png",
+      "sha256": "sha256:726667221212965318c6094d2e9f59570762446a391f0be6cd0aacf4ee4bee18",
+      "byteLength": 244425
+    },
+    {
+      "path": "seed-0001.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "seed-0001.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:d2853b312941465d0cdde2c3a7c2cd0a0d686b0c98d08072bc5e2bf8691da26b",
+      "byteLength": 478500
+    },
+    {
+      "path": "seed-9e3779b9.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "seed-9e3779b9.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:3cebd7e75a0ce43f91e0f4b200320be1afed07b2bb3b57fe4beb076ec16556a9",
+      "byteLength": 686479
+    },
+    {
+      "path": "temporal.t000.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "temporal.t000",
+      "mediaType": "image/png",
+      "sha256": "sha256:d2853b312941465d0cdde2c3a7c2cd0a0d686b0c98d08072bc5e2bf8691da26b",
+      "byteLength": 478500
+    },
+    {
+      "path": "temporal.t001.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "temporal.t001",
+      "mediaType": "image/png",
+      "sha256": "sha256:247ae09ad4fa15e98197b9c106c2f3c7d4a31f25ec7fc1dad12bc862d6a5e567",
+      "byteLength": 478192
+    }
+  ],
+  "omittedFiles": {
+    "ledgerDigest": "sha256:e5e898f54d151462b7cc882a9279a5d18ab4d790a02ae0c7172f0bd8b2b5819f",
+    "count": 3,
+    "byteLength": 273796,
+    "byKind": [
+      {
+        "kind": "capture-session-document",
+        "count": 2,
+        "byteLength": 270238
+      },
+      {
+        "kind": "supplementary-json",
+        "count": 1,
+        "byteLength": 3558
+      }
+    ]
+  },
+  "checkoutLimitations": [
+    {
+      "id": "detached-source-payloads",
+      "status": "ACTIVE",
+      "statement": "Raw readbacks and capture-session transcript bytes are omitted from the tracked projection. Checkout validation verifies their approved hash and byte-length commitments, not the detached bytes themselves.",
+      "affectedClaims": []
+    }
+  ],
+  "projectionDigest": "sha256:de48d2c73142ff5a81d35e7d44de9a3fcacfed65cba6c93bae7ace8bfaeb1fb5"
+}

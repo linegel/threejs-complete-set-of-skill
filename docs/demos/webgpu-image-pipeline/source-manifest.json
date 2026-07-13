@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "labId": "webgpu-image-pipeline",
   "kind": "canonical-lab",
-  "status": "incomplete",
+  "status": "accepted",
   "canonicalSource": [
     "threejs-image-pipeline/examples/webgpu-image-pipeline"
   ],
@@ -39,10 +39,8 @@
     "docs/demos/assets/three.webgpu-Dss1ekdK.js",
     "docs/demos/assets/webgpu-device-identity-uNUcs3Wh.js"
   ],
-  "publishedBundleHash": "sha256:faabe9378ad01133253dcf27a4b56bca809789feff3e586fd154352faed201e3",
+  "publishedBundleHash": "sha256:0772fc4768b83166bbcbcd692cb62964a77cf714c05f980e473fa822aaca5193",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:36e4490fcd74f5f358440cf8a67dbb057ea2e2c73bcfde6078bc53b0a5e63ee2",
-  "evidenceBundleId": null,
-  "skill": "threejs-image-pipeline",
-  "publishPath": "/demos/webgpu-image-pipeline/"
+  "buildRevision": "sha256:7ba7b3cc2b0ff75eb71ecf5d8b8e7b6bdf9407d8570076f6a6bce907a7e649d6",
+  "evidenceBundleId": "bundle"
 }

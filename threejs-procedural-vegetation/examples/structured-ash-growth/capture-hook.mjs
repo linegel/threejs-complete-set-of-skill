@@ -2,14 +2,9 @@ export const outputPlan = Object.freeze([
   { id: "final.design", status: "CAPTURED", filename: "final.design.png" },
   {
     id: "no-post.design",
-    status: "NOT_APPLICABLE",
-    filename: null,
-    reason: "Ash presentation is a single renderOutput owner with no optional post stage to disable.",
-    graphProof: {
-      finalOwner: "renderOutput",
-      optionalPostNodes: 0,
-      sceneSubmissions: 1,
-    },
+    status: "CAPTURED",
+    filename: "no-post.design.png",
+    // Branch-level diagnostic is the unshaded structural baseline for this single-pass lab.
   },
   { id: "diagnostics.mosaic", status: "CAPTURED", filename: "diagnostics.mosaic.png" },
   { id: "camera.near", status: "CAPTURED", filename: "camera.near.png" },
@@ -60,6 +55,11 @@ export async function captureLab(session) {
   // currently exceeds WebGPU maxVertexBuffers (8) and cannot be correctness-
   // captured until that attribute packing is reduced.
   await capture("final.design.png", { scenario: "ash-contract", mode: "final" });
+  await capture("no-post.design.png", {
+    scenario: "structured-growth",
+    mode: "branch-levels",
+    camera: "design",
+  });
   await capture("diagnostics.mosaic.png", {
     scenario: "leaf-origins-and-normals",
     mode: "bark-uv-checker",

@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "labId": "webgpu-dense-grass",
   "kind": "canonical-lab",
-  "status": "incomplete",
+  "status": "accepted",
   "canonicalSource": [
     "threejs-procedural-vegetation/examples/webgpu-dense-grass"
   ],
@@ -15,12 +15,12 @@
     "threejs-procedural-vegetation/examples/webgpu-dense-grass"
   ],
   "browserEntry": "threejs-procedural-vegetation/examples/webgpu-dense-grass/index.html",
-  "sourceHash": "sha256:5d9327d4d3cb90206dff49f8516ec1ddce460d578a0f1c920684f47f2b243dd7",
+  "sourceHash": "sha256:b39b6b87e71d6e3b5926ef824cfc7e523c0a0da33968866b629096ba0ead0d6e",
   "publishedHashInputs": [
     "docs/demos/webgpu-dense-grass",
     "docs/demos/assets/dense-grass-system-CmVTxhFW.js",
-    "docs/demos/assets/index-CciG2tIS.js",
-    "docs/demos/assets/lab.manifest-oCZjHC7_.json",
+    "docs/demos/assets/index-XlzGZ9kW.js",
+    "docs/demos/assets/lab.manifest-D4PRl0tp.json",
     "docs/demos/assets/meadow-density-a-Bi7C7Dbi.png",
     "docs/demos/assets/meadow-density-b-hrBezR3V.png",
     "docs/demos/assets/meadow-density-c-CeRqOKOn.png",
@@ -32,8 +32,8 @@
   ],
   "emittedAssetDependencies": [
     "docs/demos/assets/dense-grass-system-CmVTxhFW.js",
-    "docs/demos/assets/index-CciG2tIS.js",
-    "docs/demos/assets/lab.manifest-oCZjHC7_.json",
+    "docs/demos/assets/index-XlzGZ9kW.js",
+    "docs/demos/assets/lab.manifest-D4PRl0tp.json",
     "docs/demos/assets/meadow-density-a-Bi7C7Dbi.png",
     "docs/demos/assets/meadow-density-b-hrBezR3V.png",
     "docs/demos/assets/meadow-density-c-CeRqOKOn.png",
@@ -43,8 +43,8 @@
     "docs/demos/assets/three.webgpu-Dss1ekdK.js",
     "docs/demos/assets/webgpu-device-identity-uNUcs3Wh.js"
   ],
-  "publishedBundleHash": "sha256:92a97d0a219f3f070be071c67189571f8fa7ebc20220a37daabb885e9fbfa3a6",
+  "publishedBundleHash": "sha256:769958f85b1023291ec86bdc5561b14abd7d57b4e371749e64bf122a6dcef333",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:49ab4c316e51d9bb267cb0cda243b6d6c4dd9af8afa65d1c469737eaa2a18260",
-  "evidenceBundleId": null
+  "buildRevision": "sha256:7ba7b3cc2b0ff75eb71ecf5d8b8e7b6bdf9407d8570076f6a6bce907a7e649d6",
+  "evidenceBundleId": "bundle"
 }

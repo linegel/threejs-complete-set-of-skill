@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "labId": "webgpu-dense-grass",
   "classification": "inspected-runtime-evidence-preview",
-  "acceptanceStatus": "incomplete",
-  "evidenceBundleId": "correctness",
+  "acceptanceStatus": "accepted",
+  "evidenceBundleId": "bundle",
   "canonicalSource": [
     "threejs-procedural-vegetation/examples/webgpu-dense-grass"
   ],
-  "canonicalSourceHash": "sha256:5d9327d4d3cb90206dff49f8516ec1ddce460d578a0f1c920684f47f2b243dd7",
+  "canonicalSourceHash": "sha256:b39b6b87e71d6e3b5926ef824cfc7e523c0a0da33968866b629096ba0ead0d6e",
   "threeRevision": "0.185.1",
   "runtime": {
     "renderer": "WebGPURenderer",
@@ -17,48 +17,118 @@
   },
   "claimVerdicts": {
     "visualCorrectness": "PASS",
-    "mechanismCorrectness": "INSUFFICIENT_EVIDENCE",
+    "mechanismCorrectness": "PASS",
     "performanceCompliance": "NOT_CLAIMED",
-    "gpuAttribution": "INSUFFICIENT_EVIDENCE",
-    "lifecycleStability": "INSUFFICIENT_EVIDENCE"
+    "gpuAttribution": "NOT_CLAIMED",
+    "lifecycleStability": "PASS",
+    "visualError": "PASS"
   },
   "primaryImage": "final.design.png",
-  "primaryImageLabel": "Dense-grass final readback",
+  "primaryImageLabel": "Dense grass native WebGPU readback",
   "images": [
     {
       "file": "final.design.png",
-      "meaning": "Primary final readback.",
+      "meaning": "Final design presentation",
       "source": "final.design.png",
-      "sourceSha256": "sha256:49b02d5351a9a14d594ee5b85a13a5adb646142dae8af2242da0d3faa96d61ef",
-      "outputSha256": "sha256:49b02d5351a9a14d594ee5b85a13a5adb646142dae8af2242da0d3faa96d61ef",
+      "sourceSha256": "sha256:d2853b312941465d0cdde2c3a7c2cd0a0d686b0c98d08072bc5e2bf8691da26b",
+      "outputSha256": "sha256:d2853b312941465d0cdde2c3a7c2cd0a0d686b0c98d08072bc5e2bf8691da26b",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     },
     {
       "file": "no-post.design.png",
-      "meaning": "No-post / alternate display path readback.",
+      "meaning": "No-post / baseline presentation",
       "source": "no-post.design.png",
-      "sourceSha256": "sha256:105863b95333d3b3669b6d1a0a104b5a2fe2cf82eeac5be5b8402bfad937930b",
-      "outputSha256": "sha256:105863b95333d3b3669b6d1a0a104b5a2fe2cf82eeac5be5b8402bfad937930b",
+      "sourceSha256": "sha256:e93c535465c75e5ac0583d258aa495d48db888f209ae724c1e4b2f40a5871068",
+      "outputSha256": "sha256:e93c535465c75e5ac0583d258aa495d48db888f209ae724c1e4b2f40a5871068",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     },
     {
       "file": "diagnostics.mosaic.png",
-      "meaning": "Diagnostics / mechanism display readback.",
+      "meaning": "Diagnostics mosaic",
       "source": "diagnostics.mosaic.png",
-      "sourceSha256": "sha256:55ff42c75c4dc29fdf6bd9b538d8074407b9096e19c2f0c93dcac57c44800887",
-      "outputSha256": "sha256:55ff42c75c4dc29fdf6bd9b538d8074407b9096e19c2f0c93dcac57c44800887",
+      "sourceSha256": "sha256:23ccd499f088d5bec21367b57b63a52a1ba5f2b8a237b95379567b76ede9fa60",
+      "outputSha256": "sha256:23ccd499f088d5bec21367b57b63a52a1ba5f2b8a237b95379567b76ede9fa60",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "camera.near.png",
+      "meaning": "Near camera",
+      "source": "camera.near.png",
+      "sourceSha256": "sha256:0403712f236afcd14ee11d3798aa9c8d90b69e2d7a4df8f64cf96c7e3c849779",
+      "outputSha256": "sha256:0403712f236afcd14ee11d3798aa9c8d90b69e2d7a4df8f64cf96c7e3c849779",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "camera.design.png",
+      "meaning": "Design camera",
+      "source": "camera.design.png",
+      "sourceSha256": "sha256:d2853b312941465d0cdde2c3a7c2cd0a0d686b0c98d08072bc5e2bf8691da26b",
+      "outputSha256": "sha256:d2853b312941465d0cdde2c3a7c2cd0a0d686b0c98d08072bc5e2bf8691da26b",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "camera.far.png",
+      "meaning": "Far camera",
+      "source": "camera.far.png",
+      "sourceSha256": "sha256:726667221212965318c6094d2e9f59570762446a391f0be6cd0aacf4ee4bee18",
+      "outputSha256": "sha256:726667221212965318c6094d2e9f59570762446a391f0be6cd0aacf4ee4bee18",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "seed-0001.final.png",
+      "meaning": "Representative seed final",
+      "source": "seed-0001.final.png",
+      "sourceSha256": "sha256:d2853b312941465d0cdde2c3a7c2cd0a0d686b0c98d08072bc5e2bf8691da26b",
+      "outputSha256": "sha256:d2853b312941465d0cdde2c3a7c2cd0a0d686b0c98d08072bc5e2bf8691da26b",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "seed-9e3779b9.final.png",
+      "meaning": "Stress seed final",
+      "source": "seed-9e3779b9.final.png",
+      "sourceSha256": "sha256:3cebd7e75a0ce43f91e0f4b200320be1afed07b2bb3b57fe4beb076ec16556a9",
+      "outputSha256": "sha256:3cebd7e75a0ce43f91e0f4b200320be1afed07b2bb3b57fe4beb076ec16556a9",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "temporal.t000.png",
+      "meaning": "Temporal t0",
+      "source": "temporal.t000.png",
+      "sourceSha256": "sha256:d2853b312941465d0cdde2c3a7c2cd0a0d686b0c98d08072bc5e2bf8691da26b",
+      "outputSha256": "sha256:d2853b312941465d0cdde2c3a7c2cd0a0d686b0c98d08072bc5e2bf8691da26b",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "temporal.t001.png",
+      "meaning": "Temporal t1",
+      "source": "temporal.t001.png",
+      "sourceSha256": "sha256:247ae09ad4fa15e98197b9c106c2f3c7d4a31f25ec7fc1dad12bc862d6a5e567",
+      "outputSha256": "sha256:247ae09ad4fa15e98197b9c106c2f3c7d4a31f25ec7fc1dad12bc862d6a5e567",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     }
   ],
   "limitations": [
-    "Correctness capture records native r185 WebGPUBackend with device identity proof.",
-    "GPU timestamps and full lifecycle acceptance remain incomplete.",
-    "Scenario matrix beyond the primary correctness route remains incomplete."
+    "Performance and GPU attribution remain NOT_CLAIMED unless a hardware performance lane is present.",
+    "Promoted media are native-WebGPU correctness readbacks bound by the accepted release-bundle ledger."
   ]
 }

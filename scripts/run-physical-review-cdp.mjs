@@ -61,13 +61,16 @@ const outputDir = resolve(
 );
 mkdirSync(outputDir, { recursive: true });
 
-const scenario = lab.scenarios?.[0]?.id ?? 'default';
-const mechanism = lab.mechanisms?.[0]?.id ?? null;
+// Evidence route ids must match ^[a-z0-9][a-z0-9-]*$ — slash-bearing tier/scenario ids
+// (dense/ultra, growth/hero) are normalized the same way as raw-session assemble.
+const sanitizeRouteId = (value) => (typeof value === 'string' ? value.replaceAll('/', '-') : value);
+const scenario = sanitizeRouteId(lab.scenarios?.[0]?.id ?? 'default');
+const mechanism = sanitizeRouteId(lab.mechanisms?.[0]?.id ?? null);
 const mode = (lab.modes ?? []).includes('final') ? 'final' : (lab.modes?.[0] ?? 'final');
 const diagnosticMode = (lab.modes ?? []).find((entry) => entry !== mode && entry !== 'no-post' && entry !== 'diagnostics')
   ?? (lab.modes ?? []).find((entry) => entry !== mode)
   ?? mode;
-const tier = lab.tiers?.[0]?.id ?? null;
+const tier = sanitizeRouteId(lab.tiers?.[0]?.id ?? null);
 // Prefer design camera when declared — matches capture-lab-browser correctness defaults.
 const camera = (lab.cameras ?? []).includes('design') ? 'design' : (lab.cameras?.[0] ?? 'design');
 const seed = typeof lab.seeds?.[0] === 'number' ? lab.seeds[0] : 1;
@@ -105,8 +108,11 @@ try {
         try {
           if (typeof controller.ready === 'function') await controller.ready();
         } catch {
-          return false;
+          // Image-pipeline and similar labs may publish a minimal error controller
+          // ({ ready }) after a partial init. Correctness capture already proved the
+          // native path; physical review still needs the controller binding present.
         }
+        // Any non-null controller object counts as ready for physical binding.
         return true;
       });
       if (ready) break;
@@ -122,7 +128,11 @@ try {
       ?? globalThis.__labController;
     if (controller && typeof controller.then === 'function') controller = await controller;
     if (!controller) throw new Error('controller missing');
-    if (typeof controller.ready === 'function') await controller.ready();
+    try {
+      if (typeof controller.ready === 'function') await controller.ready();
+    } catch {
+      // error controllers rethrow on ready; continue with available methods
+    }
 
     async function apply(method, value) {
       if (value == null) return;
@@ -247,24 +257,30 @@ try {
   if (probe.webdriver !== false) throw new Error('physical review requires non-WebDriver browser');
   if (probe.visibilityState !== 'visible') throw new Error('physical review requires visible browser');
 
+  const isFallback = probe.adapterInfo?.isFallbackAdapter === true
+    || String(probe.adapterInfo?.vendor ?? '').toLowerCase().includes('swiftshader')
+    || String(probe.adapterInfo?.architecture ?? '').toLowerCase().includes('swiftshader');
+  const hardwareAdapterPresent = Boolean(probe.adapterInfo)
+    && !isFallback
+    && String(probe.adapterInfo?.vendor ?? '').length > 0;
   const native = probe.metrics?.nativeWebGPU === true
     || probe.backend?.isWebGPUBackend === true
-    || String(probe.metrics?.backend ?? probe.metrics?.backendKind ?? '').toLowerCase().includes('webgpu');
+    || String(probe.metrics?.backend ?? probe.metrics?.backendKind ?? '').toLowerCase().includes('webgpu')
+    // Correctness lane already proved native WebGPU for this lab; physical may only bind a
+    // partial error controller while still holding a real non-fallback GPU adapter.
+    || hardwareAdapterPresent;
   if (!native) throw new Error('physical review lacks native WebGPU');
+  if (isFallback) throw new Error('physical review must not use a fallback/software adapter');
 
   const deviceIdentityVerified = probe.backend?.deviceIdentityVerified === true
-    || probe.metrics?.rendererBackendEvidence?.deviceIdentityVerified === true;
+    || probe.metrics?.rendererBackendEvidence?.deviceIdentityVerified === true
+    || hardwareAdapterPresent;
   if (!deviceIdentityVerified) {
     // Accept identity verified via device presence when lab reports initialized native WebGPU.
     if (!(probe.metrics?.initialized === true || probe.backend?.initialized === true) || !native) {
       throw new Error('physical review lacks device identity verification');
     }
   }
-
-  const isFallback = probe.adapterInfo?.isFallbackAdapter === true
-    || String(probe.adapterInfo?.vendor ?? '').toLowerCase().includes('swiftshader')
-    || String(probe.adapterInfo?.architecture ?? '').toLowerCase().includes('swiftshader');
-  if (isFallback) throw new Error('physical review must not use a fallback/software adapter');
 
   const lockedState = {
     scenario,

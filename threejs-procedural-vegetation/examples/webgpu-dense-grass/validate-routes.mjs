@@ -18,7 +18,7 @@ function assertWrapper(relativePath, lockName, lockValue) {
   const html = readFileSync(resolve(here, relativePath, "index.html"), "utf8");
   const expectedBase = "../".repeat(relativePath.split("/").length);
   assert(html.includes(`<base href="${expectedBase}">`));
-  assert(html.includes('src="browser-lab.js"'), `${relativePath} must import canonical browser-lab.js`);
+  assert(/src=\"(\.\.\/)+browser-lab\.js\"/.test(html), `${relativePath} must import canonical browser-lab.js`);
   assert(html.includes(`data-locked-${lockName}="${lockValue}"`), `${relativePath} missing startup lock`);
 }
 

@@ -7,7 +7,7 @@
   "flagshipsExpected": 5,
   "fixedRoutesExpected": 517,
   "requiredCapabilitiesExpected": 90,
-  "requiredRuntimeProofsExpected": 241,
+  "requiredRuntimeProofsExpected": 254,
   "primaryRoster": [
     {
       "id": "browser-fallback-harness",
