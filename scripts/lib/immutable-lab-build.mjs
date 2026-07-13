@@ -10,7 +10,7 @@ import { buildDemoRegistry, REPO_ROOT } from './lab-registry.mjs';
 import { canonicalSha256 } from './evidence-manifest-contract.mjs';
 
 export const IMMUTABLE_LAB_BUILD_MANIFEST = 'immutable-lab-build.json';
-export const IMMUTABLE_LAB_BUILD_CONTRACT = 'declared-route-entrypoints-v1';
+export const IMMUTABLE_LAB_BUILD_CONTRACT = 'declared-route-entrypoints-v2';
 
 function sha256(bytes) {
   return `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
@@ -58,7 +58,7 @@ function htmlInputs(root, directory = root) {
   return inputs;
 }
 
-function declaredHtmlInputs(root, demo) {
+function declaredHtmlInputs(root, demo, extraEntrypoints = []) {
   const available = htmlInputs(root);
   const declaredPaths = new Set([ 'index.html' ]);
   for (const [kind, entries] of [
@@ -68,10 +68,18 @@ function declaredHtmlInputs(root, demo) {
   ]) {
     for (const entry of entries) declaredPaths.add(`${kind}/${entry.id}/index.html`);
   }
+  for (const entry of extraEntrypoints) {
+    if (typeof entry !== 'string' || entry.length === 0 || entry.startsWith('/')
+      || entry.split('/').some((segment) => segment === '.' || segment === '..')) {
+      throw new Error(`immutable lab build received invalid extra entrypoint ${entry}`);
+    }
+    declaredPaths.add(entry);
+  }
   const selected = {};
   for (const path of [ ...declaredPaths ].sort()) {
     const key = path.slice(0, -'.html'.length);
     if (available[key]) selected[key] = available[key];
+    else if (extraEntrypoints.includes(path)) throw new Error(`immutable lab build cannot resolve extra entrypoint ${path}`);
   }
   return selected;
 }
@@ -110,6 +118,7 @@ export async function loadAndValidateImmutableLabBuild(outputDirectory, options 
   if (manifest.threeRevision !== '0.185.1') throw new Error('immutable lab build has the wrong Three revision');
   const expectedContentAddress = canonicalSha256({
     builderContract: manifest.builderContract,
+    entrypointPlan: manifest.entrypoints,
     labId: manifest.labId,
     sourceClosureHash: manifest.sourceClosureHash,
     buildRevision: manifest.buildRevision,
@@ -139,12 +148,14 @@ export async function loadAndValidateImmutableLabBuild(outputDirectory, options 
 export async function buildImmutableLabSurface(options = {}) {
   const labId = options.labId;
   if (typeof labId !== 'string' || labId.length === 0) throw new Error('immutable lab build requires labId');
+  const extraEntrypoints = [ ...(options.extraEntrypoints ?? []) ].sort();
   const { demo, root, sourceClosure } = resolveLab(labId);
-  const inputs = declaredHtmlInputs(root, demo);
+  const inputs = declaredHtmlInputs(root, demo, extraEntrypoints);
   const entrypoints = Object.keys(inputs).map((path) => `${path}.html`).sort();
   if (!entrypoints.includes('index.html')) throw new Error(`immutable lab ${labId} has no index.html entrypoint`);
   const contentAddress = canonicalSha256({
     builderContract: IMMUTABLE_LAB_BUILD_CONTRACT,
+    entrypointPlan: entrypoints,
     labId,
     sourceClosureHash: sourceClosure.sourceHash,
     buildRevision: sourceClosure.buildRevision,

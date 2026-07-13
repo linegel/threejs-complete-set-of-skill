@@ -41,6 +41,7 @@ async function fixture({ drift = false } = {}) {
     spaFallback: false,
     contentAddress: hash({
       builderContract: IMMUTABLE_LAB_BUILD_CONTRACT,
+      entrypointPlan: [ 'index.html' ],
       labId: 'fixture-lab',
       sourceClosureHash: sourceClosure.sourceHash,
       buildRevision: sourceClosure.buildRevision,
