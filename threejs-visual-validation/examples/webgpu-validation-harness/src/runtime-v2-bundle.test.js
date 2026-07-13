@@ -110,7 +110,12 @@ function lifecycleFixture( mutate = () => {} ) {
 			}
 		},
 		settle: { status: 'PASS', policyAnimationFrames: 2, observedAnimationFrames: 2, queueSettled: true, delayedErrors: [] },
-		resourcesAfterDispose: { renderTargets: [], storageResources: [] }
+		resourcesAfterDispose: {
+			renderTargets: [ { bytes: 4096 + cycle, liveBytes: 0 } ],
+			storageResources: [],
+			trackedRenderTargetBytes: 0,
+			trackedLiveBytes: 0
+		}
 	} ) );
 	const fixture = { cycles: snapshots.length, snapshots };
 	mutate( fixture );
@@ -164,6 +169,8 @@ test( 'lifecycle reducer rejects missing, non-WebGPU, and retained-resource cycl
 	assert.throws( () => summarizeLifecycleEvidence( lifecycleFixture( ( fixture ) => { fixture.snapshots[ 5 ].afterDispose.lifecycleState.rendererStateDisposition = 'RESTORED'; } ) ), /truthful owned-renderer disposal/ );
 	assert.throws( () => summarizeLifecycleEvidence( lifecycleFixture( ( fixture ) => { fixture.snapshots[ 5 ].afterDispose.rendererState = null; } ) ), /renderer state snapshot/ );
 	assert.throws( () => summarizeLifecycleEvidence( lifecycleFixture( ( fixture ) => { fixture.snapshots[ 5 ].resourcesAfterDispose.renderTargets.push( { bytes: 4 } ); } ) ), /resources after disposal/ );
+	assert.throws( () => summarizeLifecycleEvidence( lifecycleFixture( ( fixture ) => { fixture.snapshots[ 5 ].resourcesAfterDispose.renderTargets[ 0 ].liveBytes = 4; } ) ), /resources after disposal/ );
+	assert.throws( () => summarizeLifecycleEvidence( lifecycleFixture( ( fixture ) => { fixture.snapshots[ 5 ].resourcesAfterDispose.trackedLiveBytes = 4; } ) ), /resources after disposal/ );
 
 } );
 

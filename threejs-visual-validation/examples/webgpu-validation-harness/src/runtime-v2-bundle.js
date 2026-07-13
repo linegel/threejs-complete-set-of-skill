@@ -325,14 +325,15 @@ function finiteNonnegativeCounters( counters, label ) {
 
 }
 
-function resourceBytes( resources, resourceName ) {
+function resourceLiveBytes( resources, resourceName ) {
 
 	const records = resources?.[ resourceName ];
 	if ( Array.isArray( records ) === false ) throw new Error( `Lifecycle snapshot is missing resources.${ resourceName}.` );
 	return records.reduce( ( sum, resource, index ) => {
 
-		if ( Number.isFinite( resource?.bytes ) === false || resource.bytes < 0 ) throw new Error( `Lifecycle ${ resourceName }[${ index }].bytes must be finite and nonnegative.` );
-		return sum + resource.bytes;
+		const value = Object.hasOwn( resource ?? {}, 'liveBytes' ) ? resource.liveBytes : resource?.bytes;
+		if ( Number.isFinite( value ) === false || value < 0 ) throw new Error( `Lifecycle ${ resourceName }[${ index }] live bytes must be finite and nonnegative.` );
+		return sum + value;
 
 	}, 0 );
 
@@ -443,11 +444,13 @@ export function summarizeLifecycleEvidence( lifecycle ) {
 		const afterRendererBytes = afterMemory.total;
 		if ( Number.isFinite( beforeRendererBytes ) === false || Number.isFinite( afterRendererBytes ) === false ) throw new Error( `Runtime lifecycle cycle ${ index } is missing renderer-memory totals.` );
 		if ( snapshot.resourcesAfterDispose?.captureError ) throw new Error( `Runtime lifecycle cycle ${ index } could not inspect resources after disposal.` );
-		const targetBytes = resourceBytes( snapshot.resourcesBeforeDispose, 'renderTargets' );
-		const storageBytes = resourceBytes( snapshot.resourcesBeforeDispose, 'storageResources' );
-		const retainedTargetBytes = resourceBytes( snapshot.resourcesAfterDispose, 'renderTargets' );
-		const retainedStorageBytes = resourceBytes( snapshot.resourcesAfterDispose, 'storageResources' );
-		if ( retainedTargetBytes !== 0 || retainedStorageBytes !== 0 || ( snapshot.resourcesAfterDispose.trackedRenderTargetBytes ?? 0 ) !== 0 ) throw new Error( `Runtime lifecycle cycle ${ index } retained resources after disposal.` );
+		const targetBytes = resourceLiveBytes( snapshot.resourcesBeforeDispose, 'renderTargets' );
+		const storageBytes = resourceLiveBytes( snapshot.resourcesBeforeDispose, 'storageResources' );
+		const retainedTargetBytes = resourceLiveBytes( snapshot.resourcesAfterDispose, 'renderTargets' );
+		const retainedStorageBytes = resourceLiveBytes( snapshot.resourcesAfterDispose, 'storageResources' );
+		const retainedTrackedBytes = snapshot.resourcesAfterDispose.trackedLiveBytes ?? 0;
+		if ( Number.isFinite( retainedTrackedBytes ) === false || retainedTrackedBytes < 0 ) throw new Error( `Runtime lifecycle cycle ${ index } has an invalid post-disposal trackedLiveBytes counter.` );
+		if ( retainedTargetBytes !== 0 || retainedStorageBytes !== 0 || ( snapshot.resourcesAfterDispose.trackedRenderTargetBytes ?? 0 ) !== 0 || retainedTrackedBytes !== 0 ) throw new Error( `Runtime lifecycle cycle ${ index } retained resources after disposal.` );
 		return {
 			rowType: snapshot.rowType,
 			cycle: index,
