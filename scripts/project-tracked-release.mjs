@@ -78,7 +78,11 @@ const registry = buildDemoRegistry();
 const lab = registry.demos.find((entry) => entry.id === labId);
 if (!lab) throw new Error(`unknown lab ${labId}`);
 if (!lab.evidenceBundle) throw new Error(`${labId} has no canonical evidenceBundle path`);
-const outputDirectory = resolve(REPOSITORY_ROOT, lab.evidenceBundle);
+const canonicalEvidenceBundle = `docs/visual-validation/${labId}/bundle`;
+if (lab.evidenceBundle !== canonicalEvidenceBundle && !lab.evidenceBundle.endsWith(`/${canonicalEvidenceBundle}`)) {
+  throw new Error(`${labId} evidenceBundle does not name its canonical tracked release path`);
+}
+const outputDirectory = resolve(REPOSITORY_ROOT, canonicalEvidenceBundle);
 if (relative(REPOSITORY_ROOT, outputDirectory).startsWith('..')) throw new Error(`${labId} evidenceBundle escapes the repository`);
 
 const sourceValidation = validateEvidenceBundle(candidateDirectory, { requireRequiredClaimsPass: true });
