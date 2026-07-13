@@ -437,6 +437,9 @@ export class WebGPUFrostLab {
     let pixels;
     try {
       this.renderer.setRenderTarget(renderTarget);
+      this.renderer.setViewport(0, 0, captureWidth, captureHeight);
+      this.renderer.setScissor(0, 0, captureWidth, captureHeight);
+      this.renderer.setScissorTest(false);
       pipeline.render();
       pixels = await this.renderer.readRenderTargetPixelsAsync(renderTarget, 0, 0, captureWidth, captureHeight);
     } finally {
