@@ -167,6 +167,11 @@ export async function startImmutableLabServer(options = {}) {
     ledgerPath,
     immutableBuild,
     async closeAndFinalize() {
+      // Node 18+: force-drop keep-alive sockets so close() cannot hang when a
+      // Playwright/CDP page still holds the immutable lab origin open.
+      if (typeof server.closeAllConnections === 'function') {
+        try { server.closeAllConnections(); } catch { /* ignore */ }
+      }
       await new Promise((resolvePromise, reject) => server.close((error) => error ? reject(error) : resolvePromise()));
       return finalizeImmutableServedLedger(ledgerPath);
     },

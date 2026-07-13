@@ -319,6 +319,15 @@ try {
     throw new Error(`physical checks failed: ${JSON.stringify(checks.filter((c) => c.expected !== c.observed))}`);
   }
 
+  // Drop the Playwright page before server.close(): keep-alive connections from
+  // the open tab make http.Server.close() hang indefinitely under CDP reuse.
+  try {
+    await Promise.race([
+      page.close(),
+      new Promise((resolve) => setTimeout(resolve, 2000)),
+    ]);
+  } catch { /* ignore */ }
+
   const served = await server.closeAndFinalize();
   writeFileSync(join(outputDir, 'served-byte-ledger.json'), `${JSON.stringify(served, null, 2)}\n`);
 

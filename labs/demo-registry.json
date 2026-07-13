@@ -12291,7 +12291,7 @@
       "skill": "threejs-scalable-real-time-shadows",
       "threeRevision": "0.185.1",
       "kind": "mechanism-demo",
-      "status": "incomplete",
+      "status": "accepted",
       "canonicalSource": [
         "threejs-scalable-real-time-shadows/examples/webgpu-shadow-architecture-bench/main.js",
         "threejs-scalable-real-time-shadows/examples/webgpu-shadow-architecture-bench/index.html",
@@ -12483,7 +12483,7 @@
         }
       ],
       "evidenceContract": "v2",
-      "evidenceBundle": null,
+      "evidenceBundle": "docs/visual-validation/webgpu-shadow-architecture-bench/bundle",
       "validationCommand": "npm --prefix threejs-scalable-real-time-shadows/examples/webgpu-shadow-architecture-bench run validate:unit",
       "commands": {
         "check": "npm --prefix threejs-scalable-real-time-shadows/examples/webgpu-shadow-architecture-bench run check",

@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "labId": "webgpu-shadow-architecture-bench",
   "kind": "mechanism-demo",
-  "status": "incomplete",
+  "status": "accepted",
   "canonicalSource": [
     "threejs-scalable-real-time-shadows/examples/webgpu-shadow-architecture-bench/main.js",
     "threejs-scalable-real-time-shadows/examples/webgpu-shadow-architecture-bench/index.html",
@@ -10,6 +10,7 @@
     "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/shadow-architectures.js"
   ],
   "sourceHashInputs": [
+    "labs/runtime/webgpu-device-identity.mjs",
     "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/cached-clipmap-shadow-node-v2.js",
     "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/canonical-lab.js",
     "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/clipmap-config.js",
@@ -18,26 +19,28 @@
     "threejs-scalable-real-time-shadows/examples/webgpu-shadow-architecture-bench"
   ],
   "browserEntry": "threejs-scalable-real-time-shadows/examples/webgpu-shadow-architecture-bench/index.html",
-  "sourceHash": "sha256:40940db67adf92fe7da2e55717e3ef0b5a58e672e51dddf4a986618f97628367",
+  "sourceHash": "sha256:b5720ffcb576439ae355f3ce8334a1d5c572150b82563c85bf2276b91012cf53",
   "publishedHashInputs": [
     "docs/demos/webgpu-shadow-architecture-bench",
-    "docs/demos/assets/canonical-lab-C_swluIP.js",
-    "docs/demos/assets/index-CrHumWUw.js",
+    "docs/demos/assets/canonical-lab-C1FaueBf.js",
+    "docs/demos/assets/index-BIWepAdm.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/shadow-architectures-CAZM5msa.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+    "docs/demos/assets/shadow-architectures-CnBoOeHY.js",
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js",
+    "docs/demos/assets/webgpu-device-identity-uNUcs3Wh.js"
   ],
   "emittedAssetDependencies": [
-    "docs/demos/assets/canonical-lab-C_swluIP.js",
-    "docs/demos/assets/index-CrHumWUw.js",
+    "docs/demos/assets/canonical-lab-C1FaueBf.js",
+    "docs/demos/assets/index-BIWepAdm.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/shadow-architectures-CAZM5msa.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+    "docs/demos/assets/shadow-architectures-CnBoOeHY.js",
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js",
+    "docs/demos/assets/webgpu-device-identity-uNUcs3Wh.js"
   ],
-  "publishedBundleHash": "sha256:41da732c1e9ec6596ee2e72bfabd0258d60ff54d1bf20c742d8994f0dd4a6c99",
+  "publishedBundleHash": "sha256:c2b9b2ea774bd2264b467729b039aaedda28f8665d524b124ef11bcb8327224a",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b",
+  "buildRevision": "sha256:7ba7b3cc2b0ff75eb71ecf5d8b8e7b6bdf9407d8570076f6a6bce907a7e649d6",
   "evidenceBundleId": null
 }
