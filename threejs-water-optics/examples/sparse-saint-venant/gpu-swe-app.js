@@ -10,6 +10,7 @@ import { commitSparseTiles, createSparseTileDomain, prepareSparseTileCommit } fr
 const params = new URLSearchParams( location.search );
 const tierId = params.get( 'tier' ) ?? 'budgeted';
 const contract = deriveSweGpuContract( tierId );
+const receiverCapacityKgPerM2 = 0.6;
 const canvas = document.getElementById( 'lab-canvas' );
 const status = document.getElementById( 'status' );
 const diagnosticButton = document.getElementById( 'diagnostic' );
@@ -100,10 +101,13 @@ function buildDisplayMesh() {
 	const stateIndex = owner.displayIndexNode.element( instanceIndex.toUint() );
 	const state = owner.committedStateNode.element( stateIndex );
 	const foamCoverage = owner.foamCommittedNode.element( stateIndex );
+	const receiverCoverage = clamp( owner.receiverCommittedNode.element( stateIndex ).div( receiverCapacityKgPerM2 ), 0, 1 );
 	const depthRatio = clamp( state.x.div( float( contract.tier.maximumDepthMeters ) ), 0, 1 );
-	const wetColor = mix( color( 0x45e0e8 ), color( 0x0756a8 ), depthRatio );
+	const baseWetColor = mix( color( 0x45e0e8 ), color( 0x0756a8 ), depthRatio );
+	const wetColor = mix( baseWetColor, color( 0x2a877e ), receiverCoverage.mul( float( 1 ).sub( depthRatio ) ).mul( 0.35 ) );
 	const foamedWaterColor = mix( wetColor, color( 0xf4fbf1 ), clamp( foamCoverage.mul( 1.4 ), 0, 1 ) );
-	const dryColor = mix( color( 0xc6a56c ), color( 0x426653 ), clamp( state.w.add( 0.12 ).mul( 5 ), 0, 1 ) );
+	const baseDryColor = mix( color( 0xc6a56c ), color( 0x426653 ), clamp( state.w.add( 0.12 ).mul( 5 ), 0, 1 ) );
+	const dryColor = mix( baseDryColor, color( 0x304f3d ), receiverCoverage.mul( 0.7 ) );
 	material.colorNode = select( state.x.lessThan( -1e-6 ), color( 0xff00cc ), select( state.x.greaterThan( 1e-5 ), foamedWaterColor, dryColor ) );
 	// positionLocal already contains the InstancedMesh transform when the custom
 	// position node is assigned; positionGeometry would collapse every cell to
@@ -154,7 +158,7 @@ async function captureDiagnostic() {
 	try {
 
 		const diagnostic = await owner.captureDiagnostics();
-		lastDiagnosticSummary = `ledger gen ${ diagnostic.committedGeneration } · wet ${ diagnostic.wetCells } · invalid ${ diagnostic.invalidCells } · negative ${ diagnostic.negativeDepthCells } · accepted ${ diagnostic.acceptedCommits } · rejected ${ diagnostic.rejectedCommits } · interaction seq ${ diagnostic.committedInteractionSequence } / batches ${ diagnostic.committedInteractionBatches } / impulse q x ${ diagnostic.interactionImpulseXPositiveQuanta - diagnostic.interactionImpulseXNegativeQuanta } z ${ diagnostic.interactionImpulseZPositiveQuanta - diagnostic.interactionImpulseZNegativeQuanta } · foam ${ diagnostic.foamCoveredCells } cells / ${ diagnostic.foamCoverageQuanta } coverage q / ${ diagnostic.foamSourceRateQuanta } source q / clamps ${ diagnostic.foamClampCells } · depth q prior ${ diagnostic.priorDepthQuanta } / candidate ${ diagnostic.candidateDepthQuanta } · net flux ${ diagnostic.netFluxInfluxDepthQuanta } in / ${ diagnostic.netFluxOutfluxDepthQuanta } out · boundary ${ diagnostic.boundaryInfluxDepthQuanta } in / ${ diagnostic.boundaryOutfluxDepthQuanta } out · internal residual ${ diagnostic.internalFluxCancellationDepthQuanta }`;
+		lastDiagnosticSummary = `ledger gen ${ diagnostic.committedGeneration } · wet ${ diagnostic.wetCells } · invalid ${ diagnostic.invalidCells } · negative ${ diagnostic.negativeDepthCells } · accepted ${ diagnostic.acceptedCommits } · rejected ${ diagnostic.rejectedCommits } · interaction seq ${ diagnostic.committedInteractionSequence } / batches ${ diagnostic.committedInteractionBatches } / impulse q x ${ diagnostic.interactionImpulseXPositiveQuanta - diagnostic.interactionImpulseXNegativeQuanta } z ${ diagnostic.interactionImpulseZPositiveQuanta - diagnostic.interactionImpulseZNegativeQuanta } · receiver seq ${ diagnostic.committedReceiverExchangeSequence } / batches ${ diagnostic.committedReceiverExchangeBatches } / wet ${ diagnostic.receiverWetCells } / coverage q ${ diagnostic.receiverCoverageQuanta } / transfer depth q ${ diagnostic.receiverTransferDepthQuanta } / invalid ${ diagnostic.receiverInvalidCells } / runoff q ${ diagnostic.receiverRunoffQuanta } · foam ${ diagnostic.foamCoveredCells } cells / ${ diagnostic.foamCoverageQuanta } coverage q / ${ diagnostic.foamSourceRateQuanta } source q / clamps ${ diagnostic.foamClampCells } · depth q prior ${ diagnostic.priorDepthQuanta } / candidate ${ diagnostic.candidateDepthQuanta } · net flux ${ diagnostic.netFluxInfluxDepthQuanta } in / ${ diagnostic.netFluxOutfluxDepthQuanta } out · boundary ${ diagnostic.boundaryInfluxDepthQuanta } in / ${ diagnostic.boundaryOutfluxDepthQuanta } out · internal residual ${ diagnostic.internalFluxCancellationDepthQuanta }`;
 		status.textContent = `READY · NATIVE WEBGPU · ${ tierId.toUpperCase() } · ${ lastDiagnosticSummary }`;
 		return diagnostic;
 
@@ -182,7 +186,9 @@ async function runRollbackMutation() {
 		const rollbackPassed = after.negativeDepthCells >= 1
 			&& after.committedGeneration === before.committedGeneration
 			&& after.acceptedCommits === before.acceptedCommits
-			&& after.rejectedCommits === before.rejectedCommits + 1;
+			&& after.rejectedCommits === before.rejectedCommits + 1
+			&& after.committedReceiverExchangeSequence === before.committedReceiverExchangeSequence
+			&& after.committedReceiverExchangeBatches === before.committedReceiverExchangeBatches;
 		if ( ! rollbackPassed ) throw new Error( `rollback mutation was admitted: before=${ JSON.stringify( before ) } after=${ JSON.stringify( after ) }` );
 		lastDiagnosticSummary = `ROLLBACK PASS · injected negative ${ after.negativeDepthCells } · generation held ${ after.committedGeneration } · accepted held ${ after.acceptedCommits } · rejected ${ before.rejectedCommits }→${ after.rejectedCommits }`;
 		status.textContent = `READY · NATIVE WEBGPU · ${ tierId.toUpperCase() } · ${ lastDiagnosticSummary }`;
@@ -219,6 +225,8 @@ async function runSustainedDiagnostic( presentationFrames = 120 ) {
 		const passed = after.invalidCells === 0 && after.negativeDepthCells === 0
 			&& after.rejectedCommits === before.rejectedCommits
 			&& after.committedGeneration > before.committedGeneration
+			&& after.committedReceiverExchangeSequence === before.committedReceiverExchangeSequence
+			&& after.committedReceiverExchangeBatches === before.committedReceiverExchangeBatches
 			&& descriptionAfter.frameCriticalReadbackCount === 0
 			&& gpuErrors.length === 0;
 		if ( ! passed ) throw new Error( `sustained diagnostic failed: before=${ JSON.stringify( before ) } after=${ JSON.stringify( after ) } errors=${ JSON.stringify( gpuErrors ) }` );
@@ -283,7 +291,8 @@ async function verifyNativeBootstrap( device ) {
 		await device.queue.onSubmittedWorkDone();
 		const rejected = await owner.captureDiagnostics();
 		if ( rejected.negativeDepthCells < 1 || rejected.committedGeneration !== 0 || rejected.acceptedCommits !== 0 || rejected.rejectedCommits !== 1
-			|| rejected.committedInteractionBatches !== 0 || rejected.committedInteractionSequence !== 0 ) throw new Error( `interaction rollback bootstrap mutation escaped: ${ JSON.stringify( rejected ) }` );
+			|| rejected.committedInteractionBatches !== 0 || rejected.committedInteractionSequence !== 0
+			|| rejected.committedReceiverExchangeBatches !== 0 || rejected.committedReceiverExchangeSequence !== 0 ) throw new Error( `joint interaction/receiver rollback bootstrap mutation escaped: ${ JSON.stringify( rejected ) }` );
 		interactionRollbackProof = Object.freeze( { rejected } );
 
 	}
@@ -294,7 +303,8 @@ async function verifyNativeBootstrap( device ) {
 	if ( gpuErrors.length > 0 ) throw new Error( gpuErrors[ 0 ] );
 	const expectedRejectedCommits = interactionRollbackProof === null ? 0 : 1;
 	if ( diagnostic.invalidCells !== 0 || diagnostic.negativeDepthCells !== 0 || diagnostic.committedGeneration !== 1 || diagnostic.acceptedCommits !== 1 || diagnostic.rejectedCommits !== expectedRejectedCommits
-		|| diagnostic.committedInteractionBatches !== 1 || diagnostic.committedInteractionSequence !== 1 ) {
+		|| diagnostic.committedInteractionBatches !== 1 || diagnostic.committedInteractionSequence !== 1
+		|| diagnostic.committedReceiverExchangeBatches !== 1 || diagnostic.committedReceiverExchangeSequence !== 1 || diagnostic.receiverInvalidCells !== 0 ) {
 
 		throw new Error( `bootstrap transaction rejected: ${ JSON.stringify( diagnostic ) }` );
 
@@ -333,6 +343,18 @@ async function boot() {
 	const sourceCellX = contract.tier.tileSize * 0.75 + 0.25;
 	const sourceCellZ = contract.tier.tileSize * 2.5 + 0.25;
 	const sourcePointMeters = [ gridOriginXMeters + ( sourceCellX + 0.5 ) * contract.tier.cellSizeMeters, 0, gridOriginZMeters + ( sourceCellZ + 0.5 ) * contract.tier.cellSizeMeters ];
+	const denseCellCount = totalCellsX * totalCellsZ;
+	const receiverMask = new Uint8Array( denseCellCount );
+	const receiverAvailableCapacityKgPerM2 = new Float64Array( denseCellCount );
+	for ( let globalCellZ = 0; globalCellZ < totalCellsZ; globalCellZ += 1 ) for ( let globalCellX = 0; globalCellX < totalCellsX; globalCellX += 1 ) {
+
+		const denseIndex = globalCellZ * totalCellsX + globalCellX;
+		const { depthMeters } = initialCondition( { globalCellX, globalCellZ } );
+		const isCoastalReceiver = depthMeters >= 0.01 && depthMeters <= 0.045;
+		receiverMask[ denseIndex ] = isCoastalReceiver ? 1 : 0;
+		receiverAvailableCapacityKgPerM2[ denseIndex ] = isCoastalReceiver ? receiverCapacityKgPerM2 : 0;
+
+	}
 	owner = createGpuSparseSweOwner( renderer, {
 		tierId,
 		preparedCommit: sparseCommit,
@@ -348,6 +370,24 @@ async function boot() {
 				targetStateEquation: 'saint-venant-horizontal-momentum',
 				payload: { tag: 'pointImpulse', timeSemantics: 'interval-integrated', linearImpulseNs: [ 1, 0, -0.35 ], applicationPointMeters: sourcePointMeters }
 			} ]
+		},
+		receiverExchange: {
+			sequence: 1,
+			receiverMask,
+			receiverAvailableCapacityKgPerM2,
+			capacityKgPerM2: receiverCapacityKgPerM2,
+			waterDensityKgPerM3: 1025,
+			uptakeRateKgPerM2S: 18,
+			lossRatePerSecond: 0.015,
+			wetDepthThresholdMeters: 0.01,
+			minimumRetainedDepthMeters: 0.005,
+			waterOwnerId: 'sparse-swe-water',
+			waterStateVersion: 'water:0',
+			receiverOwnerId: 'coastal-sand-liquid',
+			receiverMomentumOwnerId: 'coastal-terrain-momentum',
+			receiverStateVersion: 'coastal-sand:0',
+			applicationIntervalKey: 'coastal-clock:0..1',
+			commitGroupId: 'water-receiver:0..1'
 		},
 		openBoundary: {
 			side: 'west',
@@ -370,7 +410,7 @@ async function boot() {
 	rollbackButton.addEventListener( 'click', runRollbackMutation );
 	sustainedButton.addEventListener( 'click', () => runSustainedDiagnostic() );
 	window.__sparseSwe = Object.freeze( { ready: true, owner, contract, sparseCommit, setCamera, captureDiagnostic, runRollbackMutation, runSustainedDiagnostic, dispose: disposeApp, bootstrapDiagnostic, gpuErrors } );
-	const interactionRollbackSummary = bootstrapDiagnostic.interactionRollbackProof === null ? '' : ` · interaction rollback held seq ${ bootstrapDiagnostic.interactionRollbackProof.rejected.committedInteractionSequence } / batches ${ bootstrapDiagnostic.interactionRollbackProof.rejected.committedInteractionBatches } then retry committed seq ${ bootstrapDiagnostic.committedInteractionSequence } / batches ${ bootstrapDiagnostic.committedInteractionBatches }`;
+	const interactionRollbackSummary = bootstrapDiagnostic.interactionRollbackProof === null ? '' : ` · joint rollback held interaction seq ${ bootstrapDiagnostic.interactionRollbackProof.rejected.committedInteractionSequence} / receiver seq ${ bootstrapDiagnostic.interactionRollbackProof.rejected.committedReceiverExchangeSequence } then retry committed interaction seq ${ bootstrapDiagnostic.committedInteractionSequence } / receiver seq ${ bootstrapDiagnostic.committedReceiverExchangeSequence }`;
 	status.textContent = `READY · NATIVE WEBGPU · ${ tierId.toUpperCase() } · verified gen ${ bootstrapDiagnostic.committedGeneration } · ${ owner.initial.residentTileCount }/${ contract.tier.logicalTilesX * contract.tier.logicalTilesZ } tiles · ${ owner.initial.residentCellCount } cells · ${ contract.totalLogicalBytes } logical bytes${ interactionRollbackSummary }`;
 	renderer.setAnimationLoop( ( time ) => {
 

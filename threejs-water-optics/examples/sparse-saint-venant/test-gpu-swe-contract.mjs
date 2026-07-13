@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { SWE_GPU_EXECUTION_DECISION, SWE_GPU_TIERS, SWE_INTERACTION_BINDING_DECISION, SWE_INTERACTION_GPU_DECISION, deriveSweGpuContract, validateSweGpuContract } from './gpu-swe-contract.js';
+import { SWE_GPU_EXECUTION_DECISION, SWE_GPU_TIERS, SWE_INTERACTION_BINDING_DECISION, SWE_INTERACTION_GPU_DECISION, SWE_RECEIVER_GPU_DECISION, deriveSweGpuContract, validateSweGpuContract } from './gpu-swe-contract.js';
 
 assert.ok( SWE_GPU_EXECUTION_DECISION.candidates.length >= 5 );
 assert.equal( new Set( SWE_GPU_EXECUTION_DECISION.candidates.map( ( candidate ) => candidate.family ) ).size, SWE_GPU_EXECUTION_DECISION.candidates.length );
@@ -8,6 +8,8 @@ assert.equal( new Set( SWE_INTERACTION_GPU_DECISION.candidates.map( ( candidate 
 assert.equal( SWE_INTERACTION_GPU_DECISION.selectedCandidateId, 'prepared-field-cell-gather' );
 assert.equal( SWE_INTERACTION_BINDING_DECISION.candidates.length, 5 );
 assert.equal( SWE_INTERACTION_BINDING_DECISION.selectedCandidateId, 'face-reserved-channel-pack' );
+assert.equal( SWE_RECEIVER_GPU_DECISION.candidates.length, 6 );
+assert.equal( SWE_RECEIVER_GPU_DECISION.selectedCandidateId, 'water-cell-aligned-buffer-owner' );
 
 const summaries = [];
 for ( const tierId of Object.keys( SWE_GPU_TIERS ) ) {
@@ -15,9 +17,11 @@ for ( const tierId of Object.keys( SWE_GPU_TIERS ) ) {
 	const contract = deriveSweGpuContract( tierId );
 	assert.equal( validateSweGpuContract( contract ), true );
 	assert.ok( contract.tier.fixedTimeStepSeconds <= contract.stableTimeStepSeconds );
-	assert.equal( contract.dispatchOrder.length, 8 );
-	assert.equal( contract.resourceBytes.diagnostics, 88 );
+	assert.equal( contract.dispatchOrder.length, 9 );
+	assert.equal( contract.resourceBytes.diagnostics, 120 );
 	assert.equal( contract.resourceBytes.interactionSource, contract.stateRecords * 8 );
+	assert.equal( contract.resourceBytes.receiverLiquidPingPong, contract.stateRecords * 8 );
+	assert.equal( contract.resourceBytes.inundationTransfer, contract.stateRecords * 4 );
 	assert.equal( Math.max( ...Object.values( contract.storageBindingsPerStage ) ), 8 );
 	summaries.push( { tierId, bytes: contract.totalLogicalBytes, cflRatio: contract.cflRatio } );
 
@@ -39,4 +43,4 @@ const mutatedBindings = structuredClone( deriveSweGpuContract( 'budgeted' ) );
 mutatedBindings.storageBindingsPerStage.cellUpdate = 9;
 assert.throws( () => validateSweGpuContract( mutatedBindings ), /binding limit/ );
 
-console.log( `GPU SWE contract passed: 6 solver + ${ SWE_INTERACTION_GPU_DECISION.candidates.length } interaction + ${ SWE_INTERACTION_BINDING_DECISION.candidates.length } binding architectures, ${ summaries.map( ( entry ) => `${ entry.tierId }=${ entry.bytes }B@CFL${ entry.cflRatio.toFixed( 3 ) }` ).join( ', ' ) }, 5 rejection controls` );
+console.log( `GPU SWE contract passed: 6 solver + ${ SWE_INTERACTION_GPU_DECISION.candidates.length } interaction + ${ SWE_INTERACTION_BINDING_DECISION.candidates.length } binding + ${ SWE_RECEIVER_GPU_DECISION.candidates.length } receiver architectures, ${ summaries.map( ( entry ) => `${ entry.tierId }=${ entry.bytes }B@CFL${ entry.cflRatio.toFixed( 3 ) }` ).join( ', ' ) }, 5 rejection controls` );

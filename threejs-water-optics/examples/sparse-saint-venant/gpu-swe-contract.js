@@ -39,6 +39,20 @@ export const SWE_INTERACTION_BINDING_DECISION = Object.freeze( {
 	] )
 } );
 
+export const SWE_RECEIVER_GPU_DECISION = Object.freeze( {
+	problemId: 'gpu-receiver-wetness-ownership',
+	axes: Object.freeze( [ 'singleOwnerTruth', 'exchangeAtomicity', 'sparseIdentity', 'mobileTraffic', 'materialApplicability', 'recoveryClarity' ] ),
+	selectedCandidateId: 'water-cell-aligned-buffer-owner',
+	candidates: Object.freeze( [
+		Object.freeze( { id: 'material-fragment-history', family: 'material shader privately integrates wetness', scores: [ 0, 0, 2, 5, 5, 1 ], hardGate: 'fail:material-becomes-state-owner' } ),
+		Object.freeze( { id: 'screen-history', family: 'screen-space wetness history', scores: [ 0, 0, 1, 3, 4, 1 ], hardGate: 'fail:not-world-anchored' } ),
+		Object.freeze( { id: 'cpu-grid-upload', family: 'CPU receiver grid with per-step GPU upload', scores: [ 5, 3, 4, 1, 5, 4 ], hardGate: 'fail:transfer-tail-and-gpu-transaction-split' } ),
+		Object.freeze( { id: 'dense-storage-texture', family: 'dense world-space receiver StorageTexture', scores: [ 5, 5, 3, 2, 5, 5 ], hardGate: 'pass' } ),
+		Object.freeze( { id: 'dirty-tile-atlas', family: 'independent sparse dirty receiver tiles', scores: [ 5, 4, 4, 4, 5, 4 ], hardGate: 'fail:duplicate-sparse-identity-and-halo-owner' } ),
+		Object.freeze( { id: 'water-cell-aligned-buffer-owner', family: 'separate receiver state aligned to stable sparse water cells', scores: [ 5, 5, 5, 5, 5, 5 ], hardGate: 'pass' } )
+	] )
+} );
+
 export const SWE_GPU_TIERS = Object.freeze( {
 	full: Object.freeze( { tileSize: 16, capacityTiles: 32, logicalTilesX: 8, logicalTilesZ: 6, cellSizeMeters: 0.16, fixedTimeStepSeconds: 1 / 144, maximumDepthMeters: 0.45, maximumVelocityMps: 1.25, maximumCatchUpSteps: 2, cflGate: 0.35 } ),
 	budgeted: Object.freeze( { tileSize: 12, capacityTiles: 24, logicalTilesX: 8, logicalTilesZ: 6, cellSizeMeters: 0.22, fixedTimeStepSeconds: 1 / 72, maximumDepthMeters: 0.32, maximumVelocityMps: 0.85, maximumCatchUpSteps: 2, cflGate: 0.35 } ),
@@ -51,7 +65,9 @@ export const SWE_GPU_LAYOUT = Object.freeze( {
 	hydrostaticCorrection: Object.freeze( { type: 'vec2<f32>', channels: Object.freeze( [ 'leftOrSouthMomentumCorrectionM3ps2', 'rightOrNorthMomentumCorrectionM3ps2' ] ), orientations: 2 } ),
 	descriptor: Object.freeze( { type: 'vec4<i32>', channels: Object.freeze( [ 'logicalTileX', 'logicalTileZ', 'roleCode', 'resident' ] ) } ),
 	interactionSource: Object.freeze( { type: 'vec2<f32>', channels: Object.freeze( [ 'xDischargeIncrementM2ps', 'zDischargeIncrementM2ps' ] ) } ),
-	diagnostic: Object.freeze( { type: 'u32', channels: Object.freeze( [ 'invalidCells', 'negativeDepthCells', 'wetCells', 'priorDepthQuanta', 'candidateDepthQuanta', 'committedGeneration', 'acceptedCommits', 'rejectedCommits', 'netFluxInfluxDepthQuanta', 'netFluxOutfluxDepthQuanta', 'boundaryInfluxDepthQuanta', 'boundaryOutfluxDepthQuanta', 'foamCoveredCells', 'foamSourceRateQuanta', 'foamClampCells', 'foamCoverageQuanta', 'interactionImpulseXPositiveQuanta', 'interactionImpulseXNegativeQuanta', 'interactionImpulseZPositiveQuanta', 'interactionImpulseZNegativeQuanta', 'committedInteractionBatches', 'committedInteractionSequence' ] ) } )
+	receiverLiquid: Object.freeze( { type: 'f32', unit: 'kg m^-2', copies: 2 } ),
+	inundationTransfer: Object.freeze( { type: 'f32', unit: 'kg m^-2', timeSemantics: 'interval-integrated' } ),
+	diagnostic: Object.freeze( { type: 'u32', channels: Object.freeze( [ 'invalidCells', 'negativeDepthCells', 'wetCells', 'priorDepthQuanta', 'candidateDepthQuanta', 'committedGeneration', 'acceptedCommits', 'rejectedCommits', 'netFluxInfluxDepthQuanta', 'netFluxOutfluxDepthQuanta', 'boundaryInfluxDepthQuanta', 'boundaryOutfluxDepthQuanta', 'foamCoveredCells', 'foamSourceRateQuanta', 'foamClampCells', 'foamCoverageQuanta', 'interactionImpulseXPositiveQuanta', 'interactionImpulseXNegativeQuanta', 'interactionImpulseZPositiveQuanta', 'interactionImpulseZNegativeQuanta', 'committedInteractionBatches', 'committedInteractionSequence', 'receiverTransferDepthQuanta', 'receiverInvalidCells', 'receiverCandidateMassQuanta', 'committedReceiverExchangeBatches', 'committedReceiverExchangeSequence', 'receiverWetCells', 'receiverCoverageQuanta', 'receiverRunoffQuanta' ] ) } )
 } );
 
 export function resolveSweGpuTier( tierId ) {
@@ -76,6 +92,8 @@ export function deriveSweGpuContract( tierId, gravityMps2 = 9.80665 ) {
 		statePingPong: stateRecords * 16 * 2,
 		foamPingPong: stateRecords * 4 * 2,
 		interactionSource: stateRecords * 8,
+		receiverLiquidPingPong: stateRecords * 4 * 2,
+		inundationTransfer: stateRecords * 4,
 		xFaceFlux: xFaceRecords * 16,
 		zFaceFlux: zFaceRecords * 16,
 		xHydrostaticCorrection: xFaceRecords * 8,
@@ -83,7 +101,7 @@ export function deriveSweGpuContract( tierId, gravityMps2 = 9.80665 ) {
 		descriptors: tier.capacityTiles * 16,
 		logicalLookup: tier.logicalTilesX * tier.logicalTilesZ * 4,
 		displayIndices: tier.capacityTiles * tier.tileSize * tier.tileSize * 4,
-		diagnostics: 22 * 4
+		diagnostics: 30 * 4
 	} );
 	const totalLogicalBytes = Object.values( resourceBytes ).reduce( ( sum, bytes ) => sum + bytes, 0 );
 	return Object.freeze( {
@@ -101,8 +119,8 @@ export function deriveSweGpuContract( tierId, gravityMps2 = 9.80665 ) {
 		resourceBytes,
 		totalLogicalBytes,
 		portableStorageBufferLimitPerStage: 8,
-		storageBindingsPerStage: Object.freeze( { resetValidation: 2, haloAndBoundary: 4, xFaceFlux: 5, zFaceFlux: 5, cellUpdate: 8, foamTransportReaction: 6, candidateValidation: 7, atomicCommit: 6 } ),
-		dispatchOrder: Object.freeze( [ 'reset-validation', 'halo-and-boundary', 'x-face-flux', 'z-face-flux', 'cell-update', 'foam-transport-reaction', 'candidate-validation', 'atomic-commit' ] )
+		storageBindingsPerStage: Object.freeze( { resetValidation: 1, haloAndBoundary: 4, xFaceFlux: 5, zFaceFlux: 5, cellUpdate: 8, receiverSurfaceExchange: 6, foamTransportReaction: 6, candidateValidation: 7, atomicCommit: 8 } ),
+		dispatchOrder: Object.freeze( [ 'reset-validation', 'halo-and-boundary', 'x-face-flux', 'z-face-flux', 'cell-update', 'receiver-surface-exchange', 'foam-transport-reaction', 'candidate-validation', 'atomic-commit' ] )
 	} );
 
 }
@@ -120,10 +138,14 @@ export function validateSweGpuContract( contract ) {
 	if ( SWE_INTERACTION_BINDING_DECISION.candidates.length < 5 ) throw new Error( 'SWE interaction binding decision compares fewer than five architectures' );
 	if ( SWE_INTERACTION_BINDING_DECISION.selectedCandidateId !== 'face-reserved-channel-pack' ) throw new Error( 'SWE interaction binding winner drifted' );
 	if ( SWE_INTERACTION_BINDING_DECISION.candidates.find( ( candidate ) => candidate.id === SWE_INTERACTION_BINDING_DECISION.selectedCandidateId )?.hardGate !== 'pass' ) throw new Error( 'SWE interaction binding winner fails its hard gate' );
+	if ( SWE_RECEIVER_GPU_DECISION.candidates.length < 5 ) throw new Error( 'SWE receiver GPU decision compares fewer than five architectures' );
+	if ( SWE_RECEIVER_GPU_DECISION.selectedCandidateId !== 'water-cell-aligned-buffer-owner' ) throw new Error( 'SWE receiver GPU winner drifted' );
+	if ( SWE_RECEIVER_GPU_DECISION.candidates.find( ( candidate ) => candidate.id === SWE_RECEIVER_GPU_DECISION.selectedCandidateId )?.hardGate !== 'pass' ) throw new Error( 'SWE receiver GPU winner fails its hard gate' );
 	if ( contract.tier.fixedTimeStepSeconds > contract.stableTimeStepSeconds ) throw new Error( `SWE ${ contract.tierId } fixed step exceeds its derived unsplit CFL bound` );
-	if ( contract.dispatchOrder.join( '>' ) !== 'reset-validation>halo-and-boundary>x-face-flux>z-face-flux>cell-update>foam-transport-reaction>candidate-validation>atomic-commit' ) throw new Error( 'SWE GPU dispatch dependency order drifted' );
+	if ( contract.dispatchOrder.join( '>' ) !== 'reset-validation>halo-and-boundary>x-face-flux>z-face-flux>cell-update>receiver-surface-exchange>foam-transport-reaction>candidate-validation>atomic-commit' ) throw new Error( 'SWE GPU dispatch dependency order drifted' );
 	if ( contract.resourceBytes.statePingPong !== contract.stateRecords * 16 * 2 ) throw new Error( 'SWE state ping-pong byte accounting drifted' );
 	if ( contract.resourceBytes.interactionSource !== contract.stateRecords * 8 ) throw new Error( 'SWE interaction source byte accounting drifted' );
+	if ( contract.resourceBytes.receiverLiquidPingPong !== contract.stateRecords * 4 * 2 || contract.resourceBytes.inundationTransfer !== contract.stateRecords * 4 ) throw new Error( 'SWE receiver liquid byte accounting drifted' );
 	if ( contract.resourceBytes.diagnostics !== SWE_GPU_LAYOUT.diagnostic.channels.length * 4 ) throw new Error( 'SWE diagnostic byte accounting drifted' );
 	if ( Math.max( ...Object.values( contract.storageBindingsPerStage ) ) > contract.portableStorageBufferLimitPerStage ) throw new Error( 'SWE compute stage exceeds the portable storage-buffer binding limit' );
 	if ( contract.xFaceRecords !== contract.tier.capacityTiles * ( contract.tier.tileSize + 1 ) * contract.tier.tileSize ) throw new Error( 'SWE x-face ownership count drifted' );
