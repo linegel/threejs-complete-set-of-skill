@@ -1,7 +1,13 @@
-import { numericDatum, NumericLabel } from "../../../labs/runtime/numeric-evidence.mjs";
+import { numericArray, numericDatum, NumericLabel } from "../../../labs/runtime/numeric-evidence.mjs";
 
 const LAB_ID = "webgpu-touch-history-frost";
 const ROUTE_PATH = "/mechanism/refraction-and-fresnel/index.html";
+const REVIEW_TRACE = Object.freeze({
+  start: Object.freeze({ x: 0.28, y: 0.62 }),
+  end: Object.freeze({ x: 0.72, y: 0.38 }),
+  pressure: 0.85,
+  deltaSeconds: 1 / 30,
+});
 const status = document.querySelector("[data-status]");
 const frame = document.querySelector("[data-lab]");
 const form = document.querySelector("[data-review]");
@@ -65,8 +71,29 @@ async function captureHash(mode) {
   return sha256(capture.pixels);
 }
 
+async function applyReviewTrace() {
+  await controller.resetHistory("physical-review-trace");
+  controller.queuePointerSegment(REVIEW_TRACE.start, REVIEW_TRACE.end, REVIEW_TRACE.pressure, true);
+  await controller.step(REVIEW_TRACE.deltaSeconds);
+  await controller.renderOnce();
+  const metrics = controller.getMetrics();
+  if (metrics.eventCount !== 1 || metrics.sameFrameComposite !== true) {
+    throw new Error("Deterministic Frost review trace did not reach same-frame history composition.");
+  }
+  return metrics;
+}
+
 function updateFinalizeAvailability() {
   finalizeButton.disabled = !(automatedChecks.length > 0 && canvasVisible.checked && modesDistinct.checked && notes.value.trim().length >= 20);
+}
+
+function reviewTraceEvidence() {
+  return Object.freeze({
+    start: numericArray([REVIEW_TRACE.start.x, REVIEW_TRACE.start.y], "normalized-uv", NumericLabel.AUTHORED, "frozen physical-review trace start"),
+    end: numericArray([REVIEW_TRACE.end.x, REVIEW_TRACE.end.y], "normalized-uv", NumericLabel.AUTHORED, "frozen physical-review trace end"),
+    pressure: numericDatum(REVIEW_TRACE.pressure, "ratio", NumericLabel.AUTHORED, "frozen physical-review trace pressure"),
+    deltaSeconds: numericDatum(REVIEW_TRACE.deltaSeconds, "second", NumericLabel.AUTHORED, "frozen physical-review trace timestep"),
+  });
 }
 
 async function initialize() {
@@ -93,6 +120,7 @@ async function initialize() {
     throw new Error("Immutable mechanism route is not locked to refraction-and-fresnel.");
   }
   await setSelect("[data-tier]", "balanced");
+  const reviewTraceMetrics = await applyReviewTrace();
   finalPixelHash = await captureHash("final");
   diagnosticPixelHash = await captureHash("frost-mask-after-pointer");
   await setSelect("[data-mode]", "final");
@@ -104,6 +132,7 @@ async function initialize() {
     check("native-webgpu", "public-controller-read", true, metrics.nativeWebGPU === true && metrics.rendererBackendEvidence?.deviceIdentityVerified === true),
     check("mechanism-lock", "user-facing-control", "refraction-and-fresnel", metrics.mechanism),
     check("tier-control", "user-facing-control", "balanced", metrics.tier),
+    check("review-trace", "public-controller-call", 1, reviewTraceMetrics.eventCount),
     check("diagnostic-control", "user-facing-control", "distinct-pixels", diagnosticPixelHash === finalPixelHash ? "duplicate-pixels" : "distinct-pixels"),
     check("metrics-collapsed", "direct-visual-inspection", false, metricsDrawerOpen),
   ];
@@ -192,6 +221,7 @@ form.addEventListener("submit", async (event) => {
       finalPixelHash,
       diagnosticPixelHash,
       disposeEvidence,
+      reviewTrace: reviewTraceEvidence(),
     },
     errors: {
       page: errorsBeforeDispose.filter((entry) => entry.kind === "page-error" || entry.kind === "unhandled-rejection"),

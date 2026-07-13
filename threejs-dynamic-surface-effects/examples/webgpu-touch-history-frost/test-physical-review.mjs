@@ -20,6 +20,10 @@ assert(!html.includes("—") && !html.includes("–"), "review UI must not conta
 assert(client.includes('ROUTE_PATH = "/mechanism/refraction-and-fresnel/index.html"'));
 assert(client.includes('captureHash("final")'));
 assert(client.includes('captureHash("frost-mask-after-pointer")'));
+assert(client.includes("queuePointerSegment(REVIEW_TRACE.start"), "physical review must deposit one frozen trace before inspection");
+assert(client.includes("await controller.step(REVIEW_TRACE.deltaSeconds)"), "the frozen trace must reach the same-frame compute/composite path");
+assert(client.includes('check("review-trace", "public-controller-call"'), "the state-changing trace must not be misclassified as a read");
+assert(client.includes("NumericLabel.AUTHORED"), "the retained physical-review trace values must carry numeric provenance");
 assert(client.includes('capturePixels("presentation")'), "review captures must read the currently selected presentation node");
 assert(client.includes("servedLedgerHash: null"), "browser record must remain pending offline ledger binding");
 assert(client.includes('performanceCompliance: "NOT_CLAIMED"'));
