@@ -5,6 +5,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { buildDemoRegistry } from "../../../scripts/lib/lab-registry.mjs";
 import { validateEvidenceBundle } from "../../../scripts/lib/evidence-v2.mjs";
+import { FROST_CAPTURE_RECIPES } from "./capture-recipes.js";
 
 const LAB_ID = "webgpu-touch-history-frost";
 const here = dirname(fileURLToPath(import.meta.url));
@@ -16,6 +17,15 @@ function sha256(bytes) {
 
 function requiredStandardOutputs(session) {
   return new Map((session.outputPlan ?? []).map((entry) => [entry.filename, entry]));
+}
+
+function validateFrozenRecipeSet(session) {
+  const expectedIds = FROST_CAPTURE_RECIPES.map(({ id }) => id);
+  const capturedIds = (session.hookResult?.captures ?? []).map(({ recipeId }) => recipeId);
+  if (JSON.stringify(capturedIds) !== JSON.stringify(expectedIds)) {
+    return `capture hook recipe set differs from the ${expectedIds.length}-recipe canonical order`;
+  }
+  return null;
 }
 
 export function evaluateFrostCaptureStatus({ session, expectedSourceHash, artifactRoot, bundleValidation } = {}) {
@@ -77,7 +87,8 @@ export function evaluateFrostCaptureStatus({ session, expectedSourceHash, artifa
     if (!existsSync(path)) failures.push(`${filename} artifact is missing`);
     else if (sha256(readFileSync(path)) !== entry.artifact.sha256) failures.push(`${filename} artifact hash drifted`);
   }
-  if (session.hookResult?.captures?.length !== 17) failures.push("capture hook did not retain all 17 standard and coverage recipes");
+  const recipeSetFailure = validateFrozenRecipeSet(session);
+  if (recipeSetFailure) failures.push(recipeSetFailure);
   if (session.hookResult?.visualDifferences?.verdict !== "PASS") failures.push("visual-difference gates did not pass");
   if (session.hookResult?.coverageEvidence?.verdict !== "PASS") failures.push("odd-size and DPR coverage gates did not pass");
   if (session.hookResult?.lifecycleEvidence?.verdict !== "PASS"
@@ -114,7 +125,7 @@ export function evaluateFrostCaptureStatus({ session, expectedSourceHash, artifa
     }),
     provenClaims: Object.freeze(currentCapture ? [
       "native WebGPU renderer/device identity",
-      "17 transactionally isolated Frost correctness and coverage recipes",
+      `${FROST_CAPTURE_RECIPES.length} transactionally isolated Frost correctness, coverage, and fixed-route recipes`,
       "10 standard 1200x800 outputs from retained readbacks",
       "hash-bound four-source diagnostic mosaic",
       "camera, seed, temporal, and final/no-post difference gates",

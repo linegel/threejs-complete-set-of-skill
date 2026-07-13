@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 
 import { evaluateFrostCaptureStatus } from "./capture-status.mjs";
+import { FROST_CAPTURE_RECIPES } from "./capture-recipes.js";
 
 const missing = evaluateFrostCaptureStatus();
 assert.equal(missing.verdict, "INSUFFICIENT_EVIDENCE");
@@ -41,7 +42,7 @@ const session = {
   },
   outputPlan,
   hookResult: {
-    captures: Array.from({ length: 17 }, (_, index) => ({ index })),
+    captures: FROST_CAPTURE_RECIPES.map(({ id: recipeId }) => ({ recipeId })),
     visualDifferences: { verdict: "PASS" },
     coverageEvidence: { verdict: "PASS" },
     lifecycleEvidence: {
@@ -68,5 +69,25 @@ const stale = evaluateFrostCaptureStatus({
 assert.equal(stale.verdict, "FAIL");
 assert(stale.failures.includes("capture source hash is stale"));
 assert.equal(stale.provenClaims.length, 0);
+
+const substituted = structuredClone(session);
+substituted.hookResult.captures.at(-1).recipeId = FROST_CAPTURE_RECIPES[0].id;
+const substitutedResult = evaluateFrostCaptureStatus({
+  session: substituted,
+  expectedSourceHash: "sha256:source",
+  artifactRoot: "/path/that-must-not-exist",
+  bundleValidation: {
+    valid: true,
+    protocol: "unified-v2",
+    manifest: {
+      sourceClosureHash: "sha256:source",
+      claimVerdicts: { mechanismCorrectness: "PASS", lifecycleStability: "PASS" },
+      files: [],
+    },
+  },
+});
+assert(substitutedResult.failures.includes(
+  `capture hook recipe set differs from the ${FROST_CAPTURE_RECIPES.length}-recipe canonical order`,
+));
 
 console.log("frost capture status contract passed");
