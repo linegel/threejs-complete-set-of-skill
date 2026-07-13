@@ -94,6 +94,52 @@ function requireVerifiedPerformanceInput( verified ) {
 
 }
 
+function taggedValue( datum, label, expectedLabel ) {
+
+	if ( datum === null || typeof datum !== 'object' || Array.isArray( datum ) || datum.label !== expectedLabel || Number.isFinite( datum.value ) === false || datum.value < 0 ) fail( `${ label } must be a finite nonnegative ${ expectedLabel } numeric datum.` );
+	return datum.value;
+
+}
+
+function requireTierVisualEvidence( evidence ) {
+
+	if ( evidence === null || typeof evidence !== 'object' || Array.isArray( evidence ) ) fail( 'Hardware governor projection requires tier visual evidence.' );
+	if ( evidence.schemaVersion !== 1 || evidence.kind !== 'validation-harness-tier-visual-evidence-v1' || evidence.verdict !== 'PASS' ) fail( 'Hardware governor projection requires passing v1 tier visual evidence.' );
+	if ( evidence.bindingSha256 !== hashPhysicalRecord( { binding: evidence.binding, metrics: evidence.metrics, gates: evidence.gates } ) ) fail( 'Tier visual evidence binding digest is stale.' );
+
+	const reference = evidence.binding?.reference;
+	const candidate = evidence.binding?.candidate;
+	for ( const [ row, recipeId, tier, passScale, sceneWidth, sceneHeight ] of [
+		[ reference, 'tier.target-performance.final', 'target-performance', 1, 1920, 1080 ],
+		[ candidate, 'tier.governor-stress.final', 'governor-stress', 0.5, 960, 540 ]
+	] ) {
+
+		if ( row?.recipeId !== recipeId || row?.effectiveState?.tier !== tier || row?.effectiveState?.scenario !== 'timing-and-governor' || row?.effectiveState?.mode !== 'final' || row?.effectiveState?.outputNodeMode !== 'final' ) fail( `Tier visual evidence ${ tier } route identity is invalid.` );
+		if ( row?.passScale !== passScale || row.effectiveState?.passScale !== passScale ) fail( `Tier visual evidence ${ tier } pass scale is invalid.` );
+		if ( row?.normalized?.width !== 1920 || row?.normalized?.height !== 1080 || row?.normalized?.compactByteLength !== 1920 * 1080 * 4 ) fail( `Tier visual evidence ${ tier } normalized readback is not 1920x1080 RGBA8.` );
+		if ( row?.effectiveState?.viewport?.width !== 1920 || row?.effectiveState?.viewport?.height !== 1080 || row?.effectiveState?.viewport?.dpr !== 1 ) fail( `Tier visual evidence ${ tier } viewport is invalid.` );
+		if ( row?.effectiveState?.sceneTarget?.width !== sceneWidth || row?.effectiveState?.sceneTarget?.height !== sceneHeight ) fail( `Tier visual evidence ${ tier } scene extent is invalid.` );
+		if ( row?.transaction?.status !== 'COMMITTED' || row?.transaction?.restorationVerdict !== 'PASS' || row.transaction.entryStateDigest !== row.transaction.restoredStateDigest ) fail( `Tier visual evidence ${ tier } transaction was not restored.` );
+		if ( SHA256.test( row?.pngSha256 ?? '' ) === false || SHA256.test( row?.normalized?.compactRgbaSha256 ?? '' ) === false ) fail( `Tier visual evidence ${ tier } pixels are not hash-bound.` );
+
+	}
+	if ( reference.pngSha256 === candidate.pngSha256 || reference.normalized.compactRgbaSha256 === candidate.normalized.compactRgbaSha256 ) fail( 'Tier visual evidence aliases the two quality tiers.' );
+
+	const metrics = {
+		meanRgbByteDifference: taggedValue( evidence.metrics?.meanRgbByteDifference, 'tier mean RGB difference', 'Measured' ),
+		edgeMaskPixels: taggedValue( evidence.metrics?.edgeMaskPixels, 'tier edge-mask population', 'Measured' ),
+		edgeMeanRgbByteDifference: taggedValue( evidence.metrics?.edgeMeanRgbByteDifference, 'tier edge mean RGB difference', 'Measured' ),
+		edgeP95RgbByteDifference: taggedValue( evidence.metrics?.edgeP95RgbByteDifference, 'tier edge p95 RGB difference', 'Measured' )
+	};
+	const gates = {
+		meanRgbByteDifference: taggedValue( evidence.gates?.meanRgbByteDifference, 'tier mean RGB gate', 'Gated' ),
+		edgeP95RgbByteDifference: taggedValue( evidence.gates?.edgeP95RgbByteDifference, 'tier edge p95 RGB gate', 'Gated' )
+	};
+	if ( metrics.edgeMaskPixels <= 0 || metrics.meanRgbByteDifference > gates.meanRgbByteDifference || metrics.edgeP95RgbByteDifference > gates.edgeP95RgbByteDifference ) fail( 'Tier visual evidence does not satisfy its frozen visual-error gates.' );
+	return { metrics, gates };
+
+}
+
 function mapTimestampSegment( segment, label ) {
 
 	const batches = segment.gpuTimestampBatches;
@@ -231,6 +277,25 @@ export function createRuntimePerformanceTrace( verified ) {
 		lastFrameResolveResidualMs: sustained.maximumResolveResidualMs,
 		timestampReconciliationScope: `maximum final-frame resolve residual across ${ sustained.batchCount } batches in the final sustained window; per-frame totals remain Derived`
 	};
+	return deepFreeze( trace );
+
+}
+
+export function createRuntimeGovernorTrace( verified, tierVisualEvidence ) {
+
+	const record = requireVerifiedPerformanceInput( verified );
+	const visual = requireTierVisualEvidence( tierVisualEvidence );
+	const trace = structuredClone( record.governor.trace );
+	trace.visualErrorByTier = {
+		'target-performance': {
+			meanRgbByteDifference: 0,
+			edgeMaskPixels: visual.metrics.edgeMaskPixels,
+			edgeMeanRgbByteDifference: 0,
+			edgeP95RgbByteDifference: 0
+		},
+		'governor-stress': { ...visual.metrics }
+	};
+	trace.visualErrorGates = { ...visual.gates };
 	return deepFreeze( trace );
 
 }

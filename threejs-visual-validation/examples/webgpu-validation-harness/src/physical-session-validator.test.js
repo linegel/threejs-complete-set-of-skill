@@ -7,7 +7,7 @@ import { test } from 'node:test';
 import { numericDatum } from './physical-evidence-common.js';
 import { createCorrectnessCaptureSessionFixture } from './correctness-capture-session.fixture.js';
 import { HARDWARE_PERFORMANCE_CONTRACT, HARDWARE_PERFORMANCE_ROUTE_PLAN, PHYSICAL_ROUTE_PLAN } from './in-app-evidence-plan.js';
-import { createRuntimePerformanceTrace } from './physical-performance-trace.js';
+import { createRuntimeGovernorTrace, createRuntimePerformanceTrace } from './physical-performance-trace.js';
 import { validatePhysicalEvidenceRecordFile } from './physical-validate-record.js';
 import {
 	hashPhysicalRecord,
@@ -16,7 +16,7 @@ import {
 	validatePhysicalRouteSession
 } from './physical-session-validator.js';
 import { finalizeImportedPhysicalRecord, loadVerifiedImportedPhysicalRecord } from './verified-physical-record.js';
-import { classifyGpuStageAttribution, classifyPerformanceTrace } from './runtime-v2-bundle.js';
+import { classifyGovernorTrace, classifyGpuStageAttribution, classifyPerformanceTrace } from './runtime-v2-bundle.js';
 
 const HASH_A = `sha256:${ 'a'.repeat( 64 ) }`;
 const HASH_B = `sha256:${ 'b'.repeat( 64 ) }`;
@@ -351,6 +351,48 @@ function performanceSession() {
 
 }
 
+function tierVisualEvidence() {
+
+	const binding = {
+		reference: {
+			recipeId: 'tier.target-performance.final',
+			pngSha256: HASH_A,
+			passScale: 1,
+			transaction: { status: 'COMMITTED', restorationVerdict: 'PASS', entryStateDigest: HASH_A, restoredStateDigest: HASH_A },
+			normalized: { width: 1920, height: 1080, compactByteLength: 1920 * 1080 * 4, compactRgbaSha256: HASH_B },
+			effectiveState: { scenario: 'timing-and-governor', mode: 'final', tier: 'target-performance', passScale: 1, outputNodeMode: 'final', viewport: { width: 1920, height: 1080, dpr: 1 }, sceneTarget: { width: 1920, height: 1080 } }
+		},
+		candidate: {
+			recipeId: 'tier.governor-stress.final',
+			pngSha256: HASH_C,
+			passScale: 0.5,
+			transaction: { status: 'COMMITTED', restorationVerdict: 'PASS', entryStateDigest: HASH_A, restoredStateDigest: HASH_A },
+			normalized: { width: 1920, height: 1080, compactByteLength: 1920 * 1080 * 4, compactRgbaSha256: HASH_D },
+			effectiveState: { scenario: 'timing-and-governor', mode: 'final', tier: 'governor-stress', passScale: 0.5, outputNodeMode: 'final', viewport: { width: 1920, height: 1080, dpr: 1 }, sceneTarget: { width: 960, height: 540 } }
+		}
+	};
+	const metrics = {
+		meanRgbByteDifference: numericDatum( 0.25, 'mean-rgb-byte-difference', 'Measured', 'tier readback comparison' ),
+		edgeMaskPixels: numericDatum( 100, 'pixels', 'Measured', 'reference edge mask' ),
+		edgeMeanRgbByteDifference: numericDatum( 0.5, 'mean-rgb-byte-difference', 'Measured', 'tier readback comparison' ),
+		edgeP95RgbByteDifference: numericDatum( 1, 'mean-rgb-byte-difference', 'Measured', 'tier readback comparison' )
+	};
+	const gates = {
+		meanRgbByteDifference: numericDatum( 8, 'mean-rgb-byte-difference', 'Gated', 'frozen tier gate' ),
+		edgeP95RgbByteDifference: numericDatum( 32, 'mean-rgb-byte-difference', 'Gated', 'frozen tier gate' )
+	};
+	return {
+		schemaVersion: 1,
+		kind: 'validation-harness-tier-visual-evidence-v1',
+		binding,
+		metrics,
+		gates,
+		bindingSha256: hashPhysicalRecord( { binding, metrics, gates } ),
+		verdict: 'PASS'
+	};
+
+}
+
 function correctnessCaptureSession() {
 
 	return createCorrectnessCaptureSessionFixture();
@@ -577,6 +619,37 @@ test( 'verified hardware timing maps the final sustained window without relabell
 	const sharedFrameTrace = createRuntimePerformanceTrace( sharedFrameVerified );
 	assert.equal( sharedFrameTrace.timestampRows.length, 120 );
 	assert.equal( new Set( sharedFrameTrace.timestampRows.map( ( row ) => row.frameId ) ).size, 1 );
+
+} );
+
+test( 'verified governor timing joins separately bound tier visual evidence', async () => {
+
+	const imported = await importedWrapper( performanceSession() );
+	const verified = await loadVerifiedImportedPhysicalRecord( imported.path, { expectedProfile: 'performance' } );
+	const visual = tierVisualEvidence();
+	const trace = createRuntimeGovernorTrace( verified, visual );
+	assert.equal( trace.adapterClass, 'hardware' );
+	assert.equal( trace.initialState, 'governor-stress' );
+	assert.equal( trace.visualErrorByTier[ 'target-performance' ].meanRgbByteDifference, 0 );
+	assert.equal( trace.visualErrorByTier[ 'governor-stress' ].edgeP95RgbByteDifference, 1 );
+	assert.equal( classifyGovernorTrace( trace ), 'PASS' );
+	const staleVisual = structuredClone( visual );
+	staleVisual.metrics.edgeP95RgbByteDifference.value = 40;
+	assert.throws( () => createRuntimeGovernorTrace( verified, staleVisual ), /binding digest is stale/ );
+
+	for ( const [ name, mutate, pattern ] of [
+		[ 'wrong candidate tier', ( value ) => { value.binding.candidate.effectiveState.tier = 'target-performance'; }, /route identity/ ],
+		[ 'aliased pixels', ( value ) => { value.binding.candidate.pngSha256 = value.binding.reference.pngSha256; }, /aliases/ ],
+		[ 'unrestored transaction', ( value ) => { value.binding.candidate.transaction.restorationVerdict = 'FAIL'; }, /not restored/ ],
+		[ 'empty edge mask', ( value ) => { value.metrics.edgeMaskPixels.value = 0; }, /does not satisfy/ ]
+	] ) {
+
+		const mutation = structuredClone( tierVisualEvidence() );
+		mutate( mutation );
+		mutation.bindingSha256 = hashPhysicalRecord( { binding: mutation.binding, metrics: mutation.metrics, gates: mutation.gates } );
+		assert.throws( () => createRuntimeGovernorTrace( verified, mutation ), pattern, name );
+
+	}
 
 } );
 
