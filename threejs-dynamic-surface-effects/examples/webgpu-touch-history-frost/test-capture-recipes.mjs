@@ -46,6 +46,11 @@ assert.deepEqual(FROST_STANDARD_OUTPUT_PLAN[2], {
 assert.equal(resolveFrostCaptureRecipe("no-post.design").target, "scene-color");
 assert.equal(resolveFrostCaptureRecipe("final.design").mechanism, "refraction-and-fresnel");
 assert.equal(resolveFrostCaptureRecipe("final.design").tier, "balanced");
+assert.equal(resolveFrostCaptureRecipe("final.design").trace.length, 32);
+assert.equal(resolveFrostCaptureRecipe("final.design").expectedTimeSeconds, 32 / 30);
+assert(resolveFrostCaptureRecipe("final.design").trace.every((step) => (
+  Math.hypot(step.end.x - step.start.x, step.end.y - step.start.y) <= 0.075
+)));
 assert.deepEqual(
   resolveFrostCaptureRecipe("camera.near").trace,
   resolveFrostCaptureRecipe("camera.design").trace,
@@ -69,6 +74,7 @@ for (const [name, mutate, pattern] of [
   ["non-normalized-pointer", (recipes) => { recipes[0].trace[0].start.x = 1.1; }, /normalized history UV/],
   ["zero-pressure", (recipes) => { recipes[0].trace[0].pressure = 0; }, /pressure must be/],
   ["oversized-step", (recipes) => { recipes[0].trace[0].deltaSeconds = 0.1; }, /deltaSeconds must be/],
+  ["illegibly-fast-gesture", (recipes) => { recipes[0].trace[0].end = { x: 0.5, y: 0.5 }; }, /moves too quickly/],
   ["fake-history-source", (recipes) => { recipes[0].historySource = "page screenshot"; }, /GPU history source/],
   ["mechanism-drift", (recipes) => { recipes[0].mechanism = "history-and-deposit"; }, /complete Frost mechanism/],
   ["tier-drift", (recipes) => { recipes[0].tier = "budgeted"; }, /frozen correctness tier/],

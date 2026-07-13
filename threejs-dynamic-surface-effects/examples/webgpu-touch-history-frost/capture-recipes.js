@@ -32,17 +32,34 @@ const TRANSACTION = Object.freeze({
   parentRouteMutationAllowed: false,
 });
 
-const BASE_TRACE = Object.freeze([
+const BASE_GESTURE = Object.freeze([
   Object.freeze({ start: Object.freeze({ x: 0.16, y: 0.72 }), end: Object.freeze({ x: 0.34, y: 0.61 }), pressure: 0.92, deltaSeconds: 1 / 30 }),
   Object.freeze({ start: Object.freeze({ x: 0.34, y: 0.61 }), end: Object.freeze({ x: 0.52, y: 0.69 }), pressure: 0.86, deltaSeconds: 1 / 30 }),
   Object.freeze({ start: Object.freeze({ x: 0.52, y: 0.69 }), end: Object.freeze({ x: 0.69, y: 0.53 }), pressure: 0.96, deltaSeconds: 1 / 30 }),
   Object.freeze({ start: Object.freeze({ x: 0.69, y: 0.53 }), end: Object.freeze({ x: 0.81, y: 0.35 }), pressure: 0.78, deltaSeconds: 1 / 30 }),
 ]);
 
-const CAMERA_TRACE = Object.freeze(BASE_TRACE.slice(0, 3));
+function subdivideTrace(trace, subdivisionCount = 8) {
+  return Object.freeze(trace.flatMap((step) => Array.from({ length: subdivisionCount }, (_, index) => {
+    const startT = index / subdivisionCount;
+    const endT = (index + 1) / subdivisionCount;
+    const interpolate = (axis, t) => step.start[axis] + (step.end[axis] - step.start[axis]) * t;
+    return Object.freeze({
+      start: Object.freeze({ x: interpolate("x", startT), y: interpolate("y", startT) }),
+      end: Object.freeze({ x: interpolate("x", endT), y: interpolate("y", endT) }),
+      pressure: step.pressure,
+      deltaSeconds: step.deltaSeconds,
+    });
+  })));
+}
+
+const BASE_TRACE = subdivideTrace(BASE_GESTURE);
+const CAMERA_TRACE = Object.freeze(BASE_TRACE.slice(0, 24));
 const SEED_TRACE = Object.freeze([
   ...BASE_TRACE,
-  Object.freeze({ start: Object.freeze({ x: 0.26, y: 0.29 }), end: Object.freeze({ x: 0.47, y: 0.37 }), pressure: 0.81, deltaSeconds: 1 / 30 }),
+  ...subdivideTrace([
+    Object.freeze({ start: Object.freeze({ x: 0.26, y: 0.29 }), end: Object.freeze({ x: 0.47, y: 0.37 }), pressure: 0.81, deltaSeconds: 1 / 30 }),
+  ]),
 ]);
 
 const TEMPORAL_BASE_TRACE = Object.freeze([]);
@@ -156,6 +173,10 @@ function validateTraceStep(step, label) {
   }
 }
 
+function pointerDistance(step) {
+  return Math.hypot(step.end.x - step.start.x, step.end.y - step.start.y);
+}
+
 function recipeSemanticSignature(recipeDefinition) {
   return JSON.stringify({
     target: recipeDefinition.target,
@@ -200,6 +221,9 @@ export function validateFrostCaptureRecipes(recipes = FROST_CAPTURE_RECIPES, { r
       throw new Error(`${label} requires real pointer history steps`);
     }
     entry.trace.forEach((step, stepIndex) => validateTraceStep(step, `${label}.trace[${stepIndex}]`));
+    if (!entry.id.startsWith("temporal.") && entry.trace.some((step) => pointerDistance(step) > 0.075)) {
+      throw new Error(`${label} moves too quickly to produce legible raw history evidence`);
+    }
     if (!Number.isInteger(entry.initialTraceLength) || !Number.isInteger(entry.temporalTraceLength)
       || entry.initialTraceLength + entry.temporalTraceLength !== entry.trace.length) {
       throw new Error(`${label} trace partition does not reconcile`);
