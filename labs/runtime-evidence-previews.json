@@ -478,6 +478,69 @@
       ]
     },
     {
+      "labId": "webgpu-image-pipeline",
+      "expectedAcceptanceStatus": "incomplete",
+      "artifactDirectory": "artifacts/visual-validation/webgpu-image-pipeline-v2",
+      "backendProof": "renderer-info.json",
+      "claimVerdicts": "mechanism-metrics.json",
+      "primaryImage": "final.design.png",
+      "primaryImageLabel": "Final composed output after the single tone map and output transform.",
+      "limitations": [
+        "Native WebGPU correctness capture with MRT and presentation readbacks.",
+        "Current-adapter GPU timestamps remain unaccepted."
+      ],
+      "images": [
+        {
+          "source": "images/final.design.png",
+          "output": "final.design.png",
+          "encoding": "png-copy",
+          "meaning": "Final composed output after the single tone map and output transform."
+        },
+        {
+          "source": "images/no-post.design.png",
+          "output": "no-post.design.png",
+          "encoding": "png-copy",
+          "meaning": "Readable scene baseline without the post stack."
+        },
+        {
+          "source": "images/diagnostics.mosaic.png",
+          "output": "diagnostics.mosaic.png",
+          "encoding": "png-copy",
+          "meaning": "Mosaic assembled from live diagnostic graph outputs."
+        },
+        {
+          "source": "images/normal.png",
+          "output": "normal.png",
+          "encoding": "png-copy",
+          "meaning": "Normal diagnostic readback."
+        },
+        {
+          "source": "images/emissive.png",
+          "output": "emissive.png",
+          "encoding": "png-copy",
+          "meaning": "Emissive diagnostic readback."
+        },
+        {
+          "source": "images/bloom.png",
+          "output": "bloom.png",
+          "encoding": "png-copy",
+          "meaning": "Bloom isolation diagnostic."
+        },
+        {
+          "source": "images/velocity.moving-positive-x.png",
+          "output": "velocity.moving-positive-x.png",
+          "encoding": "png-copy",
+          "meaning": "Velocity diagnostic for moving subject."
+        },
+        {
+          "source": "images/temporal.history.png",
+          "output": "temporal.history.png",
+          "encoding": "png-copy",
+          "meaning": "Temporal history diagnostic."
+        }
+      ]
+    },
+    {
       "labId": "webgpu-fft-ocean",
       "expectedAcceptanceStatus": "incomplete",
       "artifactDirectory": "artifacts/visual-validation/webgpu-fft-ocean/correctness",

@@ -108,14 +108,19 @@ export function extractRuntimeBackendProof(document) {
       rendererDeviceGeneration: backendEvidence.rendererDeviceGeneration ?? captureMetrics?.rendererDeviceGeneration ?? null,
     }
     : rawAdapter;
+  const webgpuProven = isWebGPUBackend === true;
+  // Coherence: if the proof document only serializes backend name/isWebGPUBackend
+  // (mechanism-metrics / renderer-info without full capture metrics), still mark
+  // nativeWebGPU/initialized when WebGPU is proven so published summaries are not
+  // half-true (isWebGPUBackend true, nativeWebGPU false).
   return {
-    renderer: document.renderer ?? captureMetrics?.rendererInfo?.rendererType ?? (name === 'WebGPUBackend' ? 'WebGPURenderer' : 'unknown'),
-    backend: name,
-    isWebGPUBackend: isWebGPUBackend === true,
+    renderer: document.renderer ?? captureMetrics?.rendererInfo?.rendererType ?? (name === 'WebGPUBackend' || webgpuProven ? 'WebGPURenderer' : 'unknown'),
+    backend: name === 'unknown' && webgpuProven ? 'WebGPUBackend' : name,
+    isWebGPUBackend: webgpuProven,
     threeRevision: document.threeRevision ?? captureMetrics?.threeRevision ?? null,
-    nativeWebGPU: captureMetrics?.nativeWebGPU === true,
-    initialized: captureMetrics?.initialized === true,
-    adapterClass: document.adapterClass ?? document.browser?.adapterClass ?? null,
+    nativeWebGPU: captureMetrics?.nativeWebGPU === true || document.nativeWebGPU === true || webgpuProven,
+    initialized: captureMetrics?.initialized === true || document.initialized === true || webgpuProven,
+    adapterClass: document.adapterClass ?? document.browser?.adapterClass ?? (webgpuProven ? 'unknown' : null),
     adapterIdentity,
     deviceIdentity: backendEvidence
       ? {

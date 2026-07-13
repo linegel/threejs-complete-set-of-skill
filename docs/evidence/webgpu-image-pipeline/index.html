@@ -4,25 +4,25 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Evidence: WebGPU Image Pipeline | WebGPU Lab</title>
-<meta name="description" content="Evidence report for WebGPU Image Pipeline: accepted canonical-lab, source hash, Three.js revision, claim verdicts, required proofs, routes, media hashes, and…" />
+<meta name="description" content="Evidence report for WebGPU Image Pipeline: incomplete canonical-lab, source hash, Three.js revision, claim verdicts, required proofs, routes, media hashes, and…" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <link rel="canonical" href="https://threejs-skills.com/evidence/webgpu-image-pipeline/" />
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 <meta property="og:type" content="article" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
 <meta property="og:title" content="Evidence: WebGPU Image Pipeline | WebGPU Lab" />
-<meta property="og:description" content="Evidence report for WebGPU Image Pipeline: accepted canonical-lab, source hash, Three.js revision, claim verdicts, required proofs, routes, media hashes, and…" />
+<meta property="og:description" content="Evidence report for WebGPU Image Pipeline: incomplete canonical-lab, source hash, Three.js revision, claim verdicts, required proofs, routes, media hashes, and…" />
 <meta property="og:url" content="https://threejs-skills.com/evidence/webgpu-image-pipeline/" />
 <meta property="og:image" content="https://threejs-skills.com/visual-validation/webgpu-image-pipeline/final.design.png" />
 <meta property="og:image:type" content="image/png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="800" />
-<meta property="og:image:alt" content="WebGPU Image Pipeline: Final design presentation" />
+<meta property="og:image:alt" content="WebGPU Image Pipeline: Final composed output after the single tone map and output transform." />
 <meta name="twitter:image" content="https://threejs-skills.com/visual-validation/webgpu-image-pipeline/final.design.png" />
-<meta name="twitter:image:alt" content="WebGPU Image Pipeline: Final design presentation" />
+<meta name="twitter:image:alt" content="WebGPU Image Pipeline: Final composed output after the single tone map and output transform." />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Evidence: WebGPU Image Pipeline | WebGPU Lab" />
-<meta name="twitter:description" content="Evidence report for WebGPU Image Pipeline: accepted canonical-lab, source hash, Three.js revision, claim verdicts, required proofs, routes, media hashes, and…" />
+<meta name="twitter:description" content="Evidence report for WebGPU Image Pipeline: incomplete canonical-lab, source hash, Three.js revision, claim verdicts, required proofs, routes, media hashes, and…" />
 <style>
 @font-face{font-family:'Evidence Sans';src:url('/assets/vendor/katex/fonts/KaTeX_SansSerif-Regular.woff2') format('woff2');font-weight:400;font-display:swap}
 @font-face{font-family:'Evidence Sans';src:url('/assets/vendor/katex/fonts/KaTeX_SansSerif-Bold.woff2') format('woff2');font-weight:700;font-display:swap}
@@ -33,13 +33,13 @@
 @media(max-width:480px){.wrap{width:min(100% - 24px,1160px)}.facts{grid-template-columns:1fr}h1{font-size:40px}.claim{align-items:flex-start;flex-direction:column}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 </style>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":["TechArticle","Dataset"],"@id":"https://threejs-skills.com/evidence/webgpu-image-pipeline/#report","name":"Evidence report: WebGPU Image Pipeline","description":"Evidence report for WebGPU Image Pipeline: accepted canonical-lab, source hash, Three.js revision, claim verdicts, required proofs, routes, media hashes, and…","url":"https://threejs-skills.com/evidence/webgpu-image-pipeline/","inLanguage":"en","isPartOf":{"@id":"https://threejs-skills.com/#software"},"about":["threejs-image-pipeline","webgpu-image-pipeline","Three.js","WebGPU","TSL"],"image":"https://threejs-skills.com/visual-validation/webgpu-image-pipeline/final.design.png"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":["TechArticle","Dataset"],"@id":"https://threejs-skills.com/evidence/webgpu-image-pipeline/#report","name":"Evidence report: WebGPU Image Pipeline","description":"Evidence report for WebGPU Image Pipeline: incomplete canonical-lab, source hash, Three.js revision, claim verdicts, required proofs, routes, media hashes, and…","url":"https://threejs-skills.com/evidence/webgpu-image-pipeline/","inLanguage":"en","isPartOf":{"@id":"https://threejs-skills.com/#software"},"about":["threejs-image-pipeline","webgpu-image-pipeline","Three.js","WebGPU","TSL"],"image":"https://threejs-skills.com/visual-validation/webgpu-image-pipeline/final.design.png"}</script>
 </head>
 <body>
 <header class="site-nav"><div class="wrap"><a href="/">Three.js WebGPU Skill Pack</a><nav aria-label="Primary"><a href="/#skills">Skills</a><a href="/#labs">Labs</a><a href="/evidence/">Evidence</a><a href="/about/">Method</a></nav></div></header>
 <main><div class="wrap">
   <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Skill Pack</a> / <a href="/evidence/">Evidence</a> / webgpu-image-pipeline</nav>
-  <p><span class="status status--accepted">accepted</span></p>
+  <p><span class="status status--incomplete">incomplete</span></p>
   <h1>WebGPU Image Pipeline</h1>
   <p class="lede">This report separates published implementation state from accepted evidence. Every value below comes from the schema-v2 registry, the emitted source manifest, or promoted same-lab artifacts.</p>
   <div class="actions"><a href="/demos/webgpu-image-pipeline/">Open demo</a><a href="/skills/threejs-image-pipeline.html">Owning skill</a><a href="/demos/webgpu-image-pipeline/source-manifest.json">Published source manifest</a><a href="/demos/registry.json">Registry JSON</a><a href="/visual-validation/webgpu-image-pipeline/evidence-summary.json">Promoted evidence summary</a><a href="/visual-validation/webgpu-image-pipeline/bundle/evidence-manifest.json">Tracked v2 bundle manifest</a><a href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-image-pipeline">Canonical source</a></div>
@@ -49,60 +49,52 @@
     <div><dt>Owning skill</dt><dd>Image Pipeline</dd></div>
     <div><dt>Execution</dt><dd>rendering</dd></div>
     <div><dt>Three.js</dt><dd>0.185.1</dd></div>
-    <div><dt>Source hash</dt><dd><code>sha256:1abae9bb29b9f64aa5cd70ae7c916d0c0371304da94e7a6190630834b311c0ec</code></dd></div>
-    <div><dt>Published bundle hash</dt><dd><code>sha256:0772fc4768b83166bbcbcd692cb62964a77cf714c05f980e473fa822aaca5193</code></dd></div>
-    <div><dt>Build revision</dt><dd><code>sha256:7ba7b3cc2b0ff75eb71ecf5d8b8e7b6bdf9407d8570076f6a6bce907a7e649d6</code></dd></div>
+    <div><dt>Source hash</dt><dd><code>sha256:f55e0e6af55f99dffc4c5160bdecf74eb36a5d1daa196b7fa0366810565d348b</code></dd></div>
+    <div><dt>Published bundle hash</dt><dd><code>sha256:23b24c46eaac42d0e8189300a08c50296549bd903afd5a74769849777efe82b1</code></dd></div>
+    <div><dt>Build revision</dt><dd><code>sha256:4754cb3c1dfa6966f3bb946b270578476d12628fa2ac597ec254ab8568601690</code></dd></div>
     <div><dt>Renderer</dt><dd>WebGPURenderer</dd></div>
-    <div><dt>Backend</dt><dd>WebGPU</dd></div>
+    <div><dt>Backend</dt><dd>WebGPUBackend</dd></div>
     <div><dt>Evidence contract</dt><dd>v2</dd></div>
     <div><dt>Tracked release bundle</dt><dd>Present</dd></div>
   </dl>
 
-  <section class="section" aria-labelledby="claims-title"><h2 id="claims-title">Claim verdicts</h2><div class="claim-grid"><div class="claim"><code>visualCorrectness</code><span class="verdict--pass">PASS</span></div><div class="claim"><code>mechanismCorrectness</code><span class="verdict--pass">PASS</span></div><div class="claim"><code>performanceCompliance</code><span class="verdict--not-claimed">NOT_CLAIMED</span></div><div class="claim"><code>gpuAttribution</code><span class="verdict--not-claimed">NOT_CLAIMED</span></div><div class="claim"><code>lifecycleStability</code><span class="verdict--pass">PASS</span></div><div class="claim"><code>visualError</code><span class="verdict--pass">PASS</span></div></div></section>
+  <section class="section" aria-labelledby="claims-title"><h2 id="claims-title">Claim verdicts</h2><div class="claim-grid"><div class="claim"><code>visualCorrectness</code><span class="verdict--pass">PASS</span></div><div class="claim"><code>mechanismCorrectness</code><span class="verdict--pass">PASS</span></div><div class="claim"><code>performanceCompliance</code><span class="verdict--insufficient-evidence">INSUFFICIENT_EVIDENCE</span></div><div class="claim"><code>gpuAttribution</code><span class="verdict--insufficient-evidence">INSUFFICIENT_EVIDENCE</span></div><div class="claim"><code>lifecycleStability</code><span class="verdict--insufficient-evidence">INSUFFICIENT_EVIDENCE</span></div></div></section>
 
   <section class="section" aria-labelledby="media-title"><h2 id="media-title">Promoted same-lab media</h2><div class="gallery"><figure><picture class="responsive-preview">
           <source type="image/avif" srcset="/visual-validation/webgpu-image-pipeline/final.design.avif" />
           <source type="image/webp" srcset="/visual-validation/webgpu-image-pipeline/final.design.webp" />
-          <img data-responsive-preview src="/visual-validation/webgpu-image-pipeline/final.design.png" alt="WebGPU Image Pipeline: Final design presentation" width="1200" height="800" loading="lazy" decoding="async" />
-        </picture><figcaption><strong>Final design presentation</strong><span>inspected-runtime-evidence-preview · sha256:d51976bc09cf8e830f7c9c7d70745a74b50d036b7cd3b5f23fde230eac69b28e</span></figcaption></figure><figure><picture class="responsive-preview">
+          <img data-responsive-preview src="/visual-validation/webgpu-image-pipeline/final.design.png" alt="WebGPU Image Pipeline: Final composed output after the single tone map and output transform." width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><figcaption><strong>Final composed output after the single tone map and output transform.</strong><span>inspected-runtime-evidence-preview · sha256:40fe6a9b4022d2838260a7dd31bf9d26f6b3e4961801b37430d9f4295b6dcca9</span></figcaption></figure><figure><picture class="responsive-preview">
           <source type="image/avif" srcset="/visual-validation/webgpu-image-pipeline/no-post.design.avif" />
           <source type="image/webp" srcset="/visual-validation/webgpu-image-pipeline/no-post.design.webp" />
-          <img data-responsive-preview src="/visual-validation/webgpu-image-pipeline/no-post.design.png" alt="WebGPU Image Pipeline: No-post / baseline presentation" width="1200" height="800" loading="lazy" decoding="async" />
-        </picture><figcaption><strong>No-post / baseline presentation</strong><span>inspected-runtime-evidence-preview · sha256:9c3c4570a6d5b49921a9e19935a8871aaf8a2bc1126881e451e091a38bc073ce</span></figcaption></figure><figure><picture class="responsive-preview">
+          <img data-responsive-preview src="/visual-validation/webgpu-image-pipeline/no-post.design.png" alt="WebGPU Image Pipeline: Readable scene baseline without the post stack." width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><figcaption><strong>Readable scene baseline without the post stack.</strong><span>inspected-runtime-evidence-preview · sha256:4613c3a4337dfaf74d74d69fa3fb261212b93e1b66f4a5cd8904e43484881a78</span></figcaption></figure><figure><picture class="responsive-preview">
           <source type="image/avif" srcset="/visual-validation/webgpu-image-pipeline/diagnostics.mosaic.avif" />
           <source type="image/webp" srcset="/visual-validation/webgpu-image-pipeline/diagnostics.mosaic.webp" />
-          <img data-responsive-preview src="/visual-validation/webgpu-image-pipeline/diagnostics.mosaic.png" alt="WebGPU Image Pipeline: Diagnostics mosaic" width="1200" height="800" loading="lazy" decoding="async" />
-        </picture><figcaption><strong>Diagnostics mosaic</strong><span>inspected-runtime-evidence-preview · sha256:7af681740a632c0c63f400f6920235e639aaaffceabd834015927b22ac0f459f</span></figcaption></figure><figure><picture class="responsive-preview">
-          <source type="image/avif" srcset="/visual-validation/webgpu-image-pipeline/camera.near.avif" />
-          <source type="image/webp" srcset="/visual-validation/webgpu-image-pipeline/camera.near.webp" />
-          <img data-responsive-preview src="/visual-validation/webgpu-image-pipeline/camera.near.png" alt="WebGPU Image Pipeline: Near camera" width="1200" height="800" loading="lazy" decoding="async" />
-        </picture><figcaption><strong>Near camera</strong><span>inspected-runtime-evidence-preview · sha256:21a7a30550a8ff91df1706fccfd4bf6c19ad247e46c8e225f6221b369718da60</span></figcaption></figure><figure><picture class="responsive-preview">
-          <source type="image/avif" srcset="/visual-validation/webgpu-image-pipeline/camera.design.avif" />
-          <source type="image/webp" srcset="/visual-validation/webgpu-image-pipeline/camera.design.webp" />
-          <img data-responsive-preview src="/visual-validation/webgpu-image-pipeline/camera.design.png" alt="WebGPU Image Pipeline: Design camera" width="1200" height="800" loading="lazy" decoding="async" />
-        </picture><figcaption><strong>Design camera</strong><span>inspected-runtime-evidence-preview · sha256:0aee9b848ada996eba1c4037fd41f423d00fa01d6ef29d529d140936d369482c</span></figcaption></figure><figure><picture class="responsive-preview">
-          <source type="image/avif" srcset="/visual-validation/webgpu-image-pipeline/camera.far.avif" />
-          <source type="image/webp" srcset="/visual-validation/webgpu-image-pipeline/camera.far.webp" />
-          <img data-responsive-preview src="/visual-validation/webgpu-image-pipeline/camera.far.png" alt="WebGPU Image Pipeline: Far camera" width="1200" height="800" loading="lazy" decoding="async" />
-        </picture><figcaption><strong>Far camera</strong><span>inspected-runtime-evidence-preview · sha256:3a7ed03d1594cd9e0b3c5f327c42ebb89ce53e9ed778a770dbfc08b60ec10d3e</span></figcaption></figure><figure><picture class="responsive-preview">
-          <source type="image/avif" srcset="/visual-validation/webgpu-image-pipeline/seed-0001.final.avif" />
-          <source type="image/webp" srcset="/visual-validation/webgpu-image-pipeline/seed-0001.final.webp" />
-          <img data-responsive-preview src="/visual-validation/webgpu-image-pipeline/seed-0001.final.png" alt="WebGPU Image Pipeline: Representative seed final" width="1200" height="800" loading="lazy" decoding="async" />
-        </picture><figcaption><strong>Representative seed final</strong><span>inspected-runtime-evidence-preview · sha256:f6ca134b4a88e7ccbecb6fa192658ce61e9c8583e029479e81ecaeccead89123</span></figcaption></figure><figure><picture class="responsive-preview">
-          <source type="image/avif" srcset="/visual-validation/webgpu-image-pipeline/seed-9e3779b9.final.avif" />
-          <source type="image/webp" srcset="/visual-validation/webgpu-image-pipeline/seed-9e3779b9.final.webp" />
-          <img data-responsive-preview src="/visual-validation/webgpu-image-pipeline/seed-9e3779b9.final.png" alt="WebGPU Image Pipeline: Stress seed final" width="1200" height="800" loading="lazy" decoding="async" />
-        </picture><figcaption><strong>Stress seed final</strong><span>inspected-runtime-evidence-preview · sha256:49ffb25262c1c73fe516336671a0db52b33a4aa531c77ca96d3ec5c06094a8fc</span></figcaption></figure><figure><picture class="responsive-preview">
-          <source type="image/avif" srcset="/visual-validation/webgpu-image-pipeline/temporal.t000.avif" />
-          <source type="image/webp" srcset="/visual-validation/webgpu-image-pipeline/temporal.t000.webp" />
-          <img data-responsive-preview src="/visual-validation/webgpu-image-pipeline/temporal.t000.png" alt="WebGPU Image Pipeline: Temporal t0" width="1200" height="800" loading="lazy" decoding="async" />
-        </picture><figcaption><strong>Temporal t0</strong><span>inspected-runtime-evidence-preview · sha256:1d8e7ece19bb56ab8607c04072e3c20c5b1b88c1b91834c6d58966a2b6cf77e0</span></figcaption></figure><figure><picture class="responsive-preview">
-          <source type="image/avif" srcset="/visual-validation/webgpu-image-pipeline/temporal.t001.avif" />
-          <source type="image/webp" srcset="/visual-validation/webgpu-image-pipeline/temporal.t001.webp" />
-          <img data-responsive-preview src="/visual-validation/webgpu-image-pipeline/temporal.t001.png" alt="WebGPU Image Pipeline: Temporal t1" width="1200" height="800" loading="lazy" decoding="async" />
-        </picture><figcaption><strong>Temporal t1</strong><span>inspected-runtime-evidence-preview · sha256:4ef25eccb97e7c9e5c862d255df672cc8d4a84f5e67939758c02c64859623aaf</span></figcaption></figure></div></section>
+          <img data-responsive-preview src="/visual-validation/webgpu-image-pipeline/diagnostics.mosaic.png" alt="WebGPU Image Pipeline: Mosaic assembled from live diagnostic graph outputs." width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><figcaption><strong>Mosaic assembled from live diagnostic graph outputs.</strong><span>inspected-runtime-evidence-preview · sha256:1819175ad2c93f4b688c44f29ff975f20d517f8dc2f573362c74d31aae615c4b</span></figcaption></figure><figure><picture class="responsive-preview">
+          <source type="image/avif" srcset="/visual-validation/webgpu-image-pipeline/normal.avif" />
+          <source type="image/webp" srcset="/visual-validation/webgpu-image-pipeline/normal.webp" />
+          <img data-responsive-preview src="/visual-validation/webgpu-image-pipeline/normal.png" alt="WebGPU Image Pipeline: Normal diagnostic readback." width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><figcaption><strong>Normal diagnostic readback.</strong><span>inspected-runtime-evidence-preview · sha256:317126f75c6f6c3d57610c7329d0a847b90aa5b352b7e8cb986e06b09cb66705</span></figcaption></figure><figure><picture class="responsive-preview">
+          <source type="image/avif" srcset="/visual-validation/webgpu-image-pipeline/emissive.avif" />
+          <source type="image/webp" srcset="/visual-validation/webgpu-image-pipeline/emissive.webp" />
+          <img data-responsive-preview src="/visual-validation/webgpu-image-pipeline/emissive.png" alt="WebGPU Image Pipeline: Emissive diagnostic readback." width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><figcaption><strong>Emissive diagnostic readback.</strong><span>inspected-runtime-evidence-preview · sha256:43a75957c1b3cba9e70b12f51aa5b70c887e2f261a8d795ca1a78d9ff3883a85</span></figcaption></figure><figure><picture class="responsive-preview">
+          <source type="image/avif" srcset="/visual-validation/webgpu-image-pipeline/bloom.avif" />
+          <source type="image/webp" srcset="/visual-validation/webgpu-image-pipeline/bloom.webp" />
+          <img data-responsive-preview src="/visual-validation/webgpu-image-pipeline/bloom.png" alt="WebGPU Image Pipeline: Bloom isolation diagnostic." width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><figcaption><strong>Bloom isolation diagnostic.</strong><span>inspected-runtime-evidence-preview · sha256:8544bff67aee8473b42309c740dcd088b621c4754f880c68495da7af3ecdb0ca</span></figcaption></figure><figure><picture class="responsive-preview">
+          <source type="image/avif" srcset="/visual-validation/webgpu-image-pipeline/velocity.moving-positive-x.avif" />
+          <source type="image/webp" srcset="/visual-validation/webgpu-image-pipeline/velocity.moving-positive-x.webp" />
+          <img data-responsive-preview src="/visual-validation/webgpu-image-pipeline/velocity.moving-positive-x.png" alt="WebGPU Image Pipeline: Velocity diagnostic for moving subject." width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><figcaption><strong>Velocity diagnostic for moving subject.</strong><span>inspected-runtime-evidence-preview · sha256:f2ebc4dc58e95dbd78e31e034769bc259bdfe8a7547ef537b2bce215af56d04e</span></figcaption></figure><figure><picture class="responsive-preview">
+          <source type="image/avif" srcset="/visual-validation/webgpu-image-pipeline/temporal.history.avif" />
+          <source type="image/webp" srcset="/visual-validation/webgpu-image-pipeline/temporal.history.webp" />
+          <img data-responsive-preview src="/visual-validation/webgpu-image-pipeline/temporal.history.png" alt="WebGPU Image Pipeline: Temporal history diagnostic." width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><figcaption><strong>Temporal history diagnostic.</strong><span>inspected-runtime-evidence-preview · sha256:570eb48d52d9e88161c771af93d62b923b4ab7965aff0d63a87e64dceebffddf</span></figcaption></figure></div></section>
 
-  <section class="section" aria-labelledby="requirements-title"><h2 id="requirements-title">Required capability and runtime proof</h2><h3>Capabilities</h3><div class="requirement-grid"><article class="requirement"><header><code>native-webgpu</code><span class="status status--accepted">accepted</span></header><p>renderer-info.json isWebGPUBackend=true; mechanism-metrics WebGPUBackend r185 v2 bundle.</p></article><article class="requirement"><header><code>timestamp-query</code><span class="status status--accepted">accepted</span></header><p>required for performance claims; correctness capture does not accept current-adapter timestamps.</p></article></div><h3 style="margin-top:28px">Runtime proof</h3><div class="requirement-grid"><article class="requirement"><header><code>renderer-init</code><span class="status status--accepted">accepted</span></header><p>canonical capture initializes WebGPURenderer; renderer-info.json records native backend.</p></article><article class="requirement"><header><code>mrt-readback</code><span class="status status--accepted">accepted</span></header><p>validate:artifacts passes normal/emissive/velocity/final RT readbacks in webgpu-image-pipeline-v2.</p></article><article class="requirement"><header><code>temporal-reset</code><span class="status status--accepted">accepted</span></header><p>temporal.history / after-reset readbacks validated; temporal-reset proof in mechanism-metrics path.</p></article><article class="requirement"><header><code>current-adapter-timing</code><span class="status status--accepted">accepted</span></header><p>Current-adapter GPU timestamps remain INSUFFICIENT_EVIDENCE.</p></article><article class="requirement"><header><code>backend-is-webgpu</code><span class="status status--accepted">accepted</span></header><p>Accepted publishable release-bundle covers backend-is-webgpu for webgpu-image-pipeline.</p></article><article class="requirement"><header><code>mechanism-reachable</code><span class="status status--accepted">accepted</span></header><p>Accepted publishable release-bundle covers mechanism-reachable for webgpu-image-pipeline.</p></article><article class="requirement"><header><code>render-or-compute-work</code><span class="status status--accepted">accepted</span></header><p>Accepted publishable release-bundle covers render-or-compute-work for webgpu-image-pipeline.</p></article><article class="requirement"><header><code>aligned-readback</code><span class="status status--accepted">accepted</span></header><p>Accepted publishable release-bundle covers aligned-readback for webgpu-image-pipeline.</p></article></div></section>
+  <section class="section" aria-labelledby="requirements-title"><h2 id="requirements-title">Required capability and runtime proof</h2><h3>Capabilities</h3><div class="requirement-grid"><article class="requirement"><header><code>native-webgpu</code><span class="status status--accepted">accepted</span></header><p>renderer-info.json isWebGPUBackend=true; mechanism-metrics WebGPUBackend r185 v2 bundle.</p></article><article class="requirement"><header><code>timestamp-query</code><span class="status status--incomplete">incomplete</span></header><p>required for performance claims; correctness capture does not accept current-adapter timestamps. Status incomplete (not accepted).</p></article></div><h3 style="margin-top:28px">Runtime proof</h3><div class="requirement-grid"><article class="requirement"><header><code>renderer-init</code><span class="status status--accepted">accepted</span></header><p>canonical capture initializes WebGPURenderer; renderer-info.json records native backend.</p></article><article class="requirement"><header><code>mrt-readback</code><span class="status status--accepted">accepted</span></header><p>validate:artifacts passes normal/emissive/velocity/final RT readbacks in webgpu-image-pipeline-v2.</p></article><article class="requirement"><header><code>temporal-reset</code><span class="status status--accepted">accepted</span></header><p>temporal.history / after-reset readbacks validated; temporal-reset proof in mechanism-metrics path.</p></article><article class="requirement"><header><code>current-adapter-timing</code><span class="status status--incomplete">incomplete</span></header><p>Current-adapter GPU timestamps remain INSUFFICIENT_EVIDENCE; correctness capture does not claim performance timing.</p></article><article class="requirement"><header><code>backend-is-webgpu</code><span class="status status--accepted">accepted</span></header><p>Accepted publishable release-bundle covers backend-is-webgpu for webgpu-image-pipeline.</p></article><article class="requirement"><header><code>mechanism-reachable</code><span class="status status--accepted">accepted</span></header><p>Accepted publishable release-bundle covers mechanism-reachable for webgpu-image-pipeline.</p></article><article class="requirement"><header><code>render-or-compute-work</code><span class="status status--accepted">accepted</span></header><p>Accepted publishable release-bundle covers render-or-compute-work for webgpu-image-pipeline.</p></article><article class="requirement"><header><code>aligned-readback</code><span class="status status--accepted">accepted</span></header><p>Accepted publishable release-bundle covers aligned-readback for webgpu-image-pipeline.</p></article></div></section>
 
   <section class="section" aria-labelledby="capture-title"><h2 id="capture-title">Capture state</h2><div class="table-wrap"><table><thead><tr><th>Field</th><th>Published value</th></tr></thead><tbody><tr><td>Primary route</td><td><code>/demos/webgpu-image-pipeline/</code></td></tr><tr><td>Cameras</td><td><code>near, design, far</code></td></tr><tr><td>Seeds</td><td><code>0x00000001, 0x9e3779b9</code></td></tr><tr><td>Modes</td><td><code>final, no-post, output, depth, view-z, linear-depth, normal, emissive, velocity, ao, bloom, exposure, temporal-current, temporal-history, temporal-resolved, albedo-extra-pass</code></td></tr><tr><td>Capture time</td><td><code>Not present in the promoted report data</code></td></tr><tr><td>Adapter identity</td><td><code>Not promoted</code></td></tr><tr><td>Raw readback hashes</td><td><code>Not present in the promoted preview summary</code></td></tr></tbody></table></div></section>
 
@@ -179,8 +171,8 @@
   ]
 }</pre></details></section>
 
-  <section class="section" aria-labelledby="limitations-title"><h2 id="limitations-title">Limitations</h2><ul class="limitations"><li>Performance and GPU attribution remain NOT_CLAIMED unless a hardware performance lane is present.</li><li>Promoted media are native-WebGPU correctness readbacks bound by the accepted release-bundle ledger.</li></ul></section>
-  <footer class="site-footer"><span>webgpu-image-pipeline · sha256:1abae9bb29b9</span><span><a href="/evidence/">All evidence reports</a></span></footer>
+  <section class="section" aria-labelledby="limitations-title"><h2 id="limitations-title">Limitations</h2><ul class="limitations"><li>Native WebGPU correctness capture with MRT and presentation readbacks.</li><li>Current-adapter GPU timestamps remain unaccepted.</li></ul></section>
+  <footer class="site-footer"><span>webgpu-image-pipeline · sha256:f55e0e6af55f</span><span><a href="/evidence/">All evidence reports</a></span></footer>
 </div></main>
 </body>
 </html>

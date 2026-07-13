@@ -4,7 +4,7 @@
   "skill": "threejs-image-pipeline",
   "threeRevision": "0.185.1",
   "kind": "canonical-lab",
-  "status": "accepted",
+  "status": "incomplete",
   "canonicalSource": [
     "threejs-image-pipeline/examples/webgpu-image-pipeline"
   ],
@@ -189,8 +189,8 @@
     {
       "id": "timestamp-query",
       "required": true,
-      "evidence": "required for performance claims; correctness capture does not accept current-adapter timestamps.",
-      "status": "accepted"
+      "evidence": "required for performance claims; correctness capture does not accept current-adapter timestamps. Status incomplete (not accepted).",
+      "status": "incomplete"
     }
   ],
   "runtimeProof": [
@@ -215,8 +215,8 @@
     {
       "id": "current-adapter-timing",
       "required": true,
-      "evidence": "Current-adapter GPU timestamps remain NOT_CLAIMED for performance; correctness release-bundle accepted without performance PASS.",
-      "status": "accepted"
+      "evidence": "Current-adapter GPU timestamps remain INSUFFICIENT_EVIDENCE; correctness capture does not claim performance timing.",
+      "status": "incomplete"
     },
     {
       "id": "backend-is-webgpu",

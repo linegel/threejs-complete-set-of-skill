@@ -79,10 +79,21 @@ try {
 		page = await browser.newPage( { viewport, deviceScaleFactor: 1 } );
 	}
 	const browserErrors = [];
+	const requestFailures = [];
 	page.on( 'pageerror', ( error ) => browserErrors.push( String( error.stack ?? error.message ) ) );
+	page.on( 'requestfailed', ( request ) => {
+
+		const failure = request.failure();
+		requestFailures.push( `${ request.url() } ${ failure?.errorText ?? 'failed' }` );
+
+	} );
 	page.on( 'console', ( message ) => {
 
-		if ( message.type() === 'error' ) browserErrors.push( message.text() );
+		// Console "Failed to load resource: 404" fires for favicon/source-map noise;
+		// only hard-fail on page errors or failed module/script/document requests.
+		if ( message.type() === 'error' && ! /Failed to load resource/i.test( message.text() ) ) {
+			browserErrors.push( message.text() );
+		}
 
 	} );
 	await page.goto( url, { waitUntil: 'networkidle' } );
@@ -105,7 +116,12 @@ try {
 		await writeFile( resolve( options.output, 'images', name ), pngFromCapture( capture ) );
 
 	}
-	if ( browserErrors.length > 0 ) throw new Error( `Exposure browser validation failed:\n${ browserErrors.join( '\n' ) }` );
+	const criticalRequestFailures = requestFailures.filter( ( entry ) => (
+		/\.(m?js|wasm|json)(\?|$)/i.test( entry ) || /\/demos\/|\/assets\//.test( entry )
+	) && ! /favicon|source-map|sourcemap|\.map(\?|$)/i.test( entry ) );
+	if ( browserErrors.length > 0 || criticalRequestFailures.length > 0 ) {
+		throw new Error( `Exposure browser validation failed:\n${ [ ...browserErrors, ...criticalRequestFailures ].join( '\n' ) }` );
+	}
 	await page.evaluate( async () => { await window.__labController.setScenario( 'emitter' ); await window.__labController.setSeed( 1 ); } );
 	const baselineSeedCapture = await page.evaluate( () => window.__labController.capturePixels( 'final' ) );
 	await writeFile( resolve( options.output, 'images/seed-0001.final.png' ), pngFromCapture( baselineSeedCapture ) );

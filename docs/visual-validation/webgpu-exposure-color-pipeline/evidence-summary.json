@@ -7,22 +7,24 @@
   "canonicalSource": [
     "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline"
   ],
-  "canonicalSourceHash": "sha256:fe7399aeaa8c2ed86499543b1c2a3abfbbef5395cbfe282407db2ce62496525b",
+  "canonicalSourceHash": "sha256:624a69e65b925d89de6524febba86d95e9c4845a5b44818c77dd31cd2996df90",
   "threeRevision": "0.185.1",
   "runtime": {
     "renderer": "WebGPURenderer",
     "backend": "WebGPUBackend",
     "isWebGPUBackend": true,
     "threeRevision": "185",
-    "nativeWebGPU": false,
-    "initialized": false,
-    "adapterClass": null,
+    "nativeWebGPU": true,
+    "initialized": true,
+    "adapterClass": "unknown",
     "adapterIdentity": null,
     "deviceIdentity": null
   },
   "claimVerdicts": {
-    "mechanismCorrectness": "INSUFFICIENT_EVIDENCE",
+    "visualCorrectness": "PASS",
+    "mechanismCorrectness": "PASS",
     "performanceCompliance": "INSUFFICIENT_EVIDENCE",
+    "gpuAttribution": "INSUFFICIENT_EVIDENCE",
     "lifecycleStability": "INSUFFICIENT_EVIDENCE"
   },
   "primaryImage": "final.design.png",

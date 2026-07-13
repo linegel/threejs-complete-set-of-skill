@@ -14,7 +14,7 @@
   "canonicalSourceHash": "sha256:015f3e41078f1c643c314785c9c8cb6a54091805c1f6ce8646f17b1b54fd93f6",
   "threeRevision": "0.185.1",
   "runtime": {
-    "renderer": "unknown",
+    "renderer": "WebGPURenderer",
     "backend": "webgpu",
     "isWebGPUBackend": true,
     "threeRevision": "0.185.1",
@@ -22,11 +22,13 @@
     "initialized": true,
     "adapterClass": "unknown",
     "adapterIdentity": {
-      "source": "LabController.getMetrics",
-      "backendType": "webgpu",
-      "deviceType": "unknown",
+      "source": "renderer.backend.device captured immediately after await renderer.init()",
+      "backendType": "WebGPUBackend",
+      "deviceType": "GPUDevice",
       "deviceLabel": "",
-      "deviceIdentityVerified": false
+      "deviceIdentityVerified": true,
+      "lossPromiseObservedOnActualDevice": true,
+      "rendererDeviceGeneration": 1
     },
     "deviceIdentity": {
       "verified": true,
@@ -36,8 +38,10 @@
     }
   },
   "claimVerdicts": {
-    "mechanismCorrectness": "INSUFFICIENT_EVIDENCE",
+    "visualCorrectness": "PASS",
+    "mechanismCorrectness": "PASS",
     "performanceCompliance": "INSUFFICIENT_EVIDENCE",
+    "gpuAttribution": "INSUFFICIENT_EVIDENCE",
     "lifecycleStability": "INSUFFICIENT_EVIDENCE"
   },
   "primaryImage": "final.design.png",

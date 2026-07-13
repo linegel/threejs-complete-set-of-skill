@@ -18,11 +18,13 @@
     "initialized": true,
     "adapterClass": "unknown",
     "adapterIdentity": {
-      "source": "LabController.getMetrics",
-      "backendType": "WebGPU",
-      "deviceType": "unknown",
+      "source": "exact retained renderer.backend.device reference after renderer.init()",
+      "backendType": "WebGPUBackend",
+      "deviceType": "GPUDevice",
       "deviceLabel": "",
-      "deviceIdentityVerified": false
+      "deviceIdentityVerified": true,
+      "lossPromiseObservedOnActualDevice": true,
+      "rendererDeviceGeneration": 1
     },
     "deviceIdentity": {
       "verified": true,
@@ -32,8 +34,10 @@
     }
   },
   "claimVerdicts": {
-    "mechanismCorrectness": "INSUFFICIENT_EVIDENCE",
+    "visualCorrectness": "PASS",
+    "mechanismCorrectness": "PASS",
     "performanceCompliance": "INSUFFICIENT_EVIDENCE",
+    "gpuAttribution": "INSUFFICIENT_EVIDENCE",
     "lifecycleStability": "INSUFFICIENT_EVIDENCE"
   },
   "primaryImage": "final.design.png",

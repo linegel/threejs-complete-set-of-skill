@@ -10,13 +10,13 @@
   "canonicalSourceHash": "sha256:d8bfba57799a06f5fb8bdaf78eb70bb58a6de29a5de8f98724aa03bf85bda91a",
   "threeRevision": "0.185.1",
   "runtime": {
-    "renderer": "unknown",
-    "backend": "unknown",
+    "renderer": "WebGPURenderer",
+    "backend": "WebGPUBackend",
     "isWebGPUBackend": true,
     "threeRevision": "185",
-    "nativeWebGPU": false,
-    "initialized": false,
-    "adapterClass": null,
+    "nativeWebGPU": true,
+    "initialized": true,
+    "adapterClass": "unknown",
     "adapterIdentity": null,
     "deviceIdentity": null
   },

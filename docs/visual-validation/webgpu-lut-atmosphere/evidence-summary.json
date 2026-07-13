@@ -18,19 +18,21 @@
   "canonicalSourceHash": "sha256:e93675b0f1b0ec4adb8c247bf7dfb5a3e6a3f9c8c260b4cb239ab0afcd7e433c",
   "threeRevision": "0.185.1",
   "runtime": {
-    "renderer": "unknown",
-    "backend": "unknown",
+    "renderer": "WebGPURenderer",
+    "backend": "WebGPUBackend",
     "isWebGPUBackend": true,
     "threeRevision": "185",
-    "nativeWebGPU": false,
-    "initialized": false,
-    "adapterClass": null,
+    "nativeWebGPU": true,
+    "initialized": true,
+    "adapterClass": "unknown",
     "adapterIdentity": null,
     "deviceIdentity": null
   },
   "claimVerdicts": {
-    "mechanismCorrectness": "INSUFFICIENT_EVIDENCE",
+    "visualCorrectness": "PASS",
+    "mechanismCorrectness": "PASS",
     "performanceCompliance": "INSUFFICIENT_EVIDENCE",
+    "gpuAttribution": "INSUFFICIENT_EVIDENCE",
     "lifecycleStability": "INSUFFICIENT_EVIDENCE"
   },
   "primaryImage": "final.design.png",

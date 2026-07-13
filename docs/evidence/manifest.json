@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "generatedBy": "scripts/build-evidence-pages.mjs",
-  "buildRevision": "sha256:4abcb1cfc7097387ffee6469dc4fb5706f1a7e15c9df0dda69022ab68376cee6",
-  "indexSha256": "sha256:48cbadb59b9870bdd2eaf82568c9084b20faa5c0c14a63314d04ed4da584a884",
+  "buildRevision": "sha256:4754cb3c1dfa6966f3bb946b270578476d12628fa2ac597ec254ab8568601690",
+  "indexSha256": "sha256:ee40c14318e858d853660cbf8afa4ec21e100d7dda096557b2f0b4dd7707c927",
   "reports": [
     {
       "labId": "browser-fallback-harness",
@@ -12,7 +12,7 @@
       "publishedBundleHash": "sha256:013cb38db6a97ec86cbf7d03620fb0d6b9e0b8eefd7b439538dd6947b69352a3",
       "evidenceBundleId": null,
       "media": [],
-      "htmlSha256": "sha256:018cccdf983ead98cc6f5ea6cb5ea0c34748659fb14120b32aa6c869fd9fb472"
+      "htmlSha256": "sha256:561f08b8152a216c29731e0aaa2fd407e0e549cce49b629cda8374d27f625997"
     },
     {
       "labId": "creature-habitat",
@@ -22,7 +22,7 @@
       "publishedBundleHash": "sha256:0ce8f47e9de0c0fb88acbbb1be95b520b6c2b27a976bcfc14b868a5d7d623e4f",
       "evidenceBundleId": null,
       "media": [],
-      "htmlSha256": "sha256:2c3cc833edf8fb94e661c5e2a47acf4348b789e194fea47ff64e0a9ac65d7345"
+      "htmlSha256": "sha256:9c51d8c894bf6b563d9ff598f2df1e1c69348a2db0e5f250d9329e28c344261a"
     },
     {
       "labId": "debugging-contract-lab",
@@ -38,17 +38,17 @@
           "classification": "non-rendering-lab-preview"
         }
       ],
-      "htmlSha256": "sha256:0dbb42dadd5749c82bb437425a9a8e29d62fe824782d820233d08b44ca6a8f2d"
+      "htmlSha256": "sha256:a8b032b2d5a3a4918a018d3e3f2de936dc61a23484b33c2c482e4173d1207ebf"
     },
     {
       "labId": "final-image-flight",
       "path": "evidence/final-image-flight/",
       "status": "incomplete",
-      "sourceHash": "sha256:c006e6ffef968e2558b6bf856e9d297069d725f0b147bbba5f6dcc8186a3f1ae",
-      "publishedBundleHash": "sha256:8ecc80cd21215cbfad813d09c13a8097a2d679b7771369df6265284e04bc3f50",
+      "sourceHash": "sha256:770c5388063b80b1e370709c017c499e1621f845102b59d89c678aca223788fc",
+      "publishedBundleHash": "sha256:558697f76a3e4e4dd10f67f8835103da959607a094b8d8b58537290becb6b1f0",
       "evidenceBundleId": null,
       "media": [],
-      "htmlSha256": "sha256:f44057d67db3ccc7454c4db68c88b2dd0d6afa52f352d3924142cf068f11cd89"
+      "htmlSha256": "sha256:dd7048b8a807a8ffacb49616eed0d05311623f21ef9e18a2e758d5c697f549d9"
     },
     {
       "labId": "integration-image-pipeline-ao",
@@ -104,68 +104,17 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:fc462c4b1e22c2983ea33e78876d03eb2eed2cee445e096f5ff80a65c6b3e5bb"
+      "htmlSha256": "sha256:445d4b320f216de87a67292ab71d71ff4705e72a6134b1c9cbce836e149a6492"
     },
     {
       "labId": "integration-precipitation-image-pipeline",
       "path": "evidence/integration-precipitation-image-pipeline/",
-      "status": "incomplete",
+      "status": "accepted",
       "sourceHash": "sha256:7493e81f66d3f1baf848f9d22cff443725229157220b6fc2616cf800dcf03a96",
-      "publishedBundleHash": "sha256:6e0616b2a87418535dcf18fc76b57f9bee64bee4a09760c3e6d2c067fb503c4e",
-      "evidenceBundleId": "correctness",
-      "media": [
-        {
-          "file": "visual-validation/integration-precipitation-image-pipeline/final.design.png",
-          "outputSha256": "sha256:81702bd0221dd9188ad77d1399eadda48e986d8ed1fe4548f2aaf8046f8befed",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/integration-precipitation-image-pipeline/no-post.design.png",
-          "outputSha256": "sha256:25be35a85ed72024e30e92d9a9e680f99da13ad582b5dafd4b7f84519c3a26c0",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/integration-precipitation-image-pipeline/diagnostics.mosaic.png",
-          "outputSha256": "sha256:2c85733583bb4abeb24029566fdb8a3e675c67e3bac5386f05d6b3cc6ea63575",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/integration-precipitation-image-pipeline/camera.near.png",
-          "outputSha256": "sha256:b7844428d63fca7e039f5e7c3a181448259bf99f4329e27c6c311e5104b79fe8",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/integration-precipitation-image-pipeline/camera.design.png",
-          "outputSha256": "sha256:81702bd0221dd9188ad77d1399eadda48e986d8ed1fe4548f2aaf8046f8befed",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/integration-precipitation-image-pipeline/camera.far.png",
-          "outputSha256": "sha256:9413ca98da1c9c2c5d999243119e365fadf9370dda6f779ff7bbf19af80920d3",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/integration-precipitation-image-pipeline/seed-0001.final.png",
-          "outputSha256": "sha256:81702bd0221dd9188ad77d1399eadda48e986d8ed1fe4548f2aaf8046f8befed",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/integration-precipitation-image-pipeline/seed-9e3779b9.final.png",
-          "outputSha256": "sha256:0a18fd8073f8da1f11335ddab231f960a5f03d0aa32245351bb973b84f3dd43e",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/integration-precipitation-image-pipeline/temporal.t000.png",
-          "outputSha256": "sha256:1fa23efc906bddba717f3585a53daed79216723eeb940804ad42ac8fba7437b5",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/integration-precipitation-image-pipeline/temporal.t001.png",
-          "outputSha256": "sha256:f84ad7472321eedbe321b77746825b8c3015ee34fcd9bf31461bdb22ae52c440",
-          "classification": "inspected-runtime-evidence-preview"
-        }
-      ],
-      "htmlSha256": "sha256:d351a1bc3c7c52a5410c295f35ceba25afc1d26e8a5766ee65a372cdf1840c19"
+      "publishedBundleHash": "sha256:73e3bcaa577af427a2a19f45552b148657dde779415dcf12fe7a5604ecd280ff",
+      "evidenceBundleId": "docs/visual-validation/integration-precipitation-image-pipeline/bundle",
+      "media": [],
+      "htmlSha256": "sha256:70ccd256a9c1bbc8654816ed513353835542935f3924ad64e1d231ed6ad9eac4"
     },
     {
       "labId": "integration-temporal-surface",
@@ -226,68 +175,17 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:cce96fa4839c80736cdc16c1b423f0c9da7d3b5c83324e5f5ef396e703c64cc7"
+      "htmlSha256": "sha256:5508b7debb483d84aaf3ab64539a9467a78f245bcc95ef65dd2e7845e5c315c3"
     },
     {
       "labId": "node-selective-bloom",
       "path": "evidence/node-selective-bloom/",
       "status": "incomplete",
-      "sourceHash": "sha256:f8fd59115251e877a6102550f31743a10f91ccc81ebf895dd773b01a637a6c88",
-      "publishedBundleHash": "sha256:5456e10a16960481359e580533b3962774f524d783d113a1b1969d2baaab6f85",
-      "evidenceBundleId": "correctness",
-      "media": [
-        {
-          "file": "visual-validation/node-selective-bloom/final.design.png",
-          "outputSha256": "sha256:81991f1083db33d7b34c62b45b9fd295e832a0a0a1a60c0b22a4bb54d9c8f2d5",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/node-selective-bloom/no-post.design.png",
-          "outputSha256": "sha256:c79305bf766213104920e4b03bc454168f45462e3164296353eb0624e970139a",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/node-selective-bloom/diagnostics.mosaic.png",
-          "outputSha256": "sha256:eff61693ad7a3f1739c184568862e7905f09ed6b2d652d6bf3ee5719ddf2ef6b",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/node-selective-bloom/camera.near.png",
-          "outputSha256": "sha256:821a3750dc164e73102c6f673778ffa13f4c678c74b9ba7fe0973d5a583eaeb3",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/node-selective-bloom/camera.design.png",
-          "outputSha256": "sha256:81991f1083db33d7b34c62b45b9fd295e832a0a0a1a60c0b22a4bb54d9c8f2d5",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/node-selective-bloom/camera.far.png",
-          "outputSha256": "sha256:bd292a10d94984fd0ffd77da43f64b6000aa41fa6805e675793eac0868a8513b",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/node-selective-bloom/seed-0001.final.png",
-          "outputSha256": "sha256:81991f1083db33d7b34c62b45b9fd295e832a0a0a1a60c0b22a4bb54d9c8f2d5",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/node-selective-bloom/seed-9e3779b9.final.png",
-          "outputSha256": "sha256:81991f1083db33d7b34c62b45b9fd295e832a0a0a1a60c0b22a4bb54d9c8f2d5",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/node-selective-bloom/temporal.t000.png",
-          "outputSha256": "sha256:81991f1083db33d7b34c62b45b9fd295e832a0a0a1a60c0b22a4bb54d9c8f2d5",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/node-selective-bloom/temporal.t001.png",
-          "outputSha256": "sha256:81991f1083db33d7b34c62b45b9fd295e832a0a0a1a60c0b22a4bb54d9c8f2d5",
-          "classification": "inspected-runtime-evidence-preview"
-        }
-      ],
-      "htmlSha256": "sha256:ea4ad6944535c545a6a2fb2320c9f2f63c2d73d12f0d4d3bde7d3bca1a8c2210"
+      "sourceHash": "sha256:16d14b4f7cd40250bb86f91e67e22c19d2141763941251255a85dcbb159e7e05",
+      "publishedBundleHash": "sha256:8972b03625920251179be5ec48f1dc72499734300f4c274ceeab857003299d11",
+      "evidenceBundleId": null,
+      "media": [],
+      "htmlSha256": "sha256:31cb6b608b373f7dd039f69f4f8952e9c4acc432f4664a3316a5a001ddc70256"
     },
     {
       "labId": "procedural-district",
@@ -348,68 +246,17 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:6702530acd4d7216cb1f1dba78e39ab75625ad6b3bfb79d96301abe54432a318"
+      "htmlSha256": "sha256:3191c3c246cb7e3149f1f0cf5969b2c904493c46afd3cd5a6e42960bdeacebbb"
     },
     {
       "labId": "relativistic-space-shot",
       "path": "evidence/relativistic-space-shot/",
       "status": "incomplete",
-      "sourceHash": "sha256:797c2083b9f380f7313732ff6fffaa136b1a2fe41639f9b28bd33c3f70839c27",
-      "publishedBundleHash": "sha256:2b16a26750935d2e59a85d34c2edd18d0df8519a5b7f87ae6df05fede47284b4",
-      "evidenceBundleId": "correctness",
-      "media": [
-        {
-          "file": "visual-validation/relativistic-space-shot/final.design.png",
-          "outputSha256": "sha256:e27ec72167429750c0a68f4a1e82dedd14b764f27b4de799f864a862aa851518",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/relativistic-space-shot/no-post.design.png",
-          "outputSha256": "sha256:beb238c371043efa2be1945e3bab053cf114e5dafc9ad032c7ebb21acb14ef06",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/relativistic-space-shot/diagnostics.mosaic.png",
-          "outputSha256": "sha256:beb238c371043efa2be1945e3bab053cf114e5dafc9ad032c7ebb21acb14ef06",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/relativistic-space-shot/camera.near.png",
-          "outputSha256": "sha256:cff3806c5fee95d73d5807e19f7d70bdc024686772578d86e60490b7b5fdc8b3",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/relativistic-space-shot/camera.design.png",
-          "outputSha256": "sha256:d9a6fc61ba81ce917aa4dfa1e57a0dfe7ab21a674ce41e970ad3ea4cadce672e",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/relativistic-space-shot/camera.far.png",
-          "outputSha256": "sha256:93c1a75218a6b509b5c69ece52fdac908dd31d48ea7d61ef118bb94e9bbf45a7",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/relativistic-space-shot/seed-0001.final.png",
-          "outputSha256": "sha256:57d5f03d95b270eba8bd65e77403117845d92b812b4430049b9d0e990d92a440",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/relativistic-space-shot/seed-9e3779b9.final.png",
-          "outputSha256": "sha256:c03fd560eb305960324f4c2094f3b31d5fdba364a6f284986b202ef2f66c9282",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/relativistic-space-shot/temporal.t000.png",
-          "outputSha256": "sha256:91411923ac14e72295cddc84550dbbe588624a1bd1c6fd16cb9b7cd17a5bf6f8",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/relativistic-space-shot/temporal.t001.png",
-          "outputSha256": "sha256:c3c6a9ac93457b368fd1e403190ac2ab115d822f4a5a3543dfd6326615a10ee5",
-          "classification": "inspected-runtime-evidence-preview"
-        }
-      ],
-      "htmlSha256": "sha256:fb7dc545296da1692b6bc493e33233f7694ae2327042775f15de3d72b054953a"
+      "sourceHash": "sha256:6374fb119288460b2f31dbefbce3f1936711bd50d6192875c668d444503b688e",
+      "publishedBundleHash": "sha256:ae17d90bda6bb4bfe14b4fe532ca2a1e6c3eb233dcf55fe95e9aa41c6f7c00f2",
+      "evidenceBundleId": null,
+      "media": [],
+      "htmlSha256": "sha256:94dae4c73f193824d0180eb16b313a0bc40d775eb0124f48a535124e67a0f26f"
     },
     {
       "labId": "router-manifest-lab",
@@ -425,7 +272,7 @@
           "classification": "non-rendering-lab-preview"
         }
       ],
-      "htmlSha256": "sha256:f81e035b7fb2c7e69e0e04c10cab517b8221f020280eb3d27e8363dcb4498567"
+      "htmlSha256": "sha256:455269f755c97736bd5fd10c1adcb2287298361caf45f2cb0e478216cda9b3f0"
     },
     {
       "labId": "semantic-mesh-writer",
@@ -435,7 +282,7 @@
       "publishedBundleHash": "sha256:252a24d593e2ae920385f93d02e92b7e30df7cf379f034b89013c0f15c76a564",
       "evidenceBundleId": "docs/visual-validation/semantic-mesh-writer/bundle",
       "media": [],
-      "htmlSha256": "sha256:32fdf6bca603fe8a760dfe69e32be266ccc1dff12a42d11b4e5522aff622d024"
+      "htmlSha256": "sha256:b3e4b5fc6670f4359a2434c3146237924f87cb7e3eb4cd3753f22ac01df3d573"
     },
     {
       "labId": "structured-ash-growth",
@@ -496,7 +343,7 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:4b31cf1f8541bb83dd5d512474f0844e8116ee9e8d924e813a52db512bc6b491"
+      "htmlSha256": "sha256:52db442da581a8ab88db118ecb5b01df33bb27e15bc146e3e5c1bd91057f77ec"
     },
     {
       "labId": "tsl-curved-ray",
@@ -506,17 +353,17 @@
       "publishedBundleHash": "sha256:f569ce901136463f235f544de38dcd7a9bbed0db0b6bc2c204501fd81cf72f44",
       "evidenceBundleId": null,
       "media": [],
-      "htmlSha256": "sha256:930353b0bb14de8eed28309463b5acb34e63f4b9156f575136146799682264f7"
+      "htmlSha256": "sha256:cd96ce54ea00e9c7ff7a060af896dd5e44addb441d44534fcb3caed98e81b941"
     },
     {
       "labId": "tsl-procedural-pbr",
       "path": "evidence/tsl-procedural-pbr/",
       "status": "incomplete",
-      "sourceHash": "sha256:68d02503168f1635112473bc5d9a4e09c52d7fda872131646c9c3f71e48c6fbb",
+      "sourceHash": "sha256:f300027912b9c932e37dfa5b1bd3fffeff31e714099db3721dd985c57ee5dc47",
       "publishedBundleHash": "sha256:fb434f1f93232f118dcbae637f9d29e654dae486d3b5da4a30f964ac2593318a",
       "evidenceBundleId": null,
       "media": [],
-      "htmlSha256": "sha256:d4c9899ccd699ffc84613992886264c308145e9aa3adeb14a79cf44e8a7e5ed3"
+      "htmlSha256": "sha256:f2c3b667a2be0639d90e6f3bb65c2cacd045222d326d5cd7bfd1b7a51b0259ce"
     },
     {
       "labId": "weathered-world",
@@ -542,24 +389,40 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:c90c431be3cc1f660f806e3c961fff2e4fde6897908d6a01bdd4e2e016e13710"
+      "htmlSha256": "sha256:f95804de03568702ff436b8d2620ac5867c9581068e3e5e8c59900b7f885e956"
     },
     {
       "labId": "webgpu-bounded-water",
       "path": "evidence/webgpu-bounded-water/",
-      "status": "incomplete",
-      "sourceHash": "sha256:f098e536cbb664c11821b27b5c432c4d8b550e5ca5ed648031dff5fc2265a17b",
-      "publishedBundleHash": "sha256:62e7335139ff95b15e361b7e328bb4b90f5ebc0733ef2b18330a2e9e87d1e3a1",
-      "evidenceBundleId": "artifacts/visual-validation/webgpu-bounded-water/correctness",
-      "media": [],
-      "htmlSha256": "sha256:3c4df5524f4067cc2602aae8bf8660433c42ac0d0ccd8263670105f5c2537b4e"
+      "status": "accepted",
+      "sourceHash": "sha256:21461d053532040d39b4b38809ac0ad3ab93990ca41c49d15085ef2a4e3ea636",
+      "publishedBundleHash": "sha256:fa42a9cb2b2f4a07fa037a6450d9785db5d463df79f6147838a579170f6fb13d",
+      "evidenceBundleId": "correctness",
+      "media": [
+        {
+          "file": "visual-validation/webgpu-bounded-water/final.design.png",
+          "outputSha256": "sha256:da48b0c1332ab8bcd817954efb7a124d6ec80ab47628155fdd2981c175abb4b3",
+          "classification": "inspected-runtime-evidence-preview"
+        },
+        {
+          "file": "visual-validation/webgpu-bounded-water/no-post.design.png",
+          "outputSha256": "sha256:6f5b57d520eebcbfce9372315eb7b5b198232f4c5a179cc393ee2db15846a35a",
+          "classification": "inspected-runtime-evidence-preview"
+        },
+        {
+          "file": "visual-validation/webgpu-bounded-water/diagnostics.mosaic.png",
+          "outputSha256": "sha256:131eb4ef1ce8e999ce78022433c42cbc4dafb15b1f3d7e7264540996a5608af7",
+          "classification": "inspected-runtime-evidence-preview"
+        }
+      ],
+      "htmlSha256": "sha256:41707ebde25b7458982925f0365e1309865ca6310dafddb1a3981b92f5df9f0f"
     },
     {
       "labId": "webgpu-cached-clipmap-shadow",
       "path": "evidence/webgpu-cached-clipmap-shadow/",
-      "status": "incomplete",
-      "sourceHash": "sha256:6141e40a0f87dc34b03e4d490ada32bd146d960c32d23f817feda87dade21dc4",
-      "publishedBundleHash": "sha256:73692e9a9dcd0d6efa5096ca4799a0f9531b35cbabc8512b07e28126bea6da50",
+      "status": "accepted",
+      "sourceHash": "sha256:cb4d3abfaab1a84e0fbef28fd523befc0f09ed465690426c58eff739e7b1171c",
+      "publishedBundleHash": "sha256:72e144235093a27db006d320ace064ac03847d86675a96d56284aef9768ad47a",
       "evidenceBundleId": "correctness",
       "media": [
         {
@@ -578,14 +441,14 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:37c406445e4931f5d6e075a160c9498b80dec81d506f4352418a9382b4d60b9b"
+      "htmlSha256": "sha256:6bb9252b3d51be4acdc881b3b9e6bbe8506da4519dcdcc575ab2f31f57ed3e01"
     },
     {
       "labId": "webgpu-camera-rig",
       "path": "evidence/webgpu-camera-rig/",
       "status": "incomplete",
-      "sourceHash": "sha256:9f3c73624401575863b2ed755e5bdaed7a1895084a4d4854f928cc95b9ac4d63",
-      "publishedBundleHash": "sha256:7cf959945849d8755df7cd3950f74dbde7d71f4d1145793cb8a1193495ecd4d8",
+      "sourceHash": "sha256:4e67f5f41b2a31f889023eea058adc40ccd6e6e33f074bbfd3b676732cce3b39",
+      "publishedBundleHash": "sha256:ac768247b128908234db00ca9226e48162c1397e045798d7c30d91d1fbc2ff4f",
       "evidenceBundleId": "correctness",
       "media": [
         {
@@ -604,7 +467,7 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:60c42c3d1a37f4576344fb2b1bb45bc0fd41556c990d872175014836f388c534"
+      "htmlSha256": "sha256:1a15715a89c1fa54e9c932c7566693e0635682551cfca20c9c9ade7438606bb8"
     },
     {
       "labId": "webgpu-dense-grass",
@@ -612,7 +475,7 @@
       "status": "accepted",
       "sourceHash": "sha256:b39b6b87e71d6e3b5926ef824cfc7e523c0a0da33968866b629096ba0ead0d6e",
       "publishedBundleHash": "sha256:769958f85b1023291ec86bdc5561b14abd7d57b4e371749e64bf122a6dcef333",
-      "evidenceBundleId": "bundle",
+      "evidenceBundleId": "correctness",
       "media": [
         {
           "file": "visual-validation/webgpu-dense-grass/final.design.png",
@@ -665,14 +528,14 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:3ef7dfd1482b0b013eb8888f9719dc8da0242f7d7d976fcad3c08bff46d3f169"
+      "htmlSha256": "sha256:b67ea6adefe8295b226c8772382711fb6944b898e5d929d8a0685ca5bba95958"
     },
     {
       "labId": "webgpu-exposure-color-pipeline",
       "path": "evidence/webgpu-exposure-color-pipeline/",
       "status": "incomplete",
-      "sourceHash": "sha256:fe7399aeaa8c2ed86499543b1c2a3abfbbef5395cbfe282407db2ce62496525b",
-      "publishedBundleHash": "sha256:d39f50842c5eec955765351b032e43bc2f57c9e080e731edc1bbef352203f852",
+      "sourceHash": "sha256:624a69e65b925d89de6524febba86d95e9c4845a5b44818c77dd31cd2996df90",
+      "publishedBundleHash": "sha256:afb21d87a09147fe4c7ecb2fa38fc4ab4fba3cfe8c46732e091e3ff19525551c",
       "evidenceBundleId": "webgpu-exposure-color-pipeline-v2",
       "media": [
         {
@@ -706,7 +569,7 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:41816b41d593c90cda99e20d72bb2f5650e215707471b396507617a0b768ae83"
+      "htmlSha256": "sha256:bd214ab7d766772481c73a799f0612f689ee992148fe8183793b15f6f9c5d6d1"
     },
     {
       "labId": "webgpu-fft-ocean",
@@ -757,7 +620,7 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:5a3d4c848faec9cba7d0063395a432f8cd666c922add6e21d9da7651668c850c"
+      "htmlSha256": "sha256:9b41f79c1f4f91d4c70a5d9734b4773b8badaeb599856b3704ec151e6fb65ed3"
     },
     {
       "labId": "webgpu-field-bake",
@@ -813,17 +676,58 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:43c1d18a1a061ce7851c1e3edb151959de5d878d6cb2b0ac3a4a29e3de0cd7c3"
+      "htmlSha256": "sha256:4d72e464ea56b1f0b87cdd40e1f1351eddb50485c380110a9d1fb1c3617a93cd"
     },
     {
       "labId": "webgpu-image-pipeline",
       "path": "evidence/webgpu-image-pipeline/",
-      "status": "accepted",
+      "status": "incomplete",
       "sourceHash": "sha256:f55e0e6af55f99dffc4c5160bdecf74eb36a5d1daa196b7fa0366810565d348b",
-      "publishedBundleHash": "sha256:abce7026a3d4b29fc4f73f2f978a3f585b5103dfddc1e2dff94e7ba3431efde8",
-      "evidenceBundleId": "docs/visual-validation/webgpu-image-pipeline/bundle",
-      "media": [],
-      "htmlSha256": "sha256:35f2e9396aa010d26a1e9dac5f4a5d2fcd978c93774bc60d650d6da6d9fe3397"
+      "publishedBundleHash": "sha256:23b24c46eaac42d0e8189300a08c50296549bd903afd5a74769849777efe82b1",
+      "evidenceBundleId": "webgpu-image-pipeline-v2",
+      "media": [
+        {
+          "file": "visual-validation/webgpu-image-pipeline/final.design.png",
+          "outputSha256": "sha256:40fe6a9b4022d2838260a7dd31bf9d26f6b3e4961801b37430d9f4295b6dcca9",
+          "classification": "inspected-runtime-evidence-preview"
+        },
+        {
+          "file": "visual-validation/webgpu-image-pipeline/no-post.design.png",
+          "outputSha256": "sha256:4613c3a4337dfaf74d74d69fa3fb261212b93e1b66f4a5cd8904e43484881a78",
+          "classification": "inspected-runtime-evidence-preview"
+        },
+        {
+          "file": "visual-validation/webgpu-image-pipeline/diagnostics.mosaic.png",
+          "outputSha256": "sha256:1819175ad2c93f4b688c44f29ff975f20d517f8dc2f573362c74d31aae615c4b",
+          "classification": "inspected-runtime-evidence-preview"
+        },
+        {
+          "file": "visual-validation/webgpu-image-pipeline/normal.png",
+          "outputSha256": "sha256:317126f75c6f6c3d57610c7329d0a847b90aa5b352b7e8cb986e06b09cb66705",
+          "classification": "inspected-runtime-evidence-preview"
+        },
+        {
+          "file": "visual-validation/webgpu-image-pipeline/emissive.png",
+          "outputSha256": "sha256:43a75957c1b3cba9e70b12f51aa5b70c887e2f261a8d795ca1a78d9ff3883a85",
+          "classification": "inspected-runtime-evidence-preview"
+        },
+        {
+          "file": "visual-validation/webgpu-image-pipeline/bloom.png",
+          "outputSha256": "sha256:8544bff67aee8473b42309c740dcd088b621c4754f880c68495da7af3ecdb0ca",
+          "classification": "inspected-runtime-evidence-preview"
+        },
+        {
+          "file": "visual-validation/webgpu-image-pipeline/velocity.moving-positive-x.png",
+          "outputSha256": "sha256:f2ebc4dc58e95dbd78e31e034769bc259bdfe8a7547ef537b2bce215af56d04e",
+          "classification": "inspected-runtime-evidence-preview"
+        },
+        {
+          "file": "visual-validation/webgpu-image-pipeline/temporal.history.png",
+          "outputSha256": "sha256:570eb48d52d9e88161c771af93d62b923b4ab7965aff0d63a87e64dceebffddf",
+          "classification": "inspected-runtime-evidence-preview"
+        }
+      ],
+      "htmlSha256": "sha256:dfb38def0aa118f26d47a0ba1d1ba892833ccacb8ed034fe51ac6b74bdfb453d"
     },
     {
       "labId": "webgpu-lut-atmosphere",
@@ -864,7 +768,7 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:a6d2d23bb7c6a383c234f54ff9cf223a821ec69ead693d19043214a2ddfb3938"
+      "htmlSha256": "sha256:ece86e56526d123a026178cb95d0f9a4a9c4ca148837db376c8456d486ee06f3"
     },
     {
       "labId": "webgpu-material-slot-compiler",
@@ -910,7 +814,7 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:b0d206d37eec7f4f59b3264297430f16782704ef639ec57ecd981eab754d1db0"
+      "htmlSha256": "sha256:881b90c7cb9ef3ca15d1e8ee8d3341161c79baf222cadb8e9527fb18d4965c62"
     },
     {
       "labId": "webgpu-node-gtao",
@@ -918,65 +822,19 @@
       "status": "accepted",
       "sourceHash": "sha256:d151b7e9512ba31533653581a04ac7359ab067c8ae0963625f675ecdc4781455",
       "publishedBundleHash": "sha256:4e3debc2323f214d10d49f7c6f4b747a464fc7c8767b51c19622928cde664979",
-      "evidenceBundleId": "correctness",
-      "media": [
-        {
-          "file": "visual-validation/webgpu-node-gtao/final.design.png",
-          "outputSha256": "sha256:151b03675aa2b14030a3f783328ca81d6db4361bb23be9b532b0ff3572182b8c",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/webgpu-node-gtao/diagnostics.mosaic.png",
-          "outputSha256": "sha256:cbf1db13a0c86abdbdbf422db8064d6ed5896ca383a4e0852afb2c8a5db5e91b",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/webgpu-node-gtao/camera.near.png",
-          "outputSha256": "sha256:0cdae2bcc388cb9e8ce5f3d9e03134b973938d547bbb4a7f8286352539217c69",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/webgpu-node-gtao/camera.design.png",
-          "outputSha256": "sha256:151b03675aa2b14030a3f783328ca81d6db4361bb23be9b532b0ff3572182b8c",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/webgpu-node-gtao/camera.far.png",
-          "outputSha256": "sha256:f96aa70158b036c2def005efb70f3406211126cf3bd39b5c40363fa9511e9fca",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/webgpu-node-gtao/seed-0001.final.png",
-          "outputSha256": "sha256:05fd7944038380d040254167d962e97526be7286dc34f616c0e91a261b8f818e",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/webgpu-node-gtao/seed-9e3779b9.final.png",
-          "outputSha256": "sha256:79bdff1e59c014677a8c24259f14784336365a19d34528cec508d41814f9bee3",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/webgpu-node-gtao/temporal.t000.png",
-          "outputSha256": "sha256:05fd7944038380d040254167d962e97526be7286dc34f616c0e91a261b8f818e",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/webgpu-node-gtao/temporal.t001.png",
-          "outputSha256": "sha256:fc1da6a941bced83bcffdfa43aad89b6377fda1c3bd5106e196b9c3fd858dafe",
-          "classification": "inspected-runtime-evidence-preview"
-        }
-      ],
-      "htmlSha256": "sha256:4a57d4e02a81467327d82ae6151b20811320a8c27972df22501c495cfe659604"
+      "evidenceBundleId": "docs/visual-validation/webgpu-node-gtao/bundle",
+      "media": [],
+      "htmlSha256": "sha256:095d541224f5562243cd176c27c8f49246b9ab0a0f84abfa8a492c1017de7893"
     },
     {
       "labId": "webgpu-object-sculptor-corpus",
       "path": "evidence/webgpu-object-sculptor-corpus/",
       "status": "incomplete",
-      "sourceHash": "sha256:5f7aa125f305d18e139f1c8cee2e4b2bed5b96f1764c27a7f07378a2608b1a42",
+      "sourceHash": "sha256:be98fc7da783a378d6a590b31b4f66059adc2044a7d9f8f4bab3488e997ffb22",
       "publishedBundleHash": "sha256:3b5d4c97c67dc834354b1bf6cbb7092a49e498f5a52b048565791b09765d9cfb",
       "evidenceBundleId": "artifacts/visual-validation/webgpu-object-sculptor-corpus/correctness",
       "media": [],
-      "htmlSha256": "sha256:ef43aa4db0e44d692db72b3d141145a15f214434fd8472a44396136d5e807571"
+      "htmlSha256": "sha256:822cf2a6d53eb4fbb1e2dc92d2b01b36f06573b4dc21ac28869e2724d62ccafd"
     },
     {
       "labId": "webgpu-pooled-effects",
@@ -1027,14 +885,14 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:35bb95ac3057785eb7ad55894da5f14c5ab3e3619b85f8e8da77796d744276ea"
+      "htmlSha256": "sha256:ef63d2d59e549065e95776892670829235e4187b971da5fee33c35ce9b76b038"
     },
     {
       "labId": "webgpu-procedural-creature-lab",
       "path": "evidence/webgpu-procedural-creature-lab/",
       "status": "incomplete",
       "sourceHash": "sha256:0a63491b4d4001ff2bef75e7a00c05ba887642cdb15d58643d1cd02f6a41e560",
-      "publishedBundleHash": "sha256:9627cb65305270936f0f959a87612291ff576dc31e79b389e4c3c4c01ae1ed32",
+      "publishedBundleHash": "sha256:ae477bcdf8fa0f1802da6487e4153ec03e80376ee5a9a79ffada786f073856f4",
       "evidenceBundleId": "correctness",
       "media": [
         {
@@ -1088,63 +946,17 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:b3d133dc3fc81f33e1c0fe2f3eb98f9758fc9f912eee83c28cbc4b3fd8fcf88f"
+      "htmlSha256": "sha256:559d03ebb18bca513e78acfb9c921bca8b348fbd6fc1d75a3997bb336e40eb50"
     },
     {
       "labId": "webgpu-procedural-timelines",
       "path": "evidence/webgpu-procedural-timelines/",
-      "status": "incomplete",
+      "status": "accepted",
       "sourceHash": "sha256:75dc31ba17b9a98981bc67e8517eaaa97542ffa9d2bbef2e72929db178ebe709",
-      "publishedBundleHash": "sha256:75debb9aee031b9381f49214cf212267b80a3d5888d886f6a059b0f1eea0f1b7",
-      "evidenceBundleId": "correctness",
-      "media": [
-        {
-          "file": "visual-validation/webgpu-procedural-timelines/final.design.png",
-          "outputSha256": "sha256:a8b991b33d6632f9b134f9177b3b1c1b0bd185b5a31693056a688c4fe8372f52",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/webgpu-procedural-timelines/diagnostics.mosaic.png",
-          "outputSha256": "sha256:d5c41825d5cd5f1f7013098e102c16e088153930c42ff3356d944f0e4f2c0212",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/webgpu-procedural-timelines/diagnostic.normal.png",
-          "outputSha256": "sha256:c7a51a048a68d80573df717a7fcc6c14a18bdc2dac42435942f7f6e86c5de29e",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/webgpu-procedural-timelines/diagnostic.emissive.png",
-          "outputSha256": "sha256:295c72ceb55803652f173bbf1307c519ccd0a3d5949a067ad78c03eb2329793d",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/webgpu-procedural-timelines/diagnostic.velocity.png",
-          "outputSha256": "sha256:0eea5d1ea2ddeb541b86e12d502ac681ca049c21afad8546870b11a814a80ae6",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/webgpu-procedural-timelines/camera.design.png",
-          "outputSha256": "sha256:fd32bbcf464c5b147f844c8f39538300838d6fe1e689dc21f1915db418376aed",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/webgpu-procedural-timelines/mechanism.launch-and-staging.png",
-          "outputSha256": "sha256:fa488fac77a32ece6f0d16ea1fb221fe3d4872b8ba1c42e6a8da277fe30b2d91",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/webgpu-procedural-timelines/mechanism.spin-docking.png",
-          "outputSha256": "sha256:4db2130a67e2e75f5d4d81351a1a0e5b82299a469c9792a72fc09fd599a4b122",
-          "classification": "inspected-runtime-evidence-preview"
-        },
-        {
-          "file": "visual-validation/webgpu-procedural-timelines/mechanism.compute-storage.png",
-          "outputSha256": "sha256:2769ca82ed21c8095daba64fcf5e7a4ba253ebf7cf3268681708982bbee64492",
-          "classification": "inspected-runtime-evidence-preview"
-        }
-      ],
-      "htmlSha256": "sha256:8f43e8ef6096901ab69b1b7f6d4374bfff54a07d7fca59b8d8bf18e7361cedcb"
+      "publishedBundleHash": "sha256:a572da432992270aff4c515983c60bc28f62de97b3ecca78da007d59e1898c49",
+      "evidenceBundleId": "docs/visual-validation/webgpu-procedural-timelines/bundle",
+      "media": [],
+      "htmlSha256": "sha256:958010cdcddcf0505f01b084719937c4cca6328abdb5223ae153e8bc2f1baa6f"
     },
     {
       "labId": "webgpu-quadtree-planet",
@@ -1205,7 +1017,7 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:d90fc3048d9a8112cbb7959ee388c0f1ee554f48ea3786f30edc24d7d1aef371"
+      "htmlSha256": "sha256:e7c39efc2e2430d3e2ccca40546fea783c6c9b86485620fe3eee4e4ccf6e3e8c"
     },
     {
       "labId": "webgpu-rain-snow-and-wet-surfaces",
@@ -1266,7 +1078,7 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:ca79169b2b8aeb86f9340484af7fbdaf1ea22f984bd010eef5a147491fe02d6b"
+      "htmlSha256": "sha256:06f05e158c84236c2a0e3e08422bacbde7d100d8ac55780714d92b665b00692d"
     },
     {
       "labId": "webgpu-shadow-architecture-bench",
@@ -1327,7 +1139,7 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:9a3f8a2dc1592ac8e5b6a7179bbb1221261e14fb7d99863c812cd0ca93a308b0"
+      "htmlSha256": "sha256:02f66ff7a5d449685c62da5fb8a10f3d47e63b66b4b583b3cb2fc22de9e74a65"
     },
     {
       "labId": "webgpu-shadow-pipeline-integration",
@@ -1388,13 +1200,13 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:cd9f928edd2b8994d9a8cddc9896e5cc611371c9da15e641e5834b2ae1a68a9a"
+      "htmlSha256": "sha256:d63d334a63834de30b17f73ead1322bc30aa3a2f035094091d55a9a460307105"
     },
     {
       "labId": "webgpu-temporal-history",
       "path": "evidence/webgpu-temporal-history/",
       "status": "accepted",
-      "sourceHash": "sha256:39f9466604b4a394eed972080dcc689b24b1bdaed7a1d0c94de62a8b07b08022",
+      "sourceHash": "sha256:2f41080c1ecbec60bc1f3678e21c2039ede72793e8ba39260302cef254c97c3f",
       "publishedBundleHash": "sha256:0c853c5bb65d20d9787442fe1f989f7bcaadb265ccdac4792fc86ea6cee2a785",
       "evidenceBundleId": "release-approved-current",
       "media": [
@@ -1449,7 +1261,7 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:5f2b5033d1e0c804de65a9ee92168108fa9a49766d4663195b8b10b008291953"
+      "htmlSha256": "sha256:4840c3aea04aaba02c25e2b7ccec5ba4d78899f96f9c217e43d1fc23dee3062e"
     },
     {
       "labId": "webgpu-touch-history-frost",
@@ -1510,7 +1322,7 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:7a6efba4b7e18abcc2526b59c14a16f31677f0054edf45fd543459318827bc4a"
+      "htmlSha256": "sha256:9c9ae07fbd36fd3e00e6b827ed1d88a76fb22f3c855b69869366e89073f42f00"
     },
     {
       "labId": "webgpu-tower-ship-sculptor",
@@ -1571,7 +1383,7 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:67a74b469f181a02d6f03b7192305ab5d4fdf850c4ed92ce43ed9a5a91f7ab99"
+      "htmlSha256": "sha256:d32399a07edde5b48749fd3e18d4b3cdaff2f2193ed840af6666b4927098f352"
     },
     {
       "labId": "webgpu-validation-harness",
@@ -1632,7 +1444,7 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:163295e4dcdc6b4539d29667ad6b58a429a9b65814ae4c3be4bde5eac4312b57"
+      "htmlSha256": "sha256:d1bd12db37a835a60f479adb2959122671b359014ee25c7f8172ba96b9fa949c"
     },
     {
       "labId": "webgpu-vegetation-integration",
@@ -1693,7 +1505,7 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:f9739027bb3283fe280060d2bdfa3c59d9f158b8410f45150c2c03d291889c35"
+      "htmlSha256": "sha256:4545ad16d6e78bb1b9a18925378cc90d1de65973bff4bd0700af00f54e4e47e6"
     },
     {
       "labId": "webgpu-weather-volume-clouds",
@@ -1754,7 +1566,7 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:6af14734891a2f29437daa367a22a48a5fbb65586279e09c29ff4aafeb5b296f"
+      "htmlSha256": "sha256:94509c234d6e59cd16b66862e53ea7468ddb7e8dece75d2564e9f1a27ec45573"
     }
   ]
 }

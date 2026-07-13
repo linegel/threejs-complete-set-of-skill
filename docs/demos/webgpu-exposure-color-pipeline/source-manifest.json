@@ -7,29 +7,30 @@
     "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline"
   ],
   "sourceHashInputs": [
+    "labs/runtime/webgpu-device-identity.mjs",
     "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline"
   ],
   "browserEntry": "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/index.html",
-  "sourceHash": "sha256:fe7399aeaa8c2ed86499543b1c2a3abfbbef5395cbfe282407db2ce62496525b",
+  "sourceHash": "sha256:624a69e65b925d89de6524febba86d95e9c4845a5b44818c77dd31cd2996df90",
   "publishedHashInputs": [
     "docs/demos/webgpu-exposure-color-pipeline",
-    "docs/demos/assets/index-CpjZJyzU.js",
+    "docs/demos/assets/index-DrSUVdFV.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
     "docs/demos/assets/stage-CpfIdkfY.js",
     "docs/demos/assets/three.tsl--5AYqKVA.js",
-    "docs/demos/assets/three.webgpu-Dss1ekdK.js"
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js",
+    "docs/demos/assets/webgpu-device-identity-uNUcs3Wh.js"
   ],
   "emittedAssetDependencies": [
-    "docs/demos/assets/index-CpjZJyzU.js",
+    "docs/demos/assets/index-DrSUVdFV.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
     "docs/demos/assets/stage-CpfIdkfY.js",
     "docs/demos/assets/three.tsl--5AYqKVA.js",
-    "docs/demos/assets/three.webgpu-Dss1ekdK.js"
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js",
+    "docs/demos/assets/webgpu-device-identity-uNUcs3Wh.js"
   ],
-  "publishedBundleHash": "sha256:d39f50842c5eec955765351b032e43bc2f57c9e080e731edc1bbef352203f852",
+  "publishedBundleHash": "sha256:afb21d87a09147fe4c7ecb2fa38fc4ab4fba3cfe8c46732e091e3ff19525551c",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:36e4490fcd74f5f358440cf8a67dbb057ea2e2c73bcfde6078bc53b0a5e63ee2",
-  "evidenceBundleId": null,
-  "skill": "threejs-exposure-color-grading",
-  "publishPath": "/demos/webgpu-exposure-color-pipeline/"
+  "buildRevision": "sha256:4754cb3c1dfa6966f3bb946b270578476d12628fa2ac597ec254ab8568601690",
+  "evidenceBundleId": null
 }

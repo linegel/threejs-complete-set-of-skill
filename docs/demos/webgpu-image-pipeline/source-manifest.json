@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "labId": "webgpu-image-pipeline",
   "kind": "canonical-lab",
-  "status": "accepted",
+  "status": "incomplete",
   "canonicalSource": [
     "threejs-image-pipeline/examples/webgpu-image-pipeline"
   ],
@@ -15,13 +15,13 @@
     "threejs-image-pipeline/examples/webgpu-image-pipeline"
   ],
   "browserEntry": "threejs-image-pipeline/examples/webgpu-image-pipeline/index.html",
-  "sourceHash": "sha256:1abae9bb29b9f64aa5cd70ae7c916d0c0371304da94e7a6190630834b311c0ec",
+  "sourceHash": "sha256:f55e0e6af55f99dffc4c5160bdecf74eb36a5d1daa196b7fa0366810565d348b",
   "publishedHashInputs": [
     "docs/demos/webgpu-image-pipeline",
     "docs/demos/assets/BloomNode-B7VcMtwE.js",
     "docs/demos/assets/GTAONode-IHocvv2Q.js",
     "docs/demos/assets/TRAANode-s2X8LMY_.js",
-    "docs/demos/assets/canonical-browser-app-BHlpABDs.js",
+    "docs/demos/assets/canonical-browser-app-D77GmXJG.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
     "docs/demos/assets/stage-CpfIdkfY.js",
     "docs/demos/assets/three.tsl--5AYqKVA.js",
@@ -32,15 +32,15 @@
     "docs/demos/assets/BloomNode-B7VcMtwE.js",
     "docs/demos/assets/GTAONode-IHocvv2Q.js",
     "docs/demos/assets/TRAANode-s2X8LMY_.js",
-    "docs/demos/assets/canonical-browser-app-BHlpABDs.js",
+    "docs/demos/assets/canonical-browser-app-D77GmXJG.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
     "docs/demos/assets/stage-CpfIdkfY.js",
     "docs/demos/assets/three.tsl--5AYqKVA.js",
     "docs/demos/assets/three.webgpu-Dss1ekdK.js",
     "docs/demos/assets/webgpu-device-identity-uNUcs3Wh.js"
   ],
-  "publishedBundleHash": "sha256:0772fc4768b83166bbcbcd692cb62964a77cf714c05f980e473fa822aaca5193",
+  "publishedBundleHash": "sha256:23b24c46eaac42d0e8189300a08c50296549bd903afd5a74769849777efe82b1",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:7ba7b3cc2b0ff75eb71ecf5d8b8e7b6bdf9407d8570076f6a6bce907a7e649d6",
+  "buildRevision": "sha256:4754cb3c1dfa6966f3bb946b270578476d12628fa2ac597ec254ab8568601690",
   "evidenceBundleId": "bundle"
 }
