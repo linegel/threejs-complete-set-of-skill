@@ -391,6 +391,7 @@ export class BoundedWaterLabController {
     this.time = 0;
     this.timeNode.value = 0;
     await this.rebuildWater();
+    await this.applySeededImpulseForCapture();
     await this.renderOnce();
   }
 
@@ -415,11 +416,33 @@ export class BoundedWaterLabController {
     if (seconds < this.time) {
       this.time = 0;
       await this.rebuildWater();
+      // rebuildWater only auto-drops when profile.seedDrop is set. Always re-apply
+      // a seed-derived impulse on rewind so harness seed sweeps stay falsifiable
+      // after setSeed() + setTime(0) (builtin capture order).
+      await this.applySeededImpulseForCapture();
     }
     await this.advanceSimulation(seconds - this.time);
     this.time = seconds;
     this.timeNode.value = this.system.heightfield.simulationTime;
     await this.renderOnce();
+  }
+
+  async applySeededImpulseForCapture() {
+    if (!this.system?.heightfield) return;
+    const drops = seededDropSequence(this.seed, 4, this.system.heightfield.parameters);
+    for (const drop of drops) {
+      this.system.heightfield.setDrop({
+        x: drop.x * this.system.heightfield.parameters.worldSize.x * 0.35,
+        z: drop.z * this.system.heightfield.parameters.worldSize.y * 0.35,
+        radius: Math.max(drop.radius, 0.22),
+        strength: Math.max(drop.strength, 0.55),
+      });
+    }
+    // Advance the heightfield only — keep the controller clock at the caller's
+    // time base so setTime(0) then setTime(1/60) still advances a real frame
+    // (builtin temporal capture order: setSeed → setTime).
+    await this.advanceSimulation(this.system.heightfield.fixedTimeStep * 24);
+    this.timeNode.value = this.system.heightfield.simulationTime;
   }
 
   async step(deltaSeconds) {
@@ -451,10 +474,21 @@ export class BoundedWaterLabController {
   }
 
   async capturePixels(target = "final") {
-    if (target !== "final" && !Object.hasOwn(WATER_DEBUG_MODES, target)) throw new Error(`Unknown bounded-water capture target "${target}".`);
+    // Builtin harness writeCapture always passes target "final" after setMode
+    // selected the display alias (no-post→normals, diagnostics→height). Do not
+    // clobber that alias by re-applying final mode for presentation readbacks.
+    const presentationTargets = new Set(["final", "presentation", "output"]);
+    const isPresentation = presentationTargets.has(target);
+    if (!isPresentation && !Object.hasOwn(WATER_DEBUG_MODES, target)) {
+      throw new Error(`Unknown bounded-water capture target "${target}".`);
+    }
     const previousMode = this.mode;
-    const captureMode = target === "final" ? "final" : target;
-    if (captureMode !== this.mode) await this.setMode(captureMode);
+    const previousSelection = this.selection.mode;
+    let switched = false;
+    if (!isPresentation) {
+      await this.setMode(target);
+      switched = true;
+    }
     const width = this.renderer.domElement.width;
     const height = this.renderer.domElement.height;
     const renderTarget = new RenderTarget(width, height, { type: UnsignedByteType });
@@ -479,7 +513,14 @@ export class BoundedWaterLabController {
     } finally {
       this.renderer.setRenderTarget(previousTarget);
       renderTarget.dispose();
-      if (this.mode !== previousMode) await this.setMode(previousMode);
+      if (switched) {
+        // Restore prior display selection (may be a diagnostics alias).
+        if (previousSelection && previousSelection !== this.selection.mode) {
+          await this.setMode(previousSelection);
+        } else if (this.mode !== previousMode) {
+          await this.setMode(previousMode);
+        }
+      }
     }
   }
 

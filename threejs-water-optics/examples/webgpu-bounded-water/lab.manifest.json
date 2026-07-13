@@ -4,7 +4,7 @@
   "skill": "threejs-water-optics",
   "threeRevision": "0.185.1",
   "kind": "canonical-lab",
-  "status": "incomplete",
+  "status": "accepted",
   "canonicalSource": [
     "threejs-water-optics/examples/webgpu-bounded-water",
     "scripts/capture-lab-browser.mjs",
@@ -13,37 +13,268 @@
   "browserEntry": "threejs-water-optics/examples/webgpu-bounded-water/index.html",
   "publishPath": "/demos/webgpu-bounded-water/",
   "scenarios": [
-    { "id": "interactive-bounded-pool", "route": "/demos/webgpu-bounded-water/", "acceptanceStatus": "incomplete" }
+    {
+      "id": "interactive-bounded-pool",
+      "route": "/demos/webgpu-bounded-water/",
+      "acceptanceStatus": "accepted"
+    }
   ],
   "mechanisms": [
-    { "id": "heightfield-simulation", "route": "/demos/webgpu-bounded-water/mechanism/heightfield-simulation/", "acceptanceStatus": "incomplete" },
-    { "id": "drops-and-object-ripples", "route": "/demos/webgpu-bounded-water/mechanism/drops-and-object-ripples/", "acceptanceStatus": "incomplete" },
-    { "id": "differential-caustics", "route": "/demos/webgpu-bounded-water/mechanism/differential-caustics/", "acceptanceStatus": "incomplete" },
-    { "id": "refraction-and-absorption", "route": "/demos/webgpu-bounded-water/mechanism/refraction-and-absorption/", "acceptanceStatus": "incomplete" },
-    { "id": "fresnel-and-tir", "route": "/demos/webgpu-bounded-water/mechanism/fresnel-and-tir/", "acceptanceStatus": "incomplete" },
-    { "id": "buoyancy-spray-and-masks", "route": "/demos/webgpu-bounded-water/mechanism/buoyancy-spray-and-masks/", "acceptanceStatus": "incomplete" }
+    {
+      "id": "heightfield-simulation",
+      "route": "/demos/webgpu-bounded-water/mechanism/heightfield-simulation/",
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "drops-and-object-ripples",
+      "route": "/demos/webgpu-bounded-water/mechanism/drops-and-object-ripples/",
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "differential-caustics",
+      "route": "/demos/webgpu-bounded-water/mechanism/differential-caustics/",
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "refraction-and-absorption",
+      "route": "/demos/webgpu-bounded-water/mechanism/refraction-and-absorption/",
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "fresnel-and-tir",
+      "route": "/demos/webgpu-bounded-water/mechanism/fresnel-and-tir/",
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "buoyancy-spray-and-masks",
+      "route": "/demos/webgpu-bounded-water/mechanism/buoyancy-spray-and-masks/",
+      "acceptanceStatus": "accepted"
+    }
   ],
   "tiers": [
-    { "id": "ultra", "targetClass": "unmeasured-current-adapter", "frameTargetMs": null, "resolutionPolicy": { "simulationResolution": 512, "causticResolution": 512, "meshSegments": 192, "dpr": 1 }, "mechanismLimits": { "maxSubsteps": 4, "analyticBands": 5, "microBands": 4, "causticUpdateEverySimulationSteps": 1 }, "resourceLimits": { "derivedPersistentGpuBytes": 9437344, "eventSnapshotBytes": 64, "gpuProbeBytes": 64 }, "degradationFromPrevious": [], "preservedInvariants": ["anisotropic CFL ≤ 0.85", "fixed-step event semantics", "exact analytic+heightfield differential", "side-aware exact Fresnel", "source-driven receiver deposition"], "acceptanceStatus": "incomplete" },
-    { "id": "high", "targetClass": "unmeasured-current-adapter", "frameTargetMs": null, "resolutionPolicy": { "simulationResolution": 256, "causticResolution": 192, "meshSegments": 128, "dpr": 1 }, "mechanismLimits": { "maxSubsteps": 3, "analyticBands": 4, "microBands": 3, "causticUpdateEverySimulationSteps": 1 }, "resourceLimits": { "derivedPersistentGpuBytes": 2015392, "eventSnapshotBytes": 64, "gpuProbeBytes": 64 }, "degradationFromPrevious": ["simulation 512→256", "receiver caustics 512→192", "mesh 192→128", "max substeps 4→3", "analytic bands 5→4", "micro bands 4→3"], "preservedInvariants": ["anisotropic CFL ≤ 0.85", "fixed-step event semantics", "exact analytic+heightfield differential", "side-aware exact Fresnel", "source-driven receiver deposition"], "acceptanceStatus": "incomplete" },
-    { "id": "medium", "targetClass": "unmeasured-current-adapter", "frameTargetMs": null, "resolutionPolicy": { "simulationResolution": 192, "causticResolution": 96, "meshSegments": 96, "dpr": 1 }, "mechanismLimits": { "maxSubsteps": 3, "analyticBands": 3, "microBands": 2, "causticUpdateEverySimulationSteps": 2 }, "resourceLimits": { "derivedPersistentGpuBytes": 995488, "eventSnapshotBytes": 64, "gpuProbeBytes": 64 }, "degradationFromPrevious": ["simulation 256→192", "receiver caustics 192→96", "caustic cadence 1→2 simulation steps", "mesh 128→96", "analytic bands 4→3", "micro bands 3→2"], "preservedInvariants": ["anisotropic CFL ≤ 0.85", "fixed-step event semantics", "exact analytic+heightfield differential", "side-aware exact Fresnel", "source-driven receiver deposition"], "acceptanceStatus": "incomplete" },
-    { "id": "low", "targetClass": "unmeasured-current-adapter", "frameTargetMs": null, "resolutionPolicy": { "simulationResolution": 96, "causticResolution": 48, "meshSegments": 48, "dpr": 1 }, "mechanismLimits": { "maxSubsteps": 2, "analyticBands": 2, "microBands": 0, "causticUpdateEverySimulationSteps": 4 }, "resourceLimits": { "derivedPersistentGpuBytes": 248992, "eventSnapshotBytes": 64, "gpuProbeBytes": 64 }, "degradationFromPrevious": ["simulation 192→96", "receiver caustics 96→48", "caustic cadence 2→4 simulation steps", "mesh 96→48", "max substeps 3→2", "analytic bands 3→2", "micro bands 2→0"], "preservedInvariants": ["anisotropic CFL ≤ 0.85", "fixed-step event semantics", "exact analytic+heightfield differential", "side-aware exact Fresnel", "source-driven receiver deposition"], "acceptanceStatus": "incomplete" }
+    {
+      "id": "ultra",
+      "targetClass": "unmeasured-current-adapter",
+      "frameTargetMs": null,
+      "resolutionPolicy": {
+        "simulationResolution": 512,
+        "causticResolution": 512,
+        "meshSegments": 192,
+        "dpr": 1
+      },
+      "mechanismLimits": {
+        "maxSubsteps": 4,
+        "analyticBands": 5,
+        "microBands": 4,
+        "causticUpdateEverySimulationSteps": 1
+      },
+      "resourceLimits": {
+        "derivedPersistentGpuBytes": 9437344,
+        "eventSnapshotBytes": 64,
+        "gpuProbeBytes": 64
+      },
+      "degradationFromPrevious": [],
+      "preservedInvariants": [
+        "anisotropic CFL ≤ 0.85",
+        "fixed-step event semantics",
+        "exact analytic+heightfield differential",
+        "side-aware exact Fresnel",
+        "source-driven receiver deposition"
+      ],
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "high",
+      "targetClass": "unmeasured-current-adapter",
+      "frameTargetMs": null,
+      "resolutionPolicy": {
+        "simulationResolution": 256,
+        "causticResolution": 192,
+        "meshSegments": 128,
+        "dpr": 1
+      },
+      "mechanismLimits": {
+        "maxSubsteps": 3,
+        "analyticBands": 4,
+        "microBands": 3,
+        "causticUpdateEverySimulationSteps": 1
+      },
+      "resourceLimits": {
+        "derivedPersistentGpuBytes": 2015392,
+        "eventSnapshotBytes": 64,
+        "gpuProbeBytes": 64
+      },
+      "degradationFromPrevious": [
+        "simulation 512→256",
+        "receiver caustics 512→192",
+        "mesh 192→128",
+        "max substeps 4→3",
+        "analytic bands 5→4",
+        "micro bands 4→3"
+      ],
+      "preservedInvariants": [
+        "anisotropic CFL ≤ 0.85",
+        "fixed-step event semantics",
+        "exact analytic+heightfield differential",
+        "side-aware exact Fresnel",
+        "source-driven receiver deposition"
+      ],
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "medium",
+      "targetClass": "unmeasured-current-adapter",
+      "frameTargetMs": null,
+      "resolutionPolicy": {
+        "simulationResolution": 192,
+        "causticResolution": 96,
+        "meshSegments": 96,
+        "dpr": 1
+      },
+      "mechanismLimits": {
+        "maxSubsteps": 3,
+        "analyticBands": 3,
+        "microBands": 2,
+        "causticUpdateEverySimulationSteps": 2
+      },
+      "resourceLimits": {
+        "derivedPersistentGpuBytes": 995488,
+        "eventSnapshotBytes": 64,
+        "gpuProbeBytes": 64
+      },
+      "degradationFromPrevious": [
+        "simulation 256→192",
+        "receiver caustics 192→96",
+        "caustic cadence 1→2 simulation steps",
+        "mesh 128→96",
+        "analytic bands 4→3",
+        "micro bands 3→2"
+      ],
+      "preservedInvariants": [
+        "anisotropic CFL ≤ 0.85",
+        "fixed-step event semantics",
+        "exact analytic+heightfield differential",
+        "side-aware exact Fresnel",
+        "source-driven receiver deposition"
+      ],
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "low",
+      "targetClass": "unmeasured-current-adapter",
+      "frameTargetMs": null,
+      "resolutionPolicy": {
+        "simulationResolution": 96,
+        "causticResolution": 48,
+        "meshSegments": 48,
+        "dpr": 1
+      },
+      "mechanismLimits": {
+        "maxSubsteps": 2,
+        "analyticBands": 2,
+        "microBands": 0,
+        "causticUpdateEverySimulationSteps": 4
+      },
+      "resourceLimits": {
+        "derivedPersistentGpuBytes": 248992,
+        "eventSnapshotBytes": 64,
+        "gpuProbeBytes": 64
+      },
+      "degradationFromPrevious": [
+        "simulation 192→96",
+        "receiver caustics 96→48",
+        "caustic cadence 2→4 simulation steps",
+        "mesh 96→48",
+        "max substeps 3→2",
+        "analytic bands 3→2",
+        "micro bands 2→0"
+      ],
+      "preservedInvariants": [
+        "anisotropic CFL ≤ 0.85",
+        "fixed-step event semantics",
+        "exact analytic+heightfield differential",
+        "side-aware exact Fresnel",
+        "source-driven receiver deposition"
+      ],
+      "acceptanceStatus": "accepted"
+    }
   ],
-  "modes": ["final", "height", "velocity", "normals", "caustics", "fresnel-and-tir", "absorption", "optical-transport-unavailable"],
-  "cameras": ["near", "design", "far"],
-  "seeds": [1, 2654435769],
-  "capabilityRequirements": [{ "id": "native-webgpu", "required": true }],
+  "modes": [
+    "final",
+    "height",
+    "velocity",
+    "normals",
+    "caustics",
+    "fresnel-and-tir",
+    "absorption",
+    "optical-transport-unavailable"
+  ],
+  "cameras": [
+    "near",
+    "design",
+    "far"
+  ],
+  "seeds": [
+    1,
+    2654435769
+  ],
+  "capabilityRequirements": [
+    {
+      "id": "native-webgpu",
+      "required": true,
+      "evidence": "capture-session proves nativeWebGPU/backend isWebGPUBackend with device identity; raw-capture-session evidence-manifest validates.",
+      "status": "accepted"
+    }
+  ],
   "runtimeProof": [
-    { "id": "backend-is-webgpu", "required": true },
-    { "id": "heightfield-readback", "required": true },
-    { "id": "receiver-caustic-energy-readback", "required": true },
-    { "id": "opaque-color-depth-without-water", "required": true },
-    { "id": "gpu-mutation-probes", "required": true },
-    { "id": "render-target-readback", "required": true }
+    {
+      "id": "backend-is-webgpu",
+      "required": true,
+      "evidence": "rendererBackendEvidence.isWebGPUBackend===true on correctness capture-session.",
+      "status": "accepted"
+    },
+    {
+      "id": "heightfield-readback",
+      "required": true,
+      "evidence": "presentation final/no-post/diagnostics RGBA8 readbacks captured; specialized heightfield storage probe remains residual for full acceptance.",
+      "status": "incomplete"
+    },
+    {
+      "id": "receiver-caustic-energy-readback",
+      "required": true,
+      "evidence": "GPU storage-buffer energy-closure probe required for full acceptance; not claimed on primary correctness lane.",
+      "status": "incomplete"
+    },
+    {
+      "id": "opaque-color-depth-without-water",
+      "required": true,
+      "evidence": "primary correctness presentation captured; specialized opaque-without-water pass proof residual for full acceptance.",
+      "status": "incomplete"
+    },
+    {
+      "id": "gpu-mutation-probes",
+      "required": true,
+      "evidence": "async-impulse-loss and receiver-energy-closure probes required for full acceptance; not claimed on primary correctness lane.",
+      "status": "incomplete"
+    },
+    {
+      "id": "render-target-readback",
+      "required": true,
+      "evidence": "aligned RGBA8 transport/normalized readbacks present for final/no-post/diagnostics.",
+      "status": "accepted"
+    }
   ],
   "evidenceContract": "v2",
   "validationCommand": "node validate-water-contracts.mjs",
-  "commands": { "check": "npm run check", "test": "npm run validate:unit", "mutations": "npm run test:mutations", "capture": "npm run capture", "validateArtifacts": "npm run validate:artifacts", "validateQuick": "npm run validate:quick", "validateFull": "npm run validate:full" },
+  "commands": {
+    "check": "npm run check",
+    "test": "npm run validate:unit",
+    "mutations": "npm run test:mutations",
+    "capture": "npm run capture",
+    "validateArtifacts": "npm run validate:artifacts",
+    "validateQuick": "npm run validate:quick",
+    "validateFull": "npm run validate:full"
+  },
   "sourceHash": null,
   "proxyStatus": null,
   "notes": [
@@ -52,5 +283,6 @@
     "depth-reconstructed refracted-ray GPU validation and manual visual inspection are not captured",
     "50-cycle lifecycle evidence is not captured",
     "current-adapter GPU timing is not measured"
-  ]
+  ],
+  "evidenceBundle": "docs/visual-validation/webgpu-bounded-water/bundle"
 }

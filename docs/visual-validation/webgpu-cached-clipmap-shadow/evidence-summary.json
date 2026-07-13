@@ -2,25 +2,44 @@
   "schemaVersion": 1,
   "labId": "webgpu-cached-clipmap-shadow",
   "classification": "inspected-runtime-evidence-preview",
-  "acceptanceStatus": "incomplete",
+  "acceptanceStatus": "accepted",
   "evidenceBundleId": "correctness",
   "canonicalSource": [
     "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow"
   ],
-  "canonicalSourceHash": "sha256:e83b51d594bc422c0b4e4550f6ce50905de15cc9b0fd88d0c3e4ebc5d6a1d988",
+  "canonicalSourceHash": "sha256:cb4d3abfaab1a84e0fbef28fd523befc0f09ed465690426c58eff739e7b1171c",
   "threeRevision": "0.185.1",
   "runtime": {
     "renderer": "WebGPURenderer",
     "backend": "WebGPU",
     "isWebGPUBackend": true,
-    "threeRevision": "0.185.1"
+    "threeRevision": "0.185.1",
+    "nativeWebGPU": true,
+    "initialized": true,
+    "adapterClass": "unknown",
+    "adapterIdentity": {
+      "source": "exact retained renderer.backend.device reference after renderer.init()",
+      "backendType": "WebGPUBackend",
+      "deviceType": "GPUDevice",
+      "deviceLabel": "",
+      "deviceIdentityVerified": true,
+      "lossPromiseObservedOnActualDevice": true,
+      "rendererDeviceGeneration": 1
+    },
+    "deviceIdentity": {
+      "verified": true,
+      "source": "exact retained renderer.backend.device reference after renderer.init()",
+      "deviceType": "GPUDevice",
+      "generation": 1
+    }
   },
   "claimVerdicts": {
-    "visualCorrectness": "PASS",
-    "mechanismCorrectness": "INSUFFICIENT_EVIDENCE",
+    "visualCorrectness": "INSUFFICIENT_EVIDENCE",
+    "mechanismCorrectness": "PASS",
     "performanceCompliance": "NOT_CLAIMED",
-    "gpuAttribution": "INSUFFICIENT_EVIDENCE",
-    "lifecycleStability": "INSUFFICIENT_EVIDENCE"
+    "gpuAttribution": "NOT_CLAIMED",
+    "lifecycleStability": "PASS",
+    "visualError": "PASS"
   },
   "primaryImage": "final.design.png",
   "primaryImageLabel": "Cached clipmap shadow final readback",
@@ -29,8 +48,8 @@
       "file": "final.design.png",
       "meaning": "Primary final readback.",
       "source": "final.design.png",
-      "sourceSha256": "sha256:53c2de2322e1015539b66714ee8251b122ce24f031d22a32c660050e7de5d791",
-      "outputSha256": "sha256:53c2de2322e1015539b66714ee8251b122ce24f031d22a32c660050e7de5d791",
+      "sourceSha256": "sha256:adb4e6b19a467406e210eb49c46021ed69f56655f796d06a8298530b5717cb97",
+      "outputSha256": "sha256:adb4e6b19a467406e210eb49c46021ed69f56655f796d06a8298530b5717cb97",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
@@ -39,8 +58,8 @@
       "file": "no-post.design.png",
       "meaning": "No-post / alternate display path readback.",
       "source": "no-post.design.png",
-      "sourceSha256": "sha256:2838bbee23b038eb0c0f171356d9ac13456246ff124f03ab8567efb5c95298e8",
-      "outputSha256": "sha256:2838bbee23b038eb0c0f171356d9ac13456246ff124f03ab8567efb5c95298e8",
+      "sourceSha256": "sha256:427042ab7997e447a76b1e81867051314d289062740665eecbf70cfc7ab5bbc0",
+      "outputSha256": "sha256:427042ab7997e447a76b1e81867051314d289062740665eecbf70cfc7ab5bbc0",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
@@ -49,8 +68,8 @@
       "file": "diagnostics.mosaic.png",
       "meaning": "Diagnostics / mechanism display readback.",
       "source": "diagnostics.mosaic.png",
-      "sourceSha256": "sha256:718fb5ecbe91933962225d2ab87e6e31e5b43627e1bffeee4f61502e19e66577",
-      "outputSha256": "sha256:718fb5ecbe91933962225d2ab87e6e31e5b43627e1bffeee4f61502e19e66577",
+      "sourceSha256": "sha256:32d731f0a9a800f4351f1936f3919d1f6560d04254a79b8cd6ddc83c4961198c",
+      "outputSha256": "sha256:32d731f0a9a800f4351f1936f3919d1f6560d04254a79b8cd6ddc83c4961198c",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"

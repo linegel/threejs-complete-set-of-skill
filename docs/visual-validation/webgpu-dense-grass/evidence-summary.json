@@ -3,7 +3,7 @@
   "labId": "webgpu-dense-grass",
   "classification": "inspected-runtime-evidence-preview",
   "acceptanceStatus": "accepted",
-  "evidenceBundleId": "bundle",
+  "evidenceBundleId": "correctness",
   "canonicalSource": [
     "threejs-procedural-vegetation/examples/webgpu-dense-grass"
   ],
@@ -13,10 +13,28 @@
     "renderer": "WebGPURenderer",
     "backend": "WebGPU",
     "isWebGPUBackend": true,
-    "threeRevision": "0.185.1"
+    "threeRevision": "0.185.1",
+    "nativeWebGPU": true,
+    "initialized": true,
+    "adapterClass": "unknown",
+    "adapterIdentity": {
+      "source": "exact retained renderer.backend.device reference after renderer.init()",
+      "backendType": "WebGPUBackend",
+      "deviceType": "GPUDevice",
+      "deviceLabel": "",
+      "deviceIdentityVerified": true,
+      "lossPromiseObservedOnActualDevice": true,
+      "rendererDeviceGeneration": 1
+    },
+    "deviceIdentity": {
+      "verified": true,
+      "source": "exact retained renderer.backend.device reference after renderer.init()",
+      "deviceType": "GPUDevice",
+      "generation": 1
+    }
   },
   "claimVerdicts": {
-    "visualCorrectness": "PASS",
+    "visualCorrectness": "INSUFFICIENT_EVIDENCE",
     "mechanismCorrectness": "PASS",
     "performanceCompliance": "NOT_CLAIMED",
     "gpuAttribution": "NOT_CLAIMED",

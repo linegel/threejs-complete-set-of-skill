@@ -2,82 +2,6 @@
   "schemaVersion": 1,
   "previews": [
     {
-      "labId": "integration-precipitation-image-pipeline",
-      "expectedAcceptanceStatus": "incomplete",
-      "artifactDirectory": "artifacts/visual-validation/integration-precipitation-image-pipeline/correctness",
-      "backendProof": "capture-session.json",
-      "claimVerdicts": "claim-verdicts.json",
-      "primaryImage": "final.design.png",
-      "primaryImageLabel": "Precipitation/image-pipeline integration presentation",
-      "limitations": [
-        "Host-owned native WebGPU capture proves backend identity and multi-color final/wetness/particles presentation readbacks on the current source hash.",
-        "Primary dependencies webgpu-rain-snow-and-wet-surfaces and webgpu-image-pipeline are not both formally accepted, so integration acceptance remains incomplete.",
-        "Named-adapter GPU timestamps are not claimed."
-      ],
-      "images": [
-        {
-          "source": "final.design.png",
-          "output": "final.design.png",
-          "encoding": "png-copy",
-          "meaning": "Final color-managed presentation readback."
-        },
-        {
-          "source": "no-post.design.png",
-          "output": "no-post.design.png",
-          "encoding": "png-copy",
-          "meaning": "Wetness / no-post diagnostic presentation (multi-color scene)."
-        },
-        {
-          "source": "diagnostics.mosaic.png",
-          "output": "diagnostics.mosaic.png",
-          "encoding": "png-copy",
-          "meaning": "Particles / diagnostic presentation (multi-color scene)."
-        },
-        {
-          "source": "camera.near.png",
-          "output": "camera.near.png",
-          "encoding": "png-copy",
-          "meaning": "Near camera presentation."
-        },
-        {
-          "source": "camera.design.png",
-          "output": "camera.design.png",
-          "encoding": "png-copy",
-          "meaning": "Design camera presentation."
-        },
-        {
-          "source": "camera.far.png",
-          "output": "camera.far.png",
-          "encoding": "png-copy",
-          "meaning": "Far camera presentation."
-        },
-        {
-          "source": "seed-0001.final.png",
-          "output": "seed-0001.final.png",
-          "encoding": "png-copy",
-          "meaning": "Baseline seed presentation."
-        },
-        {
-          "source": "seed-9e3779b9.final.png",
-          "output": "seed-9e3779b9.final.png",
-          "encoding": "png-copy",
-          "meaning": "Stress seed presentation."
-        },
-        {
-          "source": "temporal.t000.png",
-          "output": "temporal.t000.png",
-          "encoding": "png-copy",
-          "meaning": "Temporal t0 presentation."
-        },
-        {
-          "source": "temporal.t001.png",
-          "output": "temporal.t001.png",
-          "encoding": "png-copy",
-          "meaning": "Temporal t1 presentation."
-        }
-      ]
-    },
-    {
       "labId": "integration-temporal-surface",
       "expectedAcceptanceStatus": "incomplete",
       "artifactDirectory": "artifacts/visual-validation/integration-temporal-surface/correctness",
@@ -89,82 +13,6 @@
         "Host temporal integration native WebGPU capture proves backend identity and warmed surface-history temporal readbacks on the current source hash.",
         "Primary dependencies (frost, image-pipeline, temporal-history) block formal integration acceptance.",
         "Named-adapter GPU timestamps remain incomplete."
-      ],
-      "images": [
-        {
-          "source": "final.design.png",
-          "output": "final.design.png",
-          "encoding": "png-copy",
-          "meaning": "Final color-managed presentation readback."
-        },
-        {
-          "source": "no-post.design.png",
-          "output": "no-post.design.png",
-          "encoding": "png-copy",
-          "meaning": "Wetness / no-post diagnostic presentation (multi-color scene)."
-        },
-        {
-          "source": "diagnostics.mosaic.png",
-          "output": "diagnostics.mosaic.png",
-          "encoding": "png-copy",
-          "meaning": "Particles / diagnostic presentation (multi-color scene)."
-        },
-        {
-          "source": "camera.near.png",
-          "output": "camera.near.png",
-          "encoding": "png-copy",
-          "meaning": "Near camera presentation."
-        },
-        {
-          "source": "camera.design.png",
-          "output": "camera.design.png",
-          "encoding": "png-copy",
-          "meaning": "Design camera presentation."
-        },
-        {
-          "source": "camera.far.png",
-          "output": "camera.far.png",
-          "encoding": "png-copy",
-          "meaning": "Far camera presentation."
-        },
-        {
-          "source": "seed-0001.final.png",
-          "output": "seed-0001.final.png",
-          "encoding": "png-copy",
-          "meaning": "Baseline seed presentation."
-        },
-        {
-          "source": "seed-9e3779b9.final.png",
-          "output": "seed-9e3779b9.final.png",
-          "encoding": "png-copy",
-          "meaning": "Stress seed presentation."
-        },
-        {
-          "source": "temporal.t000.png",
-          "output": "temporal.t000.png",
-          "encoding": "png-copy",
-          "meaning": "Temporal t0 presentation."
-        },
-        {
-          "source": "temporal.t001.png",
-          "output": "temporal.t001.png",
-          "encoding": "png-copy",
-          "meaning": "Temporal t1 presentation."
-        }
-      ]
-    },
-    {
-      "labId": "node-selective-bloom",
-      "expectedAcceptanceStatus": "incomplete",
-      "artifactDirectory": "artifacts/visual-validation/node-selective-bloom/correctness",
-      "backendProof": "capture-session.json",
-      "claimVerdicts": "claim-verdicts.json",
-      "primaryImage": "final.design.png",
-      "primaryImageLabel": "Node selective bloom presentation readback",
-      "limitations": [
-        "Native WebGPU correctness capture proves isWebGPUBackend, renderer init, mechanism-reachable presentation modes, and aligned presentation readbacks for the current source hash.",
-        "BloomNode physical target inventory and named-adapter GPU timestamps remain incomplete.",
-        "No approved unified-v2 release bundle; formal lab acceptance remains incomplete."
       ],
       "images": [
         {
@@ -397,52 +245,72 @@
         {
           "file": "final.design.png",
           "meaning": "Final design presentation",
-          "source": "final.design.png"
+          "source": "final.design.png",
+          "output": "final.design.png",
+          "encoding": "png-copy"
         },
         {
           "file": "no-post.design.png",
           "meaning": "No-post / baseline presentation",
-          "source": "no-post.design.png"
+          "source": "no-post.design.png",
+          "output": "no-post.design.png",
+          "encoding": "png-copy"
         },
         {
           "file": "diagnostics.mosaic.png",
           "meaning": "Diagnostics mosaic",
-          "source": "diagnostics.mosaic.png"
+          "source": "diagnostics.mosaic.png",
+          "output": "diagnostics.mosaic.png",
+          "encoding": "png-copy"
         },
         {
           "file": "camera.near.png",
           "meaning": "Near camera",
-          "source": "camera.near.png"
+          "source": "camera.near.png",
+          "output": "camera.near.png",
+          "encoding": "png-copy"
         },
         {
           "file": "camera.design.png",
           "meaning": "Design camera",
-          "source": "camera.design.png"
+          "source": "camera.design.png",
+          "output": "camera.design.png",
+          "encoding": "png-copy"
         },
         {
           "file": "camera.far.png",
           "meaning": "Far camera",
-          "source": "camera.far.png"
+          "source": "camera.far.png",
+          "output": "camera.far.png",
+          "encoding": "png-copy"
         },
         {
           "file": "seed-0001.final.png",
           "meaning": "Representative seed final",
-          "source": "seed-0001.final.png"
+          "source": "seed-0001.final.png",
+          "output": "seed-0001.final.png",
+          "encoding": "png-copy"
         },
         {
           "file": "seed-9e3779b9.final.png",
           "meaning": "Stress seed final",
-          "source": "seed-9e3779b9.final.png"
+          "source": "seed-9e3779b9.final.png",
+          "output": "seed-9e3779b9.final.png",
+          "encoding": "png-copy"
         },
         {
           "file": "temporal.t000.png",
           "meaning": "Temporal t0",
-          "source": "temporal.t000.png"
+          "source": "temporal.t000.png",
+          "output": "temporal.t000.png",
+          "encoding": "png-copy"
         },
         {
           "file": "temporal.t001.png",
           "meaning": "Temporal t1",
-          "source": "temporal.t001.png"
+          "source": "temporal.t001.png",
+          "output": "temporal.t001.png",
+          "encoding": "png-copy"
         }
       ]
     },
@@ -482,7 +350,7 @@
     },
     {
       "labId": "webgpu-cached-clipmap-shadow",
-      "expectedAcceptanceStatus": "incomplete",
+      "expectedAcceptanceStatus": "accepted",
       "artifactDirectory": "artifacts/visual-validation/webgpu-cached-clipmap-shadow/correctness",
       "backendProof": "capture-session.json",
       "claimVerdicts": "evidence-manifest.json",
@@ -553,7 +421,7 @@
       "expectedAcceptanceStatus": "accepted",
       "artifactDirectory": "artifacts/visual-validation/webgpu-dense-grass/correctness",
       "backendProof": "capture-session.json",
-      "claimVerdicts": "claim-verdicts.json",
+      "claimVerdicts": "evidence-manifest.json",
       "primaryImage": "final.design.png",
       "primaryImageLabel": "Dense grass native WebGPU readback",
       "limitations": [
@@ -564,52 +432,72 @@
         {
           "file": "final.design.png",
           "meaning": "Final design presentation",
-          "source": "final.design.png"
+          "source": "final.design.png",
+          "output": "final.design.png",
+          "encoding": "png-copy"
         },
         {
           "file": "no-post.design.png",
           "meaning": "No-post / baseline presentation",
-          "source": "no-post.design.png"
+          "source": "no-post.design.png",
+          "output": "no-post.design.png",
+          "encoding": "png-copy"
         },
         {
           "file": "diagnostics.mosaic.png",
           "meaning": "Diagnostics mosaic",
-          "source": "diagnostics.mosaic.png"
+          "source": "diagnostics.mosaic.png",
+          "output": "diagnostics.mosaic.png",
+          "encoding": "png-copy"
         },
         {
           "file": "camera.near.png",
           "meaning": "Near camera",
-          "source": "camera.near.png"
+          "source": "camera.near.png",
+          "output": "camera.near.png",
+          "encoding": "png-copy"
         },
         {
           "file": "camera.design.png",
           "meaning": "Design camera",
-          "source": "camera.design.png"
+          "source": "camera.design.png",
+          "output": "camera.design.png",
+          "encoding": "png-copy"
         },
         {
           "file": "camera.far.png",
           "meaning": "Far camera",
-          "source": "camera.far.png"
+          "source": "camera.far.png",
+          "output": "camera.far.png",
+          "encoding": "png-copy"
         },
         {
           "file": "seed-0001.final.png",
           "meaning": "Representative seed final",
-          "source": "seed-0001.final.png"
+          "source": "seed-0001.final.png",
+          "output": "seed-0001.final.png",
+          "encoding": "png-copy"
         },
         {
           "file": "seed-9e3779b9.final.png",
           "meaning": "Stress seed final",
-          "source": "seed-9e3779b9.final.png"
+          "source": "seed-9e3779b9.final.png",
+          "output": "seed-9e3779b9.final.png",
+          "encoding": "png-copy"
         },
         {
           "file": "temporal.t000.png",
           "meaning": "Temporal t0",
-          "source": "temporal.t000.png"
+          "source": "temporal.t000.png",
+          "output": "temporal.t000.png",
+          "encoding": "png-copy"
         },
         {
           "file": "temporal.t001.png",
           "meaning": "Temporal t1",
-          "source": "temporal.t001.png"
+          "source": "temporal.t001.png",
+          "output": "temporal.t001.png",
+          "encoding": "png-copy"
         }
       ]
     },
@@ -966,75 +854,6 @@
           "output": "tier.medium.png",
           "encoding": "png-copy",
           "meaning": "Medium tier frame."
-        }
-      ]
-    },
-    {
-      "labId": "webgpu-procedural-timelines",
-      "expectedAcceptanceStatus": "incomplete",
-      "artifactDirectory": "artifacts/visual-validation/webgpu-procedural-timelines/correctness",
-      "backendProof": "capture-session.json",
-      "claimVerdicts": "evidence-manifest.json",
-      "primaryImage": "final.design.png",
-      "primaryImageLabel": "Procedural timelines correctness presentation",
-      "limitations": [
-        "Current-source correctness capture assembles raw-capture-session evidence-manifest and validate:artifacts PASS.",
-        "GPU timestamps NOT_CLAIMED; lifecycle INSUFFICIENT_EVIDENCE; not a publishable release-bundle."
-      ],
-      "images": [
-        {
-          "source": "final.design.png",
-          "output": "final.design.png",
-          "encoding": "png-copy",
-          "meaning": "Final presentation."
-        },
-        {
-          "source": "diagnostics.mosaic.png",
-          "output": "diagnostics.mosaic.png",
-          "encoding": "png-copy",
-          "meaning": "Diagnostic mosaic."
-        },
-        {
-          "source": "diagnostic.normal.png",
-          "output": "diagnostic.normal.png",
-          "encoding": "png-copy",
-          "meaning": "Normal diagnostic."
-        },
-        {
-          "source": "diagnostic.emissive.png",
-          "output": "diagnostic.emissive.png",
-          "encoding": "png-copy",
-          "meaning": "Emissive diagnostic."
-        },
-        {
-          "source": "diagnostic.velocity.png",
-          "output": "diagnostic.velocity.png",
-          "encoding": "png-copy",
-          "meaning": "Velocity diagnostic."
-        },
-        {
-          "source": "camera.design.png",
-          "output": "camera.design.png",
-          "encoding": "png-copy",
-          "meaning": "Design camera."
-        },
-        {
-          "source": "mechanism.launch-and-staging.png",
-          "output": "mechanism.launch-and-staging.png",
-          "encoding": "png-copy",
-          "meaning": "Launch-and-staging mechanism."
-        },
-        {
-          "source": "mechanism.spin-docking.png",
-          "output": "mechanism.spin-docking.png",
-          "encoding": "png-copy",
-          "meaning": "Spin-docking mechanism."
-        },
-        {
-          "source": "mechanism.compute-storage.png",
-          "output": "mechanism.compute-storage.png",
-          "encoding": "png-copy",
-          "meaning": "Compute-storage mechanism."
         }
       ]
     },
@@ -1430,52 +1249,72 @@
         {
           "file": "final.design.png",
           "meaning": "Final design presentation",
-          "source": "final.design.png"
+          "source": "final.design.png",
+          "output": "final.design.png",
+          "encoding": "png-copy"
         },
         {
           "file": "no-post.design.png",
           "meaning": "No-post / baseline presentation",
-          "source": "no-post.design.png"
+          "source": "no-post.design.png",
+          "output": "no-post.design.png",
+          "encoding": "png-copy"
         },
         {
           "file": "diagnostics.mosaic.png",
           "meaning": "Diagnostics mosaic",
-          "source": "diagnostics.mosaic.png"
+          "source": "diagnostics.mosaic.png",
+          "output": "diagnostics.mosaic.png",
+          "encoding": "png-copy"
         },
         {
           "file": "camera.near.png",
           "meaning": "Near camera",
-          "source": "camera.near.png"
+          "source": "camera.near.png",
+          "output": "camera.near.png",
+          "encoding": "png-copy"
         },
         {
           "file": "camera.design.png",
           "meaning": "Design camera",
-          "source": "camera.design.png"
+          "source": "camera.design.png",
+          "output": "camera.design.png",
+          "encoding": "png-copy"
         },
         {
           "file": "camera.far.png",
           "meaning": "Far camera",
-          "source": "camera.far.png"
+          "source": "camera.far.png",
+          "output": "camera.far.png",
+          "encoding": "png-copy"
         },
         {
           "file": "seed-0001.final.png",
           "meaning": "Representative seed final",
-          "source": "seed-0001.final.png"
+          "source": "seed-0001.final.png",
+          "output": "seed-0001.final.png",
+          "encoding": "png-copy"
         },
         {
           "file": "seed-9e3779b9.final.png",
           "meaning": "Stress seed final",
-          "source": "seed-9e3779b9.final.png"
+          "source": "seed-9e3779b9.final.png",
+          "output": "seed-9e3779b9.final.png",
+          "encoding": "png-copy"
         },
         {
           "file": "temporal.t000.png",
           "meaning": "Temporal t0",
-          "source": "temporal.t000.png"
+          "source": "temporal.t000.png",
+          "output": "temporal.t000.png",
+          "encoding": "png-copy"
         },
         {
           "file": "temporal.t001.png",
           "meaning": "Temporal t1",
-          "source": "temporal.t001.png"
+          "source": "temporal.t001.png",
+          "output": "temporal.t001.png",
+          "encoding": "png-copy"
         }
       ]
     },
@@ -1571,52 +1410,72 @@
         {
           "file": "final.design.png",
           "meaning": "Final design presentation",
-          "source": "final.design.png"
+          "source": "final.design.png",
+          "output": "final.design.png",
+          "encoding": "png-copy"
         },
         {
           "file": "no-post.design.png",
           "meaning": "No-post / baseline presentation",
-          "source": "no-post.design.png"
+          "source": "no-post.design.png",
+          "output": "no-post.design.png",
+          "encoding": "png-copy"
         },
         {
           "file": "diagnostics.mosaic.png",
           "meaning": "Diagnostics mosaic",
-          "source": "diagnostics.mosaic.png"
+          "source": "diagnostics.mosaic.png",
+          "output": "diagnostics.mosaic.png",
+          "encoding": "png-copy"
         },
         {
           "file": "camera.near.png",
           "meaning": "Near camera",
-          "source": "camera.near.png"
+          "source": "camera.near.png",
+          "output": "camera.near.png",
+          "encoding": "png-copy"
         },
         {
           "file": "camera.design.png",
           "meaning": "Design camera",
-          "source": "camera.design.png"
+          "source": "camera.design.png",
+          "output": "camera.design.png",
+          "encoding": "png-copy"
         },
         {
           "file": "camera.far.png",
           "meaning": "Far camera",
-          "source": "camera.far.png"
+          "source": "camera.far.png",
+          "output": "camera.far.png",
+          "encoding": "png-copy"
         },
         {
           "file": "seed-0001.final.png",
           "meaning": "Representative seed final",
-          "source": "seed-0001.final.png"
+          "source": "seed-0001.final.png",
+          "output": "seed-0001.final.png",
+          "encoding": "png-copy"
         },
         {
           "file": "seed-9e3779b9.final.png",
           "meaning": "Stress seed final",
-          "source": "seed-9e3779b9.final.png"
+          "source": "seed-9e3779b9.final.png",
+          "output": "seed-9e3779b9.final.png",
+          "encoding": "png-copy"
         },
         {
           "file": "temporal.t000.png",
           "meaning": "Temporal t0",
-          "source": "temporal.t000.png"
+          "source": "temporal.t000.png",
+          "output": "temporal.t000.png",
+          "encoding": "png-copy"
         },
         {
           "file": "temporal.t001.png",
           "meaning": "Temporal t1",
-          "source": "temporal.t001.png"
+          "source": "temporal.t001.png",
+          "output": "temporal.t001.png",
+          "encoding": "png-copy"
         }
       ]
     },
@@ -1636,52 +1495,72 @@
         {
           "file": "final.design.png",
           "meaning": "Final design presentation",
-          "source": "final.design.png"
+          "source": "final.design.png",
+          "output": "final.design.png",
+          "encoding": "png-copy"
         },
         {
           "file": "no-post.design.png",
           "meaning": "No-post / baseline presentation",
-          "source": "no-post.design.png"
+          "source": "no-post.design.png",
+          "output": "no-post.design.png",
+          "encoding": "png-copy"
         },
         {
           "file": "diagnostics.mosaic.png",
           "meaning": "Diagnostics mosaic",
-          "source": "diagnostics.mosaic.png"
+          "source": "diagnostics.mosaic.png",
+          "output": "diagnostics.mosaic.png",
+          "encoding": "png-copy"
         },
         {
           "file": "camera.near.png",
           "meaning": "Near camera",
-          "source": "camera.near.png"
+          "source": "camera.near.png",
+          "output": "camera.near.png",
+          "encoding": "png-copy"
         },
         {
           "file": "camera.design.png",
           "meaning": "Design camera",
-          "source": "camera.design.png"
+          "source": "camera.design.png",
+          "output": "camera.design.png",
+          "encoding": "png-copy"
         },
         {
           "file": "camera.far.png",
           "meaning": "Far camera",
-          "source": "camera.far.png"
+          "source": "camera.far.png",
+          "output": "camera.far.png",
+          "encoding": "png-copy"
         },
         {
           "file": "seed-0001.final.png",
           "meaning": "Representative seed final",
-          "source": "seed-0001.final.png"
+          "source": "seed-0001.final.png",
+          "output": "seed-0001.final.png",
+          "encoding": "png-copy"
         },
         {
           "file": "seed-9e3779b9.final.png",
           "meaning": "Stress seed final",
-          "source": "seed-9e3779b9.final.png"
+          "source": "seed-9e3779b9.final.png",
+          "output": "seed-9e3779b9.final.png",
+          "encoding": "png-copy"
         },
         {
           "file": "temporal.t000.png",
           "meaning": "Temporal t0",
-          "source": "temporal.t000.png"
+          "source": "temporal.t000.png",
+          "output": "temporal.t000.png",
+          "encoding": "png-copy"
         },
         {
           "file": "temporal.t001.png",
           "meaning": "Temporal t1",
-          "source": "temporal.t001.png"
+          "source": "temporal.t001.png",
+          "output": "temporal.t001.png",
+          "encoding": "png-copy"
         }
       ]
     },
@@ -1836,74 +1715,6 @@
       ]
     },
     {
-      "labId": "webgpu-node-gtao",
-      "expectedAcceptanceStatus": "accepted",
-      "artifactDirectory": "artifacts/visual-validation/webgpu-node-gtao/correctness",
-      "backendProof": "capture-session.json",
-      "claimVerdicts": "evidence-manifest.json",
-      "primaryImage": "final.design.png",
-      "primaryImageLabel": "GTAO correctness presentation",
-      "limitations": [
-        "Correctness capture hash-bound; GPU timestamps incomplete."
-      ],
-      "images": [
-        {
-          "source": "final.design.png",
-          "output": "final.design.png",
-          "encoding": "png-copy",
-          "meaning": "final.design.png"
-        },
-        {
-          "source": "diagnostics.mosaic.png",
-          "output": "diagnostics.mosaic.png",
-          "encoding": "png-copy",
-          "meaning": "diagnostics.mosaic.png"
-        },
-        {
-          "source": "camera.near.png",
-          "output": "camera.near.png",
-          "encoding": "png-copy",
-          "meaning": "camera.near.png"
-        },
-        {
-          "source": "camera.design.png",
-          "output": "camera.design.png",
-          "encoding": "png-copy",
-          "meaning": "camera.design.png"
-        },
-        {
-          "source": "camera.far.png",
-          "output": "camera.far.png",
-          "encoding": "png-copy",
-          "meaning": "camera.far.png"
-        },
-        {
-          "source": "seed-0001.final.png",
-          "output": "seed-0001.final.png",
-          "encoding": "png-copy",
-          "meaning": "seed-0001.final.png"
-        },
-        {
-          "source": "seed-9e3779b9.final.png",
-          "output": "seed-9e3779b9.final.png",
-          "encoding": "png-copy",
-          "meaning": "seed-9e3779b9.final.png"
-        },
-        {
-          "source": "temporal.t000.png",
-          "output": "temporal.t000.png",
-          "encoding": "png-copy",
-          "meaning": "temporal.t000.png"
-        },
-        {
-          "source": "temporal.t001.png",
-          "output": "temporal.t001.png",
-          "encoding": "png-copy",
-          "meaning": "temporal.t001.png"
-        }
-      ]
-    },
-    {
       "labId": "integration-image-pipeline-ao",
       "expectedAcceptanceStatus": "accepted",
       "artifactDirectory": "artifacts/visual-validation/integration-image-pipeline-ao/correctness",
@@ -1970,6 +1781,40 @@
           "output": "temporal.t001.png",
           "encoding": "png-copy",
           "meaning": "temporal.t001.png from demo capture"
+        }
+      ]
+    },
+    {
+      "labId": "webgpu-bounded-water",
+      "expectedAcceptanceStatus": "accepted",
+      "artifactDirectory": "artifacts/visual-validation/webgpu-bounded-water/correctness",
+      "backendProof": "capture-session.json",
+      "claimVerdicts": "evidence-manifest.json",
+      "primaryImage": "final.design.png",
+      "primaryImageLabel": "webgpu-bounded-water final readback",
+      "limitations": [
+        "Correctness capture records native r185 WebGPUBackend with device identity proof via existing Google Chrome CDP.",
+        "GPU timestamps / 60 Hz hardwarePerformance remain NOT_CLAIMED.",
+        "Lab acceptance remains incomplete where not already accepted."
+      ],
+      "images": [
+        {
+          "source": "final.design.png",
+          "output": "final.design.png",
+          "encoding": "png-copy",
+          "meaning": "Primary final readback."
+        },
+        {
+          "source": "no-post.design.png",
+          "output": "no-post.design.png",
+          "encoding": "png-copy",
+          "meaning": "No-post / alternate display path readback."
+        },
+        {
+          "source": "diagnostics.mosaic.png",
+          "output": "diagnostics.mosaic.png",
+          "encoding": "png-copy",
+          "meaning": "Diagnostics display readback."
         }
       ]
     }

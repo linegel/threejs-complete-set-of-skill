@@ -25,69 +25,204 @@
   "browserEntry": "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/index.html",
   "publishPath": "/demos/webgpu-camera-rig/",
   "scenarios": [
-    { "id": "default", "acceptanceStatus": "incomplete" }
+    {
+      "id": "default",
+      "acceptanceStatus": "incomplete"
+    }
   ],
   "mechanisms": [
-    { "id": "scale-aware-framing", "route": "mechanism/scale-aware-framing/", "acceptanceStatus": "incomplete" },
-    { "id": "handoff-and-replay", "route": "mechanism/handoff-and-replay/", "acceptanceStatus": "incomplete" },
-    { "id": "pointer-orbit-and-collision", "route": "mechanism/pointer-orbit-and-collision/", "acceptanceStatus": "incomplete" },
-    { "id": "floating-origin", "route": "mechanism/floating-origin/", "acceptanceStatus": "incomplete" },
-    { "id": "projection-and-depth", "route": "mechanism/projection-and-depth/", "acceptanceStatus": "incomplete" },
-    { "id": "shared-jitter-and-velocity", "route": "mechanism/shared-jitter-and-velocity/", "acceptanceStatus": "incomplete" }
+    {
+      "id": "scale-aware-framing",
+      "route": "mechanism/scale-aware-framing/",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "handoff-and-replay",
+      "route": "mechanism/handoff-and-replay/",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "pointer-orbit-and-collision",
+      "route": "mechanism/pointer-orbit-and-collision/",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "floating-origin",
+      "route": "mechanism/floating-origin/",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "projection-and-depth",
+      "route": "mechanism/projection-and-depth/",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "shared-jitter-and-velocity",
+      "route": "mechanism/shared-jitter-and-velocity/",
+      "acceptanceStatus": "incomplete"
+    }
   ],
   "tiers": [
     {
       "id": "full",
       "targetClass": "current native-WebGPU adapter",
       "frameTargetMs": null,
-      "resolutionPolicy": { "dprCap": { "value": 2, "unit": "ratio", "label": "Authored", "source": "camera lab tier" } },
-      "mechanismLimits": { "collision": true, "thrustLag": true, "floatingOrigin": true },
+      "resolutionPolicy": {
+        "dprCap": {
+          "value": 2,
+          "unit": "ratio",
+          "label": "Authored",
+          "source": "camera lab tier"
+        }
+      },
+      "mechanismLimits": {
+        "collision": true,
+        "thrustLag": true,
+        "floatingOrigin": true
+      },
       "resourceLimits": {},
       "degradationFromPrevious": [],
-      "preservedInvariants": ["body-relative basis", "one camera owner", "one output owner"],
+      "preservedInvariants": [
+        "body-relative basis",
+        "one camera owner",
+        "one output owner"
+      ],
       "acceptanceStatus": "incomplete"
     },
     {
       "id": "budgeted",
       "targetClass": "current native-WebGPU adapter",
       "frameTargetMs": null,
-      "resolutionPolicy": { "dprCap": { "value": 1.5, "unit": "ratio", "label": "Authored", "source": "camera lab tier" } },
-      "mechanismLimits": { "collision": true, "thrustLag": true, "floatingOrigin": true },
+      "resolutionPolicy": {
+        "dprCap": {
+          "value": 1.5,
+          "unit": "ratio",
+          "label": "Authored",
+          "source": "camera lab tier"
+        }
+      },
+      "mechanismLimits": {
+        "collision": true,
+        "thrustLag": true,
+        "floatingOrigin": true
+      },
       "resourceLimits": {},
-      "degradationFromPrevious": ["lower DPR cap"],
-      "preservedInvariants": ["body-relative basis", "one camera owner", "one output owner"],
+      "degradationFromPrevious": [
+        "lower DPR cap"
+      ],
+      "preservedInvariants": [
+        "body-relative basis",
+        "one camera owner",
+        "one output owner"
+      ],
       "acceptanceStatus": "incomplete"
     },
     {
       "id": "minimum",
       "targetClass": "current native-WebGPU adapter",
       "frameTargetMs": null,
-      "resolutionPolicy": { "dprCap": { "value": 1, "unit": "ratio", "label": "Authored", "source": "camera lab tier" } },
-      "mechanismLimits": { "collision": false, "thrustLag": false, "floatingOrigin": true },
+      "resolutionPolicy": {
+        "dprCap": {
+          "value": 1,
+          "unit": "ratio",
+          "label": "Authored",
+          "source": "camera lab tier"
+        }
+      },
+      "mechanismLimits": {
+        "collision": false,
+        "thrustLag": false,
+        "floatingOrigin": true
+      },
       "resourceLimits": {},
-      "degradationFromPrevious": ["disable optional collision", "disable optional thrust lag", "lower DPR cap"],
-      "preservedInvariants": ["body-relative basis", "one camera owner", "one output owner", "native WebGPU"],
+      "degradationFromPrevious": [
+        "disable optional collision",
+        "disable optional thrust lag",
+        "lower DPR cap"
+      ],
+      "preservedInvariants": [
+        "body-relative basis",
+        "one camera owner",
+        "one output owner",
+        "native WebGPU"
+      ],
       "acceptanceStatus": "incomplete"
     }
   ],
-  "modes": ["overview", "profile", "inspection"],
-  "cameras": ["near", "design", "far"],
-  "seeds": [1, 2654435769],
+  "modes": [
+    "overview",
+    "profile",
+    "inspection"
+  ],
+  "cameras": [
+    "near",
+    "design",
+    "far"
+  ],
+  "seeds": [
+    1,
+    2654435769
+  ],
   "capabilityRequirements": [
-    { "id": "native-webgpu", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "storage-buffer", "required": true, "evidence": null, "status": "incomplete" }
+    {
+      "id": "native-webgpu",
+      "required": true,
+      "evidence": "capture-session WebGPUBackend device identity + raw-capture-session evidence-manifest validates under current sourceHash.",
+      "status": "accepted"
+    },
+    {
+      "id": "storage-buffer",
+      "required": true,
+      "evidence": "origin storage is part of the camera-rig controller contract; dedicated storage binary ledger residual for full acceptance.",
+      "status": "incomplete"
+    }
   ],
   "runtimeProof": [
-    { "id": "renderer-init", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "backend-is-webgpu", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "mechanism-reachable", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "aligned-readback", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "mrt-readback", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "origin-storage-readback", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "current-adapter-gpu-timestamp", "required": true, "evidence": null, "status": "incomplete" }
+    {
+      "id": "renderer-init",
+      "required": true,
+      "evidence": "capture-session reports initialized===true and active device generation.",
+      "status": "accepted"
+    },
+    {
+      "id": "backend-is-webgpu",
+      "required": true,
+      "evidence": "rendererBackendEvidence.isWebGPUBackend===true on correctness capture-session.",
+      "status": "accepted"
+    },
+    {
+      "id": "mechanism-reachable",
+      "required": true,
+      "evidence": "final/no-post/diagnostics presentation modes captured on the host camera-rig controller.",
+      "status": "accepted"
+    },
+    {
+      "id": "aligned-readback",
+      "required": true,
+      "evidence": "normalized/transport padded RGBA8 readbacks present for presentation targets.",
+      "status": "accepted"
+    },
+    {
+      "id": "mrt-readback",
+      "required": true,
+      "evidence": "MRT attachment recipes residual; primary presentation readbacks only on this package.",
+      "status": "incomplete"
+    },
+    {
+      "id": "origin-storage-readback",
+      "required": true,
+      "evidence": "origin storage binary ledger residual for full acceptance.",
+      "status": "incomplete"
+    },
+    {
+      "id": "current-adapter-gpu-timestamp",
+      "required": true,
+      "evidence": "timestampQueriesActive remains false for correctness profile; GPU timing is not accepted as performance evidence.",
+      "status": "incomplete"
+    }
   ],
   "evidenceContract": "v2",
-  "evidenceBundle": null,
+  "evidenceBundle": "artifacts/visual-validation/webgpu-camera-rig/correctness",
   "validationCommand": "node threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/cameraValidation.mjs",
   "commands": {
     "check": "npm --prefix threejs-camera-controls-and-rigs/examples/webgpu-camera-rig run check",

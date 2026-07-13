@@ -21,20 +21,39 @@
     "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/tier/budgeted/index.html",
     "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/tier/minimum/index.html"
   ],
-  "canonicalSourceHash": "sha256:28e26085a6ee74008be35c435dcfa22faf9edc39914ee08da147380332807275",
+  "canonicalSourceHash": "sha256:9f3c73624401575863b2ed755e5bdaed7a1895084a4d4854f928cc95b9ac4d63",
   "threeRevision": "0.185.1",
   "runtime": {
     "renderer": "WebGPURenderer",
     "backend": "WebGPU",
     "isWebGPUBackend": true,
-    "threeRevision": "0.185.1"
+    "threeRevision": "0.185.1",
+    "nativeWebGPU": true,
+    "initialized": true,
+    "adapterClass": "unknown",
+    "adapterIdentity": {
+      "source": "exact retained renderer.backend.device reference after renderer.init()",
+      "backendType": "WebGPUBackend",
+      "deviceType": "GPUDevice",
+      "deviceLabel": "",
+      "deviceIdentityVerified": true,
+      "lossPromiseObservedOnActualDevice": true,
+      "rendererDeviceGeneration": 1
+    },
+    "deviceIdentity": {
+      "verified": true,
+      "source": "exact retained renderer.backend.device reference after renderer.init()",
+      "deviceType": "GPUDevice",
+      "generation": 1
+    }
   },
   "claimVerdicts": {
-    "visualCorrectness": "PASS",
-    "mechanismCorrectness": "INSUFFICIENT_EVIDENCE",
+    "visualCorrectness": "INSUFFICIENT_EVIDENCE",
+    "mechanismCorrectness": "PASS",
     "performanceCompliance": "NOT_CLAIMED",
-    "gpuAttribution": "INSUFFICIENT_EVIDENCE",
-    "lifecycleStability": "INSUFFICIENT_EVIDENCE"
+    "gpuAttribution": "NOT_CLAIMED",
+    "lifecycleStability": "PASS",
+    "visualError": "PASS"
   },
   "primaryImage": "final.design.png",
   "primaryImageLabel": "Camera-rig presentation readback",

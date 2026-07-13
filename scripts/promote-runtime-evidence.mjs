@@ -75,13 +75,14 @@ function readJson(path) {
 }
 
 export function extractRuntimeBackendProof(document) {
-  const captureMetrics = document.runtime?.metrics ?? null;
+  const captureMetrics = document.runtime?.metrics ?? document.finalRuntime?.metrics ?? null;
   const backendEvidence = captureMetrics?.rendererBackendEvidence ?? null;
   const backend = document.backend ?? document.rendererInfo?.backend ?? captureMetrics?.backend ?? null;
   const isWebGPUBackend = backend?.isWebGPUBackend
     ?? document.isWebGPUBackend
     ?? document.rendererInfo?.isWebGPUBackend
     ?? backendEvidence?.isWebGPUBackend
+    ?? captureMetrics?.backendIsWebGPU
     ?? (typeof backend === 'string' && /webgpu/i.test(backend))
     ?? (typeof document.backend === 'string' && /webgpu/i.test(document.backend))
     ?? false;
@@ -90,12 +91,40 @@ export function extractRuntimeBackendProof(document) {
     : backend?.name
       ?? document.rendererInfo?.backend
       ?? captureMetrics?.rendererBackend
+      ?? (backendEvidence?.backendType === 'WebGPUBackend' ? 'WebGPUBackend' : null)
       ?? (backend?.isWebGPUBackend === true ? 'WebGPUBackend' : 'unknown');
+  // Prefer device-identity proof from rendererBackendEvidence over the weaker
+  // browser.adapterIdentity snapshot (which often reports verified:false while
+  // the retained GPUDevice proof is true).
+  const rawAdapter = document.adapterIdentity ?? document.browser?.adapterIdentity ?? null;
+  const adapterIdentity = backendEvidence
+    ? {
+      ...(rawAdapter && typeof rawAdapter === 'object' ? rawAdapter : {}),
+      source: backendEvidence.deviceIdentitySource ?? rawAdapter?.source ?? 'capture-session.rendererBackendEvidence',
+      backendType: backendEvidence.backendType ?? backendEvidence.backendKind ?? rawAdapter?.backendType ?? name,
+      deviceType: backendEvidence.deviceType ?? rawAdapter?.deviceType ?? null,
+      deviceIdentityVerified: backendEvidence.deviceIdentityVerified === true,
+      lossPromiseObservedOnActualDevice: backendEvidence.lossPromiseObservedOnActualDevice === true,
+      rendererDeviceGeneration: backendEvidence.rendererDeviceGeneration ?? captureMetrics?.rendererDeviceGeneration ?? null,
+    }
+    : rawAdapter;
   return {
     renderer: document.renderer ?? captureMetrics?.rendererInfo?.rendererType ?? (name === 'WebGPUBackend' ? 'WebGPURenderer' : 'unknown'),
     backend: name,
     isWebGPUBackend: isWebGPUBackend === true,
     threeRevision: document.threeRevision ?? captureMetrics?.threeRevision ?? null,
+    nativeWebGPU: captureMetrics?.nativeWebGPU === true,
+    initialized: captureMetrics?.initialized === true,
+    adapterClass: document.adapterClass ?? document.browser?.adapterClass ?? null,
+    adapterIdentity,
+    deviceIdentity: backendEvidence
+      ? {
+        verified: backendEvidence.deviceIdentityVerified === true,
+        source: backendEvidence.deviceIdentitySource ?? null,
+        deviceType: backendEvidence.deviceType ?? null,
+        generation: backendEvidence.rendererDeviceGeneration ?? captureMetrics?.rendererDeviceGeneration ?? null,
+      }
+      : null,
   };
 }
 
@@ -104,7 +133,11 @@ export function isThreeR185Revision(revision) {
 }
 
 export function normalizedPreviewClaimVerdicts(document) {
-  if (document.claimVerdicts && typeof document.claimVerdicts === 'object') return document.claimVerdicts;
+  // Prefer unified raw-capture-session / release claim ledger when present.
+  if (document.claimVerdicts && typeof document.claimVerdicts === 'object'
+    && Object.keys(document.claimVerdicts).length > 0) {
+    return document.claimVerdicts;
+  }
   if (document.hookResult?.visualDifferences?.verdict === 'PASS'
     && document.hookResult?.coverageEvidence?.verdict === 'PASS') {
     return {
@@ -229,6 +262,19 @@ export function promoteRuntimeEvidence(configPath = DEFAULT_CONFIG, { labIds = [
     }
 
     const claimDocument = readJson(resolveWithin(artifactDirectory, preview.claimVerdicts, 'claim verdicts'));
+    // Prefer assembled unified evidence-manifest claim ledger when present.
+    let claimSource = claimDocument;
+    const evidenceManifestPath = join(artifactDirectory, 'evidence-manifest.json');
+    if (existsSync(evidenceManifestPath)) {
+      try {
+        const evidenceManifest = readJson(evidenceManifestPath);
+        if (evidenceManifest?.claimVerdicts && typeof evidenceManifest.claimVerdicts === 'object') {
+          claimSource = evidenceManifest;
+        }
+      } catch {
+        // keep preview.claimVerdicts document
+      }
+    }
     const outputDirectory = join(DOCS_EVIDENCE_ROOT, preview.labId);
     mkdirSync(outputDirectory, { recursive: true });
     const images = preview.images.map((image) => imageOutput(image, artifactDirectory, outputDirectory));
@@ -244,7 +290,7 @@ export function promoteRuntimeEvidence(configPath = DEFAULT_CONFIG, { labIds = [
       canonicalSourceHash: demo.sourceHash,
       threeRevision: demo.threeRevision,
       runtime,
-      claimVerdicts: normalizedPreviewClaimVerdicts(claimDocument),
+      claimVerdicts: normalizedPreviewClaimVerdicts(claimSource),
       primaryImage: preview.primaryImage,
       primaryImageLabel: preview.primaryImageLabel,
       images,
