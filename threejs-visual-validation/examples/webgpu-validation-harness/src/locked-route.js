@@ -1,4 +1,25 @@
 import { canonicalUrlForRoute, getRouteLock } from './route-locks.js';
+import { PLAYWRIGHT_CORRECTNESS_SURFACE } from './physical-runtime-profile.js';
+
+export const PLAYWRIGHT_CORRECTNESS_HOST_GLOBAL = '__THREEJS_PLAYWRIGHT_CORRECTNESS_HOST__';
+
+export function createPlaywrightCorrectnessHost( injectedProfile, lock ) {
+
+	if ( injectedProfile?.id !== 'correctness' ) return null;
+	if ( typeof injectedProfile.labId !== 'string' || injectedProfile.labId.length === 0 ) {
+
+		throw new Error( 'Playwright correctness wrapper requires an injected lab identity.' );
+
+	}
+	return Object.freeze( {
+		automationSurface: PLAYWRIGHT_CORRECTNESS_SURFACE,
+		captureProfile: 'correctness',
+		labId: injectedProfile.labId,
+		routeKind: lock.kind,
+		routeId: lock.id
+	} );
+
+}
 
 function waitForController( frame ) {
 
@@ -56,6 +77,13 @@ export function createLifecycleRunnerForwarder( frame ) {
 export async function mountLockedRoute( { kind, id, root = document.body } ) {
 
 	const lock = getRouteLock( kind, id );
+	const correctnessHost = createPlaywrightCorrectnessHost( window.__LAB_CAPTURE_PROFILE__ ?? null, lock );
+	if ( correctnessHost !== null ) Object.defineProperty( window, PLAYWRIGHT_CORRECTNESS_HOST_GLOBAL, {
+		configurable: false,
+		enumerable: true,
+		writable: false,
+		value: correctnessHost
+	} );
 	const canonical = canonicalUrlForRoute( new URL( '../index.html', import.meta.url ), kind, id );
 	const frame = document.createElement( 'iframe' );
 	frame.title = `WebGPU validation ${ kind } ${ id }`;

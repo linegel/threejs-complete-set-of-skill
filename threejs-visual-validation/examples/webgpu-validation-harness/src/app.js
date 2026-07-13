@@ -14,7 +14,9 @@ async function start() {
 	let parentHost = null;
 	try {
 
-		if ( window.parent !== window ) parentHost = window.parent.__THREEJS_PHYSICAL_EVIDENCE_HOST__ ?? null;
+		if ( window.parent !== window ) parentHost = window.parent.__THREEJS_PHYSICAL_EVIDENCE_HOST__
+			?? window.parent.__THREEJS_PLAYWRIGHT_CORRECTNESS_HOST__
+			?? null;
 
 	} catch {
 

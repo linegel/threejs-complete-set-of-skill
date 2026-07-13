@@ -41,14 +41,20 @@ export function resolvePhysicalRuntimeProfile( {
 		&& typeof sessionToken === 'string'
 		&& sessionToken.length >= 16
 		&& host.sessionToken === sessionToken;
+	const validPlaywrightTopLevel = environment.parentIsSelf === true && host === null;
+	const validPlaywrightLockedWrapper = environment.parentIsSelf === false
+		&& host?.automationSurface === PLAYWRIGHT_CORRECTNESS_SURFACE
+		&& host?.captureProfile === 'correctness'
+		&& host?.labId === injectedProfile?.labId
+		&& host?.routeKind === routeLock?.kind
+		&& host?.routeId === routeLock?.id;
 	const validPlaywrightCorrectness = requestedProfile === 'correctness'
 		&& automationSurface === PLAYWRIGHT_CORRECTNESS_SURFACE
 		&& environment.webdriver === true
-		&& environment.parentIsSelf === true
-		&& host === null
 		&& sessionToken === null
 		&& injectedProfile?.id === 'correctness'
-		&& typeof injectedProfile?.labId === 'string';
+		&& typeof injectedProfile?.labId === 'string'
+		&& ( validPlaywrightTopLevel || validPlaywrightLockedWrapper );
 
 	const evidenceRequested = requestedProfile !== null || automationSurface === CODEX_IN_APP_SURFACE || sessionToken !== null;
 	if ( automationSurface === CODEX_IN_APP_SURFACE && environment.webdriver === true ) {

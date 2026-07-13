@@ -80,11 +80,39 @@ test( 'deterministic correctness admits only the injected Playwright surface', (
 	assert.equal( result.runtimeProfile, 'correctness' );
 	assert.equal( result.automationSurface, PLAYWRIGHT_CORRECTNESS_SURFACE );
 	assert.equal( result.physicalSession, null );
+	const wrapperResult = resolvePhysicalRuntimeProfile( {
+		parameters: new URLSearchParams( { profile: 'correctness' } ),
+		routeLock: getRouteLock( 'tier', 'webgpu-correctness' ),
+		injectedProfile: { id: 'correctness', labId: 'webgpu-validation-harness' },
+		environment: environment( {
+			webdriver: true,
+			parentIsSelf: false,
+			parentHost: {
+				automationSurface: PLAYWRIGHT_CORRECTNESS_SURFACE,
+				captureProfile: 'correctness',
+				labId: 'webgpu-validation-harness',
+				routeKind: 'tier',
+				routeId: 'webgpu-correctness'
+			}
+		} )
+	} );
+	assert.equal( wrapperResult.runtimeProfile, 'correctness' );
+	assert.equal( wrapperResult.automationSurface, PLAYWRIGHT_CORRECTNESS_SURFACE );
 	assert.throws( () => resolvePhysicalRuntimeProfile( {
 		parameters: new URLSearchParams( { profile: 'correctness' } ),
 		routeLock: getRouteLock( 'scenario', 'browser-capture' ),
 		injectedProfile: { id: 'correctness' },
 		environment: environment( { webdriver: true, parentIsSelf: true, parentHost: null } )
+	} ), /requires the injected Playwright capture runner/ );
+	for ( const parentHost of [
+		{ automationSurface: PLAYWRIGHT_CORRECTNESS_SURFACE, captureProfile: 'correctness', labId: 'another-lab', routeKind: 'tier', routeId: 'webgpu-correctness' },
+		{ automationSurface: PLAYWRIGHT_CORRECTNESS_SURFACE, captureProfile: 'correctness', labId: 'webgpu-validation-harness', routeKind: 'tier', routeId: 'release' },
+		{ automationSurface: 'codex-in-app-browser', captureProfile: 'correctness', labId: 'webgpu-validation-harness', routeKind: 'tier', routeId: 'webgpu-correctness' }
+	] ) assert.throws( () => resolvePhysicalRuntimeProfile( {
+		parameters: new URLSearchParams( { profile: 'correctness' } ),
+		routeLock: getRouteLock( 'tier', 'webgpu-correctness' ),
+		injectedProfile: { id: 'correctness', labId: 'webgpu-validation-harness' },
+		environment: environment( { webdriver: true, parentIsSelf: false, parentHost } )
 	} ), /requires the injected Playwright capture runner/ );
 
 } );

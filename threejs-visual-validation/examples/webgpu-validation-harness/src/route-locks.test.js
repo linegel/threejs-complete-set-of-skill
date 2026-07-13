@@ -10,7 +10,11 @@ import {
 	SCENARIO_ROUTE_LOCKS,
 	TIER_ROUTE_LOCKS
 } from './route-locks.js';
-import { createLifecycleRunnerForwarder } from './locked-route.js';
+import {
+	createLifecycleRunnerForwarder,
+	createPlaywrightCorrectnessHost,
+	PLAYWRIGHT_CORRECTNESS_HOST_GLOBAL
+} from './locked-route.js';
 
 const LAB_ROOT = new URL( '../', import.meta.url );
 
@@ -57,6 +61,25 @@ test( 'locked wrapper forwards the fresh-controller lifecycle runner', async () 
 	assert.deepEqual( await runLifecycle( 64 ), { cycles: 64, replacement: true } );
 	delete child.__THREEJS_LAB_LIFECYCLE__;
 	await assert.rejects( runLifecycle( 1 ), /lifecycle runner is unavailable/ );
+
+} );
+
+test( 'locked wrapper exposes only an injected correctness host identity', () => {
+
+	const lock = { kind: 'tier', id: 'webgpu-correctness' };
+	const host = createPlaywrightCorrectnessHost( { id: 'correctness', labId: 'webgpu-validation-harness' }, lock );
+	assert.deepEqual( host, {
+		automationSurface: 'playwright-headless-chromium',
+		captureProfile: 'correctness',
+		labId: 'webgpu-validation-harness',
+		routeKind: 'tier',
+		routeId: 'webgpu-correctness'
+	} );
+	assert.equal( Object.isFrozen( host ), true );
+	assert.equal( PLAYWRIGHT_CORRECTNESS_HOST_GLOBAL, '__THREEJS_PLAYWRIGHT_CORRECTNESS_HOST__' );
+	assert.equal( createPlaywrightCorrectnessHost( null, lock ), null );
+	assert.equal( createPlaywrightCorrectnessHost( { id: 'performance', labId: 'webgpu-validation-harness' }, lock ), null );
+	assert.throws( () => createPlaywrightCorrectnessHost( { id: 'correctness' }, lock ), /injected lab identity/ );
 
 } );
 
