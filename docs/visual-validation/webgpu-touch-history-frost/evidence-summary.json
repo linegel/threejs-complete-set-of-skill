@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "labId": "webgpu-touch-history-frost",
+  "classification": "inspected-runtime-evidence-preview",
+  "acceptanceStatus": "incomplete",
+  "evidenceBundleId": "correctness",
+  "canonicalSource": [
+    "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/frost-surface-effect.js",
+    "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/frost-webgpu-lab.js",
+    "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/route-wrapper.js",
+    "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/main.js",
+    "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/index.html"
+  ],
+  "canonicalSourceHash": "sha256:b24767d1863361d412de5ab3ae4a7a72c7ad17e66e70034eb139d7620c13d55e",
+  "threeRevision": "0.185.1",
+  "runtime": {
+    "renderer": "WebGPURenderer",
+    "backend": "WebGPU",
+    "isWebGPUBackend": true,
+    "threeRevision": "0.185.1"
+  },
+  "claimVerdicts": {
+    "visualCorrectness": "PASS",
+    "mechanismCorrectness": "PASS",
+    "performanceCompliance": "NOT_CLAIMED",
+    "gpuAttribution": "INSUFFICIENT_EVIDENCE",
+    "lifecycleStability": "INSUFFICIENT_EVIDENCE"
+  },
+  "primaryImage": "final.design.png",
+  "primaryImageLabel": "Touch-history Frost native-WebGPU readback",
+  "images": [
+    {
+      "file": "final.design.png",
+      "meaning": "Final Frost composite from the complete refraction-and-Fresnel recipe.",
+      "source": "final.design.png",
+      "sourceSha256": "sha256:e0229f476073bb52b4be6d0777236c9f5ca3768c844dfb3f507edfa2cfb9083a",
+      "outputSha256": "sha256:e0229f476073bb52b4be6d0777236c9f5ca3768c844dfb3f507edfa2cfb9083a",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "no-post.design.png",
+      "meaning": "Same scene, camera, seed, and pointer trace with the Frost composition bypassed.",
+      "source": "no-post.design.png",
+      "sourceSha256": "sha256:c92f545d71d00167426bb1dbd5840a38ec6e4a310a8ba44c6aa64a2e6477f36e",
+      "outputSha256": "sha256:c92f545d71d00167426bb1dbd5840a38ec6e4a310a8ba44c6aa64a2e6477f36e",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "diagnostics.mosaic.png",
+      "meaning": "Hash-bound mosaic of previous history, deposit, next history, and post-pointer Frost mask readbacks.",
+      "source": "diagnostics.mosaic.png",
+      "sourceSha256": "sha256:753b4d3c4ffaf9ae8c3becf84233cfabaab59e076f55f7f67f9b815ffdba3f8c",
+      "outputSha256": "sha256:753b4d3c4ffaf9ae8c3becf84233cfabaab59e076f55f7f67f9b815ffdba3f8c",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "seed-0001.final.png",
+      "meaning": "Baseline uint32 seed with the fixed authored pointer trace.",
+      "source": "seed-0001.final.png",
+      "sourceSha256": "sha256:05ce12e4a2ba7274e1e2507af682984d549aae5de44a9d9609aeadca84a93350",
+      "outputSha256": "sha256:05ce12e4a2ba7274e1e2507af682984d549aae5de44a9d9609aeadca84a93350",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "seed-9e3779b9.final.png",
+      "meaning": "Stress uint32 seed with camera, trace, mechanism, and tier held fixed.",
+      "source": "seed-9e3779b9.final.png",
+      "sourceSha256": "sha256:a82cfaf49392d6d74ae66a9cb79a6e49a66cd549cc5f6db2c467d5f070974609",
+      "outputSha256": "sha256:a82cfaf49392d6d74ae66a9cb79a6e49a66cd549cc5f6db2c467d5f070974609",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "temporal.t001.png",
+      "meaning": "Final output after exactly one 1/60-second pointer-history update.",
+      "source": "temporal.t001.png",
+      "sourceSha256": "sha256:b64eee5956efee5a0b7927a98c541cff0a6fb5bad43e7d3b62033d7bc8015c24",
+      "outputSha256": "sha256:b64eee5956efee5a0b7927a98c541cff0a6fb5bad43e7d3b62033d7bc8015c24",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    }
+  ],
+  "limitations": [
+    "Correctness, camera, seed, temporal, full-tier 641x359 dispatch, aligned readback, and DPR extent gates pass on the current source closure.",
+    "The temporal one-step response is measured and bounded but intentionally subtle in the final frame; the raw history diagnostics provide the decisive mechanism view.",
+    "Lifecycle stability, a unified 14-file v2 release bundle, named-hardware timing, and final acceptance remain incomplete."
+  ]
+}
