@@ -48,20 +48,56 @@ function option(name, fallback = null) {
 const labId = option('--lab');
 if (!labId) throw new Error('--lab is required');
 
+import { readFileSync, existsSync } from 'node:fs';
+import { join } from 'node:path';
+
 const { captureLabBrowser } = await import(pathToFileURL(resolve('scripts/capture-lab-browser.mjs')).href);
+const profile = option('--profile', 'correctness');
+const outputDir = option('--output')
+  ? resolve(option('--output'))
+  : resolve('artifacts/visual-validation', labId, profile);
 const summary = await captureLabBrowser({
   labId,
-  profile: option('--profile', 'correctness'),
+  profile,
   outputDir: option('--output') ? resolve(option('--output')) : null,
   hookPath: option('--hook') ? resolve(option('--hook')) : null,
   target: option('--target', 'final'),
 });
 
-console.log(JSON.stringify({
+const resolvedOutput = summary.outputDir ?? summary.output ?? outputDir;
+const sessionPath = join(resolvedOutput, 'capture-session.json');
+let sessionProof = null;
+if (existsSync(sessionPath)) {
+  const session = JSON.parse(readFileSync(sessionPath, 'utf8'));
+  const metrics = session.finalRuntime?.metrics ?? session.runtime?.metrics ?? {};
+  const backend = metrics.rendererBackendEvidence ?? {};
+  sessionProof = {
+    browserEntry: session.browserEntry ?? null,
+    automationSurface: session.automationSurface ?? null,
+    sourceHash: session.sourceClosureHash ?? session.sourceHash ?? null,
+    profileConfig: session.profileConfig ?? null,
+    nativeWebGPU: metrics.nativeWebGPU === true,
+    isWebGPUBackend: backend.isWebGPUBackend === true || metrics.backendIsWebGPU === true,
+    backendType: backend.backendType ?? metrics.rendererBackend ?? metrics.backend ?? null,
+    deviceIdentityVerified: backend.deviceIdentityVerified === true,
+    startedAt: session.startedAt ?? null,
+    finishedAt: session.finishedAt ?? null,
+  };
+}
+
+const report = {
+  ok: sessionProof?.nativeWebGPU === true && sessionProof?.isWebGPUBackend === true,
   labId: summary.labId ?? labId,
-  profile: summary.profile ?? option('--profile', 'correctness'),
-  outputDir: summary.outputDir ?? summary.output ?? null,
-}, null, 2));
+  profile: summary.profile ?? profile,
+  outputDir: resolvedOutput,
+  exit: 0,
+  proof: sessionProof,
+};
+console.log(JSON.stringify(report, null, 2));
+if (!report.ok) {
+  console.error('capture-via-cdp: missing native WebGPU backend proof in capture-session.json');
+  process.exit(1);
+}
 
 // CDP disconnect can leave Playwright event-loop handles open; force a clean
 // exit after a successful capture so dual-capture shells do not hang forever.
