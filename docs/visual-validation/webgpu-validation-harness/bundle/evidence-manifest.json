@@ -1867,7 +1867,7 @@
       "candidateBindingDigest": "sha256:9df2cd3ccc969e39b5d8cf83ec8f309f5374b6e4b2d18871132c448f2cf2b81a",
       "reviewer": "Codex direct graphics review",
       "reviewedAt": "2026-07-13T11:51:11Z",
-      "reviewDigest": "sha256:1d6b87dc569d8f176bc49f5d297d0402374659838ac03c07e2c0f8b6dd10d7b4",
+      "reviewDigest": "sha256:6a514c313d5ae0c54a4b842044c84494f40b8d942ffbfd4e8300196c6c821eb7",
       "reviewedImages": [
         "final.design.png",
         "no-post.design.png",
@@ -1892,7 +1892,7 @@
         "Near, design, and far cameras preserve the intended subject envelope without invalid pixels.",
         "The stress seed changes the procedural subject, the temporal pair changes motion state, and both reduced tiers remain readable.",
         "The 641x359 odd-size capture is complete and shows no uncovered dispatch/readback region.",
-        "Source-closure rebind 2026-07-13T14:26:17.484Z: tooling ledger sha256:ab147dc1ba24f1bba3d62731968c9f602000622d3a338480afd8208e1c447177 (registrySourceHash sha256:c099d8c03b07280a4553e1ea687d4ca092809fba4efc5c67429b954c242359c7)."
+        "Source-closure rebind 2026-07-13T14:28:05.387Z: tooling ledger sha256:ab147dc1ba24f1bba3d62731968c9f602000622d3a338480afd8208e1c447177 (registrySourceHash sha256:c099d8c03b07280a4553e1ea687d4ca092809fba4efc5c67429b954c242359c7)."
       ]
     }
   },

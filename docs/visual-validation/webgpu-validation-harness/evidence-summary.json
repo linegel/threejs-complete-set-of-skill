@@ -143,7 +143,7 @@
   "buildRevision": "sha256:d0a86105ba9377cff43d80cb7d36ab40dba78558b51fd1d9fb98d16a3b7bb511",
   "publishable": true,
   "promotionStatus": "APPROVED",
-  "updatedAt": "2026-07-13T14:26:17.526Z",
+  "updatedAt": "2026-07-13T14:28:05.412Z",
   "dualIdentity": {
     "registrySourceHash": "sha256:c099d8c03b07280a4553e1ea687d4ca092809fba4efc5c67429b954c242359c7",
     "captureSourceClosureHash": "sha256:ab147dc1ba24f1bba3d62731968c9f602000622d3a338480afd8208e1c447177",

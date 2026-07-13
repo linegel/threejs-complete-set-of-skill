@@ -12,7 +12,7 @@
   "buildRevision": "sha256:d0a86105ba9377cff43d80cb7d36ab40dba78558b51fd1d9fb98d16a3b7bb511",
   "sourceRelease": {
     "path": "evidence-manifest.json",
-    "sha256": "sha256:8cef7014a9a063ded12f2121d728427bfc5d976c938548512e12befc04363990",
+    "sha256": "sha256:faec87889b0dcc7d34539e5e8be9925a95a2fa9ed554cd7bbc072c3f43ee9fdf",
     "byteLength": 90346,
     "promotionBindingDigest": "sha256:2350b1404e7a0acab9d6ba6173655e50ddc2494bbeb01b12323079c1ee16b50a",
     "candidateBindingDigest": "sha256:9df2cd3ccc969e39b5d8cf83ec8f309f5374b6e4b2d18871132c448f2cf2b81a",
@@ -950,5 +950,5 @@
       "affectedClaims": []
     }
   ],
-  "projectionDigest": "sha256:9f8c57e317691e751ea4ab376a153943689b8801aa5b33a1f4a7785c5e24d300"
+  "projectionDigest": "sha256:386a0d6131398b09c3a928b5d0a0042134406f254573ff8cd0df1236a9f427eb"
 }
