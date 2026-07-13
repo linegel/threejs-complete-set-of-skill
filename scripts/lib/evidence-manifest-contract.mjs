@@ -427,6 +427,17 @@ function validatePromotion( manifest, fileIndex, imageIndex, errors ) {
 
 }
 
+function validateLimitations( manifest, errors ) {
+
+	const limitations = Array.isArray( manifest.limitations ) ? manifest.limitations : [];
+	const limitationIndex = indexUnique( limitations, 'id', 'limitations', errors );
+	const visualReview = limitationIndex.get( 'visual-review-pending' );
+	if ( visualReview === undefined ) return;
+	if ( manifest.promotion?.status === 'PENDING_VISUAL_SIGNOFF' && visualReview.status !== 'ACTIVE' ) errors.push( 'Pending visual signoff requires visual-review-pending to remain ACTIVE.' );
+	if ( [ 'APPROVED', 'REJECTED' ].includes( manifest.promotion?.status ) && visualReview.status !== 'RESOLVED' ) errors.push( 'Terminal visual signoff requires visual-review-pending to be RESOLVED.' );
+
+}
+
 function validatePublishableRelease( manifest, fileIndex, imageIndex, errors ) {
 
 	if ( manifest.publishable !== true ) return;
@@ -483,6 +494,7 @@ export function validateEvidenceManifestContract( manifest ) {
 	}
 	validateCaptureSessions( manifest, fileIndex, errors );
 	validateImageClosure( manifest, fileIndex, imageIndex, errors );
+	validateLimitations( manifest, errors );
 	validatePromotion( manifest, fileIndex, imageIndex, errors );
 	validatePublishableRelease( manifest, fileIndex, imageIndex, errors );
 	return errors;

@@ -11,6 +11,8 @@ import {
 } from './evidence-manifest-contract.mjs';
 import { validateEvidenceBundle } from './evidence-v2.mjs';
 
+const VISUAL_REVIEW_LIMITATION_ID = 'visual-review-pending';
+
 function sha256(bytes) {
   return `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
 }
@@ -43,6 +45,22 @@ function requireVisualReview(review) {
     reviewedImages: [...review.reviewedImages],
     notes: [...review.notes],
   };
+}
+
+function resolveVisualReviewLimitation(limitations, review) {
+  const resolved = structuredClone(limitations);
+  const matches = resolved.filter((limitation) => limitation?.id === VISUAL_REVIEW_LIMITATION_ID);
+  if (matches.length > 1) throw new Error(`release candidate duplicates limitation ${VISUAL_REVIEW_LIMITATION_ID}`);
+  if (matches.length === 0) return resolved;
+  const limitation = matches[0];
+  if (limitation.status !== 'ACTIVE') {
+    throw new Error(`release candidate limitation ${VISUAL_REVIEW_LIMITATION_ID} must be ACTIVE before signoff`);
+  }
+  limitation.status = 'RESOLVED';
+  limitation.statement = review.status === 'APPROVED'
+    ? `Offline visual review completed and approved the captured release images at ${review.reviewedAt}.`
+    : `Offline visual review completed and rejected the candidate images at ${review.reviewedAt}; the release remains nonpublishable.`;
+  return resolved;
 }
 
 async function copyBoundArtifact(sourceDirectory, stagingDirectory, entry) {
@@ -89,6 +107,7 @@ export async function promoteReleaseBundle({ candidateDirectory, outputDirectory
   review.reviewDigest = visualReviewDigest(review);
   const manifest = structuredClone(sourceManifest);
   manifest.publishable = review.status === 'APPROVED';
+  manifest.limitations = resolveVisualReviewLimitation(manifest.limitations, review);
   manifest.promotion = null;
   const binding = createReleasePromotionBinding(manifest);
   manifest.promotion = {

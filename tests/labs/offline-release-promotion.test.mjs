@@ -10,6 +10,7 @@ import {
   routeSetDigest,
   routeStateDigest,
   STANDARD_IMAGE_PATHS,
+  validateEvidenceManifestContract,
 } from '../../scripts/lib/evidence-manifest-contract.mjs';
 import { validateEvidenceBundle } from '../../scripts/lib/evidence-v2.mjs';
 import { promoteReleaseBundle } from '../../scripts/lib/offline-release-promotion.mjs';
@@ -30,6 +31,20 @@ function pendingCandidate() {
   const physical = manifest.captureSessions.find((session) => session.profile === 'physical-route');
   physical.routeSetPaths = manifest.routeSet.map((route) => route.path);
   physical.routeSetDigest = routeSetDigest(manifest.routeSet);
+  manifest.limitations = [
+    {
+      id: 'visual-review-pending',
+      status: 'ACTIVE',
+      statement: 'Offline visual inspection of the release images is pending.',
+      affectedClaims: ['visualCorrectness'],
+    },
+    {
+      id: 'opaque-renderer-residency',
+      status: 'ACTIVE',
+      statement: 'Opaque renderer-internal residency is not claimed.',
+      affectedClaims: ['performanceCompliance'],
+    },
+  ];
   manifest.promotion = null;
   const binding = createReleasePromotionBinding(manifest);
   manifest.promotion = {
@@ -69,6 +84,21 @@ test('offline promotion copies a candidate into a validated route-set-bound appr
   assert.deepEqual(result.manifest.promotion.binding.routeSet, result.manifest.routeSet);
   assert.equal(result.manifest.promotion.binding.routeSetDigest, routeSetDigest(result.manifest.routeSet));
   assert.equal(result.manifest.promotion.visualSignoff.reviewedImages.length, STANDARD_IMAGE_PATHS.length);
+  assert.deepEqual(result.manifest.limitations, [
+    {
+      id: 'visual-review-pending',
+      status: 'RESOLVED',
+      statement: 'Offline visual review completed and approved the captured release images at 2026-07-13T03:00:00Z.',
+      affectedClaims: ['visualCorrectness'],
+    },
+    {
+      id: 'opaque-renderer-residency',
+      status: 'ACTIVE',
+      statement: 'Opaque renderer-internal residency is not claimed.',
+      affectedClaims: ['performanceCompliance'],
+    },
+  ]);
+  assert.deepEqual(result.manifest.promotion.binding.limitations, result.manifest.limitations);
   await assert.rejects(
     () => promoteReleaseBundle({ candidateDirectory, outputDirectory, visualReview: review(candidateDirectory) }),
     /already exists/,
@@ -105,4 +135,31 @@ test('offline rejection remains validated and nonpublishable', async () => {
   assert.equal(result.validation.valid, true, result.validation.errors.join('\n'));
   assert.equal(result.manifest.publishable, false);
   assert.equal(result.manifest.promotion.status, 'REJECTED');
+  const visualReviewLimitation = result.manifest.limitations.find(({ id }) => id === 'visual-review-pending');
+  assert.equal(visualReviewLimitation.status, 'RESOLVED');
+  assert.match(visualReviewLimitation.statement, /completed and rejected/);
+});
+
+test('limitation lifecycle rejects contradictory or duplicated visual-review state', async () => {
+  const candidateDirectory = pendingCandidate();
+  const candidate = readFixtureManifest(candidateDirectory);
+  candidate.limitations.find(({ id }) => id === 'visual-review-pending').status = 'RESOLVED';
+  candidate.promotion.binding = createReleasePromotionBinding(candidate);
+  candidate.promotion.bindingDigest = canonicalSha256(candidate.promotion.binding);
+  assert.match(validateEvidenceManifestContract(candidate).join('\n'), /Pending visual signoff requires visual-review-pending to remain ACTIVE/);
+
+  const outputDirectory = join(mkdtempSync(join(tmpdir(), 'offline-terminal-limitation-')), 'approved');
+  const result = await promoteReleaseBundle({ candidateDirectory, outputDirectory, visualReview: review(candidateDirectory) });
+  const contradictory = structuredClone(result.manifest);
+  contradictory.limitations.find(({ id }) => id === 'visual-review-pending').status = 'ACTIVE';
+  contradictory.promotion.binding = createReleasePromotionBinding(contradictory);
+  contradictory.promotion.bindingDigest = canonicalSha256(contradictory.promotion.binding);
+  assert.match(validateEvidenceManifestContract(contradictory).join('\n'), /Terminal visual signoff requires visual-review-pending to be RESOLVED/);
+
+  const duplicated = structuredClone(result.manifest);
+  duplicated.limitations.push({
+    ...structuredClone(duplicated.limitations.find(({ id }) => id === 'visual-review-pending')),
+    statement: 'A conflicting duplicate limitation.',
+  });
+  assert.match(validateEvidenceManifestContract(duplicated).join('\n'), /limitations duplicates id "visual-review-pending"/);
 });
