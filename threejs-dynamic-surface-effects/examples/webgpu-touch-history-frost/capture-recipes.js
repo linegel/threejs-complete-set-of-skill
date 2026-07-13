@@ -100,7 +100,7 @@ function recipe(id, target, overrides = {}) {
     target,
     scenario: "touch-history-frost",
     mechanism: "refraction-and-fresnel",
-    tier: "balanced",
+    tier: overrides.tier ?? "balanced",
     camera: overrides.camera ?? "design",
     seed: overrides.seed ?? 0x00000001,
     viewport: overrides.viewport ?? DEFAULT_VIEWPORT,
@@ -134,6 +134,7 @@ const RECIPES = Object.freeze([
 export const FROST_COVERAGE_PROBE_RECIPES = Object.freeze([
   recipe("probe.odd-size.final", "final", {
     trace: CAMERA_TRACE,
+    tier: "full",
     viewport: Object.freeze({ width: 641, height: 359, dpr: 1, physicalWidth: 641, physicalHeight: 359 }),
   }),
   recipe("probe.dpr-1.final", "final", {
@@ -321,15 +322,15 @@ export function validateFrostCaptureRecipes(recipes = FROST_CAPTURE_RECIPES, { r
 
 export function validateFrostCoverageProbeRecipes(probes = FROST_COVERAGE_PROBE_RECIPES) {
   const expected = [
-    ["probe.odd-size.final", 641, 359, 1, 641, 359],
-    ["probe.dpr-1.final", 400, 300, 1, 400, 300],
-    ["probe.dpr-1-5.final", 400, 300, 1.5, 600, 450],
-    ["probe.dpr-2.final", 400, 300, 2, 800, 600],
+    ["probe.odd-size.final", "full", 641, 359, 1, 641, 359],
+    ["probe.dpr-1.final", "balanced", 400, 300, 1, 400, 300],
+    ["probe.dpr-1-5.final", "balanced", 400, 300, 1.5, 600, 450],
+    ["probe.dpr-2.final", "balanced", 400, 300, 2, 800, 600],
   ];
   if (!Array.isArray(probes) || probes.length !== expected.length) throw new Error("Frost coverage probes must contain odd-size and three DPR recipes");
   for (const [index, entry] of probes.entries()) {
-    const [id, width, height, dpr, physicalWidth, physicalHeight] = expected[index];
-    if (entry.id !== id || entry.target !== "final" || entry.mechanism !== "refraction-and-fresnel" || entry.tier !== "balanced") {
+    const [id, tier, width, height, dpr, physicalWidth, physicalHeight] = expected[index];
+    if (entry.id !== id || entry.target !== "final" || entry.mechanism !== "refraction-and-fresnel" || entry.tier !== tier) {
       throw new Error(`Frost coverage probe ${index} identity drifted`);
     }
     validateViewport(entry.viewport, `Frost coverage probe ${id}.viewport`);

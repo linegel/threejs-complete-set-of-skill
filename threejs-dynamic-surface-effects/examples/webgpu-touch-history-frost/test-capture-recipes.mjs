@@ -50,6 +50,7 @@ assert.deepEqual(resolveFrostCaptureRecipe("probe.odd-size.final").viewport, {
   physicalWidth: 641,
   physicalHeight: 359,
 });
+assert.equal(resolveFrostCaptureRecipe("probe.odd-size.final").tier, "full");
 assert.equal(Object.isFrozen(resolveFrostCaptureRecipe("final.design").trace[0].start), true);
 assert.deepEqual(
   FROST_CAPTURE_RECIPE_IDS.slice(2, 6).map((id) => resolveFrostCaptureRecipe(id).target),

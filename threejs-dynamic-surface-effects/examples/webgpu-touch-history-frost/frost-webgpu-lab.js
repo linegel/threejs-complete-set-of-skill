@@ -513,6 +513,9 @@ export class WebGPUFrostLab {
           });
           await this.rendererDevice.queue.onSubmittedWorkDone();
           const timeSeconds = recipe.expectedTimeSeconds;
+          const scratchMetrics = scratch.getMetrics();
+          const historyWidth = scratchMetrics.historySize[0];
+          const historyHeight = scratchMetrics.historySize[1];
           return Object.freeze({
             readback,
             effectiveState: Object.freeze({
@@ -536,6 +539,14 @@ export class WebGPUFrostLab {
               computeDispatchDelta: recipe.trace.length,
               renderSubmissionDelta: 1,
               sameFrameComposite: true,
+              historyExtent: Object.freeze({ width: historyWidth, height: historyHeight }),
+              workgroupSize: Object.freeze([8, 8, 1]),
+              workgroupCount: Object.freeze([scratchMetrics.dispatch.x, scratchMetrics.dispatch.y, 1]),
+              coveredExtent: Object.freeze({
+                width: scratchMetrics.dispatch.x * 8,
+                height: scratchMetrics.dispatch.y * 8,
+              }),
+              boundsChecked: true,
             }),
           });
         },
