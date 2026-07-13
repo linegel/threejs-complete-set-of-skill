@@ -110,7 +110,9 @@ export function normalizedPreviewClaimVerdicts(document) {
       mechanismCorrectness: 'PASS',
       performanceCompliance: 'NOT_CLAIMED',
       gpuAttribution: 'INSUFFICIENT_EVIDENCE',
-      lifecycleStability: 'INSUFFICIENT_EVIDENCE',
+      lifecycleStability: document.hookResult?.lifecycleEvidence?.verdict === 'PASS'
+        ? 'PASS'
+        : 'INSUFFICIENT_EVIDENCE',
     };
   }
   return {

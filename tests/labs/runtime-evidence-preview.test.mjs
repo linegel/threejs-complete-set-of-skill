@@ -65,6 +65,7 @@ test('runtime evidence extracts native backend and bounded claims from capture s
     hookResult: {
       visualDifferences: { verdict: 'PASS' },
       coverageEvidence: { verdict: 'PASS' },
+      lifecycleEvidence: { verdict: 'PASS' },
     },
   };
   assert.deepEqual(extractRuntimeBackendProof(session), {
@@ -78,6 +79,8 @@ test('runtime evidence extracts native backend and bounded claims from capture s
     mechanismCorrectness: 'PASS',
     performanceCompliance: 'NOT_CLAIMED',
     gpuAttribution: 'INSUFFICIENT_EVIDENCE',
-    lifecycleStability: 'INSUFFICIENT_EVIDENCE',
+    lifecycleStability: 'PASS',
   });
+  delete session.hookResult.lifecycleEvidence;
+  assert.equal(normalizedPreviewClaimVerdicts(session).lifecycleStability, 'INSUFFICIENT_EVIDENCE');
 });
