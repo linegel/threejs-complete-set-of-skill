@@ -151,7 +151,6 @@ function mapTimestampSegment( segment, label ) {
 	const sceneSamples = [];
 	const outputSamples = [];
 	const seenUids = new Set();
-	const seenFrameCalls = new Set();
 	let contextIds = null;
 	let timestampResolveCount = 0;
 	let maximumResolveResidualMs = 0;
@@ -159,6 +158,7 @@ function mapTimestampSegment( segment, label ) {
 	for ( const [ batchIndex, batch ] of batches.entries() ) {
 
 		const batchLabel = `${ label }.gpuTimestampBatches[${ batchIndex }]`;
+		const seenFrameCalls = new Set();
 		if ( batch.mappingCadence !== 'once-per-batch' || batch.independentPerFrameTotalsAvailable !== false ) fail( `${ batchLabel } violates the batched derived-total contract.` );
 		const frameCount = batch.sampleFrames?.value;
 		const warmupFrameCount = batch.warmupFrames?.value;
@@ -189,7 +189,8 @@ function mapTimestampSegment( segment, label ) {
 			if ( scene.frameCall !== output.frameCall + 1 || scene.uid === output.uid ) fail( `${ rowLabel } does not bind the outer final-output call followed by the nested scene-mrt call.` );
 			if ( previousFrameId !== null && row.frameId < previousFrameId ) fail( `${ batchLabel } frame IDs regress in capture order.` );
 			previousFrameId = row.frameId;
-			if ( seenFrameCalls.has( scene.frameCall ) || seenFrameCalls.has( output.frameCall ) || seenUids.has( scene.uid ) || seenUids.has( output.uid ) ) fail( `${ rowLabel } duplicates a timestamp or render-call identity.` );
+			if ( seenFrameCalls.has( scene.frameCall ) || seenFrameCalls.has( output.frameCall ) ) fail( `${ rowLabel } duplicates a render-call identity within its timestamp batch.` );
+			if ( seenUids.has( scene.uid ) || seenUids.has( output.uid ) ) fail( `${ rowLabel } duplicates a timestamp UID across the mapped segment.` );
 			seenFrameCalls.add( scene.frameCall );
 			seenFrameCalls.add( output.frameCall );
 			seenUids.add( scene.uid );

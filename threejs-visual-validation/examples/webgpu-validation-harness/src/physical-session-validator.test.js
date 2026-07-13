@@ -648,11 +648,20 @@ test( 'verified hardware timing maps the final sustained window without relabell
 	assert.equal( trace.cpuSamples[ 0 ], 1.2 );
 	assert.throws( () => createRuntimePerformanceTrace( { record: performanceSession() } ), /exact wrapper bytes/ );
 
+	const resetFrameCallRecord = performanceSession();
+	resetFrameCallRecord.sustainedWindows.at( - 1 ).gpuTimestampBatches.push( timestampBatch( { frameBase: 120, frameCallBase: 0 } ) );
+	const resetFrameCallImport = await importedWrapper( resetFrameCallRecord );
+	const resetFrameCallVerified = await loadVerifiedImportedPhysicalRecord( resetFrameCallImport.path, { expectedProfile: 'performance' } );
+	const resetFrameCallTrace = createRuntimePerformanceTrace( resetFrameCallVerified );
+	assert.equal( resetFrameCallTrace.timestampRows.length, 240 );
+	assert.equal( resetFrameCallTrace.timestampRows[ 0 ].sceneUid, 'r:2:17:f0' );
+	assert.equal( resetFrameCallTrace.timestampRows[ 120 ].sceneUid, 'r:2:17:f120' );
+
 	const duplicateRecord = performanceSession();
 	duplicateRecord.sustainedWindows.at( - 1 ).gpuTimestampBatches.push( timestampBatch() );
 	const duplicateImport = await importedWrapper( duplicateRecord );
 	const duplicateVerified = await loadVerifiedImportedPhysicalRecord( duplicateImport.path, { expectedProfile: 'performance' } );
-	assert.throws( () => createRuntimePerformanceTrace( duplicateVerified ), /duplicates a timestamp or render-call identity/ );
+	assert.throws( () => createRuntimePerformanceTrace( duplicateVerified ), /duplicates a timestamp UID across the mapped segment/ );
 
 	const sharedFrameRecord = performanceSession();
 	for ( const row of sharedFrameRecord.sustainedWindows.at( - 1 ).gpuTimestampBatches[ 0 ].timestampRows ) {
