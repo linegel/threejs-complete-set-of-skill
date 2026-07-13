@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { mkdtemp, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -8,6 +9,7 @@ import { numericDatum } from './physical-evidence-common.js';
 import { createCorrectnessCaptureSessionFixture } from './correctness-capture-session.fixture.js';
 import { HARDWARE_PERFORMANCE_CONTRACT, HARDWARE_PERFORMANCE_ROUTE_PLAN, PHYSICAL_ROUTE_PLAN } from './in-app-evidence-plan.js';
 import { createRuntimeGovernorTrace, createRuntimePerformanceTrace } from './physical-performance-trace.js';
+import { projectValidationHarnessPerformanceEvidence } from './performance-evidence-projection.js';
 import { validatePhysicalEvidenceRecordFile } from './physical-validate-record.js';
 import {
 	hashPhysicalRecord,
@@ -650,6 +652,57 @@ test( 'verified governor timing joins separately bound tier visual evidence', as
 		assert.throws( () => createRuntimeGovernorTrace( verified, mutation ), pattern, name );
 
 	}
+
+} );
+
+test( 'offline performance projection binds the exact hardware and tier-evidence inputs', async () => {
+
+	const imported = await importedWrapper( performanceSession() );
+	const verifiedPerformance = await loadVerifiedImportedPhysicalRecord( imported.path, { expectedProfile: 'performance' } );
+	const tierDocument = tierVisualEvidence();
+	const tierVisualEvidenceBytes = Buffer.from( `${ JSON.stringify( tierDocument, null, 2 ) }\n` );
+	const tierVisualEvidenceLedgerEntry = {
+		path: 'tier-visual-evidence.json',
+		status: 'captured',
+		kind: 'supplementary-json',
+		sha256: `sha256:${ createHash( 'sha256' ).update( tierVisualEvidenceBytes ).digest( 'hex' ) }`,
+		byteLength: tierVisualEvidenceBytes.byteLength
+	};
+	const correctnessIdentity = { sourceClosureHash: HASH_A, buildRevision: HASH_B, threeRevision: '0.185.1' };
+	const result = projectValidationHarnessPerformanceEvidence( {
+		verifiedPerformance,
+		tierVisualEvidenceBytes,
+		tierVisualEvidenceLedgerEntry,
+		correctnessIdentity
+	} );
+	assert.deepEqual( result.claimVerdicts, { performanceCompliance: 'PASS', gpuAttribution: 'PASS' } );
+	assert.equal( result.projectionBinding.performanceSessionDocumentSha256, verifiedPerformance.sourceDocumentSha256 );
+	assert.equal( result.projectionBinding.tierVisualEvidenceSha256, tierVisualEvidenceLedgerEntry.sha256 );
+	assert.equal( result.artifacts[ 'performance-envelope.json' ].compositorGpuReserve.status, 'NOT_CLAIMED' );
+	assert.equal( Object.isFrozen( result ), true );
+
+	assert.throws( () => projectValidationHarnessPerformanceEvidence( {
+		verifiedPerformance,
+		tierVisualEvidenceBytes,
+		tierVisualEvidenceLedgerEntry: { ...tierVisualEvidenceLedgerEntry, sha256: HASH_D },
+		correctnessIdentity
+	} ), /differ from the correctness ledger/ );
+	assert.throws( () => projectValidationHarnessPerformanceEvidence( {
+		verifiedPerformance,
+		tierVisualEvidenceBytes: Buffer.from( JSON.stringify( tierDocument ) ),
+		tierVisualEvidenceLedgerEntry: {
+			...tierVisualEvidenceLedgerEntry,
+			sha256: `sha256:${ createHash( 'sha256' ).update( Buffer.from( JSON.stringify( tierDocument ) ) ).digest( 'hex' ) }`,
+			byteLength: Buffer.byteLength( JSON.stringify( tierDocument ) )
+		},
+		correctnessIdentity
+	} ), /not canonical two-space JSON/ );
+	assert.throws( () => projectValidationHarnessPerformanceEvidence( {
+		verifiedPerformance,
+		tierVisualEvidenceBytes,
+		tierVisualEvidenceLedgerEntry,
+		correctnessIdentity: { ...correctnessIdentity, buildRevision: HASH_C }
+	} ), /buildRevision differ/ );
 
 } );
 
