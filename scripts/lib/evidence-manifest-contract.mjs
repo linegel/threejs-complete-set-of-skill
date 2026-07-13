@@ -408,6 +408,25 @@ function validatePromotion( manifest, fileIndex, imageIndex, errors ) {
 	const signoff = promotion.visualSignoff;
 	if ( signoff !== null && typeof signoff === 'object' ) {
 
+		if ( signoff.status === 'APPROVED' || signoff.status === 'REJECTED' ) {
+
+			const candidateBinding = signoff.candidateBinding;
+			if ( candidateBinding === null || typeof candidateBinding !== 'object' || Array.isArray( candidateBinding ) ) errors.push( 'Visual signoff candidate binding is missing.' );
+			else {
+
+				checkDigest( errors, signoff.candidateBindingDigest, canonicalSha256( candidateBinding ), 'Visual signoff candidate binding' );
+				const candidateProjection = structuredClone( manifest );
+				candidateProjection.publishable = false;
+				candidateProjection.limitations = structuredClone( candidateBinding.limitations );
+				const expectedCandidateBinding = createReleasePromotionBinding( candidateProjection );
+				if ( sameValue( candidateBinding, expectedCandidateBinding ) === false ) errors.push( 'Visual signoff candidate binding does not reconstruct from the immutable release inputs.' );
+				if ( candidateBinding.artifactLedgerDigest !== binding?.artifactLedgerDigest ) errors.push( 'Visual signoff candidate artifact ledger differs from the promoted release.' );
+				if ( candidateBinding.imageLedgerDigest !== binding?.imageLedgerDigest ) errors.push( 'Visual signoff candidate image ledger differs from the promoted release.' );
+
+			}
+
+		}
+
 		for ( const reviewedPath of signoff.reviewedImages ?? [] ) {
 
 			const image = imageIndex.get( reviewedPath );

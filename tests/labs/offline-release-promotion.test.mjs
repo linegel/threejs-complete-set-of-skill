@@ -11,6 +11,7 @@ import {
   routeStateDigest,
   STANDARD_IMAGE_PATHS,
   validateEvidenceManifestContract,
+  visualReviewDigest,
 } from '../../scripts/lib/evidence-manifest-contract.mjs';
 import { validateEvidenceBundle } from '../../scripts/lib/evidence-v2.mjs';
 import { promoteReleaseBundle } from '../../scripts/lib/offline-release-promotion.mjs';
@@ -84,6 +85,14 @@ test('offline promotion copies a candidate into a validated route-set-bound appr
   assert.deepEqual(result.manifest.promotion.binding.routeSet, result.manifest.routeSet);
   assert.equal(result.manifest.promotion.binding.routeSetDigest, routeSetDigest(result.manifest.routeSet));
   assert.equal(result.manifest.promotion.visualSignoff.reviewedImages.length, STANDARD_IMAGE_PATHS.length);
+  assert.deepEqual(
+    result.manifest.promotion.visualSignoff.candidateBinding,
+    readFixtureManifest(candidateDirectory).promotion.binding,
+  );
+  assert.equal(
+    result.manifest.promotion.visualSignoff.candidateBindingDigest,
+    readFixtureManifest(candidateDirectory).promotion.bindingDigest,
+  );
   assert.deepEqual(result.manifest.limitations, [
     {
       id: 'visual-review-pending',
@@ -125,6 +134,28 @@ test('offline promotion rejects incomplete signoff and drifted candidate bytes',
   await assert.rejects(
     () => promoteReleaseBundle({ candidateDirectory, outputDirectory: join(root, 'drifted'), visualReview: review(candidateDirectory) }),
     /release candidate is invalid/,
+  );
+});
+
+test('terminal signoff rejects forged candidate lineage', async () => {
+  const candidateDirectory = pendingCandidate();
+  const outputDirectory = join(mkdtempSync(join(tmpdir(), 'offline-lineage-test-')), 'approved');
+  const result = await promoteReleaseBundle({ candidateDirectory, outputDirectory, visualReview: review(candidateDirectory) });
+
+  const forgedDigest = structuredClone(result.manifest);
+  forgedDigest.promotion.visualSignoff.candidateBindingDigest = canonicalSha256('another candidate');
+  forgedDigest.promotion.visualSignoff.reviewDigest = visualReviewDigest(forgedDigest.promotion.visualSignoff);
+  assert.match(
+    validateEvidenceManifestContract(forgedDigest).join('\n'),
+    /Visual signoff candidate binding does not match/,
+  );
+
+  const forgedBinding = structuredClone(result.manifest);
+  forgedBinding.promotion.visualSignoff.candidateBinding.imageLedgerDigest = canonicalSha256('forged images');
+  forgedBinding.promotion.visualSignoff.reviewDigest = visualReviewDigest(forgedBinding.promotion.visualSignoff);
+  assert.match(
+    validateEvidenceManifestContract(forgedBinding).join('\n'),
+    /Visual signoff candidate binding|candidate image ledger differs/,
   );
 });
 

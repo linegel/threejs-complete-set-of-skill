@@ -42,6 +42,8 @@ function promotionReview( manifest, review ) {
 	const reviewedImages = review.reviewedImages ?? STANDARD_IMAGE_PATHS.filter( ( path ) => manifest.images.find( ( image ) => image.path === path )?.status === 'captured' );
 	const record = {
 		status,
+		candidateBinding: structuredClone( manifest.promotion.binding ),
+		candidateBindingDigest: manifest.promotion.bindingDigest,
 		reviewer: review.reviewer,
 		reviewedAt: review.reviewedAt,
 		reviewDigest: null,

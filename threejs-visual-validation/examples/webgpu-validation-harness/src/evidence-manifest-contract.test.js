@@ -170,8 +170,13 @@ function releaseImages( pipelineGraphDigest ) {
 function bindPromotion( manifest ) {
 
 	const binding = createOfflinePromotionBinding( manifest );
+	const candidateManifest = structuredClone( manifest );
+	candidateManifest.publishable = false;
+	const candidateBinding = createOfflinePromotionBinding( candidateManifest );
 	const visualSignoff = {
 		status: 'APPROVED',
+		candidateBinding,
+		candidateBindingDigest: canonicalSha256( candidateBinding ),
 		reviewer: 'graphics-reviewer',
 		reviewedAt: '2026-07-12T12:00:00Z',
 		reviewedImages: STANDARD_IMAGE_PATHS.filter( ( path ) => manifest.images.find( ( image ) => image.path === path )?.status === 'captured' ),
@@ -499,10 +504,11 @@ test( 'offline promotion resolves the checked release manifest rather than a par
 
 	const pending = releaseManifest();
 	pending.publishable = false;
+	const pendingBinding = createOfflinePromotionBinding( pending );
 	pending.promotion = {
 		status: 'PENDING_VISUAL_SIGNOFF',
-		binding: pending.promotion.binding,
-		bindingDigest: pending.promotion.bindingDigest,
+		binding: pendingBinding,
+		bindingDigest: canonicalSha256( pendingBinding ),
 		visualSignoff: { status: 'PENDING', reviewer: null, reviewedAt: null, reviewDigest: null, reviewedImages: [], notes: [] }
 	};
 	const result = await resolveOfflinePromotionManifest( pending, {

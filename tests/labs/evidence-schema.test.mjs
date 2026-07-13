@@ -492,6 +492,8 @@ function releaseRecord({ performance = false, visualError = true } = {}) {
     bindingDigest: hash('8'),
     visualSignoff: {
       status: 'APPROVED',
+      candidateBinding: promotionBinding(record),
+      candidateBindingDigest: hash('7'),
       reviewer: 'graphics-reviewer',
       reviewedAt: '2026-07-12T12:00:00Z',
       reviewDigest: hash('9'),

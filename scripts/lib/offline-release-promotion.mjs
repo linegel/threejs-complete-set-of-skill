@@ -17,7 +17,7 @@ function sha256(bytes) {
   return `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
 }
 
-function requireVisualReview(review) {
+function requireVisualReview(review, candidateBinding) {
   if (review === null || typeof review !== 'object' || Array.isArray(review)) {
     throw new TypeError('offline visual review must be an object');
   }
@@ -39,6 +39,8 @@ function requireVisualReview(review) {
   }
   return {
     status: review.status,
+    candidateBinding: structuredClone(candidateBinding),
+    candidateBindingDigest: review.candidateBindingDigest,
     reviewer: review.reviewer.trim(),
     reviewedAt: review.reviewedAt,
     reviewDigest: null,
@@ -89,7 +91,7 @@ export async function promoteReleaseBundle({ candidateDirectory, outputDirectory
   if (visualReview?.candidateBindingDigest !== sourceManifest.promotion.bindingDigest) {
     throw new Error('offline visual review candidate binding digest does not match the pending release');
   }
-  const review = requireVisualReview(visualReview);
+  const review = requireVisualReview(visualReview, sourceManifest.promotion.binding);
   const imageIndex = new Map(sourceManifest.images.map((image) => [image.path, image]));
   for (const path of review.reviewedImages) {
     if (imageIndex.get(path)?.status !== 'captured') throw new Error(`offline visual review references uncaptured image ${path}`);

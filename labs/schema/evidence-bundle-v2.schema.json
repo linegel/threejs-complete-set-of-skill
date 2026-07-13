@@ -736,9 +736,11 @@
     "visualSignoffApproved": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["status", "reviewer", "reviewedAt", "reviewDigest", "reviewedImages", "notes"],
+      "required": ["status", "candidateBinding", "candidateBindingDigest", "reviewer", "reviewedAt", "reviewDigest", "reviewedImages", "notes"],
       "properties": {
         "status": { "const": "APPROVED" },
+        "candidateBinding": { "$ref": "#/$defs/promotionBinding" },
+        "candidateBindingDigest": { "$ref": "#/$defs/sha256" },
         "reviewer": { "type": "string", "minLength": 1 },
         "reviewedAt": { "$ref": "#/$defs/reviewedAt" },
         "reviewDigest": { "$ref": "#/$defs/sha256" },
@@ -749,9 +751,11 @@
     "visualSignoffRejected": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["status", "reviewer", "reviewedAt", "reviewDigest", "reviewedImages", "notes"],
+      "required": ["status", "candidateBinding", "candidateBindingDigest", "reviewer", "reviewedAt", "reviewDigest", "reviewedImages", "notes"],
       "properties": {
         "status": { "const": "REJECTED" },
+        "candidateBinding": { "$ref": "#/$defs/promotionBinding" },
+        "candidateBindingDigest": { "$ref": "#/$defs/sha256" },
         "reviewer": { "type": "string", "minLength": 1 },
         "reviewedAt": { "$ref": "#/$defs/reviewedAt" },
         "reviewDigest": { "$ref": "#/$defs/sha256" },
