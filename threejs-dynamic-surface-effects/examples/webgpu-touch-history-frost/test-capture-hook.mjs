@@ -5,6 +5,7 @@ import {
   composeFrostDiagnosticMosaic,
   outputPlan,
   rgbDifferenceMetrics,
+  validateFrostCoverageEvidence,
 } from "./capture-hook.mjs";
 import { FROST_CAPTURE_RECIPES } from "./capture-recipes.js";
 
@@ -63,6 +64,7 @@ assert.deepEqual(rgbDifferenceMetrics(source(10, 4), source(20, 4)), {
   changedFraction: 1,
 });
 assert.throws(() => rgbDifferenceMetrics(source(1, 1), { width: 1, height: 1, data: new Uint8Array(4) }), /equal dimensions/);
+assert.throws(() => validateFrostCoverageEvidence(new Map()), /omits probe.odd-size.final/);
 
 const recipe = FROST_CAPTURE_RECIPES[0];
 const digest = `sha256:${"1".repeat(64)}`;
@@ -82,13 +84,18 @@ const capture = {
       camera: recipe.camera,
       seed: recipe.seed,
       timeSeconds: recipe.expectedTimeSeconds,
-      viewport: { width: 1200, height: 800, dpr: 1 },
+      viewport: { width: 1200, height: 800, dpr: 1, physicalWidth: 1200, physicalHeight: 800 },
     },
     execution: {
       pointerSegmentCount: recipe.trace.length,
       computeDispatchDelta: recipe.trace.length,
       renderSubmissionDelta: 1,
       sameFrameComposite: true,
+      historyExtent: { width: 600, height: 400 },
+      workgroupSize: [8, 8, 1],
+      workgroupCount: [75, 50, 1],
+      coveredExtent: { width: 600, height: 400 },
+      boundsChecked: true,
     },
     artifactTarget: {
       kind: "render-target",

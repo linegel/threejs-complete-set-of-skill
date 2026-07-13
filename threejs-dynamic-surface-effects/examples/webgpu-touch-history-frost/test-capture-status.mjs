@@ -40,7 +40,11 @@ const session = {
     finalState: { tier: "full" },
   },
   outputPlan,
-  hookResult: { captures: Array.from({ length: 13 }, (_, index) => ({ index })), visualDifferences: { verdict: "PASS" } },
+  hookResult: {
+    captures: Array.from({ length: 17 }, (_, index) => ({ index })),
+    visualDifferences: { verdict: "PASS" },
+    coverageEvidence: { verdict: "PASS" },
+  },
 };
 const stale = evaluateFrostCaptureStatus({
   session,

@@ -4,6 +4,7 @@ import { unpackAlignedRows } from "../../../labs/runtime/aligned-readback.mjs";
 import { encodeRgbaPng } from "../../../scripts/lib/png-rgba.mjs";
 import {
   FROST_CAPTURE_RECIPES,
+  FROST_COVERAGE_PROBE_RECIPES,
   FROST_STANDARD_OUTPUT_PLAN,
 } from "./capture-recipes.js";
 
@@ -66,7 +67,9 @@ export function assertFrostRecipeCapture(recipe, capture, recipeSetDigest) {
   requireRecord(capture, `Frost capture ${recipe.id}`);
   if (capture.target !== recipe.id) throw new Error(`${recipe.id} capture target drifted to ${capture.target}`);
   if (capture.captureMode !== recipe.target) throw new Error(`${recipe.id} capture mode drifted to ${capture.captureMode}`);
-  if (capture.width !== 1200 || capture.height !== 800) throw new Error(`${recipe.id} must retain a 1200x800 correctness readback`);
+  if (capture.width !== recipe.viewport.physicalWidth || capture.height !== recipe.viewport.physicalHeight) {
+    throw new Error(`${recipe.id} readback does not match its frozen physical extent`);
+  }
 
   const evidence = requireRecord(capture.evidence, `${recipe.id} evidence`);
   const recipeEvidence = requireRecord(evidence.recipe, `${recipe.id} recipe evidence`);
@@ -85,7 +88,7 @@ export function assertFrostRecipeCapture(recipe, capture, recipeSetDigest) {
     throw new Error(`${recipe.id} effective time drifted`);
   }
   const viewport = requireRecord(state.viewport, `${recipe.id} viewport`);
-  if (viewport.width !== 1200 || viewport.height !== 800 || viewport.dpr !== 1) {
+  if (JSON.stringify(viewport) !== JSON.stringify(recipe.viewport)) {
     throw new Error(`${recipe.id} effective viewport drifted`);
   }
 
@@ -102,8 +105,8 @@ export function assertFrostRecipeCapture(recipe, capture, recipeSetDigest) {
     || artifactTarget.rendererDeviceGeneration !== 1
     || typeof artifactTarget.captureTargetId !== "string"
     || typeof artifactTarget.colorTextureUuid !== "string"
-    || artifactTarget.width !== 1200
-    || artifactTarget.height !== 800
+    || artifactTarget.width !== recipe.viewport.physicalWidth
+    || artifactTarget.height !== recipe.viewport.physicalHeight
     || artifactTarget.format !== "rgba8unorm"
     || artifactTarget.depthBuffer !== false
     || artifactTarget.stencilBuffer !== false) {
@@ -123,6 +126,67 @@ export function assertFrostRecipeCapture(recipe, capture, recipeSetDigest) {
     throw new Error(`${recipe.id} did not restore its parent state digest`);
   }
   return true;
+}
+
+function alignedRowBytes(width) {
+  return Math.ceil((width * 4) / 256) * 256;
+}
+
+export function validateFrostCoverageEvidence(retained) {
+  if (!(retained instanceof Map)) throw new TypeError("Frost coverage validation requires retained recipe captures");
+  const records = FROST_COVERAGE_PROBE_RECIPES.map((recipe) => {
+    const record = retained.get(recipe.id);
+    if (!record) throw new Error(`Frost coverage evidence omits ${recipe.id}`);
+    const capture = record.capture;
+    const expectedStride = alignedRowBytes(recipe.viewport.physicalWidth);
+    if (capture.sourceBytesPerRow !== expectedStride
+      || capture.transport?.rendererCopy?.requestedLayout?.bytesPerRow !== expectedStride
+      || capture.transport?.rendererCopy?.requestedLayout?.alignmentBytes !== 256) {
+      throw new Error(`${recipe.id} aligned transport layout drifted`);
+    }
+    const execution = requireRecord(capture.evidence?.execution, `${recipe.id} execution evidence`);
+    const historyExtent = requireRecord(execution.historyExtent, `${recipe.id} history extent`);
+    const coveredExtent = requireRecord(execution.coveredExtent, `${recipe.id} covered extent`);
+    if (execution.boundsChecked !== true
+      || JSON.stringify(execution.workgroupSize) !== JSON.stringify([8, 8, 1])
+      || !Array.isArray(execution.workgroupCount)
+      || execution.workgroupCount.length !== 3
+      || coveredExtent.width !== execution.workgroupCount[0] * 8
+      || coveredExtent.height !== execution.workgroupCount[1] * 8
+      || coveredExtent.width < historyExtent.width
+      || coveredExtent.height < historyExtent.height) {
+      throw new Error(`${recipe.id} compute coverage evidence is inconsistent`);
+    }
+    return Object.freeze({
+      recipeId: recipe.id,
+      viewport: recipe.viewport,
+      historyExtent,
+      workgroupSize: execution.workgroupSize,
+      workgroupCount: execution.workgroupCount,
+      coveredExtent,
+      boundsChecked: execution.boundsChecked,
+      alignedBytesPerRow: measured(expectedStride, "bytes-per-row", `${recipe.id} renderer transport readback`),
+      transactionId: capture.evidence.transaction.transactionId,
+      entryStateDigest: capture.evidence.transaction.entryStateDigest,
+      restoredStateDigest: capture.evidence.transaction.restoredStateDigest,
+    });
+  });
+  const odd = records[0];
+  if (odd.historyExtent.width !== 641
+    || odd.historyExtent.height !== 359
+    || JSON.stringify(odd.workgroupCount) !== JSON.stringify([81, 45, 1])
+    || odd.coveredExtent.width !== 648
+    || odd.coveredExtent.height !== 360) {
+    throw new Error("Frost odd-size probe does not prove full 641x359 dispatch coverage");
+  }
+  if (new Set(records.map(({ transactionId }) => transactionId)).size !== records.length) {
+    throw new Error("Frost coverage probes reused a capture transaction");
+  }
+  return Object.freeze({
+    verdict: "PASS",
+    probes: Object.freeze(records),
+    dprSweep: Object.freeze(records.slice(1).map(({ viewport }) => viewport.dpr)),
+  });
 }
 
 async function retainRecipeCapture(session, recipe, recipeSetDigest) {
@@ -359,10 +423,13 @@ export async function captureLab(session) {
   if (JSON.stringify(description.recipes?.map(({ id }) => id)) !== JSON.stringify(FROST_CAPTURE_RECIPES.map(({ id }) => id))) {
     throw new Error("Frost controller recipe inventory drifted from the hook contract");
   }
+  if (JSON.stringify(description.coverageProbes?.map(({ id }) => id)) !== JSON.stringify(FROST_COVERAGE_PROBE_RECIPES.map(({ id }) => id))) {
+    throw new Error("Frost controller coverage-probe inventory drifted from the hook contract");
+  }
 
   const retained = new Map();
   const captures = [];
-  for (const recipe of FROST_CAPTURE_RECIPES) {
+  for (const recipe of [...FROST_CAPTURE_RECIPES, ...FROST_COVERAGE_PROBE_RECIPES]) {
     const record = await retainRecipeCapture(session, recipe, description.recipeSetDigest);
     retained.set(recipe.id, record);
     captures.push(Object.freeze({
@@ -379,11 +446,13 @@ export async function captureLab(session) {
   const mosaic = composeFrostDiagnosticMosaic(DIAGNOSTIC_RECIPE_IDS.map((id) => retained.get(id)));
   const mosaicOutput = await writeDerivedMosaic(session, mosaic);
   const visualDifferences = validateFrostVisualDifferences(retained);
+  const coverageEvidence = validateFrostCoverageEvidence(retained);
   return Object.freeze({
     recipeSetDigest: description.recipeSetDigest,
     captures: Object.freeze(captures),
     standardOutputs: Object.freeze([mosaicOutput]),
     visualDifferences,
+    coverageEvidence,
   });
 }
 
