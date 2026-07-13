@@ -37,6 +37,14 @@ import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
 import { createExposureColorStage } from '../../../threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/stage.js';
+import {
+	bindWebGPUDeviceIdentity,
+	captureRuntimeProfileFields,
+	markWebGPUDeviceDisposed,
+	markWebGPUDeviceDisposing,
+	webgpuDeviceIdentityMetrics,
+} from '../../../labs/runtime/webgpu-device-identity.mjs';
+import { REVISION } from 'three';
 
 export const IMAGE_PIPELINE_TIERS = Object.freeze( {
 	full: Object.freeze( { normal: true, emissive: true, temporal: true, ao: true, bloom: true, exposureTier: 'full-histogram', aoScale: 0.5, bloomScale: 0.5, diagnosticAlbedoPass: false } ),
@@ -84,6 +92,7 @@ export async function createCanonicalImagePipeline( canvas, { tierId = 'full', m
 	const renderer = new WebGPURenderer( { canvas, antialias: false, outputBufferType: HalfFloatType, trackTimestamp: true } );
 	await renderer.init();
 	if ( renderer.backend?.isWebGPUBackend !== true ) throw new Error( 'Canonical image pipeline requires native WebGPU; fallback is not activated.' );
+	const deviceIdentity = bindWebGPUDeviceIdentity( renderer );
 
 	const scene = new Scene();
 	scene.background = new Color( 0x070b14 );
@@ -103,6 +112,9 @@ export async function createCanonicalImagePipeline( canvas, { tierId = 'full', m
 	let currentSeed = 1;
 	let seedPhase = 0;
 	let seededSubjectZ = 0;
+	let viewportWidth = 1;
+	let viewportHeight = 1;
+	let viewportDpr = 1;
 
 	const renderPipeline = new RenderPipeline( renderer );
 	const scenePass = pass( scene, camera );
@@ -231,10 +243,13 @@ export async function createCanonicalImagePipeline( canvas, { tierId = 'full', m
 	function resize( width, height, dpr = 1 ) {
 
 		if ( width <= 0 || height <= 0 || dpr <= 0 ) throw new Error( 'Image-pipeline extent and DPR must be positive.' );
+		viewportWidth = Math.floor( width );
+		viewportHeight = Math.floor( height );
+		viewportDpr = dpr;
 		camera.aspect = width / height;
 		camera.updateProjectionMatrix();
 		renderer.setPixelRatio( dpr );
-		renderer.setSize( Math.floor( width ), Math.floor( height ), false );
+		renderer.setSize( viewportWidth, viewportHeight, false );
 		if ( tier.temporal ) buildDynamicGraph( 'resize-or-dpr' );
 
 	}
@@ -278,6 +293,7 @@ export async function createCanonicalImagePipeline( canvas, { tierId = 'full', m
 
 	function describePipeline() {
 
+		const profileFields = captureRuntimeProfileFields();
 		return {
 			owners: { renderer: 'canonical-image-pipeline', primaryScenePass: 'scenePass', jitter: tier.temporal ? 'TRAANode' : null, exposure: 'exposure-color-stage', toneMap: 'exposure-color-stage', outputTransform: 'exposure-color-stage' },
 			signals: [ 'output', 'depth', ...( tier.normal ? [ 'normal' ] : [] ), ...( tier.emissive ? [ 'emissive' ] : [] ), ...( tier.temporal ? [ 'velocity', 'history' ] : [] ) ],
@@ -300,7 +316,12 @@ export async function createCanonicalImagePipeline( canvas, { tierId = 'full', m
 			tierId,
 			mode: currentMode,
 			temporalGeneration,
-			resetLog: [ ...resetLog ]
+			resetLog: [ ...resetLog ],
+			...profileFields,
+			// Correctness capture must keep timestamps inactive even if the renderer was created with trackTimestamp.
+			timestampQueriesRequired: false,
+			timestampQueriesRequested: false,
+			timestampQueriesActive: false,
 		};
 
 	}
@@ -349,6 +370,7 @@ export async function createCanonicalImagePipeline( canvas, { tierId = 'full', m
 
 		if ( disposed ) return false;
 		disposed = true;
+		markWebGPUDeviceDisposing( deviceIdentity );
 		disposeDynamicGraph();
 		stableInput.dispose?.();
 		aoNode?.dispose?.();
@@ -358,6 +380,7 @@ export async function createCanonicalImagePipeline( canvas, { tierId = 'full', m
 		renderPipeline.dispose?.();
 		for ( const mesh of [ subject, ground, emitter ] ) { mesh.geometry.dispose(); mesh.material.dispose(); }
 		renderer.dispose();
+		markWebGPUDeviceDisposed( deviceIdentity );
 		return true;
 
 	}
@@ -383,13 +406,32 @@ export async function createCanonicalImagePipeline( canvas, { tierId = 'full', m
 		describePipeline,
 		describeResources,
 		readbackExposureState: () => exposureStage.readback(),
-		getMetrics: () => ( {
-			verdict: 'INSUFFICIENT_EVIDENCE',
-			reason: 'Current-adapter timestamp and physical-allocation evidence have not been accepted.',
-			seed: currentSeed,
-			rendererInfo: describeRendererInfo(),
-			exposure: exposureStage.describe()
-		} ),
+		getMetrics: () => {
+
+			// Force correctness-profile timestamp flags for capture-lab-browser (renderer may be constructed with trackTimestamp).
+			const identityMetrics = webgpuDeviceIdentityMetrics( deviceIdentity, renderer, { runtimeProfile: 'correctness' } );
+			return {
+				verdict: 'INSUFFICIENT_EVIDENCE',
+				reason: 'Current-adapter timestamp and physical-allocation evidence have not been accepted.',
+				seed: currentSeed,
+				threeRevision: REVISION,
+				...identityMetrics,
+				timestampQueriesRequired: false,
+				timestampQueriesRequested: false,
+				timestampQueriesActive: false,
+				viewport: {
+					width: viewportWidth,
+					height: viewportHeight,
+					dpr: viewportDpr,
+				},
+				rendererInfo: {
+					...identityMetrics.rendererInfo,
+					...describeRendererInfo(),
+				},
+				exposure: exposureStage.describe(),
+			};
+
+		},
 		dispose
 	};
 

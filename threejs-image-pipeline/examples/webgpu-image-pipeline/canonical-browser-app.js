@@ -93,17 +93,26 @@ async function initialize() {
 
 	}
 
-	async function capturePixels( mode = 'final' ) {
+	async function capturePixels( captureTarget = 'presentation' ) {
 
-		app.setMode( mode );
-		const width = Math.max( 1, Math.floor( innerWidth ) );
-		const height = Math.max( 1, Math.floor( innerHeight ) );
+		// Capture harness requests presentation/final RT readbacks; mode switches use setMode.
+		const width = Math.max( 1, Math.floor( app.renderer.domElement.width || innerWidth ) );
+		const height = Math.max( 1, Math.floor( app.renderer.domElement.height || innerHeight ) );
 		target.setSize( width, height );
 		app.renderer.setRenderTarget( target );
 		app.render( 0 );
 		const pixels = await app.renderer.readRenderTargetPixelsAsync( target, 0, 0, width, height );
 		app.renderer.setRenderTarget( null );
-		return { width, height, bytesPerRow: bytesPerRow( width, height, pixels.length ), pixels };
+		return {
+			target: captureTarget,
+			width,
+			height,
+			bytesPerRow: bytesPerRow( width, height, pixels.length ),
+			bytesPerPixel: 4,
+			format: 'rgba8unorm',
+			outputColorSpace: app.renderer.outputColorSpace,
+			pixels,
+		};
 
 	}
 

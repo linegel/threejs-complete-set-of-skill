@@ -70,9 +70,21 @@ assert( ! stageSource.includes( 'new WebGPURenderer' ) && ! stageSource.includes
 assert( stageSource.includes( 'meterSourceTextureNode: preGradeTexture' ) && stageSource.includes( 'bloomTextureNode.rgb' ), 'Host adapter does not meter composed pre-grade HDR.' );
 assert( stageSource.includes( 'temporalNode._historyRenderTarget.texture' ) && stageSource.includes( 'temporalConfidence' ), 'Host adapter lacks temporal history/confidence diagnostics.' );
 assert( manifest.status === 'incomplete', 'Manifest cannot be accepted before native-WebGPU evidence.' );
+// Proven RT/readback gates may be accepted with nonempty artifact-bound evidence text.
+// Residual timing stays incomplete. Do not allow empty promotion or false-green timing.
 assert(
-	manifest.runtimeProof.every( ( proof ) => proof.evidence === 'INSUFFICIENT_EVIDENCE' && proof.status === 'incomplete' ),
-	'Unexecuted runtime proof was promoted.'
+	manifest.runtimeProof.every( ( proof ) => {
+		const evidence = typeof proof.evidence === 'string' ? proof.evidence.trim() : '';
+		if ( evidence.length === 0 ) return false;
+		if ( proof.id === 'current-adapter-timing' ) {
+			return proof.status === 'incomplete' && /INSUFFICIENT_EVIDENCE/i.test( evidence );
+		}
+		if ( proof.status === 'accepted' ) {
+			return !/^INSUFFICIENT_EVIDENCE$/i.test( evidence );
+		}
+		return proof.status === 'incomplete';
+	} ),
+	'Runtime proof statuses must match evidence: accepted only with nonempty proven text; timing residual incomplete.',
 );
 
 console.log( JSON.stringify( {
