@@ -12,6 +12,20 @@ export const RECEIVER_WETNESS_DECISION = Object.freeze({
   ]),
 });
 
+export const RECEIVER_TRANSFER_PHASE_DECISION = Object.freeze({
+  problemId: "interval-integrated-liquid-transfer-phase",
+  axes: Object.freeze(["timeTruth", "cadenceInvariance", "lossCoupling", "schemaClarity", "runtimeCost"]),
+  selectedCandidateId: "explicit-declared-phase",
+  candidates: Object.freeze([
+    Object.freeze({ id: "ignore-phase", family: "apply transfer without temporal phase", scores: [0, 0, 1, 1, 5], hardGate: "fail:undefined-loss-overlap" }),
+    Object.freeze({ id: "force-interval-start", family: "treat every integral as interval-start", scores: [2, 2, 2, 3, 5], hardGate: "fail:water-postsolve-transfer-decays-early" }),
+    Object.freeze({ id: "force-midpoint", family: "treat every integral as midpoint impulse", scores: [2, 3, 3, 2, 5], hardGate: "fail:authored-phase-erasure" }),
+    Object.freeze({ id: "force-interval-end", family: "treat every integral as interval-end", scores: [2, 2, 2, 3, 5], hardGate: "fail:presolve-deposition-decays-late" }),
+    Object.freeze({ id: "uniform-rate-reconstruction", family: "reinterpret every integral as a uniform rate", scores: [3, 4, 5, 2, 4], hardGate: "fail:changes-time-semantics" }),
+    Object.freeze({ id: "explicit-declared-phase", family: "preserve declared interval-start or interval-end phase", scores: [5, 5, 5, 5, 5], hardGate: "pass" }),
+  ]),
+});
+
 function requireFinite(value, label) {
   if (!Number.isFinite(value)) throw new TypeError(`${label} must be finite`);
   return value;
@@ -70,9 +84,9 @@ function prepareMassTransfer(interaction, prior, cellAreaM2, knownKeys, batchKey
   if (!Number.isInteger(interaction.targetCellIndex) || interaction.targetCellIndex < 0 || interaction.targetCellIndex >= prior.liquidMassKgPerM2.length) throw new RangeError("liquid transfer target cell lies outside the receiver");
   if (interaction.footprint?.distributionKind !== "extensive-distributed" || interaction.footprint.representedAreaM2 !== cellAreaM2) throw new Error("liquid transfer footprint must represent exactly one physical receiver cell area");
   const payload = interaction.payload;
-  if (payload?.tag !== "massTransfer" || payload.timeSemantics !== "interval-integrated" || payload.applicationPhase !== "interval-start") throw new Error("receiver requires an interval-start, interval-integrated massTransfer payload");
+  if (payload?.tag !== "massTransfer" || payload.timeSemantics !== "interval-integrated" || !["interval-start", "interval-end"].includes(payload.applicationPhase)) throw new Error("receiver requires an explicitly phased, interval-integrated massTransfer payload");
   const liquidMassKg = requireNonnegative(payload.speciesPhaseMassKg?.liquidWater, "liquidWater mass transfer");
-  return Object.freeze({ interaction, liquidMassKg });
+  return Object.freeze({ interaction, liquidMassKg, applicationPhase: payload.applicationPhase });
 }
 
 export function advanceReceiverLiquidInventory(prior, {
@@ -99,6 +113,9 @@ export function advanceReceiverLiquidInventory(prior, {
   const knownKeys = new Set(prior.applicationLedgerKeys);
   const batchKeys = new Set();
   const prepared = interactions.map((interaction) => prepareMassTransfer(interaction, prior, area, knownKeys, batchKeys));
+  const applicationPhases = new Set(prepared.map((item) => item.applicationPhase));
+  if (applicationPhases.size > 1) throw new Error("receiver liquid batch mixes incompatible integral application phases");
+  const applicationPhase = prepared[0]?.applicationPhase ?? "interval-start";
   const incomingKgByCell = new Float64Array(cellCount);
   for (const item of prepared) incomingKgByCell[item.interaction.targetCellIndex] += item.liquidMassKg;
 
@@ -116,17 +133,21 @@ export function advanceReceiverLiquidInventory(prior, {
   for (let cell = 0; cell < cellCount; cell += 1) {
     const priorKg = prior.liquidMassKgPerM2[cell] * area;
     const incomingKg = incomingKgByCell[cell];
-    const availableKgPerM2 = prior.liquidMassKgPerM2[cell] + incomingKg / area;
-    const storedBeforeLossKgPerM2 = Math.min(prior.capacityKgPerM2, availableKgPerM2);
+    const priorAfterLossKgPerM2 = prior.liquidMassKgPerM2[cell] * decay;
+    const startAvailableKgPerM2 = prior.liquidMassKgPerM2[cell] + incomingKg / area;
+    const endAvailableKgPerM2 = priorAfterLossKgPerM2 + incomingKg / area;
+    const availableKgPerM2 = applicationPhase === "interval-start" ? startAvailableKgPerM2 : endAvailableKgPerM2;
+    const storedAtCapacityKgPerM2 = Math.min(prior.capacityKgPerM2, availableKgPerM2);
     const overflowKg = Math.max(0, availableKgPerM2 - prior.capacityKgPerM2) * area;
-    const retainedKgPerM2 = storedBeforeLossKgPerM2 * decay;
-    const lossKg = (storedBeforeLossKgPerM2 - retainedKgPerM2) * area;
+    const retainedKgPerM2 = applicationPhase === "interval-start" ? storedAtCapacityKgPerM2 * decay : storedAtCapacityKgPerM2;
+    const lossBasisKgPerM2 = applicationPhase === "interval-start" ? storedAtCapacityKgPerM2 : prior.liquidMassKgPerM2[cell];
+    const lossKg = lossBasisKgPerM2 * (1 - decay) * area;
     const rateScale = totalLossRate === 0 ? 0 : lossKg / totalLossRate;
     nextMass[cell] = retainedKgPerM2;
     saturation[cell] = retainedKgPerM2 / prior.capacityKgPerM2;
     priorMassKg += priorKg;
     incomingMassKg += incomingKg;
-    storedAfterInputKg += storedBeforeLossKgPerM2 * area;
+    storedAfterInputKg += storedAtCapacityKgPerM2 * area;
     overflowRunoffKg += overflowKg;
     drainageKg += rateScale * rates.drainage;
     infiltrationKg += rateScale * rates.infiltration;
@@ -158,6 +179,7 @@ export function advanceReceiverLiquidInventory(prior, {
     }),
     diagnostics: Object.freeze({
       applicationIntervalKey,
+      applicationPhase,
       interactionCount: prepared.length,
       priorMassKg,
       incomingMassKg,
