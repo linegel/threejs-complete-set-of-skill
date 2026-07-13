@@ -75,6 +75,7 @@ export const DEFAULT_FROST_SETTINGS = Object.freeze({
   visibleNoiseStrength: 0.16,
   tiltNoiseStrength: 0.06,
   brushRadius: 0.16,
+  historyVisualKnee: 0.06,
   sideFade: 0.35,
   cornerFade: 0.55,
   blurResolutionScale: 0.4,
@@ -392,6 +393,14 @@ export function survivalFactor(decaySurvivalPerSecond, deltaSeconds) {
 
 export function depositScale(depositPerSecond, deltaSeconds) {
   return 1 - (1 - depositPerSecond) ** deltaSeconds;
+}
+
+export function historyVisualResponse(value, knee = DEFAULT_FROST_SETTINGS.historyVisualKnee) {
+  if (!Number.isFinite(value) || !Number.isFinite(knee) || knee <= 0 || knee > 1) {
+    throw new RangeError("history visual response requires a finite value and knee in (0, 1]");
+  }
+  const t = Math.min(1, Math.max(0, value / knee));
+  return t * t * (3 - 2 * t);
 }
 
 export function laplacianDiffusion({
@@ -815,8 +824,10 @@ function buildFrostCompositeGraph({
     mechanismProfile.crystalField ? 0.3 : 0,
   ).mul(0.72).add(0.28).clamp(0, 1).toVar();
   const highlightStructure = pow(frozenStructure, 5).toVar();
-  const previousClear = float(1).sub(previousHistory.r).clamp(0, 1).toVar();
-  const currentClear = float(1).sub(currentHistory.r).clamp(0, 1).toVar();
+  const previousVisibleHistory = smoothstep(0, settings.historyVisualKnee, previousHistory.r).toVar();
+  const currentVisibleHistory = smoothstep(0, settings.historyVisualKnee, currentHistory.r).toVar();
+  const previousClear = float(1).sub(previousVisibleHistory).clamp(0, 1).toVar();
+  const currentClear = float(1).sub(currentVisibleHistory).clamp(0, 1).toVar();
   const frostMaskBefore = frozenStructure.mul(previousClear).clamp(0, 1).toVar();
   const frostMaskAfter = frozenStructure.mul(currentClear).clamp(0, 1).toVar();
   const blurMix = mechanismProfile.blur
@@ -1035,6 +1046,11 @@ export class WebGPUTouchHistoryFrostEffect {
     }
     if (!Number.isFinite(this.settings.sourceInset) || this.settings.sourceInset < 0) {
       throw new RangeError("frost source inset must be finite nonnegative pixels");
+    }
+    if (!Number.isFinite(this.settings.historyVisualKnee)
+      || this.settings.historyVisualKnee <= 0
+      || this.settings.historyVisualKnee > 1) {
+      throw new RangeError("frost history visual knee must be in (0, 1]");
     }
     if (this.settings.opticalSide !== "outside" && this.settings.opticalSide !== "inside") {
       throw new RangeError(`unknown optical side "${this.settings.opticalSide}"`);

@@ -24,6 +24,7 @@ import {
   estimateHistoryStorageBytes,
   exactDielectricFresnel,
   frostSeedPhase,
+  historyVisualResponse,
   laplacianDiffusion,
   resolveFrostGraphContract,
   screenPeriodPhase,
@@ -69,6 +70,10 @@ assert.equal(clampDeltaSeconds(-1), 0);
 assert.equal(clampDeltaSeconds(2), DEFAULT_FROST_SETTINGS.maxDeltaSeconds);
 assert.equal(survivalFactor(0.92, 0), 1);
 assert(depositScale(0.94, 1 / 60) > 0);
+assert.equal(historyVisualResponse(0), 0);
+assert.equal(historyVisualResponse(DEFAULT_FROST_SETTINGS.historyVisualKnee), 1);
+assert(historyVisualResponse(depositScale(0.94, 1 / 60)) > depositScale(0.94, 1 / 60));
+assert.throws(() => historyVisualResponse(0.2, 0), /knee in/);
 
 const fps30 = simulateHeldPointer({ fps: 30, seconds: 1 });
 const fps60 = simulateHeldPointer({ fps: 60, seconds: 1 });
