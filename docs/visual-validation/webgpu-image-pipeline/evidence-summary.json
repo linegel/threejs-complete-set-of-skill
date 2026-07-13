@@ -13,7 +13,12 @@
     "renderer": "WebGPURenderer",
     "backend": "WebGPUBackend",
     "isWebGPUBackend": true,
-    "threeRevision": null
+    "threeRevision": null,
+    "nativeWebGPU": false,
+    "initialized": false,
+    "adapterClass": null,
+    "adapterIdentity": null,
+    "deviceIdentity": null
   },
   "claimVerdicts": {
     "mechanismCorrectness": "INSUFFICIENT_EVIDENCE",

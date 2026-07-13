@@ -13,7 +13,12 @@
     "renderer": "unknown",
     "backend": "unknown",
     "isWebGPUBackend": true,
-    "threeRevision": "185"
+    "threeRevision": "185",
+    "nativeWebGPU": false,
+    "initialized": false,
+    "adapterClass": null,
+    "adapterIdentity": null,
+    "deviceIdentity": null
   },
   "claimVerdicts": {
     "visualCorrectness": "PASS",

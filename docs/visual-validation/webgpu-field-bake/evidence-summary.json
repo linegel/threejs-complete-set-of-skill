@@ -17,7 +17,23 @@
     "renderer": "unknown",
     "backend": "webgpu",
     "isWebGPUBackend": true,
-    "threeRevision": "0.185.1"
+    "threeRevision": "0.185.1",
+    "nativeWebGPU": true,
+    "initialized": true,
+    "adapterClass": "unknown",
+    "adapterIdentity": {
+      "source": "LabController.getMetrics",
+      "backendType": "webgpu",
+      "deviceType": "unknown",
+      "deviceLabel": "",
+      "deviceIdentityVerified": false
+    },
+    "deviceIdentity": {
+      "verified": true,
+      "source": "renderer.backend.device captured immediately after await renderer.init()",
+      "deviceType": "GPUDevice",
+      "generation": 1
+    }
   },
   "claimVerdicts": {
     "mechanismCorrectness": "INSUFFICIENT_EVIDENCE",
