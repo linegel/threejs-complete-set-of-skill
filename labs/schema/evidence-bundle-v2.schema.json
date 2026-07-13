@@ -45,6 +45,12 @@
     "sourceClosureHash": { "$ref": "#/$defs/sha256" },
     "buildRevision": { "$ref": "#/$defs/sha256" },
     "route": { "$ref": "#/$defs/route" },
+    "routeSet": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/route" }
+    },
     "limitations": { "$ref": "#/$defs/limitations" },
     "claimVerdicts": { "$ref": "#/$defs/claimVerdicts" },
     "captureSessions": {
@@ -654,6 +660,13 @@
         "threeRevision": { "const": "0.185.1" },
         "route": { "$ref": "#/$defs/route" },
         "routeDigest": { "$ref": "#/$defs/sha256" },
+        "routeSet": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/route" }
+        },
+        "routeSetDigest": { "$ref": "#/$defs/sha256" },
         "limitations": { "$ref": "#/$defs/limitations" },
         "limitationsDigest": { "$ref": "#/$defs/sha256" },
         "claimVerdicts": { "$ref": "#/$defs/claimVerdicts" },

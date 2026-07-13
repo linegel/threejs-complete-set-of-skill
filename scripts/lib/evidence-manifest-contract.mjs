@@ -101,6 +101,18 @@ export function routeStateDigest( route ) {
 
 }
 
+export function routeSetDigest( routes ) {
+
+	return canonicalSha256( [ ...( routes ?? [] ) ].sort( ( left, right ) => {
+
+		const leftKey = `${ left?.path ?? '' }\u0000${ left?.stateDigest ?? '' }`;
+		const rightKey = `${ right?.path ?? '' }\u0000${ right?.stateDigest ?? '' }`;
+		return leftKey.localeCompare( rightKey );
+
+	} ) );
+
+}
+
 export function captureSessionSetDigest( sessions ) {
 
 	return canonicalSha256( sortedBy( sessions, 'sessionId' ) );
@@ -136,6 +148,7 @@ export function manifestCoreDigest( manifest ) {
 		'limitations',
 		'claimVerdicts'
 	] ) core[ key ] = manifest?.[ key ];
+	if ( Object.hasOwn( manifest ?? {}, 'routeSet' ) ) core.routeSet = manifest.routeSet;
 	return canonicalSha256( core );
 
 }
@@ -201,6 +214,19 @@ function requireCapturedReference( errors, fileIndex, reference, expectedKind, l
 function validateCaptureSessions( manifest, fileIndex, errors ) {
 
 	const sessions = Array.isArray( manifest.captureSessions ) ? manifest.captureSessions : [];
+	const routeSet = Array.isArray( manifest.routeSet ) ? manifest.routeSet : [ manifest.route ];
+	const routeIndex = indexUnique( routeSet, 'path', 'routeSet', errors );
+	for ( const [ index, route ] of routeSet.entries() ) {
+
+		if ( route?.stateDigest !== routeStateDigest( route ) ) errors.push( `routeSet[${ index }] state digest is invalid.` );
+
+	}
+	if ( manifest.routeSet !== undefined ) {
+
+		const canonicalRoute = routeIndex.get( manifest.route?.path );
+		if ( canonicalRoute === undefined || sameValue( canonicalRoute, manifest.route ) === false ) errors.push( 'routeSet does not contain the canonical release route.' );
+
+	}
 	indexUnique( sessions, 'sessionId', 'captureSessions', errors );
 	indexUnique( sessions, 'profile', 'captureSessions', errors );
 	const documentPaths = new Set();
@@ -216,9 +242,14 @@ function validateCaptureSessions( manifest, fileIndex, errors ) {
 		const startedAt = Date.parse( session?.startedAt );
 		const finishedAt = Date.parse( session?.finishedAt );
 		if ( Number.isFinite( startedAt ) === false || Number.isFinite( finishedAt ) === false || finishedAt < startedAt ) errors.push( `${ label } capture interval is invalid.` );
-		if ( session?.routePath !== manifest.route?.path ) errors.push( `${ label } route path differs from the release manifest.` );
-		if ( session?.routeDigest !== canonicalSha256( manifest.route ) ) errors.push( `${ label } route digest differs from the canonical release route.` );
-		if ( session?.stateDigest !== manifest.route?.stateDigest ) errors.push( `${ label } state digest differs from the release route state.` );
+		const sessionRoute = routeIndex.get( session?.routePath );
+		if ( sessionRoute === undefined ) errors.push( `${ label } route path is not a member of the release route set.` );
+		else {
+
+			if ( session?.routeDigest !== canonicalSha256( sessionRoute ) ) errors.push( `${ label } route digest differs from its bound release route.` );
+			if ( session?.stateDigest !== sessionRoute.stateDigest ) errors.push( `${ label } state digest differs from its bound release route state.` );
+
+		}
 		if ( session?.rendererInitialized !== true || session?.isWebGPUBackend !== true ) errors.push( `${ label } does not prove initialized native WebGPU execution.` );
 		if ( manifest.bundleKind === 'release-bundle' && [ 'physical-route', 'performance' ].includes( session?.profile ) && session?.adapterClass !== 'hardware' ) errors.push( `${ label } physical release lane is not bound to a hardware adapter.` );
 		if ( manifest.bundleKind === 'release-bundle' && session?.profile === 'performance' && session?.timestampQuerySupported !== true ) errors.push( `${ label } performance lane lacks timestamp-query support.` );
@@ -310,6 +341,12 @@ function validatePromotion( manifest, fileIndex, imageIndex, errors ) {
 		if ( binding.buildRevision !== manifest.buildRevision ) errors.push( 'Promotion binding build revision differs from the release manifest.' );
 		if ( binding.threeRevision !== manifest.threeRevision ) errors.push( 'Promotion binding Three.js revision differs from the release manifest.' );
 		if ( sameValue( binding.route, manifest.route ) === false ) errors.push( 'Promotion binding route differs from the release manifest.' );
+		if ( Object.hasOwn( manifest, 'routeSet' ) ) {
+
+			if ( sameValue( binding.routeSet, manifest.routeSet ) === false ) errors.push( 'Promotion binding route set differs from the release manifest.' );
+			checkDigest( errors, binding.routeSetDigest, routeSetDigest( manifest.routeSet ), 'Promotion route set' );
+
+		} else if ( Object.hasOwn( binding, 'routeSet' ) || Object.hasOwn( binding, 'routeSetDigest' ) ) errors.push( 'Promotion binding invents a route set absent from the release manifest.' );
 		if ( sameValue( binding.limitations, manifest.limitations ) === false ) errors.push( 'Promotion binding limitations differ from the release manifest.' );
 		if ( sameValue( binding.claimVerdicts, manifest.claimVerdicts ) === false ) errors.push( 'Promotion binding claim verdicts differ from the release manifest.' );
 		if ( sameValue( binding.captureSessions, manifest.captureSessions ) === false ) errors.push( 'Promotion binding capture-session set differs from the release manifest.' );

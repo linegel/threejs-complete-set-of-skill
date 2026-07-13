@@ -16,6 +16,7 @@ import {
   manifestCoreDigest,
   NORMATIVE_JSON_PATHS,
   routeStateDigest,
+  routeSetDigest,
   STANDARD_IMAGE_PATHS,
   visualReviewDigest,
 } from '../../scripts/lib/evidence-manifest-contract.mjs';
@@ -451,6 +452,10 @@ export function rebindFixturePromotion(manifest) {
     artifactLedgerDigest: artifactLedgerDigest(manifest.files),
     imageLedgerDigest: imageLedgerDigest(manifest.images),
   };
+  if (Object.hasOwn(manifest, 'routeSet')) {
+    binding.routeSet = structuredClone(manifest.routeSet);
+    binding.routeSetDigest = routeSetDigest(manifest.routeSet);
+  }
   const visualSignoff = {
     status: 'APPROVED',
     reviewer: 'fixture-graphics-reviewer',
