@@ -106,87 +106,31 @@
 
   <section class="section" aria-labelledby="capture-title"><h2 id="capture-title">Capture state</h2><div class="table-wrap"><table><thead><tr><th>Field</th><th>Published value</th></tr></thead><tbody><tr><td>Primary route</td><td><code>/demos/webgpu-shadow-architecture-bench/</code></td></tr><tr><td>Cameras</td><td><code>near, design, far</code></td></tr><tr><td>Seeds</td><td><code>0x00000001, 0x9e3779b9</code></td></tr><tr><td>Modes</td><td><code>final, shadow-depth, owner-graph</code></td></tr><tr><td>Capture time</td><td><code>Not present in the promoted report data</code></td></tr><tr><td>Adapter identity</td><td><code>{&quot;source&quot;:&quot;renderer.backend after init&quot;,&quot;info&quot;:{}}</code></td></tr><tr><td>Raw readback hashes</td><td><code>Not present in the promoted preview summary</code></td></tr></tbody></table></div></section>
 
-    <section class="section" aria-labelledby="routes-title"><h2 id="routes-title">Fixed routes</h2><div class="table-wrap"><table><thead><tr><th>Kind</th><th>Id</th><th>Startup state</th><th>Status</th></tr></thead><tbody><tr><td>scenario</td><td><a href="/demos/webgpu-shadow-architecture-bench/?scenario=bounded"><code>bounded</code></a></td><td><code>{"scenario":"bounded"}</code></td><td>accepted</td></tr><tr><td>scenario</td><td><a href="/demos/webgpu-shadow-architecture-bench/?scenario=csm"><code>csm</code></a></td><td><code>{"scenario":"csm"}</code></td><td>accepted</td></tr><tr><td>scenario</td><td><a href="/demos/webgpu-shadow-architecture-bench/?scenario=tiled"><code>tiled</code></a></td><td><code>{"scenario":"tiled"}</code></td><td>accepted</td></tr><tr><td>scenario</td><td><a href="/demos/webgpu-shadow-architecture-bench/?scenario=cached"><code>cached</code></a></td><td><code>{"scenario":"cached"}</code></td><td>accepted</td></tr><tr><td>mechanism</td><td><code>bounded-shadow</code></td><td><code>{"mechanism":"bounded-shadow"}</code></td><td>accepted</td></tr><tr><td>mechanism</td><td><code>csm</code></td><td><code>{"mechanism":"csm"}</code></td><td>accepted</td></tr><tr><td>mechanism</td><td><code>tiled-shadow</code></td><td><code>{"mechanism":"tiled-shadow"}</code></td><td>accepted</td></tr><tr><td>mechanism</td><td><code>cached-clipmap</code></td><td><code>{"mechanism":"cached-clipmap"}</code></td><td>accepted</td></tr></tbody></table></div></section>
+      <section class="section" aria-labelledby="routes-title"><h2 id="routes-title">Fixed routes</h2><div class="table-wrap"><table><thead><tr><th>Kind</th><th>Id</th><th>Startup state</th><th>Status</th></tr></thead><tbody><tr><td>scenario</td><td><a href="/demos/webgpu-shadow-architecture-bench/?scenario=bounded"><code>bounded</code></a></td><td><code>{"scenario":"bounded"}</code></td><td>accepted</td></tr><tr><td>scenario</td><td><a href="/demos/webgpu-shadow-architecture-bench/?scenario=csm"><code>csm</code></a></td><td><code>{"scenario":"csm"}</code></td><td>accepted</td></tr><tr><td>scenario</td><td><a href="/demos/webgpu-shadow-architecture-bench/?scenario=tiled"><code>tiled</code></a></td><td><code>{"scenario":"tiled"}</code></td><td>accepted</td></tr><tr><td>scenario</td><td><a href="/demos/webgpu-shadow-architecture-bench/?scenario=cached"><code>cached</code></a></td><td><code>{"scenario":"cached"}</code></td><td>accepted</td></tr><tr><td>mechanism</td><td><code>bounded-shadow</code></td><td><code>{"mechanism":"bounded-shadow"}</code></td><td>accepted</td></tr><tr><td>mechanism</td><td><code>csm</code></td><td><code>{"mechanism":"csm"}</code></td><td>accepted</td></tr><tr><td>mechanism</td><td><code>tiled-shadow</code></td><td><code>{"mechanism":"tiled-shadow"}</code></td><td>accepted</td></tr><tr><td>mechanism</td><td><code>cached-clipmap</code></td><td><code>{"mechanism":"cached-clipmap"}</code></td><td>accepted</td></tr><tr><td>tier</td><td><code>high</code></td><td><code>{"tier":"high"}</code></td><td>accepted</td></tr></tbody></table></div></section>
 
-  <section class="section" aria-labelledby="tiers-title"><h2 id="tiers-title">Locked tier contracts</h2><details><summary>high · accepted</summary><pre>{
-  &quot;targetClass&quot;: &quot;close-inspection&quot;,
-  &quot;frameTargetMs&quot;: null,
-  &quot;resolutionPolicy&quot;: {
-    &quot;receiverScale&quot;: 1,
-    &quot;dprCap&quot;: 2
+    <section class="section" aria-labelledby="tiers-title"><h2 id="tiers-title">Locked tier contracts</h2><details><summary>high · accepted</summary><pre>{
+  "id": "high",
+  "targetClass": "current WebGPU adapter",
+  "frameTargetMs": null,
+  "resolutionPolicy": {
+    "width": 1200,
+    "height": 800,
+    "dpr": 1
   },
-  &quot;mechanismLimits&quot;: {
-    &quot;rainInstances&quot;: 24576,
-    &quot;snowInstances&quot;: 12288,
-    &quot;impactCapacity&quot;: 4096,
-    &quot;recurrentTurbulence&quot;: true
+  "mechanismLimits": {
+    "architectureCount": 4,
+    "fixedTier": "high"
   },
-  &quot;resourceLimits&quot;: {
-    &quot;precipitationDraws&quot;: 2,
-    &quot;splashDraws&quot;: 1
+  "resourceLimits": {
+    "inventorySource": "runtime-owned shadow targets"
   },
-  &quot;degradationFromPrevious&quot;: [],
-  &quot;preservedInvariants&quot;: [
-    &quot;shared-weather-object&quot;,
-    &quot;world-stable-impacts&quot;,
-    &quot;integrated-surface-state&quot;,
-    &quot;single-field-snow-normal&quot;
-  ]
-}</pre></details><details><summary>medium · accepted</summary><pre>{
-  &quot;targetClass&quot;: &quot;ordinary-inspection&quot;,
-  &quot;frameTargetMs&quot;: null,
-  &quot;resolutionPolicy&quot;: {
-    &quot;receiverScale&quot;: 0.5,
-    &quot;dprCap&quot;: 1.5
-  },
-  &quot;mechanismLimits&quot;: {
-    &quot;rainInstances&quot;: 12288,
-    &quot;snowInstances&quot;: 6144,
-    &quot;impactCapacity&quot;: 2048,
-    &quot;recurrentTurbulence&quot;: false
-  },
-  &quot;resourceLimits&quot;: {
-    &quot;precipitationDraws&quot;: 2,
-    &quot;splashDraws&quot;: 1
-  },
-  &quot;degradationFromPrevious&quot;: [
-    &quot;halve-visible-samples&quot;,
-    &quot;disable-recurrent-turbulence&quot;
+  "degradationFromPrevious": [],
+  "preservedInvariants": [
+    "identical seeded receiver/caster scene",
+    "normal depth for the stock r185 tile comparison",
+    "one directional illumination owner"
   ],
-  &quot;preservedInvariants&quot;: [
-    &quot;shared-weather-object&quot;,
-    &quot;world-stable-impacts&quot;,
-    &quot;integrated-surface-state&quot;,
-    &quot;single-field-snow-normal&quot;
-  ]
-}</pre></details><details><summary>budgeted · accepted</summary><pre>{
-  &quot;targetClass&quot;: &quot;small-projected-footprint&quot;,
-  &quot;frameTargetMs&quot;: null,
-  &quot;resolutionPolicy&quot;: {
-    &quot;receiverScale&quot;: 0.25,
-    &quot;dprCap&quot;: 1
-  },
-  &quot;mechanismLimits&quot;: {
-    &quot;rainInstances&quot;: 4096,
-    &quot;snowInstances&quot;: 2048,
-    &quot;impactCapacity&quot;: 512,
-    &quot;recurrentTurbulence&quot;: false
-  },
-  &quot;resourceLimits&quot;: {
-    &quot;precipitationDraws&quot;: 2,
-    &quot;splashDraws&quot;: 1
-  },
-  &quot;degradationFromPrevious&quot;: [
-    &quot;reduce-visible-samples&quot;,
-    &quot;reduce-receiver-resolution&quot;,
-    &quot;bound-impact-ring&quot;
-  ],
-  &quot;preservedInvariants&quot;: [
-    &quot;shared-weather-object&quot;,
-    &quot;world-stable-impacts&quot;,
-    &quot;integrated-surface-state&quot;,
-    &quot;single-field-snow-normal&quot;
-  ]
+  "acceptanceStatus": "accepted"
 }</pre></details></section>
 
     <section class="section" aria-labelledby="limitations-title"><h2 id="limitations-title">Limitations</h2><ul class="limitations"><li>Correctness and CDP Chrome hardware physical-route visual review pass on the current source closure.</li><li>Named-adapter GPU timestamp timing remains NOT_CLAIMED.</li></ul></section>
