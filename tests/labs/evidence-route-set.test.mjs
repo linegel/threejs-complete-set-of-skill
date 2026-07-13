@@ -65,6 +65,50 @@ test('one capture session can bind every route it executed without fabricating d
   assert.equal(result.valid, true, result.errors.join('\n'));
 });
 
+test('canonical scenario query routes bind the query to the locked scenario state', () => {
+  const { directory, manifest } = createMultiRouteFixture();
+  const queryRoute = manifest.routeSet[1];
+  queryRoute.path = '/demos/webgpu-validation-harness/?scenario=visual-error-metrics';
+  queryRoute.scenario = 'visual-error-metrics';
+  queryRoute.stateDigest = routeStateDigest(queryRoute);
+  const physical = manifest.captureSessions.find((session) => session.profile === 'physical-route');
+  physical.routePath = queryRoute.path;
+  physical.routeDigest = canonicalSha256(queryRoute);
+  physical.stateDigest = queryRoute.stateDigest;
+  physical.routeSetPaths = manifest.routeSet.map((route) => route.path);
+  physical.routeSetDigest = routeSetDigest(manifest.routeSet);
+  rebindFixturePromotion(manifest);
+  writeFixtureManifest(directory, manifest);
+  const result = validateEvidenceBundle(directory);
+  assert.equal(result.valid, true, result.errors.join('\n'));
+});
+
+test('scenario query routes reject state mismatches and noncanonical query syntax', () => {
+  for (const path of [
+    '/demos/webgpu-validation-harness/?scenario=visual-error-metrics',
+    '/demos/webgpu-validation-harness/?scenario=visual-error-metrics&mode=final',
+    '/demos/webgpu-validation-harness/?mode=final',
+    '/demos/webgpu-validation-harness/?scenario=Visual-Error',
+    '/demos/webgpu-validation-harness/#visual-error-metrics',
+  ]) {
+    const { directory, manifest } = createMultiRouteFixture();
+    const queryRoute = manifest.routeSet[1];
+    queryRoute.path = path;
+    queryRoute.scenario = 'browser-capture';
+    queryRoute.stateDigest = routeStateDigest(queryRoute);
+    const physical = manifest.captureSessions.find((session) => session.profile === 'physical-route');
+    physical.routePath = queryRoute.path;
+    physical.routeDigest = canonicalSha256(queryRoute);
+    physical.stateDigest = queryRoute.stateDigest;
+    physical.routeSetPaths = manifest.routeSet.map((route) => route.path);
+    physical.routeSetDigest = routeSetDigest(manifest.routeSet);
+    rebindFixturePromotion(manifest);
+    writeFixtureManifest(directory, manifest);
+    const result = validateEvidenceBundle(directory);
+    assert.equal(result.valid, false, `noncanonical or mismatched route unexpectedly validated: ${path}`);
+  }
+});
+
 test('route-set membership, canonical inclusion, route digests, and unique paths are enforced', () => {
   for (const mutate of [
     (manifest) => { manifest.routeSet = [manifest.route]; },

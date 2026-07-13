@@ -247,6 +247,8 @@ function validateCaptureSessions( manifest, fileIndex, errors ) {
 	for ( const [ index, route ] of routeSet.entries() ) {
 
 		if ( route?.stateDigest !== routeStateDigest( route ) ) errors.push( `routeSet[${ index }] state digest is invalid.` );
+		const scenarioQuery = typeof route?.path === 'string' ? route.path.match( /\?scenario=([a-z0-9][a-z0-9-]*)$/ )?.[ 1 ] : undefined;
+		if ( scenarioQuery !== undefined && route?.scenario !== scenarioQuery ) errors.push( `routeSet[${ index }] scenario query differs from its locked scenario state.` );
 
 	}
 	if ( manifest.routeSet !== undefined ) {
