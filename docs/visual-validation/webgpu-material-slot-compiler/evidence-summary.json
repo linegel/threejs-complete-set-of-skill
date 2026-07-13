@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "labId": "webgpu-material-slot-compiler",
+  "classification": "inspected-runtime-evidence-preview",
+  "acceptanceStatus": "incomplete",
+  "evidenceBundleId": "correctness",
+  "canonicalSource": [
+    "threejs-procedural-buildings-and-cities/examples/webgpu-material-slot-compiler"
+  ],
+  "canonicalSourceHash": "sha256:dd6b7dfc24b0553b4562b465dcfd3dcf5a10c6741d76da60e2f70ceb8355e500",
+  "threeRevision": "0.185.1",
+  "runtime": {
+    "renderer": "WebGPURenderer",
+    "backend": "WebGPU",
+    "isWebGPUBackend": true,
+    "threeRevision": "0.185.1"
+  },
+  "claimVerdicts": {
+    "mechanismCorrectness": "INSUFFICIENT_EVIDENCE",
+    "performanceCompliance": "INSUFFICIENT_EVIDENCE",
+    "lifecycleStability": "INSUFFICIENT_EVIDENCE"
+  },
+  "primaryImage": "final.design.png",
+  "primaryImageLabel": "Material-slot presentation readback",
+  "images": [
+    {
+      "file": "final.design.png",
+      "meaning": "Material-slot presentation readback.",
+      "source": "final.design.png",
+      "sourceSha256": "sha256:2fe4485816dbfc87e8eba17f116dcd094539d66bced9c53f8f1236f195f4292d",
+      "outputSha256": "sha256:2fe4485816dbfc87e8eba17f116dcd094539d66bced9c53f8f1236f195f4292d",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "diagnostics.mosaic.png",
+      "meaning": "Module-geometry diagnostic presentation.",
+      "source": "diagnostics.mosaic.png",
+      "sourceSha256": "sha256:2ac72b8d7d5b75c415b1d7764e9dbcdec1fe14a562a90009c0280b476b9ad41c",
+      "outputSha256": "sha256:2ac72b8d7d5b75c415b1d7764e9dbcdec1fe14a562a90009c0280b476b9ad41c",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "camera.near.png",
+      "meaning": "Near camera building presentation.",
+      "source": "camera.near.png",
+      "sourceSha256": "sha256:0700a0bf66ff8898a002d7191f801ef9c544fa91939fa5adce8de2a1521bfa0b",
+      "outputSha256": "sha256:0700a0bf66ff8898a002d7191f801ef9c544fa91939fa5adce8de2a1521bfa0b",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "camera.design.png",
+      "meaning": "Design camera building presentation.",
+      "source": "camera.design.png",
+      "sourceSha256": "sha256:2fe4485816dbfc87e8eba17f116dcd094539d66bced9c53f8f1236f195f4292d",
+      "outputSha256": "sha256:2fe4485816dbfc87e8eba17f116dcd094539d66bced9c53f8f1236f195f4292d",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "camera.far.png",
+      "meaning": "Far camera building presentation.",
+      "source": "camera.far.png",
+      "sourceSha256": "sha256:5dba6ec3e2e3e509eefc5859a2e90e1cfafed07384d5f77f47915db36a3e3ec7",
+      "outputSha256": "sha256:5dba6ec3e2e3e509eefc5859a2e90e1cfafed07384d5f77f47915db36a3e3ec7",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "seed-0001.final.png",
+      "meaning": "Seed 1 building variant.",
+      "source": "seed-0001.final.png",
+      "sourceSha256": "sha256:2fe4485816dbfc87e8eba17f116dcd094539d66bced9c53f8f1236f195f4292d",
+      "outputSha256": "sha256:2fe4485816dbfc87e8eba17f116dcd094539d66bced9c53f8f1236f195f4292d",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "seed-9e3779b9.final.png",
+      "meaning": "Stress seed building variant.",
+      "source": "seed-9e3779b9.final.png",
+      "sourceSha256": "sha256:5b4739fb19026e9e25ab4fbe671e44804eff2fcfe4506ca27da401c9a538ab4c",
+      "outputSha256": "sha256:5b4739fb19026e9e25ab4fbe671e44804eff2fcfe4506ca27da401c9a538ab4c",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    }
+  ],
+  "limitations": [
+    "Native WebGPU MRT/presentation readbacks and seed/camera variants captured.",
+    "Lab remains incomplete until every mechanism/tier route is release-accepted; no GPU timing claim."
+  ]
+}

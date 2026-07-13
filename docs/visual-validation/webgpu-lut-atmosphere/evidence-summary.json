@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "labId": "webgpu-lut-atmosphere",
+  "classification": "inspected-runtime-evidence-preview",
+  "acceptanceStatus": "incomplete",
+  "evidenceBundleId": "correctness",
+  "canonicalSource": [
+    "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere",
+    "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere/webgpu-lut-atmosphere.js",
+    "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere/atmosphere-config.js",
+    "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere/atmosphere-math.js",
+    "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere/depth-contract.js",
+    "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere/runtime-state.js",
+    "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere/browser-app.js",
+    "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere/lab-routes.js",
+    "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere/route-shell.js"
+  ],
+  "canonicalSourceHash": "sha256:e93675b0f1b0ec4adb8c247bf7dfb5a3e6a3f9c8c260b4cb239ab0afcd7e433c",
+  "threeRevision": "0.185.1",
+  "runtime": {
+    "renderer": "unknown",
+    "backend": "unknown",
+    "isWebGPUBackend": true,
+    "threeRevision": "185"
+  },
+  "claimVerdicts": {
+    "mechanismCorrectness": "INSUFFICIENT_EVIDENCE",
+    "performanceCompliance": "INSUFFICIENT_EVIDENCE",
+    "lifecycleStability": "INSUFFICIENT_EVIDENCE"
+  },
+  "primaryImage": "final.design.png",
+  "primaryImageLabel": "Atmosphere final composite readback",
+  "images": [
+    {
+      "file": "final.design.png",
+      "meaning": "Atmosphere final composite with aerial composition.",
+      "source": "final.design.png",
+      "sourceSha256": "sha256:83c227dc44efa0295c326a35626a160232be328b3d0cda9dd485442492def034",
+      "outputSha256": "sha256:83c227dc44efa0295c326a35626a160232be328b3d0cda9dd485442492def034",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "no-post.design.png",
+      "meaning": "Scene color without atmosphere composite.",
+      "source": "no-post.design.png",
+      "sourceSha256": "sha256:0b61f90f8e87901ebf9fb0529d4e472d5c1c1bad0655a15354a0208a31b61b09",
+      "outputSha256": "sha256:0b61f90f8e87901ebf9fb0529d4e472d5c1c1bad0655a15354a0208a31b61b09",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "diagnostics.mosaic.png",
+      "meaning": "Transmittance diagnostic frame used as mosaic proxy.",
+      "source": "diagnostics.mosaic.png",
+      "sourceSha256": "sha256:874a92c7920e1670165bd26653b9e675c468ad986b1efa2ab8d4dd2304513c7c",
+      "outputSha256": "sha256:874a92c7920e1670165bd26653b9e675c468ad986b1efa2ab8d4dd2304513c7c",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "camera.near.png",
+      "meaning": "Sea-level camera composite.",
+      "source": "camera.near.png",
+      "sourceSha256": "sha256:83c227dc44efa0295c326a35626a160232be328b3d0cda9dd485442492def034",
+      "outputSha256": "sha256:83c227dc44efa0295c326a35626a160232be328b3d0cda9dd485442492def034",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "camera.design.png",
+      "meaning": "Mountain camera composite.",
+      "source": "camera.design.png",
+      "sourceSha256": "sha256:6f123335accbc8be2f6e3bca6507b416883a7b00c29c9f6d9cda9663e6d8a2c7",
+      "outputSha256": "sha256:6f123335accbc8be2f6e3bca6507b416883a7b00c29c9f6d9cda9663e6d8a2c7",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "camera.far.png",
+      "meaning": "High-orbit camera composite.",
+      "source": "camera.far.png",
+      "sourceSha256": "sha256:8ce5b55d5bbccfcff6dd4d34066df0b443bf52628381dc87583122408fa68876",
+      "outputSha256": "sha256:8ce5b55d5bbccfcff6dd4d34066df0b443bf52628381dc87583122408fa68876",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    }
+  ],
+  "limitations": [
+    "Five-stage LUT chain, live depth/body composition, and cumulative aerial XY topology proved from the correctness bundle.",
+    "Named-adapter GPU timestamps, reference radiance/energy, and lifecycle stability remain residual."
+  ]
+}

@@ -1,0 +1,125 @@
+{
+  "schemaVersion": 1,
+  "labId": "webgpu-field-bake",
+  "classification": "inspected-runtime-evidence-preview",
+  "acceptanceStatus": "incomplete",
+  "evidenceBundleId": "correctness",
+  "canonicalSource": [
+    "threejs-procedural-fields/examples/webgpu-field-bake",
+    "threejs-procedural-fields/examples/webgpu-field-bake/field-constants.mjs",
+    "threejs-procedural-fields/examples/webgpu-field-bake/field-bundle.mjs",
+    "threejs-procedural-fields/examples/webgpu-field-bake/field-bake.mjs",
+    "threejs-procedural-fields/examples/webgpu-field-bake/browser-app.js"
+  ],
+  "canonicalSourceHash": "sha256:dce4e4e26c06e5a6cf5e49bb15a1f13672b7b75895d3edf013ca3b853e0701d5",
+  "threeRevision": "0.185.1",
+  "runtime": {
+    "renderer": "unknown",
+    "backend": "webgpu",
+    "isWebGPUBackend": true,
+    "threeRevision": "0.185.1"
+  },
+  "claimVerdicts": {
+    "mechanismCorrectness": "INSUFFICIENT_EVIDENCE",
+    "performanceCompliance": "INSUFFICIENT_EVIDENCE",
+    "lifecycleStability": "INSUFFICIENT_EVIDENCE"
+  },
+  "primaryImage": "final.design.png",
+  "primaryImageLabel": "final.design.png",
+  "images": [
+    {
+      "file": "final.design.png",
+      "meaning": "Field gallery final presentation readback.",
+      "source": "final.design.png",
+      "sourceSha256": "sha256:8c0f7c40a965110f2d35b92e309af8a0d8cf58835682f7d0711cc11d90e4d5dd",
+      "outputSha256": "sha256:8c0f7c40a965110f2d35b92e309af8a0d8cf58835682f7d0711cc11d90e4d5dd",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "diagnostics.mosaic.png",
+      "meaning": "Gradient diagnostic mosaic readback.",
+      "source": "diagnostics.mosaic.png",
+      "sourceSha256": "sha256:4ef9b2517b725e31cc82383d60d7bb847ab823e5b029efbf9436b745a8d93fe0",
+      "outputSha256": "sha256:4ef9b2517b725e31cc82383d60d7bb847ab823e5b029efbf9436b745a8d93fe0",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "camera.near.png",
+      "meaning": "Near camera field presentation.",
+      "source": "camera.near.png",
+      "sourceSha256": "sha256:5930638e4e0ee585adb7e59f9654c03dacac57be709657e15e564c0d1a795bc7",
+      "outputSha256": "sha256:5930638e4e0ee585adb7e59f9654c03dacac57be709657e15e564c0d1a795bc7",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "camera.design.png",
+      "meaning": "Design camera field presentation.",
+      "source": "camera.design.png",
+      "sourceSha256": "sha256:8c0f7c40a965110f2d35b92e309af8a0d8cf58835682f7d0711cc11d90e4d5dd",
+      "outputSha256": "sha256:8c0f7c40a965110f2d35b92e309af8a0d8cf58835682f7d0711cc11d90e4d5dd",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "camera.far.png",
+      "meaning": "Far camera field presentation.",
+      "source": "camera.far.png",
+      "sourceSha256": "sha256:d19793df8b28ae575e2a1db738330a482c28a9ab5217b71e15dba56be47e2d3b",
+      "outputSha256": "sha256:d19793df8b28ae575e2a1db738330a482c28a9ab5217b71e15dba56be47e2d3b",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "seed-0001.final.png",
+      "meaning": "Structured-placement seed 1 final.",
+      "source": "seed-0001.final.png",
+      "sourceSha256": "sha256:c7ba44a291b800df3926f4ee75917087d84811321e1480638b34d43debe978e7",
+      "outputSha256": "sha256:c7ba44a291b800df3926f4ee75917087d84811321e1480638b34d43debe978e7",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "seed-9e3779b9.final.png",
+      "meaning": "Structured-placement stress seed final.",
+      "source": "seed-9e3779b9.final.png",
+      "sourceSha256": "sha256:ac2b8a9f6c7842e66e6a8a604373679fdbd22b3901ea3903fa2f7ac907b933aa",
+      "outputSha256": "sha256:ac2b8a9f6c7842e66e6a8a604373679fdbd22b3901ea3903fa2f7ac907b933aa",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "temporal.t000.png",
+      "meaning": "Shared-cause composition at t=0.",
+      "source": "temporal.t000.png",
+      "sourceSha256": "sha256:31436785af6a4bb2d8458abb3c1caff4ed3bde0d945f8a5c147de43f2d6fc809",
+      "outputSha256": "sha256:31436785af6a4bb2d8458abb3c1caff4ed3bde0d945f8a5c147de43f2d6fc809",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "temporal.t001.png",
+      "meaning": "Shared-cause composition at t=25s step.",
+      "source": "temporal.t001.png",
+      "sourceSha256": "sha256:422df154e3768de12886b6af85755cb81725dab3e8246f13b22b5ed2d21eeea3",
+      "outputSha256": "sha256:422df154e3768de12886b6af85755cb81725dab3e8246f13b22b5ed2d21eeea3",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    }
+  ],
+  "limitations": [
+    "Native WebGPU correctness bundle with field/storage/placement/probe readbacks and mechanism diagnostics.",
+    "Current-adapter GPU timestamps remain unaccepted in the correctness profile."
+  ]
+}

@@ -7,7 +7,7 @@
   "canonicalSource": [
     "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline"
   ],
-  "canonicalSourceHash": "sha256:6030ee02f228505590a3a9c61ed20a8fc2955e63d64396fe6c098d18e82a5759",
+  "canonicalSourceHash": "sha256:fa55bb90f79f9cdeda61be3bcb88107795791eb89cfc06274d455e76ce4e41a0",
   "threeRevision": "0.185.1",
   "runtime": {
     "renderer": "WebGPURenderer",
