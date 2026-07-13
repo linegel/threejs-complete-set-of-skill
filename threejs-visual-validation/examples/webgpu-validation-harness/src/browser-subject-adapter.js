@@ -55,7 +55,7 @@ const TIERS = new Map( [
 	[ 'webgpu-correctness', { passScale: 1, performanceClaim: false } ],
 	[ 'target-performance', { passScale: 1, performanceClaim: true } ],
 	[ 'governor-stress', { passScale: 0.5, performanceClaim: true } ],
-	[ 'release', { passScale: 1, performanceClaim: true } ]
+	[ 'release', { passScale: 1, performanceClaim: false } ]
 ] );
 const CAMERAS = new Map( [
 	[ 'near', { position: [ 0.4, 1.2, 3.4 ], target: [ 0, 0.45, 0 ] } ],
@@ -216,6 +216,13 @@ class ValidationTimestampInspector extends InspectorBase {
 function requireKnown( collection, value, label ) {
 
 	if ( collection.has( value ) === false ) throw new Error( `Unknown ${ label } "${ value }".` );
+
+}
+
+export function tierDeclaresPerformanceProfile( id ) {
+
+	requireKnown( TIERS, id, 'tier' );
+	return TIERS.get( id ).performanceClaim === true;
 
 }
 
@@ -1926,7 +1933,7 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 
 			return runExclusiveControllerOperation( 'runPerformanceProfile', async () => {
 
-			if ( TIERS.get( tier ).performanceClaim !== true ) throw new Error( `Tier ${ tier } does not declare a performance profile.` );
+			if ( tierDeclaresPerformanceProfile( tier ) === false ) throw new Error( `Tier ${ tier } does not declare a performance profile.` );
 			if ( typeof requestAnimationFrame !== 'function' ) throw new Error( 'Presentation cadence sampling requires requestAnimationFrame.' );
 			const warmupFrames = requireFrameCount( configuration.warmupFrames ?? 30, 'warmupFrames', 30, 120 );
 			const sampleFrames = requireFrameCount( configuration.sampleFrames ?? 120, 'sampleFrames', 60, 240 );

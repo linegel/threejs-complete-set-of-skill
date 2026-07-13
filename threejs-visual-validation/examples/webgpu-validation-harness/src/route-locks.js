@@ -50,7 +50,7 @@ export const TIER_ROUTE_LOCKS = Object.freeze( {
 	release: startup( PERFORMANCE_STARTUP, { scenario: 'browser-capture', tier: 'release' } )
 } );
 
-export const PERFORMANCE_TIER_IDS = Object.freeze( [ 'target-performance', 'governor-stress', 'release' ] );
+export const PERFORMANCE_TIER_IDS = Object.freeze( [ 'target-performance', 'governor-stress' ] );
 
 const ROUTE_LOCK_TABLES = Object.freeze( {
 	scenario: SCENARIO_ROUTE_LOCKS,

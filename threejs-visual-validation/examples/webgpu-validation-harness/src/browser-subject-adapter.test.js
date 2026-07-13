@@ -32,6 +32,7 @@ import {
 	finalizeCaptureEvidenceWithDeviceGuard,
 	parseRenderTimestampUid,
 	summarizeTimestampBatch,
+	tierDeclaresPerformanceProfile,
 	timestampResolutionPolicy,
 	VALIDATION_MODE_OUTPUT_NODE_IDS
 } from './browser-subject-adapter.js';
@@ -46,6 +47,16 @@ import { getRouteLock } from './route-locks.js';
 test( 'final output retains a visible authored emissive composite', () => {
 
 	assert.equal( FINAL_EMISSIVE_COMPOSITE_STRENGTH, 0.4 );
+
+} );
+
+test( 'only measured hardware tiers declare a performance profile', () => {
+
+	assert.equal( tierDeclaresPerformanceProfile( 'target-performance' ), true );
+	assert.equal( tierDeclaresPerformanceProfile( 'governor-stress' ), true );
+	assert.equal( tierDeclaresPerformanceProfile( 'release' ), false );
+	assert.equal( tierDeclaresPerformanceProfile( 'webgpu-correctness' ), false );
+	assert.throws( () => tierDeclaresPerformanceProfile( 'missing' ), /Unknown tier/ );
 
 } );
 

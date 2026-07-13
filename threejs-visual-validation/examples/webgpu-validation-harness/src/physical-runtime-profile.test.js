@@ -126,3 +126,24 @@ test( 'correctness route rejects a forged performance profile', () => {
 	} ), /reserved for declared performance routes/ );
 
 } );
+
+test( 'release aggregation route does not claim its own performance population', () => {
+
+	const routeLock = getRouteLock( 'tier', 'release' );
+	const result = resolvePhysicalRuntimeProfile( {
+		parameters: new URLSearchParams( {
+			automationSurface: 'codex-in-app-browser',
+			physicalSession: SESSION_TOKEN
+		} ),
+		routeLock,
+		environment: environment()
+	} );
+	assert.equal( result.runtimeProfile, 'correctness' );
+	assert.equal( result.requiresPerformance, false );
+	assert.throws( () => resolvePhysicalRuntimeProfile( {
+		parameters: parameters(),
+		routeLock,
+		environment: environment()
+	} ), /reserved for declared performance routes/ );
+
+} );

@@ -76,10 +76,14 @@
     },
     {
       "id": "release",
-      "targetClass": "current-adapter-release",
-      "frameTargetMs": { "value": 16.67, "unit": "ms", "label": "Gated", "source": "60 Hz current-adapter release target" },
+      "targetClass": "current-adapter-release-aggregation",
+      "frameTargetMs": null,
       "resolutionPolicy": { "scenePassScale": 1, "dprCap": 1 },
-      "mechanismLimits": { "allClaimClassesResolved": true },
+      "mechanismLimits": {
+        "releaseAggregation": true,
+        "performanceEvidenceTier": "target-performance",
+        "governorEvidenceTier": "governor-stress"
+      },
       "resourceLimits": { "lifecycleCyclesMinimum": 50, "lifecycleCyclesMaximum": 100 },
       "degradationFromPrevious": [],
       "preservedInvariants": [ "native WebGPU", "schema v2", "real images", "lifecycle stability" ],
@@ -92,7 +96,7 @@
   "capabilityRequirements": [
     { "id": "native-webgpu", "required": true, "evidence": "renderer.backend.isWebGPUBackend after await renderer.init()", "status": "incomplete" },
     { "id": "render-target-readback", "required": true, "evidence": "RGBA8 capture target copied through an aligned WebGPU row layout", "status": "incomplete" },
-    { "id": "timestamp-query", "required": false, "evidence": "Required only by target-performance and release GPU-attribution claims", "status": "incomplete" }
+    { "id": "timestamp-query", "required": false, "evidence": "Required by target-performance and governor-stress; release aggregates their joined hardware evidence", "status": "incomplete" }
   ],
   "runtimeProof": [
     { "id": "renderer-init", "required": true, "evidence": "Native browser subject initialization and backend gate", "status": "incomplete" },

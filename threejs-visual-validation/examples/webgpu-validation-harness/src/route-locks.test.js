@@ -5,8 +5,11 @@ import { test } from 'node:test';
 import {
 	canonicalUrlForRoute,
 	createLockedController,
+	getRouteLock,
 	MECHANISM_ROUTE_LOCKS,
+	PERFORMANCE_TIER_IDS,
 	resolveRouteLockFromParameters,
+	routeRequiresPerformanceProfile,
 	SCENARIO_ROUTE_LOCKS,
 	TIER_ROUTE_LOCKS
 } from './route-locks.js';
@@ -142,6 +145,15 @@ test( 'route URLs select and lock exact startup state', () => {
 	assert.equal( url.searchParams.get( 'width' ), '1920' );
 	assert.equal( url.searchParams.get( 'height' ), '1080' );
 	assert.equal( url.searchParams.get( 'dpr' ), '1' );
+
+} );
+
+test( 'release is an aggregation route rather than an unmeasured performance workload', () => {
+
+	assert.deepEqual( PERFORMANCE_TIER_IDS, [ 'target-performance', 'governor-stress' ] );
+	assert.equal( routeRequiresPerformanceProfile( getRouteLock( 'tier', 'target-performance' ) ), true );
+	assert.equal( routeRequiresPerformanceProfile( getRouteLock( 'tier', 'governor-stress' ) ), true );
+	assert.equal( routeRequiresPerformanceProfile( getRouteLock( 'tier', 'release' ) ), false );
 
 } );
 
