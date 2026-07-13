@@ -48,7 +48,7 @@
     "threejs-water-optics/examples/webgpu-bounded-water/webgpu-bounded-water.js"
   ],
   "browserEntry": "integration-labs/weathered-world/index.html",
-  "sourceHash": "sha256:df4effe0e07f696e37fb44ef1771cb594009f135d48ca85df84cf7930048681f",
+  "sourceHash": "sha256:99e4e43d1a99d15238e8c54328fa44c349b837e32ed36a40f308b451c25611a3",
   "publishedHashInputs": [
     "docs/demos/weathered-world",
     "docs/demos/assets/dense-grass-system-CmVTxhFW.js",
@@ -102,6 +102,6 @@
   ],
   "publishedBundleHash": "sha256:c0d59daa719f534a1326b293033a71055df51b982f53e3d8ec50e0523fae9fc2",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:caa4bd9a0d957e7dd8f25b94091ab083fa62083edb7c9a6f00872b044beac719",
+  "buildRevision": "sha256:348d7584a398e339bdf08ac952ded6eb67b5ed813416a6fe3ba445615164b63a",
   "evidenceBundleId": "correctness"
 }

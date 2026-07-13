@@ -6,7 +6,7 @@
     "check": "node check.mjs",
     "validate:unit": "node validate.mjs",
     "test:mutations": "node test-mutations.mjs",
-    "capture": "node ../../scripts/capture-lab-browser.mjs --lab weathered-world --target final",
+    "capture": "node ../../scripts/capture-lab-browser.mjs --lab weathered-world --target final --hook integration-labs/weathered-world/capture-hook.mjs",
     "capture:evidence": "node capture.mjs",
     "validate:artifacts": "node validate-artifacts.mjs",
     "validate:quick": "node check.mjs && node test-mutations.mjs",

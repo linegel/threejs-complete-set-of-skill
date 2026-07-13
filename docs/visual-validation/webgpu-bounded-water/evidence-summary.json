@@ -9,7 +9,7 @@
     "scripts/capture-lab-browser.mjs",
     "scripts/lib/evidence-v2.mjs"
   ],
-  "canonicalSourceHash": "sha256:e862f22425735e058c309a055eb695c15f724a67dd1897dce397d98d30e98caa",
+  "canonicalSourceHash": "sha256:612685e33fbfc7296ba884f439f79240bd08404beee9e39690176c935f87ae70",
   "threeRevision": "0.185.1",
   "runtime": {
     "renderer": "WebGPURenderer",
@@ -50,8 +50,8 @@
       "file": "final.design.png",
       "meaning": "Primary final readback.",
       "source": "final.design.png",
-      "sourceSha256": "sha256:da48b0c1332ab8bcd817954efb7a124d6ec80ab47628155fdd2981c175abb4b3",
-      "outputSha256": "sha256:da48b0c1332ab8bcd817954efb7a124d6ec80ab47628155fdd2981c175abb4b3",
+      "sourceSha256": "sha256:bb1ab8189d92a99ee5841d1d43bcc75ee58fc99eeddf76d37512265567771857",
+      "outputSha256": "sha256:bb1ab8189d92a99ee5841d1d43bcc75ee58fc99eeddf76d37512265567771857",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
@@ -60,8 +60,8 @@
       "file": "no-post.design.png",
       "meaning": "No-post / alternate display path readback.",
       "source": "no-post.design.png",
-      "sourceSha256": "sha256:6f5b57d520eebcbfce9372315eb7b5b198232f4c5a179cc393ee2db15846a35a",
-      "outputSha256": "sha256:6f5b57d520eebcbfce9372315eb7b5b198232f4c5a179cc393ee2db15846a35a",
+      "sourceSha256": "sha256:d5b00af9e2c21fec8761ef41d6cf4f38014be81ce165a4fb13f9feee191eaa83",
+      "outputSha256": "sha256:d5b00af9e2c21fec8761ef41d6cf4f38014be81ce165a4fb13f9feee191eaa83",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
@@ -70,8 +70,8 @@
       "file": "diagnostics.mosaic.png",
       "meaning": "Diagnostics display readback.",
       "source": "diagnostics.mosaic.png",
-      "sourceSha256": "sha256:131eb4ef1ce8e999ce78022433c42cbc4dafb15b1f3d7e7264540996a5608af7",
-      "outputSha256": "sha256:131eb4ef1ce8e999ce78022433c42cbc4dafb15b1f3d7e7264540996a5608af7",
+      "sourceSha256": "sha256:5bf167b0b005810bca10153b7a7fc5573c03fbca004accc47d65941d333c74b5",
+      "outputSha256": "sha256:5bf167b0b005810bca10153b7a7fc5573c03fbca004accc47d65941d333c74b5",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"

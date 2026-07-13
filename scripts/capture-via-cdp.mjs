@@ -62,3 +62,7 @@ console.log(JSON.stringify({
   profile: summary.profile ?? option('--profile', 'correctness'),
   outputDir: summary.outputDir ?? summary.output ?? null,
 }, null, 2));
+
+// CDP disconnect can leave Playwright event-loop handles open; force a clean
+// exit after a successful capture so dual-capture shells do not hang forever.
+process.exit(0);

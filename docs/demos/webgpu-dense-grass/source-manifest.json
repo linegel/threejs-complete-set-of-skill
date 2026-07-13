@@ -15,7 +15,7 @@
     "threejs-procedural-vegetation/examples/webgpu-dense-grass"
   ],
   "browserEntry": "threejs-procedural-vegetation/examples/webgpu-dense-grass/index.html",
-  "sourceHash": "sha256:b39b6b87e71d6e3b5926ef824cfc7e523c0a0da33968866b629096ba0ead0d6e",
+  "sourceHash": "sha256:588a351cf985a1cbc55b7192354f2e1b61572d70c61ad41b408c73888b017fc6",
   "publishedHashInputs": [
     "docs/demos/webgpu-dense-grass",
     "docs/demos/assets/dense-grass-system-CmVTxhFW.js",
@@ -45,6 +45,6 @@
   ],
   "publishedBundleHash": "sha256:769958f85b1023291ec86bdc5561b14abd7d57b4e371749e64bf122a6dcef333",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:caa4bd9a0d957e7dd8f25b94091ab083fa62083edb7c9a6f00872b044beac719",
+  "buildRevision": "sha256:348d7584a398e339bdf08ac952ded6eb67b5ed813416a6fe3ba445615164b63a",
   "evidenceBundleId": "bundle"
 }

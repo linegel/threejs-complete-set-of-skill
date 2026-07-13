@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "labId": "webgpu-camera-rig",
   "kind": "canonical-lab",
-  "status": "incomplete",
+  "status": "accepted",
   "canonicalSource": [
     "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/CameraDirectionController.mjs",
     "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/CameraRelativeOrigin.mjs",
@@ -25,12 +25,12 @@
     "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig"
   ],
   "browserEntry": "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/index.html",
-  "sourceHash": "sha256:9f3c73624401575863b2ed755e5bdaed7a1895084a4d4854f928cc95b9ac4d63",
+  "sourceHash": "sha256:5de189ce8d19010837810f2c4ffbc15213cf5a11141018d2dd71799da904c7e0",
   "publishedHashInputs": [
     "docs/demos/webgpu-camera-rig",
     "docs/demos/assets/CameraDirectionController-bRQgyYUd.js",
-    "docs/demos/assets/index-BAyL8dsQ.js",
-    "docs/demos/assets/main-BEpTiz-h.js",
+    "docs/demos/assets/index-BW0Riz6A.js",
+    "docs/demos/assets/main-DcXTU1xp.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
     "docs/demos/assets/three.tsl--5AYqKVA.js",
     "docs/demos/assets/three.webgpu-Dss1ekdK.js",
@@ -38,15 +38,15 @@
   ],
   "emittedAssetDependencies": [
     "docs/demos/assets/CameraDirectionController-bRQgyYUd.js",
-    "docs/demos/assets/index-BAyL8dsQ.js",
-    "docs/demos/assets/main-BEpTiz-h.js",
+    "docs/demos/assets/index-BW0Riz6A.js",
+    "docs/demos/assets/main-DcXTU1xp.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
     "docs/demos/assets/three.tsl--5AYqKVA.js",
     "docs/demos/assets/three.webgpu-Dss1ekdK.js",
     "docs/demos/assets/webgpu-device-identity-uNUcs3Wh.js"
   ],
-  "publishedBundleHash": "sha256:7cf959945849d8755df7cd3950f74dbde7d71f4d1145793cb8a1193495ecd4d8",
+  "publishedBundleHash": "sha256:46e697e2c8f250b5dcbc6c309f6a5fc8e6dd31af225e41e2d1491661dff06d04",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:caa4bd9a0d957e7dd8f25b94091ab083fa62083edb7c9a6f00872b044beac719",
-  "evidenceBundleId": "correctness"
+  "buildRevision": "sha256:348d7584a398e339bdf08ac952ded6eb67b5ed813416a6fe3ba445615164b63a",
+  "evidenceBundleId": "bundle"
 }

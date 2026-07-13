@@ -48,8 +48,8 @@
       "file": "final.design.png",
       "meaning": "Primary final readback.",
       "source": "final.design.png",
-      "sourceSha256": "sha256:adb4e6b19a467406e210eb49c46021ed69f56655f796d06a8298530b5717cb97",
-      "outputSha256": "sha256:adb4e6b19a467406e210eb49c46021ed69f56655f796d06a8298530b5717cb97",
+      "sourceSha256": "sha256:53c2de2322e1015539b66714ee8251b122ce24f031d22a32c660050e7de5d791",
+      "outputSha256": "sha256:53c2de2322e1015539b66714ee8251b122ce24f031d22a32c660050e7de5d791",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
@@ -58,8 +58,8 @@
       "file": "no-post.design.png",
       "meaning": "No-post / alternate display path readback.",
       "source": "no-post.design.png",
-      "sourceSha256": "sha256:427042ab7997e447a76b1e81867051314d289062740665eecbf70cfc7ab5bbc0",
-      "outputSha256": "sha256:427042ab7997e447a76b1e81867051314d289062740665eecbf70cfc7ab5bbc0",
+      "sourceSha256": "sha256:7b2a850fb71de0594aba9490507fc18fa6fd74b47bce0f0ad3849f539491d9e0",
+      "outputSha256": "sha256:7b2a850fb71de0594aba9490507fc18fa6fd74b47bce0f0ad3849f539491d9e0",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"

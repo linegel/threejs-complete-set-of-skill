@@ -7,7 +7,7 @@
   "canonicalSource": [
     "integration-labs/weathered-world"
   ],
-  "canonicalSourceHash": "sha256:df4effe0e07f696e37fb44ef1771cb594009f135d48ca85df84cf7930048681f",
+  "canonicalSourceHash": "sha256:99e4e43d1a99d15238e8c54328fa44c349b837e32ed36a40f308b451c25611a3",
   "threeRevision": "0.185.1",
   "runtime": {
     "renderer": "WebGPURenderer",
@@ -48,8 +48,8 @@
       "file": "final.design.png",
       "meaning": "Primary final composition readback.",
       "source": "final.design.png",
-      "sourceSha256": "sha256:08bd3b50d152c480da5dd5db7cc1b78e7c2afefa7f3873bbaa4a112bfbb20529",
-      "outputSha256": "sha256:08bd3b50d152c480da5dd5db7cc1b78e7c2afefa7f3873bbaa4a112bfbb20529",
+      "sourceSha256": "sha256:2864b9b7b564cfa7eb1cda9f2bbee546ef8960cca265b62e9b10c1c555e2bdf3",
+      "outputSha256": "sha256:2864b9b7b564cfa7eb1cda9f2bbee546ef8960cca265b62e9b10c1c555e2bdf3",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
@@ -58,8 +58,8 @@
       "file": "no-post.design.png",
       "meaning": "No-post / scene-HDR baseline readback.",
       "source": "no-post.design.png",
-      "sourceSha256": "sha256:038515ca848f2c1b6a7f9105bd5a73276696d6504d04e3146a127340b3edf057",
-      "outputSha256": "sha256:038515ca848f2c1b6a7f9105bd5a73276696d6504d04e3146a127340b3edf057",
+      "sourceSha256": "sha256:7873dea597e1803abb7892391829e43929593c60918c3c5a6cbb2018626289aa",
+      "outputSha256": "sha256:7873dea597e1803abb7892391829e43929593c60918c3c5a6cbb2018626289aa",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
@@ -68,8 +68,8 @@
       "file": "diagnostics.mosaic.png",
       "meaning": "Owner-graph diagnostics display readback.",
       "source": "diagnostics.mosaic.png",
-      "sourceSha256": "sha256:a8a39bad653f297ce3a02cbb6c10d0caeca99263505d1f44eb903f2192d96a57",
-      "outputSha256": "sha256:a8a39bad653f297ce3a02cbb6c10d0caeca99263505d1f44eb903f2192d96a57",
+      "sourceSha256": "sha256:5a2bb807ac14c1c8ea871508a350af038a326453fd1494710fd8a1e6fd2f5657",
+      "outputSha256": "sha256:5a2bb807ac14c1c8ea871508a350af038a326453fd1494710fd8a1e6fd2f5657",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
