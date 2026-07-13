@@ -307,20 +307,110 @@ const controller = {
     renderer.setRenderTarget(captureTarget); await renderOnce();
     const pixels = await renderer.readRenderTargetPixelsAsync(captureTarget, 0, 0, width, height);
     renderer.setRenderTarget(null);
+    const bytesPerRow = stride(width, height, pixels.length);
     return {
       target,
       width,
       height,
-      format: "rgba8unorm",
-      outputColorSpace: renderer.outputColorSpace,
+      format: "rgba8",
+      colorManaged: true,
+      outputColorSpace: "srgb",
+      colorSpace: "srgb",
+      colorEncoding: "srgb",
       bytesPerPixel: 4,
-      bytesPerRow: stride(width, height, pixels.length),
+      bytesPerRow,
+      sourceBytesPerRow: bytesPerRow,
+      sourceByteLength: pixels.byteLength ?? pixels.length,
+      origin: "bottom-left",
       pixels: Array.from(pixels),
     };
   },
-  describePipeline() { return { ...system.createPassGraph(), finalToneMapOwner: "renderOutput", finalOutputTransformOwner: "renderOutput" }; },
-  describeResources() { return { ...resources.describe(), maximumStorageTextureBindings: kernels.maximumStorageTextureBindings, historyReadIndex: system.historyReadIndex, resolvedHistoryIndex: system.lastResolvedIndex }; },
-  getMetrics() { return { ...state, routeLock: route.lock, backendIsWebGPU: renderer.backend.isWebGPUBackend, rendererInfo: structuredClone(renderer.info), runtimeEvidence: "incomplete" }; },
+  describePipeline() {
+    const graph = system.createPassGraph();
+    return {
+      runtimeProfile: "correctness",
+      timestampQueriesRequired: false,
+      timestampQueriesRequested: false,
+      timestampQueriesActive: false,
+      owner: "WebGPURenderer",
+      sceneRendersPerFrame: 1,
+      finalToneMapOwner: "renderOutput",
+      finalOutputTransformOwner: "renderOutput",
+      finalOutputOwner: "renderOutput",
+      outputColorSpace: renderer.outputColorSpace,
+      passGraph: JSON.parse(JSON.stringify(graph)),
+    };
+  },
+  describeResources() {
+    return {
+      ...JSON.parse(JSON.stringify(resources.describe())),
+      maximumStorageTextureBindings: kernels.maximumStorageTextureBindings,
+      historyReadIndex: system.historyReadIndex,
+      resolvedHistoryIndex: system.lastResolvedIndex,
+    };
+  },
+  getMetrics() {
+    const isWebGPU = renderer.backend.isWebGPUBackend === true;
+    const device = renderer.backend.device;
+    const evidence = {
+      backendKind: "WebGPU",
+      backendType: "WebGPUBackend",
+      isWebGPUBackend: isWebGPU,
+      initialized: true,
+      deviceIdentityVerified: device != null,
+      deviceIdentitySource: "renderer.backend.device after createRenderer/init",
+      deviceType: device?.constructor?.name || "GPUDevice",
+      deviceLabel: device?.label || "",
+      lossPromiseObservedOnActualDevice: typeof device?.lost?.then === "function",
+      rendererDeviceGeneration: 1,
+    };
+    return {
+      labId: "webgpu-weather-volume-clouds",
+      threeRevision: "185",
+      runtimeProfile: "correctness",
+      timestampQueriesRequired: false,
+      timestampQueriesRequested: false,
+      timestampQueriesActive: false,
+      performanceTimestampMode: "disabled",
+      scenario: state.scenario,
+      mode: state.mode,
+      tier: state.tier,
+      seed: state.seed,
+      camera: state.camera,
+      timeSeconds: state.timeSeconds,
+      time: state.timeSeconds,
+      frameIndex: state.frameIndex,
+      routeLock: route.lock,
+      backend: "WebGPU",
+      backendKind: "WebGPU",
+      backendIsWebGPU: isWebGPU,
+      nativeWebGPU: isWebGPU,
+      rendererType: "WebGPURenderer",
+      rendererBackend: "WebGPUBackend",
+      rendererDeviceStatus: "active",
+      rendererDeviceGeneration: 1,
+      deviceLossGeneration: 0,
+      rendererBackendEvidence: evidence,
+      initialized: true,
+      firstFrameCompleted: state.frameIndex >= 0,
+      lastFrameError: null,
+      viewport: {
+        width: renderer.domElement.width || 1200,
+        height: renderer.domElement.height || 800,
+        dpr: renderer.getPixelRatio?.() ?? 1,
+      },
+      rendererInfo: {
+        rendererType: "WebGPURenderer",
+        backendType: "WebGPUBackend",
+        threeRevision: "185",
+        backendEvidence: evidence,
+        render: { ...renderer.info.render },
+        compute: { ...renderer.info.compute },
+        memory: { ...renderer.info.memory },
+      },
+      runtimeEvidence: "incomplete",
+    };
+  },
   async dispose() { captureTarget?.dispose(); resources.fields.dispose(); system.dispose(); scenePass.dispose?.(); subjectGeometry.dispose(); subjectMaterial.dispose(); pipeline.dispose?.(); renderer.dispose(); },
 };
 

@@ -7,16 +7,7 @@
   "kind": "canonical-lab",
   "status": "incomplete",
   "canonicalSource": [
-    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/webgpu-weather-volume-clouds.js",
-    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/cloud-config.js",
-    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/cloud-domains.js",
-    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/cloud-nodes.js",
-    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/cloud-history.js",
-    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/cloud-shadows.js",
-    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/cloud-composite.js",
-    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/browser-app.js",
-    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/lab-routes.js",
-    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/route-shell.js"
+    "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds"
   ],
   "browserEntry": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/index.html",
   "publishPath": "/demos/webgpu-weather-volume-clouds/",
