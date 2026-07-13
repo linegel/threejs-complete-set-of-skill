@@ -17,13 +17,9 @@ import {
 } from 'node:path';
 
 import {
-  artifactLedgerDigest,
   canonicalSha256,
-  captureSessionSetDigest,
-  imageLedgerDigest,
-  manifestCoreDigest,
+  createReleasePromotionBinding,
   NORMATIVE_JSON_PATHS,
-  routeSetDigest,
   routeStateDigest,
   STANDARD_IMAGE_PATHS,
 } from './evidence-manifest-contract.mjs';
@@ -122,28 +118,6 @@ function orderByRequiredPrefix(entries, requiredPaths, label) {
     return entry;
   });
   return [...prefix, ...[...index.values()].sort((left, right) => left.path.localeCompare(right.path))];
-}
-
-function promotionBinding(manifest) {
-  const value = {
-    manifestCoreDigest: manifestCoreDigest(manifest),
-    sourceClosureHash: manifest.sourceClosureHash,
-    buildRevision: manifest.buildRevision,
-    threeRevision: manifest.threeRevision,
-    route: structuredClone(manifest.route),
-    routeDigest: canonicalSha256(manifest.route),
-    routeSet: structuredClone(manifest.routeSet),
-    routeSetDigest: routeSetDigest(manifest.routeSet),
-    limitations: structuredClone(manifest.limitations),
-    limitationsDigest: canonicalSha256(manifest.limitations),
-    claimVerdicts: structuredClone(manifest.claimVerdicts),
-    claimVerdictsDigest: canonicalSha256(manifest.claimVerdicts),
-    captureSessions: structuredClone(manifest.captureSessions),
-    captureSessionSetDigest: captureSessionSetDigest(manifest.captureSessions),
-    artifactLedgerDigest: artifactLedgerDigest(manifest.files),
-    imageLedgerDigest: imageLedgerDigest(manifest.images),
-  };
-  return value;
 }
 
 async function sourceArtifactPath(directory, path) {
@@ -254,7 +228,7 @@ export async function assemblePendingReleaseBundle({
     images: orderByRequiredPrefix(structuredClone(raw.images), STANDARD_IMAGE_PATHS, 'release image ledger'),
     promotion: null,
   };
-  const bindingValue = promotionBinding(manifest);
+  const bindingValue = createReleasePromotionBinding(manifest);
   manifest.promotion = {
     status: 'PENDING_VISUAL_SIGNOFF',
     binding: bindingValue,

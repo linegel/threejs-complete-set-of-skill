@@ -160,6 +160,34 @@ export function visualReviewDigest( visualSignoff ) {
 
 }
 
+export function createReleasePromotionBinding( manifest ) {
+
+	const binding = {
+		manifestCoreDigest: manifestCoreDigest( manifest ),
+		sourceClosureHash: manifest.sourceClosureHash,
+		buildRevision: manifest.buildRevision,
+		threeRevision: manifest.threeRevision,
+		route: structuredClone( manifest.route ),
+		routeDigest: canonicalSha256( manifest.route ),
+		limitations: structuredClone( manifest.limitations ),
+		limitationsDigest: canonicalSha256( manifest.limitations ),
+		claimVerdicts: structuredClone( manifest.claimVerdicts ),
+		claimVerdictsDigest: canonicalSha256( manifest.claimVerdicts ),
+		captureSessions: structuredClone( manifest.captureSessions ),
+		captureSessionSetDigest: captureSessionSetDigest( manifest.captureSessions ),
+		artifactLedgerDigest: artifactLedgerDigest( manifest.files ),
+		imageLedgerDigest: imageLedgerDigest( manifest.images )
+	};
+	if ( Object.hasOwn( manifest ?? {}, 'routeSet' ) ) {
+
+		binding.routeSet = structuredClone( manifest.routeSet );
+		binding.routeSetDigest = routeSetDigest( manifest.routeSet );
+
+	}
+	return binding;
+
+}
+
 function sameValue( left, right ) {
 
 	try {
