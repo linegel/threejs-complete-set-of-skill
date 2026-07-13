@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>Frost Physical Review</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    html { background: #07101d; color: #e3f2ff; font: 14px/1.5 ui-monospace, monospace; }
+    body { margin: 0; padding: 20px; }
+    main { width: min(1180px, 100%); margin: 0 auto; }
+    h1 { margin: 0 0 8px; font: 650 clamp(24px, 4vw, 38px)/1.1 system-ui, sans-serif; }
+    p { max-width: 78ch; color: #a5b7c9; }
+    iframe { display: block; width: 100%; aspect-ratio: 16 / 9; border: 1px solid #91c8ff35; border-radius: 8px; background: #07101d; }
+    form { display: grid; gap: 10px; margin-top: 16px; }
+    label { display: flex; gap: 10px; align-items: start; }
+    textarea { width: 100%; min-height: 84px; resize: vertical; color: inherit; background: #0d1b2b; border: 1px solid #7a9fc066; border-radius: 4px; padding: 9px; font: inherit; }
+    button { width: fit-content; min-height: 36px; color: #07101d; background: #9cdbbd; border: 0; border-radius: 4px; padding: 8px 13px; font: 700 13px/1.2 ui-monospace, monospace; }
+    button:disabled { opacity: .45; }
+    button:focus-visible, textarea:focus-visible, input:focus-visible, summary:focus-visible { outline: 2px solid #9cdbbd; outline-offset: 2px; }
+    details { margin-top: 14px; }
+    pre { max-height: 46vh; overflow: auto; padding: 12px; background: #0a1725; border: 1px solid #91c8ff2b; white-space: pre-wrap; font-size: 11px; }
+    [role="status"] { margin: 12px 0; color: #9cdbbd; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Frost physical review</h1>
+    <p>Inspect the real immutable WebGPU route below. The automated checks exercise actual page controls; your confirmations cover only visible presentation quality.</p>
+    <div role="status" data-status>Loading immutable route.</div>
+    <iframe data-lab title="Frost immutable mechanism route"></iframe>
+    <form data-review>
+      <label><input data-canvas-visible type="checkbox">The rendered scene is visible and the controls do not obstruct the important subject area.</label>
+      <label><input data-modes-distinct type="checkbox">The final and frost-mask diagnostic states are visibly distinct and meaningful.</label>
+      <label for="review-notes">Reviewer notes</label>
+      <textarea id="review-notes" data-notes required placeholder="Describe the inspected scene, diagnostic state, and any limitation."></textarea>
+      <button type="submit" disabled>Finalize pending physical review</button>
+    </form>
+    <details>
+      <summary>pending record</summary>
+      <pre data-result>No record finalized.</pre>
+    </details>
+  </main>
+  <script type="module" src="./physical-review.js"></script>
+</body>
+</html>

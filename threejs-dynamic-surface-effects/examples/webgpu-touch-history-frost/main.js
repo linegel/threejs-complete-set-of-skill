@@ -12,7 +12,9 @@ const lab = await createFrostLab({ canvas, ...route, seed: 0x00000001, runtimePr
 
 globalThis.labController = lab;
 globalThis.__LAB_CONTROLLER__ = lab;
+globalThis.__THREEJS_LAB__ = lab;
 globalThis.__LAB_READY__ = true;
+document.documentElement.dataset.ready = "true";
 readiness.textContent = "WebGPU ready";
 
 function populate(select, values, selected) {
