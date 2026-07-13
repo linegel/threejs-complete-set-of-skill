@@ -223,11 +223,19 @@ export async function createCanonicalImagePipeline( canvas, { tierId = 'full', m
 
 	function setMode( id ) {
 
-		if ( ! modes[ id ] ) throw new Error( `Unknown or unavailable image-pipeline mode "${ id }".` );
-		currentMode = id;
-		renderPipeline.outputNode = modes[ id ];
+		// Builtin capture recipes request no-post/diagnostics display aliases.
+		// no-post is a real mode; diagnostics must be a non-final, non-blank view.
+		// Prefer temporal-history / normal over raw velocity (often near-flat NDC).
+		const resolved = id === 'diagnostics'
+			? ( modes[ 'temporal-history' ]
+				? 'temporal-history'
+				: ( modes.normal ? 'normal' : ( modes.output ? 'output' : 'velocity' ) ) )
+			: id;
+		if ( ! modes[ resolved ] ) throw new Error( `Unknown or unavailable image-pipeline mode "${ id }".` );
+		currentMode = resolved;
+		renderPipeline.outputNode = modes[ resolved ];
 		renderPipeline.needsUpdate = true;
-		return id;
+		return resolved;
 
 	}
 

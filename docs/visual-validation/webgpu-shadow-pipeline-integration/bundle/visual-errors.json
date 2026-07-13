@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 2,
+  "metrics": [
+    {
+      "id": "final-nonblank",
+      "domain": "presentation",
+      "truthSource": "retained final.design capture",
+      "alignment": "exact 1200x800 recipe coordinates",
+      "mask": "all RGB pixels",
+      "measured": {
+        "value": 1,
+        "unit": "ratio",
+        "label": "Derived",
+        "source": "nonzero presentation content observed during capture"
+      },
+      "gate": {
+        "value": 0.01,
+        "unit": "ratio",
+        "label": "Gated",
+        "source": "presentation must not be a blank buffer"
+      },
+      "verdict": "PASS",
+      "worstCaseArtifact": "final.design.png"
+    }
+  ],
+  "spatialErrorMaps": [],
+  "worstCaseArtifacts": [
+    "diagnostics.mosaic.png"
+  ]
+}

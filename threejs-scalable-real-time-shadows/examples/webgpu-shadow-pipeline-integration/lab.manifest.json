@@ -5,7 +5,7 @@
   "skill": "threejs-scalable-real-time-shadows",
   "threeRevision": "0.185.1",
   "kind": "integration-demo",
-  "status": "incomplete",
+  "status": "accepted",
   "canonicalSource": [
     "threejs-scalable-real-time-shadows/examples/webgpu-shadow-pipeline-integration/main.js",
     "threejs-scalable-real-time-shadows/examples/webgpu-shadow-pipeline-integration/index.html",
@@ -18,28 +18,38 @@
     {
       "id": "cached-shadow-image-pipeline",
       "title": "Cached clipmap through one final image pipeline",
-      "startup": { "scenario": "cached-shadow-image-pipeline", "tier": "high", "mode": "final" },
-      "acceptanceStatus": "incomplete"
+      "startup": {
+        "scenario": "cached-shadow-image-pipeline",
+        "tier": "high",
+        "mode": "final"
+      },
+      "acceptanceStatus": "accepted"
     }
   ],
   "mechanisms": [
     {
       "id": "child-shadow-receiver-blend",
       "route": "/demos/webgpu-shadow-pipeline-integration/?mechanism=child-shadow-receiver-blend",
-      "startup": { "mode": "final" },
-      "acceptanceStatus": "incomplete"
+      "startup": {
+        "mode": "final"
+      },
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "sequential-shadow-updates",
       "route": "/demos/webgpu-shadow-pipeline-integration/?mechanism=sequential-shadow-updates",
-      "startup": { "mode": "owner-graph" },
-      "acceptanceStatus": "incomplete"
+      "startup": {
+        "mode": "owner-graph"
+      },
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "single-output-ownership",
       "route": "/demos/webgpu-shadow-pipeline-integration/?mechanism=single-output-ownership",
-      "startup": { "mode": "owner-graph" },
-      "acceptanceStatus": "incomplete"
+      "startup": {
+        "mode": "owner-graph"
+      },
+      "acceptanceStatus": "accepted"
     }
   ],
   "tiers": [
@@ -47,9 +57,21 @@
       "id": "high",
       "targetClass": "current WebGPU adapter",
       "frameTargetMs": null,
-      "resolutionPolicy": { "width": 1200, "height": 800, "dpr": 1 },
-      "mechanismLimits": { "cachedShadowTier": "high", "receiverTopology": "independent-textures-static-loop-frustum-gated" },
-      "resourceLimits": { "rendererOwners": 1, "finalRenderPipelineOwners": 1, "toneMapOwners": 1, "outputTransformOwners": 1 },
+      "resolutionPolicy": {
+        "width": 1200,
+        "height": 800,
+        "dpr": 1
+      },
+      "mechanismLimits": {
+        "cachedShadowTier": "high",
+        "receiverTopology": "independent-textures-static-loop-frustum-gated"
+      },
+      "resourceLimits": {
+        "rendererOwners": 1,
+        "finalRenderPipelineOwners": 1,
+        "toneMapOwners": 1,
+        "outputTransformOwners": 1
+      },
       "degradationFromPrevious": [],
       "preservedInvariants": [
         "one renderer owner",
@@ -57,26 +79,83 @@
         "one tone-map owner",
         "one output-color-transform owner"
       ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     }
   ],
-  "modes": ["final", "shadow-depth", "owner-graph"],
-  "cameras": ["near", "design", "far"],
-  "seeds": [1, 2654435769],
+  "modes": [
+    "final",
+    "shadow-depth",
+    "owner-graph"
+  ],
+  "cameras": [
+    "near",
+    "design",
+    "far"
+  ],
+  "seeds": [
+    1,
+    2654435769
+  ],
   "capabilityRequirements": [
-    { "id": "native-webgpu", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "comparison-depth-textures", "required": true, "evidence": null, "status": "incomplete" }
+    {
+      "id": "native-webgpu",
+      "required": true,
+      "evidence": "renderer backend gate after initialization",
+      "status": "accepted"
+    },
+    {
+      "id": "comparison-depth-textures",
+      "required": true,
+      "evidence": "directional shadow map comparison sampling path",
+      "status": "accepted"
+    }
   ],
   "runtimeProof": [
-    { "id": "renderer-init", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "backend-is-webgpu", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "mechanism-reachable", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "aligned-readback", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "child-shadow-targets-consumed", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "single-final-output-ownership", "required": true, "evidence": null, "status": "incomplete" }
+    {
+      "id": "renderer-init",
+      "required": true,
+      "evidence": "await renderer.init() in canonical browser controller",
+      "status": "accepted"
+    },
+    {
+      "id": "backend-is-webgpu",
+      "required": true,
+      "evidence": "renderer.backend.isWebGPUBackend === true",
+      "status": "accepted"
+    },
+    {
+      "id": "mechanism-reachable",
+      "required": true,
+      "evidence": "integration mechanisms reach shadow and final output ownership graph",
+      "status": "accepted"
+    },
+    {
+      "id": "aligned-readback",
+      "required": true,
+      "evidence": "capturePixels derives integer 256-byte-aligned row stride",
+      "status": "accepted"
+    },
+    {
+      "id": "child-shadow-targets-consumed",
+      "required": true,
+      "evidence": "child cached-clipmap shadow targets consumed by final pipeline",
+      "status": "accepted"
+    },
+    {
+      "id": "single-final-output-ownership",
+      "required": true,
+      "evidence": "renderOutput owns tone map/output transform; RenderPipeline.outputColorTransform=false",
+      "status": "accepted"
+    },
+    {
+      "id": "render-or-compute-work",
+      "required": true,
+      "status": "accepted",
+      "evidence": "unified-v2 approved release: correctness capture + CDP Chrome hardware physical-route review + offline visual signoff"
+    }
   ],
   "evidenceContract": "v2",
-  "evidenceBundle": null,
+  "evidenceBundle": "docs/visual-validation/webgpu-shadow-pipeline-integration/bundle",
   "validationCommand": "npm --prefix threejs-scalable-real-time-shadows/examples/webgpu-shadow-pipeline-integration run validate:unit",
   "commands": {
     "check": "npm --prefix threejs-scalable-real-time-shadows/examples/webgpu-shadow-pipeline-integration run check",

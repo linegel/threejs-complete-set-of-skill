@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 2,
+  "passes": [
+    {
+      "id": "presentation-readback",
+      "lower": {
+        "value": 3840000,
+        "unit": "bytes-per-capture",
+        "label": "Derived",
+        "source": "one RGBA8 1200x800 readback"
+      },
+      "upper": {
+        "value": 3840000,
+        "unit": "bytes-per-capture",
+        "label": "Derived",
+        "source": "one RGBA8 1200x800 readback"
+      }
+    }
+  ],
+  "lowerBoundBytesPerFrame": {
+    "value": 3840000,
+    "unit": "bytes-per-capture",
+    "label": "Derived",
+    "source": "explicit presentation readback lower bound"
+  },
+  "upperBoundBytesPerFrame": {
+    "value": 3840000,
+    "unit": "bytes-per-capture",
+    "label": "Derived",
+    "source": "explicit presentation readback upper bound"
+  },
+  "bytesPerSecond": null,
+  "assumptions": [
+    "Correctness capture does not claim hardware bandwidth counters."
+  ],
+  "hardwareCountersAvailable": false,
+  "verdict": "NOT_CLAIMED"
+}

@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "labId": "webgpu-temporal-history",
+  "classification": "inspected-runtime-evidence-preview",
+  "acceptanceStatus": "accepted",
+  "evidenceBundleId": "release-approved-current",
+  "canonicalSource": [
+    "threejs-image-pipeline/examples/webgpu-image-pipeline/canonical-main.js",
+    "threejs-image-pipeline/examples/webgpu-image-pipeline/canonical-browser-app.js",
+    "threejs-image-pipeline/examples/webgpu-image-pipeline/lab-identity.js",
+    "threejs-image-pipeline/examples/webgpu-temporal-history"
+  ],
+  "canonicalSourceHash": "sha256:39f9466604b4a394eed972080dcc689b24b1bdaed7a1d0c94de62a8b07b08022",
+  "threeRevision": "0.185.1",
+  "runtime": {
+    "renderer": "WebGPURenderer",
+    "backend": "WebGPUBackend",
+    "isWebGPUBackend": true,
+    "threeRevision": "0.185.1",
+    "nativeWebGPU": true,
+    "initialized": true,
+    "adapterClass": "unknown",
+    "adapterIdentity": {
+      "source": "LabController.getMetrics",
+      "backendType": "WebGPU",
+      "deviceType": "unknown",
+      "deviceLabel": "",
+      "deviceIdentityVerified": false
+    },
+    "deviceIdentity": {
+      "verified": true,
+      "source": "exact retained renderer.backend.device reference after renderer.init()",
+      "deviceType": "GPUDevice",
+      "generation": 1
+    }
+  },
+  "claimVerdicts": {
+    "visualCorrectness": "PASS",
+    "mechanismCorrectness": "PASS",
+    "performanceCompliance": "NOT_CLAIMED",
+    "gpuAttribution": "NOT_CLAIMED",
+    "lifecycleStability": "PASS",
+    "visualError": "PASS"
+  },
+  "primaryImage": "final.design.png",
+  "primaryImageLabel": "Temporal history hardware WebGPU readback",
+  "images": [
+    {
+      "file": "final.design.png",
+      "meaning": "Final temporal composite",
+      "source": "final.design.png",
+      "sourceSha256": "sha256:c59bc4edc073728081c1a3f1deaabfdd9af99cb9bdcb82086bd0b18b4b5bd7cf",
+      "outputSha256": "sha256:c59bc4edc073728081c1a3f1deaabfdd9af99cb9bdcb82086bd0b18b4b5bd7cf",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "no-post.design.png",
+      "meaning": "No-post / HDR path",
+      "source": "no-post.design.png",
+      "sourceSha256": "sha256:9c3c4570a6d5b49921a9e19935a8871aaf8a2bc1126881e451e091a38bc073ce",
+      "outputSha256": "sha256:9c3c4570a6d5b49921a9e19935a8871aaf8a2bc1126881e451e091a38bc073ce",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "diagnostics.mosaic.png",
+      "meaning": "Temporal-history diagnostic",
+      "source": "diagnostics.mosaic.png",
+      "sourceSha256": "sha256:42e58436b7ff1e0c281e25c8ccffbf3c1aa269acd192f043fdd63daae8d1e6d2",
+      "outputSha256": "sha256:42e58436b7ff1e0c281e25c8ccffbf3c1aa269acd192f043fdd63daae8d1e6d2",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "camera.near.png",
+      "meaning": "Near camera",
+      "source": "camera.near.png",
+      "sourceSha256": "sha256:51a9d1a5d582dd189b31fdc6836c5bebd8329f3f12b4144cfb66a7b96bd2481b",
+      "outputSha256": "sha256:51a9d1a5d582dd189b31fdc6836c5bebd8329f3f12b4144cfb66a7b96bd2481b",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "camera.design.png",
+      "meaning": "Design camera",
+      "source": "camera.design.png",
+      "sourceSha256": "sha256:aa39ed58046c02673a2ac984f42816cf8429eaa4311fcbfe0673261e5211e84e",
+      "outputSha256": "sha256:aa39ed58046c02673a2ac984f42816cf8429eaa4311fcbfe0673261e5211e84e",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "camera.far.png",
+      "meaning": "Far camera",
+      "source": "camera.far.png",
+      "sourceSha256": "sha256:f77f00421a7b260e2ee742f8b873d39e381b7ea193aa3d665010bbdc4d18dd15",
+      "outputSha256": "sha256:f77f00421a7b260e2ee742f8b873d39e381b7ea193aa3d665010bbdc4d18dd15",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "seed-0001.final.png",
+      "meaning": "Seed 0x1 final",
+      "source": "seed-0001.final.png",
+      "sourceSha256": "sha256:6890f6c16d2f071e5c47e1126374efa6485185f4bad2294ae818bfec752dfe07",
+      "outputSha256": "sha256:6890f6c16d2f071e5c47e1126374efa6485185f4bad2294ae818bfec752dfe07",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "seed-9e3779b9.final.png",
+      "meaning": "Seed 0x9e3779b9 final",
+      "source": "seed-9e3779b9.final.png",
+      "sourceSha256": "sha256:fc752a39e042057bbb068849e34aed112b4628421753102a2ca262088b49e491",
+      "outputSha256": "sha256:fc752a39e042057bbb068849e34aed112b4628421753102a2ca262088b49e491",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "temporal.t000.png",
+      "meaning": "Temporal t0",
+      "source": "temporal.t000.png",
+      "sourceSha256": "sha256:b5ac4bda094684826587ebe654e96a6f740fb01a590ceb0937e0a75615744936",
+      "outputSha256": "sha256:b5ac4bda094684826587ebe654e96a6f740fb01a590ceb0937e0a75615744936",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "temporal.t001.png",
+      "meaning": "Temporal t1",
+      "source": "temporal.t001.png",
+      "sourceSha256": "sha256:2b5e9ec2a851a8ac7f549196af933b6082e689d10d7d8eb71524d428453f0398",
+      "outputSha256": "sha256:2b5e9ec2a851a8ac7f549196af933b6082e689d10d7d8eb71524d428453f0398",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    }
+  ],
+  "limitations": [
+    "Correctness and CDP Chrome hardware physical-route visual review pass on the current source closure.",
+    "Named-adapter GPU timestamp timing remains NOT_CLAIMED."
+  ]
+}

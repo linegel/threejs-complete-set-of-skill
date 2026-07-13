@@ -1905,7 +1905,7 @@
         {
           "id": "lifecycle-loop",
           "required": true,
-          "evidence": "50–100 measured create/render/resize/mode/tier/dispose cycles are not captured",
+          "evidence": "50\u2013100 measured create/render/resize/mode/tier/dispose cycles are not captured",
           "status": "incomplete"
         }
       ],
@@ -3080,7 +3080,7 @@
         {
           "id": "current-adapter-gpu-timestamps",
           "required": true,
-          "evidence": "NOT_CLAIMED / INSUFFICIENT_EVIDENCE — no named-adapter timestamp lane in correctness capture",
+          "evidence": "NOT_CLAIMED / INSUFFICIENT_EVIDENCE \u2014 no named-adapter timestamp lane in correctness capture",
           "status": "incomplete"
         }
       ],
@@ -3650,7 +3650,7 @@
         {
           "id": "gpu-timestamps",
           "required": true,
-          "evidence": "INSUFFICIENT_EVIDENCE — correctness capture does not claim named-adapter timestamps",
+          "evidence": "INSUFFICIENT_EVIDENCE \u2014 correctness capture does not claim named-adapter timestamps",
           "status": "incomplete"
         }
       ],
@@ -3676,7 +3676,7 @@
         {
           "id": "lifecycle-loop",
           "required": true,
-          "evidence": "INSUFFICIENT_EVIDENCE — 50-100 cycle evidence not captured",
+          "evidence": "INSUFFICIENT_EVIDENCE \u2014 50-100 cycle evidence not captured",
           "status": "incomplete"
         }
       ],
@@ -6913,7 +6913,7 @@
         {
           "id": "current-adapter-timing",
           "required": true,
-          "evidence": "INSUFFICIENT_EVIDENCE — correctness lane does not claim GPU timestamps.",
+          "evidence": "INSUFFICIENT_EVIDENCE \u2014 correctness lane does not claim GPU timestamps.",
           "status": "incomplete"
         },
         {
@@ -7080,7 +7080,7 @@
           },
           "degradationFromPrevious": [],
           "preservedInvariants": [
-            "anisotropic CFL ≤ 0.85",
+            "anisotropic CFL \u2264 0.85",
             "fixed-step event semantics",
             "exact analytic+heightfield differential",
             "side-aware exact Fresnel",
@@ -7110,15 +7110,15 @@
             "gpuProbeBytes": 64
           },
           "degradationFromPrevious": [
-            "simulation 512→256",
-            "receiver caustics 512→192",
-            "mesh 192→128",
-            "max substeps 4→3",
-            "analytic bands 5→4",
-            "micro bands 4→3"
+            "simulation 512\u2192256",
+            "receiver caustics 512\u2192192",
+            "mesh 192\u2192128",
+            "max substeps 4\u21923",
+            "analytic bands 5\u21924",
+            "micro bands 4\u21923"
           ],
           "preservedInvariants": [
-            "anisotropic CFL ≤ 0.85",
+            "anisotropic CFL \u2264 0.85",
             "fixed-step event semantics",
             "exact analytic+heightfield differential",
             "side-aware exact Fresnel",
@@ -7148,15 +7148,15 @@
             "gpuProbeBytes": 64
           },
           "degradationFromPrevious": [
-            "simulation 256→192",
-            "receiver caustics 192→96",
-            "caustic cadence 1→2 simulation steps",
-            "mesh 128→96",
-            "analytic bands 4→3",
-            "micro bands 3→2"
+            "simulation 256\u2192192",
+            "receiver caustics 192\u219296",
+            "caustic cadence 1\u21922 simulation steps",
+            "mesh 128\u219296",
+            "analytic bands 4\u21923",
+            "micro bands 3\u21922"
           ],
           "preservedInvariants": [
-            "anisotropic CFL ≤ 0.85",
+            "anisotropic CFL \u2264 0.85",
             "fixed-step event semantics",
             "exact analytic+heightfield differential",
             "side-aware exact Fresnel",
@@ -7186,16 +7186,16 @@
             "gpuProbeBytes": 64
           },
           "degradationFromPrevious": [
-            "simulation 192→96",
-            "receiver caustics 96→48",
-            "caustic cadence 2→4 simulation steps",
-            "mesh 96→48",
-            "max substeps 3→2",
-            "analytic bands 3→2",
-            "micro bands 2→0"
+            "simulation 192\u219296",
+            "receiver caustics 96\u219248",
+            "caustic cadence 2\u21924 simulation steps",
+            "mesh 96\u219248",
+            "max substeps 3\u21922",
+            "analytic bands 3\u21922",
+            "micro bands 2\u21920"
           ],
           "preservedInvariants": [
-            "anisotropic CFL ≤ 0.85",
+            "anisotropic CFL \u2264 0.85",
             "fixed-step event semantics",
             "exact analytic+heightfield differential",
             "side-aware exact Fresnel",
@@ -12519,7 +12519,7 @@
       "skill": "threejs-scalable-real-time-shadows",
       "threeRevision": "0.185.1",
       "kind": "integration-demo",
-      "status": "incomplete",
+      "status": "accepted",
       "canonicalSource": [
         "threejs-scalable-real-time-shadows/examples/webgpu-shadow-pipeline-integration/main.js",
         "threejs-scalable-real-time-shadows/examples/webgpu-shadow-pipeline-integration/index.html",
@@ -12663,7 +12663,7 @@
         }
       ],
       "evidenceContract": "v2",
-      "evidenceBundle": null,
+      "evidenceBundle": "docs/visual-validation/webgpu-shadow-pipeline-integration/bundle",
       "validationCommand": "npm --prefix threejs-scalable-real-time-shadows/examples/webgpu-shadow-pipeline-integration run validate:unit",
       "commands": {
         "check": "npm --prefix threejs-scalable-real-time-shadows/examples/webgpu-shadow-pipeline-integration run check",
@@ -12702,7 +12702,7 @@
       "skill": "threejs-image-pipeline",
       "threeRevision": "0.185.1",
       "kind": "mechanism-demo",
-      "status": "incomplete",
+      "status": "accepted",
       "canonicalSource": [
         "threejs-image-pipeline/examples/webgpu-image-pipeline/canonical-main.js",
         "threejs-image-pipeline/examples/webgpu-image-pipeline/canonical-browser-app.js",
@@ -12791,7 +12791,7 @@
         }
       ],
       "evidenceContract": "v2",
-      "evidenceBundle": null,
+      "evidenceBundle": "docs/visual-validation/webgpu-temporal-history/bundle",
       "validationCommand": "npm run validate:full",
       "commands": {
         "check": "npm run check",

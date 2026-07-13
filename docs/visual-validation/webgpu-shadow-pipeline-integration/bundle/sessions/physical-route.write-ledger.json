@@ -1,0 +1,47 @@
+{
+  "entries": [
+    {
+      "at": "2026-07-13T14:07:42.413Z",
+      "method": "GET",
+      "requestUrl": "/index.html?physicalReview=1",
+      "redirected": false,
+      "fallback": false,
+      "transformed": false,
+      "status": 200,
+      "resolvedPath": "index.html",
+      "query": "physicalReview=1",
+      "sha256": "sha256:26035c1e875a735d1ba9b69bb0f1359238e52091f9b04cc1b88c9dbe892755f6",
+      "byteLength": 762,
+      "responseKind": "exact-prebuilt-byte"
+    },
+    {
+      "at": "2026-07-13T14:07:42.430Z",
+      "method": "GET",
+      "requestUrl": "/assets/index-wH5DHind.js",
+      "redirected": false,
+      "fallback": false,
+      "transformed": false,
+      "status": 200,
+      "resolvedPath": "assets/index-wH5DHind.js",
+      "query": "",
+      "sha256": "sha256:cf767f128264b32530ef4e6a0e5ba7607f7eb1a863297c69d03d0b6b4a9922cd",
+      "byteLength": 928651,
+      "responseKind": "exact-prebuilt-byte"
+    },
+    {
+      "at": "2026-07-13T14:07:42.565Z",
+      "method": "GET",
+      "requestUrl": "/favicon.ico",
+      "redirected": false,
+      "fallback": false,
+      "transformed": false,
+      "status": 404,
+      "reason": "missing-exact-static-route",
+      "resolvedPath": "favicon.ico",
+      "responseKind": "missing-exact-static-route"
+    }
+  ],
+  "ledgerSha256": "sha256:c7c7cc8e14464aad38ecfa144afc6cd808b19adeccf2af5e13519caaeb966378",
+  "documentSha256": "sha256:944482200cb182321c87b094e9ec9a8f4e1688c66473884f2c33997d84bb5b77",
+  "byteLength": 963
+}

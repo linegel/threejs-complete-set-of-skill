@@ -80,6 +80,8 @@ async function initialize() {
 	target.texture.colorSpace = NoColorSpace;
 	let time = 0;
 	let cameraId = 'design';
+	// Satellite labs (e.g. temporal-history) publish distinct scenario ids that capture locks.
+	let scenarioId = LAB_ID === 'webgpu-temporal-history' ? 'moving-rigid-subject' : 'pipeline-fixture';
 
 	function setCamera( id ) {
 
@@ -119,7 +121,16 @@ async function initialize() {
 	const controller = {
 		get labId() { return LAB_ID; },
 		async ready() {},
-		async setScenario( id ) { if ( id !== 'pipeline-fixture' ) throw new Error( `Unknown image-pipeline scenario "${ id }".` ); return id; },
+		async setScenario( id ) {
+			// Satellite labs publish their own scenario ids; parent lab keeps pipeline-fixture.
+			const allowed = new Set( [
+				'pipeline-fixture',
+				'moving-rigid-subject', // webgpu-temporal-history
+			] );
+			if ( ! allowed.has( id ) ) throw new Error( `Unknown image-pipeline scenario "${ id }".` );
+			scenarioId = id;
+			return id;
+		},
 		async setMode( id ) { return app.setMode( id ); },
 		async setTier( id ) { if ( id !== app.tierId ) throw new Error( `Load locked tier route "${ id }" to rebuild attachments.` ); return id; },
 		async setSeed( seed ) { const selected = app.setSeed( seed ); await app.resetHistory( `seed-${ selected.toString( 16 ) }` ); return selected; },
@@ -139,7 +150,7 @@ async function initialize() {
 			return {
 				labId: LAB_ID,
 				...app.getMetrics(),
-				scenario: 'pipeline-fixture',
+				scenario: scenarioId,
 				mechanism: startup.mechanism,
 				tier: app.tierId,
 				tierId: app.tierId,
@@ -147,7 +158,7 @@ async function initialize() {
 				seed: app.getMetrics().seed,
 				camera: cameraId,
 				time,
-				routeSelection: { scenario: 'pipeline-fixture', mechanism: startup.mechanism, tier: app.tierId, mode: pipeline.mode, seed: app.getMetrics().seed, camera: cameraId, time }
+				routeSelection: { scenario: scenarioId, mechanism: startup.mechanism, tier: app.tierId, mode: pipeline.mode, seed: app.getMetrics().seed, camera: cameraId, time }
 			};
 
 		},

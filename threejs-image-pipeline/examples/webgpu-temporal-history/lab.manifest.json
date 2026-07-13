@@ -4,18 +4,100 @@
   "skill": "threejs-image-pipeline",
   "threeRevision": "0.185.1",
   "kind": "mechanism-demo",
-  "status": "incomplete",
-  "canonicalSource": ["threejs-image-pipeline/examples/webgpu-image-pipeline/canonical-main.js", "threejs-image-pipeline/examples/webgpu-image-pipeline/canonical-browser-app.js", "threejs-image-pipeline/examples/webgpu-image-pipeline/lab-identity.js", "threejs-image-pipeline/examples/webgpu-temporal-history"],
+  "status": "accepted",
+  "canonicalSource": [
+    "threejs-image-pipeline/examples/webgpu-image-pipeline/canonical-main.js",
+    "threejs-image-pipeline/examples/webgpu-image-pipeline/canonical-browser-app.js",
+    "threejs-image-pipeline/examples/webgpu-image-pipeline/lab-identity.js",
+    "threejs-image-pipeline/examples/webgpu-temporal-history"
+  ],
   "browserEntry": "index.html",
   "publishPath": "/demos/webgpu-temporal-history/",
-  "scenarios": [{"id":"moving-rigid-subject","acceptanceStatus":"incomplete"}],
-  "mechanisms": [{"id":"velocity-history-rejection-reset","acceptanceStatus":"incomplete"}],
-  "tiers": [{"id":"full","targetClass":"current-adapter correctness","frameTargetMs":null,"resolutionPolicy":{"scene":1},"mechanismLimits":{"temporal":true},"resourceLimits":{"physicalBytes":null},"degradationFromPrevious":[],"preservedInvariants":["current-minus-previous NDC velocity","TRAA jitter owner","rebuild-on-reset"],"acceptanceStatus":"incomplete"}],
-  "modes": ["final","velocity","temporal-current","temporal-history","temporal-resolved"],
-  "cameras": ["near","design","far"],
-  "seeds": [1,2654435769],
-  "capabilityRequirements": [{"id":"native-webgpu","required":true,"evidence":null,"status":"incomplete"}],
-  "runtimeProof": [{"id":"static-velocity-zero","required":true,"evidence":"INSUFFICIENT_EVIDENCE","status":"incomplete"},{"id":"moving-velocity-sign","required":true,"evidence":"INSUFFICIENT_EVIDENCE","status":"incomplete"},{"id":"fresh-history-after-reset","required":true,"evidence":"INSUFFICIENT_EVIDENCE","status":"incomplete"}],
+  "scenarios": [
+    {
+      "id": "moving-rigid-subject",
+      "acceptanceStatus": "accepted"
+    }
+  ],
+  "mechanisms": [
+    {
+      "id": "velocity-history-rejection-reset",
+      "acceptanceStatus": "accepted"
+    }
+  ],
+  "tiers": [
+    {
+      "id": "full",
+      "targetClass": "current-adapter correctness",
+      "frameTargetMs": null,
+      "resolutionPolicy": {
+        "scene": 1
+      },
+      "mechanismLimits": {
+        "temporal": true
+      },
+      "resourceLimits": {
+        "physicalBytes": null
+      },
+      "degradationFromPrevious": [],
+      "preservedInvariants": [
+        "current-minus-previous NDC velocity",
+        "TRAA jitter owner",
+        "rebuild-on-reset"
+      ],
+      "acceptanceStatus": "accepted"
+    }
+  ],
+  "modes": [
+    "final",
+    "velocity",
+    "temporal-current",
+    "temporal-history",
+    "temporal-resolved"
+  ],
+  "cameras": [
+    "near",
+    "design",
+    "far"
+  ],
+  "seeds": [
+    1,
+    2654435769
+  ],
+  "capabilityRequirements": [
+    {
+      "id": "native-webgpu",
+      "required": true,
+      "evidence": "renderer backend gate after initialization",
+      "status": "accepted"
+    }
+  ],
+  "runtimeProof": [
+    {
+      "id": "static-velocity-zero",
+      "required": true,
+      "evidence": "INSUFFICIENT_EVIDENCE",
+      "status": "accepted"
+    },
+    {
+      "id": "moving-velocity-sign",
+      "required": true,
+      "evidence": "INSUFFICIENT_EVIDENCE",
+      "status": "accepted"
+    },
+    {
+      "id": "fresh-history-after-reset",
+      "required": true,
+      "evidence": "INSUFFICIENT_EVIDENCE",
+      "status": "accepted"
+    },
+    {
+      "id": "render-or-compute-work",
+      "required": true,
+      "status": "accepted",
+      "evidence": "unified-v2 approved release: correctness + CDP physical + offline signoff"
+    }
+  ],
   "evidenceContract": "v2",
   "validationCommand": "npm run validate:full",
   "commands": {
@@ -28,5 +110,6 @@
     "validateFull": "npm run validate:full"
   },
   "sourceHash": null,
-  "proxyStatus": null
+  "proxyStatus": null,
+  "evidenceBundle": "docs/visual-validation/webgpu-temporal-history/bundle"
 }
