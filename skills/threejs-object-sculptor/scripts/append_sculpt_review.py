@@ -1,0 +1,1 @@
+../../../threejs-object-sculptor/scripts/append_sculpt_review.py

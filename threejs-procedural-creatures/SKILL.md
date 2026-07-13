@@ -432,16 +432,12 @@ defines the reference crab dimensions, stable 40-slot rig, alternating-tetrapod
 gait, batched support query, one-way water contract, mobile tier limits, and
 texture/image-generation acceptance gates.
 
-Diagnostic lab: `examples/webgpu-procedural-creature-lab/`.
-The lab currently provides a pure-core runtime, TSL adapter module boundaries,
-deterministic `window.__lab` browser surface, Playwright capture harness,
-numeric gates, and artifact gates for field math, snap residuals, preview-shell counts,
-locomotion, determinism, boot metrics, and capture manifests. Current caveat:
-the visible capture path is deterministic canvas evidence over the core and
-adapter contracts, not shipping-surface proof. Canonical closure requires a
-real `WebGPURenderer` reference-mesh path with proven skinning/local correction,
-mesh-validity gates, and visible/cast/received-shadow parity. The per-slot
-snapped shell remains diagnostic even after that closure.
+For the created creature system, a deterministic diagnostic surface may expose
+field math, snap residuals, preview-shell counts, locomotion, determinism, boot
+metrics, and mesh-validity results. A diagnostic shell is not shipping-surface
+proof: validate the real `WebGPURenderer` reference-mesh path, skinning/local
+correction, and visible/cast/received-shadow parity when those mechanisms are
+claimed.
 
 ## Failure Conditions
 
@@ -515,6 +511,6 @@ contract. Use `$threejs-procedural-geometry` for general
 semantic mesh writers; this skill owns field-derived reference skins and its
 diagnostic shell. Use
 `$threejs-procedural-vegetation` for plants. Use `$threejs-visual-validation`
-for evidence bundles the creature lab emits. Imported skinned-asset character
+for claim-scoped visual contracts and diagnostics in the target project. Imported skinned-asset character
 pipelines (glTF clips, retargeting, VAT crowds) are an explicit gap in this
 pack — do not stretch this skill over them.

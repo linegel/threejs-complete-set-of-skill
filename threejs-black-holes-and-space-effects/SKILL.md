@@ -301,8 +301,8 @@ world-position-reprojected, termination-aware temporal ping-pong. A separate
 direct-GPU probe path executes Ellis/Schwarzschild ODEs, and the convergence
 route dispatches three Schwarzschild step caps. Independent float64 Ellis quadrature and
 Schwarzschild Hamiltonian rays gate tables and validation readback. These CPU/source
-checks do not replace the native-browser readback/timestamp evidence required
-by `lab.manifest.json`.
+checks do not replace target-project native WebGPU readback or timestamp
+measurements when the implementation claims GPU correctness or performance.
 
 Legacy WebGL implementation (deprecated, do not extend): `examples/curved-ray-accretion-volume/curved-ray-effect.js`
 

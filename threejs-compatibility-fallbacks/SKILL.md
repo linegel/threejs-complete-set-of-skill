@@ -67,17 +67,18 @@ It is never the canonical architecture. Do not recommend a direct
 
 ## Numeric Evidence Labels
 
-Every numeric value in the fallback plan, implementation notes, or validation
-result carries exactly one label and a source:
+Every quantity used to justify a fallback decision or claim carries a unit,
+one label, and a source:
 
 - `Authored`: declared target, policy, or quality input;
 - `Derived`: computed from labelled inputs;
 - `Measured`: observed on the named target and run;
 - `Gated`: frozen acceptance limit.
 
-Use `{ value, unit, label, source }`. Bare refresh rates, frame budgets,
+Use `{ value, unit, label, source }` when a machine-readable target-project
+record benefits from it. Claim-driving refresh rates, frame budgets,
 resolutions, sample counts, update cadences, memory caps, pass counts, error
-thresholds, or test durations invalidate the plan. Performance envelopes derive
+thresholds, or test durations still need units and provenance. Performance envelopes derive
 from target refresh after browser and compositor reserves; do not copy universal
 device-class constants.
 

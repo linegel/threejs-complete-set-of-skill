@@ -5,7 +5,7 @@ description: "Choose the smallest expert skill set and the correct rendering arc
 
 # Three.js WebGPU/TSL Choose Skills
 
-This router targets the repository's `[Gated] r185` architecture: `WebGPURenderer`
+This router targets Three.js r185 with `WebGPURenderer`
 from `three/webgpu`, TSL from `three/tsl`, `NodeMaterial` families, node
 `RenderPipeline`, and compute/storage only when the workload justifies them.
 The installed package plus runtime `THREE.REVISION` are the revision gate;
@@ -20,8 +20,8 @@ blocker. Never dilute destination skills with alternate-renderer branches.
 
 ## Quantitative Evidence Labels
 
-Every quantitative claim, budget value, threshold, count, resolution, memory
-figure, timing, and example must carry one of these labels inline:
+For quantities that determine an architecture choice or support a correctness,
+performance, or hardware claim, state the unit and distinguish:
 
 | Label | Meaning | Permitted use |
 | --- | --- | --- |
@@ -30,8 +30,9 @@ figure, timing, and example must carry one of these labels inline:
 | `[Measured]` | Captured on a named browser/device/GPU at named resolution, DPR, scene state, quality state, and sampling protocol. | Full-frame CPU/GPU distributions, pass timings, memory, thermal behavior. |
 | `[Authored]` | An explicitly authored starting point or policy fixed before a run; it cannot prove acceptance. | Initial quality level, controller persistence, interaction reserve. |
 
-Serialize reported values as `{ value, unit, label, source }`. An unlabelled
-numeric budget is unknown. Do not route or accept from it. A
+Use `{ value, unit, label, source }` when a machine-readable target-project
+record benefits from it. A claim-driving numeric budget without units or
+provenance is unknown. Do not route or accept from it. A
 published skill table is not `[Measured]` for the composed scene unless its
 device, resolution, included work, and harness match.
 
@@ -165,7 +166,7 @@ Every route decision produces this shape:
 
 ```yaml
 backendManifest:
-  requiredReleaseBand: { value: "", unit: revision, label: Gated, source: "repository contract" }
+  requiredReleaseBand: { value: "", unit: revision, label: Gated, source: "target architecture" }
   installedPackageVersion: { value: "", unit: semver, label: Measured, source: "installed package" }
   runtimeRevision: { value: "", unit: revision, label: Measured, source: "THREE.REVISION after import" }
   requiredBackend: { value: WebGPU, unit: backend, label: Gated, source: "flagship route contract" }
@@ -767,8 +768,8 @@ Choose the downgrade axis from the measured bottleneck:
 
 ## Skill Inventory Gate
 
-Enumerate the live `threejs-*` skills before composing a route and intersect it
-with this repository roster:
+Enumerate the installed `threejs-*` skills before composing a route and
+intersect them with the product inventory:
 
 - `threejs-ambient-contact-shading`
 - `threejs-black-holes-and-space-effects`
@@ -985,9 +986,10 @@ A routed implementation is incomplete without:
   signals or an explicit unavailable reason;
 - hysteretic controller trace showing pressure classification, downgrade,
   cooldown, recovery headroom, and absence of oscillation;
-- fixed-view/trajectory captures and regression artifacts for every accepted
-  target tier;
+- fixed-view/trajectory captures and regression artifacts for every target tier
+  the created implementation claims to support;
 - coupled replay, subcycle/step convergence, reaction/conservation, provider
   error propagation, origin-rebase, presentation-motion, and quality-migration
   evidence for every active physics edge;
-- `{ value, unit, label, source }` evidence on every quantitative claim.
+- units and provenance for quantities that support a correctness, performance,
+  or hardware claim.

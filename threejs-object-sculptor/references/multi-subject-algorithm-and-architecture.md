@@ -509,8 +509,7 @@ Independent audits found benchmark bugs that this guide must prevent:
   springs and straight cables without connected motion anchors; generated
   bounds/contact plane contradicting the contract; excessive minimum-tier
   submissions, per-instance materials, and shadow casters; PBR labels that
-  conflicted with coating/glass response; and tests that omitted these failures
-  from the package gate.
+  conflicted with coating/glass response; and tests that omitted these failures.
 - Bonsai: globally reversed ring/crown winding; pole-degenerate crown
   triangles; authored envelopes/errors smaller than the geometry they claimed
   to cover; a `0.055 m` variation claim contradicted by actual displacement;
@@ -523,9 +522,10 @@ Independent audits found benchmark bugs that this guide must prevent:
 - Tower Ship: an uncapped station-ring end appeared as a bow/stern hole; axial
   cameras and a boundary-edge mutation must prevent recurrence.
 
-Treat fixes as in progress until the exact tests, native-WebGPU diagnostics,
-staged images, target measurements, and lifecycle evidence pass. Do not call a
-benchmark accepted merely because its source now contains the intended rule.
+In a target project, do not claim one of these failures is resolved merely
+because the source contains the intended rule. Use the exact structural test or
+claim-scoped native-WebGPU diagnostic, staged image, target measurement, or
+lifecycle check that can falsify the fix.
 
 ## End-To-End Selection Workflow
 
@@ -546,8 +546,9 @@ benchmark accepted merely because its source now contains the intended rule.
 7. Implement blockout, structure, form, material, action, and optimization in
    locked passes. Run the exact topology/normal/bounds/collider/seed/motion
    tests and their mutations at the owning pass.
-8. Capture the staged camera matrix in the Codex in-app Browser. Compare final
-   and mechanism diagnostics; a nonblank render is not acceptance.
+8. Capture the staged camera matrix through an available target-project
+   surface. Compare final and mechanism diagnostics; a nonblank render is not
+   acceptance.
 9. Derive tier candidates from visual error and resource accounting, then run
    sustained measurements on each named target. Include tile traffic,
    overdraw, bindings, uploads, frames in flight, migration overlap, and

@@ -1,0 +1,1 @@
+../../threejs-bloom/SKILL.md

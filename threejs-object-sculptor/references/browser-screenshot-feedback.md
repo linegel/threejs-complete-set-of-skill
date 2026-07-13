@@ -4,7 +4,10 @@ Use this reference when a procedural Three.js reconstruction has a browser-rende
 
 ## Capture Rule
 
-Each visual build pass should produce at least one rendered screenshot from a named review viewpoint. Use the Codex in-app Browser screenshot tool first. Do not install or download Playwright/Chromium just for this skill; use Playwright or another browser automation path only when the user explicitly allows it or the project already depends on it. If the in-app Browser is unavailable, ask for a screenshot path or use browser tooling that is already present in the target project.
+Each visual build pass should produce at least one rendered screenshot from a
+named review viewpoint. Use a capture surface already available in the target
+project or agent environment. Do not add a browser automation dependency solely
+for this review; when capture is unavailable, ask for a screenshot path.
 
 Create a side-by-side review image after capture:
 
@@ -16,7 +19,8 @@ scripts/make_visual_comparison_sheet.py \
   --json
 ```
 
-The script only aligns and packages evidence. It must not calculate the acceptance score. Codex AI vision must inspect `comparison.png`.
+The script only aligns and packages evidence. It must not calculate the
+acceptance score. A visual reviewer must inspect `comparison.png`.
 
 Use the same full image pair to score at most five critical semantic features per pass. A feature is a subsystem such as a hull, cabin system, roof system, limb assembly, face, control panel, or sail-and-rigging system. It is not an individual mesh and does not need a separate crop. Score up to three uncertain important features only when adaptive escalation is useful.
 

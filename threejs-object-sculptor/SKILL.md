@@ -65,18 +65,7 @@ Prefer this loop for implementation tasks:
 6. Generate a factory skeleton only after the strict quality gate passes or after explicitly documenting accepted fidelity limits.
 7. Hand-refine geometry, materials, animation anchors, and destruction anchors one pass at a time. Do not generate or implement a deeper pass until `sculpt_pass_orchestrator.py check` passes for that pass.
 8. After each visual pass, capture a browser screenshot, create one full reference/render comparison pair, inspect it once with AI vision, then update `reviewHistory` with overall, layer, and semantic feature scores.
-9. Run project typecheck/build and browser visual review; use the Codex in-app Browser screenshot tool first. Do not install or download Playwright/Chromium just for this skill unless the user explicitly requests that route.
-
-### Executable WebGPU References
-
-Use `examples/webgpu-tower-ship-sculptor/` as the reference-reconstruction exemplar. It includes the strict `ObjectSculptSpec`, a station-built Tower Ship factory, 24 hinge-rooted oars, named sockets/collider-construction inputs/destruction groups, `final`/`blockout`/`hierarchy`/`materials`/`interaction` modes, geometry tiers, deterministic browser routes, native WebGPU render-target capture, and visual-evidence validation. The example and its Tower Ship reference preserve attribution to the original author, Vinh Hiển.
-
-Use `examples/webgpu-object-sculptor-corpus/` as the cross-subject representation and architecture benchmark. It deliberately spans an articulated hard-surface lamp, an organic potted bonsai, and a rotational ceramic teapot. Its shared runtime separates semantic and live-instance identity, visual LOD from collider construction, authored action preview from solver motion, and runtime-owned from registered external resources. Its gates target failure classes that a single ship cannot: hinge reset and constraint frames, shade apertures, botanical ring/crown winding, nondegenerate lathe poles, sweep boundaries, open vessel interiors, seed envelopes, directed collider-error lower-bound regressions, tier invariants, route locks, lifecycle, and aligned-readback layout/normalization. These self-authored benchmarks have no external reference image; they exercise transfer and runtime contracts, while native browser, visual, bidirectional collider-error, timing, and performance evidence remain separate gates.
-The lamp's executable `architecture-decision.js` also demonstrates the required five-family geometry/hierarchy comparison and the separate five-source texture decision, including detailed GPT Image prompt and applicability gates when generated raster material is considered.
-
-From the repository root, run `npm --prefix threejs-object-sculptor/examples/webgpu-tower-ship-sculptor run validate:quick` before browser capture. Treat the lab's `incomplete` evidence status literally until comparison review, sustained timing, and lifecycle gates have their required artifacts.
-
-From the repository root, run `npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run validate:quick` before corpus browser review. Its artifact validator must remain `INSUFFICIENT_EVIDENCE` until the declared visual, resource, lifecycle, GPU-timing, and target-performance evidence exists.
+9. Run the target project's typecheck/build and review the result in an available browser or application surface. Use whichever screenshot or capture mechanism the project already provides.
 
 ## 3D Terminology Discipline
 
@@ -397,7 +386,7 @@ Use this order:
 7. Classify each mismatch as a spec gap, code gap, rendering/lighting gap, reference ambiguity, or performance tradeoff.
 8. Record the screenshot pair, comparison image, overall AI vision score, layer scores, feature scores, and critique in `reviewHistory.visualEvidence` and `visualEvidence`.
 
-Default to the Codex in-app Browser screenshot tool when available. Playwright/Chromium is not the default validation path for this skill; do not install or download a browser runtime merely to get screenshots unless the user explicitly asks for that route. If no screenshot can be captured, no comparison sheet exists, AI vision has not reviewed it, the global score is below threshold, or any critical semantic feature is below its threshold, do not choose `continue`; choose `refine-spec`, `refine-code`, `request-input`, or explain the blocker.
+Use an available project capture surface. If no screenshot can be captured, no comparison sheet exists, visual review has not been performed, the global score is below threshold, or any critical semantic feature is below its threshold, do not choose `continue`; choose `refine-spec`, `refine-code`, `request-input`, or explain the blocker.
 
 Minimum gates:
 
@@ -418,7 +407,7 @@ Before each implementation pass:
 1. Run `scripts/sculpt_pass_orchestrator.py status object-sculpt-spec.json`.
 2. Run `scripts/sculpt_pass_orchestrator.py check object-sculpt-spec.json --pass-id <pass>`.
 3. Generate or edit only the unlocked pass.
-4. Render in the Codex in-app Browser and capture screenshot evidence.
+4. Render in the target application or an available browser and capture the comparison view.
 5. Build one full reference/render comparison sheet with `scripts/make_visual_comparison_sheet.py`.
 6. Inspect it once with AI vision and record overall, layer, and critical semantic feature scores plus concrete mismatch notes.
 7. Append review with `scripts/append_sculpt_review.py ... --pass-id <pass> --action continue --render-screenshot <path> --comparison-image <path> --ai-vision-score <0-1> --layer-scores-json '<json>' --feature-reviews-json <reviews.json> --ai-vision-notes "..." --camera-view <view> --in-place`.

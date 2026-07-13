@@ -6,8 +6,8 @@ description: "Select, integrate, and validate physics architectures for Three.js
 # Three.js Physics Integration
 
 Use this skill to choose the smallest solver architecture that satisfies the
-observable contract, then connect it to rendering through the repository's
-shared physics ABI. The ABI coordinates solvers; it is not a universal solver.
+observable contract, then connect it to rendering through the shared physics
+ABI. The ABI coordinates solvers; it is not a universal solver.
 
 Start with `$threejs-choose-skills`. Read the canonical
 [physics domain and interaction contract](../threejs-choose-skills/references/physics-domain-and-interaction-contract.md)
@@ -72,6 +72,10 @@ Separate render, query, collision, support, and physical integration
 representations. A visible mesh is not automatically a collider, hydrostatic
 hull, support surface, or mass distribution.
 
+Publish a `SupportSurfaceSample` when locomotion, placement, or contact logic
+consumes a versioned support-surface query; it carries the owning frame, time,
+validity, error, and provider identity rather than borrowing visible mesh state.
+
 - Use analytic shapes for exact primitive queries and compact moving proxies.
 - Use convex shapes for robust dynamic contact; decompose only when concavity
   is an observable collision requirement.
@@ -134,6 +138,9 @@ names its interval, reads, prepared writes, dependency completions, state
 advance claim, and status. Only the graph-wide catch-up policy may admit,
 retain, or drop debt. Domain-local clipping or render-loop stepping is invalid.
 
+`PhysicsStageExecution` is the typed record for that interval, resolved read and
+write versions, dependency completions, state-advance claim, and status.
+
 Keep fixed-step clocks rational and versioned. Use substeps only from a stated
 stability, tunnelling, or solver-convergence gate. More substeps are not a
 substitute for CCD, a suitable constraint formulation, or a stable coupling
@@ -165,6 +172,9 @@ Use typed `PhysicsSignalDescriptor` providers and `SurfaceExchange` records.
 Each `InteractionRecord` declares payload tag, rate versus integral semantics,
 application interval, SI units, frame, origin epoch, transform revision,
 physical footprint, sign, target equation, error, and exact-once key.
+`InteractionApplicationLedger` records exact-once application for each consumer
+and interval. Use its cursor and key to reject duplicate retries or substep
+applications.
 
 - Integrate rates only over interval overlap.
 - Apply an integral exactly once, never once per substep or render.
@@ -172,6 +182,9 @@ physical footprint, sign, target equation, error, and exact-once key.
 - Close force, torque, work, mass, momentum, and energy in the declared balance
   frame when those commodities are claimed.
 - Keep visual spray, dust, foam, and deformation as non-authoritative children.
+
+`ConservationGroup` binds each claimed conserved commodity to its source,
+reaction, residual, tolerance, and balance frame.
 
 Use a bounded coupling loop when explicit partitioning violates the
 added-mass/stiffness gate. Recompute both participants at one bracket, record
@@ -204,6 +217,9 @@ Never render mutable solver work state. Publish committed previous/current
 state handles through `PhysicsPresentationCandidate`, then per-view
 `CameraViewPublication` and `ViewPreparationPublication`, seal a
 `PhysicsPresentationSnapshot`, and submit its `PresentationRenderPlan`.
+`FrameExecutionRecord` then records the target submissions, completion tokens,
+reset actions, failures, and resource-lease dispositions. The sealed snapshot
+remains immutable.
 
 Keep physics origin separate from render origin. Preserve exact entity/slot
 identity across compaction. Mark spawn, death, teleport, reparent, LOD change,
@@ -233,6 +249,11 @@ queueing, transport, remote wait/solve, fence, deserialize, and atomic-commit
 tail along the actual dependency path. Mark unavailable remote/GPU attribution
 as insufficient evidence.
 
+`PhysicsCostLedger` composes shared and per-target work, hot and peak resource
+bytes, submissions, transfers, and timing attribution. `PhysicsContactCost`
+records broadphase, narrowphase, manifold, constraint, cache, and stress-tail
+work separately from body count.
+
 ## Quality and recovery
 
 A quality governor may request a change but cannot mutate physics. Every
@@ -240,26 +261,25 @@ physics quality state declares equations, discretization, active domain,
 cadence, conserved inventories, IDs/cursors, error, and cost. Every transition
 uses prepare, validate, atomic step-boundary commit, completion-joined retire,
 and rollback. A solver-family change is a new truth contract, not a tier.
+`QualityTransition` binds the old and new state versions, migration plan,
+invariant gates, commit boundary, resource overlap, and rollback result.
 
 GPU loss and external-process failure freeze affected commits. Restore one
 digest-closed checkpoint and replay exact-once ranges, or publish an explicit
 loss ledger, new discontinuity epoch, reset plan, and validated restart. Never
 reconstruct authoritative physics from visible render state.
 
-## Acceptance
+`AuthoritativeGpuStateRecovery` records the checkpoint, lost and restored
+resource generations, replay interval, cursor closure, and restart verdict.
 
-Run the conformance fixture:
+## Validate The Created Integration
 
-```text
-npm --prefix threejs-physics-integration/examples/external-physics-adapter-conformance run validate:quick
-```
-
-It must reject fewer than five solutions, missing decision axes, post-hoc
+The target project's conformance fixture must reject fewer than five solutions, missing decision axes, post-hoc
 winner changes, implicit ownership, wrong SI/frame/clock maps, ambiguous
 capabilities, missing exact-once support, submission-only visibility, half
 commits, incomplete recovery, and omitted external-tail cost.
 
-Native WebGPU, physics correctness, performance, and recovery claims remain
-`INSUFFICIENT_EVIDENCE` until Codex's in-app Browser runs the exact frozen route
-on the named target and required diagnostics are directly inspected. A green
-contract fixture proves selection and boundary invariants only.
+A green contract fixture proves selection and boundary invariants only. Claim
+native WebGPU execution, physics correctness, performance, or recovery only
+after the corresponding target-project mechanism diagnostics and claim-scoped
+measurements have been inspected on the named target.

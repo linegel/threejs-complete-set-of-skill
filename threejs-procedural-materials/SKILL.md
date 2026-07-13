@@ -95,18 +95,7 @@ for the WebGPU/TSL material system, quality tiers, budgets, atlas/triplanar
 costs, derivative normals, specular AA, planet fields, wetness, emissive
 ownership, per-instance dissolve, and validation.
 
-Canonical walnut, antique-gold, ebony, and lava TSL example:
-[examples/tsl-procedural-pbr/](examples/tsl-procedural-pbr/).
-
-The example now enforces dielectric/conductor metalness endpoints, meter-valued
-height through the route's `metersPerWorldUnit`, footprint-filtered structural
-bands, and
-removed material slope-energy transfer so r185 geometry roughness is not
-counted twice. Its spectral-support/variance multipliers and identity ranges
-remain **Authored** trial values. The Node construction validator is structural
-evidence, not an energy, visual-reference, timing, or thermal acceptance proof.
-
-Use the sibling examples as domain sources, not implementation recipes:
+Use the sibling skills as domain owners:
 
 - `$threejs-procedural-fields` for designing shared scalar/vector causes.
 - `$threejs-procedural-planets` for planet-space coordinates, altitude

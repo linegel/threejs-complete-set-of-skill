@@ -4,14 +4,13 @@
   "packageManager": "npm@10.9.4",
   "description": "Agent skill pack for Three.js WebGPU/TSL procedural graphics, image pipelines, and visual validation.",
   "engines": {
-    "node": "22.22.0",
-    "npm": "10.9.4"
+    "node": ">=22"
   },
   "files": [
-    "skills/",
+    "skills/**",
     "threejs-*/SKILL.md",
-    "threejs-*/references/",
-    "threejs-*/assets/",
+    "threejs-*/references/**",
+    "threejs-*/assets/**",
     "threejs-object-sculptor/scripts/*.py",
     "!threejs-object-sculptor/scripts/test_*.py",
     "skills.sh.json",
@@ -21,7 +20,7 @@
   "scripts": {
     "toolchain:preflight": "node scripts/toolchain-preflight.mjs",
     "browser:install": "PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium",
-    "build:pages": "npm run pages:build",
+    "build:pages": "npm run site:build",
     "labs:registry": "node scripts/validate-lab-manifests.mjs --write-registry",
     "labs:check": "node scripts/validate-lab-manifests.mjs && node scripts/check-lab-implementation-matrix.mjs && node scripts/check-lab-sources.mjs && node scripts/check-capture-wiring.mjs && node --test tests/labs/*.test.mjs && node scripts/run-labs.mjs check",
     "labs:test": "node scripts/run-labs.mjs test",
@@ -46,13 +45,20 @@
     "pages:validate-presentation": "node scripts/validate-site-presentation.mjs",
     "pages:validate-seo": "node scripts/validate-site-seo.mjs",
     "pages:validate-source-hashes": "node scripts/validate-pages-source-hashes.mjs",
+    "evidence:build-pages": "node scripts/build-evidence-pages.mjs",
+    "evidence:promote-curated": "node scripts/promote-runtime-evidence.mjs",
+    "evidence:promote-reviewed": "node scripts/promote-demo-evidence.mjs",
+    "evidence:test": "node --test tests/labs/evidence-schema.test.mjs tests/labs/evidence-v2.test.mjs tests/labs/raw-evidence-manifest.test.mjs",
+    "site:build": "node scripts/build-pages.mjs && node scripts/generate-seo-images.mjs && node scripts/build-lab-pages.mjs && node scripts/build-evidence-pages.mjs && node scripts/generate-responsive-images.mjs && node scripts/validate-site-presentation.mjs && node scripts/validate-site-seo.mjs",
+    "site:smoke": "node scripts/pages-smoke.mjs",
+    "site:validate": "node scripts/validate-site-presentation.mjs && node scripts/validate-site-seo.mjs",
     "skills:list": "npx skills@latest add linegel/threejs-complete-set-of-skill --list",
     "skills:sync": "node scripts/sync-skill-distribution.mjs",
-    "skills:check": "node scripts/validate-skills-manifest.mjs && node scripts/validate-skill-distribution.mjs && node --test tests/skills/*.test.mjs",
+    "skills:check": "node scripts/validate-skills-manifest.mjs && node scripts/validate-skill-distribution.mjs && node scripts/validate-skill-package.mjs && node --test tests/skills/*.test.mjs",
     "skills:pack": "npm run skills:check && npm pack",
     "skills:pack:dry-run": "npm run skills:check && npm pack --dry-run --json --ignore-scripts",
     "test:skills": "npm run skills:check",
-    "check:all": "npm run skills:check && npm run labs:check && npm run pages:build",
+    "check:all": "npm run skills:check && npm run labs:check && npm run evidence:test && npm run site:build",
     "test": "npm run skills:check"
   },
   "keywords": [
@@ -77,13 +83,11 @@
     "url": "https://github.com/linegel/threejs-complete-set-of-skill/issues"
   },
   "license": "ISC",
-  "dependencies": {
-    "three": "0.185.1"
-  },
   "devDependencies": {
     "marked": "18.0.5",
     "playwright": "1.61.1",
     "sharp": "0.35.3",
+    "three": "0.185.1",
     "vite": "8.1.3"
   }
 }

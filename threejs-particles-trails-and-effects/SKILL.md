@@ -119,9 +119,9 @@ SoA A/B state, ordered mark/two-level exclusive-scan/scatter kernels,
 stable entity IDs backed by an atomic GPU free stack, deterministic event
 expansion, indirect spark/debris render objects, and the hull-shell/wake stage.
 Motion, appearance, and identity scatter are split so every kernel stays at or
-below seven storage-buffer bindings. Its CPU oracles prove invariants only; canonical
-acceptance still requires the native-browser readback/timing evidence named by
-`lab.manifest.json`. Indirect meshes retain frustum culling through conservative
+below seven storage-buffer bindings. CPU oracles prove invariants only; a target
+project that claims GPU correctness or performance must add native WebGPU
+readback or timestamp measurements scoped to that claim. Indirect meshes retain frustum culling through conservative
 event-envelope bounds, and evidence keeps pool, draw-consumption, hull,
 dissolve/shadow, depth, and emissive claims separate.
 

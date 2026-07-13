@@ -15,14 +15,16 @@ or adaptive resolution are shared.
 
 ## Numeric provenance
 
-Every quantitative claim is tagged:
+Tag quantities that drive an architecture decision or a correctness,
+performance, or hardware claim:
 
 - **[Derived]** follows from r185 source or an explicit formula.
 - **[Gated]** is a branch condition that must pass on the target scene/device.
 - **[Measured]** is recorded target-device evidence, never a portable promise.
 - **[Authored]** is a starting value or planning ceiling, not a fact of hardware.
 
-Release numbers and list ordering are identifiers, not tuning claims.
+API versions, identifiers, list ordering, and illustrative values do not need
+evidence labels unless they support such a claim.
 
 ## Decide whether screen AO is the right algorithm
 

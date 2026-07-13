@@ -24,16 +24,18 @@ before implementation.
 
 ## Numeric Evidence Rule
 
-Tag every number:
+Tag quantities that determine an architecture decision or support a
+correctness, performance, or hardware claim:
 
 - `[Derived]`: formula, dimensions, format, or verified API consequence;
 - `[Gated]`: enabled only after a named capability/correctness gate;
 - `[Measured]`: captured on a named target and complete graph;
 - `[Authored]`: a deliberate quality/look/controller starting point.
 
-This applies to attachment counts, formats, byte costs, resolution scales,
+This applies when attachment counts, formats, byte costs, resolution scales,
 workgroup sizes, history lengths, timing thresholds, DPR limits, hysteresis,
-and frame budgets.
+or frame budgets justify the created implementation. API literals and
+explanatory examples do not need ceremonial wrappers.
 
 ## Required Architecture
 

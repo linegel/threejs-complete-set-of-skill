@@ -1,0 +1,1 @@
+../../threejs-sky-atmosphere-and-haze/SKILL.md

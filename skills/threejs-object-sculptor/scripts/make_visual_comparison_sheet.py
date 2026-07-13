@@ -1,0 +1,1 @@
+../../../threejs-object-sculptor/scripts/make_visual_comparison_sheet.py

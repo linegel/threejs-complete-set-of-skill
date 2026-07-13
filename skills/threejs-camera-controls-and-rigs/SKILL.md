@@ -1,0 +1,1 @@
+../../threejs-camera-controls-and-rigs/SKILL.md

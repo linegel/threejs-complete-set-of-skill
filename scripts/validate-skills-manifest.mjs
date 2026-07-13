@@ -116,37 +116,6 @@ for (const dir of skillDirs) {
   }
 }
 
-const rootManifestText = readFileSync(join(root, 'skills.json'), 'utf8');
-const docsManifestText = readFileSync(join(root, 'docs', 'skills.json'), 'utf8');
-if (rootManifestText !== docsManifestText) fail('skills.json and docs/skills.json differ');
-
-const manifest = JSON.parse(rootManifestText);
-if (manifest.source !== repoSlug) fail(`manifest source is "${manifest.source}", expected "${repoSlug}"`);
-if (manifest.install?.source !== repoSlug) fail('manifest install.source is missing or incorrect');
-if (!manifest.discovery?.primary?.includes(`npx skills@latest add ${repoSlug} --list`)) {
-  fail('manifest discovery.primary does not expose npx skills@latest add --list');
-}
-
-const manifestNames = (manifest.skills ?? []).map((skill) => skill.name).sort();
-if (JSON.stringify(manifestNames) !== JSON.stringify(skillDirs)) {
-  fail('manifest skills do not match top-level threejs-* skill directories');
-}
-
-const categoryNames = new Set((manifest.categories ?? []).flatMap((category) => category.skills ?? []));
-for (const name of skillDirs) {
-  if (!categoryNames.has(name)) fail(`${name} is missing from manifest categories`);
-}
-for (const name of categoryNames) {
-  if (!frontmatterByDir.has(name)) fail(`manifest category references unknown skill ${name}`);
-}
-
-for (const skill of manifest.skills) {
-  const fm = frontmatterByDir.get(skill.name);
-  if (!fm) fail(`manifest includes unknown skill ${skill.name}`);
-  if (skill.description !== fm.description) fail(`${skill.name} manifest description differs from SKILL.md frontmatter`);
-  if (!skill.raw?.endsWith(`/${skill.name}/SKILL.md`)) fail(`${skill.name} raw SKILL.md URL is missing`);
-}
-
 const physicsContractRelative = 'threejs-choose-skills/references/physics-domain-and-interaction-contract.md';
 const physicsContractPath = join(root, physicsContractRelative);
 if (!existsSync(physicsContractPath)) fail(`${physicsContractRelative} is missing`);
@@ -1072,41 +1041,6 @@ for (const dir of skillDirs) {
   ];
   for (const [pattern, message] of forbiddenPhysicsDialects) {
     if (pattern.test(corpus)) fail(`${dir} ${message}`);
-  }
-}
-
-const physicsOwnershipShellSource = readFileSync(join(root, 'labs', 'runtime', 'physics-integration-contracts.mjs'), 'utf8');
-for (const exclusion of [
-  'canonical-physics-abi-publication-chain',
-  'interaction-and-conservation-ledgers',
-  'performance-or-acceptance-evidence'
-]) {
-  if (!physicsOwnershipShellSource.includes(`'${exclusion}'`)) {
-    fail(`physics integration ownership shell does not exclude ${exclusion}`);
-  }
-}
-const boundedWaterIntegrationSource = readFileSync(join(root, 'threejs-water-optics', 'examples', 'webgpu-bounded-water', 'integration-stage.js'), 'utf8');
-const boundedWaterReadme = readFileSync(join(root, 'threejs-water-optics', 'examples', 'webgpu-bounded-water', 'README.md'), 'utf8');
-for (const token of [
-  'bounded-water-render-integration-only-v1',
-  'canonicalPhysicsAbi: false',
-  'presentation-authored-moving-boundary-object-impulse',
-  'InteractionRecord consumption',
-  'InteractionBatchLedger exact-once delivery',
-  'conservation or two-way coupling'
-]) {
-  if (!boundedWaterIntegrationSource.includes(token)) {
-    fail(`bounded-water render integration boundary omits ${token}`);
-  }
-}
-for (const token of [
-  'render-integration shell, not the',
-  'presentation-authored local events',
-  'live-state residual bound',
-  'frame-critical synchronous readback is forbidden'
-]) {
-  if (!boundedWaterReadme.includes(token)) {
-    fail(`bounded-water README physics boundary omits ${token}`);
   }
 }
 

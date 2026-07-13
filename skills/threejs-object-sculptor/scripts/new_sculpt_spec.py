@@ -1,0 +1,1 @@
+../../../threejs-object-sculptor/scripts/new_sculpt_spec.py

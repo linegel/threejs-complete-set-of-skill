@@ -1,0 +1,1 @@
+../../../threejs-object-sculptor/scripts/probe_reference_image.py

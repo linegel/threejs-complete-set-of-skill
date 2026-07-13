@@ -1,0 +1,1 @@
+../../../threejs-object-sculptor/scripts/extract_reference_pbr.py

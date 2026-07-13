@@ -1,6 +1,6 @@
 ---
 name: threejs-visual-validation
-description: Validate advanced Three.js WebGPU/TSL scenes with falsifiable visual contracts, mechanism diagnostics, sustained CPU/GPU timing, refresh-derived budgets, quality-governor traces, tile-GPU resource models, visual-error metrics, leak loops, and stable JSON+PNG evidence.
+description: Validate advanced Three.js WebGPU/TSL scenes with falsifiable visual contracts, mechanism diagnostics, claim-scoped CPU/GPU timing, resource models, visual-error metrics, lifecycle checks, and reproducible evidence.
 ---
 
 # Visual Validation
@@ -31,22 +31,23 @@ field evolution, temporal reconstruction, or resource ownership.
 
 ## Numeric Evidence Labels
 
-Every numeric value in a contract, manifest, table, caption, or conclusion must
-carry exactly one label and a source:
+Every quantity used to support a correctness, performance, or hardware claim
+must carry a unit, one label, and a source:
 
 - `Authored`: a declared input or policy fixed before the run;
 - `Derived`: computed from labelled inputs by a recorded formula;
 - `Measured`: observed during this run, with method and sample scope;
 - `Gated`: an acceptance bound fixed before inspecting the candidate result.
 
-Serialize numeric evidence as `{ value, unit, label, source }`. Do not publish
-bare budgets, sample counts, resolutions, percentiles, quality constants, or
-error thresholds. `p50 [Measured]` and `p95 [Measured]` name estimators; their
-reported values still use the numeric-evidence record. A gate derived from a
+For numbers that support a correctness, performance, or hardware claim, record
+the unit, provenance, and whether the value is measured, derived, authored, or
+a gate. Use `{ value, unit, label, source }` when a machine-readable
+target-project format benefits from it. `p50 [Measured]` and `p95 [Measured]`
+name estimators. A gate derived from a
 frame envelope is stored twice: the computed envelope as `Derived` and the
 frozen acceptance limit as `Gated`, with the latter citing the former.
 
-## Required Architecture
+## Validation Architecture
 
 The validation surface uses:
 
@@ -58,8 +59,8 @@ The validation surface uses:
 - `renderer.compute()` or `renderer.computeAsync()` and storage-resource
   evidence when simulation, culling, compaction, histories, or generated
   instance data are GPU-owned;
-- deterministic automation for fixed cameras, time, seed, viewport, DPR,
-  quality state, and diagnostic mode.
+- deterministic controls for the cameras, time, seed, viewport, DPR, quality
+  state, and diagnostic modes used by the declared visual comparison.
 
 After initialization prefer `renderer.compute()` for submission. In r185,
 `computeAsync()` is not a GPU-completion fence; CPU-visible completion needs an
@@ -86,14 +87,19 @@ if (renderer.backend.isWebGPUBackend !== true) {
 
 After the gate, record revision, renderer/backend identity, output color space,
 tone map, sample count, depth mode, output buffer type, compatibility mode,
-timestamp support, adapter features, and adapter limits. Wrap every numeric
-capability or enum in the numeric-evidence record; do not serialize raw numbers.
+timestamp support, adapter features, and adapter limits. Preserve units and
+provenance for claim-driving capabilities; API enums need no numeric wrapper.
 
 Budgeted tiers retain the canonical WebGPU mechanism and name every visual
 loss. They are not compatibility branches. This skill never teaches or embeds
 a non-WebGPU fallback.
 
-## Required Evidence
+## Claim-Scoped Evidence
+
+Select only the records and captures needed to falsify the claims the created
+work actually makes. A correctness-only scene does not need a thermal dossier;
+a fixed-quality scene does not need governor traces; a project without temporal
+state does not need history captures. Typical evidence includes:
 
 - `visual-contract.json`: invariant-to-artifact bindings, numeric-evidence
   policy, target refresh envelope, visual-error gates, performance claims, and
@@ -101,8 +107,8 @@ a non-WebGPU fallback.
 - `evidence-manifest.json`: renderer/backend, target device, browser, display
   refresh, gated presentation rate, camera, seed, time, viewport, DPR, quality
   state, assets, color pipeline, post graph, stochastic masks, and known compromises;
-- final, no-post, contribution, diagnostic, near/design/far, representative
-  seed, stress, and temporal captures as applicable to the contract;
+- final, contribution, diagnostic, distance, seed, stress, or temporal captures
+  only as applicable to the contract;
 - pipeline graph: output owner, pass dependencies, MRT outputs, resolution
   scales, histories, and diagnostic routes;
 - resource ledger: textures, geometry, uniforms, render targets, storage,
@@ -112,12 +118,11 @@ a non-WebGPU fallback.
 - timing trace: warm-up, cold and sustained windows, `p50 [Measured]`,
   `p95 [Measured]`, deadline misses, GPU timestamps when required, browser and
   compositor reserves, presentation cadence, and capture overhead separated;
-- quality-governor trace: decision inputs, thresholds, hysteresis, dwell time,
-  tier transitions, visual error per tier, and final stable tier;
-- lifecycle evidence: resize, DPR and tier changes, history reset, teardown,
-  device errors, and dispose/recreate loops with before/after resource counts.
+- quality-governor trace only when the work uses a governor;
+- lifecycle evidence only for the resource ownership, resize, history, device
+  loss, or recreation behavior the work claims to support.
 
-## Pack-Wide Physics Integration Gate
+## Coupled-Project Physics Integration Gate
 
 Use the canonical
 [physics domain and interaction contract](../threejs-choose-skills/references/physics-domain-and-interaction-contract.md)
@@ -297,8 +302,9 @@ phases, never silently removed from end-to-end startup or capture claims.
 
 ## Sustained And Thermal Evidence
 
-Performance acceptance requires both cold and sustained traces on each target
-class. Window durations, sampling cadence, workload path, and thermal
+When the created work makes a performance or sustained-operation claim,
+validate both cold and sustained traces on each named target. Window durations,
+sampling cadence, workload path, and thermal
 stabilization rule are `Authored`; minimum sample and residence requirements
 are `Gated`. Report per-window CPU and GPU `p50 [Measured]` and
 `p95 [Measured]`, presentation intervals, deadline misses, memory trend, active
@@ -310,7 +316,7 @@ late throttling. Temperature, clocks, power, and hardware counters are
 cadence, memory, and quality drift; do not claim absence of thermal throttling.
 An emulator or desktop emulation is not evidence for a low-power target.
 
-An adaptive governor passes only if the settled tier meets both the performance
+When an adaptive governor exists, it passes only if the settled tier meets both the performance
 gates and its visual-error gates. Oscillation, repeated emergency drops,
 unbounded recovery, or satisfying timing by crossing the visual-error gate is
 a failure. Log the exact decision metric, filtered value, threshold, hysteresis,
@@ -442,8 +448,8 @@ selected mechanism makes them relevant. A still frame cannot sign off foam
 advection, simulation boundaries, LOD registration, history decay, or
 frame-rate-independent evolution.
 
-Validate `Full`, `Budgeted`, and `Minimum viable` states as separate visual
-contracts. Every state preserves coastline identity, semantic terrain order,
+If the coastal scene exposes adaptive `Full`, `Budgeted`, and `Minimum viable`
+states, validate each claimed state as a separate visual contract. Every state preserves coastline identity, semantic terrain order,
 bathymetric ordering, water/normal state agreement, foam causality, landmark
 support, and the single output owner. Lower states may reduce projected-error
 detail, local-water or foam resolution/cadence, sub-pixel wave bands,

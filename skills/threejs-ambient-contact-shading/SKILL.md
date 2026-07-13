@@ -1,0 +1,1 @@
+../../threejs-ambient-contact-shading/SKILL.md
