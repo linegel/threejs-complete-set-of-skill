@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:49ab4c316e51d9bb267cb0cda243b6d6c4dd9af8afa65d1c469737eaa2a18260",
+  "buildRevision": "sha256:83b208ec61a7d8ea1260929095a2bb81138a2c704d4c38524f02888b93407987",
   "demoKinds": [
     "canonical-lab",
     "mechanism-demo",
@@ -1442,7 +1442,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "npm --prefix threejs-procedural-fields/examples/webgpu-field-bake run validate:generated-assets",
-      "sourceHash": "sha256:816def7d25148c2ca132ff058b1506392fee99fbb5e3b8df35acc5e356f55eca",
+      "sourceHash": "sha256:ee1be6f95bfebcb4dac41c50854eeb291806109d873242623eb81d05b31a5025",
       "proxyStatus": {
         "limitation": "Generated biome maps are reduced-tier diagnostics. The production field path remains shared CPU/TSL parity plus compute/storage bakes when reuse justifies it.",
         "canonicalLabId": "webgpu-field-bake"
@@ -9182,7 +9182,7 @@
         "validateQuick": "npm run validate:quick",
         "validateFull": "npm run validate:full"
       },
-      "sourceHash": "sha256:dce4e4e26c06e5a6cf5e49bb15a1f13672b7b75895d3edf013ca3b853e0701d5",
+      "sourceHash": "sha256:b6517664b812f4652352bb6329841996305da5b7ac360acd73f94bf7fb79f740",
       "proxyStatus": null,
       "executionClass": "rendering",
       "flagship": false,
