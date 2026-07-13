@@ -30,6 +30,7 @@ export const TIER_VISUAL_ERROR_GATES = Object.freeze( {
 	meanRgbByteDifference: 8,
 	edgeP95RgbByteDifference: 32
 } );
+export const TIER_VISUAL_EDGE_SEARCH_RADIUS_PIXELS = 2;
 export const DIRECT_CAPTURE_RECIPE_ORDER = Object.freeze( CORRECTNESS_CAPTURE_RECIPES.map( ( recipe ) => recipe.id ) );
 if ( DIRECT_CAPTURE_RECIPE_ORDER.length !== 14 ) throw new Error( `Correctness capture requires exactly 14 direct recipes, observed ${ DIRECT_CAPTURE_RECIPE_ORDER.length }.` );
 export { DIAGNOSTIC_MOSAIC_RECIPE, DIAGNOSTIC_MOSAIC_SOURCES };
@@ -196,12 +197,23 @@ export function tierVisualErrorMetrics( reference, candidate ) {
 		let gradient = 0;
 		for ( const neighbor of neighbors ) for ( let channel = 0; channel < 3; channel ++ ) gradient = Math.max( gradient, Math.abs( reference.data[ center + channel ] - reference.data[ neighbor + channel ] ) );
 		if ( gradient < 8 ) continue;
-		const difference = (
-			Math.abs( reference.data[ center ] - candidate.data[ center ] ) +
-			Math.abs( reference.data[ center + 1 ] - candidate.data[ center + 1 ] ) +
-			Math.abs( reference.data[ center + 2 ] - candidate.data[ center + 2 ] )
-		) / 3;
-		edgeDifferences.push( difference );
+		let minimumDifference = Number.POSITIVE_INFINITY;
+		const minimumY = Math.max( 0, y - TIER_VISUAL_EDGE_SEARCH_RADIUS_PIXELS );
+		const maximumY = Math.min( candidate.height - 1, y + TIER_VISUAL_EDGE_SEARCH_RADIUS_PIXELS );
+		const minimumX = Math.max( 0, x - TIER_VISUAL_EDGE_SEARCH_RADIUS_PIXELS );
+		const maximumX = Math.min( candidate.width - 1, x + TIER_VISUAL_EDGE_SEARCH_RADIUS_PIXELS );
+		for ( let candidateY = minimumY; candidateY <= maximumY; candidateY ++ ) for ( let candidateX = minimumX; candidateX <= maximumX; candidateX ++ ) {
+
+			const candidateOffset = ( candidateY * candidate.width + candidateX ) * 4;
+			const difference = (
+				Math.abs( reference.data[ center ] - candidate.data[ candidateOffset ] ) +
+				Math.abs( reference.data[ center + 1 ] - candidate.data[ candidateOffset + 1 ] ) +
+				Math.abs( reference.data[ center + 2 ] - candidate.data[ candidateOffset + 2 ] )
+			) / 3;
+			minimumDifference = Math.min( minimumDifference, difference );
+
+		}
+		edgeDifferences.push( minimumDifference );
 
 	}
 	if ( edgeDifferences.length === 0 ) throw new Error( 'Tier comparison reference edge mask is empty.' );
@@ -330,13 +342,13 @@ export function createTierVisualEvidence( reference, candidate ) {
 			measured.edgeMeanRgbByteDifference,
 			'mean-rgb-byte-difference',
 			'Measured',
-			'reference-edge-mask comparison'
+			`reference-edge-mask minimum within a ${ TIER_VISUAL_EDGE_SEARCH_RADIUS_PIXELS }-pixel Chebyshev candidate neighborhood`
 		),
 		edgeP95RgbByteDifference: numericEvidence(
 			measured.edgeP95RgbByteDifference,
 			'mean-rgb-byte-difference',
 			'Measured',
-			'reference-edge-mask p95 comparison'
+			`reference-edge-mask p95 of minima within a ${ TIER_VISUAL_EDGE_SEARCH_RADIUS_PIXELS }-pixel Chebyshev candidate neighborhood`
 		)
 	};
 	const gates = {

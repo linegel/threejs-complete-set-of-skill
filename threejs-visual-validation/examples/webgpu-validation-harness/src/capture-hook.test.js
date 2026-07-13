@@ -15,6 +15,7 @@ import {
 	outputPlan,
 	reconstructDiagnosticMosaic,
 	runLockedMechanismAndLifecycleProfiles,
+	TIER_VISUAL_EDGE_SEARCH_RADIUS_PIXELS,
 	TIER_VISUAL_ERROR_GATES,
 	TIER_VISUAL_EVIDENCE_FILENAME,
 	tierVisualErrorMetrics
@@ -56,6 +57,17 @@ function edgeReadback( width = 4, height = 4, delta = 0 ) {
 		data.set( [ Math.min( 255, ( x < width / 2 ? 16 : 224 ) + delta ), Math.min( 255, ( y < height / 2 ? 24 : 216 ) + delta ), 64 + delta, 255 ], offset );
 
 	}
+	return { width, height, data };
+
+}
+
+function verticalEdgeReadback( width = 12, height = 8, boundary = 6, rightColor = [ 224, 216, 64, 255 ] ) {
+
+	const data = new Uint8Array( width * height * 4 );
+	for ( let y = 0; y < height; y ++ ) for ( let x = 0; x < width; x ++ ) data.set(
+		x < boundary ? [ 16, 24, 64, 255 ] : rightColor,
+		( y * width + x ) * 4
+	);
 	return { width, height, data };
 
 }
@@ -392,6 +404,20 @@ test( 'the reference-tier edge mask is measured even when its visual error is ze
 	assert.ok( metrics.edgeMaskPixels > 0 );
 	assert.equal( metrics.meanRgbByteDifference, 0 );
 	assert.equal( metrics.edgeP95RgbByteDifference, 0 );
+
+} );
+
+test( 'tier edge comparison tolerates one reduced-resolution texel of phase shift but rejects a removed edge', () => {
+
+	assert.equal( TIER_VISUAL_EDGE_SEARCH_RADIUS_PIXELS, 2 );
+	const reference = verticalEdgeReadback();
+	const shifted = verticalEdgeReadback( 12, 8, 8 );
+	const removed = verticalEdgeReadback( 12, 8, 12 );
+	const shiftedMetrics = tierVisualErrorMetrics( reference, shifted );
+	const removedMetrics = tierVisualErrorMetrics( reference, removed );
+	assert.equal( shiftedMetrics.edgeP95RgbByteDifference, 0 );
+	assert.ok( shiftedMetrics.meanRgbByteDifference > 0 );
+	assert.ok( removedMetrics.edgeP95RgbByteDifference > TIER_VISUAL_ERROR_GATES.edgeP95RgbByteDifference );
 
 } );
 
