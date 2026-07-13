@@ -18,6 +18,7 @@ import {
   dot,
   exp,
   float,
+  fract,
   globalId,
   max,
   min,
@@ -29,7 +30,6 @@ import {
   refract,
   renderOutput,
   select,
-  sin,
   smoothstep,
   sqrt,
   storageTexture,
@@ -79,10 +79,10 @@ export const DEFAULT_FROST_SETTINGS = Object.freeze({
   sideFade: 0.35,
   cornerFade: 0.55,
   blurResolutionScale: 0.4,
-  mainScreenPeriod: 1200,
-  detailScreenPeriod: 350,
-  mainNormalStrength: 0.3,
-  detailNormalStrength: 2.0,
+  mainScreenPeriod: 220,
+  detailScreenPeriod: 64,
+  mainNormalStrength: 0.09,
+  detailNormalStrength: 0.42,
   ior: 1.31,
   thickness: 1.0,
   sourceInset: 0.17,
@@ -265,6 +265,40 @@ export function frostSeedPhase(seed) {
     x: mixUint32(seed ^ 0xa511e9b3) * scale,
     y: mixUint32(seed ^ 0x63d83595) * scale,
   });
+}
+
+export function evaluateFrostCrystalField({
+  pixelX,
+  pixelY,
+  seed = 1,
+  settings = DEFAULT_FROST_SETTINGS,
+} = {}) {
+  if (![pixelX, pixelY, settings.mainScreenPeriod, settings.detailScreenPeriod].every(Number.isFinite)
+    || settings.mainScreenPeriod <= 0 || settings.detailScreenPeriod <= 0) {
+    throw new RangeError("frost crystal field requires finite pixel coordinates and positive periods");
+  }
+  const phase = frostSeedPhase(seed);
+  const fractValue = (value) => value - Math.floor(value);
+  const smooth = (low, high, value) => {
+    const t = Math.min(1, Math.max(0, (value - low) / (high - low)));
+    return t * t * (3 - 2 * t);
+  };
+  const star = (period, phaseX, phaseY, sharpness) => {
+    const x = fractValue(pixelX / period + phaseX / (2 * Math.PI)) - 0.5;
+    const y = fractValue(pixelY / period + phaseY / (2 * Math.PI)) - 0.5;
+    const axisA = Math.abs(x);
+    const axisB = Math.abs(x * 0.5 + y * 0.8660254037844386);
+    const axisC = Math.abs(x * 0.5 - y * 0.8660254037844386);
+    const branch = Math.min(axisA, axisB, axisC);
+    const radiusGate = 1 - smooth(0.18, 0.68, Math.hypot(x, y));
+    return Math.exp(-branch * sharpness) * radiusGate;
+  };
+  const frostNoise = star(settings.mainScreenPeriod, phase.x, phase.y, 42);
+  const detailNoise = star(settings.detailScreenPeriod, phase.y, phase.x, 28);
+  const crystalVein = Math.max(frostNoise, detailNoise * 0.72);
+  const frozenStructure = Math.min(1, Math.max(0, 0.58 + crystalVein * 0.42));
+  const highlightStructure = crystalVein;
+  return Object.freeze({ frostNoise, detailNoise, crystalVein, frozenStructure, highlightStructure });
 }
 
 export function exactDielectricFresnel(cosIncident, incidentIor, transmittedIor) {
@@ -808,22 +842,21 @@ function buildFrostCompositeGraph({
   }
 
   const screenPixels = screenUv.mul(uniforms.displayResolution).toVar();
-  const mainPhase = screenPixels
-    .mul((2 * Math.PI) / settings.mainScreenPeriod)
-    .add(uniforms.crystalPhase)
-    .toVar();
-  const detailPhase = screenPixels
-    .mul((2 * Math.PI) / settings.detailScreenPeriod)
-    .add(uniforms.crystalPhase.yx)
-    .toVar();
-  const frostNoise = sin(mainPhase.x.mul(0.73).add(sin(mainPhase.y.mul(0.59))))
-    .mul(0.5).add(0.5).toVar();
-  const frozenStructure = mix(
-    frostNoise,
-    sin(detailPhase.x.add(detailPhase.y.mul(0.87))).mul(0.5).add(0.5),
-    mechanismProfile.crystalField ? 0.3 : 0,
-  ).mul(0.72).add(0.28).clamp(0, 1).toVar();
-  const highlightStructure = pow(frozenStructure, 5).toVar();
+  const phaseOffset = uniforms.crystalPhase.div(2 * Math.PI).toVar();
+  const crystalStar = (period, offset, sharpness) => {
+    const cell = fract(screenPixels.div(period).add(offset)).sub(0.5).toVar();
+    const axisA = abs(cell.x).toVar();
+    const axisB = abs(cell.x.mul(0.5).add(cell.y.mul(0.8660254037844386))).toVar();
+    const axisC = abs(cell.x.mul(0.5).sub(cell.y.mul(0.8660254037844386))).toVar();
+    const branch = min(axisA, min(axisB, axisC)).toVar();
+    const radiusGate = float(1).sub(smoothstep(0.18, 0.68, cell.length())).toVar();
+    return exp(branch.mul(-sharpness)).mul(radiusGate);
+  };
+  const frostNoise = crystalStar(settings.mainScreenPeriod, phaseOffset, 42).toVar();
+  const detailNoise = crystalStar(settings.detailScreenPeriod, phaseOffset.yx, 28).toVar();
+  const crystalVein = max(frostNoise, detailNoise.mul(0.72)).toVar();
+  const frozenStructure = float(0.58).add(crystalVein.mul(mechanismProfile.crystalField ? 0.42 : 0)).clamp(0, 1).toVar();
+  const highlightStructure = crystalVein.toVar();
   const previousVisibleHistory = smoothstep(0, settings.historyVisualKnee, previousHistory.r).toVar();
   const currentVisibleHistory = smoothstep(0, settings.historyVisualKnee, currentHistory.r).toVar();
   const previousClear = float(1).sub(previousVisibleHistory).clamp(0, 1).toVar();
@@ -831,20 +864,25 @@ function buildFrostCompositeGraph({
   const frostMaskBefore = frozenStructure.mul(previousClear).clamp(0, 1).toVar();
   const frostMaskAfter = frozenStructure.mul(currentClear).clamp(0, 1).toVar();
   const blurMix = mechanismProfile.blur
-    ? frostMaskAfter.add(0.18).mul(currentClear).clamp(0, 1).toVar()
+    ? frostMaskAfter.mul(float(0.2).add(frozenStructure.mul(0.08))).clamp(0, 0.28).toVar()
     : float(0).toVar();
+  const iceTint = mix(vec3(1), vec3(0.76, 0.88, 1.08), frostMaskAfter).toVar();
+  const subsurfaceScatter = vec3(0.16, 0.3, 0.46)
+    .mul(frostMaskAfter)
+    .mul(float(0.16).add(highlightStructure.mul(0.72)))
+    .toVar();
   const frostedBase = mix(sharp.rgb, verticalBlur.rgb, blurMix)
-    .mul(vec3(0.9, 0.92, 1.03))
-    .add(vec3(0.04, 0.07, 0.12).mul(highlightStructure).mul(frostMaskAfter))
+    .mul(iceTint)
+    .add(subsurfaceScatter)
     .toVar();
 
   const mainSlope = vec2(
-    sin(mainPhase.y.mul(0.91)),
-    sin(mainPhase.x.mul(1.07)),
+    frostNoise.sub(detailNoise),
+    detailNoise.sub(frostNoise.mul(0.37)),
   ).mul(settings.mainNormalStrength).toVar();
   const detailSlope = vec2(
-    sin(detailPhase.y.mul(0.73).add(1.7)),
-    sin(detailPhase.x.mul(0.61).sub(0.9)),
+    detailNoise.sub(0.5),
+    frostNoise.sub(0.5),
   ).mul(mechanismProfile.refraction && tierConfig.twoScaleRefraction ? settings.detailNormalStrength : 0).toVar();
   const mainOptics = buildOpticalInterfaceNode({
     slope: mainSlope,
@@ -862,15 +900,18 @@ function buildFrostCompositeGraph({
   const refractOffset = mechanismProfile.refraction
     ? mainRefractionOffset.add(detailRefractionOffset).toVar()
     : vec2(0).toVar();
-  const sourceInsetUv = abs(refractOffset)
-    .add(vec2(settings.sourceInset).div(uniforms.displayResolution));
+  const sourceInsetUv = vec2(settings.sourceInset).div(uniforms.displayResolution);
   const refractUv = clamp(screenUv.add(refractOffset), sourceInsetUv, vec2(1).sub(sourceInsetUv));
   const refracted = sceneColorNode.sample(refractUv).rgb;
-  const reflectionTint = frostedBase.add(vec3(0.08, 0.12, 0.2).mul(highlightStructure));
-  const interfaceColor = refracted.mul(float(1).sub(optics.fresnel))
-    .add(reflectionTint.mul(optics.fresnel));
+  const reflectionTint = frostedBase.add(vec3(0.18, 0.28, 0.42).mul(highlightStructure));
+  const boundedRefraction = frostedBase
+    .add(refracted.sub(sharp.rgb).mul(frostMaskAfter).mul(0.18))
+    .clamp(0, 16)
+    .toVar();
+  const reflectionWeight = optics.fresnel.mul(0.35).clamp(0, 0.35).toVar();
+  const interfaceColor = mix(boundedRefraction, reflectionTint, reflectionWeight).toVar();
   const finalRgb = mechanismProfile.refraction
-    ? mix(frostedBase, interfaceColor, frostMaskAfter)
+    ? mix(sharp.rgb, interfaceColor, frostMaskAfter)
     : frostedBase;
 
   const debugNodes = {

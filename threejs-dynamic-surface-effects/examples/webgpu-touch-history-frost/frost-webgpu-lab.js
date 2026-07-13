@@ -136,37 +136,61 @@ export function parseFrostLabRoute(pathname = "/", search = "") {
 
 function createBackdropScene() {
   const scene = new Scene();
-  scene.background = new Color(0x101829);
+  scene.background = new Color(0x294a63);
   scene.add(new AmbientLight(0xa8c8ed, 1.35));
   const sun = new DirectionalLight(0xffe2bd, 3.8);
   sun.position.set(4, 8, 5);
   scene.add(sun);
 
   const objects = [];
+  const addObject = (mesh, geometry, material) => {
+    scene.add(mesh);
+    objects.push({ mesh, geometry, material });
+    return mesh;
+  };
+
+  for (let index = 0; index < 9; index += 1) {
+    const railGeometry = new BoxGeometry(0.1, 4.8, 0.12);
+    const railMaterial = new MeshStandardNodeMaterial({ roughness: 0.42, metalness: 0 });
+    const railColor = index % 2 === 0 ? 0x8bdcf4 : 0xf7b267;
+    railMaterial.colorNode = color(railColor);
+    railMaterial.emissiveNode = color(railColor).mul(0.38);
+    const rail = new Mesh(railGeometry, railMaterial);
+    rail.position.set(-4 + index, 0.35, -2.2);
+    addObject(rail, railGeometry, railMaterial);
+  }
+
+  for (const y of [-1.25, 1.95]) {
+    const railGeometry = new BoxGeometry(8.2, 0.1, 0.12);
+    const railMaterial = new MeshStandardNodeMaterial({ roughness: 0.42, metalness: 0 });
+    railMaterial.colorNode = color(0xb9e6ff);
+    railMaterial.emissiveNode = color(0xb9e6ff).mul(0.3);
+    const rail = new Mesh(railGeometry, railMaterial);
+    rail.position.set(0, y, -2.2);
+    addObject(rail, railGeometry, railMaterial);
+  }
+
   const boxGeometry = new BoxGeometry(2.4, 2.4, 2.4, 4, 4, 4);
   const boxMaterial = new MeshStandardNodeMaterial({ roughness: 0.32, metalness: 0.12 });
   boxMaterial.colorNode = color(0xe46f56);
   const box = new Mesh(boxGeometry, boxMaterial);
   box.position.set(-2.3, 0.1, 0);
   box.rotation.set(0.5, 0.7, 0.1);
-  scene.add(box);
-  objects.push({ mesh: box, geometry: boxGeometry, material: boxMaterial });
+  addObject(box, boxGeometry, boxMaterial);
 
   const sphereGeometry = new SphereGeometry(1.45, 48, 28);
   const sphereMaterial = new MeshStandardNodeMaterial({ roughness: 0.2, metalness: 0.58 });
   sphereMaterial.colorNode = color(0x56aee4);
   const sphere = new Mesh(sphereGeometry, sphereMaterial);
   sphere.position.set(2.1, 0.35, -0.3);
-  scene.add(sphere);
-  objects.push({ mesh: sphere, geometry: sphereGeometry, material: sphereMaterial });
+  addObject(sphere, sphereGeometry, sphereMaterial);
 
   const floorGeometry = new BoxGeometry(10, 0.3, 7);
   const floorMaterial = new MeshStandardNodeMaterial({ roughness: 0.78, metalness: 0 });
   floorMaterial.colorNode = color(0x31404f);
   const floor = new Mesh(floorGeometry, floorMaterial);
   floor.position.y = -1.55;
-  scene.add(floor);
-  objects.push({ mesh: floor, geometry: floorGeometry, material: floorMaterial });
+  addObject(floor, floorGeometry, floorMaterial);
 
   return {
     scene,

@@ -143,8 +143,8 @@ assert.equal(textureDescriptor.colorSpace, "NoColorSpace");
 assert.equal(textureDescriptor.generateMipmaps, false);
 
 const refraction = createTwoScaleRefractionContract();
-assert.equal(refraction.mainScreenPeriod, 1200);
-assert.equal(refraction.detailScreenPeriod, 350);
+assert.equal(refraction.mainScreenPeriod, 220);
+assert.equal(refraction.detailScreenPeriod, 64);
 assert(refraction.heightWeight.includes("height"));
 assert(refraction.Fresnel.includes("exact dielectric Fresnel"));
 assert.equal(refraction.opticalSide, "outside");
@@ -337,8 +337,8 @@ for (const token of [
   "compute(",
   "mainScreenPeriod",
   "detailScreenPeriod",
-  ".mul((2 * Math.PI) / settings.mainScreenPeriod)",
-  ".add(uniforms.crystalPhase)",
+  "crystalStar(settings.mainScreenPeriod",
+  "uniforms.crystalPhase.div(2 * Math.PI)",
   "exactDielectricFresnelNode",
   "settings.thickness",
   "settings.ior",
