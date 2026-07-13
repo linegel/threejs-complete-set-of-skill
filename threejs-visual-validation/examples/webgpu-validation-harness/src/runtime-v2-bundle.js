@@ -352,6 +352,16 @@ function hasNativeWebGpuIdentity( metrics ) {
 
 }
 
+function rendererDeviceGeneration( metrics, label ) {
+
+	const generation = metrics?.rendererDeviceGeneration;
+	const backendEvidenceGeneration = metrics?.rendererBackendEvidence?.rendererDeviceGeneration;
+	if ( Number.isInteger( generation ) === false || generation < 1 ) throw new Error( `${ label}.rendererDeviceGeneration must be a positive integer.` );
+	if ( backendEvidenceGeneration !== generation ) throw new Error( `${ label} renderer device generation evidence disagrees with the canonical metric.` );
+	return generation;
+
+}
+
 function runtimeDeviceErrors( metrics ) {
 
 	return [
@@ -407,14 +417,14 @@ export function summarizeLifecycleEvidence( lifecycle ) {
 		const rendererStateBeforeDigest = digest( canonicalize( snapshot.beforeDispose.rendererState ) );
 		const rendererStateAfterDigest = digest( canonicalize( snapshot.afterDispose.rendererState ) );
 		const controllerGeneration = snapshot.beforeDispose?.controllerGeneration;
-		const rendererDeviceGeneration = snapshot.beforeDispose?.backend?.rendererDeviceGeneration;
+		const beforeRendererDeviceGeneration = rendererDeviceGeneration( snapshot.beforeDispose, `Runtime lifecycle cycle ${ index } before disposal` );
+		const afterRendererDeviceGeneration = rendererDeviceGeneration( snapshot.afterDispose, `Runtime lifecycle cycle ${ index } after disposal` );
 		if (
 			Number.isInteger( controllerGeneration ) === false || controllerGeneration < 1 ||
-			Number.isInteger( rendererDeviceGeneration ) === false || rendererDeviceGeneration < 1 ||
 			disposeEvidence.controllerGeneration !== controllerGeneration ||
-			disposeEvidence.rendererDeviceGeneration !== rendererDeviceGeneration ||
+			disposeEvidence.rendererDeviceGeneration !== beforeRendererDeviceGeneration ||
 			snapshot.afterDispose?.controllerGeneration !== controllerGeneration ||
-			snapshot.afterDispose?.backend?.rendererDeviceGeneration !== rendererDeviceGeneration
+			afterRendererDeviceGeneration !== beforeRendererDeviceGeneration
 		) throw new Error( `Runtime lifecycle cycle ${ index } generation identity drifted across disposal.` );
 		if ( snapshot.beforeDispose?.listenerState?.runtimeEventListeners !== 1 || snapshot.afterDispose?.listenerState?.runtimeEventListeners !== 0 ) throw new Error( `Runtime lifecycle cycle ${ index } listener census did not close.` );
 		if ( hasNativeWebGpuIdentity( snapshot.beforeDispose ) === false ) throw new Error( `Runtime lifecycle cycle ${ index } did not initialize native WebGPU.` );

@@ -70,7 +70,10 @@ function lifecycleFixture( mutate = () => {} ) {
 		cycle,
 		beforeDispose: {
 			controllerGeneration: cycle + 1,
-			backend: { isWebGPUBackend: true, rendererDeviceGeneration: cycle + 101 },
+			nativeWebGPU: true,
+			backend: 'WebGPU',
+			rendererDeviceGeneration: cycle + 101,
+			rendererBackendEvidence: { isWebGPUBackend: true, rendererDeviceGeneration: cycle + 101 },
 			listenerState: { runtimeEventListeners: 1 },
 			lifecycleState: { activeControls: 0, activeMaterials: 3, rendererStateDisposition: 'ACTIVE_OWNED_RENDERER' },
 			rendererState: { outputColorSpace: 'srgb', toneMapping: 'NeutralToneMapping', exposure: 1 },
@@ -78,7 +81,10 @@ function lifecycleFixture( mutate = () => {} ) {
 		},
 		afterDispose: {
 			controllerGeneration: cycle + 1,
-			backend: { isWebGPUBackend: true, rendererDeviceGeneration: cycle + 101 },
+			nativeWebGPU: true,
+			backend: 'WebGPU',
+			rendererDeviceGeneration: cycle + 101,
+			rendererBackendEvidence: { isWebGPUBackend: true, rendererDeviceGeneration: cycle + 101 },
 			listenerState: { runtimeEventListeners: 0 },
 			lifecycleState: { activeControls: 0, activeMaterials: 0, rendererStateDisposition: 'OWNED_RENDERER_DISPOSED' },
 			rendererState: { outputColorSpace: 'srgb', toneMapping: 'NeutralToneMapping', exposure: 1 },
@@ -132,7 +138,11 @@ test( 'lifecycle reducer accepts complete native-WebGPU zero-retention evidence'
 test( 'lifecycle reducer rejects missing, non-WebGPU, and retained-resource cycles', () => {
 
 	assert.throws( () => summarizeLifecycleEvidence( lifecycleFixture( ( fixture ) => fixture.snapshots.pop() ) ), /snapshot count/ );
-	assert.throws( () => summarizeLifecycleEvidence( lifecycleFixture( ( fixture ) => { fixture.snapshots[ 7 ].beforeDispose.backend.isWebGPUBackend = false; } ) ), /did not initialize native WebGPU/ );
+	assert.throws( () => summarizeLifecycleEvidence( lifecycleFixture( ( fixture ) => {
+		fixture.snapshots[ 7 ].beforeDispose.nativeWebGPU = false;
+		fixture.snapshots[ 7 ].beforeDispose.backend = 'WebGL';
+		fixture.snapshots[ 7 ].beforeDispose.rendererBackendEvidence.isWebGPUBackend = false;
+	} ) ), /did not initialize native WebGPU/ );
 	assert.throws( () => summarizeLifecycleEvidence( lifecycleFixture( ( fixture ) => { fixture.snapshots[ 12 ].afterDispose.rendererInfo.memory.textures = 1; } ) ), /retained renderer memory/ );
 	assert.throws( () => summarizeLifecycleEvidence( lifecycleFixture( ( fixture ) => { fixture.snapshots[ 5 ].beforeDispose.deviceLostObserved = true; } ) ), /device loss/ );
 	assert.throws( () => summarizeLifecycleEvidence( lifecycleFixture( ( fixture ) => { fixture.snapshots[ 5 ].afterDispose.uncapturedErrors = [ 'late validation error' ]; } ) ), /device error/ );
@@ -142,6 +152,12 @@ test( 'lifecycle reducer rejects missing, non-WebGPU, and retained-resource cycl
 	assert.throws( () => summarizeLifecycleEvidence( lifecycleFixture( ( fixture ) => { fixture.snapshots[ 5 ].settle.queueSettled = false; } ) ), /observed post-disposal settle/ );
 	assert.throws( () => summarizeLifecycleEvidence( lifecycleFixture( ( fixture ) => { fixture.snapshots[ 5 ].dispose.evidence.queueSettlement.status = 'FAIL'; } ) ), /actual GPU queue/ );
 	assert.throws( () => summarizeLifecycleEvidence( lifecycleFixture( ( fixture ) => { fixture.snapshots[ 5 ].dispose.evidence.rendererDeviceGeneration ++; } ) ), /generation identity/ );
+	assert.throws( () => summarizeLifecycleEvidence( lifecycleFixture( ( fixture ) => { fixture.snapshots[ 5 ].beforeDispose.rendererBackendEvidence.rendererDeviceGeneration ++; } ) ), /generation evidence disagrees/ );
+	assert.throws( () => summarizeLifecycleEvidence( lifecycleFixture( ( fixture ) => {
+		fixture.snapshots[ 5 ].afterDispose.rendererDeviceGeneration ++;
+		fixture.snapshots[ 5 ].afterDispose.rendererBackendEvidence.rendererDeviceGeneration ++;
+	} ) ), /generation identity/ );
+	assert.throws( () => summarizeLifecycleEvidence( lifecycleFixture( ( fixture ) => { fixture.snapshots[ 5 ].afterDispose.rendererBackendEvidence.rendererDeviceGeneration ++; } ) ), /generation evidence disagrees/ );
 	assert.throws( () => summarizeLifecycleEvidence( lifecycleFixture( ( fixture ) => { fixture.snapshots[ 5 ].afterDispose.listenerState.runtimeEventListeners = 1; } ) ), /listener census/ );
 	assert.throws( () => summarizeLifecycleEvidence( lifecycleFixture( ( fixture ) => { fixture.snapshots[ 5 ].afterDispose.lifecycleState.activeMaterials = 1; } ) ), /retained controls or materials/ );
 	assert.throws( () => summarizeLifecycleEvidence( lifecycleFixture( ( fixture ) => { fixture.snapshots[ 5 ].dispose.evidence.controlsAfterDispose = 1; } ) ), /registry evidence disagrees/ );
