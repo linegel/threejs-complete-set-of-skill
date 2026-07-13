@@ -3,8 +3,9 @@ import {
 	Fn,
 	float,
 	instanceIndex,
+	int,
+	ivec2,
 	textureStore,
-	uvec2,
 	uniform,
 	vec4
 } from 'three/tsl';
@@ -133,13 +134,13 @@ function makeFftPlan( cascade, fieldIndex, resources ) {
 
 function createReadbackPatternNode( textureTarget, resolution, name ) {
 	const kernel = Fn( ( { outputTex } ) => {
-		const x = instanceIndex.mod( resolution );
-		const y = instanceIndex.div( resolution );
-		const cell = uvec2( x, y );
+		const x = int( instanceIndex.mod( resolution ) );
+		const y = int( instanceIndex.div( resolution ) );
+		const cell = ivec2( x, y );
 		textureStore( outputTex, cell, vec4( float( y.mul( resolution ).add( x ) ), float( x ), float( y ), 1.0 ) ).toWriteOnly();
 	} );
 
-	return kernel( { outputTex: textureTarget } ).compute( resolution * resolution, [ 64 ] ).setName( name );
+	return kernel( { outputTex: textureTarget } ).compute( resolution * resolution, [ 64 ] ).setName( String( name ).replace( /[^a-zA-Z0-9_]/g, '_' ) );
 }
 
 function readPixel( readback, x, y, width, height ) {
@@ -536,10 +537,19 @@ export class WebGPUFftOcean {
 				...fullFftPlan.verticalStages
 			];
 			fixtureNodes.push( ...fullFftNodes );
+			// Submit each dependent storage stage with its own fence so fixture
+			// write → FFT stages → readback cannot race within one compute list.
+			const submitStages = async ( nodes ) => {
+				const list = Array.isArray( nodes ) ? nodes.flat() : [ nodes ];
+				for ( const node of list ) {
+					registerNode( node );
+					await submitCompute( this.renderer, node );
+				}
+			};
+
 			for ( const fixture of [ 'dc-and-axis', 'oblique-pair', 'hermitian-cosines' ] ) {
 				const fixtureNode = createFftFixtureNode( input, resolution, fixture );
-				fixtureNodes.push( fixtureNode );
-				await submitCompute( this.renderer, [ fixtureNode, ...fullFftNodes ] );
+				await submitStages( [ fixtureNode, ...fullFftNodes ] );
 				const transformed = await copyTextureToBuffer.call( this.renderer.backend, fullFftPlan.finalTexture, 0, 0, resolution, resolution, 0 );
 				errors[ `fullFft:${ fixture }` ] = fullTextureError(
 					transformed,
@@ -549,32 +559,32 @@ export class WebGPUFftOcean {
 				);
 			}
 
-			await submitCompute( this.renderer, registerNode( createReadbackPatternNode( input, resolution, 'ocean:readback:pattern' ) ) );
-			await submitCompute( this.renderer, registerNode( createBitReverseNode( resolution, 0, {
+			await submitStages( createReadbackPatternNode( input, resolution, 'ocean_readback_pattern' ) );
+			await submitStages( createBitReverseNode( resolution, 0, {
 				inputTex: input,
 				outputTex: output,
 				bitReverseTex: bitReverseTexture
-			} ) ) );
+			} ) );
 			const bitReverse = await copyTextureToBuffer.call( this.renderer.backend, output, 0, 0, resolution, resolution, 0 );
 			errors.bitReverseX = maxPixelError( readPixel( bitReverse, 1, 0, resolution, resolution ), [ 4, 4, 0, 1 ] );
 
-			await submitCompute( this.renderer, registerNode( createClearTextureNode( input, resolution, [ 1, 0, 0, 0 ], 'ocean:readback:fft-clear' ) ) );
-			await submitCompute( this.renderer, registerNode( createFftStageNode( resolution, 0, 0, {
+			await submitStages( createClearTextureNode( input, resolution, [ 1, 0, 0, 0 ], 'ocean_readback_fft_clear' ) );
+			await submitStages( createFftStageNode( resolution, 0, 0, {
 				inputTex: input,
 				outputTex: output,
 				butterflyTex: butterflyTexture
-			} ) ) );
+			} ) );
 			const fftStage = await copyTextureToBuffer.call( this.renderer.backend, output, 0, 0, resolution, resolution, 0 );
 			errors.fftStageEven = maxPixelError( readPixel( fftStage, 0, 0, resolution, resolution ), [ 2, 0, 0, 0 ] );
 			errors.fftStageOdd = maxPixelError( readPixel( fftStage, 1, 0, resolution, resolution ), [ 0, 0, 0, 0 ] );
 
-			await submitCompute( this.renderer, registerNode( [
-				createClearTextureNode( input, resolution, [ 2, 3, 0, 0 ], 'ocean:readback:assembly-field0' ),
-				createClearTextureNode( output, resolution, [ 4, 5, 0, 0 ], 'ocean:readback:assembly-field1' ),
-				createClearTextureNode( scratch, resolution, [ 6, 7, 0, 0 ], 'ocean:readback:assembly-field2' ),
-				createClearTextureNode( field3, resolution, [ - 0.1, - 0.2, 0, 0 ], 'ocean:readback:assembly-field3' ),
-				createClearTextureNode( previousFoam, resolution, [ 0, 0, 1, 1 ], 'ocean:readback:assembly-previous-foam' )
-			] ) );
+			await submitStages( [
+				createClearTextureNode( input, resolution, [ 2, 3, 0, 0 ], 'ocean_readback_assembly_field0' ),
+				createClearTextureNode( output, resolution, [ 4, 5, 0, 0 ], 'ocean_readback_assembly_field1' ),
+				createClearTextureNode( scratch, resolution, [ 6, 7, 0, 0 ], 'ocean_readback_assembly_field2' ),
+				createClearTextureNode( field3, resolution, [ - 0.1, - 0.2, 0, 0 ], 'ocean_readback_assembly_field3' ),
+				createClearTextureNode( previousFoam, resolution, [ 0, 0, 1, 1 ], 'ocean_readback_assembly_previous_foam' )
+			] );
 			const assemblyTargets = {
 				field0: input,
 				field1: output,
@@ -591,13 +601,13 @@ export class WebGPUFftOcean {
 					createDerivativesAssemblyNode( cascade, { field2: scratch, field3, derivatives } ),
 					createJacobianAssemblyNode( cascade, { field1: output, field3, crossJacobianFoam } )
 				];
-			await submitCompute( this.renderer, registerNode( assemblyFixtureNodes ) );
-			await submitCompute( this.renderer, registerNode( createFoamHistoryNode( cascade, {
+			await submitStages( assemblyFixtureNodes );
+			await submitStages( createFoamHistoryNode( cascade, {
 				crossJacobian: crossJacobianFoam,
 				previousFoam,
 				foamHistory,
 				dt: this.dtUniform
-			} ) ) );
+			} ) );
 			const assembled = await copyTextureToBuffer.call( this.renderer.backend, displacement, 0, 0, resolution, resolution, 0 );
 			const assembledDerivatives = await copyTextureToBuffer.call( this.renderer.backend, derivatives, 0, 0, resolution, resolution, 0 );
 			const assembledCross = await copyTextureToBuffer.call( this.renderer.backend, crossJacobianFoam, 0, 0, resolution, resolution, 0 );

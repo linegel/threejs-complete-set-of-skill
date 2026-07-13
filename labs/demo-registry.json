@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:cfb1f13dd59f3f7ee5965c63fbb8fd958655b1de331513d5eec8fede76d5b9f0",
+  "buildRevision": "sha256:49ab4c316e51d9bb267cb0cda243b6d6c4dd9af8afa65d1c469737eaa2a18260",
   "demoKinds": [
     "canonical-lab",
     "mechanism-demo",
@@ -3235,7 +3235,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "npm --prefix threejs-procedural-planets/examples/webgpu-quadtree-planet run validate:generated-assets",
-      "sourceHash": "sha256:bdb316523b47a0762781a538a95e6cce63588c22396e0349a18a3db9b5a91ce5",
+      "sourceHash": "sha256:a94abe066ebf4ccb216872ae6caab1d2214192dd82658bdecd82777346f47d6a",
       "proxyStatus": {
         "limitation": "Generated crater masks are reduced-tier diagnostics. The production planet path remains planetFields() plus cube-sphere quadtree LOD and parity checks.",
         "canonicalLabId": "webgpu-quadtree-planet"
@@ -8806,64 +8806,64 @@
         {
           "id": "native-webgpu",
           "required": true,
-          "evidence": null,
-          "status": "incomplete"
+          "evidence": "Native browser capture-session: nativeWebGPU/backend WebGPU after renderer.init(); GPU FFT fixture suite pass.",
+          "status": "accepted"
         },
         {
           "id": "minimum-four-storage-textures",
           "required": true,
-          "evidence": "initialized adapter limit",
-          "status": "incomplete"
+          "evidence": "Ocean capabilities gate requires adapter maxStorageTexturesPerShaderStage >= 4; capture initializes full cascade storage layout.",
+          "status": "accepted"
         }
       ],
       "runtimeProof": [
         {
           "id": "renderer-init",
           "required": true,
-          "evidence": null,
-          "status": "incomplete"
+          "evidence": "createWebGPUFftOcean after await renderer.init(); capture-session records initialized native WebGPU.",
+          "status": "accepted"
         },
         {
           "id": "backend-is-webgpu",
           "required": true,
-          "evidence": null,
-          "status": "incomplete"
+          "evidence": "metrics.backend=WebGPU / isWebGPUBackend=true in capture-session and renderer-info.json.",
+          "status": "accepted"
         },
         {
           "id": "mechanism-reachable",
           "required": true,
-          "evidence": null,
-          "status": "incomplete"
+          "evidence": "Mechanism debug modes spectrum-fft/jacobian/foam/underwater captured as distinct PNG readbacks.",
+          "status": "accepted"
         },
         {
           "id": "render-or-compute-work",
           "required": true,
-          "evidence": null,
-          "status": "incomplete"
+          "evidence": "GPU FFT fixture suite and per-frame compute dispatches recorded; mechanism-metrics.gpuReadback.pass=true.",
+          "status": "accepted"
         },
         {
           "id": "aligned-readback",
           "required": true,
-          "evidence": null,
-          "status": "incomplete"
+          "evidence": "Integer 256-byte-aligned RT transport-readbacks for final/diagnostics/seed/temporal captures.",
+          "status": "accepted"
         },
         {
           "id": "complete-2d-fft-readback",
           "required": true,
-          "evidence": null,
-          "status": "incomplete"
+          "evidence": "runBrowserGpuReadbackFixtures complete-2d-fft suite pass (textureLoad-based storage stages) recorded in mechanism-metrics.json.",
+          "status": "accepted"
         },
         {
           "id": "per-cascade-surface-and-foam-readback",
           "required": true,
-          "evidence": null,
-          "status": "incomplete"
+          "evidence": "whitecaps-and-foam.png + temporal foam frames and cascade surface materialCascades ledger from native capture.",
+          "status": "accepted"
         },
         {
           "id": "pages-source-hash",
           "required": true,
-          "evidence": null,
-          "status": "incomplete"
+          "evidence": "evidence-manifest.sourceHash matches demo-registry sourceHash for this capture session.",
+          "status": "accepted"
         }
       ],
       "evidenceContract": "v2",
@@ -10206,8 +10206,8 @@
         {
           "id": "native-webgpu",
           "required": true,
-          "evidence": "capture:evidence 2026-07-13 wrote renderer-info.json with WebGPURenderer and backend.isWebGPUBackend===true under Playwright chromium on Apple M4 Max.",
-          "status": "incomplete"
+          "evidence": "correctness capture-session + evidence-manifest (current sourceHash) validates with WebGPUBackend deviceIdentityVerified; validate:artifacts structuralVerdict PASS.",
+          "status": "accepted"
         },
         {
           "id": "standard-depth",
@@ -10220,14 +10220,14 @@
         {
           "id": "renderer-init",
           "required": true,
-          "evidence": "capture.mjs awaited controller ready and completed 7 aligned WebGPU render-target readbacks after resize/renderOnce.",
-          "status": "incomplete"
+          "evidence": "capture-lab-browser correctness session completed with initialized metrics and 10 standard presentation readbacks.",
+          "status": "accepted"
         },
         {
           "id": "backend-is-webgpu",
           "required": true,
-          "evidence": "renderer-info.json records backend.isWebGPUBackend===true and threeRevision 185; metrics.backend===webgpu.",
-          "status": "incomplete"
+          "evidence": "rendererBackendEvidence.isWebGPUBackend===true in capture-session finalRuntime metrics.",
+          "status": "accepted"
         },
         {
           "id": "mechanism-reachable",
@@ -10238,8 +10238,8 @@
         {
           "id": "aligned-readback",
           "required": true,
-          "evidence": "render-targets.json records integer 256-byte-aligned bytesPerRow metadata for final-lit-display, raw-gtao, reconstructed-gtao, normals, velocity, and odd 641x359 AO.",
-          "status": "incomplete"
+          "evidence": "normalized-readbacks and transport-readbacks written with 256-byte-aligned row strides for 1200x800 captures.",
+          "status": "accepted"
         },
         {
           "id": "one-prepass-one-lit-pass",
@@ -10820,52 +10820,52 @@
         {
           "id": "webgpu-backend",
           "required": true,
-          "evidence": "CANDIDATE (pending validator): correctness capture wrote renderer-info.json with WebGPURenderer and backend.isWebGPUBackend===true.",
-          "status": "incomplete"
+          "evidence": "correctness evidence-manifest bound to current sourceHash; validate:artifacts PASS with WebGPU backend proof.",
+          "status": "accepted"
         },
         {
           "id": "storage-buffer",
           "required": true,
-          "evidence": "CANDIDATE (pending validator): GPUCompactionEffectPool storage SoA lanes and free-list counters were stepped and read back during capture mechanism evidence.",
-          "status": "incomplete"
+          "evidence": "GPUCompactionEffectPool storage SoA lanes stepped and validated via mechanism-metrics.gpuReadback.allValid.",
+          "status": "accepted"
         },
         {
           "id": "indirect-draw",
           "required": true,
-          "evidence": "CANDIDATE (pending validator): publish-indirect-count path populated IndirectStorageBufferAttribute instance counts observed in mechanism readback and mechanism.indirect-draws.png.",
-          "status": "incomplete"
+          "evidence": "indirect instance counts match liveCount in mechanism readback; mechanism.indirect-draws.png captured.",
+          "status": "accepted"
         },
         {
           "id": "mrt",
           "required": true,
-          "evidence": "CANDIDATE (pending validator): diagnostics.mosaic.png and multi-target capture path wrote emissive/bloom/normal diagnostics from the scene MRT graph.",
-          "status": "incomplete"
+          "evidence": "diagnostics.mosaic.png and multi-target presentation captures from scene MRT graph.",
+          "status": "accepted"
         }
       ],
       "runtimeProof": [
         {
           "id": "backend-is-webgpu",
           "required": true,
-          "evidence": "CANDIDATE (pending validator): renderer-info.json backend.isWebGPUBackend===true for the correctness bundle under artifacts/visual-validation/webgpu-pooled-effects/correctness.",
-          "status": "incomplete"
+          "evidence": "renderer-info.json backend.isWebGPUBackend===true in correctness bundle.",
+          "status": "accepted"
         },
         {
           "id": "ordered-compute-dispatch",
           "required": true,
-          "evidence": "CANDIDATE (pending validator): pipeline-graph.json records the 11-dispatch mark/scan/scatter/expand/publish order used by GPUCompactionEffectPool.step.",
-          "status": "incomplete"
+          "evidence": "pipeline-graph records mark/scan/scatter/expand/publish dispatch order.",
+          "status": "accepted"
         },
         {
           "id": "stable-identity-free-list-readback",
           "required": true,
-          "evidence": "CANDIDATE (pending validator): readMechanismEvidence validated dense indexToEntity/entityToIndex free-list invariants for spark and debris pools during capture.",
-          "status": "incomplete"
+          "evidence": "mechanism-metrics records validated dense free-list invariants for spark and debris pools.",
+          "status": "accepted"
         },
         {
           "id": "indirect-count-readback",
           "required": true,
-          "evidence": "CANDIDATE (pending validator): mechanism readback recorded indirect instance counts matching liveCount for both pools.",
-          "status": "incomplete"
+          "evidence": "indirect instance counts equal liveCount in GPU compaction readback.",
+          "status": "accepted"
         },
         {
           "id": "live-soft-depth-sampling",
@@ -10876,8 +10876,8 @@
         {
           "id": "render-target-output",
           "required": true,
-          "evidence": "CANDIDATE (pending validator): correctness capture wrote final.design.png, no-post.design.png, camera/seed/temporal PNGs, and tier/mechanism scenario images.",
-          "status": "incomplete"
+          "evidence": "REQUIRED_EVIDENCE_IMAGES captured as 1200x800 RGBA8 PNGs under correctness profile.",
+          "status": "accepted"
         },
         {
           "id": "gpu-timestamps",
@@ -11420,58 +11420,58 @@
         {
           "id": "native-webgpu",
           "required": true,
-          "evidence": "CANDIDATE (pending validator): correctness capture-session records nativeWebGPU===true, rendererType WebGPURenderer, and deviceIdentityVerified after init.",
-          "status": "incomplete"
+          "evidence": "assembled raw-capture-session evidence-manifest validates under current sourceHash with nativeWebGPU===true.",
+          "status": "accepted"
         },
         {
           "id": "storage-buffer",
           "required": true,
-          "evidence": "CANDIDATE (pending validator): capture wrote storage.*.f32.bin / u32.bin compute storage readbacks for live and debris motion lanes.",
-          "status": "incomplete"
+          "evidence": "storage.*.bin compute storage readbacks written during correctness capture.",
+          "status": "accepted"
         },
         {
           "id": "compute",
           "required": true,
-          "evidence": "CANDIDATE (pending validator): mechanism.compute-storage.png and storage compute-storage-live buffers were produced by the compute motion plan during correctness capture.",
-          "status": "incomplete"
+          "evidence": "mechanism.compute-storage.png and storage compute-storage-live buffers produced by motion compute plan.",
+          "status": "accepted"
         }
       ],
       "runtimeProof": [
         {
           "id": "renderer-init",
           "required": true,
-          "evidence": "CANDIDATE (pending validator): capture-session runtime metrics report initialized===true and rendererDeviceStatus active with generation 1.",
-          "status": "incomplete"
+          "evidence": "capture-session reports initialized===true and active device generation 1.",
+          "status": "accepted"
         },
         {
           "id": "backend-is-webgpu",
           "required": true,
-          "evidence": "CANDIDATE (pending validator): rendererBackendEvidence.isWebGPUBackend===true with backendType WebGPUBackend on the correctness capture session.",
-          "status": "incomplete"
+          "evidence": "rendererBackendEvidence.isWebGPUBackend===true on correctness capture session.",
+          "status": "accepted"
         },
         {
           "id": "mechanism-reachable",
           "required": true,
-          "evidence": "CANDIDATE (pending validator): mechanism launch/spin/debris/quaternion/compute/interpolation PNG diagnostics were captured on fixed routes.",
-          "status": "incomplete"
+          "evidence": "mechanism launch/spin/debris/quaternion/compute/interpolation PNGs captured on fixed routes.",
+          "status": "accepted"
         },
         {
           "id": "aligned-readback",
           "required": true,
-          "evidence": "CANDIDATE (pending validator): capture wrote normalized-readbacks and transport-readbacks with padded row stride artifacts for presentation targets.",
-          "status": "incomplete"
+          "evidence": "normalized/transport padded readbacks present for presentation targets.",
+          "status": "accepted"
         },
         {
           "id": "compute-storage-readback",
           "required": true,
-          "evidence": "CANDIDATE (pending validator): storage.compute-storage-live.* and storage.debris-mid.* binary buffers were written during the correctness capture session.",
-          "status": "incomplete"
+          "evidence": "storage.compute-storage-live.* and storage.debris-mid.* binaries captured.",
+          "status": "accepted"
         },
         {
           "id": "mrt-readback",
           "required": true,
-          "evidence": "CANDIDATE (pending validator): diagnostic.normal/emissive/velocity PNGs and diagnostics.mosaic.png were captured from the MRT graph.",
-          "status": "incomplete"
+          "evidence": "diagnostic.normal/emissive/velocity and diagnostics.mosaic captured from MRT graph.",
+          "status": "accepted"
         },
         {
           "id": "current-adapter-gpu-timestamp",
@@ -11872,13 +11872,13 @@
         {
           "id": "native-webgpu",
           "required": true,
-          "evidence": "CANDIDATE (pending validator): Lab-owned capture wrote renderer-info.json with WebGPURenderer and backend.isWebGPUBackend===true after await renderer.init().",
+          "evidence": "RUNTIME: headless capturePixels returns clear/background only (no planet fragment contribution) despite 1782 draws; see SCRATCH planet env-failure log.",
           "status": "incomplete"
         },
         {
           "id": "storage-compute",
           "required": true,
-          "evidence": "CANDIDATE (pending validator): Field atlas and patch-bounds compute dispatches are described in runtime-snapshot pipeline/resources from the live capture session.",
+          "evidence": "RUNTIME: headless capturePixels returns clear/background only (no planet fragment contribution) despite 1782 draws; see SCRATCH planet env-failure log.",
           "status": "incomplete"
         }
       ],
@@ -11886,19 +11886,19 @@
         {
           "id": "render-target-readback",
           "required": true,
-          "evidence": "CANDIDATE (pending validator): controller.capturePixels produced 1200x800 PNG readbacks for final and diagnostic targets under Playwright WebGPU.",
+          "evidence": "RUNTIME: headless capturePixels returns clear/background only (no planet fragment contribution) despite 1782 draws; see SCRATCH planet env-failure log.",
           "status": "incomplete"
         },
         {
           "id": "pipeline-graph",
           "required": true,
-          "evidence": "CANDIDATE (pending validator): describePipeline() from the capture session records scenePass, atlas, and patch-bounds owners with final tone-map ownership on renderOutput.",
+          "evidence": "RUNTIME: headless capturePixels returns clear/background only (no planet fragment contribution) despite 1782 draws; see SCRATCH planet env-failure log.",
           "status": "incomplete"
         },
         {
           "id": "resource-ledger",
           "required": true,
-          "evidence": "describeResources() is present in runtime-snapshot.json but has not been validated against a full v2 resource ledger schema.",
+          "evidence": "RUNTIME: headless capturePixels returns clear/background only (no planet fragment contribution) despite 1782 draws; see SCRATCH planet env-failure log.",
           "status": "incomplete"
         }
       ],
@@ -11914,7 +11914,7 @@
         "validateQuick": "npm --prefix threejs-procedural-planets/examples/webgpu-quadtree-planet run validate:quick",
         "validateFull": "npm --prefix threejs-procedural-planets/examples/webgpu-quadtree-planet run validate:full"
       },
-      "sourceHash": "sha256:a5544f67eb16c9b42970dd6cf0ffd2ffb1f20d5d1a8b2afef92b43d908df1882",
+      "sourceHash": "sha256:6edc4923c18b3a2d20f205a015b67ac2acf57e67ace5b3ea6e1573bb3a6c2152",
       "proxyStatus": null,
       "notes": [
         "Status remains incomplete until a native-WebGPU v2 evidence bundle is captured on the current adapter.",

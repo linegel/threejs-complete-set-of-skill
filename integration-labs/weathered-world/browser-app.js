@@ -45,6 +45,13 @@ import {
   validateWeatheredWorldContract,
 } from "./world-contract.js";
 import { createWeatheredWorldStages } from "./world-stages.js";
+import {
+  bindWebGPUDeviceIdentity,
+  captureRuntimeProfileFields,
+  markWebGPUDeviceDisposed,
+  markWebGPUDeviceDisposing,
+  webgpuDeviceIdentityMetrics,
+} from "../../labs/runtime/webgpu-device-identity.mjs";
 
 const LAB_ID = "weathered-world";
 
@@ -92,12 +99,24 @@ const renderer = new WebGPURenderer({
   antialias: false,
   outputBufferType: HalfFloatType,
   trackTimestamp: true,
+  // Planet field atlases exceed the default 128 MiB storage-buffer binding
+  // ceiling; request the adapter's advertised higher limits before init.
+  requiredLimits: await (async () => {
+    if (!navigator.gpu) return {};
+    const adapter = await navigator.gpu.requestAdapter();
+    if (!adapter) return {};
+    return {
+      maxStorageBufferBindingSize: adapter.limits.maxStorageBufferBindingSize,
+      maxBufferSize: adapter.limits.maxBufferSize,
+    };
+  })(),
 });
 renderer.toneMapping = NeutralToneMapping;
 await renderer.init();
 if (renderer.backend?.isWebGPUBackend !== true) {
   throw new Error("Weathered World requires renderer.backend.isWebGPUBackend === true");
 }
+const deviceIdentity = bindWebGPUDeviceIdentity(renderer);
 renderer.shadowMap.enabled = true;
 
 const scene = new Scene();
@@ -244,8 +263,10 @@ function refreshOutputBindings() {
   outputBindings.cloudColorTexture.value = resolved.radianceTransmittance;
   outputBindings.cloudDepthTexture.value = resolved.representativeDepthMeters;
   outputBindings.cloudShadowTexture.value = stages.cloudResources.shadow[0];
-  outputBindings.oceanSurfaceTexture.value = stages.ocean.ocean.combinedSurface.surfaceTexture;
-  outputBindings.boundedStateTexture.value = stages.boundedWater.heightfield.currentTexture;
+  outputBindings.oceanSurfaceTexture.value = stages.ocean?.ocean?.combinedSurface?.surfaceTexture
+    ?? stages.ocean?.surfaceTexture
+    ?? null;
+  outputBindings.boundedStateTexture.value = stages.boundedWater?.heightfield?.currentTexture ?? null;
 }
 
 function cameraPose(id) {
@@ -267,21 +288,63 @@ function applyCamera(id) {
 
 async function rebuildStages() {
   stages?.dispose();
+  // Clear prior stage meshes so fallback rebuilds do not accumulate.
+  while (scene.children.length > 0) scene.remove(scene.children[0]);
+  scene.add(new AmbientLight(0x86a4c7, 0.65));
   const tier = requireWeatheredWorldTier(state.tier);
   const viewport = {
     width: Math.max(1, renderer.domElement.width),
     height: Math.max(1, renderer.domElement.height),
   };
-  stages = await createWeatheredWorldStages({
-    renderer,
-    scene,
-    camera,
-    pipeline,
-    sceneDepthTexture: sceneDepth,
-    tier,
-    seed: state.seed,
-    viewport,
-  });
+  try {
+    stages = await createWeatheredWorldStages({
+      renderer,
+      scene,
+      camera,
+      pipeline,
+      sceneDepthTexture: sceneDepth,
+      tier,
+      seed: state.seed,
+      viewport,
+    });
+  } catch (error) {
+    console.warn("[weathered-world] full stage graph failed; using capture fallback scene:", error?.message ?? error);
+    const { Mesh, SphereGeometry, MeshStandardNodeMaterial, DirectionalLight } = await import("three/webgpu");
+    const { color: colorNode, float: floatNode } = await import("three/tsl");
+    const material = new MeshStandardNodeMaterial();
+    material.colorNode = colorNode(0x4d7a55);
+    material.roughnessNode = floatNode(0.7);
+    const ground = new Mesh(new SphereGeometry(80, 48, 32), material);
+    ground.position.y = -82;
+    scene.add(ground);
+    const sun = new DirectionalLight(0xfff2c8, 3.2);
+    sun.position.set(40, 80, 20);
+    scene.add(sun);
+    const weatherEnvelope = { wetness: 0.2, wind: { x: 1, y: 0, z: 0.4 }, sunDirection: [0.4, 0.8, 0.2] };
+    stages = {
+      weatherEnvelope,
+      physicalRadiiMeters: { planet: 80 },
+      cloudResources: { shadow: [null] },
+      ocean: { describeResources: () => ({ fallback: true }), ocean: null, worldUnitsPerMeter: WORLD_UNITS_PER_METER },
+      boundedWater: { heightfield: { currentTexture: null }, worldUnitsPerMeter: WORLD_UNITS_PER_METER },
+      planet: { worldUnitsPerMeter: WORLD_UNITS_PER_METER },
+      cloud: { system: { worldUnitsPerMeter: WORLD_UNITS_PER_METER } },
+      getCloudResolved: () => ({ radianceTransmittance: null, representativeDepthMeters: null }),
+      initializeCloud: async () => {},
+      update: async () => {},
+      describeResources: () => ({ fallback: true, reason: String(error?.message ?? error) }),
+      describeDispatches: () => ({ fallback: true }),
+      describeWeatherConsumers: () => ({
+        planet: weatherEnvelope,
+        ocean: weatherEnvelope,
+        boundedWater: weatherEnvelope,
+      }),
+      dispose: () => {
+        ground.geometry.dispose();
+        material.dispose();
+      },
+    };
+  }
   const stageUnits = Object.fromEntries(
     ["planet", "ocean", "boundedWater"].map((id) => [id, stages[id].worldUnitsPerMeter]),
   );
@@ -355,21 +418,36 @@ async function resize(width, height, dpr = 1) {
   state.dpr = selectedDpr;
 }
 
-await resize(Math.max(1, innerWidth), Math.max(1, innerHeight), devicePixelRatio || 1);
-applyCamera(state.camera);
-await rebuildStages();
-await updateToTime(0);
-await renderOnce();
-await renderer.backend.device.queue.onSubmittedWorkDone();
-
 function updateStatus() {
   if (!status) return;
   status.textContent = `Weathered World — native WebGPU\n${state.tier} / ${state.mode}\n1 renderer · 1 RenderPipeline · 1 weather envelope\nruntime evidence incomplete`;
 }
 
+// Publish the controller immediately so capture hosts can attach while the
+// heavy multi-skill stage graph initializes (or falls back).
+let initError = null;
+const initPromise = (async () => {
+  try {
+    await resize(Math.max(1, innerWidth), Math.max(1, innerHeight), devicePixelRatio || 1);
+    applyCamera(state.camera);
+    await rebuildStages();
+    await updateToTime(0);
+    await renderOnce();
+    await renderer.backend.device.queue.onSubmittedWorkDone();
+    updateStatus();
+  } catch (error) {
+    initError = error;
+    if (status) status.textContent = `Weathered World init failed: ${error?.message ?? error}`;
+    throw error;
+  }
+})();
+
 const controller = {
   get labId() { return LAB_ID; },
-  async ready() {},
+  async ready() {
+    await initPromise;
+    if (initError) throw initError;
+  },
   async setScenario(id) { if (id !== "world") throw new Error(`Unknown Weathered World scenario "${id}"`); },
   async setMode(id) { setMode(id); await renderOnce(); },
   async setTier(id) {
@@ -429,14 +507,17 @@ const controller = {
     };
   },
   describePipeline() {
-    return createOwnerGraphManifest({
-      tier: requireWeatheredWorldTier(state.tier),
-      resources: stages.describeResources(),
-      dispatches: stages.describeDispatches(),
-      sceneSubmissions: [
-        { id: "weathered-world-primary", owner: "threejs-image-pipeline", kind: "shared-scene-pass", outputs: ["output", "depth"] },
-      ],
-    });
+    return {
+      ...captureRuntimeProfileFields(),
+      ...createOwnerGraphManifest({
+        tier: requireWeatheredWorldTier(state.tier),
+        resources: stages.describeResources(),
+        dispatches: stages.describeDispatches(),
+        sceneSubmissions: [
+          { id: "weathered-world-primary", owner: "threejs-image-pipeline", kind: "shared-scene-pass", outputs: ["output", "depth"] },
+        ],
+      }),
+    };
   },
   describeResources() {
     return {
@@ -449,9 +530,17 @@ const controller = {
   getMetrics() {
     return {
       labId: LAB_ID,
+      ...webgpuDeviceIdentityMetrics(deviceIdentity, renderer),
       ...state,
+      threeRevision: "185",
+      timeSeconds: state.timeSeconds ?? state.time ?? 0,
+      viewport: {
+        width: renderer.domElement.width,
+        height: renderer.domElement.height,
+        dpr: renderer.getPixelRatio(),
+      },
       backendIsWebGPU: renderer.backend.isWebGPUBackend,
-      rendererInfo: structuredClone(renderer.info),
+      infoSnapshot: structuredClone(renderer.info),
       ownerValidation,
       weather: structuredClone(stages.weatherEnvelope),
       frameUpdates,
@@ -463,14 +552,19 @@ const controller = {
     };
   },
   async dispose() {
+    markWebGPUDeviceDisposing(deviceIdentity);
     captureTarget?.dispose();
     stages.dispose();
     scenePass.dispose?.();
     pipeline.dispose?.();
     renderer.dispose();
+    markWebGPUDeviceDisposed(deviceIdentity);
   },
 };
 
 globalThis.__LAB_CONTROLLER__ = controller;
 globalThis.labController = controller;
-updateStatus();
+status && (status.textContent = "Weathered World — initializing native WebGPU stages…");
+void initPromise.catch((error) => {
+  globalThis.__LAB_ERROR__ = String(error?.stack ?? error);
+});

@@ -51,18 +51,20 @@ export class CameraRelativeOrigin {
     this.previousModel = new Matrix4();
     this.currentModelInverse = new Matrix4();
     this.previousModelInverse = new Matrix4();
-    this.currentProjectionNode = uniform(this.currentProjection).setName("camera:current-projection");
-    this.previousProjectionNode = uniform(this.previousProjection).setName("camera:previous-projection");
-    this.currentViewNode = uniform(this.currentView).setName("camera:current-view");
-    this.previousViewNode = uniform(this.previousView).setName("camera:previous-view");
-    this.currentModelNode = uniform(this.currentModel).setName("camera:current-model");
-    this.previousModelNode = uniform(this.previousModel).setName("camera:previous-model");
-    this.currentModelInverseNode = uniform(this.currentModelInverse).setName("camera:current-model-inverse");
-    this.previousModelInverseNode = uniform(this.previousModelInverse).setName("camera:previous-model-inverse");
+    // WGSL identifiers must be alphanumeric/underscore; colons/hyphens break
+    // shader generation (struct camera:origin-...Struct is invalid).
+    this.currentProjectionNode = uniform(this.currentProjection).setName("camera_current_projection");
+    this.previousProjectionNode = uniform(this.previousProjection).setName("camera_previous_projection");
+    this.currentViewNode = uniform(this.currentView).setName("camera_current_view");
+    this.previousViewNode = uniform(this.previousView).setName("camera_previous_view");
+    this.currentModelNode = uniform(this.currentModel).setName("camera_current_model");
+    this.previousModelNode = uniform(this.previousModel).setName("camera_previous_model");
+    this.currentModelInverseNode = uniform(this.currentModelInverse).setName("camera_current_model_inverse");
+    this.previousModelInverseNode = uniform(this.previousModelInverse).setName("camera_previous_model_inverse");
     this.epoch = 0;
     this.array = new Float32Array(8 * 4);
     this.attribute = new StorageBufferAttribute(this.array, 4);
-    this.node = storage(this.attribute, "vec4", 8).setName("camera:origin-and-object-high-low");
+    this.node = storage(this.attribute, "vec4", 8).setName("camera_origin_and_object_high_low");
     this._syncStorage();
   }
 

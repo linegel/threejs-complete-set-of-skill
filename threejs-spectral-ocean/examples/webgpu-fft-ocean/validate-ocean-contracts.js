@@ -161,8 +161,8 @@ const afterPartialGpu = ocean.validate( { resolution: 8 } );
 assert( afterPartialGpu.pass === null && afterPartialGpu.accepted === false, 'Partial kernel smoke/readback must not promote the scaffold to accepted.' );
 assert( afterPartialGpu.gpuReadback.scope === 'complete-2d-fft-suite-defined-not-executed', 'Unexecuted GPU readback must name the complete pending suite.' );
 const dispatchGraph = ocean.describeDispatches();
-assert( dispatchGraph.frameNodes.some( ( name ) => name.includes( 'ocean:fft:stage-' ) ), 'Runtime graph must expose actual FFT stages.' );
-assert( dispatchGraph.frameNodes.some( ( name ) => name.includes( 'ocean:foam-history:cascade-' ) ), 'Runtime graph must expose native per-cascade foam history.' );
+assert( dispatchGraph.frameNodes.some( ( name ) => name.includes( 'ocean_fft_stage_' ) ), 'Runtime graph must expose actual FFT stages.' );
+assert( dispatchGraph.frameNodes.some( ( name ) => name.includes( 'ocean_foam_history_cascade_' ) ), 'Runtime graph must expose native per-cascade foam history.' );
 assert( dispatchGraph.compiledLayoutGate.status === 'all-selected-runtime-layouts-submitted-to-webgpu-compiler', 'Every selected compute layout must reach an initialized WebGPU submission gate.' );
 const resourceLedger = ocean.describeResources();
 assert( resourceLedger.textures.length === countOceanStorageTextures( ocean.config ), 'Runtime storage ledger must reconcile with the configured texture count.' );
@@ -229,7 +229,7 @@ assert( ! computeSource.includes( 'derivativeNyquistMask' ), 'Blanket derivative
 assert( computeSource.includes( 'equilibrium.add' ) && computeSource.includes( 'reactionRate.mul( dt ).negate()' ), 'Foam reaction must be timestep-correct and bounded.' );
 assert( computeSource.includes( 'createFftFixtureNode' ) && computeSource.includes( "'hermitian-cosines'" ), 'GPU readback fixtures must cover a complete 2D transform and both packed complex lanes.' );
 assert( ! computeSource.includes( 'createCombinedSurfaceAssemblyNode' ) && ! computeSource.includes( 'createFilteredFoamSourceNode' ), 'An undersampled shared world atlas must not re-enter the canonical graph.' );
-assert( computeSource.includes( 'createFoamHistoryNode' ) && computeSource.includes( 'ocean:foam-history:cascade-' ), 'Every cascade must retain an independently dispatchable Lagrangian foam history.' );
+assert( computeSource.includes( 'createFoamHistoryNode' ) && computeSource.includes( 'ocean_foam_history_cascade_' ), 'Every cascade must retain an independently dispatchable Lagrangian foam history.' );
 
 const nodeSource = sources[ 'ocean-nodes.js' ];
 assert( nodeSource.includes( 'combinedJacobian = tangentA.mul( tangentC ).sub( tangentB.mul( tangentB ) )' ), 'Material must form the combined-cascade determinant after summing linear fields.' );

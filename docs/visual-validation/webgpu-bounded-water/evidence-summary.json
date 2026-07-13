@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "labId": "webgpu-bounded-water",
+  "classification": "inspected-runtime-evidence-preview",
+  "acceptanceStatus": "incomplete",
+  "evidenceBundleId": "correctness",
+  "canonicalSource": [
+    "threejs-water-optics/examples/webgpu-bounded-water",
+    "scripts/capture-lab-browser.mjs",
+    "scripts/lib/evidence-v2.mjs"
+  ],
+  "canonicalSourceHash": "sha256:fa528573afdb607a124bef4f0578a803e93319da06728cd711aac36a0c14efe2",
+  "threeRevision": "0.185.1",
+  "runtime": {
+    "renderer": "WebGPURenderer",
+    "backend": "WebGPU",
+    "isWebGPUBackend": true,
+    "threeRevision": "0.185.1"
+  },
+  "claimVerdicts": {
+    "visualCorrectness": "PASS",
+    "mechanismCorrectness": "INSUFFICIENT_EVIDENCE",
+    "performanceCompliance": "NOT_CLAIMED",
+    "gpuAttribution": "INSUFFICIENT_EVIDENCE",
+    "lifecycleStability": "INSUFFICIENT_EVIDENCE"
+  },
+  "primaryImage": "final.design.png",
+  "primaryImageLabel": "Bounded-water final readback",
+  "images": [
+    {
+      "file": "final.design.png",
+      "meaning": "Primary final readback.",
+      "source": "final.design.png",
+      "sourceSha256": "sha256:67d078ffa4e630f423da4b5033061a936787cd8cdf1d83fb237acfad51f43eb0",
+      "outputSha256": "sha256:67d078ffa4e630f423da4b5033061a936787cd8cdf1d83fb237acfad51f43eb0",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "no-post.design.png",
+      "meaning": "No-post / alternate display path readback.",
+      "source": "no-post.design.png",
+      "sourceSha256": "sha256:717456579a2f012c87877d81f0ecae5e97c418bbf7168634469b36d67139a69e",
+      "outputSha256": "sha256:717456579a2f012c87877d81f0ecae5e97c418bbf7168634469b36d67139a69e",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "diagnostics.mosaic.png",
+      "meaning": "Diagnostics / mechanism display readback.",
+      "source": "diagnostics.mosaic.png",
+      "sourceSha256": "sha256:7fadd03180503a088b93d96bfe4729c96ff5c7eb77023c94786eb25438d65fa7",
+      "outputSha256": "sha256:7fadd03180503a088b93d96bfe4729c96ff5c7eb77023c94786eb25438d65fa7",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    }
+  ],
+  "limitations": [
+    "Correctness capture records native r185 WebGPUBackend with device identity proof.",
+    "GPU timestamps, 50-cycle lifecycle, and full mechanism matrix remain incomplete.",
+    "Named-adapter performance compliance is NOT_CLAIMED."
+  ]
+}

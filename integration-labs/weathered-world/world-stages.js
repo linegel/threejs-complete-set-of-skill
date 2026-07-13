@@ -170,8 +170,12 @@ export async function createWeatheredWorldStages({ renderer, scene, camera, pipe
   const planetAtmosphereTopMeters =
     planet.mesh.userData.config.preset.atmosphereOuterRadiusKm * 1000;
   const localTerrainAmplitudeMeters = 6;
-  planet.mesh.material.userData.planetUniforms.amplitude.value =
-    localTerrainAmplitudeMeters * WORLD_UNITS_PER_METER;
+  const planetUniforms = planet.mesh.userData.primaryMaterial?.userData?.planetUniforms
+    ?? planet.mesh.material?.userData?.planetUniforms;
+  if (!planetUniforms?.amplitude) {
+    throw new Error("Planet adapter did not expose planetUniforms.amplitude on the primary material");
+  }
+  planetUniforms.amplitude.value = localTerrainAmplitudeMeters * WORLD_UNITS_PER_METER;
   planet.mesh.userData.integrationTerrainAmplitudeMeters = localTerrainAmplitudeMeters;
   planet.mesh.position.y = -planetRadiusWorld;
   // Vertex-node displacement expands the unit cube-sphere to planetary scale;
@@ -301,13 +305,34 @@ export async function createWeatheredWorldStages({ renderer, scene, camera, pipe
     });
     cloudFrameIndex += 1;
   }
-  const ocean = await createSpectralOceanStage({
-    renderer,
+  // Spectral FFT material currently hits a cyclic TSL getCacheKey recursion on
+  // this Chrome/Metal adapter after integer storage-load rewrites. Keep the
+  // integration lab bootable for correctness capture with a stable plane in the
+  // unbounded-ocean slot; restore createSpectralOceanStage when FFT is green.
+  const { Mesh, PlaneGeometry, MeshStandardNodeMaterial } = await import("three/webgpu");
+  const { color: colorNode, float: floatNode } = await import("three/tsl");
+  const fallbackMaterial = new MeshStandardNodeMaterial();
+  fallbackMaterial.colorNode = colorNode(0x1a4d6e);
+  fallbackMaterial.roughnessNode = floatNode(0.18);
+  fallbackMaterial.metalnessNode = floatNode(0.05);
+  const fallbackMesh = new Mesh(new PlaneGeometry(420, 420, 1, 1), fallbackMaterial);
+  fallbackMesh.rotation.x = -Math.PI / 2;
+  const ocean = {
+    mesh: fallbackMesh,
     weatherState: weather,
-    quality: tier.ocean,
-    seed,
-    meshOptions: { sizeMeters: 420, segments: tier.id === "budgeted" ? 160 : 256 },
-  });
+    worldUnitsPerMeter: WORLD_UNITS_PER_METER,
+    ocean: null,
+    update: async () => {},
+    describeResources: () => ({
+      fallback: true,
+      reason: "spectral FFT deferred: TSL cache-key cycle on current adapter",
+    }),
+    describeDispatches: () => ({ fallback: true }),
+    dispose: () => {
+      fallbackMesh.geometry.dispose();
+      fallbackMaterial.dispose();
+    },
+  };
   ocean.worldUnitsPerMeter = WORLD_UNITS_PER_METER;
   ocean.mesh.position.y = -4.5;
   ocean.mesh.receiveShadow = true;

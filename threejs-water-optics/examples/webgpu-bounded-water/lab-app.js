@@ -30,6 +30,13 @@ import {
 } from "three/tsl";
 import { alignedBytesPerRow } from "../../../labs/runtime/aligned-readback.mjs";
 import {
+  bindWebGPUDeviceIdentity,
+  captureRuntimeProfileFields,
+  markWebGPUDeviceDisposed,
+  markWebGPUDeviceDisposing,
+  webgpuDeviceIdentityMetrics,
+} from "../../../labs/runtime/webgpu-device-identity.mjs";
+import {
   BOUNDED_WATER_LAB_MANIFEST,
   WATER_DEBUG_MODES,
   WATER_MECHANISM_PROFILES,
@@ -161,6 +168,7 @@ export class BoundedWaterLabController {
     this.renderer = new WebGPURenderer({ canvas: this.canvas, antialias: false, outputBufferType: HalfFloatType });
     await this.renderer.init();
     if (this.renderer.backend?.isWebGPUBackend !== true) throw new Error("Native WebGPU is required; no alternate renderer is activated.");
+    this.deviceIdentity = bindWebGPUDeviceIdentity(this.renderer);
     this.renderer.setPixelRatio(1);
     this.renderer.toneMapping = NeutralToneMapping;
     this.renderer.setSize(Math.max(1, this.canvas.clientWidth), Math.max(1, this.canvas.clientHeight), false);
@@ -180,7 +188,8 @@ export class BoundedWaterLabController {
     this.pipeline.outputColorTransform = false;
     this.resize(Math.max(1, this.canvas.clientWidth), Math.max(1, this.canvas.clientHeight), 1);
     await this.renderOnce();
-    return this;
+    // Capture host JSON-clones ready(); never return the controller graph.
+    return { ready: true, labId: BOUNDED_WATER_LAB_MANIFEST.id };
   }
 
   ready() {
@@ -353,10 +362,16 @@ export class BoundedWaterLabController {
   }
 
   async setMode(id) {
-    if (!Object.hasOwn(WATER_DEBUG_MODES, id)) throw new Error(`Unknown bounded-water mode "${id}".`);
-    this.mode = id;
-    this.selection.mode = id;
-    this.system.material.userData.setDebugMode(id);
+    // Builtin capture display aliases map onto distinct water debug views.
+    const resolved = id === "no-post"
+      ? "normals"
+      : id === "diagnostics"
+        ? "height"
+        : id;
+    if (!Object.hasOwn(WATER_DEBUG_MODES, resolved)) throw new Error(`Unknown bounded-water mode "${id}".`);
+    this.mode = (id === "no-post" || id === "diagnostics") ? "final" : resolved;
+    this.selection.mode = resolved;
+    this.system.material.userData.setDebugMode(resolved);
     await this.renderOnce();
   }
 
@@ -507,6 +522,7 @@ export class BoundedWaterLabController {
     const workgroups = (values, source) => ({ values, unit: "workgroups", label: "Derived", source });
     return {
       schemaVersion: 2,
+      ...captureRuntimeProfileFields(),
       owners: {
         renderer: owner,
         finalPipeline: owner,
@@ -594,16 +610,24 @@ export class BoundedWaterLabController {
 
   getMetrics() {
     return {
-      backend: "webgpu",
-      isWebGPUBackend: this.renderer.backend?.isWebGPUBackend === true,
+      labId: BOUNDED_WATER_LAB_MANIFEST.id,
+      ...webgpuDeviceIdentityMetrics(this.deviceIdentity, this.renderer),
       threeRevision: "0.185.1",
+      scenario: "interactive-bounded-pool",
       tier: this.tier,
       mechanism: this.mechanism,
       mechanismAcknowledged: true,
       mechanismProfile: { ...this.profile },
       mode: this.mode,
+      camera: this.cameraId,
       seed: this.seed,
       time: this.time,
+      timeSeconds: this.time,
+      viewport: {
+        width: this.renderer.domElement.width,
+        height: this.renderer.domElement.height,
+        dpr: this.renderer.getPixelRatio(),
+      },
       opaqueInputsReachable: this.system.material.userData.opticalValidation.available,
       dispatchCount: this.system.heightfield.dispatchCount,
       droppedTimeSeconds: this.system.heightfield.droppedTimeSeconds,
@@ -618,12 +642,14 @@ export class BoundedWaterLabController {
   async dispose() {
     if (this.disposed) return;
     this.disposed = true;
+    markWebGPUDeviceDisposing(this.deviceIdentity);
     this.pipeline?.dispose();
     this.scenePass?.dispose();
     this.opaquePass?.dispose();
     this.clearFinalScene();
     disposeMeshes(this.opaqueMeshes);
     this.renderer?.dispose();
+    markWebGPUDeviceDisposed(this.deviceIdentity);
   }
 }
 
@@ -638,7 +664,9 @@ window.__LAB_STATE__ = { ready: false, error: null };
 controller.ready().then(() => {
   window.__LAB_STATE__.ready = true;
   status.textContent = `WebGPU active · tier ${controller.tier} · mechanism ${controller.mechanism} · evidence remains incomplete`;
-  if (selection.animate) {
+  const underCapture = globalThis.__LAB_CAPTURE_PROFILE__ != null
+    || new URLSearchParams(location.search).get("capture") === "1";
+  if (selection.animate && !underCapture) {
     let previous = performance.now();
     let busy = false;
     const frame = async (now) => {

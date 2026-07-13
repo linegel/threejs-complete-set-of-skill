@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "labId": "webgpu-camera-rig",
+  "classification": "inspected-runtime-evidence-preview",
+  "acceptanceStatus": "incomplete",
+  "evidenceBundleId": "correctness",
+  "canonicalSource": [
+    "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/CameraDirectionController.mjs",
+    "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/CameraRelativeOrigin.mjs",
+    "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/routeState.mjs",
+    "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/main.mjs",
+    "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/browser.mjs",
+    "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/index.html",
+    "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/mechanism/scale-aware-framing/index.html",
+    "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/mechanism/handoff-and-replay/index.html",
+    "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/mechanism/pointer-orbit-and-collision/index.html",
+    "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/mechanism/floating-origin/index.html",
+    "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/mechanism/projection-and-depth/index.html",
+    "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/mechanism/shared-jitter-and-velocity/index.html",
+    "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/tier/full/index.html",
+    "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/tier/budgeted/index.html",
+    "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/tier/minimum/index.html"
+  ],
+  "canonicalSourceHash": "sha256:28e26085a6ee74008be35c435dcfa22faf9edc39914ee08da147380332807275",
+  "threeRevision": "0.185.1",
+  "runtime": {
+    "renderer": "WebGPURenderer",
+    "backend": "WebGPU",
+    "isWebGPUBackend": true,
+    "threeRevision": "0.185.1"
+  },
+  "claimVerdicts": {
+    "visualCorrectness": "PASS",
+    "mechanismCorrectness": "INSUFFICIENT_EVIDENCE",
+    "performanceCompliance": "NOT_CLAIMED",
+    "gpuAttribution": "INSUFFICIENT_EVIDENCE",
+    "lifecycleStability": "INSUFFICIENT_EVIDENCE"
+  },
+  "primaryImage": "final.design.png",
+  "primaryImageLabel": "Camera-rig presentation readback",
+  "images": [
+    {
+      "file": "final.design.png",
+      "meaning": "Primary final readback.",
+      "source": "final.design.png",
+      "sourceSha256": "sha256:81c0e2ff26eeb2a8df7d94643100e5a083c525cad5ccf08a24fbd70633b20a94",
+      "outputSha256": "sha256:81c0e2ff26eeb2a8df7d94643100e5a083c525cad5ccf08a24fbd70633b20a94",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "no-post.design.png",
+      "meaning": "No-post / alternate display path readback.",
+      "source": "no-post.design.png",
+      "sourceSha256": "sha256:4f5b2d3c49e03828aae5fec0d999514858ec3c7b84c8c787781b6146edf8a39b",
+      "outputSha256": "sha256:4f5b2d3c49e03828aae5fec0d999514858ec3c7b84c8c787781b6146edf8a39b",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "diagnostics.mosaic.png",
+      "meaning": "Diagnostics / mechanism display readback.",
+      "source": "diagnostics.mosaic.png",
+      "sourceSha256": "sha256:fb57544e5a65619372d33cc043c28a7225e9c9f6b8152e3bbe0e11c2fba4f2b1",
+      "outputSha256": "sha256:fb57544e5a65619372d33cc043c28a7225e9c9f6b8152e3bbe0e11c2fba4f2b1",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    }
+  ],
+  "limitations": [
+    "Correctness capture records native r185 WebGPUBackend with device identity proof.",
+    "Named-adapter GPU timestamps and 60 Hz hardwarePerformance remain NOT_CLAIMED.",
+    "Mechanism and tier routes beyond the primary correctness capture remain incomplete."
+  ]
+}

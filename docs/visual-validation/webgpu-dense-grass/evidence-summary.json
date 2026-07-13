@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "labId": "webgpu-dense-grass",
+  "classification": "inspected-runtime-evidence-preview",
+  "acceptanceStatus": "incomplete",
+  "evidenceBundleId": "correctness",
+  "canonicalSource": [
+    "threejs-procedural-vegetation/examples/webgpu-dense-grass"
+  ],
+  "canonicalSourceHash": "sha256:5d9327d4d3cb90206dff49f8516ec1ddce460d578a0f1c920684f47f2b243dd7",
+  "threeRevision": "0.185.1",
+  "runtime": {
+    "renderer": "WebGPURenderer",
+    "backend": "WebGPU",
+    "isWebGPUBackend": true,
+    "threeRevision": "0.185.1"
+  },
+  "claimVerdicts": {
+    "visualCorrectness": "PASS",
+    "mechanismCorrectness": "INSUFFICIENT_EVIDENCE",
+    "performanceCompliance": "NOT_CLAIMED",
+    "gpuAttribution": "INSUFFICIENT_EVIDENCE",
+    "lifecycleStability": "INSUFFICIENT_EVIDENCE"
+  },
+  "primaryImage": "final.design.png",
+  "primaryImageLabel": "Dense-grass final readback",
+  "images": [
+    {
+      "file": "final.design.png",
+      "meaning": "Primary final readback.",
+      "source": "final.design.png",
+      "sourceSha256": "sha256:49b02d5351a9a14d594ee5b85a13a5adb646142dae8af2242da0d3faa96d61ef",
+      "outputSha256": "sha256:49b02d5351a9a14d594ee5b85a13a5adb646142dae8af2242da0d3faa96d61ef",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "no-post.design.png",
+      "meaning": "No-post / alternate display path readback.",
+      "source": "no-post.design.png",
+      "sourceSha256": "sha256:105863b95333d3b3669b6d1a0a104b5a2fe2cf82eeac5be5b8402bfad937930b",
+      "outputSha256": "sha256:105863b95333d3b3669b6d1a0a104b5a2fe2cf82eeac5be5b8402bfad937930b",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "diagnostics.mosaic.png",
+      "meaning": "Diagnostics / mechanism display readback.",
+      "source": "diagnostics.mosaic.png",
+      "sourceSha256": "sha256:55ff42c75c4dc29fdf6bd9b538d8074407b9096e19c2f0c93dcac57c44800887",
+      "outputSha256": "sha256:55ff42c75c4dc29fdf6bd9b538d8074407b9096e19c2f0c93dcac57c44800887",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    }
+  ],
+  "limitations": [
+    "Correctness capture records native r185 WebGPUBackend with device identity proof.",
+    "GPU timestamps and full lifecycle acceptance remain incomplete.",
+    "Scenario matrix beyond the primary correctness route remains incomplete."
+  ]
+}

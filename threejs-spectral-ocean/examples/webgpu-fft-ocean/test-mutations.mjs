@@ -128,8 +128,8 @@ kill( 'nested-dependency-drift', ! localPackage.dependencies && ! existsSync( jo
 
 const ocean = new WebGPUFftOcean( fakeRenderer( 4 ), { quality: 'low' } );
 const dispatches = ocean.describeDispatches();
-kill( 'fft-omitted-from-runtime-graph', dispatches.frameNodes.some( ( name ) => name.includes( 'ocean:fft:stage-' ) ), 'runtime graph omits FFT stages' );
-kill( 'foam-omitted-from-runtime-graph', dispatches.frameNodes.some( ( name ) => name.includes( 'ocean:foam-history:cascade-' ) ), 'runtime graph omits per-cascade foam history' );
+kill( 'fft-omitted-from-runtime-graph', dispatches.frameNodes.some( ( name ) => name.includes( 'ocean_fft_stage_' ) ), 'runtime graph omits FFT stages' );
+kill( 'foam-omitted-from-runtime-graph', dispatches.frameNodes.some( ( name ) => name.includes( 'ocean_foam_history_cascade_' ) ), 'runtime graph omits per-cascade foam history' );
 const expectedTextures = ( OCEAN_BASE_STORAGE_TEXTURES_PER_CASCADE + 2 ) * ocean.config.cascadeCount + OCEAN_COMBINED_STORAGE_TEXTURES;
 kill( 'resource-ledger-drift', ocean.describeResources().textures.length === expectedTextures && countOceanStorageTextures( ocean.config ) === expectedTextures, 'reported storage does not equal allocated storage' );
 const foamState = ocean.combinedSurface;

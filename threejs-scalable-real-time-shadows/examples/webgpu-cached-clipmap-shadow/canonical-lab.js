@@ -61,6 +61,13 @@ import {
   configForShadowTier,
   resolveLockedShadowRoute,
 } from "./routes.js";
+import {
+  bindWebGPUDeviceIdentity,
+  captureRuntimeProfileFields,
+  markWebGPUDeviceDisposed,
+  markWebGPUDeviceDisposing,
+  webgpuDeviceIdentityMetrics,
+} from "../../../labs/runtime/webgpu-device-identity.mjs";
 
 const MODES = Object.freeze([
   "final",
@@ -126,6 +133,7 @@ export async function createCanonicalShadowLab({
     renderer.dispose();
     throw new Error(`canonical shadow lab requires Three r185, found ${REVISION}`);
   }
+  const deviceIdentity = bindWebGPUDeviceIdentity(renderer);
   configureShadowRenderer(renderer);
 
   const tier = SHADOW_QUALITY_TIERS[route.tierId];
@@ -227,13 +235,19 @@ export async function createCanonicalShadowLab({
   }
 
   function setOutputForMode(mode) {
-    if (!MODES.includes(mode)) throw new RangeError(`unknown shadow mode: ${mode}`);
+    // Builtin capture uses no-post/diagnostics display aliases.
+    const resolved = mode === "no-post"
+      ? "shadow-contribution"
+      : mode === "diagnostics"
+        ? "owner-graph"
+        : mode;
+    if (!MODES.includes(resolved)) throw new RangeError(`unknown shadow mode: ${mode}`);
     let outputNode = finalNode;
     let dataOutput = false;
-    if (mode === "shadow-contribution") {
+    if (resolved === "shadow-contribution") {
       outputNode = shadowContributionNode;
       dataOutput = true;
-    } else if (mode === "shadow-depth") {
+    } else if (resolved === "shadow-depth") {
       const depthTexture = firstDepthTexture(owner);
       if (!depthTexture) {
         throw new Error("shadow-depth mode requires a compiled, rendered shadow target");
@@ -241,23 +255,23 @@ export async function createCanonicalShadowLab({
       const depth = texture(depthTexture).r;
       outputNode = keepRuntimeGraphReachable(vec4(vec3(depth), 1));
       dataOutput = true;
-    } else if (mode === "level-centers") {
-      requireCachedMode(mode);
+    } else if (resolved === "level-centers") {
+      requireCachedMode(resolved);
       outputNode = keepRuntimeGraphReachable(levelCentersNode);
       dataOutput = true;
-    } else if (mode === "level-validity") {
-      requireCachedMode(mode);
+    } else if (resolved === "level-validity") {
+      requireCachedMode(resolved);
       outputNode = keepRuntimeGraphReachable(levelValidityNode);
       dataOutput = true;
-    } else if (mode === "scheduler") {
-      requireCachedMode(mode);
+    } else if (resolved === "scheduler") {
+      requireCachedMode(resolved);
       outputNode = keepRuntimeGraphReachable(schedulerNode);
       dataOutput = true;
-    } else if (mode === "silhouette-parity") {
-      requireCachedMode(mode);
+    } else if (resolved === "silhouette-parity") {
+      requireCachedMode(resolved);
       outputNode = keepRuntimeGraphReachable(ensureParityNode());
       dataOutput = true;
-    } else if (mode === "owner-graph") {
+    } else if (resolved === "owner-graph") {
       outputNode = keepRuntimeGraphReachable(ownerGraphNode);
       dataOutput = true;
     }
@@ -265,7 +279,8 @@ export async function createCanonicalShadowLab({
       ? renderOutput(outputNode, NoToneMapping, renderer.outputColorSpace)
       : renderOutput(outputNode);
     renderPipeline.needsUpdate = true;
-    state.mode = mode;
+    // Keep locked semantic mode as final when capture uses display aliases.
+    state.mode = (mode === "no-post" || mode === "diagnostics") ? "final" : resolved;
   }
 
   function requireCachedMode(mode) {
@@ -619,6 +634,7 @@ export async function createCanonicalShadowLab({
   function describePipeline() {
     const architecture = owner.describe();
     return {
+      ...captureRuntimeProfileFields(),
       owners: {
         renderer: "canonical-shadow-lab",
         finalRenderPipeline: "canonical-shadow-lab",
@@ -679,31 +695,39 @@ export async function createCanonicalShadowLab({
 
   function getMetrics() {
     return {
+      labId: "webgpu-cached-clipmap-shadow",
+      ...webgpuDeviceIdentityMetrics(deviceIdentity, renderer),
       status: "runtime-implemented-evidence-pending",
       performanceVerdict: "INSUFFICIENT_EVIDENCE",
-      backend: {
-        isWebGPUBackend: renderer.backend?.isWebGPUBackend === true,
-      },
       threeRevision: REVISION,
       frameCount: state.frameCount,
       time: state.time,
+      timeSeconds: state.time,
       mode: state.mode,
       mechanismId: state.route.mechanismId,
+      tier: state.tierId,
       tierId: state.tierId,
       scenario: state.scenario,
       camera: state.cameraId,
+      seed: state.seed,
+      viewport: {
+        width: renderer.domElement.width,
+        height: renderer.domElement.height,
+        dpr: renderer.getPixelRatio(),
+      },
       route: { ...state.route },
       routeSelection: routeSelection(),
       scenarioTrace: structuredClone(state.scenarioTrace),
       parityCasterClasses: [...parityCasterClasses],
       architecture: owner.describe(),
-      rendererInfo: snapshotRendererInfo(renderer.info),
+      infoSnapshot: snapshotRendererInfo(renderer.info),
     };
   }
 
   async function dispose() {
     if (state.disposed) return;
     state.disposed = true;
+    markWebGPUDeviceDisposing(deviceIdentity);
     owner.dispose();
     parityPass?.dispose?.();
     shadowMaskPass.dispose?.();
@@ -711,6 +735,7 @@ export async function createCanonicalShadowLab({
     for (const resource of resources) resource.dispose?.();
     renderPipeline.dispose();
     renderer.dispose();
+    markWebGPUDeviceDisposed(deviceIdentity);
   }
 
   function routeSelection() {

@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "labId": "webgpu-cached-clipmap-shadow",
+  "classification": "inspected-runtime-evidence-preview",
+  "acceptanceStatus": "incomplete",
+  "evidenceBundleId": "correctness",
+  "canonicalSource": [
+    "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow"
+  ],
+  "canonicalSourceHash": "sha256:e83b51d594bc422c0b4e4550f6ce50905de15cc9b0fd88d0c3e4ebc5d6a1d988",
+  "threeRevision": "0.185.1",
+  "runtime": {
+    "renderer": "WebGPURenderer",
+    "backend": "WebGPU",
+    "isWebGPUBackend": true,
+    "threeRevision": "0.185.1"
+  },
+  "claimVerdicts": {
+    "visualCorrectness": "PASS",
+    "mechanismCorrectness": "INSUFFICIENT_EVIDENCE",
+    "performanceCompliance": "NOT_CLAIMED",
+    "gpuAttribution": "INSUFFICIENT_EVIDENCE",
+    "lifecycleStability": "INSUFFICIENT_EVIDENCE"
+  },
+  "primaryImage": "final.design.png",
+  "primaryImageLabel": "Cached clipmap shadow final readback",
+  "images": [
+    {
+      "file": "final.design.png",
+      "meaning": "Primary final readback.",
+      "source": "final.design.png",
+      "sourceSha256": "sha256:53c2de2322e1015539b66714ee8251b122ce24f031d22a32c660050e7de5d791",
+      "outputSha256": "sha256:53c2de2322e1015539b66714ee8251b122ce24f031d22a32c660050e7de5d791",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "no-post.design.png",
+      "meaning": "No-post / alternate display path readback.",
+      "source": "no-post.design.png",
+      "sourceSha256": "sha256:2838bbee23b038eb0c0f171356d9ac13456246ff124f03ab8567efb5c95298e8",
+      "outputSha256": "sha256:2838bbee23b038eb0c0f171356d9ac13456246ff124f03ab8567efb5c95298e8",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "diagnostics.mosaic.png",
+      "meaning": "Diagnostics / mechanism display readback.",
+      "source": "diagnostics.mosaic.png",
+      "sourceSha256": "sha256:718fb5ecbe91933962225d2ab87e6e31e5b43627e1bffeee4f61502e19e66577",
+      "outputSha256": "sha256:718fb5ecbe91933962225d2ab87e6e31e5b43627e1bffeee4f61502e19e66577",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    }
+  ],
+  "limitations": [
+    "Correctness capture records native r185 WebGPUBackend with device identity proof.",
+    "Physical multi-scenario shadow matrix and GPU timestamps remain incomplete.",
+    "Named-adapter 60 Hz performance is NOT_CLAIMED."
+  ]
+}

@@ -24,6 +24,13 @@ import {
 } from "./dense-grass-system.js";
 import { DENSE_GRASS_RUNTIME_TIER, resolveDenseGrassRoute } from "./route-contract.js";
 import { createStrictLabController } from "../../../labs/runtime/strict-lab-controller.mjs";
+import {
+  bindWebGPUDeviceIdentity,
+  captureRuntimeProfileFields,
+  markWebGPUDeviceDisposed,
+  markWebGPUDeviceDisposing,
+  webgpuDeviceIdentityMetrics,
+} from "../../../labs/runtime/webgpu-device-identity.mjs";
 
 const canvas = document.querySelector("#view");
 const status = document.querySelector("#status");
@@ -91,6 +98,7 @@ async function createLab() {
   if (renderer.backend?.isWebGPUBackend !== true) {
     throw new Error("threejs-procedural-vegetation dense grass requires native WebGPU");
   }
+  const deviceIdentity = bindWebGPUDeviceIdentity(renderer);
   renderer.shadowMap.enabled = true;
 
   const scene = new Scene();
@@ -214,6 +222,18 @@ async function createLab() {
     async ready() {},
     setScenario,
     async setMode(id) {
+      // Builtin capture requests final/no-post/diagnostics; map the latter two
+      // onto distinct dense-grass debug views so images are not byte-identical.
+      if (id === "no-post") {
+        mode = "bounds";
+        system.setDebugMode("bounds");
+        return;
+      }
+      if (id === "diagnostics") {
+        mode = "density";
+        system.setDebugMode("density");
+        return;
+      }
       if (!webgpuDenseGrassDebugModes.has(id)) throw new Error(`unknown dense-grass mode "${id}"`);
       mode = id;
       system.setDebugMode(id);
@@ -296,7 +316,7 @@ async function createLab() {
         bytesPerPixel: 4,
         bytesPerRow: readback.bytesPerRow,
         format: "rgba8unorm",
-        colorSpace: "display-srgb",
+        colorSpace: "srgb",
         colorManaged: true,
         colorTransformOwner: "renderOutput",
         sourceBytesPerRow: readback.bytesPerRow,
@@ -308,6 +328,7 @@ async function createLab() {
     },
     describePipeline() {
       return {
+        ...captureRuntimeProfileFields(),
         owners: {
           renderer: "webgpu-dense-grass",
           scenePass: "webgpu-dense-grass",
@@ -348,24 +369,31 @@ async function createLab() {
     },
     getMetrics() {
       return {
-        backend: "webgpu",
-        isWebGPUBackend: true,
-        renderer: { threeRevision: REVISION, isWebGPUBackend: true },
+        labId: "webgpu-dense-grass",
+        ...webgpuDeviceIdentityMetrics(deviceIdentity, renderer),
+        threeRevision: REVISION,
         scenario,
         tier,
         mode,
         seed,
         camera: cameraId,
+        timeSeconds: elapsed,
         elapsed,
         frameCount,
+        viewport: {
+          width: viewport.width,
+          height: viewport.height,
+          dpr: viewport.actualDpr,
+        },
         dpr: { ...viewport, cap: tierDprCap() },
-        rendererInfo: rendererInfoSnapshot(),
+        infoSnapshot: rendererInfoSnapshot(),
         ...system.getDiagnostics(),
       };
     },
     async dispose() {
       if (disposed) return;
       disposed = true;
+      markWebGPUDeviceDisposing(deviceIdentity);
       await destroySystem();
       ground.geometry.dispose();
       ground.material.dispose();
@@ -373,6 +401,7 @@ async function createLab() {
       scenePass.dispose?.();
       pipeline.dispose();
       renderer.dispose();
+      markWebGPUDeviceDisposed(deviceIdentity);
     },
   };
   const controller = createStrictLabController(manifest, implementation);

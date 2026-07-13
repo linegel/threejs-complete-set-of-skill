@@ -1,6 +1,7 @@
 import {
   AmbientLight,
   BoxGeometry,
+  Color,
   DirectionalLight,
   Group,
   Mesh,
@@ -27,6 +28,9 @@ import {
   pass,
   positionLocal,
   renderOutput,
+  select,
+  vec3,
+  vec4,
   velocity,
 } from "three/tsl";
 
@@ -48,6 +52,13 @@ import {
   parseCameraRoute,
   requireCameraState,
 } from "./routeState.mjs";
+import {
+  bindWebGPUDeviceIdentity,
+  captureRuntimeProfileFields,
+  markWebGPUDeviceDisposed,
+  markWebGPUDeviceDisposing,
+  webgpuDeviceIdentityMetrics,
+} from "../../../labs/runtime/webgpu-device-identity.mjs";
 
 const FIXED_SEEDS = Object.freeze([0x00000001, 0x9e3779b9]);
 const LAB_ID = "webgpu-camera-rig";
@@ -131,8 +142,10 @@ export async function createCameraRigDemo({
   if (renderer.backend?.isWebGPUBackend !== true) {
     throw new Error("WebGPU backend required for the canonical camera rig lab");
   }
+  const deviceIdentity = bindWebGPUDeviceIdentity(renderer);
 
   const scene = new Scene();
+  scene.background = new Color(0x0b1220);
   const width = Math.max(1, canvas.clientWidth || canvas.width || 1);
   const height = Math.max(1, canvas.clientHeight || canvas.height || 1);
   const initialDpr = Math.min(globalThis.devicePixelRatio || 1, CAMERA_TIERS[route.tier].dprCap);
@@ -189,10 +202,24 @@ export async function createCameraRigDemo({
     velocity: route.mechanism === "floating-origin" ? originNodes.velocityNdc : velocity,
   }));
   const renderPipeline = new RenderPipeline(renderer);
-  renderPipeline.outputNode = renderOutput(scenePass.getTextureNode("output"));
+  const designOutputNode = renderOutput(scenePass.getTextureNode("output"));
+  // no-post keeps the same scene graph without the final renderOutput owner
+  // so final vs no-post differ by the tone/output transfer, not by camera pose.
+  const noPostOutputNode = scenePass.getTextureNode("output");
+  const diagnosticsOutputNode = renderOutput(
+    vec4(scenePass.getTextureNode("normal").xyz.mul(0.5).add(0.5), 1),
+  );
+  renderPipeline.outputNode = designOutputNode;
   renderPipeline.outputColorTransform = false;
   const captureTarget = new RenderTarget(1, 1, { type: UnsignedByteType, depthBuffer: false });
   captureTarget.texture.colorSpace = renderer.outputColorSpace;
+
+  function applyCaptureDisplayMode(id) {
+    if (id === "no-post") renderPipeline.outputNode = noPostOutputNode;
+    else if (id === "diagnostics") renderPipeline.outputNode = diagnosticsOutputNode;
+    else renderPipeline.outputNode = designOutputNode;
+    renderPipeline.needsUpdate = true;
+  }
 
   const debugElement = documentRef?.querySelector?.("[data-camera-debug]") ?? null;
   const debugForward = new Vector3();
@@ -224,6 +251,13 @@ export async function createCameraRigDemo({
   let timeSeconds = 0;
   let lastTimestamp = 0;
   let disposed = false;
+  let scenarioId = CAMERA_SCENARIOS[0];
+  let cameraId = "design";
+  let viewport = {
+    width: renderer.domElement.width,
+    height: renderer.domElement.height,
+    dpr: renderer.getPixelRatio(),
+  };
   const animatedOrigin = new Vector3();
 
   function updateDebug(mode) {
@@ -320,35 +354,75 @@ export async function createCameraRigDemo({
     async ready() {},
     async setScenario(id) {
       requireChoice(id, CAMERA_SCENARIOS, "scenario");
+      scenarioId = id;
     },
     async setMode(id) {
+      // Builtin capture uses final/no-post/diagnostics display modes that are
+      // not semantic camera modes (overview/profile/inspection).
+      if (id === "final" || id === "presentation" || id === "no-post" || id === "diagnostics") {
+        applyCaptureDisplayMode(id === "presentation" ? "final" : id);
+        return;
+      }
       requireChoice(id, CAMERA_MODES, "mode");
       controller.startHandoff(id, 0.8);
+      applyCaptureDisplayMode("final");
     },
     async setTier(id) {
       requireChoice(id, Object.keys(CAMERA_TIERS), "tier");
       assertCameraRouteLock(route, { tier: id });
       controller.setTier(id);
       renderer.setPixelRatio(Math.min(globalThis.devicePixelRatio || 1, CAMERA_TIERS[id].dprCap));
+      viewport = {
+        width: renderer.domElement.width,
+        height: renderer.domElement.height,
+        dpr: renderer.getPixelRatio(),
+      };
     },
     async setSeed(value) {
       if (!Number.isInteger(value)) throw new RangeError("seed must be an integer");
       seed = value >>> 0;
+      // Seed must change the authored surface so seed sweeps are falsifiable.
+      const hue = ((seed >>> 0) % 360) / 360;
+      const seedColor = new Color().setHSL(hue, 0.55, 0.55);
+      subjectMaterial.colorNode = color(seedColor.getHex());
+      subjectMaterial.needsUpdate = true;
+      renderPipeline.needsUpdate = true;
     },
     async setCamera(id) {
       requireChoice(id, CAMERA_IDS, "camera");
+      cameraId = id;
       const radius = controller.subjectRadius();
-      if (id === "near") camera.near = Math.max(0.05, radius * 0.04);
-      else if (id === "far") camera.far = radius * 200;
-      else {
+      const target = controller.subjectWorldPosition(controller.scratch.target);
+      if (id === "near") {
+        camera.near = Math.max(0.05, radius * 0.04);
+        camera.far = radius * 40;
+        camera.position.set(target.x + radius * 2.2, target.y + radius * 1.1, target.z + radius * 2.8);
+      } else if (id === "far") {
+        camera.near = 0.3;
+        camera.far = radius * 400;
+        camera.position.set(target.x + radius * 14, target.y + radius * 8, target.z + radius * 16);
+      } else {
         camera.near = 0.3;
         camera.far = 2000;
+        camera.position.set(target.x + radius * 5.5, target.y + radius * 2.4, target.z + radius * 7.5);
       }
+      camera.lookAt(target);
       camera.updateProjectionMatrix();
+      camera.updateMatrixWorld(true);
     },
     async setTime(seconds) {
       if (!Number.isFinite(seconds) || seconds < 0) throw new RangeError("time must be finite and >= 0");
+      const previous = timeSeconds;
       timeSeconds = seconds;
+      // Apply absolute time as a pose update so temporal frames differ under capture.
+      const delta = Math.max(0, seconds - previous);
+      if (delta > 0 || seconds === 0) {
+        advanceFrame(delta > 0 ? delta : 0);
+        if (seconds === 0 && previous !== 0) {
+          // Hard reset path: re-seed a deterministic overview pose.
+          controller.setThrust(0.65 + (seed % 7) * 0.01);
+        }
+      }
     },
     async step(deltaSeconds) {
       return advanceFrame(deltaSeconds);
@@ -370,6 +444,11 @@ export async function createCameraRigDemo({
       captureTarget.setSize(renderer.domElement.width, renderer.domElement.height);
       camera.aspect = nextWidth / nextHeight;
       camera.updateProjectionMatrix();
+      viewport = {
+        width: renderer.domElement.width,
+        height: renderer.domElement.height,
+        dpr: renderer.getPixelRatio(),
+      };
       renderPipeline.needsUpdate = true;
     },
     async renderOnce() {
@@ -428,6 +507,7 @@ export async function createCameraRigDemo({
     },
     describePipeline() {
       return {
+        ...captureRuntimeProfileFields(),
         owners: {
           renderer: "webgpu-camera-rig",
           camera: "camera-controller",
@@ -453,18 +533,24 @@ export async function createCameraRigDemo({
     getMetrics() {
       return {
         labId: LAB_ID,
-        rendererBackend: renderer.backend?.isWebGPUBackend === true ? "WebGPU" : "unsupported",
+        ...webgpuDeviceIdentityMetrics(deviceIdentity, renderer),
         threeRevision: REVISION,
-        mechanism: route.mechanism,
+        scenario: scenarioId,
+        mode: controller.mode,
         tier: controller.tier,
+        camera: cameraId,
+        seed,
         timeSeconds,
+        mechanism: route.mechanism,
         originEpoch: originState.epoch,
+        viewport: { ...viewport },
         gpuTiming: renderer.hasFeature?.("timestamp-query") ? "available-not-yet-resolved" : "INSUFFICIENT_EVIDENCE",
       };
     },
     async dispose() {
       if (disposed) return;
       disposed = true;
+      markWebGPUDeviceDisposing(deviceIdentity);
       renderer.setAnimationLoop(null);
       for (const { button, handler } of buttonHandlers) button.removeEventListener("click", handler);
       pointerAdapter.dispose();
@@ -475,10 +561,13 @@ export async function createCameraRigDemo({
       captureTarget.dispose();
       renderPipeline.dispose?.();
       renderer.dispose();
+      markWebGPUDeviceDisposed(deviceIdentity);
     },
   };
 
-  if (startAnimationLoop) {
+  // Capture host freezes the clock so final metrics match locked setTime(0).
+  const underCapture = globalThis.__LAB_CAPTURE_PROFILE__ != null;
+  if (startAnimationLoop && !underCapture) {
     renderer.setAnimationLoop((timestamp) => {
       const dt = lastTimestamp === 0 ? 0 : Math.min((timestamp - lastTimestamp) / 1000, 1 / 20);
       lastTimestamp = timestamp;

@@ -11,10 +11,13 @@
   "sourceHashInputs": [
     "labs/runtime/aligned-readback.mjs",
     "labs/runtime/numeric-evidence.mjs",
+    "labs/runtime/webgpu-device-identity.mjs",
     "labs/schema/evidence-bundle-v2.schema.json",
     "labs/schema/lab-manifest.schema.json",
     "labs/schema/physics-integration.schema.json",
     "labs/schema/runtime-graph.schema.json",
+    "labs/schema/tier-visual-evidence.schema.json",
+    "labs/schema/tracked-release-projection-v1.schema.json",
     "scripts/capture-lab-browser.mjs",
     "scripts/lib/checked-json-schema.mjs",
     "scripts/lib/evidence-manifest-contract.mjs",
@@ -22,33 +25,36 @@
     "scripts/lib/evidence-v2.mjs",
     "scripts/lib/lab-registry.mjs",
     "scripts/lib/png-rgba.mjs",
+    "scripts/lib/tracked-release-projection.mjs",
     "scripts/lib/vite-lab-config.mjs",
     "scripts/provider-demos.mjs",
     "threejs-water-optics/examples/webgpu-bounded-water"
   ],
   "browserEntry": "threejs-water-optics/examples/webgpu-bounded-water/index.html",
-  "sourceHash": "sha256:fb027f0dee11f916fabf2fb8147509a5c9829ad57b41b514bfc0a7e63551690d",
+  "sourceHash": "sha256:fa528573afdb607a124bef4f0578a803e93319da06728cd711aac36a0c14efe2",
   "publishedHashInputs": [
     "docs/demos/webgpu-bounded-water",
     "docs/demos/assets/aligned-readback-XAnJComS.js",
-    "docs/demos/assets/index-DCVWzNYY.js",
-    "docs/demos/assets/integration-stage-BN2jCvHh.js",
+    "docs/demos/assets/index-YX0DO7As.js",
+    "docs/demos/assets/integration-stage-DelEZhWP.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js",
-    "docs/demos/assets/webgpu-bounded-water-BN4VBzH1.js"
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js",
+    "docs/demos/assets/webgpu-bounded-water-BTmuFlv9.js",
+    "docs/demos/assets/webgpu-device-identity-uNUcs3Wh.js"
   ],
   "emittedAssetDependencies": [
     "docs/demos/assets/aligned-readback-XAnJComS.js",
-    "docs/demos/assets/index-DCVWzNYY.js",
-    "docs/demos/assets/integration-stage-BN2jCvHh.js",
+    "docs/demos/assets/index-YX0DO7As.js",
+    "docs/demos/assets/integration-stage-DelEZhWP.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js",
-    "docs/demos/assets/webgpu-bounded-water-BN4VBzH1.js"
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js",
+    "docs/demos/assets/webgpu-bounded-water-BTmuFlv9.js",
+    "docs/demos/assets/webgpu-device-identity-uNUcs3Wh.js"
   ],
-  "publishedBundleHash": "sha256:19e5dd8c822cdc71f169d37c3c09dfef6e35ccd552ee984e74540be9e0667e95",
+  "publishedBundleHash": "sha256:c7da43ecee3effae6d8bb6f598a9b9378a81c20d6dae0cc87fc46c36bac4d560",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b",
+  "buildRevision": "sha256:49ab4c316e51d9bb267cb0cda243b6d6c4dd9af8afa65d1c469737eaa2a18260",
   "evidenceBundleId": null
 }

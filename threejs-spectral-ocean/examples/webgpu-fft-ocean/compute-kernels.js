@@ -9,6 +9,7 @@ import {
 	floor,
 	instanceIndex,
 	int,
+	ivec2,
 	length,
 	max,
 	min,
@@ -22,6 +23,7 @@ import {
 	step,
 	storageTexture,
 	texture,
+	textureLoad,
 	textureStore,
 	uint,
 	uvec2,
@@ -33,9 +35,15 @@ import {
 import { PACKED_FIELD_LAYOUT, TAU } from './constants.js';
 
 function cellFromIndex( resolution ) {
-	const x = instanceIndex.mod( resolution );
-	const y = instanceIndex.div( resolution );
-	return uvec2( x, y );
+	// Storage texture load/store in WGSL expects signed integer coords.
+	const x = int( instanceIndex.mod( resolution ) );
+	const y = int( instanceIndex.div( resolution ) );
+	return ivec2( x, y );
+}
+
+// r185: storageTexture(...).toReadOnly() does not sample prior writes; textureLoad does.
+function storageLoad( textureTarget, cell ) {
+	return textureLoad( textureTarget, ivec2( cell ) );
 }
 
 function complexMul( a, b ) {
@@ -257,7 +265,7 @@ export function createSpectrumInitNode( cascade, targets ) {
 		textureStore( maskDebug, cell, vec4( inBand, kLength, constants.cutoffLow, constants.cutoffHigh ) ).toWriteOnly();
 	} );
 
-	return kernel( targets ).compute( constants.resolution * constants.resolution, [ 64 ] ).setName( `ocean:h0:cascade-${ cascade.index }` );
+	return kernel( targets ).compute( constants.resolution * constants.resolution, [ 64 ] ).setName( `ocean_h0_cascade_${ cascade.index }` );
 }
 
 export function createClearTextureNode( textureTarget, resolution, value = [ 0, 0, 0, 0 ], name = 'ocean:clear' ) {
@@ -293,7 +301,7 @@ export function createFftFixtureNode( textureTarget, resolution, fixture ) {
 		const cell = cellFromIndex( resolution );
 		const packed = vec4( 0, 0, 0, 0 ).toVar();
 		for ( const coefficient of coefficients ) {
-			const matches = cell.x.equal( uint( coefficient.x ) ).and( cell.y.equal( uint( coefficient.y ) ) );
+			const matches = cell.x.equal( int( coefficient.x ) ).and( cell.y.equal( int( coefficient.y ) ) );
 			packed.assign( select( matches, vec4( ...coefficient.value ), packed ) );
 		}
 		textureStore( outputTex, cell, packed ).toWriteOnly();
@@ -301,7 +309,7 @@ export function createFftFixtureNode( textureTarget, resolution, fixture ) {
 
 	return kernel( { outputTex: textureTarget } )
 		.compute( resolution * resolution, [ 64 ] )
-		.setName( `ocean:fft-fixture:${ fixture }` );
+		.setName( `ocean_fft_fixture_${ fixture }` );
 }
 
 export function createEvolutionNode( cascade, fieldIndex, targets ) {
@@ -310,7 +318,7 @@ export function createEvolutionNode( cascade, fieldIndex, targets ) {
 
 	const kernel = Fn( ( { h0, outputTex, time } ) => {
 		const cell = cellFromIndex( constants.resolution );
-		const initial = storageTexture( h0, cell ).toReadOnly();
+		const initial = storageLoad( h0, cell  );
 		const centered = vec2( cell ).sub( constants.resolution * 0.5 );
 		const kVec = centered.mul( TAU / constants.patchLength );
 		const kLength = max( length( kVec ), 1e-4 );
@@ -345,15 +353,15 @@ export function createEvolutionNode( cascade, fieldIndex, targets ) {
 		textureStore( outputTex, cell, packed ).toWriteOnly();
 	} );
 
-	return kernel( targets ).compute( constants.resolution * constants.resolution, [ 64 ] ).setName( `ocean:evolve:${ layoutName }:cascade-${ cascade.index }` );
+	return kernel( targets ).compute( constants.resolution * constants.resolution, [ 64 ] ).setName( `ocean_evolve_${ layoutName }_cascade_${ cascade.index }` );
 }
 
 export function createBitReverseNode( resolution, axis, targets ) {
 	const kernel = Fn( ( { inputTex, outputTex, bitReverseTex } ) => {
 		const cell = cellFromIndex( resolution );
-		const source = uvec2( cell ).toVar();
-		const reverseX = texture( bitReverseTex, vec2( float( cell.x ).add( 0.5 ).div( resolution ), 0.5 ) ).r.mul( resolution - 1 ).round().toUint();
-		const reverseY = texture( bitReverseTex, vec2( float( cell.y ).add( 0.5 ).div( resolution ), 0.5 ) ).r.mul( resolution - 1 ).round().toUint();
+		const source = ivec2( cell ).toVar();
+		const reverseX = int( texture( bitReverseTex, vec2( float( cell.x ).add( 0.5 ).div( resolution ), 0.5 ) ).r.mul( resolution - 1 ).round() );
+		const reverseY = int( texture( bitReverseTex, vec2( float( cell.y ).add( 0.5 ).div( resolution ), 0.5 ) ).r.mul( resolution - 1 ).round() );
 
 		If( int( axis ).equal( 0 ), () => {
 			source.x.assign( reverseX );
@@ -361,10 +369,10 @@ export function createBitReverseNode( resolution, axis, targets ) {
 			source.y.assign( reverseY );
 		} );
 
-		textureStore( outputTex, cell, storageTexture( inputTex, source ).toReadOnly() ).toWriteOnly();
+		textureStore( outputTex, cell, storageLoad( inputTex, source ) ).toWriteOnly();
 	} );
 
-	return kernel( targets ).compute( resolution * resolution, [ 64 ] ).setName( `ocean:fft:bit-reverse:${ axis === 0 ? 'x' : 'y' }` );
+	return kernel( targets ).compute( resolution * resolution, [ 64 ] ).setName( `ocean_fft_bit_reverse_${ axis === 0 ? 'x' : 'y' }` );
 }
 
 export function createFftStageNode( resolution, stage, axis, targets ) {
@@ -375,11 +383,11 @@ export function createFftStageNode( resolution, stage, axis, targets ) {
 		const cell = cellFromIndex( resolution );
 		const coordinate = select( int( axis ).equal( 0 ), cell.x, cell.y );
 		const butterfly = texture( butterflyTex, vec2( float( coordinate ).add( 0.5 ).div( resolution ), stageUvY ) );
-		const indexA = butterfly.z.mul( resolution - 1 ).round().toUint();
-		const indexB = butterfly.w.mul( resolution - 1 ).round().toUint();
+		const indexA = int( butterfly.z.mul( resolution - 1 ).round() );
+		const indexB = int( butterfly.w.mul( resolution - 1 ).round() );
 		const twiddle = butterfly.xy;
-		const cellA = uvec2( cell ).toVar();
-		const cellB = uvec2( cell ).toVar();
+		const cellA = ivec2( cell ).toVar();
+		const cellB = ivec2( cell ).toVar();
 
 		If( int( axis ).equal( 0 ), () => {
 			cellA.x.assign( indexA );
@@ -389,14 +397,14 @@ export function createFftStageNode( resolution, stage, axis, targets ) {
 			cellB.y.assign( indexB );
 		} );
 
-		const a = storageTexture( inputTex, cellA ).toReadOnly();
-		const b = storageTexture( inputTex, cellB ).toReadOnly();
+		const a = storageLoad( inputTex, cellA  );
+		const b = storageLoad( inputTex, cellB  );
 		const weighted0 = complexMul( twiddle, b.xy );
 		const weighted1 = complexMul( twiddle, b.zw );
 		textureStore( outputTex, cell, vec4( a.xy.add( weighted0 ), a.zw.add( weighted1 ) ) ).toWriteOnly();
 	} );
 
-	return kernel( targets ).compute( resolution * resolution, [ 64 ] ).setName( `ocean:fft:stage-${ stage }:${ axis === 0 ? 'x' : 'y' }` );
+	return kernel( targets ).compute( resolution * resolution, [ 64 ] ).setName( `ocean_fft_stage_${ stage }_${ axis === 0 ? 'x' : 'y' }` );
 }
 
 export function createCenterAndAssembleNode( cascade, targets ) {
@@ -413,10 +421,10 @@ export function createCenterAndAssembleNode( cascade, targets ) {
 	} ) => {
 		const cell = cellFromIndex( constants.resolution );
 		const sign = select( int( cell.x.add( cell.y ).mod( 2 ) ).equal( 0 ), 1.0, - 1.0 );
-		const f0 = storageTexture( field0, cell ).toReadOnly().mul( sign );
-		const f1 = storageTexture( field1, cell ).toReadOnly().mul( sign );
-		const f2 = storageTexture( field2, cell ).toReadOnly().mul( sign );
-		const f3 = storageTexture( field3, cell ).toReadOnly().mul( sign );
+		const f0 = storageLoad( field0, cell  ).mul( sign );
+		const f1 = storageLoad( field1, cell  ).mul( sign );
+		const f2 = storageLoad( field2, cell  ).mul( sign );
+		const f3 = storageLoad( field3, cell  ).mul( sign );
 		const lambda = float( constants.choppiness );
 		const dDzDx = lambda.mul( f1.y );
 		const jxx = float( 1.0 ).add( lambda.mul( f3.x ) );
@@ -427,7 +435,7 @@ export function createCenterAndAssembleNode( cascade, targets ) {
 		textureStore( crossJacobianFoam, cell, vec4( dDzDx, jacobian, 0.0, 0.0 ) ).toWriteOnly();
 	} );
 
-	return kernel( targets ).compute( constants.resolution * constants.resolution, [ 64 ] ).setName( `ocean:assemble:cascade-${ cascade.index }` );
+	return kernel( targets ).compute( constants.resolution * constants.resolution, [ 64 ] ).setName( `ocean_assemble_cascade_${ cascade.index }` );
 }
 
 export function createDisplacementAssemblyNode( cascade, targets ) {
@@ -435,12 +443,12 @@ export function createDisplacementAssemblyNode( cascade, targets ) {
 	const kernel = Fn( ( { field0, field1, displacement } ) => {
 		const cell = cellFromIndex( constants.resolution );
 		const sign = select( int( cell.x.add( cell.y ).mod( 2 ) ).equal( 0 ), 1.0, - 1.0 );
-		const f0 = storageTexture( field0, cell ).toReadOnly().mul( sign );
-		const f1 = storageTexture( field1, cell ).toReadOnly().mul( sign );
+		const f0 = storageLoad( field0, cell  ).mul( sign );
+		const f1 = storageLoad( field1, cell  ).mul( sign );
 		const lambda = float( constants.choppiness );
 		textureStore( displacement, cell, vec4( lambda.mul( f0.x ), f1.x, lambda.mul( f0.y ), 1.0 ) ).toWriteOnly();
 	} );
-	return kernel( targets ).compute( constants.resolution * constants.resolution, [ 64 ] ).setName( `ocean:assemble-displacement:cascade-${ cascade.index }` );
+	return kernel( targets ).compute( constants.resolution * constants.resolution, [ 64 ] ).setName( `ocean_assemble_displacement_cascade_${ cascade.index }` );
 }
 
 export function createDerivativesAssemblyNode( cascade, targets ) {
@@ -448,12 +456,12 @@ export function createDerivativesAssemblyNode( cascade, targets ) {
 	const kernel = Fn( ( { field2, field3, derivatives } ) => {
 		const cell = cellFromIndex( constants.resolution );
 		const sign = select( int( cell.x.add( cell.y ).mod( 2 ) ).equal( 0 ), 1.0, - 1.0 );
-		const f2 = storageTexture( field2, cell ).toReadOnly().mul( sign );
-		const f3 = storageTexture( field3, cell ).toReadOnly().mul( sign );
+		const f2 = storageLoad( field2, cell  ).mul( sign );
+		const f3 = storageLoad( field3, cell  ).mul( sign );
 		const lambda = float( constants.choppiness );
 		textureStore( derivatives, cell, vec4( f2.x, f2.y, lambda.mul( f3.x ), lambda.mul( f3.y ) ) ).toWriteOnly();
 	} );
-	return kernel( targets ).compute( constants.resolution * constants.resolution, [ 64 ] ).setName( `ocean:assemble-derivatives:cascade-${ cascade.index }` );
+	return kernel( targets ).compute( constants.resolution * constants.resolution, [ 64 ] ).setName( `ocean_assemble_derivatives_cascade_${ cascade.index }` );
 }
 
 export function createJacobianAssemblyNode( cascade, targets ) {
@@ -461,8 +469,8 @@ export function createJacobianAssemblyNode( cascade, targets ) {
 	const kernel = Fn( ( { field1, field3, crossJacobianFoam } ) => {
 		const cell = cellFromIndex( constants.resolution );
 		const sign = select( int( cell.x.add( cell.y ).mod( 2 ) ).equal( 0 ), 1.0, - 1.0 );
-		const f1 = storageTexture( field1, cell ).toReadOnly().mul( sign );
-		const f3 = storageTexture( field3, cell ).toReadOnly().mul( sign );
+		const f1 = storageLoad( field1, cell  ).mul( sign );
+		const f3 = storageLoad( field3, cell  ).mul( sign );
 		const lambda = float( constants.choppiness );
 		const dDzDx = lambda.mul( f1.y );
 		const jxx = float( 1.0 ).add( lambda.mul( f3.x ) );
@@ -470,7 +478,7 @@ export function createJacobianAssemblyNode( cascade, targets ) {
 		const jacobian = jxx.mul( jzz ).sub( dDzDx.mul( dDzDx ) );
 		textureStore( crossJacobianFoam, cell, vec4( dDzDx, jacobian, 0.0, 0.0 ) ).toWriteOnly();
 	} );
-	return kernel( targets ).compute( constants.resolution * constants.resolution, [ 64 ] ).setName( `ocean:assemble-jacobian:cascade-${ cascade.index }` );
+	return kernel( targets ).compute( constants.resolution * constants.resolution, [ 64 ] ).setName( `ocean_assemble_jacobian_cascade_${ cascade.index }` );
 }
 
 export function createFoamHistoryNode( cascade, targets ) {
@@ -483,8 +491,8 @@ export function createFoamHistoryNode( cascade, targets ) {
 		dt
 	} ) => {
 		const cell = cellFromIndex( constants.resolution );
-		const jacobian = storageTexture( crossJacobian, cell ).toReadOnly().g;
-		const previous = storageTexture( previousFoam, cell ).toReadOnly().r.clamp( 0.0, 1.0 );
+		const jacobian = storageLoad( crossJacobian, cell  ).g;
+		const previous = storageLoad( previousFoam, cell  ).r.clamp( 0.0, 1.0 );
 		const sourceRate = max( float( constants.foamThreshold ).sub( jacobian ).mul( constants.foamScale ), 0.0 );
 		const decayRate = max( float( constants.foamRecovery ), 1e-6 );
 		const reactionRate = sourceRate.add( decayRate );
@@ -493,5 +501,5 @@ export function createFoamHistoryNode( cascade, targets ) {
 		textureStore( foamHistory, cell, vec4( coverage, sourceRate, jacobian, 1.0 ) ).toWriteOnly();
 	} );
 
-	return kernel( targets ).compute( constants.resolution * constants.resolution, [ 64 ] ).setName( `ocean:foam-history:cascade-${ cascade.index }` );
+	return kernel( targets ).compute( constants.resolution * constants.resolution, [ 64 ] ).setName( `ocean_foam_history_cascade_${ cascade.index }` );
 }

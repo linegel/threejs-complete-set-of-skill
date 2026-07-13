@@ -7,29 +7,32 @@
     "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow"
   ],
   "sourceHashInputs": [
+    "labs/runtime/webgpu-device-identity.mjs",
     "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow"
   ],
   "browserEntry": "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/canonical.html",
-  "sourceHash": "sha256:ef8576bd7bb49d234967864afbb9638e126f5398b3704015c39f285d14a33281",
+  "sourceHash": "sha256:e83b51d594bc422c0b4e4550f6ce50905de15cc9b0fd88d0c3e4ebc5d6a1d988",
   "publishedHashInputs": [
     "docs/demos/webgpu-cached-clipmap-shadow",
-    "docs/demos/assets/canonical-lab-C_swluIP.js",
-    "docs/demos/assets/index-BbrcYlON.js",
+    "docs/demos/assets/canonical-lab-Cho1YMq8.js",
+    "docs/demos/assets/index-Q6pGU4wS.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/shadow-architectures-CAZM5msa.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+    "docs/demos/assets/shadow-architectures-CnBoOeHY.js",
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js",
+    "docs/demos/assets/webgpu-device-identity-uNUcs3Wh.js"
   ],
   "emittedAssetDependencies": [
-    "docs/demos/assets/canonical-lab-C_swluIP.js",
-    "docs/demos/assets/index-BbrcYlON.js",
+    "docs/demos/assets/canonical-lab-Cho1YMq8.js",
+    "docs/demos/assets/index-Q6pGU4wS.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/shadow-architectures-CAZM5msa.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+    "docs/demos/assets/shadow-architectures-CnBoOeHY.js",
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js",
+    "docs/demos/assets/webgpu-device-identity-uNUcs3Wh.js"
   ],
-  "publishedBundleHash": "sha256:a09d4d33ccfe8751f26199ac9c847f19e9d3ccbff6c273ff61afbcaae5e7bd1e",
+  "publishedBundleHash": "sha256:3457053de5ab050ce0d1000d459599610d5c1995d4127b2cdc220050717c0a91",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b",
+  "buildRevision": "sha256:49ab4c316e51d9bb267cb0cda243b6d6c4dd9af8afa65d1c469737eaa2a18260",
   "evidenceBundleId": null
 }
