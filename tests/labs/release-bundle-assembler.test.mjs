@@ -236,6 +236,15 @@ test('prepared assembler rejects unconfined, colliding, stale, and unknown input
   }
 });
 
+test('prepared assembler keeps source and release trees disjoint outside the portable join', async () => {
+  const { directory, manifest } = makeRawCorrectnessBundle();
+  await assert.rejects(() => assemblePreparedReleaseBundle({
+    correctnessDirectory: directory,
+    outputDirectory: join(directory, 'nested-release'),
+    prepareReleaseInputs: () => preparedReleaseInputs(manifest),
+  }), /disjoint resolved directory trees/);
+});
+
 test('offline assembler creates a validated nonpublishable multi-route release candidate', async () => {
   const { directory, manifest } = makeRawCorrectnessBundle();
   const root = mkdtempSync(join(tmpdir(), 'release-assembler-test-'));

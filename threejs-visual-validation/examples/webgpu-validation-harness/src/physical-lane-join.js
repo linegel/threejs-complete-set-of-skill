@@ -6,6 +6,17 @@ import { validateCorrectnessCaptureSession } from './physical-session-validator.
 
 const SHA256 = /^sha256:[a-f0-9]{64}$/;
 
+const PORTABLE_JOIN_KEYS = Object.freeze( [
+	'correctness',
+	'hardwarePerformance',
+	'performanceClaims',
+	'physicalRoute',
+	'publishable',
+	'rawEvidenceManifestFinalized',
+	'rewriteRawEvidenceManifest',
+	'schemaVersion'
+] );
+
 const LANE_CONTRACTS = Object.freeze( {
 	correctness: Object.freeze( { profile: CORRECTNESS_PROFILE, automationSurface: 'playwright-headless-chromium', adapterClasses: Object.freeze( [ 'hardware', 'software' ] ) } ),
 	physicalRoute: Object.freeze( { profile: PHYSICAL_ROUTE_PROFILE, automationSurface: 'codex-in-app-browser', adapterClasses: Object.freeze( [ 'hardware' ] ) } ),
@@ -249,10 +260,11 @@ export function correctnessLaneReference( record, documentBinding, writeLedgerBi
 
 export function validateEvidenceLaneJoin( join ) {
 
-	if ( join === null || typeof join !== 'object' || Array.isArray( join ) || join.schemaVersion !== 1 ) throw new Error( 'Offline evidence lane join schema is invalid.' );
+	if ( join === null || typeof join !== 'object' || Array.isArray( join ) || join.schemaVersion !== 2 ) throw new Error( 'Offline evidence lane join schema v2 is invalid.' );
+	const keys = Object.keys( join ).sort();
+	if ( stableStringify( keys ) !== stableStringify( PORTABLE_JOIN_KEYS ) ) throw new Error( 'Offline evidence lane join must contain the exact portable top-level fields.' );
 	if ( join.publishable !== false ) throw new Error( 'The lane join is a nonpublishable promotion input, not a publishable raw bundle.' );
 	if ( join.rawEvidenceManifestFinalized !== true || join.rewriteRawEvidenceManifest !== false ) throw new Error( 'Offline lane join must preserve the finalized raw evidence manifest byte-for-byte.' );
-	if ( typeof join.rawBundleDirectory !== 'string' || typeof join.releaseBundleDirectory !== 'string' || join.rawBundleDirectory.length === 0 || join.releaseBundleDirectory.length === 0 || join.rawBundleDirectory === join.releaseBundleDirectory ) throw new Error( 'Offline promotion requires a separate release-bundle directory.' );
 	const correctness = assertLaneReference( join.correctness, 'correctness' );
 	const physicalRoute = assertLaneReference( join.physicalRoute, 'physicalRoute' );
 	const hardwarePerformance = join.performanceClaims === true
@@ -278,9 +290,7 @@ export function validateEvidenceLaneJoin( join ) {
 		laneCount: references.length,
 		sourceClosureHash: correctness.sourceClosureHash,
 		buildRevision: correctness.buildRevision,
-		threeRevision: correctness.threeRevision,
-		rawBundleDirectory: join.rawBundleDirectory,
-		releaseBundleDirectory: join.releaseBundleDirectory
+		threeRevision: correctness.threeRevision
 	} );
 
 }

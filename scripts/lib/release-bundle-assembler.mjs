@@ -14,7 +14,9 @@ import {
   dirname,
   isAbsolute,
   join,
+  relative,
   resolve,
+  sep,
 } from 'node:path';
 
 import {
@@ -65,6 +67,19 @@ function requireRoutePath(path, label) {
   }
   if (path.includes('//') || path.includes('/./') || path.split('/').some((segment) => segment === '..')) throw new Error(`${label} is not normalized`);
   return path;
+}
+
+function pathContains(root, candidate) {
+  const child = relative(root, candidate);
+  return child === '' || (child !== '..' && !child.startsWith(`..${sep}`) && !isAbsolute(child));
+}
+
+function requireDisjointBundleDirectories(correctnessDirectory, outputDirectory) {
+  const correctnessRoot = resolve(correctnessDirectory);
+  const outputRoot = resolve(outputDirectory);
+  if (pathContains(correctnessRoot, outputRoot) || pathContains(outputRoot, correctnessRoot)) {
+    throw new Error('correctness input and release output must use disjoint resolved directory trees');
+  }
 }
 
 function capturedFile(reference) {
@@ -310,6 +325,7 @@ export async function assemblePreparedReleaseBundle({
   outputDirectory,
   prepareReleaseInputs,
 }) {
+  requireDisjointBundleDirectories(correctnessDirectory, outputDirectory);
   if (existsSync(outputDirectory)) throw new Error(`release output already exists: ${outputDirectory}`);
   if (typeof prepareReleaseInputs !== 'function') throw new TypeError('prepareReleaseInputs must be a function');
   const correctness = validateEvidenceBundle(correctnessDirectory);

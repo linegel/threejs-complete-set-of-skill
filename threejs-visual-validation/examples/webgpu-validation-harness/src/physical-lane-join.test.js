@@ -53,12 +53,10 @@ function lane( name, profile, automationSurface, hashIndex ) {
 function joined() {
 
 	const value = {
-		schemaVersion: 1,
+		schemaVersion: 2,
 		publishable: false,
 		rawEvidenceManifestFinalized: true,
 		rewriteRawEvidenceManifest: false,
-		rawBundleDirectory: '/external/raw-session',
-		releaseBundleDirectory: '/external/release-candidate',
 		performanceClaims: true,
 		correctness: lane( 'correctness', 'correctness', 'playwright-headless-chromium', 0 ),
 		physicalRoute: lane( 'physicalRoute', 'physical-route', 'codex-in-app-browser', 1 ),
@@ -90,9 +88,7 @@ test( 'offline promotion hook requires three distinct matching lanes for perform
 		laneCount: 3,
 		sourceClosureHash: HASHES[ 3 ],
 		buildRevision: HASHES[ 4 ],
-		threeRevision: '0.185.1',
-		rawBundleDirectory: '/external/raw-session',
-		releaseBundleDirectory: '/external/release-candidate'
+		threeRevision: '0.185.1'
 	} );
 
 } );
@@ -196,7 +192,9 @@ test( 'offline promotion hook rejects missing, swapped, cross-source, and raw-pu
 		[ 'wrong Three revision', ( value ) => { value.correctness.threeRevision = '0.184.0'; }, /wrong Three revision/ ],
 		[ 'invalid capture interval', ( value ) => { value.physicalRoute.finishedAt = '2026-07-11T00:00:00.000Z'; }, /invalid capture interval/ ],
 		[ 'raw manifest rewrite', ( value ) => { value.rewriteRawEvidenceManifest = true; }, /preserve the finalized raw/ ],
-		[ 'release reuses raw directory', ( value ) => { value.releaseBundleDirectory = value.rawBundleDirectory; }, /separate release-bundle/ ]
+		[ 'legacy host paths', ( value ) => { value.rawBundleDirectory = '/capture-machine/raw'; }, /exact portable top-level fields/ ],
+		[ 'unknown extension field', ( value ) => { value.note = 'not bound by schema'; }, /exact portable top-level fields/ ],
+		[ 'missing required field', ( value ) => { delete value.physicalRoute; }, /exact portable top-level fields/ ]
 	];
 	for ( const [ name, mutate, pattern ] of mutations ) {
 

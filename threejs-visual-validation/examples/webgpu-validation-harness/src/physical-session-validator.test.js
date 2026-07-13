@@ -866,12 +866,10 @@ test( 'release artifact projector requires the strict three-lane join and projec
 	const verifiedPhysical = await loadVerifiedImportedPhysicalRecord( physicalImport.path, { expectedProfile: 'physical-route' } );
 	const verifiedPerformance = await loadVerifiedImportedPhysicalRecord( performanceImport.path, { expectedProfile: 'performance' } );
 	const strictJoin = {
-		schemaVersion: 1,
+		schemaVersion: 2,
 		publishable: false,
 		rawEvidenceManifestFinalized: true,
 		rewriteRawEvidenceManifest: false,
-		rawBundleDirectory: '/external/raw-correctness',
-		releaseBundleDirectory: '/external/release-candidate',
 		performanceClaims: true,
 		correctness: correctnessLaneReference(
 			correctnessRecord,
