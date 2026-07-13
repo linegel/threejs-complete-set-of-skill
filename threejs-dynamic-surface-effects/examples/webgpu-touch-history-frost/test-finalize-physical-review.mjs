@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { numericDatum, NumericLabel } from "../../../labs/runtime/numeric-evidence.mjs";
 import { canonicalSha256 } from "../../../scripts/lib/evidence-manifest-contract.mjs";
 import { joinFrostPhysicalReview } from "./finalize-physical-review.mjs";
+import { FROST_PHYSICAL_ROUTE_MATRIX } from "./physical-route-matrix.js";
 
 const hash = (value) => canonicalSha256(value);
 
@@ -66,24 +67,68 @@ function pendingFixture() {
 function servedFixture() {
   const entries = [
     "physical-review.html",
+    "physical-route-matrix-review.html",
     "immutable-lab-build.json",
-    "mechanism/refraction-and-fresnel/index.html",
+    ...FROST_PHYSICAL_ROUTE_MATRIX.map(({ staticPath }) => staticPath.slice(1)),
   ].map((resolvedPath) => ({ status: 200, responseKind: "exact-prebuilt-byte", redirected: false, fallback: false, transformed: false, resolvedPath }));
   return { entries, ledgerSha256: hash(entries), documentSha256: hash("document"), byteLength: 1000 };
 }
 
-const finalized = joinFrostPhysicalReview(pendingFixture(), servedFixture());
+function routeMatrixFixture() {
+  const pending = pendingFixture();
+  return {
+    schemaVersion: 1,
+    recordKind: "lab-physical-route-matrix-review-v1",
+    labId: "webgpu-touch-history-frost",
+    profile: "physical-route",
+    automationSurface: "codex-in-app-browser",
+    publishable: false,
+    sourceClosureHash: pending.sourceClosureHash,
+    buildRevision: pending.buildRevision,
+    threeRevision: pending.threeRevision,
+    bundleHash: pending.immutableBuild.bundleHash,
+    startedAt: pending.startedAt,
+    finishedAt: pending.finishedAt,
+    verdict: "PASS",
+    routes: FROST_PHYSICAL_ROUTE_MATRIX.map((route, index) => ({
+      recipeId: route.recipeId,
+      staticPath: route.staticPath,
+      finalUrl: `http://127.0.0.1:4323${route.staticPath}?physicalReview=1&route=${index}`,
+      controllerReady: true,
+      nativeWebGPU: true,
+      deviceIdentityVerified: true,
+      adapterClass: "hardware",
+      mechanismControlLocked: route.locks.mechanism,
+      tierControlLocked: route.locks.tier,
+      observedState: structuredClone(route.startup),
+      finalPixelHash: hash(`pixels-${index}`),
+      disposeEvidence: { status: "PASS", retainedStorageBytes: 0, retainedTargetBytes: 0 },
+      errors: { page: [], console: [], request: [], device: [], postDisposal: [] },
+    })),
+  };
+}
+
+const finalized = joinFrostPhysicalReview(pendingFixture(), routeMatrixFixture(), servedFixture());
 assert.equal(finalized.validation.valid, true);
 assert.equal(finalized.record.immutableBuild.servedLedgerHash, servedFixture().ledgerSha256);
 assert.equal(finalized.serving.status, "FINALIZED_EXACT_STATIC_BYTES");
 assert.equal(finalized.record.publishable, false);
+assert.equal(finalized.record.routeMatrix.routes.length, 10);
 
 const fallback = servedFixture();
 fallback.entries[0].fallback = true;
-assert.throws(() => joinFrostPhysicalReview(pendingFixture(), fallback), /failed, redirected, fallback, or transformed/);
+assert.throws(() => joinFrostPhysicalReview(pendingFixture(), routeMatrixFixture(), fallback), /failed, redirected, fallback, or transformed/);
 
 const missingRoute = servedFixture();
-missingRoute.entries = missingRoute.entries.slice(0, 2);
-assert.throws(() => joinFrostPhysicalReview(pendingFixture(), missingRoute), /omits mechanism/);
+missingRoute.entries = missingRoute.entries.filter(({ resolvedPath }) => resolvedPath !== "tier/budgeted/index.html");
+assert.throws(() => joinFrostPhysicalReview(pendingFixture(), routeMatrixFixture(), missingRoute), /omits tier\/budgeted/);
+
+const staleMatrix = routeMatrixFixture();
+staleMatrix.buildRevision = hash("stale-build");
+assert.throws(() => joinFrostPhysicalReview(pendingFixture(), staleMatrix, servedFixture()), /buildRevision drifted/);
+
+const routeFailure = routeMatrixFixture();
+routeFailure.routes[4].errors.postDisposal.push("late device error");
+assert.throws(() => joinFrostPhysicalReview(pendingFixture(), routeFailure, servedFixture()), /postDisposal errors/);
 
 console.log("frost physical review finalizer contract passed");
