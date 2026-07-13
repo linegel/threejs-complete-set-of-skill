@@ -125,6 +125,15 @@ and following-interval runoff rule. The weather/receiver owner consumes those
 records into its separate `kg/m²` inventory. Water and receiver candidates must
 commit all-or-none; a material never writes either state.
 
+`obstacle-boundary-core.js` covers sub-cell piles and rocks that cannot survive
+a binary cell-centre mask. After six boundary/coupling comparisons it selects
+an exact exponential anisotropic porosity drag for the constrained route. It
+preserves depth, clears dry-cell momentum, resolves normal/tangent response in
+the physics XZ frame, emits the equal-opposite obstacle impulse, and records
+nonnegative kinetic-energy dissipation. A fraction of one is rejected to the
+canonical reflected wall-flux path; hero moving boundaries remain a cut-cell
+escalation rather than an undocumented porosity parameter.
+
 Run `node test-swe-core.mjs`. The test covers a non-flat 10,000-step lake at
 rest, a 240-step wet/dry dam break, closed-domain volume, positivity, CFL
 rejection, invalid-grid mutations, descriptor permutation, slot retention,
