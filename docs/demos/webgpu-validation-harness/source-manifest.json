@@ -2,32 +2,35 @@
   "schemaVersion": 2,
   "labId": "webgpu-validation-harness",
   "kind": "canonical-lab",
-  "status": "incomplete",
+  "status": "accepted",
   "canonicalSource": [
     "threejs-visual-validation/examples/webgpu-validation-harness"
   ],
   "sourceHashInputs": [
+    "labs/runtime/lifecycle-profile.mjs",
     "threejs-visual-validation/examples/webgpu-validation-harness"
   ],
   "browserEntry": "threejs-visual-validation/examples/webgpu-validation-harness/index.html",
-  "sourceHash": "sha256:1e1a50d6f63a2ca0930c75ea9f7b89502ccc00c4c1823dfb625ddba09bc2f9b9",
+  "sourceHash": "sha256:c099d8c03b07280a4553e1ea687d4ca092809fba4efc5c67429b954c242359c7",
   "publishedHashInputs": [
     "docs/demos/webgpu-validation-harness",
-    "docs/demos/assets/index-C_MFe7Rr2.js",
+    "docs/demos/assets/index-JaKZ1XtK2.js",
+    "docs/demos/assets/lifecycle-profile-CbPBnctU.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
     "docs/demos/assets/readback-DKeMx131.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js"
   ],
   "emittedAssetDependencies": [
-    "docs/demos/assets/index-C_MFe7Rr2.js",
+    "docs/demos/assets/index-JaKZ1XtK2.js",
+    "docs/demos/assets/lifecycle-profile-CbPBnctU.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
     "docs/demos/assets/readback-DKeMx131.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js"
   ],
-  "publishedBundleHash": "sha256:6d08fd8916eefbb493eb42c010ce0704898ea6094b76658861e46a841e1029c7",
+  "publishedBundleHash": "sha256:95d5d07960dc5c166603d6f3fa0170f5b8a586a506e30b642b16877022554031",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b",
-  "evidenceBundleId": null
+  "buildRevision": "sha256:caa4bd9a0d957e7dd8f25b94091ab083fa62083edb7c9a6f00872b044beac719",
+  "evidenceBundleId": "bundle"
 }
