@@ -1,6 +1,12 @@
 import * as THREE from 'three/webgpu';
 import { color, float, materialAO, screenUV, vec3, vec4 } from 'three/tsl';
 import {
+	bindWebGPUDeviceIdentity,
+	markWebGPUDeviceDisposed,
+	markWebGPUDeviceDisposing,
+	webgpuDeviceIdentityMetrics
+} from '../../../labs/runtime/webgpu-device-identity.mjs';
+import {
 	AO_TIERS,
 	createGTAOStage,
 	inferPaddedLayout
@@ -11,6 +17,13 @@ import {
 } from './host-adapter.js';
 
 const LAB_ID = 'integration-image-pipeline-ao';
+
+function resolveRuntimeProfile() {
+
+	const profile = globalThis.__LAB_CAPTURE_PROFILE__?.id;
+	return profile === 'performance' ? 'performance' : 'correctness';
+
+}
 
 export const INTEGRATION_SCENARIOS = Object.freeze( [ 'wall-receiver', 'direct-emissive' ] );
 export const INTEGRATION_MODES = Object.freeze( [
@@ -123,11 +136,19 @@ export async function createImagePipelineAOIntegration( {
 } = {} ) {
 
 	if ( AO_TIERS[ initialTier ] === undefined ) throw new Error( `Unknown AO integration tier: ${ initialTier }` );
-	const renderer = new THREE.WebGPURenderer( { canvas, antialias: false, outputBufferType: THREE.HalfFloatType, trackTimestamp: true } );
+	const runtimeProfile = resolveRuntimeProfile();
+	const trackTimestamp = runtimeProfile === 'performance';
+	const renderer = new THREE.WebGPURenderer( {
+		canvas,
+		antialias: false,
+		outputBufferType: THREE.HalfFloatType,
+		trackTimestamp
+	} );
 	renderer.setPixelRatio( dpr );
 	renderer.setSize( width, height, false );
 	await renderer.init();
 	if ( renderer.backend.isWebGPUBackend !== true ) throw new Error( 'Image-pipeline AO integration requires native WebGPU; fallback is not activated.' );
+	const deviceIdentity = bindWebGPUDeviceIdentity( renderer );
 
 	const { scene, camera, groups, movingBlock } = createIntegrationScene();
 	camera.aspect = width / height;
@@ -146,6 +167,7 @@ export async function createImagePipelineAOIntegration( {
 	let tierId = initialTier;
 	let scenarioId = initialScenario;
 	let mode = initialMode;
+	let cameraId = 'design';
 	let timeSeconds = 0;
 	let currentSeed = seed >>> 0;
 	let temporalEnabled = false;
@@ -162,7 +184,9 @@ export async function createImagePipelineAOIntegration( {
 			case 'depth': return vec4( vec3( stage.linearDepth ), 1 );
 			case 'velocity': return vec4( stage.velocityNode.sample( screenUV ).rg.mul( 0.5 ).add( 0.5 ), 0, 1 );
 			case 'indirect-visibility': return vec4( vec3( float( 1 ).sub( stage.reconstructedAO.sample( screenUV ).r ) ), 1 );
-			case 'owner-graph': return vec4( 0.2, 0.72, 1, 1 );
+			// Owner-graph diagnostic: expose denoised AO as a greyscale mechanism panel
+			// (not a solid placeholder — evidence captures reject effectively flat buffers).
+			case 'owner-graph': return vec4( vec3( stage.reconstructedAO.sample( screenUV ).r ), 1 );
 			default: throw new Error( `Unknown AO integration mode: ${ id }` );
 
 		}
@@ -213,6 +237,7 @@ export async function createImagePipelineAOIntegration( {
 		else if ( id === 'design' ) camera.position.set( 3.4, 2.2, 5.3 );
 		else if ( id === 'far' ) camera.position.set( 5.6, 3.5, 8.4 );
 		else throw new Error( `Unknown AO integration camera: ${ id }` );
+		cameraId = id;
 		camera.lookAt( 0, 0.65, 0 );
 		camera.updateMatrixWorld();
 		await resetHistory( 'camera-change' );
@@ -308,7 +333,13 @@ export async function createImagePipelineAOIntegration( {
 		} );
 		const verdict = validateImagePipelineAOOwnership( graph );
 		if ( verdict.valid !== true ) throw new Error( verdict.errors.join( '; ' ) );
-		return graph;
+		return {
+			...graph,
+			runtimeProfile,
+			timestampQueriesRequired: trackTimestamp,
+			timestampQueriesRequested: trackTimestamp,
+			timestampQueriesActive: trackTimestamp && renderer.backend?.isWebGPUBackend === true
+		};
 
 	}
 
@@ -320,23 +351,46 @@ export async function createImagePipelineAOIntegration( {
 
 	function getMetrics() {
 
+		const identityMetrics = webgpuDeviceIdentityMetrics( deviceIdentity, renderer );
 		return {
 			labId: LAB_ID,
-			backend: renderer.backend.isWebGPUBackend === true ? 'webgpu' : 'unsupported',
+			...identityMetrics,
 			threeRevision: THREE.REVISION,
+			runtimeProfile,
+			timestampQueriesRequired: trackTimestamp,
+			timestampQueriesRequested: trackTimestamp,
+			timestampQueriesActive: trackTimestamp && renderer.backend?.isWebGPUBackend === true,
 			tier: tierId,
 			scenario: scenarioId,
 			mode,
+			camera: cameraId,
 			seed: currentSeed,
 			timeSeconds,
+			viewport: {
+				width,
+				height,
+				dpr
+			},
+			routeSelection: {
+				scenario: scenarioId,
+				mode,
+				tier: tierId,
+				camera: cameraId,
+				seed: currentSeed,
+				time: timeSeconds
+			},
 			gpuTiming: { verdict: 'INSUFFICIENT_EVIDENCE', samples: [] },
-			rendererInfo: renderer.info
+			rendererInfo: {
+				...identityMetrics.rendererInfo,
+				info: renderer.info
+			}
 		};
 
 	}
 
 	async function dispose() {
 
+		markWebGPUDeviceDisposing( deviceIdentity );
 		stage.dispose();
 		renderPipeline.dispose();
 		presentationTarget.dispose();
@@ -351,6 +405,7 @@ export async function createImagePipelineAOIntegration( {
 		for ( const geometry of geometries ) geometry.dispose();
 		for ( const value of materials ) value.dispose();
 		renderer.dispose();
+		markWebGPUDeviceDisposed( deviceIdentity );
 
 	}
 

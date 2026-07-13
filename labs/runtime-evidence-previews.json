@@ -1837,7 +1837,7 @@
     },
     {
       "labId": "webgpu-node-gtao",
-      "expectedAcceptanceStatus": "incomplete",
+      "expectedAcceptanceStatus": "accepted",
       "artifactDirectory": "artifacts/visual-validation/webgpu-node-gtao/correctness",
       "backendProof": "capture-session.json",
       "claimVerdicts": "evidence-manifest.json",
@@ -1900,6 +1900,76 @@
           "output": "temporal.t001.png",
           "encoding": "png-copy",
           "meaning": "temporal.t001.png"
+        }
+      ]
+    },
+    {
+      "labId": "integration-image-pipeline-ao",
+      "expectedAcceptanceStatus": "accepted",
+      "artifactDirectory": "artifacts/visual-validation/integration-image-pipeline-ao/correctness",
+      "backendProof": "capture-session.json",
+      "claimVerdicts": "claim-verdicts.json",
+      "primaryImage": "final.design.png",
+      "primaryImageLabel": "Image-pipeline AO integration final presentation (from demo browserEntry)",
+      "limitations": [
+        "Evidence pixels are native-WebGPU readbacks from threejs-ambient-contact-shading/examples/integration-image-pipeline-ao/index.html (the live demo), not substitute gallery art.",
+        "Tracked v2 release bundle: docs/visual-validation/integration-image-pipeline-ao/bundle.",
+        "hardwarePerformance remains NOT_CLAIMED without named-adapter GPU timestamps."
+      ],
+      "images": [
+        {
+          "source": "final.design.png",
+          "output": "final.design.png",
+          "encoding": "png-copy",
+          "meaning": "final.design.png from demo capture"
+        },
+        {
+          "source": "diagnostics.mosaic.png",
+          "output": "diagnostics.mosaic.png",
+          "encoding": "png-copy",
+          "meaning": "diagnostics.mosaic.png from demo capture"
+        },
+        {
+          "source": "camera.near.png",
+          "output": "camera.near.png",
+          "encoding": "png-copy",
+          "meaning": "camera.near.png from demo capture"
+        },
+        {
+          "source": "camera.design.png",
+          "output": "camera.design.png",
+          "encoding": "png-copy",
+          "meaning": "camera.design.png from demo capture"
+        },
+        {
+          "source": "camera.far.png",
+          "output": "camera.far.png",
+          "encoding": "png-copy",
+          "meaning": "camera.far.png from demo capture"
+        },
+        {
+          "source": "seed-0001.final.png",
+          "output": "seed-0001.final.png",
+          "encoding": "png-copy",
+          "meaning": "seed-0001.final.png from demo capture"
+        },
+        {
+          "source": "seed-9e3779b9.final.png",
+          "output": "seed-9e3779b9.final.png",
+          "encoding": "png-copy",
+          "meaning": "seed-9e3779b9.final.png from demo capture"
+        },
+        {
+          "source": "temporal.t000.png",
+          "output": "temporal.t000.png",
+          "encoding": "png-copy",
+          "meaning": "temporal.t000.png from demo capture"
+        },
+        {
+          "source": "temporal.t001.png",
+          "output": "temporal.t001.png",
+          "encoding": "png-copy",
+          "meaning": "temporal.t001.png from demo capture"
         }
       ]
     }

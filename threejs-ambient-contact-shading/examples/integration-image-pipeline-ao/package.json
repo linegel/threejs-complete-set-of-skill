@@ -7,7 +7,7 @@
     "validate": "node test.mjs && node test-mutations.mjs",
     "validate:unit": "node test.mjs",
     "test:mutations": "node test-mutations.mjs",
-    "capture": "node ../../../scripts/capture-lab-browser.mjs --lab integration-image-pipeline-ao --target presentation",
+    "capture": "node ../../../scripts/capture-lab-browser.mjs --lab integration-image-pipeline-ao --target presentation --hook capture-hook.mjs",
     "capture:status": "node evidence-status.mjs capture",
     "validate:artifacts": "node evidence-status.mjs validate:artifacts",
     "validate:quick": "npm run check && npm run validate:unit && npm run test:mutations",

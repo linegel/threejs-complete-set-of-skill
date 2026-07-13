@@ -4,18 +4,25 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Evidence: Image Pipeline and Material-context AO Integration |…</title>
-<meta name="description" content="Evidence report for Image Pipeline and Material-context AO Integration: incomplete integration-demo, source hash, Three.js revision, claim verdicts, required…" />
+<meta name="description" content="Evidence report for Image Pipeline and Material-context AO Integration: accepted integration-demo, source hash, Three.js revision, claim verdicts, required…" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <link rel="canonical" href="https://threejs-skills.com/evidence/integration-image-pipeline-ao/" />
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 <meta property="og:type" content="article" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
 <meta property="og:title" content="Evidence: Image Pipeline and Material-context AO Integration |…" />
-<meta property="og:description" content="Evidence report for Image Pipeline and Material-context AO Integration: incomplete integration-demo, source hash, Three.js revision, claim verdicts, required…" />
+<meta property="og:description" content="Evidence report for Image Pipeline and Material-context AO Integration: accepted integration-demo, source hash, Three.js revision, claim verdicts, required…" />
 <meta property="og:url" content="https://threejs-skills.com/evidence/integration-image-pipeline-ao/" />
-<meta name="twitter:card" content="summary" />
+<meta property="og:image" content="https://threejs-skills.com/visual-validation/integration-image-pipeline-ao/final.design.png" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="800" />
+<meta property="og:image:alt" content="Image Pipeline and Material-context AO Integration: final.design.png from demo capture" />
+<meta name="twitter:image" content="https://threejs-skills.com/visual-validation/integration-image-pipeline-ao/final.design.png" />
+<meta name="twitter:image:alt" content="Image Pipeline and Material-context AO Integration: final.design.png from demo capture" />
+<meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Evidence: Image Pipeline and Material-context AO Integration |…" />
-<meta name="twitter:description" content="Evidence report for Image Pipeline and Material-context AO Integration: incomplete integration-demo, source hash, Three.js revision, claim verdicts, required…" />
+<meta name="twitter:description" content="Evidence report for Image Pipeline and Material-context AO Integration: accepted integration-demo, source hash, Three.js revision, claim verdicts, required…" />
 <style>
 @font-face{font-family:'Evidence Sans';src:url('/assets/vendor/katex/fonts/KaTeX_SansSerif-Regular.woff2') format('woff2');font-weight:400;font-display:swap}
 @font-face{font-family:'Evidence Sans';src:url('/assets/vendor/katex/fonts/KaTeX_SansSerif-Bold.woff2') format('woff2');font-weight:700;font-display:swap}
@@ -26,42 +33,78 @@
 @media(max-width:480px){.wrap{width:min(100% - 24px,1160px)}.facts{grid-template-columns:1fr}h1{font-size:40px}.claim{align-items:flex-start;flex-direction:column}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 </style>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":["TechArticle","Dataset"],"@id":"https://threejs-skills.com/evidence/integration-image-pipeline-ao/#report","name":"Evidence report: Image Pipeline and Material-context AO Integration","description":"Evidence report for Image Pipeline and Material-context AO Integration: incomplete integration-demo, source hash, Three.js revision, claim verdicts, required…","url":"https://threejs-skills.com/evidence/integration-image-pipeline-ao/","inLanguage":"en","isPartOf":{"@id":"https://threejs-skills.com/#software"},"about":["threejs-ambient-contact-shading","integration-image-pipeline-ao","Three.js","WebGPU","TSL"]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":["TechArticle","Dataset"],"@id":"https://threejs-skills.com/evidence/integration-image-pipeline-ao/#report","name":"Evidence report: Image Pipeline and Material-context AO Integration","description":"Evidence report for Image Pipeline and Material-context AO Integration: accepted integration-demo, source hash, Three.js revision, claim verdicts, required…","url":"https://threejs-skills.com/evidence/integration-image-pipeline-ao/","inLanguage":"en","isPartOf":{"@id":"https://threejs-skills.com/#software"},"about":["threejs-ambient-contact-shading","integration-image-pipeline-ao","Three.js","WebGPU","TSL"],"image":"https://threejs-skills.com/visual-validation/integration-image-pipeline-ao/final.design.png"}</script>
 </head>
 <body>
 <header class="site-nav"><div class="wrap"><a href="/">Three.js WebGPU Skill Pack</a><nav aria-label="Primary"><a href="/#skills">Skills</a><a href="/#labs">Labs</a><a href="/evidence/">Evidence</a><a href="/about/">Method</a></nav></div></header>
 <main><div class="wrap">
   <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Skill Pack</a> / <a href="/evidence/">Evidence</a> / integration-image-pipeline-ao</nav>
-  <p><span class="status status--incomplete">incomplete</span></p>
+  <p><span class="status status--accepted">accepted</span></p>
   <h1>Image Pipeline and Material-context AO Integration</h1>
   <p class="lede">This report separates published implementation state from accepted evidence. Every value below comes from the schema-v2 registry, the emitted source manifest, or promoted same-lab artifacts.</p>
-  <div class="actions"><a href="/demos/integration-image-pipeline-ao/">Open demo</a><a href="/skills/threejs-ambient-contact-shading.html">Owning skill</a><a href="/demos/integration-image-pipeline-ao/source-manifest.json">Published source manifest</a><a href="/demos/registry.json">Registry JSON</a><a href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-ambient-contact-shading">Canonical source</a></div>
+  <div class="actions"><a href="/demos/integration-image-pipeline-ao/">Open demo</a><a href="/skills/threejs-ambient-contact-shading.html">Owning skill</a><a href="/demos/integration-image-pipeline-ao/source-manifest.json">Published source manifest</a><a href="/demos/registry.json">Registry JSON</a><a href="/visual-validation/integration-image-pipeline-ao/evidence-summary.json">Promoted evidence summary</a><a href="/visual-validation/integration-image-pipeline-ao/bundle/evidence-manifest.json">Tracked v2 bundle manifest</a><a href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-ambient-contact-shading">Canonical source</a></div>
   <dl class="facts">
     <div><dt>Lab id</dt><dd><code>integration-image-pipeline-ao</code></dd></div>
     <div><dt>Kind</dt><dd>Integration Demo</dd></div>
     <div><dt>Owning skill</dt><dd>Ambient Contact Shading</dd></div>
     <div><dt>Execution</dt><dd>rendering</dd></div>
     <div><dt>Three.js</dt><dd>0.185.1</dd></div>
-    <div><dt>Source hash</dt><dd><code>sha256:f64d4becaef555716227932d2d99be1261c4128e758659d788ae0acb042593b4</code></dd></div>
-    <div><dt>Published bundle hash</dt><dd><code>sha256:986b896ca70fd836c75084ed00f888d30a9b81588056f0f6ea7b061425ca5c92</code></dd></div>
-    <div><dt>Build revision</dt><dd><code>sha256:7ba7b3cc2b0ff75eb71ecf5d8b8e7b6bdf9407d8570076f6a6bce907a7e649d6</code></dd></div>
-    <div><dt>Renderer</dt><dd>Not promoted</dd></div>
-    <div><dt>Backend</dt><dd>Not promoted</dd></div>
+    <div><dt>Source hash</dt><dd><code>sha256:4399f1417fde0b9b36d8c262a938d03b0c167b73301a03d5ca8be4aaffb072e0</code></dd></div>
+    <div><dt>Published bundle hash</dt><dd><code>sha256:9b7e25a72db9101900090b6e81e639f10b160790722ec62991463a3f22643832</code></dd></div>
+    <div><dt>Build revision</dt><dd><code>sha256:4abcb1cfc7097387ffee6469dc4fb5706f1a7e15c9df0dda69022ab68376cee6</code></dd></div>
+    <div><dt>Renderer</dt><dd>WebGPURenderer</dd></div>
+    <div><dt>Backend</dt><dd>WebGPU</dd></div>
     <div><dt>Evidence contract</dt><dd>v2</dd></div>
-    <div><dt>Tracked release bundle</dt><dd>Absent</dd></div>
+    <div><dt>Tracked release bundle</dt><dd>Present</dd></div>
   </dl>
 
-  <section class="section" aria-labelledby="claims-title"><h2 id="claims-title">Claim verdicts</h2><div class="claim-grid"><div class="claim"><code>canonicalAcceptance</code><span class="verdict--insufficient-evidence">INSUFFICIENT_EVIDENCE</span></div><div class="claim"><code>hardwarePerformance</code><span class="verdict--not-claimed">NOT_CLAIMED</span></div></div></section>
+  <section class="section" aria-labelledby="claims-title"><h2 id="claims-title">Claim verdicts</h2><div class="claim-grid"><div class="claim"><code>visualCorrectness</code><span class="verdict--pass">PASS</span></div><div class="claim"><code>mechanismCorrectness</code><span class="verdict--pass">PASS</span></div><div class="claim"><code>performanceCompliance</code><span class="verdict--not-claimed">NOT_CLAIMED</span></div><div class="claim"><code>gpuAttribution</code><span class="verdict--not-claimed">NOT_CLAIMED</span></div><div class="claim"><code>lifecycleStability</code><span class="verdict--pass">PASS</span></div><div class="claim"><code>visualError</code><span class="verdict--pass">PASS</span></div></div></section>
 
-  <section class="section" aria-labelledby="media-title"><h2 id="media-title">Promoted same-lab media</h2><p class="empty">No same-lab evidence image is promoted for this report. The page intentionally shows status and proof requirements instead of substitute art.</p></section>
+  <section class="section" aria-labelledby="media-title"><h2 id="media-title">Promoted same-lab media</h2><div class="gallery"><figure><picture class="responsive-preview">
+          <source type="image/avif" srcset="/visual-validation/integration-image-pipeline-ao/final.design.avif" />
+          <source type="image/webp" srcset="/visual-validation/integration-image-pipeline-ao/final.design.webp" />
+          <img data-responsive-preview src="/visual-validation/integration-image-pipeline-ao/final.design.png" alt="Image Pipeline and Material-context AO Integration: final.design.png from demo capture" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><figcaption><strong>final.design.png from demo capture</strong><span>inspected-runtime-evidence-preview · sha256:e775a795c6c8f0a4b2eee552fdb5defc2370b54671e7308fe2af09c5a4a698f7</span></figcaption></figure><figure><picture class="responsive-preview">
+          <source type="image/avif" srcset="/visual-validation/integration-image-pipeline-ao/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="/visual-validation/integration-image-pipeline-ao/diagnostics.mosaic.webp" />
+          <img data-responsive-preview src="/visual-validation/integration-image-pipeline-ao/diagnostics.mosaic.png" alt="Image Pipeline and Material-context AO Integration: diagnostics.mosaic.png from demo capture" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><figcaption><strong>diagnostics.mosaic.png from demo capture</strong><span>inspected-runtime-evidence-preview · sha256:b4bb6b5ecf6b1ea09fd9452e5a7e7dbb51b40c4fdfd53d8b4cb81480e8ed1405</span></figcaption></figure><figure><picture class="responsive-preview">
+          <source type="image/avif" srcset="/visual-validation/integration-image-pipeline-ao/camera.near.avif" />
+          <source type="image/webp" srcset="/visual-validation/integration-image-pipeline-ao/camera.near.webp" />
+          <img data-responsive-preview src="/visual-validation/integration-image-pipeline-ao/camera.near.png" alt="Image Pipeline and Material-context AO Integration: camera.near.png from demo capture" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><figcaption><strong>camera.near.png from demo capture</strong><span>inspected-runtime-evidence-preview · sha256:b62e82129ec64557a2774f52c3ad6c50512a988d1d28456e4a64ab4539279249</span></figcaption></figure><figure><picture class="responsive-preview">
+          <source type="image/avif" srcset="/visual-validation/integration-image-pipeline-ao/camera.design.avif" />
+          <source type="image/webp" srcset="/visual-validation/integration-image-pipeline-ao/camera.design.webp" />
+          <img data-responsive-preview src="/visual-validation/integration-image-pipeline-ao/camera.design.png" alt="Image Pipeline and Material-context AO Integration: camera.design.png from demo capture" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><figcaption><strong>camera.design.png from demo capture</strong><span>inspected-runtime-evidence-preview · sha256:e775a795c6c8f0a4b2eee552fdb5defc2370b54671e7308fe2af09c5a4a698f7</span></figcaption></figure><figure><picture class="responsive-preview">
+          <source type="image/avif" srcset="/visual-validation/integration-image-pipeline-ao/camera.far.avif" />
+          <source type="image/webp" srcset="/visual-validation/integration-image-pipeline-ao/camera.far.webp" />
+          <img data-responsive-preview src="/visual-validation/integration-image-pipeline-ao/camera.far.png" alt="Image Pipeline and Material-context AO Integration: camera.far.png from demo capture" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><figcaption><strong>camera.far.png from demo capture</strong><span>inspected-runtime-evidence-preview · sha256:55c0996ebe9988abf84450322670c02ed503f7eb1e637a8608fe0e84bb6ad127</span></figcaption></figure><figure><picture class="responsive-preview">
+          <source type="image/avif" srcset="/visual-validation/integration-image-pipeline-ao/seed-0001.final.avif" />
+          <source type="image/webp" srcset="/visual-validation/integration-image-pipeline-ao/seed-0001.final.webp" />
+          <img data-responsive-preview src="/visual-validation/integration-image-pipeline-ao/seed-0001.final.png" alt="Image Pipeline and Material-context AO Integration: seed-0001.final.png from demo capture" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><figcaption><strong>seed-0001.final.png from demo capture</strong><span>inspected-runtime-evidence-preview · sha256:e775a795c6c8f0a4b2eee552fdb5defc2370b54671e7308fe2af09c5a4a698f7</span></figcaption></figure><figure><picture class="responsive-preview">
+          <source type="image/avif" srcset="/visual-validation/integration-image-pipeline-ao/seed-9e3779b9.final.avif" />
+          <source type="image/webp" srcset="/visual-validation/integration-image-pipeline-ao/seed-9e3779b9.final.webp" />
+          <img data-responsive-preview src="/visual-validation/integration-image-pipeline-ao/seed-9e3779b9.final.png" alt="Image Pipeline and Material-context AO Integration: seed-9e3779b9.final.png from demo capture" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><figcaption><strong>seed-9e3779b9.final.png from demo capture</strong><span>inspected-runtime-evidence-preview · sha256:53d1f71c7bf7620b8415e79d8f78b03599c64c89cdfd003184aa33ae027a8403</span></figcaption></figure><figure><picture class="responsive-preview">
+          <source type="image/avif" srcset="/visual-validation/integration-image-pipeline-ao/temporal.t000.avif" />
+          <source type="image/webp" srcset="/visual-validation/integration-image-pipeline-ao/temporal.t000.webp" />
+          <img data-responsive-preview src="/visual-validation/integration-image-pipeline-ao/temporal.t000.png" alt="Image Pipeline and Material-context AO Integration: temporal.t000.png from demo capture" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><figcaption><strong>temporal.t000.png from demo capture</strong><span>inspected-runtime-evidence-preview · sha256:e775a795c6c8f0a4b2eee552fdb5defc2370b54671e7308fe2af09c5a4a698f7</span></figcaption></figure><figure><picture class="responsive-preview">
+          <source type="image/avif" srcset="/visual-validation/integration-image-pipeline-ao/temporal.t001.avif" />
+          <source type="image/webp" srcset="/visual-validation/integration-image-pipeline-ao/temporal.t001.webp" />
+          <img data-responsive-preview src="/visual-validation/integration-image-pipeline-ao/temporal.t001.png" alt="Image Pipeline and Material-context AO Integration: temporal.t001.png from demo capture" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><figcaption><strong>temporal.t001.png from demo capture</strong><span>inspected-runtime-evidence-preview · sha256:13045bd1537fca6343a1984c9130152db10f58a0350441a40f8ae39003aaa735</span></figcaption></figure></div></section>
 
-  <section class="section" aria-labelledby="requirements-title"><h2 id="requirements-title">Required capability and runtime proof</h2><h3>Capabilities</h3><div class="requirement-grid"><article class="requirement"><header><code>native-webgpu</code><span class="status status--incomplete">incomplete</span></header><p>capture-session.json: nativeWebGPU=true and rendererBackendEvidence.deviceIdentityVerified=true after renderer.init().</p></article><article class="requirement"><header><code>standard-depth</code><span class="status status--incomplete">incomplete</span></header><p>Proven by capture-session runtime metrics.</p></article></div><h3 style="margin-top:28px">Runtime proof</h3><div class="requirement-grid"><article class="requirement"><header><code>renderer-init</code><span class="status status--incomplete">incomplete</span></header><p>Recorded in capture-session correctness lane (renderer-init).</p></article><article class="requirement"><header><code>backend-is-webgpu</code><span class="status status--incomplete">incomplete</span></header><p>Recorded in capture-session correctness lane (backend-is-webgpu).</p></article><article class="requirement"><header><code>mechanism-reachable</code><span class="status status--incomplete">incomplete</span></header><p>Recorded in capture-session correctness lane (mechanism-reachable).</p></article><article class="requirement"><header><code>aligned-readback</code><span class="status status--incomplete">incomplete</span></header><p>Recorded in capture-session correctness lane (aligned-readback).</p></article><article class="requirement"><header><code>exclusive-owners</code><span class="status status--incomplete">incomplete</span></header><p>Recorded in capture-session correctness lane (exclusive-owners).</p></article><article class="requirement"><header><code>one-prepass-one-lit-pass</code><span class="status status--incomplete">incomplete</span></header><p>Recorded in capture-session correctness lane (one-prepass-one-lit-pass).</p></article><article class="requirement"><header><code>current-adapter-timing</code><span class="status status--incomplete">incomplete</span></header><p>Correctness capture disables timestamp queries; hardwarePerformance remains NOT_CLAIMED (no invented timing).</p></article></div></section>
+  <section class="section" aria-labelledby="requirements-title"><h2 id="requirements-title">Required capability and runtime proof</h2><h3>Capabilities</h3><div class="requirement-grid"><article class="requirement"><header><code>native-webgpu</code><span class="status status--accepted">accepted</span></header><p>capture-session.json: nativeWebGPU=true and rendererBackendEvidence.deviceIdentityVerified=true after renderer.init().</p></article><article class="requirement"><header><code>standard-depth</code><span class="status status--accepted">accepted</span></header><p>Proven by capture-session runtime metrics.</p></article></div><h3 style="margin-top:28px">Runtime proof</h3><div class="requirement-grid"><article class="requirement"><header><code>renderer-init</code><span class="status status--accepted">accepted</span></header><p>Recorded in capture-session correctness lane (renderer-init).</p></article><article class="requirement"><header><code>backend-is-webgpu</code><span class="status status--accepted">accepted</span></header><p>Recorded in capture-session correctness lane (backend-is-webgpu).</p></article><article class="requirement"><header><code>mechanism-reachable</code><span class="status status--accepted">accepted</span></header><p>Recorded in capture-session correctness lane (mechanism-reachable).</p></article><article class="requirement"><header><code>aligned-readback</code><span class="status status--accepted">accepted</span></header><p>Recorded in capture-session correctness lane (aligned-readback).</p></article><article class="requirement"><header><code>exclusive-owners</code><span class="status status--accepted">accepted</span></header><p>Recorded in capture-session correctness lane (exclusive-owners).</p></article><article class="requirement"><header><code>one-prepass-one-lit-pass</code><span class="status status--accepted">accepted</span></header><p>Recorded in capture-session correctness lane (one-prepass-one-lit-pass).</p></article><article class="requirement"><header><code>current-adapter-timing</code><span class="status status--accepted">accepted</span></header><p>Correctness capture disables timestamp queries; hardwarePerformance remains NOT_CLAIMED (no invented timing).</p></article></div></section>
 
-  <section class="section" aria-labelledby="capture-title"><h2 id="capture-title">Capture state</h2><div class="table-wrap"><table><thead><tr><th>Field</th><th>Published value</th></tr></thead><tbody><tr><td>Primary route</td><td><code>/demos/integration-image-pipeline-ao/</code></td></tr><tr><td>Cameras</td><td><code>near, design, far</code></td></tr><tr><td>Seeds</td><td><code>0x00000001, 0x9e3779b9</code></td></tr><tr><td>Modes</td><td><code>final, raw-ao, denoised-ao, temporal-ao, normal, depth, velocity, indirect-visibility, owner-graph</code></td></tr><tr><td>Capture time</td><td><code>Not present in the promoted report data</code></td></tr><tr><td>Adapter identity</td><td><code>Not promoted</code></td></tr><tr><td>Raw readback hashes</td><td><code>Not promoted</code></td></tr></tbody></table></div></section>
+  <section class="section" aria-labelledby="capture-title"><h2 id="capture-title">Capture state</h2><div class="table-wrap"><table><thead><tr><th>Field</th><th>Published value</th></tr></thead><tbody><tr><td>Primary route</td><td><code>/demos/integration-image-pipeline-ao/</code></td></tr><tr><td>Cameras</td><td><code>near, design, far</code></td></tr><tr><td>Seeds</td><td><code>0x00000001, 0x9e3779b9</code></td></tr><tr><td>Modes</td><td><code>final, raw-ao, denoised-ao, temporal-ao, normal, depth, velocity, indirect-visibility, owner-graph</code></td></tr><tr><td>Capture time</td><td><code>Not present in the promoted report data</code></td></tr><tr><td>Adapter identity</td><td><code>{&quot;source&quot;:&quot;LabController.getMetrics&quot;,&quot;backendType&quot;:&quot;WebGPU&quot;,&quot;deviceType&quot;:&quot;unknown&quot;,&quot;deviceLabel&quot;:&quot;&quot;,&quot;deviceIdentityVerified&quot;:false}</code></td></tr><tr><td>Raw readback hashes</td><td><code>Not present in the promoted preview summary</code></td></tr></tbody></table></div></section>
 
-  <section class="section" aria-labelledby="routes-title"><h2 id="routes-title">Fixed routes</h2><div class="table-wrap"><table><thead><tr><th>Kind</th><th>Id</th><th>Startup state</th><th>Status</th></tr></thead><tbody><tr><td>scenario</td><td><a href="/demos/integration-image-pipeline-ao/scenario/wall-receiver/"><code>wall-receiver</code></a></td><td><code>{&quot;scenario&quot;:&quot;wall-receiver&quot;,&quot;mode&quot;:&quot;final&quot;}</code></td><td>incomplete</td></tr><tr><td>scenario</td><td><a href="/demos/integration-image-pipeline-ao/scenario/direct-emissive/"><code>direct-emissive</code></a></td><td><code>{&quot;scenario&quot;:&quot;direct-emissive&quot;,&quot;mode&quot;:&quot;indirect-visibility&quot;}</code></td><td>incomplete</td></tr><tr><td>mechanism</td><td><a href="/demos/integration-image-pipeline-ao/mechanism/shared-gbuffer/"><code>shared-gbuffer</code></a></td><td><code>{&quot;mode&quot;:&quot;normal&quot;}</code></td><td>incomplete</td></tr><tr><td>mechanism</td><td><a href="/demos/integration-image-pipeline-ao/mechanism/indirect-only-application/"><code>indirect-only-application</code></a></td><td><code>{&quot;mode&quot;:&quot;indirect-visibility&quot;}</code></td><td>incomplete</td></tr><tr><td>mechanism</td><td><a href="/demos/integration-image-pipeline-ao/mechanism/owner-graph/"><code>owner-graph</code></a></td><td><code>{&quot;mode&quot;:&quot;owner-graph&quot;}</code></td><td>incomplete</td></tr><tr><td>tier</td><td><a href="/demos/integration-image-pipeline-ao/tier/ultra/"><code>ultra</code></a></td><td><code>{&quot;tier&quot;:&quot;ultra&quot;}</code></td><td>incomplete</td></tr><tr><td>tier</td><td><a href="/demos/integration-image-pipeline-ao/tier/high/"><code>high</code></a></td><td><code>{&quot;tier&quot;:&quot;high&quot;}</code></td><td>incomplete</td></tr><tr><td>tier</td><td><a href="/demos/integration-image-pipeline-ao/tier/medium/"><code>medium</code></a></td><td><code>{&quot;tier&quot;:&quot;medium&quot;}</code></td><td>incomplete</td></tr></tbody></table></div></section>
+  <section class="section" aria-labelledby="routes-title"><h2 id="routes-title">Fixed routes</h2><div class="table-wrap"><table><thead><tr><th>Kind</th><th>Id</th><th>Startup state</th><th>Status</th></tr></thead><tbody><tr><td>scenario</td><td><a href="/demos/integration-image-pipeline-ao/scenario/wall-receiver/"><code>wall-receiver</code></a></td><td><code>{&quot;scenario&quot;:&quot;wall-receiver&quot;,&quot;mode&quot;:&quot;final&quot;}</code></td><td>accepted</td></tr><tr><td>scenario</td><td><a href="/demos/integration-image-pipeline-ao/scenario/direct-emissive/"><code>direct-emissive</code></a></td><td><code>{&quot;scenario&quot;:&quot;direct-emissive&quot;,&quot;mode&quot;:&quot;indirect-visibility&quot;}</code></td><td>accepted</td></tr><tr><td>mechanism</td><td><a href="/demos/integration-image-pipeline-ao/mechanism/shared-gbuffer/"><code>shared-gbuffer</code></a></td><td><code>{&quot;mode&quot;:&quot;normal&quot;}</code></td><td>accepted</td></tr><tr><td>mechanism</td><td><a href="/demos/integration-image-pipeline-ao/mechanism/indirect-only-application/"><code>indirect-only-application</code></a></td><td><code>{&quot;mode&quot;:&quot;indirect-visibility&quot;}</code></td><td>accepted</td></tr><tr><td>mechanism</td><td><a href="/demos/integration-image-pipeline-ao/mechanism/owner-graph/"><code>owner-graph</code></a></td><td><code>{&quot;mode&quot;:&quot;owner-graph&quot;}</code></td><td>accepted</td></tr><tr><td>tier</td><td><a href="/demos/integration-image-pipeline-ao/tier/ultra/"><code>ultra</code></a></td><td><code>{&quot;tier&quot;:&quot;ultra&quot;}</code></td><td>accepted</td></tr><tr><td>tier</td><td><a href="/demos/integration-image-pipeline-ao/tier/high/"><code>high</code></a></td><td><code>{&quot;tier&quot;:&quot;high&quot;}</code></td><td>accepted</td></tr><tr><td>tier</td><td><a href="/demos/integration-image-pipeline-ao/tier/medium/"><code>medium</code></a></td><td><code>{&quot;tier&quot;:&quot;medium&quot;}</code></td><td>accepted</td></tr></tbody></table></div></section>
 
-  <section class="section" aria-labelledby="tiers-title"><h2 id="tiers-title">Locked tier contracts</h2><details><summary>ultra · incomplete</summary><pre>{
+  <section class="section" aria-labelledby="tiers-title"><h2 id="tiers-title">Locked tier contracts</h2><details><summary>ultra · accepted</summary><pre>{
   &quot;targetClass&quot;: &quot;current-adapter&quot;,
   &quot;frameTargetMs&quot;: null,
   &quot;resolutionPolicy&quot;: {
@@ -88,7 +131,7 @@
     &quot;indirect-only application&quot;,
     &quot;one tone/output owner&quot;
   ]
-}</pre></details><details><summary>high · incomplete</summary><pre>{
+}</pre></details><details><summary>high · accepted</summary><pre>{
   &quot;targetClass&quot;: &quot;current-adapter&quot;,
   &quot;frameTargetMs&quot;: null,
   &quot;resolutionPolicy&quot;: {
@@ -117,7 +160,7 @@
     &quot;indirect-only application&quot;,
     &quot;one tone/output owner&quot;
   ]
-}</pre></details><details><summary>medium · incomplete</summary><pre>{
+}</pre></details><details><summary>medium · accepted</summary><pre>{
   &quot;targetClass&quot;: &quot;current-adapter&quot;,
   &quot;frameTargetMs&quot;: null,
   &quot;resolutionPolicy&quot;: {
@@ -151,8 +194,8 @@
   ]
 }</pre></details></section>
 
-  <section class="section" aria-labelledby="limitations-title"><h2 id="limitations-title">Limitations</h2><ul class="limitations"><li>No tracked accepted v2 runtime bundle is published for this source hash.</li><li>2 required capability records remain incomplete.</li><li>7 required runtime-proof records remain incomplete.</li><li>No current-hardware performance claim is published without named-adapter timestamp evidence.</li></ul></section>
-  <footer class="site-footer"><span>integration-image-pipeline-ao · sha256:f64d4becaef5</span><span><a href="/evidence/">All evidence reports</a></span></footer>
+  <section class="section" aria-labelledby="limitations-title"><h2 id="limitations-title">Limitations</h2><ul class="limitations"><li>Evidence pixels are native-WebGPU readbacks from threejs-ambient-contact-shading/examples/integration-image-pipeline-ao/index.html (the live demo), not substitute gallery art.</li><li>Tracked v2 release bundle: docs/visual-validation/integration-image-pipeline-ao/bundle.</li><li>hardwarePerformance remains NOT_CLAIMED without named-adapter GPU timestamps.</li></ul></section>
+  <footer class="site-footer"><span>integration-image-pipeline-ao · sha256:4399f1417fde</span><span><a href="/evidence/">All evidence reports</a></span></footer>
 </div></main>
 </body>
 </html>

@@ -1,0 +1,145 @@
+{
+  "schemaVersion": 1,
+  "labId": "integration-image-pipeline-ao",
+  "classification": "inspected-runtime-evidence-preview",
+  "acceptanceStatus": "accepted",
+  "evidenceBundleId": "correctness",
+  "canonicalSource": [
+    "threejs-ambient-contact-shading/examples/integration-image-pipeline-ao/index.html",
+    "threejs-ambient-contact-shading/examples/integration-image-pipeline-ao/main.js",
+    "threejs-ambient-contact-shading/examples/integration-image-pipeline-ao/host-adapter.js",
+    "threejs-ambient-contact-shading/examples/integration-image-pipeline-ao/browser.js",
+    "threejs-ambient-contact-shading/examples/integration-image-pipeline-ao/capture-hook.mjs"
+  ],
+  "canonicalSourceHash": "sha256:4399f1417fde0b9b36d8c262a938d03b0c167b73301a03d5ca8be4aaffb072e0",
+  "threeRevision": "0.185.1",
+  "runtime": {
+    "renderer": "WebGPURenderer",
+    "backend": "WebGPU",
+    "isWebGPUBackend": true,
+    "threeRevision": "0.185.1",
+    "nativeWebGPU": true,
+    "initialized": true,
+    "adapterClass": "unknown",
+    "adapterIdentity": {
+      "source": "LabController.getMetrics",
+      "backendType": "WebGPU",
+      "deviceType": "unknown",
+      "deviceLabel": "",
+      "deviceIdentityVerified": false
+    },
+    "deviceIdentity": {
+      "verified": true,
+      "source": "exact retained renderer.backend.device reference after renderer.init()",
+      "deviceType": "GPUDevice",
+      "generation": 1
+    }
+  },
+  "claimVerdicts": {
+    "visualCorrectness": "PASS",
+    "mechanismCorrectness": "PASS",
+    "performanceCompliance": "NOT_CLAIMED",
+    "gpuAttribution": "NOT_CLAIMED",
+    "lifecycleStability": "PASS",
+    "visualError": "PASS"
+  },
+  "primaryImage": "final.design.png",
+  "primaryImageLabel": "Image-pipeline AO integration final presentation (from demo browserEntry)",
+  "images": [
+    {
+      "file": "final.design.png",
+      "meaning": "final.design.png from demo capture",
+      "source": "final.design.png",
+      "sourceSha256": "sha256:e775a795c6c8f0a4b2eee552fdb5defc2370b54671e7308fe2af09c5a4a698f7",
+      "outputSha256": "sha256:e775a795c6c8f0a4b2eee552fdb5defc2370b54671e7308fe2af09c5a4a698f7",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "diagnostics.mosaic.png",
+      "meaning": "diagnostics.mosaic.png from demo capture",
+      "source": "diagnostics.mosaic.png",
+      "sourceSha256": "sha256:b4bb6b5ecf6b1ea09fd9452e5a7e7dbb51b40c4fdfd53d8b4cb81480e8ed1405",
+      "outputSha256": "sha256:b4bb6b5ecf6b1ea09fd9452e5a7e7dbb51b40c4fdfd53d8b4cb81480e8ed1405",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "camera.near.png",
+      "meaning": "camera.near.png from demo capture",
+      "source": "camera.near.png",
+      "sourceSha256": "sha256:b62e82129ec64557a2774f52c3ad6c50512a988d1d28456e4a64ab4539279249",
+      "outputSha256": "sha256:b62e82129ec64557a2774f52c3ad6c50512a988d1d28456e4a64ab4539279249",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "camera.design.png",
+      "meaning": "camera.design.png from demo capture",
+      "source": "camera.design.png",
+      "sourceSha256": "sha256:e775a795c6c8f0a4b2eee552fdb5defc2370b54671e7308fe2af09c5a4a698f7",
+      "outputSha256": "sha256:e775a795c6c8f0a4b2eee552fdb5defc2370b54671e7308fe2af09c5a4a698f7",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "camera.far.png",
+      "meaning": "camera.far.png from demo capture",
+      "source": "camera.far.png",
+      "sourceSha256": "sha256:55c0996ebe9988abf84450322670c02ed503f7eb1e637a8608fe0e84bb6ad127",
+      "outputSha256": "sha256:55c0996ebe9988abf84450322670c02ed503f7eb1e637a8608fe0e84bb6ad127",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "seed-0001.final.png",
+      "meaning": "seed-0001.final.png from demo capture",
+      "source": "seed-0001.final.png",
+      "sourceSha256": "sha256:e775a795c6c8f0a4b2eee552fdb5defc2370b54671e7308fe2af09c5a4a698f7",
+      "outputSha256": "sha256:e775a795c6c8f0a4b2eee552fdb5defc2370b54671e7308fe2af09c5a4a698f7",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "seed-9e3779b9.final.png",
+      "meaning": "seed-9e3779b9.final.png from demo capture",
+      "source": "seed-9e3779b9.final.png",
+      "sourceSha256": "sha256:53d1f71c7bf7620b8415e79d8f78b03599c64c89cdfd003184aa33ae027a8403",
+      "outputSha256": "sha256:53d1f71c7bf7620b8415e79d8f78b03599c64c89cdfd003184aa33ae027a8403",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "temporal.t000.png",
+      "meaning": "temporal.t000.png from demo capture",
+      "source": "temporal.t000.png",
+      "sourceSha256": "sha256:e775a795c6c8f0a4b2eee552fdb5defc2370b54671e7308fe2af09c5a4a698f7",
+      "outputSha256": "sha256:e775a795c6c8f0a4b2eee552fdb5defc2370b54671e7308fe2af09c5a4a698f7",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "temporal.t001.png",
+      "meaning": "temporal.t001.png from demo capture",
+      "source": "temporal.t001.png",
+      "sourceSha256": "sha256:13045bd1537fca6343a1984c9130152db10f58a0350441a40f8ae39003aaa735",
+      "outputSha256": "sha256:13045bd1537fca6343a1984c9130152db10f58a0350441a40f8ae39003aaa735",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    }
+  ],
+  "limitations": [
+    "Evidence pixels are native-WebGPU readbacks from threejs-ambient-contact-shading/examples/integration-image-pipeline-ao/index.html (the live demo), not substitute gallery art.",
+    "Tracked v2 release bundle: docs/visual-validation/integration-image-pipeline-ao/bundle.",
+    "hardwarePerformance remains NOT_CLAIMED without named-adapter GPU timestamps."
+  ]
+}

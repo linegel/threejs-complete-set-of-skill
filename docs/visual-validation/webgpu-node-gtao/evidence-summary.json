@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "labId": "webgpu-node-gtao",
   "classification": "inspected-runtime-evidence-preview",
-  "acceptanceStatus": "incomplete",
+  "acceptanceStatus": "accepted",
   "evidenceBundleId": "correctness",
   "canonicalSource": [
     "threejs-ambient-contact-shading/examples/webgpu-node-gtao"
@@ -32,7 +32,7 @@
     }
   },
   "claimVerdicts": {
-    "visualCorrectness": "INSUFFICIENT_EVIDENCE",
+    "visualCorrectness": "PASS",
     "mechanismCorrectness": "PASS",
     "performanceCompliance": "NOT_CLAIMED",
     "gpuAttribution": "NOT_CLAIMED",

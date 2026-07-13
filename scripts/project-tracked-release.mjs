@@ -21,8 +21,26 @@ function sha256Bytes(bytes) {
   return `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
 }
 
+function sanitizeSourceClosure(sourceClosure, files = null) {
+  // projection schema allows only algorithm/roots/files/threeRevision/sourceHash/buildRevision
+  const sanitized = {
+    algorithm: sourceClosure?.algorithm,
+    roots: sourceClosure?.roots,
+    files: files ?? sourceClosure?.files,
+    threeRevision: sourceClosure?.threeRevision,
+    sourceHash: sourceClosure?.sourceHash,
+    buildRevision: sourceClosure?.buildRevision,
+  };
+  for (const key of Object.keys(sanitized)) {
+    if (sanitized[key] === undefined) delete sanitized[key];
+  }
+  return sanitized;
+}
+
 function materializeSourceClosureFiles(sourceClosure, repositoryRoot) {
-  if (Array.isArray(sourceClosure?.files) && sourceClosure.files.length > 0) return sourceClosure;
+  if (Array.isArray(sourceClosure?.files) && sourceClosure.files.length > 0) {
+    return sanitizeSourceClosure(sourceClosure, sourceClosure.files);
+  }
   const roots = sourceClosure?.roots;
   if (!Array.isArray(roots) || roots.length === 0) throw new Error('source closure has no roots to materialize');
   const excludedSegments = new Set(['.git', '.DS_Store', 'artifacts', 'node_modules']);
@@ -53,7 +71,7 @@ function materializeSourceClosureFiles(sourceClosure, repositoryRoot) {
     walk(absolute);
   }
   files.sort((left, right) => left.repositoryPath.localeCompare(right.repositoryPath));
-  return { ...sourceClosure, files };
+  return sanitizeSourceClosure(sourceClosure, files);
 }
 
 

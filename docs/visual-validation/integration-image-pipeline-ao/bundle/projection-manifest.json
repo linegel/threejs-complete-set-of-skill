@@ -1,0 +1,341 @@
+{
+  "schemaVersion": 1,
+  "projectionKind": "tracked-release-projection-v1",
+  "policy": {
+    "id": "native-webgpu-tracked-release-v1",
+    "digest": "sha256:e349900d79da27cb5570ea959707f741e03ea7e206d85a717a1129b27268f6a4"
+  },
+  "labId": "integration-image-pipeline-ao",
+  "skill": "threejs-ambient-contact-shading",
+  "threeRevision": "0.185.1",
+  "sourceClosureHash": "sha256:4399f1417fde0b9b36d8c262a938d03b0c167b73301a03d5ca8be4aaffb072e0",
+  "buildRevision": "sha256:16a8b5868643f52a1e053ac5f8f1efbbf4c97028701cf3578e1acef775c65a89",
+  "sourceRelease": {
+    "path": "evidence-manifest.json",
+    "sha256": "sha256:67455467a87873b09ac9b53e858c558a24b76562ad89da8e7c994b3b783100cc",
+    "byteLength": 34333,
+    "promotionBindingDigest": "sha256:7f040d39d979b53c2b1bdf867741f68390c55ad967509fb5e4e86fb14a4f245f",
+    "candidateBindingDigest": "sha256:272bde46061c47928b0230754e4963809fa8cbe9bab994ebfbe66d9be783fd9a",
+    "artifactLedgerDigest": "sha256:1ad79945b3118a70abd1339438aac795885584dc10e4760ff8eabd8b980d44eb",
+    "imageLedgerDigest": "sha256:d84a9c069dcd8185639a6ccc664678aa7d904f70d31ac1b815e938a4094d078e"
+  },
+  "sourceClosure": {
+    "algorithm": "demo-registry-transitive-source-closure-v2",
+    "roots": [
+      "labs/runtime/webgpu-device-identity.mjs",
+      "threejs-ambient-contact-shading/examples/integration-image-pipeline-ao",
+      "threejs-ambient-contact-shading/examples/webgpu-node-gtao/main.js"
+    ],
+    "files": [
+      {
+        "repositoryPath": "labs/runtime/webgpu-device-identity.mjs",
+        "sha256": "sha256:4bc6eb92755516473bc39b488c0bcfd419e5f23800c497bc44bbf3d07d509bfe",
+        "byteLength": 4095
+      },
+      {
+        "repositoryPath": "threejs-ambient-contact-shading/examples/integration-image-pipeline-ao/browser.js",
+        "sha256": "sha256:ca41151389e41720dfcc3bbc574cb92d41c7f400e10a0505519670fc18e2901b",
+        "byteLength": 3023
+      },
+      {
+        "repositoryPath": "threejs-ambient-contact-shading/examples/integration-image-pipeline-ao/capture-hook.mjs",
+        "sha256": "sha256:6619ad34cf47455f8d30166964664904dcebd4911264394d7d6d288fcea3edd3",
+        "byteLength": 4432
+      },
+      {
+        "repositoryPath": "threejs-ambient-contact-shading/examples/integration-image-pipeline-ao/evidence-status.mjs",
+        "sha256": "sha256:bb55487e38d9eba16f619e3bbbb00d22d876da34616091bcccc41c2aab2d900f",
+        "byteLength": 1755
+      },
+      {
+        "repositoryPath": "threejs-ambient-contact-shading/examples/integration-image-pipeline-ao/host-adapter.js",
+        "sha256": "sha256:78c007d86eae2d9a8cd3974db004a3915ac2f068ca74c83c09f16b986bd042f8",
+        "byteLength": 8833
+      },
+      {
+        "repositoryPath": "threejs-ambient-contact-shading/examples/integration-image-pipeline-ao/index.html",
+        "sha256": "sha256:3c694985b5053be349809aa07bc03fabe6e0a9c75a7b5a9c4e1562365f92d6a1",
+        "byteLength": 775
+      },
+      {
+        "repositoryPath": "threejs-ambient-contact-shading/examples/integration-image-pipeline-ao/main.js",
+        "sha256": "sha256:2b22193e30de190d4a840d4461cfd4b8cb49842c17902fe040e772aca8532daa",
+        "byteLength": 14345
+      },
+      {
+        "repositoryPath": "threejs-ambient-contact-shading/examples/integration-image-pipeline-ao/mechanism/indirect-only-application/index.html",
+        "sha256": "sha256:338443cd0354dc971fc59d54ebd67aadd83b377115ef7df3e80d32b91e702532",
+        "byteLength": 619
+      },
+      {
+        "repositoryPath": "threejs-ambient-contact-shading/examples/integration-image-pipeline-ao/mechanism/owner-graph/index.html",
+        "sha256": "sha256:4ecebab59c4614607c0c0595f206a3c019f07d65f2e987dcb2985a334add1469",
+        "byteLength": 617
+      },
+      {
+        "repositoryPath": "threejs-ambient-contact-shading/examples/integration-image-pipeline-ao/mechanism/shared-gbuffer/index.html",
+        "sha256": "sha256:0fb0798677c8759c05f56ca5edebbe085671f6fc27348cda6593873777f8c295",
+        "byteLength": 620
+      },
+      {
+        "repositoryPath": "threejs-ambient-contact-shading/examples/integration-image-pipeline-ao/package.json",
+        "sha256": "sha256:d7bda8cded0bec4c6d1071db997d5b8a8d30fdf3ddb1e4871398cb24325ae514",
+        "byteLength": 907
+      },
+      {
+        "repositoryPath": "threejs-ambient-contact-shading/examples/integration-image-pipeline-ao/README.md",
+        "sha256": "sha256:5bbce97d7794bc8b5a3bfc3b40d38ebd226d58fae9c8dd814f6adc45da8a3eed",
+        "byteLength": 1420
+      },
+      {
+        "repositoryPath": "threejs-ambient-contact-shading/examples/integration-image-pipeline-ao/test-mutations.mjs",
+        "sha256": "sha256:889b4ab18786ff9e88c7cb7f58f0aa191e7afabf1559d7376baebab6cb9db810",
+        "byteLength": 1963
+      },
+      {
+        "repositoryPath": "threejs-ambient-contact-shading/examples/integration-image-pipeline-ao/test.mjs",
+        "sha256": "sha256:dae8ad50d5ccc2a6e8d308d52d0d87de2ee5ace0379522b00c58d81267930886",
+        "byteLength": 3864
+      },
+      {
+        "repositoryPath": "threejs-ambient-contact-shading/examples/integration-image-pipeline-ao/tier/high/index.html",
+        "sha256": "sha256:586d6f007db025178d69a452af1aca4368f55b16ede1e33e6fb03307dcf63230",
+        "byteLength": 610
+      },
+      {
+        "repositoryPath": "threejs-ambient-contact-shading/examples/integration-image-pipeline-ao/tier/medium/index.html",
+        "sha256": "sha256:f53c9fd1ea17848589f9691e2a55b0c58f6516164fecc2f5e8ef513712276a01",
+        "byteLength": 612
+      },
+      {
+        "repositoryPath": "threejs-ambient-contact-shading/examples/integration-image-pipeline-ao/tier/ultra/index.html",
+        "sha256": "sha256:d719f64bebfdb440c52371b06b20da50d08e92b2cf6fe88e2c02ff46d9f59d14",
+        "byteLength": 611
+      },
+      {
+        "repositoryPath": "threejs-ambient-contact-shading/examples/webgpu-node-gtao/main.js",
+        "sha256": "sha256:a835055fb1efb19bec38c32de03fadfbbbd28379229cc38138d0831a02fe87a4",
+        "byteLength": 41721
+      }
+    ],
+    "threeRevision": "0.185.1",
+    "sourceHash": "sha256:4399f1417fde0b9b36d8c262a938d03b0c167b73301a03d5ca8be4aaffb072e0",
+    "buildRevision": "sha256:16a8b5868643f52a1e053ac5f8f1efbbf4c97028701cf3578e1acef775c65a89"
+  },
+  "retainedFiles": [
+    {
+      "path": "visual-contract.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:880d7b97323d2c6c775cc37d74804068edb1526d421bb548a58fdd6ae1160370",
+      "byteLength": 892
+    },
+    {
+      "path": "renderer-info.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:ce98dc437ff1e48283efdd61f5f63f5c0cc95934b77e56c419199c8db5c3b599",
+      "byteLength": 466
+    },
+    {
+      "path": "pipeline-graph.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:14e26b378c65058bdd2a61cc3b7705e949cc9e6da5454b09e06543651f7b354b",
+      "byteLength": 1019
+    },
+    {
+      "path": "performance-envelope.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:62e1abb57e217febce5044e04788aae2967a749c9dd5c70432f279fc3c45e507",
+      "byteLength": 634
+    },
+    {
+      "path": "frame-trace.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:61e2604f805c8759b4999cc2b6ef8e27ea9446acb8902d2b4f38c58f787479e7",
+      "byteLength": 280
+    },
+    {
+      "path": "quality-governor.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:b9cb014243839dae6b958cdabb03ca8f3b0f1391cae8328c4e4c6c64b785a074",
+      "byteLength": 256
+    },
+    {
+      "path": "render-targets.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:074793ed2cf9e6f9b9163b1c011d3e91fbfbc543b47a0fff1f4b86034e64a2a5",
+      "byteLength": 9730
+    },
+    {
+      "path": "storage-resources.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:579719a4f114bada5939fff4c4a645ac178e5b40a8f18de1cfb9532f02a92486",
+      "byteLength": 333
+    },
+    {
+      "path": "resident-resources.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:cd0553ae12a5f01c0d5068bd532309cd2e4566c5b2112363d7a05b5930ed0ce0",
+      "byteLength": 1303
+    },
+    {
+      "path": "bandwidth-model.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:e921c52741c0a3b03c5a02ac0b1337262a182750cd76a01d10c49323c047a034",
+      "byteLength": 956
+    },
+    {
+      "path": "visual-errors.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:f4b2464fc52bef50bc4fdd264442c77fe07b680905d615eb5be53d0d84a8ff9c",
+      "byteLength": 752
+    },
+    {
+      "path": "leak-loop.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:a5a32f1488c1a33f9b2f1b905813dd2da6fc20bf733b8339cca29d1cc0f312aa",
+      "byteLength": 131673
+    },
+    {
+      "path": "mechanism-metrics.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:6a7880261141f5d772f3c988d8f575ececbbd8bea8c0155ebf2930d06384e764",
+      "byteLength": 4342
+    },
+    {
+      "path": "capture-write-ledger.json",
+      "status": "captured",
+      "kind": "capture-session-write-ledger",
+      "sha256": "sha256:b5dc123349c85ac0fbdb48607e76ca82a21cb12c7c654af28540cf8cf78125e3",
+      "byteLength": 9629
+    },
+    {
+      "path": "sessions/physical-route.write-ledger.json",
+      "status": "captured",
+      "kind": "capture-session-write-ledger",
+      "sha256": "sha256:7c224080e3955ad3604a752d2e9da93ede7aa4ed6ed03951109d3a9562926010",
+      "byteLength": 1500
+    }
+  ],
+  "retainedImages": [
+    {
+      "path": "final.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "final.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:e775a795c6c8f0a4b2eee552fdb5defc2370b54671e7308fe2af09c5a4a698f7",
+      "byteLength": 40556
+    },
+    {
+      "path": "diagnostics.mosaic.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "diagnostics.mosaic",
+      "mediaType": "image/png",
+      "sha256": "sha256:b4bb6b5ecf6b1ea09fd9452e5a7e7dbb51b40c4fdfd53d8b4cb81480e8ed1405",
+      "byteLength": 72918
+    },
+    {
+      "path": "camera.near.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.near",
+      "mediaType": "image/png",
+      "sha256": "sha256:b62e82129ec64557a2774f52c3ad6c50512a988d1d28456e4a64ab4539279249",
+      "byteLength": 76448
+    },
+    {
+      "path": "camera.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:e775a795c6c8f0a4b2eee552fdb5defc2370b54671e7308fe2af09c5a4a698f7",
+      "byteLength": 40556
+    },
+    {
+      "path": "camera.far.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.far",
+      "mediaType": "image/png",
+      "sha256": "sha256:55c0996ebe9988abf84450322670c02ed503f7eb1e637a8608fe0e84bb6ad127",
+      "byteLength": 36811
+    },
+    {
+      "path": "seed-0001.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "seed-0001.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:e775a795c6c8f0a4b2eee552fdb5defc2370b54671e7308fe2af09c5a4a698f7",
+      "byteLength": 40556
+    },
+    {
+      "path": "seed-9e3779b9.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "seed-9e3779b9.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:53d1f71c7bf7620b8415e79d8f78b03599c64c89cdfd003184aa33ae027a8403",
+      "byteLength": 41991
+    },
+    {
+      "path": "temporal.t000.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "temporal.t000",
+      "mediaType": "image/png",
+      "sha256": "sha256:e775a795c6c8f0a4b2eee552fdb5defc2370b54671e7308fe2af09c5a4a698f7",
+      "byteLength": 40556
+    },
+    {
+      "path": "temporal.t001.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "temporal.t001",
+      "mediaType": "image/png",
+      "sha256": "sha256:13045bd1537fca6343a1984c9130152db10f58a0350441a40f8ae39003aaa735",
+      "byteLength": 40371
+    }
+  ],
+  "omittedFiles": {
+    "ledgerDigest": "sha256:1f059bba0517c5432abdc90c988120d085113547df730f31d1d07aa173011e74",
+    "count": 3,
+    "byteLength": 113367,
+    "byKind": [
+      {
+        "kind": "capture-session-document",
+        "count": 2,
+        "byteLength": 109787
+      },
+      {
+        "kind": "supplementary-json",
+        "count": 1,
+        "byteLength": 3580
+      }
+    ]
+  },
+  "checkoutLimitations": [
+    {
+      "id": "detached-source-payloads",
+      "status": "ACTIVE",
+      "statement": "Raw readbacks and capture-session transcript bytes are omitted from the tracked projection. Checkout validation verifies their approved hash and byte-length commitments, not the detached bytes themselves.",
+      "affectedClaims": []
+    }
+  ],
+  "projectionDigest": "sha256:7ac4c34310235da600b8d39c28288eae7b431a86a49bae1ebadd73d51403a2d1"
+}

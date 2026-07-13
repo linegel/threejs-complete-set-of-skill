@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 2,
+  "subject": "webgpu-node-gtao",
+  "identity": {
+    "labId": "webgpu-node-gtao",
+    "skill": "threejs-ambient-contact-shading",
+    "threeRevision": "0.185.1",
+    "sourceHash": "sha256:d151b7e9512ba31533653581a04ac7359ab067c8ae0963625f675ecdc4781455"
+  },
+  "invariants": [
+    "native WebGPU backend required",
+    "aligned readback retained",
+    "single tone/output owner where declared"
+  ],
+  "requiredImages": [
+    "final.design.png",
+    "no-post.design.png",
+    "diagnostics.mosaic.png",
+    "camera.near.png",
+    "camera.design.png",
+    "camera.far.png",
+    "seed-0001.final.png",
+    "seed-9e3779b9.final.png",
+    "temporal.t000.png",
+    "temporal.t001.png"
+  ],
+  "performanceClaims": "NOT_CLAIMED",
+  "limitations": [
+    "Correctness capture lane; hardware GPU timing not claimed unless timestamp windows exist."
+  ]
+}

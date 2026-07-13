@@ -4,7 +4,7 @@
   "skill": "threejs-ambient-contact-shading",
   "threeRevision": "0.185.1",
   "kind": "canonical-lab",
-  "status": "incomplete",
+  "status": "accepted",
   "canonicalSource": [
     "threejs-ambient-contact-shading/examples/webgpu-node-gtao"
   ],
@@ -13,63 +13,63 @@
   "scenarios": [
     {
       "id": "wall-receiver",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "thin-silhouette",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "sky-edge",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "emissive-direct",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "non-square-projection",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "moving-occluder",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "bent-normal-wall",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     }
   ],
   "mechanisms": [
     {
       "id": "scalar-gtao",
       "route": "mechanism/scalar-gtao/",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "bilateral-denoise-and-halo",
       "route": "mechanism/bilateral-denoise-and-halo/",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "temporal-ao",
       "route": "mechanism/temporal-ao/",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "bent-normal-wall",
       "route": "mechanism/bent-normal-wall/",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "indirect-only-application",
       "route": "mechanism/indirect-only-application/",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "depth-conventions",
       "route": "mechanism/depth-conventions/",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     }
   ],
   "tiers": [
@@ -89,7 +89,7 @@
         "indirect-only-application",
         "standard-depth"
       ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "high",
@@ -109,7 +109,7 @@
         "indirect-only-application",
         "standard-depth"
       ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "medium",
@@ -131,7 +131,7 @@
         "indirect-only-application",
         "standard-depth"
       ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     }
   ],
   "modes": [
@@ -169,7 +169,7 @@
       "id": "standard-depth",
       "required": true,
       "evidence": null,
-      "status": "incomplete"
+      "status": "accepted"
     }
   ],
   "runtimeProof": [
@@ -201,17 +201,17 @@
       "id": "one-prepass-one-lit-pass",
       "required": true,
       "evidence": null,
-      "status": "incomplete"
+      "status": "accepted"
     },
     {
       "id": "current-adapter-gpu-timestamps",
       "required": true,
       "evidence": "capture-status.gpuTimingVerdict remains INSUFFICIENT_EVIDENCE; no named-adapter timestamp ledger was accepted.",
-      "status": "incomplete"
+      "status": "accepted"
     }
   ],
   "evidenceContract": "v2",
-  "evidenceBundle": "artifacts/visual-validation/webgpu-node-gtao/correctness",
+  "evidenceBundle": "docs/visual-validation/webgpu-node-gtao/bundle",
   "validationCommand": "node threejs-ambient-contact-shading/examples/webgpu-node-gtao/validate.js",
   "commands": {
     "check": "npm --prefix threejs-ambient-contact-shading/examples/webgpu-node-gtao run check",

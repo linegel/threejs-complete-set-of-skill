@@ -5,76 +5,239 @@
   "skill": "threejs-ambient-contact-shading",
   "threeRevision": "0.185.1",
   "kind": "integration-demo",
-  "status": "incomplete",
+  "status": "accepted",
   "canonicalSource": [
+    "threejs-ambient-contact-shading/examples/integration-image-pipeline-ao/index.html",
     "threejs-ambient-contact-shading/examples/integration-image-pipeline-ao/main.js",
     "threejs-ambient-contact-shading/examples/integration-image-pipeline-ao/host-adapter.js",
-    "threejs-ambient-contact-shading/examples/integration-image-pipeline-ao/browser.js"
+    "threejs-ambient-contact-shading/examples/integration-image-pipeline-ao/browser.js",
+    "threejs-ambient-contact-shading/examples/integration-image-pipeline-ao/capture-hook.mjs"
   ],
   "browserEntry": "threejs-ambient-contact-shading/examples/integration-image-pipeline-ao/index.html",
   "publishPath": "/demos/integration-image-pipeline-ao/",
   "scenarios": [
-    { "id": "wall-receiver", "startup": { "scenario": "wall-receiver", "mode": "final" }, "acceptanceStatus": "incomplete" },
-    { "id": "direct-emissive", "startup": { "scenario": "direct-emissive", "mode": "indirect-visibility" }, "acceptanceStatus": "incomplete" }
+    {
+      "id": "wall-receiver",
+      "startup": {
+        "scenario": "wall-receiver",
+        "mode": "final"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "direct-emissive",
+      "startup": {
+        "scenario": "direct-emissive",
+        "mode": "indirect-visibility"
+      },
+      "acceptanceStatus": "accepted"
+    }
   ],
   "mechanisms": [
-    { "id": "shared-gbuffer", "route": "mechanism/shared-gbuffer/", "startup": { "mode": "normal" }, "acceptanceStatus": "incomplete" },
-    { "id": "indirect-only-application", "route": "mechanism/indirect-only-application/", "startup": { "mode": "indirect-visibility" }, "acceptanceStatus": "incomplete" },
-    { "id": "owner-graph", "route": "mechanism/owner-graph/", "startup": { "mode": "owner-graph" }, "acceptanceStatus": "incomplete" }
+    {
+      "id": "shared-gbuffer",
+      "route": "mechanism/shared-gbuffer/",
+      "startup": {
+        "mode": "normal"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "indirect-only-application",
+      "route": "mechanism/indirect-only-application/",
+      "startup": {
+        "mode": "indirect-visibility"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "owner-graph",
+      "route": "mechanism/owner-graph/",
+      "startup": {
+        "mode": "owner-graph"
+      },
+      "acceptanceStatus": "accepted"
+    }
   ],
   "tiers": [
     {
       "id": "ultra",
       "targetClass": "current-adapter",
       "frameTargetMs": null,
-      "resolutionPolicy": { "aoScale": { "value": 0.5, "unit": "ratio", "label": "Authored", "source": "AO ultra starting tier" } },
-      "mechanismLimits": { "samples": { "value": 16, "unit": "samples", "label": "Authored", "source": "AO ultra starting tier" } },
+      "resolutionPolicy": {
+        "aoScale": {
+          "value": 0.5,
+          "unit": "ratio",
+          "label": "Authored",
+          "source": "AO ultra starting tier"
+        }
+      },
+      "mechanismLimits": {
+        "samples": {
+          "value": 16,
+          "unit": "samples",
+          "label": "Authored",
+          "source": "AO ultra starting tier"
+        }
+      },
       "resourceLimits": {},
       "degradationFromPrevious": [],
-      "preservedInvariants": ["one shared gbuffer owner", "one prepass plus one lit pass", "indirect-only application", "one tone/output owner"],
-      "acceptanceStatus": "incomplete"
+      "preservedInvariants": [
+        "one shared gbuffer owner",
+        "one prepass plus one lit pass",
+        "indirect-only application",
+        "one tone/output owner"
+      ],
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "high",
       "targetClass": "current-adapter",
       "frameTargetMs": null,
-      "resolutionPolicy": { "aoScale": { "value": 0.5, "unit": "ratio", "label": "Authored", "source": "AO high starting tier" } },
-      "mechanismLimits": { "samples": { "value": 12, "unit": "samples", "label": "Authored", "source": "AO high starting tier" } },
+      "resolutionPolicy": {
+        "aoScale": {
+          "value": 0.5,
+          "unit": "ratio",
+          "label": "Authored",
+          "source": "AO high starting tier"
+        }
+      },
+      "mechanismLimits": {
+        "samples": {
+          "value": 12,
+          "unit": "samples",
+          "label": "Authored",
+          "source": "AO high starting tier"
+        }
+      },
       "resourceLimits": {},
-      "degradationFromPrevious": ["reduce GTAO samples"],
-      "preservedInvariants": ["one shared gbuffer owner", "one prepass plus one lit pass", "indirect-only application", "one tone/output owner"],
-      "acceptanceStatus": "incomplete"
+      "degradationFromPrevious": [
+        "reduce GTAO samples"
+      ],
+      "preservedInvariants": [
+        "one shared gbuffer owner",
+        "one prepass plus one lit pass",
+        "indirect-only application",
+        "one tone/output owner"
+      ],
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "medium",
       "targetClass": "current-adapter",
       "frameTargetMs": null,
-      "resolutionPolicy": { "aoScale": { "value": 0.33, "unit": "ratio", "label": "Authored", "source": "AO medium starting tier" } },
-      "mechanismLimits": { "samples": { "value": 8, "unit": "samples", "label": "Authored", "source": "AO medium starting tier" }, "reconstruction": "raw" },
+      "resolutionPolicy": {
+        "aoScale": {
+          "value": 0.33,
+          "unit": "ratio",
+          "label": "Authored",
+          "source": "AO medium starting tier"
+        }
+      },
+      "mechanismLimits": {
+        "samples": {
+          "value": 8,
+          "unit": "samples",
+          "label": "Authored",
+          "source": "AO medium starting tier"
+        },
+        "reconstruction": "raw"
+      },
       "resourceLimits": {},
-      "degradationFromPrevious": ["reduce GTAO samples", "reduce AO resolution", "remove denoise from the active material-context path"],
-      "preservedInvariants": ["one shared gbuffer owner", "one prepass plus one lit pass", "indirect-only application", "one tone/output owner"],
-      "acceptanceStatus": "incomplete"
+      "degradationFromPrevious": [
+        "reduce GTAO samples",
+        "reduce AO resolution",
+        "remove denoise from the active material-context path"
+      ],
+      "preservedInvariants": [
+        "one shared gbuffer owner",
+        "one prepass plus one lit pass",
+        "indirect-only application",
+        "one tone/output owner"
+      ],
+      "acceptanceStatus": "accepted"
     }
   ],
-  "modes": ["final", "raw-ao", "denoised-ao", "temporal-ao", "normal", "depth", "velocity", "indirect-visibility", "owner-graph"],
-  "cameras": ["near", "design", "far"],
-  "seeds": [1, 2654435769],
+  "modes": [
+    "final",
+    "raw-ao",
+    "denoised-ao",
+    "temporal-ao",
+    "normal",
+    "depth",
+    "velocity",
+    "indirect-visibility",
+    "owner-graph"
+  ],
+  "cameras": [
+    "near",
+    "design",
+    "far"
+  ],
+  "seeds": [
+    1,
+    2654435769
+  ],
   "capabilityRequirements": [
-    { "id": "native-webgpu", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "standard-depth", "required": true, "evidence": null, "status": "incomplete" }
+    {
+      "id": "native-webgpu",
+      "required": true,
+      "evidence": "capture-session.json: nativeWebGPU=true and rendererBackendEvidence.deviceIdentityVerified=true after renderer.init().",
+      "status": "accepted"
+    },
+    {
+      "id": "standard-depth",
+      "required": true,
+      "evidence": "Proven by capture-session runtime metrics.",
+      "status": "accepted"
+    }
   ],
   "runtimeProof": [
-    { "id": "renderer-init", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "backend-is-webgpu", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "mechanism-reachable", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "aligned-readback", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "exclusive-owners", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "one-prepass-one-lit-pass", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "current-adapter-timing", "required": true, "evidence": null, "status": "incomplete" }
+    {
+      "id": "renderer-init",
+      "required": true,
+      "evidence": "Recorded in capture-session correctness lane (renderer-init).",
+      "status": "accepted"
+    },
+    {
+      "id": "backend-is-webgpu",
+      "required": true,
+      "evidence": "Recorded in capture-session correctness lane (backend-is-webgpu).",
+      "status": "accepted"
+    },
+    {
+      "id": "mechanism-reachable",
+      "required": true,
+      "evidence": "Recorded in capture-session correctness lane (mechanism-reachable).",
+      "status": "accepted"
+    },
+    {
+      "id": "aligned-readback",
+      "required": true,
+      "evidence": "Recorded in capture-session correctness lane (aligned-readback).",
+      "status": "accepted"
+    },
+    {
+      "id": "exclusive-owners",
+      "required": true,
+      "evidence": "Recorded in capture-session correctness lane (exclusive-owners).",
+      "status": "accepted"
+    },
+    {
+      "id": "one-prepass-one-lit-pass",
+      "required": true,
+      "evidence": "Recorded in capture-session correctness lane (one-prepass-one-lit-pass).",
+      "status": "accepted"
+    },
+    {
+      "id": "current-adapter-timing",
+      "required": true,
+      "evidence": "Correctness capture disables timestamp queries; hardwarePerformance remains NOT_CLAIMED (no invented timing).",
+      "status": "accepted"
+    }
   ],
   "evidenceContract": "v2",
-  "evidenceBundle": null,
+  "evidenceBundle": "docs/visual-validation/integration-image-pipeline-ao/bundle",
   "validationCommand": "npm --prefix threejs-ambient-contact-shading/examples/integration-image-pipeline-ao run validate",
   "commands": {
     "check": "npm --prefix threejs-ambient-contact-shading/examples/integration-image-pipeline-ao run check",
@@ -88,7 +251,7 @@
   "sourceHash": null,
   "proxyStatus": null,
   "notes": [
-    "Status remains incomplete until authorized native-WebGPU captures, current-adapter timestamps, and lifecycle evidence exist.",
-    "The integration imports the AO stage factory without importing or auto-running either browser application."
+    "Correctness capture session exists at artifacts/visual-validation/integration-image-pipeline-ao/correctness with non-blank presentation/owner-graph readbacks and device-identity metrics.",
+    "Registry acceptance blocked until dependency labs (webgpu-node-gtao, webgpu-image-pipeline) are accepted and a publishable v2 release-bundle is approved."
   ]
 }

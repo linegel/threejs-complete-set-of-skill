@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 2,
+  "subject": "integration-image-pipeline-ao",
+  "identity": {
+    "labId": "integration-image-pipeline-ao",
+    "skill": "threejs-ambient-contact-shading",
+    "threeRevision": "0.185.1",
+    "sourceHash": "sha256:4399f1417fde0b9b36d8c262a938d03b0c167b73301a03d5ca8be4aaffb072e0"
+  },
+  "invariants": [
+    "native WebGPU backend required",
+    "aligned readback retained",
+    "single tone/output owner where declared"
+  ],
+  "requiredImages": [
+    "final.design.png",
+    "no-post.design.png",
+    "diagnostics.mosaic.png",
+    "camera.near.png",
+    "camera.design.png",
+    "camera.far.png",
+    "seed-0001.final.png",
+    "seed-9e3779b9.final.png",
+    "temporal.t000.png",
+    "temporal.t001.png"
+  ],
+  "performanceClaims": "NOT_CLAIMED",
+  "limitations": [
+    "Correctness capture lane; hardware GPU timing not claimed unless timestamp windows exist."
+  ]
+}
