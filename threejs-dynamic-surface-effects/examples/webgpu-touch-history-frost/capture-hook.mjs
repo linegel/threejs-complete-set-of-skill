@@ -7,6 +7,7 @@ import {
   FROST_COVERAGE_PROBE_RECIPES,
   FROST_STANDARD_OUTPUT_PLAN,
 } from "./capture-recipes.js";
+import { buildFrostNormativeArtifacts } from "./frost-evidence-artifacts.mjs";
 
 const SHA256_PATTERN = /^sha256:[0-9a-f]{64}$/;
 const DIAGNOSTIC_RECIPE_IDS = Object.freeze([
@@ -46,6 +47,10 @@ export const outputPlan = Object.freeze(FROST_STANDARD_OUTPUT_PLAN.map((entry) =
 
 function sha256(bytes) {
   return `sha256:${createHash("sha256").update(bytes).digest("hex")}`;
+}
+
+function jsonBytes(value) {
+  return Buffer.from(`${JSON.stringify(value, null, 2)}\n`);
 }
 
 function requireRecord(value, label) {
@@ -550,6 +555,22 @@ export async function captureLab(session) {
   const visualDifferences = validateFrostVisualDifferences(retained);
   const coverageEvidence = validateFrostCoverageEvidence(retained);
   const lifecycleEvidence = validateFrostLifecycleEvidence(await session.controllerCall("runLifecycleProfile", 50));
+  const capturesWithEvidence = [...retained.values()].map((record) => ({
+    target: record.capture.target,
+    width: record.capture.width,
+    height: record.capture.height,
+    evidence: record.capture.evidence,
+  }));
+  const normativeArtifacts = buildFrostNormativeArtifacts({
+    runtime: session.runtime,
+    captures: capturesWithEvidence,
+    visualDifferences,
+    coverageEvidence,
+    lifecycleEvidence,
+  });
+  for (const [path, artifact] of Object.entries(normativeArtifacts)) {
+    await session.writeArtifact(path, jsonBytes(artifact));
+  }
   return Object.freeze({
     recipeSetDigest: description.recipeSetDigest,
     captures: Object.freeze(captures),
@@ -557,6 +578,7 @@ export async function captureLab(session) {
     visualDifferences,
     coverageEvidence,
     lifecycleEvidence,
+    normativeArtifacts: Object.freeze(Object.keys(normativeArtifacts)),
   });
 }
 
