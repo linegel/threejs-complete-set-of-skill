@@ -65,6 +65,7 @@ const CAMERAS = new Map( [
 const SEEDS = new Set( [ 0x00000001, 0x9e3779b9 ] );
 const RUNTIME_PROFILES = new Set( [ 'correctness', 'performance' ] );
 export const VALIDATION_HARNESS_LAB_ID = 'webgpu-validation-harness';
+export const FINAL_EMISSIVE_COMPOSITE_STRENGTH = 0.4;
 export const VALIDATION_MODE_OUTPUT_NODE_IDS = Object.freeze( {
 	final: 'final-output-node',
 	'no-post': 'no-post-output-node',
@@ -942,7 +943,7 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 	const emissiveNode = scenePass.getTextureNode( 'emissive' );
 	const depthNode = scenePass.getTextureNode( 'depth' );
 	scenePass.renderTarget.depthTexture.type = FloatType;
-	const finalLinearNode = vec4( outputNode.rgb.add( emissiveNode.rgb.mul( float( 0.12 ) ) ), outputNode.a );
+	const finalLinearNode = vec4( outputNode.rgb.add( emissiveNode.rgb.mul( float( FINAL_EMISSIVE_COMPOSITE_STRENGTH ) ) ), outputNode.a );
 	const modeNodes = {
 		final: renderOutput( finalLinearNode ),
 		'no-post': renderOutput( outputNode ),

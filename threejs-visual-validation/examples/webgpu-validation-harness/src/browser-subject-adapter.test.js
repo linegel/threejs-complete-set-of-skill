@@ -28,6 +28,7 @@ import {
 	createExclusiveControllerOperationGate,
 	createJoinableControllerDisposal,
 	createValidationResourceLedgerObserver,
+	FINAL_EMISSIVE_COMPOSITE_STRENGTH,
 	finalizeCaptureEvidenceWithDeviceGuard,
 	parseRenderTimestampUid,
 	summarizeTimestampBatch,
@@ -41,6 +42,12 @@ import {
 } from './correctness-capture-recipes.js';
 import { sha256Hex } from './physical-evidence-common.js';
 import { getRouteLock } from './route-locks.js';
+
+test( 'final output retains a visible authored emissive composite', () => {
+
+	assert.equal( FINAL_EMISSIVE_COMPOSITE_STRENGTH, 0.4 );
+
+} );
 
 function testCanvas() {
 
