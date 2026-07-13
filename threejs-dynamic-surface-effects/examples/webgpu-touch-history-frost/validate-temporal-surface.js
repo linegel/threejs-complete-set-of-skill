@@ -23,6 +23,7 @@ import {
   depositScale,
   estimateHistoryStorageBytes,
   exactDielectricFresnel,
+  resolveFrostUpdatePolicyDecision,
   frostSeedPhase,
   historyVisualResponse,
   laplacianDiffusion,
@@ -198,6 +199,22 @@ assert.equal(opticalFullGraph.refractionScaleCount, 2);
 assert.equal(opticalBudgetGraph.refractionScaleCount, 1);
 assert.notEqual(opticalFullGraph.extents.historyWidth, opticalBudgetGraph.extents.historyWidth, "tier routes must select different storage extents");
 assert.equal(benchmarkGraph.benchmarkLedger, true, "benchmark route must allocate reachable instrumentation rather than changing metadata only");
+const canonicalPolicy = resolveFrostUpdatePolicyDecision();
+assert.equal(canonicalPolicy.selected, "full-field");
+assert.deepEqual(
+  canonicalPolicy.candidates.map(({ id, verdict }) => [id, verdict]),
+  [
+    ["full-field", "ELIGIBLE"],
+    ["dirty-tiles", "INELIGIBLE"],
+    ["many-event-binning", "INELIGIBLE"],
+    ["idle-suspend", "INELIGIBLE"],
+  ],
+);
+assert.deepEqual(
+  canonicalPolicy.candidates.filter(({ implemented }) => implemented).map(({ id }) => id),
+  ["full-field"],
+  "the benchmark must not claim unimplemented policy executors",
+);
 assert.deepEqual(Object.keys(FROST_MECHANISM_PROFILES), FROST_MECHANISMS);
 
 const computeSubmissions = [];
@@ -293,7 +310,10 @@ assert.equal(diffusionPlan.graph.diffusion, true);
 assert.notDeepEqual(historyPlan.graph.reachableNodes, diffusionPlan.graph.reachableNodes);
 const benchmarkPlan = effect.setMechanism("full-vs-dirty-vs-idle") && effect.createResourcePlan();
 assert.equal(benchmarkPlan.benchmarkLedger.name, "touch-history-frost:benchmark-ledger");
-assert.equal(benchmarkPlan.residentStorageBytes, benchmarkPlan.storageBytes.total + 8);
+assert.equal(benchmarkPlan.benchmarkLedger.width, 4);
+assert.equal(benchmarkPlan.benchmarkLedger.bytes, 32);
+assert.equal(benchmarkPlan.benchmarkLedger.decision.selected, "full-field");
+assert.equal(benchmarkPlan.residentStorageBytes, benchmarkPlan.storageBytes.total + 32);
 effect.setMechanism("refraction-and-fresnel");
 effect.setTier("budgeted");
 assert.throws(

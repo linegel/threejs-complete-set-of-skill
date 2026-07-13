@@ -7,6 +7,7 @@ import {
   computeFrostExtents,
   computeSideAwareRefraction,
   exactDielectricFresnel,
+  resolveFrostUpdatePolicyDecision,
   resolveFrostGraphContract,
   screenPeriodPhase,
   solveDecayDeposit,
@@ -22,6 +23,47 @@ const dirty = new TimestampedDirtyTileHistory({ tileCount: 1, initialValue: 1, i
 const correct = dirty.materialize(0, 12);
 const omitAgeCatchUpMutation = 1;
 assert(correct < omitAgeCatchUpMutation - 0.1, "dirty-tile age-catch-up mutation must fail");
+
+const canonicalPolicy = resolveFrostUpdatePolicyDecision();
+assert.equal(canonicalPolicy.selected, "full-field");
+assert.equal(canonicalPolicy.candidates.find(({ id }) => id === "dirty-tiles").verdict, "INELIGIBLE");
+assert.equal(canonicalPolicy.candidates.find(({ id }) => id === "idle-suspend").verdict, "INELIGIBLE");
+const sparseEligible = resolveFrostUpdatePolicyDecision({
+  visibleTileAgeCatchUp: true,
+  dirtyCoverageRatio: 0.1,
+});
+assert.equal(sparseEligible.selected, "full-field", "unimplemented sparse work must not become selected execution");
+assert.equal(sparseEligible.candidates.find(({ id }) => id === "dirty-tiles").verdict, "ELIGIBLE_NOT_IMPLEMENTED");
+const sparseImplementedFixture = resolveFrostUpdatePolicyDecision({
+  visibleTileAgeCatchUp: true,
+  dirtyCoverageRatio: 0.1,
+  implementedPolicies: ["full-field", "dirty-tiles"],
+});
+assert.equal(sparseImplementedFixture.selected, "dirty-tiles", "the decision oracle must retain the eligible sparse branch");
+const staleDirtyMutation = resolveFrostUpdatePolicyDecision({
+  visibleTileAgeCatchUp: false,
+  dirtyCoverageRatio: 0.1,
+});
+assert.notEqual(staleDirtyMutation.selected, "dirty-tiles", "dirty tiles without visible age catch-up must be rejected");
+const invalidIdleMutation = resolveFrostUpdatePolicyDecision({ eventCount: 0, analyticIdleCatchUp: false });
+assert.notEqual(invalidIdleMutation.selected, "idle-suspend", "idle suspension cannot freeze decaying state");
+const validIdle = resolveFrostUpdatePolicyDecision({ eventCount: 0, analyticIdleCatchUp: true });
+assert.equal(validIdle.selected, "full-field");
+assert.equal(validIdle.candidates.find(({ id }) => id === "idle-suspend").verdict, "ELIGIBLE_NOT_IMPLEMENTED");
+const manyEvents = resolveFrostUpdatePolicyDecision({ eventCount: 64 });
+assert.equal(manyEvents.selected, "full-field");
+assert.equal(manyEvents.candidates.find(({ id }) => id === "many-event-binning").verdict, "ELIGIBLE_NOT_IMPLEMENTED");
+const diffusionIdleMutation = resolveFrostUpdatePolicyDecision({
+  eventCount: 0,
+  analyticIdleCatchUp: true,
+  diffusionEnabled: true,
+});
+assert.notEqual(diffusionIdleMutation.selected, "idle-suspend", "diffusion cannot be analytically skipped without bounded substeps");
+assert.throws(
+  () => resolveFrostUpdatePolicyDecision({ implementedPolicies: ["dirty-tiles"] }),
+  /retain the full-field implementation/,
+  "a fabricated replacement policy must not hide the canonical implementation",
+);
 
 let partitioned = 0;
 for (let frame = 0; frame < 120; frame += 1) {

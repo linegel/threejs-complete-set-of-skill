@@ -98,6 +98,112 @@ export const FROST_MECHANISMS = Object.freeze([
   "full-vs-dirty-vs-idle",
 ]);
 
+export const FROST_UPDATE_POLICIES = Object.freeze([
+  "full-field",
+  "dirty-tiles",
+  "many-event-binning",
+  "idle-suspend",
+]);
+
+const FROST_POLICY_REASON_CODES = Object.freeze({
+  eligible: 0,
+  "global-evolution-needs-age-catch-up": 1,
+  "diffusion-needs-neighbor-halos": 2,
+  "event-count-below-binning-threshold": 3,
+  "state-evolves-while-idle": 4,
+  "diffusion-needs-bounded-idle-substeps": 5,
+});
+
+export function resolveFrostUpdatePolicyDecision({
+  decaySurvivalPerSecond = DEFAULT_FROST_SETTINGS.decaySurvivalPerSecond,
+  diffusionEnabled = false,
+  visibleTileAgeCatchUp = false,
+  diffusionHaloMaterialization = false,
+  analyticIdleCatchUp = false,
+  eventCount = 1,
+  eventBinningThreshold = 32,
+  dirtyCoverageRatio = 1,
+  implementedPolicies = ["full-field"],
+} = {}) {
+  if (!Number.isFinite(decaySurvivalPerSecond)
+    || decaySurvivalPerSecond <= 0
+    || decaySurvivalPerSecond > 1) {
+    throw new RangeError("frost policy decay survival must be in (0, 1]");
+  }
+  if (!Number.isInteger(eventCount) || eventCount < 0) {
+    throw new RangeError("frost policy eventCount must be a nonnegative integer");
+  }
+  if (!Number.isInteger(eventBinningThreshold) || eventBinningThreshold <= 0) {
+    throw new RangeError("frost policy binning threshold must be a positive integer");
+  }
+  if (!Number.isFinite(dirtyCoverageRatio) || dirtyCoverageRatio < 0 || dirtyCoverageRatio > 1) {
+    throw new RangeError("frost dirty coverage ratio must be in [0, 1]");
+  }
+  if (!Array.isArray(implementedPolicies)
+    || implementedPolicies.length === 0
+    || implementedPolicies.some((policy) => !FROST_UPDATE_POLICIES.includes(policy))) {
+    throw new RangeError("frost implemented policies must be a nonempty subset of the declared policies");
+  }
+  const implemented = new Set(implementedPolicies);
+  if (!implemented.has("full-field")) {
+    throw new RangeError("the canonical frost runtime must retain the full-field implementation");
+  }
+
+  const globalEvolution = decaySurvivalPerSecond !== 1;
+  const dirtyReasons = [];
+  if (globalEvolution && !visibleTileAgeCatchUp) {
+    dirtyReasons.push("global-evolution-needs-age-catch-up");
+  }
+  if (diffusionEnabled && !diffusionHaloMaterialization) {
+    dirtyReasons.push("diffusion-needs-neighbor-halos");
+  }
+  const dirtyEligible = dirtyReasons.length === 0;
+  const binningReasons = eventCount >= eventBinningThreshold
+    ? []
+    : ["event-count-below-binning-threshold"];
+  const idleReasons = globalEvolution && !analyticIdleCatchUp
+    ? ["state-evolves-while-idle"]
+    : [];
+  if (diffusionEnabled) idleReasons.push("diffusion-needs-bounded-idle-substeps");
+  const preferred = eventCount === 0 && idleReasons.length === 0
+    ? "idle-suspend"
+    : (binningReasons.length === 0
+      ? "many-event-binning"
+      : (dirtyEligible && dirtyCoverageRatio < 0.35 ? "dirty-tiles" : "full-field"));
+  const selected = implemented.has(preferred) ? preferred : "full-field";
+  const candidate = (id, reasons) => Object.freeze({
+    id,
+    verdict: reasons.length > 0
+      ? "INELIGIBLE"
+      : (implemented.has(id) ? "ELIGIBLE" : "ELIGIBLE_NOT_IMPLEMENTED"),
+    implemented: implemented.has(id),
+    selected: selected === id,
+    reasonCodes: Object.freeze(reasons),
+    numericReasonCode: reasons.length === 0 ? FROST_POLICY_REASON_CODES.eligible : FROST_POLICY_REASON_CODES[reasons[0]],
+  });
+
+  return Object.freeze({
+    selected,
+    inputs: Object.freeze({
+      decaySurvivalPerSecond,
+      diffusionEnabled,
+      visibleTileAgeCatchUp,
+      diffusionHaloMaterialization,
+      analyticIdleCatchUp,
+      eventCount,
+      eventBinningThreshold,
+      dirtyCoverageRatio,
+      implementedPolicies: Object.freeze([...implementedPolicies]),
+    }),
+    candidates: Object.freeze([
+      candidate("full-field", []),
+      candidate("dirty-tiles", dirtyReasons),
+      candidate("many-event-binning", binningReasons),
+      candidate("idle-suspend", idleReasons),
+    ]),
+  });
+}
+
 export const FROST_MECHANISM_PROFILES = Object.freeze({
   "history-and-deposit": Object.freeze({
     id: "history-and-deposit",
@@ -748,17 +854,22 @@ function createHistoryComputeNodes({ width, height, historyA, historyB, settings
   };
 }
 
-function createBenchmarkLedgerComputeNode(target, uniforms, dispatchedTexels) {
+function createBenchmarkLedgerComputeNode(target, policyDecision) {
+  const candidates = Object.fromEntries(policyDecision.candidates.map((candidate) => [candidate.id, candidate]));
+  const writeCandidate = (x, id) => {
+    const candidate = candidates[id];
+    textureStore(target, uvec2(x, 0), vec4(
+      candidate.verdict === "INELIGIBLE" ? 0 : 1,
+      candidate.implemented ? 1 : 0,
+      candidate.selected ? 1 : 0,
+      candidate.numericReasonCode,
+    )).toWriteOnly();
+  };
   return Fn(() => {
-    const coord = globalId.xy.toVar();
-    If(coord.x.equal(uint(0)).and(coord.y.equal(uint(0))), () => {
-      textureStore(target, coord, vec4(
-        uniforms.pointerActive,
-        uniforms.deltaTime,
-        float(dispatchedTexels),
-        1,
-      )).toWriteOnly();
-    });
+    writeCandidate(0, "full-field");
+    writeCandidate(1, "dirty-tiles");
+    writeCandidate(2, "many-event-binning");
+    writeCandidate(3, "idle-suspend");
   })().compute([1, 1, 1], [1, 1, 1]).setName("touch-history-frost:benchmark-ledger");
 }
 
@@ -1259,12 +1370,18 @@ export class WebGPUTouchHistoryFrostEffect {
       dispatch: computeDispatchSize(this.width, this.height),
       storageBytes: estimateHistoryStorageBytes(this.width, this.height),
       benchmarkLedger: this.benchmarkLedgerTexture ? {
-        ...createHistoryStorageDescriptor(1, 1),
+        ...createHistoryStorageDescriptor(FROST_UPDATE_POLICIES.length, 1),
         name: this.benchmarkLedgerTexture.name,
-        bytes: 8,
+        bytes: FROST_UPDATE_POLICIES.length * 8,
+        layout: Object.freeze(FROST_UPDATE_POLICIES.map((policy, lane) => Object.freeze({
+          lane,
+          policy,
+          channels: Object.freeze(["eligible", "implemented", "selected", "reason-code"]),
+        }))),
+        decision: this.policyDecision,
       } : null,
       residentStorageBytes: estimateHistoryStorageBytes(this.width, this.height).total
-        + (this.benchmarkLedgerTexture ? 8 : 0),
+        + (this.benchmarkLedgerTexture ? FROST_UPDATE_POLICIES.length * 8 : 0),
       blur: this.mechanismProfile.blur ? {
         passCount: 2,
         vertical: { resolutionScale: this.tier.blurResolutionScale },
@@ -1463,7 +1580,8 @@ export class WebGPUTouchHistoryFrostEffect {
       workgroupSize: [...this.computeNodes.workgroupSize],
       dispatch: { ...this.computeNodes.dispatch },
       storageBytes: estimateHistoryStorageBytes(this.width, this.height).total
-        + (this.benchmarkLedgerTexture ? 8 : 0),
+        + (this.benchmarkLedgerTexture ? FROST_UPDATE_POLICIES.length * 8 : 0),
+      policyDecision: this.policyDecision,
       reachableNodes: [...this.mechanismProfile.reachableNodes],
       availableDebugViews: [...(this.availableDebugViews ?? [])],
     };
@@ -1491,12 +1609,26 @@ export class WebGPUTouchHistoryFrostEffect {
     this.benchmarkLedgerTexture?.dispose();
     this.benchmarkLedgerTexture = null;
     this.benchmarkLedgerNode = null;
+    this.policyDecision = null;
     if (this.mechanismProfile.benchmarkLedger) {
-      this.benchmarkLedgerTexture = createHistoryStorageTexture(1, 1, "touch-history-frost:benchmark-ledger");
+      this.policyDecision = resolveFrostUpdatePolicyDecision({
+        decaySurvivalPerSecond: this.settings.decaySurvivalPerSecond,
+        diffusionEnabled: this.settings.diffusionEnabled,
+        visibleTileAgeCatchUp: false,
+        diffusionHaloMaterialization: false,
+        analyticIdleCatchUp: false,
+        eventCount: 1,
+        dirtyCoverageRatio: 1,
+        implementedPolicies: ["full-field"],
+      });
+      this.benchmarkLedgerTexture = createHistoryStorageTexture(
+        FROST_UPDATE_POLICIES.length,
+        1,
+        "touch-history-frost:benchmark-ledger",
+      );
       this.benchmarkLedgerNode = createBenchmarkLedgerComputeNode(
         this.benchmarkLedgerTexture,
-        this.uniforms,
-        this.width * this.height,
+        this.policyDecision,
       );
     }
   }
