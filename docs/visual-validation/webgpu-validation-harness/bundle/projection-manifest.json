@@ -8,14 +8,14 @@
   "labId": "webgpu-validation-harness",
   "skill": "threejs-visual-validation",
   "threeRevision": "0.185.1",
-  "sourceClosureHash": "sha256:f2d12e9ebde8ea9270583daa6ac880024b74828b65c4fdb074e0d66323399353",
-  "buildRevision": "sha256:c10918f8233674b967bc3fd673f61edaf56617d95c3a54a6c218b24b37c94f6d",
+  "sourceClosureHash": "sha256:2485f6979ff948a546b1575eea0b98700e58e6f608af09b2d53b7aa2956f86ac",
+  "buildRevision": "sha256:7db99732c66efc234ff819c548e5e9729caaaac80b9a588439d3adac324e505f",
   "sourceRelease": {
     "path": "evidence-manifest.json",
-    "sha256": "sha256:9ecc6ce0e6aa7c1677d3553d14814f892e1439de9511c08052eac54bd8154d29",
+    "sha256": "sha256:6c76887fb77c9c479f3f5e2eb61f94e3e22287c319383a7f12faedf260ed11c2",
     "byteLength": 90346,
-    "promotionBindingDigest": "sha256:92b90f054b8545069d2c730084665279bb26e7680b0b136aab7003631b0a313e",
-    "candidateBindingDigest": "sha256:578afdfaca1a3e5d66035edb0289e996689355cda3244ea397ab5eccee92d005",
+    "promotionBindingDigest": "sha256:37fd1843e9f2d7ad6a3c0bfa66be5ff1b6c569f1733555bcb56d932a11cccfc5",
+    "candidateBindingDigest": "sha256:ba2a84b534d779dafee03c9e7b2ac0344ef029c476444e6d1c23201246131cd5",
     "artifactLedgerDigest": "sha256:1126d41c039ac661f1eb94975934b2254ef8955a5d7e13594d93695ae06cd174",
     "imageLedgerDigest": "sha256:b3407588a0bade9830858e9e5c0347234e068ec6badbebcd6b5977ed03752ddf"
   },
@@ -41,8 +41,8 @@
       },
       {
         "repositoryPath": "labs/schema/evidence-bundle-v2.schema.json",
-        "sha256": "sha256:0dba6486cb835d4592d579429e9b47e122e390999bd23b019b8f91138b798eb5",
-        "byteLength": 48299
+        "sha256": "sha256:2fd5edc50ec33209d8029a3784ee3a7c140852e9c0f662cab93855163279e1c8",
+        "byteLength": 46812
       },
       {
         "repositoryPath": "labs/schema/runtime-graph.schema.json",
@@ -641,8 +641,8 @@
       }
     ],
     "threeRevision": "0.185.1",
-    "sourceHash": "sha256:f2d12e9ebde8ea9270583daa6ac880024b74828b65c4fdb074e0d66323399353",
-    "buildRevision": "sha256:c10918f8233674b967bc3fd673f61edaf56617d95c3a54a6c218b24b37c94f6d"
+    "sourceHash": "sha256:2485f6979ff948a546b1575eea0b98700e58e6f608af09b2d53b7aa2956f86ac",
+    "buildRevision": "sha256:7db99732c66efc234ff819c548e5e9729caaaac80b9a588439d3adac324e505f"
   },
   "retainedFiles": [
     {
@@ -950,5 +950,5 @@
       "affectedClaims": []
     }
   ],
-  "projectionDigest": "sha256:cc73dd697417bb22c1084fa032e79cbbfd7337c70b94fbf5eb1cc8cdefb0839b"
+  "projectionDigest": "sha256:1831f6e70ebaf08b551f821fa89ec13b725e4cb77beb6ac3fca3709ce3efaaaa"
 }
