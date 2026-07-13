@@ -34,7 +34,13 @@ appendOptions(cameraSelect, FINAL_IMAGE_FLIGHT_CAMERAS);
 appendOptions(seedSelect, FINAL_IMAGE_FLIGHT_SEEDS, (value) => `0x${value.toString(16).padStart(8, "0")}`);
 
 try {
-  const lab = await createFinalImageFlightLab({ canvas, documentRef: document, locationRef: location });
+  const automatedCapture = new URLSearchParams(location.search).get("capture") === "1";
+  const lab = await createFinalImageFlightLab({
+    canvas,
+    documentRef: document,
+    locationRef: location,
+    startAnimationLoop: automatedCapture !== true,
+  });
   const controller = lab.labController;
   globalThis.__FINAL_IMAGE_FLIGHT__ = lab;
   globalThis.__LAB_CONTROLLER__ = controller;

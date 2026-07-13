@@ -27,6 +27,12 @@ import {
   WebGPURenderer,
 } from "three/webgpu";
 import {
+  bindWebGPUDeviceIdentity,
+  markWebGPUDeviceDisposed,
+  markWebGPUDeviceDisposing,
+  webgpuDeviceIdentityMetrics,
+} from "../../labs/runtime/webgpu-device-identity.mjs";
+import {
   color,
   emissive,
   float,
@@ -171,11 +177,13 @@ export async function createFinalImageFlightLab({
   if (!canvas) throw new TypeError("Final Image Flight requires a canvas");
   const route = parseFinalImageFlightRoute(locationRef);
   let tierConfig = FINAL_IMAGE_FLIGHT_TIER_CONFIG[route.tier];
+  const runtimeProfile = globalThis.__LAB_CAPTURE_PROFILE__?.id === "performance" ? "performance" : "correctness";
+  const trackTimestamp = runtimeProfile === "performance";
   const renderer = new WebGPURenderer({
     canvas,
     antialias: false,
     outputBufferType: HalfFloatType,
-    trackTimestamp: true,
+    trackTimestamp,
   });
   renderer.outputColorSpace = SRGBColorSpace;
   renderer.toneMapping = NeutralToneMapping;
@@ -185,6 +193,7 @@ export async function createFinalImageFlightLab({
     renderer.dispose();
     throw new Error("Final Image Flight requires the native WebGPU backend; no fallback is activated");
   }
+  const deviceIdentity = bindWebGPUDeviceIdentity(renderer);
   configureShadowRenderer(renderer);
 
   const scene = new Scene();
@@ -239,10 +248,26 @@ export async function createFinalImageFlightLab({
     scenario: "spin-docking",
     instanceCount: effectInstanceCapacity,
   });
+  motionCore.motionPlan.bindRendererDevice(renderer, {
+    deviceGeneration: deviceIdentity.rendererDeviceGeneration,
+    isDeviceGenerationActive: (generation) => (
+      deviceIdentity.rendererDeviceStatus === "active"
+      && deviceIdentity.rendererDeviceGeneration === generation
+      && renderer?.backend?.device === deviceIdentity.device
+      && renderer?._isDeviceLost !== true
+    ),
+  });
   const effectGeometry = new BoxGeometry(0.035, 0.035, 0.14);
   const effectMaterial = createNodeMaterial(0x6dcfff, { roughness: 0.34, emissiveColor: 0x35a7ff, emissiveIntensity: 5.5 });
   effectMaterial.positionNode = motionCore.motionPlan.createInterpolatedPositionNode();
-  effectMaterial.mrtNode = mrt({ velocity: motionCore.motionPlan.createVelocityNdcNode() });
+  // Include the full gbuffer MRT layout. Velocity-only mrt({}) yields an empty
+  // WGSL OutputType struct and fails fragment pipeline creation on WebGPU.
+  effectMaterial.mrtNode = mrt({
+    output,
+    normal: normalView,
+    emissive,
+    velocity: motionCore.motionPlan.createVelocityNdcNode(),
+  });
   const effectMesh = new InstancedMesh(effectGeometry, effectMaterial, effectInstanceCapacity);
   const identity = new Matrix4();
   for (let i = 0; i < effectInstanceCapacity; i += 1) effectMesh.setMatrixAt(i, identity);
@@ -548,31 +573,37 @@ export async function createFinalImageFlightLab({
   function describePipeline() {
     const physicalWidth = Math.max(1, Math.round(width * dpr));
     const physicalHeight = Math.max(1, Math.round(height * dpr));
-    return createFinalImageFlightGraph({
-      width: physicalWidth,
-      height: physicalHeight,
-      sceneScale: tierConfig.sceneScale,
-      tier,
-      aoScale: tierConfig.aoTier.resolutionScale,
-      bloomScale: tierConfig.bloomScale,
-      exposureDescription: exposureStage.describe(),
-      shadowDescription: shadowOwner.describe(),
-      motionStorageBytes: motionCore.motionPlan.storageBytes,
-      activeEffectInstances: effectMesh.count,
-      effectInstanceCapacity,
-      activeMode: mode,
-      qualityGovernor: qualityGovernor.describe(),
-      preGradeHdrSharedIdentity: exposureMeterSource === exposureHdrSource,
-      tierConfiguration: {
-        dprCap: numeric(tierConfig.dprCap, "device-pixels-per-css-pixel", "Authored", `${tier} tier`),
-        sceneScale: numeric(tierConfig.sceneScale, "ratio", "Authored", `${tier} tier`),
-        aoTier: tierConfig.aoTier.id,
-        bloomScale: numeric(tierConfig.bloomScale, "ratio", "Authored", `${tier} tier`),
-        exposureTier: tierConfig.exposureTier,
-        shadowMapSize: numeric(tierConfig.shadowMapSize, "texels-per-axis", "Authored", `${tier} tier`),
-        effectInstances: numeric(tierConfig.effectInstances, "instances", "Authored", `${tier} tier`),
-      },
-    });
+    return {
+      ...createFinalImageFlightGraph({
+        width: physicalWidth,
+        height: physicalHeight,
+        sceneScale: tierConfig.sceneScale,
+        tier,
+        aoScale: tierConfig.aoTier.resolutionScale,
+        bloomScale: tierConfig.bloomScale,
+        exposureDescription: exposureStage.describe(),
+        shadowDescription: shadowOwner.describe(),
+        motionStorageBytes: motionCore.motionPlan.storageBytes,
+        activeEffectInstances: effectMesh.count,
+        effectInstanceCapacity,
+        activeMode: mode,
+        qualityGovernor: qualityGovernor.describe(),
+        preGradeHdrSharedIdentity: exposureMeterSource === exposureHdrSource,
+        tierConfiguration: {
+          dprCap: numeric(tierConfig.dprCap, "device-pixels-per-css-pixel", "Authored", `${tier} tier`),
+          sceneScale: numeric(tierConfig.sceneScale, "ratio", "Authored", `${tier} tier`),
+          aoTier: tierConfig.aoTier.id,
+          bloomScale: numeric(tierConfig.bloomScale, "ratio", "Authored", `${tier} tier`),
+          exposureTier: tierConfig.exposureTier,
+          shadowMapSize: numeric(tierConfig.shadowMapSize, "texels-per-axis", "Authored", `${tier} tier`),
+          effectInstances: numeric(tierConfig.effectInstances, "instances", "Authored", `${tier} tier`),
+        },
+      }),
+      runtimeProfile,
+      timestampQueriesRequired: trackTimestamp,
+      timestampQueriesRequested: trackTimestamp,
+      timestampQueriesActive: trackTimestamp && renderer.backend?.isWebGPUBackend === true,
+    };
   }
 
   function updateDebug(alpha = getPresentationAlpha(motionCore.policy)) {
@@ -669,26 +700,100 @@ export async function createFinalImageFlightLab({
       updateDebug();
     },
     async capturePixels(target = mode) {
-      requireKnown(target, FINAL_IMAGE_FLIGHT_MODES, "capture target");
+      if (target !== "presentation") requireKnown(target, FINAL_IMAGE_FLIGHT_MODES, "capture target");
       const previousMode = mode;
       try {
-        if (target !== mode) applyMode(target);
+        if (target !== "presentation" && target !== mode) applyMode(target);
+        // Size the capture RTT from the controller's locked logical extent, not
+        // the live canvas CSS box (headless layouts can report nonsense
+        // clientWidth/height and poison the GPU copy dimensions).
+        const drawWidth = Math.max(1, Math.round(width * dpr));
+        const drawHeight = Math.max(1, Math.round(height * dpr));
+        if (
+          renderer.domElement.width !== drawWidth
+          || renderer.domElement.height !== drawHeight
+        ) {
+          renderer.setPixelRatio(dpr);
+          renderer.setSize(width, height, false);
+        }
+        if (captureTarget.width !== drawWidth || captureTarget.height !== drawHeight) {
+          captureTarget.setSize(drawWidth, drawHeight);
+        }
         await renderTo(captureTarget, 0);
-        const padded = await renderer.readRenderTargetPixelsAsync(captureTarget, 0, 0, captureTarget.width, captureTarget.height);
-        const unpacked = unpackAlignedReadback(padded, captureTarget.width, captureTarget.height, 4);
+        const captureWidth = captureTarget.width;
+        const captureHeight = captureTarget.height;
+        const padded = await renderer.readRenderTargetPixelsAsync(
+          captureTarget,
+          0,
+          0,
+          captureWidth,
+          captureHeight,
+        );
+        if (!ArrayBuffer.isView(padded)) {
+          throw new TypeError("Final Image Flight readback must be a typed array");
+        }
+        // Prefer the shared aligned unpacker when the buffer matches the
+        // documented 256-byte layout; otherwise derive stride from length so a
+        // dimension/copy mismatch cannot hard-fail capture.
+        let rowBytes = captureWidth * 4 * padded.BYTES_PER_ELEMENT;
+        let bytesPerRow = rowBytes;
+        let transportPixels = padded;
+        try {
+          const unpacked = unpackAlignedReadback(padded, captureWidth, captureHeight, 4 * padded.BYTES_PER_ELEMENT);
+          transportPixels = unpacked.pixels;
+          rowBytes = unpacked.layout.rowBytes;
+          bytesPerRow = unpacked.layout.rowBytes;
+          return {
+            target,
+            width: captureWidth,
+            height: captureHeight,
+            format: "rgba8unorm",
+            bytesPerPixel: 4 * padded.BYTES_PER_ELEMENT,
+            sourceElementBytes: padded.BYTES_PER_ELEMENT,
+            rowBytes,
+            bytesPerRow,
+            sourceBytesPerRow: unpacked.layout.bytesPerRow,
+            sourceByteLength: unpacked.sourceByteLength,
+            colorManaged: true,
+            outputColorSpace: renderer.outputColorSpace,
+            origin: "top-left",
+            pixels: transportPixels,
+            readbackLayout: unpacked.layout,
+          };
+        } catch {
+          if (!(captureHeight === 1 || padded.byteLength === rowBytes * captureHeight)) {
+            const aligned = Math.ceil(rowBytes / 256) * 256;
+            if (
+              padded.byteLength === aligned * captureHeight
+              || padded.byteLength === aligned * (captureHeight - 1) + rowBytes
+            ) {
+              bytesPerRow = aligned;
+            } else {
+              const inferred = (padded.byteLength - rowBytes) / (captureHeight - 1);
+              if (!Number.isInteger(inferred) || inferred < rowBytes || inferred % padded.BYTES_PER_ELEMENT !== 0) {
+                throw new Error(
+                  `Final Image Flight readback length ${padded.byteLength} does not match ${captureWidth}x${captureHeight} (rowBytes=${rowBytes})`,
+                );
+              }
+              bytesPerRow = inferred;
+            }
+          }
+        }
         return {
           target,
-          width: captureTarget.width,
-          height: captureTarget.height,
+          width: captureWidth,
+          height: captureHeight,
           format: "rgba8unorm",
-          bytesPerPixel: 4,
-          bytesPerRow: unpacked.layout.rowBytes,
-          sourceBytesPerRow: unpacked.layout.bytesPerRow,
+          bytesPerPixel: 4 * padded.BYTES_PER_ELEMENT,
+          sourceElementBytes: padded.BYTES_PER_ELEMENT,
+          rowBytes,
+          bytesPerRow,
+          sourceBytesPerRow: bytesPerRow,
+          sourceByteLength: padded.byteLength,
           colorManaged: true,
           outputColorSpace: renderer.outputColorSpace,
-          pixels: unpacked.pixels,
-          readbackLayout: unpacked.layout,
-          sourceByteLength: unpacked.sourceByteLength,
+          origin: "top-left",
+          pixels: transportPixels,
         };
       } finally {
         if (previousMode !== mode) applyMode(previousMode);
@@ -729,10 +834,15 @@ export async function createFinalImageFlightLab({
       };
     },
     getMetrics() {
+      const identityMetrics = webgpuDeviceIdentityMetrics(deviceIdentity, renderer);
       return {
         labId: this.labId,
         threeRevision: REVISION,
-        backend: renderer.backend?.isWebGPUBackend === true ? "WebGPU" : "unsupported",
+        ...identityMetrics,
+        runtimeProfile,
+        timestampQueriesRequired: trackTimestamp,
+        timestampQueriesRequested: trackTimestamp,
+        timestampQueriesActive: trackTimestamp && renderer.backend?.isWebGPUBackend === true,
         scenario,
         mode,
         tier,
@@ -741,6 +851,11 @@ export async function createFinalImageFlightLab({
         timeSeconds,
         frameId: lastRenderedFrameId,
         mechanism: route.mechanism,
+        viewport: {
+          width: canvas.width || 1,
+          height: canvas.height || 1,
+          dpr: renderer.getPixelRatio?.() ?? 1,
+        },
         routeSelection: {
           scenario,
           mechanism: route.mechanism,
@@ -764,6 +879,10 @@ export async function createFinalImageFlightLab({
         shadowFrame: shadowOwner.describe().frameMetrics,
         gpuTimingVerdict: qualityGovernor.describe().verdict,
         motionGpuSeekParity: "INSUFFICIENT_EVIDENCE",
+        rendererInfo: {
+          ...identityMetrics.rendererInfo,
+          info: renderer.info,
+        },
       };
     },
     async resolveGpuTimings() {
@@ -813,6 +932,7 @@ export async function createFinalImageFlightLab({
     async dispose() {
       if (disposed) return;
       disposed = true;
+      markWebGPUDeviceDisposing(deviceIdentity);
       renderer.setAnimationLoop(null);
       timer.dispose?.();
       shadowOwner.dispose();
@@ -836,6 +956,7 @@ export async function createFinalImageFlightLab({
       captureTarget.dispose();
       renderPipeline.dispose();
       renderer.dispose();
+      markWebGPUDeviceDisposed(deviceIdentity);
       captureTarget = null;
     },
   };
