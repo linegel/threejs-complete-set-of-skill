@@ -57,7 +57,8 @@
       "limitations": [
         "Correctness, camera, seed, temporal, full-tier 641x359 dispatch, aligned readback, and DPR extent gates pass on the current source closure.",
         "The temporal one-step response is measured and bounded but intentionally subtle in the final frame; the raw history diagnostics provide the decisive mechanism view.",
-        "Lifecycle stability, a unified 14-file v2 release bundle, named-hardware timing, and final acceptance remain incomplete."
+        "Fifty fresh create/render/resize/mode/tier/dispose cycles pass with queue and two-frame settlement; opaque renderer-internal byte residency remains explicitly unclaimed.",
+        "A unified 14-file v2 release bundle, named-hardware timing, and final acceptance remain incomplete."
       ],
       "images": [
         { "source": "final.design.png", "output": "final.design.png", "encoding": "png-copy", "meaning": "Final Frost composite from the complete refraction-and-Fresnel recipe." },

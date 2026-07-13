@@ -11,7 +11,7 @@
     "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/main.js",
     "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/index.html"
   ],
-  "canonicalSourceHash": "sha256:b24767d1863361d412de5ab3ae4a7a72c7ad17e66e70034eb139d7620c13d55e",
+  "canonicalSourceHash": "sha256:d71192998a5bb04e87777bb88fbec406ea85eb967a27655eabe602c7ff8cac70",
   "threeRevision": "0.185.1",
   "runtime": {
     "renderer": "WebGPURenderer",
@@ -24,7 +24,7 @@
     "mechanismCorrectness": "PASS",
     "performanceCompliance": "NOT_CLAIMED",
     "gpuAttribution": "INSUFFICIENT_EVIDENCE",
-    "lifecycleStability": "INSUFFICIENT_EVIDENCE"
+    "lifecycleStability": "PASS"
   },
   "primaryImage": "final.design.png",
   "primaryImageLabel": "Touch-history Frost native-WebGPU readback",
@@ -33,8 +33,8 @@
       "file": "final.design.png",
       "meaning": "Final Frost composite from the complete refraction-and-Fresnel recipe.",
       "source": "final.design.png",
-      "sourceSha256": "sha256:e0229f476073bb52b4be6d0777236c9f5ca3768c844dfb3f507edfa2cfb9083a",
-      "outputSha256": "sha256:e0229f476073bb52b4be6d0777236c9f5ca3768c844dfb3f507edfa2cfb9083a",
+      "sourceSha256": "sha256:28ac0227e25ff84f2f61728536f351966af8bdb7d0a23a874bd123f9fda076b1",
+      "outputSha256": "sha256:28ac0227e25ff84f2f61728536f351966af8bdb7d0a23a874bd123f9fda076b1",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
@@ -43,8 +43,8 @@
       "file": "no-post.design.png",
       "meaning": "Same scene, camera, seed, and pointer trace with the Frost composition bypassed.",
       "source": "no-post.design.png",
-      "sourceSha256": "sha256:c92f545d71d00167426bb1dbd5840a38ec6e4a310a8ba44c6aa64a2e6477f36e",
-      "outputSha256": "sha256:c92f545d71d00167426bb1dbd5840a38ec6e4a310a8ba44c6aa64a2e6477f36e",
+      "sourceSha256": "sha256:caec165148b239d21f343ec522526fc8afb35fa276011c5f26001136866097cb",
+      "outputSha256": "sha256:caec165148b239d21f343ec522526fc8afb35fa276011c5f26001136866097cb",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
@@ -53,8 +53,8 @@
       "file": "diagnostics.mosaic.png",
       "meaning": "Hash-bound mosaic of previous history, deposit, next history, and post-pointer Frost mask readbacks.",
       "source": "diagnostics.mosaic.png",
-      "sourceSha256": "sha256:753b4d3c4ffaf9ae8c3becf84233cfabaab59e076f55f7f67f9b815ffdba3f8c",
-      "outputSha256": "sha256:753b4d3c4ffaf9ae8c3becf84233cfabaab59e076f55f7f67f9b815ffdba3f8c",
+      "sourceSha256": "sha256:7322ee51b1dbdb4d7dfd624f0614420799dcb555a6b9f3b8223cef083d783d15",
+      "outputSha256": "sha256:7322ee51b1dbdb4d7dfd624f0614420799dcb555a6b9f3b8223cef083d783d15",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
@@ -63,8 +63,8 @@
       "file": "seed-0001.final.png",
       "meaning": "Baseline uint32 seed with the fixed authored pointer trace.",
       "source": "seed-0001.final.png",
-      "sourceSha256": "sha256:05ce12e4a2ba7274e1e2507af682984d549aae5de44a9d9609aeadca84a93350",
-      "outputSha256": "sha256:05ce12e4a2ba7274e1e2507af682984d549aae5de44a9d9609aeadca84a93350",
+      "sourceSha256": "sha256:df2faefa9e48b7d01c8a5e68fe4eb71aa635493fda040c0c4d0b47bebbffa64e",
+      "outputSha256": "sha256:df2faefa9e48b7d01c8a5e68fe4eb71aa635493fda040c0c4d0b47bebbffa64e",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
@@ -73,8 +73,8 @@
       "file": "seed-9e3779b9.final.png",
       "meaning": "Stress uint32 seed with camera, trace, mechanism, and tier held fixed.",
       "source": "seed-9e3779b9.final.png",
-      "sourceSha256": "sha256:a82cfaf49392d6d74ae66a9cb79a6e49a66cd549cc5f6db2c467d5f070974609",
-      "outputSha256": "sha256:a82cfaf49392d6d74ae66a9cb79a6e49a66cd549cc5f6db2c467d5f070974609",
+      "sourceSha256": "sha256:01b0f4580b0a7621bcfe4f1eb54ff036bfcd15f4d870cc68451f74f8ec1c1b48",
+      "outputSha256": "sha256:01b0f4580b0a7621bcfe4f1eb54ff036bfcd15f4d870cc68451f74f8ec1c1b48",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
@@ -83,8 +83,8 @@
       "file": "temporal.t001.png",
       "meaning": "Final output after exactly one 1/60-second pointer-history update.",
       "source": "temporal.t001.png",
-      "sourceSha256": "sha256:b64eee5956efee5a0b7927a98c541cff0a6fb5bad43e7d3b62033d7bc8015c24",
-      "outputSha256": "sha256:b64eee5956efee5a0b7927a98c541cff0a6fb5bad43e7d3b62033d7bc8015c24",
+      "sourceSha256": "sha256:84c72087e1f7b2e8502f2f89cfa6d915155ba2c82886e6184ae213cfdf0778ca",
+      "outputSha256": "sha256:84c72087e1f7b2e8502f2f89cfa6d915155ba2c82886e6184ae213cfdf0778ca",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
@@ -93,6 +93,7 @@
   "limitations": [
     "Correctness, camera, seed, temporal, full-tier 641x359 dispatch, aligned readback, and DPR extent gates pass on the current source closure.",
     "The temporal one-step response is measured and bounded but intentionally subtle in the final frame; the raw history diagnostics provide the decisive mechanism view.",
-    "Lifecycle stability, a unified 14-file v2 release bundle, named-hardware timing, and final acceptance remain incomplete."
+    "Fifty fresh create/render/resize/mode/tier/dispose cycles pass with queue and two-frame settlement; opaque renderer-internal byte residency remains explicitly unclaimed.",
+    "A unified 14-file v2 release bundle, named-hardware timing, and final acceptance remain incomplete."
   ]
 }
