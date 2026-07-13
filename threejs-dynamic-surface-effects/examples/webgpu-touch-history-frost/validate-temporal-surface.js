@@ -456,16 +456,20 @@ for (const token of [
 }
 const entrySource = readFileSync(resolve(here, "main.js"), "utf8");
 const pageSource = readFileSync(resolve(here, "index.html"), "utf8");
+const shellSource = readFileSync(resolve(here, "ui-shell.js"), "utf8");
+const bootstrapSource = readFileSync(resolve(here, "bootstrap.js"), "utf8");
 assert(entrySource.includes("globalThis.labController = lab"), "canonical frost controller is not published through labController");
 assert(entrySource.includes("globalThis.__LAB_CONTROLLER__ = lab"), "canonical frost controller compatibility alias is missing");
 assert(entrySource.includes("lab.setMechanism(mechanismSelect.value)"), "mechanism UI still mutates the scenario channel");
 assert(entrySource.includes("globalThis.__LAB_CAPTURE_PROFILE__?.id"), "capture profile is not an explicit runtime input");
 assert(entrySource.includes('get("capture") === "1"'), "automated capture does not own a deterministic clock");
 assert(entrySource.includes("if (!automatedCapture)"), "presentation animation still runs during automated capture");
-assert(pageSource.includes("<details data-metrics>"), "runtime metrics must use a native disclosure drawer");
-assert(!pageSource.includes("<details data-metrics open"), "runtime metrics must not obscure the canvas by default");
-assert(pageSource.includes("data-readiness"), "the compact HUD must expose renderer readiness");
+assert(shellSource.includes("<details data-metrics>"), "runtime metrics must use a native disclosure drawer");
+assert(!shellSource.includes("<details data-metrics open"), "runtime metrics must not obscure the canvas by default");
+assert(shellSource.includes("data-readiness"), "the compact HUD must expose renderer readiness");
 assert(entrySource.includes("metricsDetails.open"), "closed metrics drawers must not serialize runtime data every frame");
 assert(entrySource.includes("nextMetricsUpdate = timestamp + 250"), "open metrics serialization must be throttled");
+assert(pageSource.includes('src="./bootstrap.js"'), "base route must use the shared Frost bootstrap");
+assert(bootstrapSource.indexOf('import("./physical-observer.js")') < bootstrapSource.indexOf('import("./main.js")'), "physical observer must install before the lab runtime");
 
 console.log("webgpu-touch-history-frost validation passed");
