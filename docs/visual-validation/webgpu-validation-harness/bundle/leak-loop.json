@@ -1,0 +1,4121 @@
+{
+  "schemaVersion": 2,
+  "operations": [
+    "create",
+    "await ready",
+    "resize width/height/DPR",
+    "change tier",
+    "change mode",
+    "reset history",
+    "render once",
+    "dispose",
+    "measure post-disposal renderer state"
+  ],
+  "cycles": {
+    "value": 50,
+    "unit": "cycle",
+    "label": "Measured",
+    "source": "fresh-controller lifecycle runner result"
+  },
+  "before": {
+    "targetBytes": {
+      "value": 69120000,
+      "unit": "byte",
+      "label": "Measured",
+      "source": "maximum described render-target allocation across lifecycle cycles"
+    },
+    "storageBytes": {
+      "value": 0,
+      "unit": "byte",
+      "label": "Measured",
+      "source": "maximum described storage allocation across lifecycle cycles"
+    }
+  },
+  "after": {
+    "targetBytes": {
+      "value": 0,
+      "unit": "byte",
+      "label": "Measured",
+      "source": "all post-disposal renderer-memory counters were measured at zero in every cycle"
+    },
+    "storageBytes": {
+      "value": 0,
+      "unit": "byte",
+      "label": "Measured",
+      "source": "all post-disposal renderer-memory counters were measured at zero in every cycle"
+    }
+  },
+  "trend": {
+    "targetBytesPerCycle": {
+      "value": 0,
+      "unit": "byte/cycle",
+      "label": "Measured",
+      "source": "post-disposal renderer-memory total is zero for every cycle"
+    },
+    "storageBytesPerCycle": {
+      "value": 0,
+      "unit": "byte/cycle",
+      "label": "Measured",
+      "source": "post-disposal renderer-memory total is zero for every cycle"
+    }
+  },
+  "gates": {
+    "targetBytes": {
+      "value": 0,
+      "unit": "byte",
+      "label": "Gated",
+      "source": "no retained target allocation is permitted after disposal"
+    },
+    "storageBytes": {
+      "value": 0,
+      "unit": "byte",
+      "label": "Gated",
+      "source": "no retained storage allocation is permitted after disposal"
+    }
+  },
+  "allowedCachePlateaus": [],
+  "deviceErrors": [],
+  "verdict": "PASS",
+  "rendererMemoryRange": {
+    "beforeMin": {
+      "value": 1955512,
+      "unit": "byte",
+      "label": "Measured",
+      "source": "minimum renderer-info memory total before disposal"
+    },
+    "beforeMax": {
+      "value": 60831431,
+      "unit": "byte",
+      "label": "Measured",
+      "source": "maximum renderer-info memory total before disposal"
+    },
+    "afterMax": {
+      "value": 0,
+      "unit": "byte",
+      "label": "Measured",
+      "source": "maximum renderer-info memory total after disposal"
+    }
+  },
+  "resourceRange": {
+    "targetBytesMin": {
+      "value": 2524316,
+      "unit": "byte",
+      "label": "Measured",
+      "source": "minimum described render-target allocation across lifecycle resize states"
+    },
+    "targetBytesMax": {
+      "value": 69120000,
+      "unit": "byte",
+      "label": "Measured",
+      "source": "maximum described render-target allocation across lifecycle resize states"
+    },
+    "storageBytesMax": {
+      "value": 0,
+      "unit": "byte",
+      "label": "Measured",
+      "source": "maximum described storage allocation across lifecycle cycles"
+    }
+  },
+  "cycleSnapshots": [
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 0,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 3966791,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 5689432,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 1,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 27231672,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 30720000,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 2,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 1955512,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 2524316,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 3,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 60831431,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 69120000,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 4,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 1955512,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 2524316,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 5,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 27231672,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 30720000,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 6,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 3966791,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 5689432,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 7,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 27231672,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 30720000,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 8,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 1955512,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 2524316,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 9,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 60831431,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 69120000,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 10,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 1955512,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 2524316,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 11,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 27231672,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 30720000,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 12,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 3966791,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 5689432,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 13,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 27231672,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 30720000,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 14,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 1955512,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 2524316,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 15,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 60831431,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 69120000,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 16,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 1955512,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 2524316,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 17,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 27231672,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 30720000,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 18,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 3966791,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 5689432,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 19,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 27231672,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 30720000,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 20,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 1955512,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 2524316,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 21,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 60831431,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 69120000,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 22,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 1955512,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 2524316,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 23,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 27231672,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 30720000,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 24,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 3966791,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 5689432,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 25,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 27231672,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 30720000,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 26,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 1955512,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 2524316,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 27,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 60831431,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 69120000,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 28,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 1955512,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 2524316,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 29,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 27231672,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 30720000,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 30,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 3966791,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 5689432,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 31,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 27231672,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 30720000,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 32,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 1955512,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 2524316,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 33,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 60831431,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 69120000,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 34,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 1955512,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 2524316,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 35,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 27231672,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 30720000,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 36,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 3966791,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 5689432,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 37,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 27231672,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 30720000,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 38,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 1955512,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 2524316,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 39,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 60831431,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 69120000,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 40,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 1955512,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 2524316,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 41,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 27231672,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 30720000,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 42,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 3966791,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 5689432,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 43,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 27231672,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 30720000,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 44,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 1955512,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 2524316,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 45,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 60831431,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 69120000,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 46,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 1955512,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 2524316,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 47,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 27231672,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 30720000,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 48,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 3966791,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 5689432,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "cycle": {
+        "value": 49,
+        "unit": "cycle",
+        "label": "Measured",
+        "source": "fresh-controller lifecycle runner result"
+      },
+      "beforeRendererBytes": {
+        "value": 27231672,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total before disposal"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "renderer-info memory total after disposal"
+      },
+      "targetBytes": {
+        "value": 30720000,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described render-target bytes before disposal"
+      },
+      "storageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "described storage bytes before disposal"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle render-target inventory"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "byte",
+        "label": "Measured",
+        "source": "post-settle storage inventory"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "listener",
+        "label": "Measured",
+        "source": "post-settle subject listener registry"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "control",
+        "label": "Measured",
+        "source": "post-settle subject control registry"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "material",
+        "label": "Measured",
+        "source": "post-settle subject material registry"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "error",
+        "label": "Measured",
+        "source": "post-settle delayed and device error channels"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "rendererStateAfterDigest": "sha256:c38542f6cd38f7440bada15dea528dd835ab183fd48cd5b00a47a8991514b2b9",
+      "deviceLossObserved": false,
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "frame",
+        "label": "Measured",
+        "source": "post-disposal observation window"
+      },
+      "disposeStatus": "PASS"
+    }
+  ]
+}

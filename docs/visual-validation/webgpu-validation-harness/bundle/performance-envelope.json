@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 2,
+  "gpuTimingRequirement": "required",
+  "refreshRate": {
+    "value": 120.48192771101236,
+    "unit": "Hz",
+    "label": "Measured",
+    "source": "named-hardware physical-browser performance capture; idle-rAF median interval"
+  },
+  "refreshPeriod": {
+    "value": 8.299999999988358,
+    "unit": "ms",
+    "label": "Derived",
+    "source": "1000 / measured refresh Hz"
+  },
+  "browserMainThreadReserve": {
+    "value": 1.400000000023283,
+    "unit": "ms",
+    "label": "Measured",
+    "source": "named-hardware physical-browser performance capture; idle-rAF p95 minus p50"
+  },
+  "compositorGpuReserve": {
+    "status": "NOT_CLAIMED",
+    "value": null,
+    "reason": "The browser surface exposes no compositor timing API; no value is inferred."
+  },
+  "cpuSafetyReserve": {
+    "value": 1,
+    "unit": "ms",
+    "label": "Authored",
+    "source": "authored target envelope"
+  },
+  "gpuSafetyReserve": {
+    "value": 1,
+    "unit": "ms",
+    "label": "Authored",
+    "source": "authored target envelope"
+  },
+  "cpuSceneEnvelope": {
+    "value": 14.666666666666668,
+    "unit": "ms",
+    "label": "Gated",
+    "source": "frozen current-adapter CPU scene budget"
+  },
+  "gpuSceneEnvelope": {
+    "value": 14.666666666666668,
+    "unit": "ms",
+    "label": "Gated",
+    "source": "frozen current-adapter GPU scene budget"
+  },
+  "cpuP95Gate": {
+    "value": 14.666666666666668,
+    "unit": "ms",
+    "label": "Gated",
+    "source": "frozen 60 Hz scene budget"
+  },
+  "gpuP95Gate": {
+    "value": 14.666666666666668,
+    "unit": "ms",
+    "label": "Gated",
+    "source": "frozen 60 Hz scene budget"
+  },
+  "deadlineInterval": {
+    "value": 25.005,
+    "unit": "ms",
+    "label": "Gated",
+    "source": "1.5 times the authored 16.67 ms current-adapter frame target"
+  },
+  "deadlineMissRatioGate": {
+    "value": 0.01,
+    "unit": "ratio",
+    "label": "Gated",
+    "source": "authored target applied to measured presentation cadence"
+  }
+}

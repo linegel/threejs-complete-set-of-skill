@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 2,
+  "passes": [
+    {
+      "id": "scene-pass-and-capture-target",
+      "lower": {
+        "value": 30720000,
+        "unit": "byte/frame",
+        "label": "Derived",
+        "source": "one store per reported target"
+      },
+      "upper": {
+        "value": 61440000,
+        "unit": "byte/frame",
+        "label": "Derived",
+        "source": "conservative load-plus-store bound without compression"
+      }
+    }
+  ],
+  "lowerBoundBytesPerFrame": {
+    "value": 30720000,
+    "unit": "byte/frame",
+    "label": "Derived",
+    "source": "reported target store lower bound"
+  },
+  "upperBoundBytesPerFrame": {
+    "value": 61440000,
+    "unit": "byte/frame",
+    "label": "Derived",
+    "source": "reported target load-plus-store upper bound"
+  },
+  "bytesPerSecond": {
+    "value": 1843200000,
+    "unit": "byte/s",
+    "label": "Derived",
+    "source": "lower bound * authored target rate"
+  },
+  "assumptions": [
+    "Logical uncompressed target bytes include depth32float; physical compression, cache, tile residency, and staging remain unclaimed."
+  ],
+  "hardwareCountersAvailable": false,
+  "verdict": "INSUFFICIENT_EVIDENCE",
+  "correctnessLaneArtifact": {
+    "sha256": "sha256:b449f68c757edc21342eed013a4964d7f2ccdc45a81c68a1eb571288e16e9f3f",
+    "byteLength": {
+      "value": 1161,
+      "unit": "byte",
+      "label": "Measured",
+      "source": "correctness evidence-manifest ledger entry for bandwidth-model.json"
+    }
+  },
+  "performanceTierModels": [
+    {
+      "tier": "target-performance",
+      "logicalLowerBoundBytesPerFrame": {
+        "value": 66355200,
+        "unit": "byte/frame",
+        "label": "Derived",
+        "source": "one logical store per validated lab-owned render target"
+      },
+      "logicalUpperBoundBytesPerFrame": {
+        "value": 132710400,
+        "unit": "byte/frame",
+        "label": "Derived",
+        "source": "conservative logical load-plus-store bound"
+      },
+      "presentationRate": {
+        "value": 120.48192771101236,
+        "unit": "frame/s",
+        "label": "Derived",
+        "source": "1000 ms/s divided by measured refresh p50"
+      },
+      "logicalLowerBoundBytesPerSecond": {
+        "value": 7994602409.649768,
+        "unit": "byte/s",
+        "label": "Derived",
+        "source": "logical lower bound bytes/frame multiplied by derived presentation rate"
+      },
+      "hardwareCountersAvailable": false,
+      "verdict": "INSUFFICIENT_EVIDENCE"
+    },
+    {
+      "tier": "governor-stress",
+      "logicalLowerBoundBytesPerFrame": {
+        "value": 22809600,
+        "unit": "byte/frame",
+        "label": "Derived",
+        "source": "one logical store per validated lab-owned render target"
+      },
+      "logicalUpperBoundBytesPerFrame": {
+        "value": 45619200,
+        "unit": "byte/frame",
+        "label": "Derived",
+        "source": "conservative logical load-plus-store bound"
+      },
+      "presentationRate": {
+        "value": 120.48192771101236,
+        "unit": "frame/s",
+        "label": "Derived",
+        "source": "1000 ms/s divided by measured refresh p50"
+      },
+      "logicalLowerBoundBytesPerSecond": {
+        "value": 2748144578.3171077,
+        "unit": "byte/s",
+        "label": "Derived",
+        "source": "logical lower bound bytes/frame multiplied by derived presentation rate"
+      },
+      "hardwareCountersAvailable": false,
+      "verdict": "INSUFFICIENT_EVIDENCE"
+    }
+  ],
+  "hardwareBandwidthVerdict": "NOT_CLAIMED"
+}

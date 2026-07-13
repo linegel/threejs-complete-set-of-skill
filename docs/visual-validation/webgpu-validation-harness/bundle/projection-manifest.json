@@ -1,0 +1,955 @@
+{
+  "schemaVersion": 1,
+  "projectionKind": "tracked-release-projection-v1",
+  "policy": {
+    "id": "native-webgpu-tracked-release-v1",
+    "digest": "sha256:e349900d79da27cb5570ea959707f741e03ea7e206d85a717a1129b27268f6a4"
+  },
+  "labId": "webgpu-validation-harness",
+  "skill": "threejs-visual-validation",
+  "threeRevision": "0.185.1",
+  "sourceClosureHash": "sha256:281b93606ce2ed351b58deb4e45ccce5f7a752de26e737c36211cf294c6bab95",
+  "buildRevision": "sha256:7db153853b7ed98bcba359e3bc796004340de59ff9864b67bd66cdeb6ee488f4",
+  "sourceRelease": {
+    "path": "evidence-manifest.json",
+    "sha256": "sha256:80c055265da82baee9539bb1018b959d8a4af9ee12a8f235d9d1eef720c699e8",
+    "byteLength": 90106,
+    "promotionBindingDigest": "sha256:6c19a88e2a9026989f09fb492c8c950a1ce93e91716753ad0a871413ec8017f1",
+    "candidateBindingDigest": "sha256:5814efc6b8d5dfa83c92783bf47bf4faef11a7e336d26a207b265dd5c2696f6b",
+    "artifactLedgerDigest": "sha256:1126d41c039ac661f1eb94975934b2254ef8955a5d7e13594d93695ae06cd174",
+    "imageLedgerDigest": "sha256:b3407588a0bade9830858e9e5c0347234e068ec6badbebcd6b5977ed03752ddf"
+  },
+  "sourceClosure": {
+    "algorithm": "validation-harness-codex-browser-source-closure-v4",
+    "roots": [
+      "threejs-visual-validation/examples/webgpu-validation-harness",
+      "scripts/capture-lab-browser.mjs",
+      "scripts/lib/lab-registry.mjs",
+      "scripts/lib/png-rgba.mjs",
+      "scripts/lib/vite-lab-config.mjs",
+      "labs/runtime/aligned-readback.mjs",
+      "labs/schema/evidence-bundle-v2.schema.json",
+      "labs/schema/runtime-graph.schema.json",
+      "package.json",
+      "package-lock.json"
+    ],
+    "files": [
+      {
+        "repositoryPath": "labs/runtime/aligned-readback.mjs",
+        "sha256": "sha256:368531b396bb8f601be5ba65db468b4e15b1350448ceffad3a041fb5583c86a3",
+        "byteLength": 2264
+      },
+      {
+        "repositoryPath": "labs/schema/evidence-bundle-v2.schema.json",
+        "sha256": "sha256:cade6c3bafbd4b12cfb30abd248eb8a61b675ae88a1ce8b7bf86992b627af143",
+        "byteLength": 37304
+      },
+      {
+        "repositoryPath": "labs/schema/runtime-graph.schema.json",
+        "sha256": "sha256:298784d829d509e1cc8d314d7ee6c8644c4108bf22e24f373bba84659291f9cb",
+        "byteLength": 3365
+      },
+      {
+        "repositoryPath": "package-lock.json",
+        "sha256": "sha256:ae3530769872675f9e91ecc51174d61a2d40aac97ce5a06b773b9c7cb2247487",
+        "byteLength": 48798
+      },
+      {
+        "repositoryPath": "package.json",
+        "sha256": "sha256:db5840bd02d9a5ed1b382bb225ae563ce92b00019d1667b09ae9d583444cf540",
+        "byteLength": 3998
+      },
+      {
+        "repositoryPath": "scripts/capture-lab-browser.mjs",
+        "sha256": "sha256:f2b84453dbdcfbc291a049dc0c01a892832551e10eda76c80c810255faa33aae",
+        "byteLength": 100036
+      },
+      {
+        "repositoryPath": "scripts/lib/lab-registry.mjs",
+        "sha256": "sha256:9e91e4d22b1e77379bcbcd09fa88c498e1091af2611d498172bae505c4787505",
+        "byteLength": 41681
+      },
+      {
+        "repositoryPath": "scripts/lib/png-rgba.mjs",
+        "sha256": "sha256:d7c1b4c60bdc82b1399d966b238eb6ed2565368bc8705f23925bcec8e6efe58c",
+        "byteLength": 8572
+      },
+      {
+        "repositoryPath": "scripts/lib/vite-lab-config.mjs",
+        "sha256": "sha256:15e59fb83dd145a2480d1b9b5c35916a325fd2b22bbf7422f780ebd7fe6606ba",
+        "byteLength": 652
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/capture-hook.mjs",
+        "sha256": "sha256:bebb72667ebda6b423ae8d7c20cefece0d261a0c2172a2ee778e0f1b3496e357",
+        "byteLength": 29056
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/fixtures/budgets/over-budget-timings.json",
+        "sha256": "sha256:f8ebfe644bdb42323ce37ab4c26e68e9214ce55b43beed0ee29d1cc765f145d8",
+        "byteLength": 602
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/fixtures/pixel-diff/identical-a.png",
+        "sha256": "sha256:593b22bd33e3435c761ffa61a885639ba42d5f9b2ca2af9ff474abefbafb3b7a",
+        "byteLength": 233
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/fixtures/pixel-diff/identical-b.png",
+        "sha256": "sha256:593b22bd33e3435c761ffa61a885639ba42d5f9b2ca2af9ff474abefbafb3b7a",
+        "byteLength": 233
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/fixtures/pixel-diff/one-pixel-off.png",
+        "sha256": "sha256:c9fbd4a16eb342de53547eba9264722ed7aab1c2fc9adc11fdc8894c2b670d14",
+        "byteLength": 233
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/index.html",
+        "sha256": "sha256:49f14acb0be8ab0b5dc02e0b482c9c20f4340de24237f056bb39967f238a3018",
+        "byteLength": 949
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/lab.manifest.json",
+        "sha256": "sha256:b891782b62d77d1bfa1ab014fab382146ee89ddbd9b01ea17cdf195ddef820f8",
+        "byteLength": 9286
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/mechanism/aligned-readback/index.html",
+        "sha256": "sha256:2a4bdbb9c74630c03907b13ead724c80502f25bdc347c2fbc9f563383d807d97",
+        "byteLength": 350
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/mechanism/claim-verdicts/index.html",
+        "sha256": "sha256:1c894f041f7554eb18a567a3475e06d0ad63936238bfa539f67ac0c713da12af",
+        "byteLength": 346
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/mechanism/gpu-timestamps/index.html",
+        "sha256": "sha256:93dc8f7dbd963bd605d1633e4b1e64c865b818c3d7ac086204650afb3b7ed75b",
+        "byteLength": 346
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/mechanism/lifecycle-trend/index.html",
+        "sha256": "sha256:250f07280f05b47d487aea986c23f8140ca84035bc87a0cda729b5d268d245ad",
+        "byteLength": 348
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/mechanism/resource-inventory/index.html",
+        "sha256": "sha256:6419f0cc96f21b7cd94b1f0ed5de1970a86747ff17772ea22fd3c5cd665a7a33",
+        "byteLength": 354
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/mechanism/visual-errors/index.html",
+        "sha256": "sha256:bb2a9ad39568f3487db84bb3bccda572c9ea0c0542770d0f41a293a5fd9e8f63",
+        "byteLength": 344
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/package.json",
+        "sha256": "sha256:bf5651edd040bde69299f78f472561ccc50d895f23289a279cc77483f09fb574",
+        "byteLength": 1713
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/README.md",
+        "sha256": "sha256:17b5834e2b9cd782746adfd7864be71b95a6052c013774adabcc6752836d0125",
+        "byteLength": 6951
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/app.js",
+        "sha256": "sha256:d27ab60907de314de39fa1c59bdaad62f5c1281edca29c79cbe857882a357750",
+        "byteLength": 3220
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/artifact-paths.js",
+        "sha256": "sha256:f12845bbda52b4ee622da7ea81a45cbdc3a90bbaf920af8a17ccee233c5e855a",
+        "byteLength": 1903
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/artifact-paths.test.js",
+        "sha256": "sha256:6e03027e82c22ae8d5b6eaddcd9d454ecb044641cbf6a7082743100f6f83755f",
+        "byteLength": 1700
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/browser-subject-adapter.js",
+        "sha256": "sha256:4e9af183a9695bf5f51b99efc99846f6738473e1b30fb16c8ef3a15f7fede0c9",
+        "byteLength": 89057
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/browser-subject-adapter.test.js",
+        "sha256": "sha256:bfa901a4343b777c5f58e34fba448e564096b4000b82778bb509c7aef3961c61",
+        "byteLength": 29864
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/browser-webgpu-surface.js",
+        "sha256": "sha256:e002ad18a4cabe09e8b6a28c59ee1a65ca5d5cb102ad30c2664c25dd5dfe71bb",
+        "byteLength": 3286
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/capture-browser.js",
+        "sha256": "sha256:85e6abd34e4b1b5139e8995bdd3e2aa955c6b96ae3f96efdf17b500a02d643c5",
+        "byteLength": 635
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/capture-correctness.js",
+        "sha256": "sha256:ce5f70b41158142eed278a695619df66462c3d717013eab3138493b43e76d45a",
+        "byteLength": 2834
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/capture-hook.test.js",
+        "sha256": "sha256:b9a1e6ab2ba343d5c07315a8078727b7ddfbecdbdf0629f85152edbace41ce66",
+        "byteLength": 19092
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/capture-source-closure.js",
+        "sha256": "sha256:4453859b890856a1d4435bd3e7b4862878d6a74361aa566323e6539df4e35e28",
+        "byteLength": 3951
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/capture-source-closure.test.js",
+        "sha256": "sha256:a30663792deccf2b654a0b16ce2b51b036599c4f8f4f488e29bfc4efd284c7e6",
+        "byteLength": 1295
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/capture-transaction.js",
+        "sha256": "sha256:de5300181910cab003d6fcd04a08b51e6d395e4cbfc77226e732aa1b8dd0e54c",
+        "byteLength": 5822
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/capture-transaction.test.js",
+        "sha256": "sha256:b1fff998084704a568be19000d5d760fdcc1a91edb13c445df0d7f9eea44e023",
+        "byteLength": 5982
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/check-imports.mjs",
+        "sha256": "sha256:463936f2a86d8b46acbe704ff6db5929c8a7534f6f0272db41e9d2ddae8da38f",
+        "byteLength": 238
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/checked-json-schema.js",
+        "sha256": "sha256:9c51966102756d4c4b5e39f8c7a5cf0e245b1a5217b3695bb969b68d85c6ffac",
+        "byteLength": 605
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/checked-json-schema.test.js",
+        "sha256": "sha256:58123b3c910ab500f3d8f7aeba543f8c7a223b3f4a839071e8815ff51c727b17",
+        "byteLength": 2514
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/cli.js",
+        "sha256": "sha256:cf577510059b5ba93b6e15283e21c3f44de532e53f109835677203b77303f3c6",
+        "byteLength": 999
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/correctness-capture-recipes.js",
+        "sha256": "sha256:e4b0ca400fa216fbb3c694b3908f7752c81191677f735feb538294ae86e918d6",
+        "byteLength": 4880
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/correctness-capture-recipes.test.js",
+        "sha256": "sha256:6cbd20dfde029c59fe7e3f89c07a87896c0693f01055f0d6c70f9ecb50879dba",
+        "byteLength": 5900
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/correctness-capture-session.fixture.js",
+        "sha256": "sha256:f9af8b71fd40261d5d7fa26ba611a988aa75cd68cfdb7fe8555610c665895dd2",
+        "byteLength": 22557
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/correctness-write-ledger.js",
+        "sha256": "sha256:c2d88560dbac28781bc65012a853d0b730fb1e97394ea85565daf9c2ab67cd5a",
+        "byteLength": 3283
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/correctness-write-ledger.test.js",
+        "sha256": "sha256:991df6124de4436c5e2d56daf0d17542323505b039592c376cf2717fb10e057f",
+        "byteLength": 2657
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/diagnostic-mosaic.js",
+        "sha256": "sha256:396bb044200e3ffb4e3ebd09bdba12746581e66605698ca71fc0952959c11ecd",
+        "byteLength": 3019
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/evidence-bundle-v2.js",
+        "sha256": "sha256:3a9be05c0f9a466b7298013405a3d0571abcac647f8a6af0e1a9ec0b0368acee",
+        "byteLength": 6749
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/evidence-bundle-v2.test.js",
+        "sha256": "sha256:aa6c787f91f3aa5453e22652a464f8a827995ba71c515e3218e5c6b75d5a8636",
+        "byteLength": 1639
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/evidence-manifest-contract.js",
+        "sha256": "sha256:a67ba74c894ce50c0f932f1103c471338acc38d67132ce07db89ca88ba1601e3",
+        "byteLength": 72
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/evidence-manifest-contract.test.js",
+        "sha256": "sha256:8bd959edfa971ed3d7c0a0b57114aaeb929706efd0c870b7a78d98a7b34cda33",
+        "byteLength": 19782
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/evidence-readiness.js",
+        "sha256": "sha256:fa00ccbc817c0587803f065809a71dc6fbc9330f38b082b73dc726712cb14ef5",
+        "byteLength": 14858
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/evidence-readiness.test.js",
+        "sha256": "sha256:bf2eb890fda0aeb9fffb88cc8f84e7640c49ade050ca5cdb151038d4745a702e",
+        "byteLength": 5294
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/harness.js",
+        "sha256": "sha256:3c02b2fc3f47591c2e2790bd1ea9fa6b135b58f75c15619add25ff9bdc3f1463",
+        "byteLength": 11993
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/immutable-physical-build.js",
+        "sha256": "sha256:df9386704f487aa29ea7df2bdc6220cd9cd3d7ff65d5f94617ae3075b4953e6a",
+        "byteLength": 7606
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/immutable-physical-build.test.js",
+        "sha256": "sha256:ba28154622527b4cdeb03986c4d544232c1b34deae50823285d7769e04805fdb",
+        "byteLength": 1048
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/immutable-physical-server.js",
+        "sha256": "sha256:843830dae0afb3b498f6c57276a61d069b110927a246396d9c8b65a3333b47e5",
+        "byteLength": 6143
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/immutable-physical-server.test.js",
+        "sha256": "sha256:511747291d7adc581d3fbbecb442d2f3a4d4109a972d287b81352c54250b3f0c",
+        "byteLength": 1448
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/in-app-evidence-client.js",
+        "sha256": "sha256:ff691534583f31b2e35e18d1dfdc23e0bfb756d2e14d3ac8d307d9baf18a1196",
+        "byteLength": 19073
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/in-app-evidence-import.js",
+        "sha256": "sha256:bde009040b7ded09e07515a2cb8bb8796ed95a9c248de8fdb975f3b546091cf7",
+        "byteLength": 4123
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/in-app-evidence-plan.js",
+        "sha256": "sha256:b64a30bd9e44ac120dd368a28ea7a3cdcecc4d5ad717f7637de814767301bbf2",
+        "byteLength": 3762
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/in-app-evidence.html",
+        "sha256": "sha256:229525b41ca2e51319c31ed016cef1cb0be3df4bb021c540d1cbeaf633d69e0b",
+        "byteLength": 2118
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/ledger-bound-json.js",
+        "sha256": "sha256:5b7b3679417b9dae03e882243fd8329eb382892a5e86987d802259b127d9239d",
+        "byteLength": 1609
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/lifecycle-profile.test.js",
+        "sha256": "sha256:008ba5265ee4f39afb9a7bc33258bb9f4350b6cfbefd39ed5b64b257af665494",
+        "byteLength": 2696
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/locked-route.js",
+        "sha256": "sha256:13e5b8fbe93f0fc013cf471c538ebe0678c3f516cf1ddf1615babac5e8c3d77e",
+        "byteLength": 4038
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/numeric-evidence.js",
+        "sha256": "sha256:76bafa1f91ea94ae0234d22f7db197f0e99d2cd6797c9c88c9ffaaf5f214b610",
+        "byteLength": 229
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/offline-promotion.js",
+        "sha256": "sha256:8313a944685db82dd446539cd2e80ac4a4bfabbdb5156f8c68cdb261f555a8b6",
+        "byteLength": 4259
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/path-confinement.js",
+        "sha256": "sha256:624693ad120ff5bf93b23c2b69d65286c8d621e72eddfb61e9a02dc6391e0a87",
+        "byteLength": 2585
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/performance-evidence-projection.js",
+        "sha256": "sha256:3f0fc9f9ba306d34963c50fb138a95b14b9517c8caeb090f606493ccea7aa904",
+        "byteLength": 3439
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/performance-resource-projection.js",
+        "sha256": "sha256:3598df0840b8ffc82daf1a79b303955e67ae8ac647a326aa04ba51b44b6381aa",
+        "byteLength": 13772
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/physical-evidence-common.js",
+        "sha256": "sha256:06796c016968e1ab95f7f4beb524adafc69072f5393dd856c132c8867529a9d0",
+        "byteLength": 2676
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/physical-evidence-common.test.js",
+        "sha256": "sha256:9f8ff4c971006c67fcc5b856642c642447b49ca752736dbd5fdef27794474469",
+        "byteLength": 1926
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/physical-lane-join.js",
+        "sha256": "sha256:edba8614dfe65f127b8946ede13e6e5d7e292123dc493d1585acd0c3a90abe61",
+        "byteLength": 15294
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/physical-lane-join.test.js",
+        "sha256": "sha256:8230752e9da232cf7b19770496a44fb9c726e50188aedd70c6c945e8607d6dd0",
+        "byteLength": 11031
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/physical-observer.js",
+        "sha256": "sha256:d02b38385554bb65514ebd4c83eb90beadb73385b54fc55c23b8f0ec468165f6",
+        "byteLength": 1087
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/physical-performance-trace.js",
+        "sha256": "sha256:ca8d6419c4f0d88c2c4b9987c61abc199c049008e389728053f6caebd075c632",
+        "byteLength": 17907
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/physical-runtime-profile.js",
+        "sha256": "sha256:8fb1af2532b83969d54247ac6600673d24d88aefb1da0c1ad49317aa381ee417",
+        "byteLength": 4418
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/physical-runtime-profile.test.js",
+        "sha256": "sha256:4cc9625ce40956fbeeca052a5fe790bfd484099ad561a7cec589dffa4e4a7b04",
+        "byteLength": 5725
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/physical-session-validator.js",
+        "sha256": "sha256:a405b27344da96d7bf2154ceae28308724fc6bd9837f54c577c8c3a95b290c55",
+        "byteLength": 94175
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/physical-session-validator.test.js",
+        "sha256": "sha256:e25deb82f4dc623bafd8d8eb53be539242c300b591fef317813613255be4ea82",
+        "byteLength": 47514
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/physical-session.fixture.js",
+        "sha256": "sha256:e586ae63c2839a9345e809c5f847eb79158b91c84d0d0cdf6445e372a28136a6",
+        "byteLength": 15627
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/physical-validate-record.js",
+        "sha256": "sha256:65f5761e4e75073f4e4d44e2ebc68a22136aeee91e40cb7f90ec332d9d768c6b",
+        "byteLength": 988
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/png-image-contract.js",
+        "sha256": "sha256:cc35e6a2b8bd5cd807cabaf6a84f67ccdaa2b4235761e9c6fb0ab4cfc0278a5c",
+        "byteLength": 798
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/png.js",
+        "sha256": "sha256:4247d8dbb596b6abcb2cdc03f6a30d666481421c0df80fb58bb0160e012f75a2",
+        "byteLength": 1805
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/png.test.js",
+        "sha256": "sha256:86b6d31ffc046c7b19b4aee5ab46b156a65ba482da053f0a688133bb39388e59",
+        "byteLength": 1512
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/publishability-hardening.test.js",
+        "sha256": "sha256:cc6321bdd8fc40ffb7d60f30d2d9d9da8f001a91994b4c8f7cf9a40bcd2627bd",
+        "byteLength": 3067
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/raw-capture-manifest.js",
+        "sha256": "sha256:51918b16c7bd5ef1b4e8a261fe0b7177a32598d9021733705adfe86a03fb4aa4",
+        "byteLength": 23180
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/raw-capture-manifest.test.js",
+        "sha256": "sha256:c4464007eb539266be41df90053ae886f9cae9ebe52fe837811c29fc7cdfb25e",
+        "byteLength": 36687
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/readback.js",
+        "sha256": "sha256:7de3f8df4e29601268a29dba2e5d6928da5622679c458d423c552d4d0bf67b1d",
+        "byteLength": 2859
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/release-bundle-input.js",
+        "sha256": "sha256:7d004b85a5e886b569f1529a73929a3a7a4468d7b251dea4ca960281bea6550d",
+        "byteLength": 17540
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/release-bundle-input.test.js",
+        "sha256": "sha256:4afbe9f052544f4346383084869ea11c3d8707e55af890886df4557321ca2d42",
+        "byteLength": 11807
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/release-evidence-projection.js",
+        "sha256": "sha256:9e34241293bb17d62f251c4261629dfa37737e676353a9e58bde7f0cff7aadd9",
+        "byteLength": 5416
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/renderer-info-snapshot.js",
+        "sha256": "sha256:4111f9a3d5468e987ebc5ab7cdd8661df895bc5da183c5458d000f29059b5884",
+        "byteLength": 6392
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/renderer-info-snapshot.test.js",
+        "sha256": "sha256:594c7bcab8e53e13770735501893ed59a831d04a7e0a87a5f019a7cd4687d1d3",
+        "byteLength": 4447
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/resource-ledger.js",
+        "sha256": "sha256:ae04a5f49ced3e790287affc5bad4b3d75d4e44890ea4977082dba3f6ed3e919",
+        "byteLength": 48540
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/resource-ledger.test.js",
+        "sha256": "sha256:1caf3c9ddc1b3378613189097b98654c845fcc8ecbdc7f75ce5437f9f18081c2",
+        "byteLength": 17243
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/route-locks.js",
+        "sha256": "sha256:7c646b073fc107ae4839c29e994db57a1847cfda19944572a417e4c5091c5099",
+        "byteLength": 7533
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/route-locks.test.js",
+        "sha256": "sha256:828a9ea75aec1244c8f9993b36fb8f29ab445c51e1c2614c26edc263109b53d1",
+        "byteLength": 9875
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/runtime-graph-inspector.js",
+        "sha256": "sha256:e13bad8717c2c2fd3cd014ec9ade045bd6aed4917377bbc69985e2edaa521b10",
+        "byteLength": 19209
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/runtime-graph-inspector.test.js",
+        "sha256": "sha256:5834046abb286fd569d22802fe5e04f03a91535be6b90403628caf78ece039b9",
+        "byteLength": 11432
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/runtime-v2-bundle.js",
+        "sha256": "sha256:5e82cfb8d99b84a5d1ccff5c84fa0448cdc1d92e0fa41bf111a50d2642e7a1b6",
+        "byteLength": 82567
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/runtime-v2-bundle.test.js",
+        "sha256": "sha256:22e7537f030f0afc9123b5d9a25a55d5bf2ce24cafaf09c884038f421f760e5d",
+        "byteLength": 26585
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/schema-dispatcher.test.js",
+        "sha256": "sha256:5f5613cccb9d7a7537ede2ac7e46f686238291b907f6fab45c5f4376e71fdd1c",
+        "byteLength": 1911
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/schema/artifact-schemas.js",
+        "sha256": "sha256:714d33f5e7fbab02d99693550b1f2e2610c8e87276ad79584eb855e6e99f5e65",
+        "byteLength": 27256
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/schema/dispatcher.js",
+        "sha256": "sha256:60bd299a97850fd4551747dcf1f66d750bc0fee0d76d312aa3f13fd0897d3ca9",
+        "byteLength": 3189
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/schema/v2.js",
+        "sha256": "sha256:a07d0e4ce3b2487cab74d9d771ded46ab0dac2462f5439fa9cc942f87ba4eddb",
+        "byteLength": 88123
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/self-test.js",
+        "sha256": "sha256:1c0ec480179dcf5a729232c1366059174f8d81d89bbc28decce2007fd3613231",
+        "byteLength": 9923
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/subject-adapter.js",
+        "sha256": "sha256:8b97d917aa2324040ea7f795ce27790e1c300134044510b0d1035eea6280f3af",
+        "byteLength": 4066
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/tier-visual-evidence-schema.test.js",
+        "sha256": "sha256:421b5a902b532f292b058f4d8b7fb7f9c1dad38d766e7dfac733445bf16a7560",
+        "byteLength": 2472
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/unified-v2-fixture.js",
+        "sha256": "sha256:fa1d71cf92d68a0b53675d265d1d3c49eeb28a0909295c9b0bd7e2d082e35486",
+        "byteLength": 2352
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/v2-fixture.js",
+        "sha256": "sha256:6538b60739a0b3bf651a1970c2b68320d30e1f69f9b23990fbf84e74a2c66271",
+        "byteLength": 15240
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/v2-self-test.js",
+        "sha256": "sha256:c2183bcd76588ef52b092b99bd6e54ae85669f9193027538d9b617de7718653e",
+        "byteLength": 2837
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/validate-browser-artifacts.js",
+        "sha256": "sha256:0ca84006080777a4f1268da858f2eee9e6be8d263ccd2e8ea8c89c30616c481c",
+        "byteLength": 2051
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/validate-v2.js",
+        "sha256": "sha256:fd4f91c3a007ac0ba7e5f374ee07bc10c6b47bc7e2900114a02a642ba893e7d6",
+        "byteLength": 1270
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/validate.js",
+        "sha256": "sha256:87a2929c01b4400477b39cd393d6cca48d16eb6b8ed6b9e2c92ef4a7f8c148d7",
+        "byteLength": 1197
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/src/verified-physical-record.js",
+        "sha256": "sha256:b95c2b35098829ad0719ff6ad83d223a4aa3a7465bfe0ae1e87c5bf4003b7bf9",
+        "byteLength": 4315
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/tier/governor-stress/index.html",
+        "sha256": "sha256:fc2e4ad36cfebae2d4a35cbe006decbba2af1d243222a24e48068e5c7aeb0a03",
+        "byteLength": 351
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/tier/release/index.html",
+        "sha256": "sha256:d4643208f64148852db3aee089e753a05c64652fdf2c23e54da9315300218f10",
+        "byteLength": 335
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/tier/schema-fixture/index.html",
+        "sha256": "sha256:22d18078f11ea7a700571ba54dbb386a1268294619e66e9796be4274eeb54c64",
+        "byteLength": 349
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/tier/target-performance/index.html",
+        "sha256": "sha256:1f8e29a354a38d5b276f003e940369420493c103ef27f9f717cabb33d69e8bf6",
+        "byteLength": 357
+      },
+      {
+        "repositoryPath": "threejs-visual-validation/examples/webgpu-validation-harness/tier/webgpu-correctness/index.html",
+        "sha256": "sha256:6cdc3afcf170ff876166cc48c4750ede59c9d1658a17870f7cfafdfb7af277db",
+        "byteLength": 357
+      }
+    ],
+    "threeRevision": "0.185.1",
+    "sourceHash": "sha256:281b93606ce2ed351b58deb4e45ccce5f7a752de26e737c36211cf294c6bab95",
+    "buildRevision": "sha256:7db153853b7ed98bcba359e3bc796004340de59ff9864b67bd66cdeb6ee488f4",
+    "registrySourceHash": "sha256:443835b1db637aeaa87745ba074f252191687d431a3c7dbcfcb525c2e36a8bd5"
+  },
+  "retainedFiles": [
+    {
+      "path": "visual-contract.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:617677b33a9277c88c37c14d38a878dbac1f8e751af59942b3ffde36d22a13c1",
+      "byteLength": 3608
+    },
+    {
+      "path": "renderer-info.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:2a1a609591571d62777ec754265d3196dee1dddeabfd24c94af05ea731fd26dc",
+      "byteLength": 18577
+    },
+    {
+      "path": "pipeline-graph.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:d89730d465617b0325b7d936bca3b7b341e361500110bf5afa3e9d7f58634224",
+      "byteLength": 2524
+    },
+    {
+      "path": "performance-envelope.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:88e9ccd3ee8d08a773b7c51f64d4efbb566c33e32100216751f14b021ed02239",
+      "byteLength": 1963
+    },
+    {
+      "path": "frame-trace.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:6fee4ef96cbe7f60d75b923fdb3916a07007b3c0146ca58b438dc98abde237f8",
+      "byteLength": 3612645
+    },
+    {
+      "path": "quality-governor.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:4955aee28cb923dbcbe79f62189b2dd3030a6033959a8f5cc7fde2c1074a5499",
+      "byteLength": 197126
+    },
+    {
+      "path": "render-targets.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:4f8a794798e2582b62ff01dda2958e0827449d4964071d20132ea6190f6994a8",
+      "byteLength": 38422
+    },
+    {
+      "path": "storage-resources.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:693d152d953d7546a630fc4586af661beb604fb5e706fb0b782088fde6540adb",
+      "byteLength": 369
+    },
+    {
+      "path": "resident-resources.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:b037495551c22594f6bf53fbc63b945a703613d47e9a9bc6ad68d890781a3117",
+      "byteLength": 6929
+    },
+    {
+      "path": "bandwidth-model.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:c696e6e2c7c6d99356457a99ca25422d33aec62e43640d367e0a2b72edc95b02",
+      "byteLength": 3481
+    },
+    {
+      "path": "visual-errors.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:1e72004c938258d0f9aa9892a20ae3e93bcd8e4224488299f514ece30df5afee",
+      "byteLength": 806
+    },
+    {
+      "path": "leak-loop.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:71ba6dad261454ad212bdc4a0467a43bc1828c665a1e87350599726dcf06f6df",
+      "byteLength": 127081
+    },
+    {
+      "path": "mechanism-metrics.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:8270830c5150a9d3d3de398037ef13373da41365e83be061fac45b68d389405f",
+      "byteLength": 19689
+    },
+    {
+      "path": "capture-write-ledger.json",
+      "status": "captured",
+      "kind": "capture-session-write-ledger",
+      "sha256": "sha256:1884b30572375e6a51dd26b731a72e4b7aaed5c223dd88bff4f4692d49766e27",
+      "byteLength": 20969
+    },
+    {
+      "path": "sessions/performance.write-ledger.json",
+      "status": "captured",
+      "kind": "capture-session-write-ledger",
+      "sha256": "sha256:2dad0666d1584ee07002a8a687a31b9f1498ca48730fce3d4297e6b9be39295d",
+      "byteLength": 23539
+    },
+    {
+      "path": "sessions/physical-route.write-ledger.json",
+      "status": "captured",
+      "kind": "capture-session-write-ledger",
+      "sha256": "sha256:c006c6cd1bd9058e2030a57cc0e6fc58bd51e81be08b1887bd149b674b81266d",
+      "byteLength": 21402
+    },
+    {
+      "path": "strict-lane-join.json",
+      "status": "captured",
+      "kind": "supplementary-json",
+      "sha256": "sha256:0b0896dac2917d823cf8d82f6464939e5583dd96cb14a4c70298e1bc1766c306",
+      "byteLength": 6932
+    },
+    {
+      "path": "tier-visual-evidence.json",
+      "status": "captured",
+      "kind": "supplementary-json",
+      "sha256": "sha256:828c193f7390adb753590a063362d41ca146302d5abe011c27170250baec890f",
+      "byteLength": 12679
+    }
+  ],
+  "retainedImages": [
+    {
+      "path": "final.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "final.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:4a02ce8c369fd0a8fc9416f392d0a1decbce7f377f238b07ae0db85b0a07c794",
+      "byteLength": 45891
+    },
+    {
+      "path": "no-post.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "no-post.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:97918f2bb0666edfe4f6f5513fda9e39dd6448f967cef0d526996c82cf434902",
+      "byteLength": 56795
+    },
+    {
+      "path": "diagnostics.mosaic.png",
+      "status": "captured",
+      "kind": "derived-image",
+      "role": "diagnostics.mosaic",
+      "mediaType": "image/png",
+      "sha256": "sha256:c5f7614a27d9b8635a76e3abec2233a01288c86e4eec1ad192a978fd7775a485",
+      "byteLength": 114279,
+      "derivation": {
+        "method": "deterministic four-route diagnostic contact sheet",
+        "implementation": "capture-hook.mjs",
+        "parametersDigest": "sha256:5e3ac6711c0a37639531f7905caae1e8ec3849347866d240d703c23027f15072"
+      },
+      "sourceCaptures": [
+        "final.design.png",
+        "no-post.design.png",
+        "diagnostic.normal.png",
+        "diagnostic.emissive.png"
+      ]
+    },
+    {
+      "path": "camera.near.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.near",
+      "mediaType": "image/png",
+      "sha256": "sha256:52a0cc139fd69acf04f87c76d243ae51afb3211f6c1b95799116fb6544631955",
+      "byteLength": 63093
+    },
+    {
+      "path": "camera.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:4a02ce8c369fd0a8fc9416f392d0a1decbce7f377f238b07ae0db85b0a07c794",
+      "byteLength": 45891
+    },
+    {
+      "path": "camera.far.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.far",
+      "mediaType": "image/png",
+      "sha256": "sha256:b86e6300205d33a80196513884f4a739d6957b570aa61d3c0d7ec54248ee1f63",
+      "byteLength": 27455
+    },
+    {
+      "path": "seed-0001.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "seed-0001.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:4a02ce8c369fd0a8fc9416f392d0a1decbce7f377f238b07ae0db85b0a07c794",
+      "byteLength": 45891
+    },
+    {
+      "path": "seed-9e3779b9.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "seed-9e3779b9.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:7c79d3065117a6e3838a4910ab2b8e36ff72e58fde061b3ab8a27cfa01a79912",
+      "byteLength": 38090
+    },
+    {
+      "path": "temporal.t000.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "temporal.t000",
+      "mediaType": "image/png",
+      "sha256": "sha256:4a02ce8c369fd0a8fc9416f392d0a1decbce7f377f238b07ae0db85b0a07c794",
+      "byteLength": 45891
+    },
+    {
+      "path": "temporal.t001.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "temporal.t001",
+      "mediaType": "image/png",
+      "sha256": "sha256:ce0e24010b49f1201ca720bc0002c6cefbae4ef49ae586f971dfa486f5a1bf21",
+      "byteLength": 46063
+    },
+    {
+      "path": "diagnostic.emissive.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "diagnostic.emissive",
+      "mediaType": "image/png",
+      "sha256": "sha256:55bcc7734c81b74bbf164aab67939d2194a9fcb22749a816d9c6912798823ebb",
+      "byteLength": 7837
+    },
+    {
+      "path": "diagnostic.normal.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "diagnostic.normal",
+      "mediaType": "image/png",
+      "sha256": "sha256:6e485745dc1e946cb80664e02f41075b33252de86012d3a5b3de94b1fee8a419",
+      "byteLength": 183628
+    },
+    {
+      "path": "odd-size.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "odd-size.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:1116876cd3e978cf46862bb7725c9ffb7a161b97df3e5c39ca1680f2568c5076",
+      "byteLength": 17941
+    },
+    {
+      "path": "tier.governor-stress.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "tier.governor-stress.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:aa1ab8e0e24b261f5bee8de03f2ab2ae2582c5f79a6aa69a0745792112369eab",
+      "byteLength": 87465
+    },
+    {
+      "path": "tier.target-performance.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "tier.target-performance.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:b02bb0fb1b7fae3d05d044ae5b7f55b0b06766ea4284c7dee2d2a9615e2f8ebe",
+      "byteLength": 70930
+    }
+  ],
+  "omittedFiles": {
+    "ledgerDigest": "sha256:48632ce764b24b462f490e8676a1ad278ba92f62889601517e90c9cca4201f64",
+    "count": 34,
+    "byteLength": 146970780,
+    "byKind": [
+      {
+        "kind": "capture-session-document",
+        "count": 3,
+        "byteLength": 12253313
+      },
+      {
+        "kind": "raw-readback",
+        "count": 30,
+        "byteLength": 128536132
+      },
+      {
+        "kind": "supplementary-json",
+        "count": 1,
+        "byteLength": 6181335
+      }
+    ]
+  },
+  "checkoutLimitations": [
+    {
+      "id": "detached-source-payloads",
+      "status": "ACTIVE",
+      "statement": "Raw readbacks and capture-session transcript bytes are omitted from the tracked projection. Checkout validation verifies their approved hash and byte-length commitments, not the detached bytes themselves.",
+      "affectedClaims": []
+    }
+  ],
+  "projectionDigest": "sha256:17f0a0710ceee55c306aa5bebf6739789c304242c7395bb2c20a290e0e95f80b"
+}

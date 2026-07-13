@@ -5,29 +5,29 @@
   "skill": "threejs-visual-validation",
   "threeRevision": "0.185.1",
   "kind": "canonical-lab",
-  "status": "incomplete",
+  "status": "accepted",
   "canonicalSource": [
     "threejs-visual-validation/examples/webgpu-validation-harness"
   ],
   "browserEntry": "threejs-visual-validation/examples/webgpu-validation-harness/index.html",
   "publishPath": "/demos/webgpu-validation-harness/",
   "scenarios": [
-    { "id": "browser-capture", "route": "/demos/webgpu-validation-harness/?scenario=browser-capture", "acceptanceStatus": "incomplete" },
-    { "id": "pipeline-graph-inspector", "route": "/demos/webgpu-validation-harness/?scenario=pipeline-graph-inspector", "acceptanceStatus": "incomplete" },
-    { "id": "resource-ledger", "route": "/demos/webgpu-validation-harness/?scenario=resource-ledger", "acceptanceStatus": "incomplete" },
-    { "id": "timing-and-governor", "route": "/demos/webgpu-validation-harness/?scenario=timing-and-governor", "acceptanceStatus": "incomplete" },
-    { "id": "lifecycle-and-leaks", "route": "/demos/webgpu-validation-harness/?scenario=lifecycle-and-leaks", "acceptanceStatus": "incomplete" },
-    { "id": "visual-error-metrics", "route": "/demos/webgpu-validation-harness/?scenario=visual-error-metrics", "acceptanceStatus": "incomplete" },
-    { "id": "mutation-gallery", "route": "/demos/webgpu-validation-harness/?scenario=mutation-gallery", "acceptanceStatus": "incomplete" },
-    { "id": "artifact-inspector", "route": "/demos/webgpu-validation-harness/?scenario=artifact-inspector", "acceptanceStatus": "incomplete" }
+    { "id": "browser-capture", "route": "/demos/webgpu-validation-harness/?scenario=browser-capture", "acceptanceStatus": "accepted" },
+    { "id": "pipeline-graph-inspector", "route": "/demos/webgpu-validation-harness/?scenario=pipeline-graph-inspector", "acceptanceStatus": "accepted" },
+    { "id": "resource-ledger", "route": "/demos/webgpu-validation-harness/?scenario=resource-ledger", "acceptanceStatus": "accepted" },
+    { "id": "timing-and-governor", "route": "/demos/webgpu-validation-harness/?scenario=timing-and-governor", "acceptanceStatus": "accepted" },
+    { "id": "lifecycle-and-leaks", "route": "/demos/webgpu-validation-harness/?scenario=lifecycle-and-leaks", "acceptanceStatus": "accepted" },
+    { "id": "visual-error-metrics", "route": "/demos/webgpu-validation-harness/?scenario=visual-error-metrics", "acceptanceStatus": "accepted" },
+    { "id": "mutation-gallery", "route": "/demos/webgpu-validation-harness/?scenario=mutation-gallery", "acceptanceStatus": "accepted" },
+    { "id": "artifact-inspector", "route": "/demos/webgpu-validation-harness/?scenario=artifact-inspector", "acceptanceStatus": "accepted" }
   ],
   "mechanisms": [
-    { "id": "aligned-readback", "route": "/demos/webgpu-validation-harness/mechanism/aligned-readback/", "startup": { "scenario": "browser-capture", "mode": "final" }, "acceptanceStatus": "incomplete" },
-    { "id": "claim-verdicts", "route": "/demos/webgpu-validation-harness/mechanism/claim-verdicts/", "startup": { "scenario": "artifact-inspector", "mode": "emissive" }, "acceptanceStatus": "incomplete" },
-    { "id": "gpu-timestamps", "route": "/demos/webgpu-validation-harness/mechanism/gpu-timestamps/", "startup": { "scenario": "timing-and-governor", "mode": "final" }, "acceptanceStatus": "incomplete" },
-    { "id": "resource-inventory", "route": "/demos/webgpu-validation-harness/mechanism/resource-inventory/", "startup": { "scenario": "resource-ledger", "mode": "normal" }, "acceptanceStatus": "incomplete" },
-    { "id": "visual-errors", "route": "/demos/webgpu-validation-harness/mechanism/visual-errors/", "startup": { "scenario": "visual-error-metrics", "mode": "normal" }, "acceptanceStatus": "incomplete" },
-    { "id": "lifecycle-trend", "route": "/demos/webgpu-validation-harness/mechanism/lifecycle-trend/", "startup": { "scenario": "lifecycle-and-leaks", "mode": "final" }, "acceptanceStatus": "incomplete" }
+    { "id": "aligned-readback", "route": "/demos/webgpu-validation-harness/mechanism/aligned-readback/", "startup": { "scenario": "browser-capture", "mode": "final" }, "acceptanceStatus": "accepted" },
+    { "id": "claim-verdicts", "route": "/demos/webgpu-validation-harness/mechanism/claim-verdicts/", "startup": { "scenario": "artifact-inspector", "mode": "emissive" }, "acceptanceStatus": "accepted" },
+    { "id": "gpu-timestamps", "route": "/demos/webgpu-validation-harness/mechanism/gpu-timestamps/", "startup": { "scenario": "timing-and-governor", "mode": "final" }, "acceptanceStatus": "accepted" },
+    { "id": "resource-inventory", "route": "/demos/webgpu-validation-harness/mechanism/resource-inventory/", "startup": { "scenario": "resource-ledger", "mode": "normal" }, "acceptanceStatus": "accepted" },
+    { "id": "visual-errors", "route": "/demos/webgpu-validation-harness/mechanism/visual-errors/", "startup": { "scenario": "visual-error-metrics", "mode": "normal" }, "acceptanceStatus": "accepted" },
+    { "id": "lifecycle-trend", "route": "/demos/webgpu-validation-harness/mechanism/lifecycle-trend/", "startup": { "scenario": "lifecycle-and-leaks", "mode": "final" }, "acceptanceStatus": "accepted" }
   ],
   "tiers": [
     {
@@ -39,7 +39,7 @@
       "resourceLimits": { "publishable": false },
       "degradationFromPrevious": [],
       "preservedInvariants": [ "schema v2", "claim separation", "fixture quarantine" ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "webgpu-correctness",
@@ -50,7 +50,7 @@
       "resourceLimits": { "lifecycleCyclesMinimum": 50, "lifecycleCyclesMaximum": 100 },
       "degradationFromPrevious": [],
       "preservedInvariants": [ "native WebGPU", "real MRT", "aligned readback", "one output owner" ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "target-performance",
@@ -61,7 +61,7 @@
       "resourceLimits": { "sustainedTraceRequired": true },
       "degradationFromPrevious": [],
       "preservedInvariants": [ "native WebGPU", "timestamp-backed GPU attribution" ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "governor-stress",
@@ -72,7 +72,7 @@
       "resourceLimits": { "oscillationAllowed": false },
       "degradationFromPrevious": [ "scene pass resolution scale reduced to 0.5" ],
       "preservedInvariants": [ "native WebGPU", "MRT semantics", "output ownership" ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "release",
@@ -87,24 +87,29 @@
       "resourceLimits": { "lifecycleCyclesMinimum": 50, "lifecycleCyclesMaximum": 100 },
       "degradationFromPrevious": [],
       "preservedInvariants": [ "native WebGPU", "schema v2", "real images", "lifecycle stability" ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     }
   ],
   "modes": [ "final", "no-post", "normal", "emissive" ],
   "cameras": [ "near", "design", "far" ],
   "seeds": [ 1, 2654435769 ],
   "capabilityRequirements": [
-    { "id": "native-webgpu", "required": true, "evidence": "renderer.backend.isWebGPUBackend after await renderer.init()", "status": "incomplete" },
-    { "id": "render-target-readback", "required": true, "evidence": "RGBA8 capture target copied through an aligned WebGPU row layout", "status": "incomplete" },
-    { "id": "timestamp-query", "required": false, "evidence": "Required by target-performance and governor-stress; release aggregates their joined hardware evidence", "status": "incomplete" }
+    { "id": "native-webgpu", "required": true, "evidence": "renderer.backend.isWebGPUBackend after await renderer.init()", "status": "accepted" },
+    { "id": "render-target-readback", "required": true, "evidence": "RGBA8 capture target copied through an aligned WebGPU row layout", "status": "accepted" },
+    { "id": "timestamp-query", "required": false, "evidence": "Required by target-performance and governor-stress; release aggregates their joined hardware evidence", "status": "accepted" }
   ],
   "runtimeProof": [
-    { "id": "renderer-init", "required": true, "evidence": "Native browser subject initialization and backend gate", "status": "incomplete" },
-    { "id": "mrt-readback", "required": true, "evidence": "Actual output, normal, and emissive render-target readback", "status": "incomplete" },
-    { "id": "schema-v2", "required": true, "evidence": "Fourteen semantic JSON artifacts plus required real images", "status": "incomplete" },
-    { "id": "lifecycle", "required": true, "evidence": "50-100 create/render/resize/mode/tier/dispose cycles", "status": "incomplete" }
+    { "id": "renderer-init", "required": true, "evidence": "Native browser subject initialization and backend gate", "status": "accepted" },
+    { "id": "backend-is-webgpu", "required": true, "evidence": "Every correctness and physical route records renderer.backend.isWebGPUBackend === true after await renderer.init()", "status": "accepted" },
+    { "id": "mechanism-reachable", "required": true, "evidence": "Runtime graph inspection and all 19 immutable route locks prove the selected mechanism is reachable from the active output", "status": "accepted" },
+    { "id": "render-or-compute-work", "required": true, "evidence": "Measured scene and output submissions, native render-target pixels, and hardware timestamp populations prove executed GPU work", "status": "accepted" },
+    { "id": "aligned-readback", "required": true, "evidence": "Retained transport and normalized readbacks record exact integer row strides, 256-byte alignment, byte lengths, and PNG hashes", "status": "accepted" },
+    { "id": "mrt-readback", "required": true, "evidence": "Actual output, normal, and emissive render-target readback", "status": "accepted" },
+    { "id": "schema-v2", "required": true, "evidence": "Fourteen semantic JSON artifacts plus required real images", "status": "accepted" },
+    { "id": "lifecycle", "required": true, "evidence": "50-100 create/render/resize/mode/tier/dispose cycles", "status": "accepted" }
   ],
   "evidenceContract": "v2",
+  "evidenceBundle": "docs/visual-validation/webgpu-validation-harness/bundle",
   "validationCommand": "npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run validate:full",
   "commands": {
     "check": "npm --prefix threejs-visual-validation/examples/webgpu-validation-harness run check",
@@ -118,6 +123,8 @@
   "sourceHash": null,
   "proxyStatus": null,
   "notes": [
-    "Current-adapter browser capture and lifecycle evidence remain incomplete; no runtime acceptance is claimed."
+    "Accepted against the tracked v2 release bundle with deterministic correctness readback, all 19 immutable physical routes, Apple Metal hardware timestamps, and 50-cycle lifecycle evidence.",
+    "The correctness lane uses the pinned software adapter for deterministic pixels; physical-route and performance claims use the named Apple Metal hardware adapter.",
+    "Opaque renderer-internal residency remains explicitly unclaimed."
   ]
 }

@@ -1,0 +1,1177 @@
+{
+  "schemaVersion": 2,
+  "targets": [
+    {
+      "name": "output",
+      "owner": "scene-pass",
+      "semantic": "runtime output attachment",
+      "width": {
+        "value": 1200,
+        "unit": "pixel",
+        "label": "Measured",
+        "source": "LabController.describeResources"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixel",
+        "label": "Measured",
+        "source": "LabController.describeResources"
+      },
+      "format": "rgba16float",
+      "bytesPerTexel": {
+        "value": 8,
+        "unit": "byte/texel",
+        "label": "Derived",
+        "source": "rgba16float format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "sample/pixel",
+        "label": "Authored",
+        "source": "canonical validation subject disables MSAA"
+      },
+      "memoryBytes": {
+        "value": 7680000,
+        "unit": "byte",
+        "label": "Derived",
+        "source": "reported extent * format byte width"
+      },
+      "lifetime": "one live validation subject generation",
+      "loadOp": "clear",
+      "storeOp": "store",
+      "readback": {
+        "rowBytes": {
+          "value": 9600,
+          "unit": "byte",
+          "label": "Derived",
+          "source": "width * bytesPerTexel"
+        },
+        "bytesPerRow": {
+          "value": 9728,
+          "unit": "byte",
+          "label": "Gated",
+          "source": "WebGPU 256-byte texture-copy row alignment"
+        },
+        "minimumByteLength": {
+          "value": 7782272,
+          "unit": "byte",
+          "label": "Derived",
+          "source": "bytesPerRow * (height - 1) + rowBytes"
+        },
+        "fullyPaddedByteLength": {
+          "value": 7782400,
+          "unit": "byte",
+          "label": "Derived",
+          "source": "bytesPerRow * height"
+        },
+        "alignment": {
+          "value": 256,
+          "unit": "byte",
+          "label": "Gated",
+          "source": "WebGPU texture-copy row alignment"
+        }
+      },
+      "directlyReadBack": false
+    },
+    {
+      "name": "normal",
+      "owner": "scene-pass",
+      "semantic": "runtime normal attachment",
+      "width": {
+        "value": 1200,
+        "unit": "pixel",
+        "label": "Measured",
+        "source": "LabController.describeResources"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixel",
+        "label": "Measured",
+        "source": "LabController.describeResources"
+      },
+      "format": "rgba16float",
+      "bytesPerTexel": {
+        "value": 8,
+        "unit": "byte/texel",
+        "label": "Derived",
+        "source": "rgba16float format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "sample/pixel",
+        "label": "Authored",
+        "source": "canonical validation subject disables MSAA"
+      },
+      "memoryBytes": {
+        "value": 7680000,
+        "unit": "byte",
+        "label": "Derived",
+        "source": "reported extent * format byte width"
+      },
+      "lifetime": "one live validation subject generation",
+      "loadOp": "clear",
+      "storeOp": "store",
+      "readback": {
+        "rowBytes": {
+          "value": 9600,
+          "unit": "byte",
+          "label": "Derived",
+          "source": "width * bytesPerTexel"
+        },
+        "bytesPerRow": {
+          "value": 9728,
+          "unit": "byte",
+          "label": "Gated",
+          "source": "WebGPU 256-byte texture-copy row alignment"
+        },
+        "minimumByteLength": {
+          "value": 7782272,
+          "unit": "byte",
+          "label": "Derived",
+          "source": "bytesPerRow * (height - 1) + rowBytes"
+        },
+        "fullyPaddedByteLength": {
+          "value": 7782400,
+          "unit": "byte",
+          "label": "Derived",
+          "source": "bytesPerRow * height"
+        },
+        "alignment": {
+          "value": 256,
+          "unit": "byte",
+          "label": "Gated",
+          "source": "WebGPU texture-copy row alignment"
+        }
+      },
+      "directlyReadBack": false
+    },
+    {
+      "name": "emissive",
+      "owner": "scene-pass",
+      "semantic": "runtime emissive attachment",
+      "width": {
+        "value": 1200,
+        "unit": "pixel",
+        "label": "Measured",
+        "source": "LabController.describeResources"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixel",
+        "label": "Measured",
+        "source": "LabController.describeResources"
+      },
+      "format": "rgba16float",
+      "bytesPerTexel": {
+        "value": 8,
+        "unit": "byte/texel",
+        "label": "Derived",
+        "source": "rgba16float format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "sample/pixel",
+        "label": "Authored",
+        "source": "canonical validation subject disables MSAA"
+      },
+      "memoryBytes": {
+        "value": 7680000,
+        "unit": "byte",
+        "label": "Derived",
+        "source": "reported extent * format byte width"
+      },
+      "lifetime": "one live validation subject generation",
+      "loadOp": "clear",
+      "storeOp": "store",
+      "readback": {
+        "rowBytes": {
+          "value": 9600,
+          "unit": "byte",
+          "label": "Derived",
+          "source": "width * bytesPerTexel"
+        },
+        "bytesPerRow": {
+          "value": 9728,
+          "unit": "byte",
+          "label": "Gated",
+          "source": "WebGPU 256-byte texture-copy row alignment"
+        },
+        "minimumByteLength": {
+          "value": 7782272,
+          "unit": "byte",
+          "label": "Derived",
+          "source": "bytesPerRow * (height - 1) + rowBytes"
+        },
+        "fullyPaddedByteLength": {
+          "value": 7782400,
+          "unit": "byte",
+          "label": "Derived",
+          "source": "bytesPerRow * height"
+        },
+        "alignment": {
+          "value": 256,
+          "unit": "byte",
+          "label": "Gated",
+          "source": "WebGPU texture-copy row alignment"
+        }
+      },
+      "directlyReadBack": false
+    },
+    {
+      "name": "depth",
+      "owner": "scene-pass",
+      "semantic": "runtime depth attachment",
+      "width": {
+        "value": 1200,
+        "unit": "pixel",
+        "label": "Measured",
+        "source": "LabController.describeResources"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixel",
+        "label": "Measured",
+        "source": "LabController.describeResources"
+      },
+      "format": "depth32float",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "byte/texel",
+        "label": "Derived",
+        "source": "depth32float format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "sample/pixel",
+        "label": "Authored",
+        "source": "canonical validation subject disables MSAA"
+      },
+      "memoryBytes": {
+        "value": 3840000,
+        "unit": "byte",
+        "label": "Derived",
+        "source": "reported extent * format byte width"
+      },
+      "lifetime": "one live validation subject generation",
+      "loadOp": "clear",
+      "storeOp": "store",
+      "readback": {
+        "rowBytes": {
+          "value": 4800,
+          "unit": "byte",
+          "label": "Derived",
+          "source": "width * bytesPerTexel"
+        },
+        "bytesPerRow": {
+          "value": 4864,
+          "unit": "byte",
+          "label": "Gated",
+          "source": "WebGPU 256-byte texture-copy row alignment"
+        },
+        "minimumByteLength": {
+          "value": 3891136,
+          "unit": "byte",
+          "label": "Derived",
+          "source": "bytesPerRow * (height - 1) + rowBytes"
+        },
+        "fullyPaddedByteLength": {
+          "value": 3891200,
+          "unit": "byte",
+          "label": "Derived",
+          "source": "bytesPerRow * height"
+        },
+        "alignment": {
+          "value": 256,
+          "unit": "byte",
+          "label": "Gated",
+          "source": "WebGPU texture-copy row alignment"
+        }
+      },
+      "directlyReadBack": false
+    },
+    {
+      "name": "capture-target",
+      "owner": "validation-capture",
+      "semantic": "color-managed RGBA8 validation readback",
+      "width": {
+        "value": 1200,
+        "unit": "pixel",
+        "label": "Measured",
+        "source": "LabController.describeResources"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixel",
+        "label": "Measured",
+        "source": "LabController.describeResources"
+      },
+      "format": "rgba8unorm-srgb",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "byte/texel",
+        "label": "Derived",
+        "source": "rgba8unorm-srgb format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "sample/pixel",
+        "label": "Authored",
+        "source": "canonical validation subject disables MSAA"
+      },
+      "memoryBytes": {
+        "value": 3840000,
+        "unit": "byte",
+        "label": "Derived",
+        "source": "reported extent * format byte width"
+      },
+      "lifetime": "one live validation subject generation",
+      "loadOp": "clear",
+      "storeOp": "store",
+      "readback": {
+        "rowBytes": {
+          "value": 4800,
+          "unit": "byte",
+          "label": "Derived",
+          "source": "width * bytesPerTexel"
+        },
+        "bytesPerRow": {
+          "value": 4864,
+          "unit": "byte",
+          "label": "Gated",
+          "source": "WebGPU 256-byte texture-copy row alignment"
+        },
+        "minimumByteLength": {
+          "value": 3891136,
+          "unit": "byte",
+          "label": "Derived",
+          "source": "bytesPerRow * (height - 1) + rowBytes"
+        },
+        "fullyPaddedByteLength": {
+          "value": 3891200,
+          "unit": "byte",
+          "label": "Derived",
+          "source": "bytesPerRow * height"
+        },
+        "alignment": {
+          "value": 256,
+          "unit": "byte",
+          "label": "Gated",
+          "source": "WebGPU texture-copy row alignment"
+        },
+        "actualRendererReturn": {
+          "layout": "padded",
+          "bytesPerRow": {
+            "value": 4864,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "renderer-returned WebGPU copy layout"
+          },
+          "byteLength": {
+            "value": 3891136,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "renderer-returned mapped WebGPU copy"
+          }
+        },
+        "browserTransport": {
+          "layout": "padded",
+          "bytesPerRow": {
+            "value": 4864,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "shared runner retained transport layout"
+          },
+          "byteLength": {
+            "value": 3891136,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "shared runner retained transport artifact"
+          }
+        },
+        "requestedCopyLayout": {
+          "width": {
+            "value": 1200,
+            "unit": "layout value",
+            "label": "Measured",
+            "source": "requested WebGPU copy layout.width"
+          },
+          "height": {
+            "value": 800,
+            "unit": "layout value",
+            "label": "Measured",
+            "source": "requested WebGPU copy layout.height"
+          },
+          "rowBytes": {
+            "value": 4800,
+            "unit": "layout value",
+            "label": "Measured",
+            "source": "requested WebGPU copy layout.rowBytes"
+          },
+          "byteLength": {
+            "value": 3891136,
+            "unit": "layout value",
+            "label": "Measured",
+            "source": "requested WebGPU copy layout.byteLength"
+          },
+          "alignmentBytes": {
+            "value": 256,
+            "unit": "layout value",
+            "label": "Measured",
+            "source": "requested WebGPU copy layout.alignmentBytes"
+          }
+        },
+        "cpuNormalizedArtifact": {
+          "layout": "rgba8unorm",
+          "bytesPerRow": {
+            "value": 4864,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "CPU-normalized 256-byte-aligned artifact row stride"
+          },
+          "byteLength": {
+            "value": 3891200,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "CPU-normalized retained padded artifact"
+          }
+        },
+        "controllerNormalization": {
+          "layout": {
+            "width": {
+              "value": 1200,
+              "unit": "layout value",
+              "label": "Measured",
+              "source": "LabController normalization evidence.layout.width"
+            },
+            "height": {
+              "value": 800,
+              "unit": "layout value",
+              "label": "Measured",
+              "source": "LabController normalization evidence.layout.height"
+            },
+            "rowBytes": {
+              "value": 4800,
+              "unit": "layout value",
+              "label": "Measured",
+              "source": "LabController normalization evidence.layout.rowBytes"
+            },
+            "bytesPerRow": {
+              "value": 4864,
+              "unit": "layout value",
+              "label": "Measured",
+              "source": "LabController normalization evidence.layout.bytesPerRow"
+            },
+            "byteLength": {
+              "value": 3891200,
+              "unit": "layout value",
+              "label": "Measured",
+              "source": "LabController normalization evidence.layout.byteLength"
+            },
+            "format": "rgba8unorm",
+            "origin": "top-left"
+          },
+          "origin": "top-left",
+          "orientationTransform": "none",
+          "byteLength": {
+            "value": 3891200,
+            "unit": "layout value",
+            "label": "Measured",
+            "source": "LabController normalization evidence.byteLength"
+          },
+          "sha256": "sha256:05a632091936e3af0f415333a871100db5bd18d999c4b179684311107a58df6e",
+          "compactSha256": "sha256:f171b48752a842fd0958fcfff4701b72b8ed629d72fef74cbd9d845e7437efd0",
+          "independentPaddedSha256": "sha256:05a632091936e3af0f415333a871100db5bd18d999c4b179684311107a58df6e",
+          "paddingBytesPerRow": {
+            "value": 64,
+            "unit": "layout value",
+            "label": "Measured",
+            "source": "LabController normalization evidence.paddingBytesPerRow"
+          },
+          "paddingVerifiedZero": true,
+          "reconciliationStatus": "PASS"
+        }
+      },
+      "directlyReadBack": true
+    }
+  ],
+  "accountingScope": "lab-owned-render-targets-only",
+  "completeness": "PARTIAL",
+  "trackedRenderTargetBytes": {
+    "value": 30720000,
+    "unit": "byte",
+    "label": "Derived",
+    "source": "sum of LabController render-target byte records"
+  },
+  "trackedPeakLiveRenderTargetBytes": {
+    "value": 30720000,
+    "unit": "byte",
+    "label": "Derived",
+    "source": "all reported lab-owned validation targets simultaneously live"
+  },
+  "correctnessLaneArtifact": {
+    "sha256": "sha256:7dbe5d5fff2efd153facfcd44e35c3130099387f0f8864e879a14cf698672e2e",
+    "byteLength": {
+      "value": 15043,
+      "unit": "byte",
+      "label": "Measured",
+      "source": "correctness evidence-manifest ledger entry for render-targets.json"
+    }
+  },
+  "performanceTierInventories": [
+    {
+      "tier": "target-performance",
+      "routeKey": "tier/target-performance",
+      "resourceDigest": "sha256:882141e85c12fdca89196d9394d3fdf3168705b9e08f342fe095ad0d7f5f9edc",
+      "viewport": {
+        "width": {
+          "value": 1920,
+          "unit": "pixel",
+          "label": "Gated",
+          "source": "immutable hardware performance route lock"
+        },
+        "height": {
+          "value": 1080,
+          "unit": "pixel",
+          "label": "Gated",
+          "source": "immutable hardware performance route lock"
+        },
+        "dpr": {
+          "value": 1,
+          "unit": "ratio",
+          "label": "Gated",
+          "source": "immutable hardware performance route lock"
+        }
+      },
+      "targets": [
+        {
+          "semantic": "output",
+          "owner": "scene-pass",
+          "targetName": null,
+          "textureUuid": "078773ae-b8dd-4935-84e6-3f0bf372d131",
+          "format": "rgba16float",
+          "liveness": "live",
+          "width": {
+            "value": 1920,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "validated hardware route tier/target-performance LabController.describeResources"
+          },
+          "height": {
+            "value": 1080,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "validated hardware route tier/target-performance LabController.describeResources"
+          },
+          "depth": {
+            "value": 1,
+            "unit": "texel-layer",
+            "label": "Measured",
+            "source": "validated hardware route tier/target-performance LabController.describeResources"
+          },
+          "sampleCount": {
+            "value": 1,
+            "unit": "sample/pixel",
+            "label": "Measured",
+            "source": "validated hardware route tier/target-performance LabController.describeResources"
+          },
+          "bytesPerTexel": {
+            "value": 8,
+            "unit": "byte/texel",
+            "label": "Measured",
+            "source": "validated hardware route tier/target-performance LabController.describeResources"
+          },
+          "bytes": {
+            "value": 16588800,
+            "unit": "byte",
+            "label": "Derived",
+            "source": "1920 x 1080 x 1 x 1 x 8"
+          },
+          "logicalBytes": {
+            "value": 16588800,
+            "unit": "byte",
+            "label": "Derived",
+            "source": "validated target byte formula"
+          },
+          "liveBytes": {
+            "value": 16588800,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "validated hardware route tier/target-performance LabController.describeResources"
+          }
+        },
+        {
+          "semantic": "normal",
+          "owner": "scene-pass",
+          "targetName": null,
+          "textureUuid": "bc5f60a1-9efd-4952-8023-eb93f783e290",
+          "format": "rgba16float",
+          "liveness": "live",
+          "width": {
+            "value": 1920,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "validated hardware route tier/target-performance LabController.describeResources"
+          },
+          "height": {
+            "value": 1080,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "validated hardware route tier/target-performance LabController.describeResources"
+          },
+          "depth": {
+            "value": 1,
+            "unit": "texel-layer",
+            "label": "Measured",
+            "source": "validated hardware route tier/target-performance LabController.describeResources"
+          },
+          "sampleCount": {
+            "value": 1,
+            "unit": "sample/pixel",
+            "label": "Measured",
+            "source": "validated hardware route tier/target-performance LabController.describeResources"
+          },
+          "bytesPerTexel": {
+            "value": 8,
+            "unit": "byte/texel",
+            "label": "Measured",
+            "source": "validated hardware route tier/target-performance LabController.describeResources"
+          },
+          "bytes": {
+            "value": 16588800,
+            "unit": "byte",
+            "label": "Derived",
+            "source": "1920 x 1080 x 1 x 1 x 8"
+          },
+          "logicalBytes": {
+            "value": 16588800,
+            "unit": "byte",
+            "label": "Derived",
+            "source": "validated target byte formula"
+          },
+          "liveBytes": {
+            "value": 16588800,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "validated hardware route tier/target-performance LabController.describeResources"
+          }
+        },
+        {
+          "semantic": "emissive",
+          "owner": "scene-pass",
+          "targetName": null,
+          "textureUuid": "afd7b621-f904-4884-b2f6-48baa3486bb2",
+          "format": "rgba16float",
+          "liveness": "live",
+          "width": {
+            "value": 1920,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "validated hardware route tier/target-performance LabController.describeResources"
+          },
+          "height": {
+            "value": 1080,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "validated hardware route tier/target-performance LabController.describeResources"
+          },
+          "depth": {
+            "value": 1,
+            "unit": "texel-layer",
+            "label": "Measured",
+            "source": "validated hardware route tier/target-performance LabController.describeResources"
+          },
+          "sampleCount": {
+            "value": 1,
+            "unit": "sample/pixel",
+            "label": "Measured",
+            "source": "validated hardware route tier/target-performance LabController.describeResources"
+          },
+          "bytesPerTexel": {
+            "value": 8,
+            "unit": "byte/texel",
+            "label": "Measured",
+            "source": "validated hardware route tier/target-performance LabController.describeResources"
+          },
+          "bytes": {
+            "value": 16588800,
+            "unit": "byte",
+            "label": "Derived",
+            "source": "1920 x 1080 x 1 x 1 x 8"
+          },
+          "logicalBytes": {
+            "value": 16588800,
+            "unit": "byte",
+            "label": "Derived",
+            "source": "validated target byte formula"
+          },
+          "liveBytes": {
+            "value": 16588800,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "validated hardware route tier/target-performance LabController.describeResources"
+          }
+        },
+        {
+          "semantic": "depth",
+          "owner": "scene-pass",
+          "targetName": null,
+          "textureUuid": "eaee82e3-f390-47f0-8ff6-d798e5c27b1e",
+          "format": "depth32float",
+          "liveness": "live",
+          "width": {
+            "value": 1920,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "validated hardware route tier/target-performance LabController.describeResources"
+          },
+          "height": {
+            "value": 1080,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "validated hardware route tier/target-performance LabController.describeResources"
+          },
+          "depth": {
+            "value": 1,
+            "unit": "texel-layer",
+            "label": "Measured",
+            "source": "validated hardware route tier/target-performance LabController.describeResources"
+          },
+          "sampleCount": {
+            "value": 1,
+            "unit": "sample/pixel",
+            "label": "Measured",
+            "source": "validated hardware route tier/target-performance LabController.describeResources"
+          },
+          "bytesPerTexel": {
+            "value": 4,
+            "unit": "byte/texel",
+            "label": "Measured",
+            "source": "validated hardware route tier/target-performance LabController.describeResources"
+          },
+          "bytes": {
+            "value": 8294400,
+            "unit": "byte",
+            "label": "Derived",
+            "source": "1920 x 1080 x 1 x 1 x 4"
+          },
+          "logicalBytes": {
+            "value": 8294400,
+            "unit": "byte",
+            "label": "Derived",
+            "source": "validated target byte formula"
+          },
+          "liveBytes": {
+            "value": 8294400,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "validated hardware route tier/target-performance LabController.describeResources"
+          }
+        },
+        {
+          "semantic": "capture-target",
+          "owner": "validation-capture",
+          "targetName": null,
+          "textureUuid": "dd3b8d3a-8c9a-47b7-b850-529e0cbd86a3",
+          "format": "rgba8unorm-srgb",
+          "liveness": "live",
+          "width": {
+            "value": 1920,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "validated hardware route tier/target-performance LabController.describeResources"
+          },
+          "height": {
+            "value": 1080,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "validated hardware route tier/target-performance LabController.describeResources"
+          },
+          "depth": {
+            "value": 1,
+            "unit": "texel-layer",
+            "label": "Measured",
+            "source": "validated hardware route tier/target-performance LabController.describeResources"
+          },
+          "sampleCount": {
+            "value": 1,
+            "unit": "sample/pixel",
+            "label": "Measured",
+            "source": "validated hardware route tier/target-performance LabController.describeResources"
+          },
+          "bytesPerTexel": {
+            "value": 4,
+            "unit": "byte/texel",
+            "label": "Measured",
+            "source": "validated hardware route tier/target-performance LabController.describeResources"
+          },
+          "bytes": {
+            "value": 8294400,
+            "unit": "byte",
+            "label": "Derived",
+            "source": "1920 x 1080 x 1 x 1 x 4"
+          },
+          "logicalBytes": {
+            "value": 8294400,
+            "unit": "byte",
+            "label": "Derived",
+            "source": "validated target byte formula"
+          },
+          "liveBytes": {
+            "value": 8294400,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "validated hardware route tier/target-performance LabController.describeResources"
+          }
+        }
+      ],
+      "trackedRenderTargetBytes": {
+        "value": 66355200,
+        "unit": "byte",
+        "label": "Derived",
+        "source": "validated hardware route tier/target-performance target live-byte sum"
+      },
+      "nonTargetResidency": {
+        "status": "NOT_CLAIMED",
+        "reason": "This projection claims only the validated target inventory; complete non-target and renderer-internal residency is unavailable."
+      }
+    },
+    {
+      "tier": "governor-stress",
+      "routeKey": "tier/governor-stress",
+      "resourceDigest": "sha256:dd781339bb84936ab0da9a260474a00e6695becc3a4fcdad89af484d04075d27",
+      "viewport": {
+        "width": {
+          "value": 1920,
+          "unit": "pixel",
+          "label": "Gated",
+          "source": "immutable hardware performance route lock"
+        },
+        "height": {
+          "value": 1080,
+          "unit": "pixel",
+          "label": "Gated",
+          "source": "immutable hardware performance route lock"
+        },
+        "dpr": {
+          "value": 1,
+          "unit": "ratio",
+          "label": "Gated",
+          "source": "immutable hardware performance route lock"
+        }
+      },
+      "targets": [
+        {
+          "semantic": "output",
+          "owner": "scene-pass",
+          "targetName": null,
+          "textureUuid": "44f750e1-8026-4907-8353-9c815529b93a",
+          "format": "rgba16float",
+          "liveness": "live",
+          "width": {
+            "value": 960,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "validated hardware route tier/governor-stress LabController.describeResources"
+          },
+          "height": {
+            "value": 540,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "validated hardware route tier/governor-stress LabController.describeResources"
+          },
+          "depth": {
+            "value": 1,
+            "unit": "texel-layer",
+            "label": "Measured",
+            "source": "validated hardware route tier/governor-stress LabController.describeResources"
+          },
+          "sampleCount": {
+            "value": 1,
+            "unit": "sample/pixel",
+            "label": "Measured",
+            "source": "validated hardware route tier/governor-stress LabController.describeResources"
+          },
+          "bytesPerTexel": {
+            "value": 8,
+            "unit": "byte/texel",
+            "label": "Measured",
+            "source": "validated hardware route tier/governor-stress LabController.describeResources"
+          },
+          "bytes": {
+            "value": 4147200,
+            "unit": "byte",
+            "label": "Derived",
+            "source": "960 x 540 x 1 x 1 x 8"
+          },
+          "logicalBytes": {
+            "value": 4147200,
+            "unit": "byte",
+            "label": "Derived",
+            "source": "validated target byte formula"
+          },
+          "liveBytes": {
+            "value": 4147200,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "validated hardware route tier/governor-stress LabController.describeResources"
+          }
+        },
+        {
+          "semantic": "normal",
+          "owner": "scene-pass",
+          "targetName": null,
+          "textureUuid": "e95748df-67c8-4428-9445-b9fed5dd21a2",
+          "format": "rgba16float",
+          "liveness": "live",
+          "width": {
+            "value": 960,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "validated hardware route tier/governor-stress LabController.describeResources"
+          },
+          "height": {
+            "value": 540,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "validated hardware route tier/governor-stress LabController.describeResources"
+          },
+          "depth": {
+            "value": 1,
+            "unit": "texel-layer",
+            "label": "Measured",
+            "source": "validated hardware route tier/governor-stress LabController.describeResources"
+          },
+          "sampleCount": {
+            "value": 1,
+            "unit": "sample/pixel",
+            "label": "Measured",
+            "source": "validated hardware route tier/governor-stress LabController.describeResources"
+          },
+          "bytesPerTexel": {
+            "value": 8,
+            "unit": "byte/texel",
+            "label": "Measured",
+            "source": "validated hardware route tier/governor-stress LabController.describeResources"
+          },
+          "bytes": {
+            "value": 4147200,
+            "unit": "byte",
+            "label": "Derived",
+            "source": "960 x 540 x 1 x 1 x 8"
+          },
+          "logicalBytes": {
+            "value": 4147200,
+            "unit": "byte",
+            "label": "Derived",
+            "source": "validated target byte formula"
+          },
+          "liveBytes": {
+            "value": 4147200,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "validated hardware route tier/governor-stress LabController.describeResources"
+          }
+        },
+        {
+          "semantic": "emissive",
+          "owner": "scene-pass",
+          "targetName": null,
+          "textureUuid": "4bc27aa8-a2fe-4079-847b-c3a6fcc1b975",
+          "format": "rgba16float",
+          "liveness": "live",
+          "width": {
+            "value": 960,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "validated hardware route tier/governor-stress LabController.describeResources"
+          },
+          "height": {
+            "value": 540,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "validated hardware route tier/governor-stress LabController.describeResources"
+          },
+          "depth": {
+            "value": 1,
+            "unit": "texel-layer",
+            "label": "Measured",
+            "source": "validated hardware route tier/governor-stress LabController.describeResources"
+          },
+          "sampleCount": {
+            "value": 1,
+            "unit": "sample/pixel",
+            "label": "Measured",
+            "source": "validated hardware route tier/governor-stress LabController.describeResources"
+          },
+          "bytesPerTexel": {
+            "value": 8,
+            "unit": "byte/texel",
+            "label": "Measured",
+            "source": "validated hardware route tier/governor-stress LabController.describeResources"
+          },
+          "bytes": {
+            "value": 4147200,
+            "unit": "byte",
+            "label": "Derived",
+            "source": "960 x 540 x 1 x 1 x 8"
+          },
+          "logicalBytes": {
+            "value": 4147200,
+            "unit": "byte",
+            "label": "Derived",
+            "source": "validated target byte formula"
+          },
+          "liveBytes": {
+            "value": 4147200,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "validated hardware route tier/governor-stress LabController.describeResources"
+          }
+        },
+        {
+          "semantic": "depth",
+          "owner": "scene-pass",
+          "targetName": null,
+          "textureUuid": "533f1cc4-28ec-43b5-94fd-e95b8a88b8d9",
+          "format": "depth32float",
+          "liveness": "live",
+          "width": {
+            "value": 960,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "validated hardware route tier/governor-stress LabController.describeResources"
+          },
+          "height": {
+            "value": 540,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "validated hardware route tier/governor-stress LabController.describeResources"
+          },
+          "depth": {
+            "value": 1,
+            "unit": "texel-layer",
+            "label": "Measured",
+            "source": "validated hardware route tier/governor-stress LabController.describeResources"
+          },
+          "sampleCount": {
+            "value": 1,
+            "unit": "sample/pixel",
+            "label": "Measured",
+            "source": "validated hardware route tier/governor-stress LabController.describeResources"
+          },
+          "bytesPerTexel": {
+            "value": 4,
+            "unit": "byte/texel",
+            "label": "Measured",
+            "source": "validated hardware route tier/governor-stress LabController.describeResources"
+          },
+          "bytes": {
+            "value": 2073600,
+            "unit": "byte",
+            "label": "Derived",
+            "source": "960 x 540 x 1 x 1 x 4"
+          },
+          "logicalBytes": {
+            "value": 2073600,
+            "unit": "byte",
+            "label": "Derived",
+            "source": "validated target byte formula"
+          },
+          "liveBytes": {
+            "value": 2073600,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "validated hardware route tier/governor-stress LabController.describeResources"
+          }
+        },
+        {
+          "semantic": "capture-target",
+          "owner": "validation-capture",
+          "targetName": null,
+          "textureUuid": "f5bc5020-ad51-44ee-9216-56787d06f4c2",
+          "format": "rgba8unorm-srgb",
+          "liveness": "live",
+          "width": {
+            "value": 1920,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "validated hardware route tier/governor-stress LabController.describeResources"
+          },
+          "height": {
+            "value": 1080,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "validated hardware route tier/governor-stress LabController.describeResources"
+          },
+          "depth": {
+            "value": 1,
+            "unit": "texel-layer",
+            "label": "Measured",
+            "source": "validated hardware route tier/governor-stress LabController.describeResources"
+          },
+          "sampleCount": {
+            "value": 1,
+            "unit": "sample/pixel",
+            "label": "Measured",
+            "source": "validated hardware route tier/governor-stress LabController.describeResources"
+          },
+          "bytesPerTexel": {
+            "value": 4,
+            "unit": "byte/texel",
+            "label": "Measured",
+            "source": "validated hardware route tier/governor-stress LabController.describeResources"
+          },
+          "bytes": {
+            "value": 8294400,
+            "unit": "byte",
+            "label": "Derived",
+            "source": "1920 x 1080 x 1 x 1 x 4"
+          },
+          "logicalBytes": {
+            "value": 8294400,
+            "unit": "byte",
+            "label": "Derived",
+            "source": "validated target byte formula"
+          },
+          "liveBytes": {
+            "value": 8294400,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "validated hardware route tier/governor-stress LabController.describeResources"
+          }
+        }
+      ],
+      "trackedRenderTargetBytes": {
+        "value": 22809600,
+        "unit": "byte",
+        "label": "Derived",
+        "source": "validated hardware route tier/governor-stress target live-byte sum"
+      },
+      "nonTargetResidency": {
+        "status": "NOT_CLAIMED",
+        "reason": "This projection claims only the validated target inventory; complete non-target and renderer-internal residency is unavailable."
+      }
+    }
+  ],
+  "performanceTransition": {
+    "from": "governor-stress",
+    "to": "target-performance",
+    "fromResourceBytes": {
+      "value": 22809600,
+      "unit": "byte",
+      "label": "Measured",
+      "source": "hardware governor transition pre-rebuild target inventory"
+    },
+    "toResourceBytes": {
+      "value": 66355200,
+      "unit": "byte",
+      "label": "Measured",
+      "source": "hardware governor transition post-rebuild target inventory"
+    },
+    "peakSimultaneousLiveBytes": {
+      "status": "NOT_CLAIMED",
+      "value": null,
+      "reason": "The current WebGPU/Three instrumentation does not expose simultaneous old/new internal target liveness during the rebuild."
+    }
+  }
+}

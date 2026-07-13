@@ -1,0 +1,687 @@
+{
+  "schemaVersion": 2,
+  "subjectAdapter": "createNativeWebGPUValidationSubject",
+  "proofKind": "native-browser-runtime",
+  "captureProfile": "correctness",
+  "pipelineGraphDigest": "sha256:e10bc811d7bc9f023f9f821b92de6b36fde47545cfdfc0bf1687f404ddf401a6",
+  "runtimeReachability": {
+    "signals": [
+      "output",
+      "normal",
+      "emissive",
+      "depth"
+    ],
+    "resources": [
+      "output",
+      "normal",
+      "emissive",
+      "depth",
+      "capture-target"
+    ],
+    "routes": [
+      "final",
+      "no-post",
+      "normal",
+      "emissive"
+    ]
+  },
+  "routeExecutions": [
+    {
+      "mode": "final",
+      "outputNodeId": "final-output-node",
+      "selectedOutputNodeId": "final-output-node",
+      "selectedOutputNodeIdentityVerified": true,
+      "graphMarkedDirtyBeforeRender": true,
+      "renderSubmissionCountBefore": {
+        "value": 32,
+        "unit": "submission",
+        "label": "Measured",
+        "source": "native mechanism reachability profile"
+      },
+      "renderSubmissionCountAfter": {
+        "value": 33,
+        "unit": "submission",
+        "label": "Measured",
+        "source": "native mechanism reachability profile"
+      },
+      "renderSubmissionDelta": {
+        "value": 1,
+        "unit": "submission",
+        "label": "Measured",
+        "source": "native mechanism reachability profile"
+      }
+    },
+    {
+      "mode": "no-post",
+      "outputNodeId": "no-post-output-node",
+      "selectedOutputNodeId": "no-post-output-node",
+      "selectedOutputNodeIdentityVerified": true,
+      "graphMarkedDirtyBeforeRender": true,
+      "renderSubmissionCountBefore": {
+        "value": 33,
+        "unit": "submission",
+        "label": "Measured",
+        "source": "native mechanism reachability profile"
+      },
+      "renderSubmissionCountAfter": {
+        "value": 34,
+        "unit": "submission",
+        "label": "Measured",
+        "source": "native mechanism reachability profile"
+      },
+      "renderSubmissionDelta": {
+        "value": 1,
+        "unit": "submission",
+        "label": "Measured",
+        "source": "native mechanism reachability profile"
+      }
+    },
+    {
+      "mode": "normal",
+      "outputNodeId": "normal-output-node",
+      "selectedOutputNodeId": "normal-output-node",
+      "selectedOutputNodeIdentityVerified": true,
+      "graphMarkedDirtyBeforeRender": true,
+      "renderSubmissionCountBefore": {
+        "value": 34,
+        "unit": "submission",
+        "label": "Measured",
+        "source": "native mechanism reachability profile"
+      },
+      "renderSubmissionCountAfter": {
+        "value": 35,
+        "unit": "submission",
+        "label": "Measured",
+        "source": "native mechanism reachability profile"
+      },
+      "renderSubmissionDelta": {
+        "value": 1,
+        "unit": "submission",
+        "label": "Measured",
+        "source": "native mechanism reachability profile"
+      }
+    },
+    {
+      "mode": "emissive",
+      "outputNodeId": "emissive-output-node",
+      "selectedOutputNodeId": "emissive-output-node",
+      "selectedOutputNodeIdentityVerified": true,
+      "graphMarkedDirtyBeforeRender": true,
+      "renderSubmissionCountBefore": {
+        "value": 35,
+        "unit": "submission",
+        "label": "Measured",
+        "source": "native mechanism reachability profile"
+      },
+      "renderSubmissionCountAfter": {
+        "value": 36,
+        "unit": "submission",
+        "label": "Measured",
+        "source": "native mechanism reachability profile"
+      },
+      "renderSubmissionDelta": {
+        "value": 1,
+        "unit": "submission",
+        "label": "Measured",
+        "source": "native mechanism reachability profile"
+      }
+    }
+  ],
+  "negativeControls": {
+    "unknownModeRejected": true,
+    "unknownModeError": "Unknown mode \"__invalid-mechanism-route__\".",
+    "modeStatePreserved": true,
+    "outputNodeIdentityPreserved": true
+  },
+  "diagnosticComparisons": [
+    {
+      "route": "normal",
+      "baseline": "final.design.png",
+      "candidate": "diagnostic.normal.png",
+      "meanRgbByteDifference": {
+        "value": 143.20495034722222,
+        "unit": "mean-rgb-byte-difference",
+        "label": "Measured",
+        "source": "final versus live normal output-node readback"
+      },
+      "minimumDifferenceGate": {
+        "value": 1,
+        "unit": "mean-rgb-byte-difference",
+        "label": "Gated",
+        "source": "frozen diagnostic-route separation threshold"
+      },
+      "verdict": "PASS"
+    },
+    {
+      "route": "emissive",
+      "baseline": "final.design.png",
+      "candidate": "diagnostic.emissive.png",
+      "meanRgbByteDifference": {
+        "value": 64.75570520833334,
+        "unit": "mean-rgb-byte-difference",
+        "label": "Measured",
+        "source": "final versus live emissive output-node readback"
+      },
+      "minimumDifferenceGate": {
+        "value": 1,
+        "unit": "mean-rgb-byte-difference",
+        "label": "Gated",
+        "source": "frozen diagnostic-route separation threshold"
+      },
+      "verdict": "PASS"
+    }
+  ],
+  "metrics": [
+    {
+      "id": "diagnostic-mean-rgb-byte-difference",
+      "measured": {
+        "value": 64.75570520833334,
+        "unit": "mean-rgb-byte-difference",
+        "label": "Measured",
+        "source": "minimum of final-vs-normal and final-vs-emissive"
+      },
+      "captures": [
+        "diagnostic.normal.png",
+        "diagnostic.emissive.png"
+      ]
+    },
+    {
+      "id": "render-timestamp-availability",
+      "verdict": "NOT_CLAIMED",
+      "measured": null
+    },
+    {
+      "id": "readback-captures",
+      "records": [
+        {
+          "id": "final.design.png",
+          "width": {
+            "value": 1200,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "capture record"
+          },
+          "height": {
+            "value": 800,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "capture record"
+          },
+          "sourceBytesPerRow": {
+            "value": 4864,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "original mapped WebGPU copy"
+          },
+          "sourceByteLength": {
+            "value": 3891136,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "original mapped WebGPU copy"
+          },
+          "transportByteLength": {
+            "value": 3891136,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "compacted browser transport"
+          }
+        },
+        {
+          "id": "no-post.design.png",
+          "width": {
+            "value": 1200,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "capture record"
+          },
+          "height": {
+            "value": 800,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "capture record"
+          },
+          "sourceBytesPerRow": {
+            "value": 4864,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "original mapped WebGPU copy"
+          },
+          "sourceByteLength": {
+            "value": 3891136,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "original mapped WebGPU copy"
+          },
+          "transportByteLength": {
+            "value": 3891136,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "compacted browser transport"
+          }
+        },
+        {
+          "id": "diagnostic.normal.png",
+          "width": {
+            "value": 1200,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "capture record"
+          },
+          "height": {
+            "value": 800,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "capture record"
+          },
+          "sourceBytesPerRow": {
+            "value": 4864,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "original mapped WebGPU copy"
+          },
+          "sourceByteLength": {
+            "value": 3891136,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "original mapped WebGPU copy"
+          },
+          "transportByteLength": {
+            "value": 3891136,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "compacted browser transport"
+          }
+        },
+        {
+          "id": "diagnostic.emissive.png",
+          "width": {
+            "value": 1200,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "capture record"
+          },
+          "height": {
+            "value": 800,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "capture record"
+          },
+          "sourceBytesPerRow": {
+            "value": 4864,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "original mapped WebGPU copy"
+          },
+          "sourceByteLength": {
+            "value": 3891136,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "original mapped WebGPU copy"
+          },
+          "transportByteLength": {
+            "value": 3891136,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "compacted browser transport"
+          }
+        },
+        {
+          "id": "camera.near.png",
+          "width": {
+            "value": 1200,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "capture record"
+          },
+          "height": {
+            "value": 800,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "capture record"
+          },
+          "sourceBytesPerRow": {
+            "value": 4864,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "original mapped WebGPU copy"
+          },
+          "sourceByteLength": {
+            "value": 3891136,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "original mapped WebGPU copy"
+          },
+          "transportByteLength": {
+            "value": 3891136,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "compacted browser transport"
+          }
+        },
+        {
+          "id": "camera.design.png",
+          "width": {
+            "value": 1200,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "capture record"
+          },
+          "height": {
+            "value": 800,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "capture record"
+          },
+          "sourceBytesPerRow": {
+            "value": 4864,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "original mapped WebGPU copy"
+          },
+          "sourceByteLength": {
+            "value": 3891136,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "original mapped WebGPU copy"
+          },
+          "transportByteLength": {
+            "value": 3891136,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "compacted browser transport"
+          }
+        },
+        {
+          "id": "camera.far.png",
+          "width": {
+            "value": 1200,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "capture record"
+          },
+          "height": {
+            "value": 800,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "capture record"
+          },
+          "sourceBytesPerRow": {
+            "value": 4864,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "original mapped WebGPU copy"
+          },
+          "sourceByteLength": {
+            "value": 3891136,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "original mapped WebGPU copy"
+          },
+          "transportByteLength": {
+            "value": 3891136,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "compacted browser transport"
+          }
+        },
+        {
+          "id": "seed-0001.final.png",
+          "width": {
+            "value": 1200,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "capture record"
+          },
+          "height": {
+            "value": 800,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "capture record"
+          },
+          "sourceBytesPerRow": {
+            "value": 4864,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "original mapped WebGPU copy"
+          },
+          "sourceByteLength": {
+            "value": 3891136,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "original mapped WebGPU copy"
+          },
+          "transportByteLength": {
+            "value": 3891136,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "compacted browser transport"
+          }
+        },
+        {
+          "id": "seed-9e3779b9.final.png",
+          "width": {
+            "value": 1200,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "capture record"
+          },
+          "height": {
+            "value": 800,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "capture record"
+          },
+          "sourceBytesPerRow": {
+            "value": 4864,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "original mapped WebGPU copy"
+          },
+          "sourceByteLength": {
+            "value": 3891136,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "original mapped WebGPU copy"
+          },
+          "transportByteLength": {
+            "value": 3891136,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "compacted browser transport"
+          }
+        },
+        {
+          "id": "temporal.t000.png",
+          "width": {
+            "value": 1200,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "capture record"
+          },
+          "height": {
+            "value": 800,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "capture record"
+          },
+          "sourceBytesPerRow": {
+            "value": 4864,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "original mapped WebGPU copy"
+          },
+          "sourceByteLength": {
+            "value": 3891136,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "original mapped WebGPU copy"
+          },
+          "transportByteLength": {
+            "value": 3891136,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "compacted browser transport"
+          }
+        },
+        {
+          "id": "temporal.t001.png",
+          "width": {
+            "value": 1200,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "capture record"
+          },
+          "height": {
+            "value": 800,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "capture record"
+          },
+          "sourceBytesPerRow": {
+            "value": 4864,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "original mapped WebGPU copy"
+          },
+          "sourceByteLength": {
+            "value": 3891136,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "original mapped WebGPU copy"
+          },
+          "transportByteLength": {
+            "value": 3891136,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "compacted browser transport"
+          }
+        },
+        {
+          "id": "odd-size.final.png",
+          "width": {
+            "value": 641,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "capture record"
+          },
+          "height": {
+            "value": 359,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "capture record"
+          },
+          "sourceBytesPerRow": {
+            "value": 2816,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "original mapped WebGPU copy"
+          },
+          "sourceByteLength": {
+            "value": 1010692,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "original mapped WebGPU copy"
+          },
+          "transportByteLength": {
+            "value": 1010692,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "compacted browser transport"
+          }
+        },
+        {
+          "id": "tier.target-performance.final.png",
+          "width": {
+            "value": 1920,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "capture record"
+          },
+          "height": {
+            "value": 1080,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "capture record"
+          },
+          "sourceBytesPerRow": {
+            "value": 7680,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "original mapped WebGPU copy"
+          },
+          "sourceByteLength": {
+            "value": 8294400,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "original mapped WebGPU copy"
+          },
+          "transportByteLength": {
+            "value": 8294400,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "compacted browser transport"
+          }
+        },
+        {
+          "id": "tier.governor-stress.final.png",
+          "width": {
+            "value": 1920,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "capture record"
+          },
+          "height": {
+            "value": 1080,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "capture record"
+          },
+          "sourceBytesPerRow": {
+            "value": 7680,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "original mapped WebGPU copy"
+          },
+          "sourceByteLength": {
+            "value": 8294400,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "original mapped WebGPU copy"
+          },
+          "transportByteLength": {
+            "value": 8294400,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "compacted browser transport"
+          }
+        },
+        {
+          "id": "diagnostics.mosaic.png",
+          "width": {
+            "value": 1200,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "capture record"
+          },
+          "height": {
+            "value": 800,
+            "unit": "pixel",
+            "label": "Measured",
+            "source": "capture record"
+          },
+          "sourceBytesPerRow": null,
+          "sourceByteLength": null,
+          "transportByteLength": null
+        }
+      ]
+    }
+  ],
+  "verdicts": {
+    "visualCorrectness": "INSUFFICIENT_EVIDENCE",
+    "mechanismCorrectness": "PASS",
+    "performanceCompliance": "NOT_CLAIMED",
+    "gpuAttribution": "INSUFFICIENT_EVIDENCE",
+    "lifecycleStability": "PASS"
+  },
+  "verdict": "PASS"
+}

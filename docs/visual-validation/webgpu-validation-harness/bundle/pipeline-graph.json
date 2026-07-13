@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 2,
+  "owners": {
+    "renderer": "native-validation-subject",
+    "renderPipeline": "native-validation-subject",
+    "toneMap": "renderOutput",
+    "outputTransform": "renderOutput"
+  },
+  "signals": [
+    {
+      "id": "output",
+      "producer": "scene-pass",
+      "consumers": [
+        "final",
+        "no-post"
+      ],
+      "reachable": true
+    },
+    {
+      "id": "normal",
+      "producer": "scene-pass",
+      "consumers": [
+        "normal"
+      ],
+      "reachable": true
+    },
+    {
+      "id": "emissive",
+      "producer": "scene-pass",
+      "consumers": [
+        "final",
+        "emissive"
+      ],
+      "reachable": true
+    },
+    {
+      "id": "depth",
+      "producer": "scene-pass",
+      "consumers": [],
+      "reachable": true
+    }
+  ],
+  "sceneSubmissions": [
+    {
+      "id": "scene-pass",
+      "owner": "native-validation-subject",
+      "kind": "lit-scene",
+      "submissionCount": {
+        "value": 1,
+        "unit": "submission/frame",
+        "label": "Measured",
+        "source": "LabController.describePipeline"
+      }
+    }
+  ],
+  "computeDispatches": [],
+  "resources": [
+    {
+      "id": "output",
+      "owner": "scene-pass",
+      "kind": "render-target",
+      "residentBytes": {
+        "value": 7680000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "1200 x 800 x 8 bytes/texel"
+      }
+    },
+    {
+      "id": "normal",
+      "owner": "scene-pass",
+      "kind": "render-target",
+      "residentBytes": {
+        "value": 7680000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "1200 x 800 x 8 bytes/texel"
+      }
+    },
+    {
+      "id": "emissive",
+      "owner": "scene-pass",
+      "kind": "render-target",
+      "residentBytes": {
+        "value": 7680000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "1200 x 800 x 8 bytes/texel"
+      }
+    },
+    {
+      "id": "depth",
+      "owner": "scene-pass",
+      "kind": "render-target",
+      "residentBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "1200 x 800 x 4 bytes/texel"
+      }
+    },
+    {
+      "id": "capture-target",
+      "owner": "validation-capture",
+      "kind": "render-target",
+      "residentBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "1200 x 800 x 4 bytes/texel"
+      }
+    }
+  ],
+  "finalToneMapOwner": "renderOutput",
+  "finalOutputTransformOwner": "renderOutput"
+}

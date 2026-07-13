@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 2,
+  "contractRevision": "webgpu-validation-runtime-v2-1",
+  "subject": "native WebGPU validation subject",
+  "identity": [
+    "webgpu-validation-harness",
+    "sha256:443835b1db637aeaa87745ba074f252191687d431a3c7dbcfcb525c2e36a8bd5",
+    "correctness",
+    "webgpu-correctness"
+  ],
+  "invariants": [
+    {
+      "id": "diagnostic-route-separation",
+      "statement": "The diagnostic mosaic is assembled from live final, no-post, normal, and emissive output-node captures.",
+      "domain": "image",
+      "truthSource": "capture hook render-target readbacks",
+      "diagnostic": "diagnostics.mosaic.png",
+      "metric": "mean RGB byte difference from final",
+      "gate": {
+        "value": 1,
+        "unit": "mean-rgb-byte-difference",
+        "label": "Gated",
+        "source": "frozen minimum diagnostic separation"
+      },
+      "requiredArtifacts": [
+        "pipeline-graph.json",
+        "final.design.png",
+        "diagnostics.mosaic.png"
+      ],
+      "blockingFailure": "diagnostic routes collapse to final output"
+    }
+  ],
+  "requiredImages": [
+    "final.design.png",
+    "no-post.design.png",
+    "diagnostics.mosaic.png",
+    "camera.near.png",
+    "camera.design.png",
+    "camera.far.png",
+    "seed-0001.final.png",
+    "seed-9e3779b9.final.png",
+    "temporal.t000.png",
+    "temporal.t001.png",
+    "diagnostic.normal.png",
+    "diagnostic.emissive.png"
+  ],
+  "requiredDiagnostics": [
+    "final",
+    "no-post",
+    "normal",
+    "emissive",
+    "near/design/far",
+    "seed pair",
+    "temporal pair"
+  ],
+  "requiredMetrics": [
+    "native backend",
+    "readback layout",
+    "pipeline owners",
+    "resource inventory",
+    "claim-separated verdicts"
+  ],
+  "blockingFailures": [
+    "non-WebGPU backend",
+    "unlabelled numeric",
+    "bad padded stride",
+    "false diagnostic route",
+    "publishable incomplete claims"
+  ],
+  "allowedDivergences": [
+    "Correctness capture only; no sustained performance window was run.",
+    "The quality governor was not exercised.",
+    "One resolved render timestamp proves availability but not per-stage GPU attribution.",
+    "Authored direct visual signoff is absent; visualCorrectness remains INSUFFICIENT_EVIDENCE.",
+    "Software-adapter timestamps are retained only as diagnostic data and cannot support a hardware performance claim.",
+    "Owned adapter identity, features, and limits are serialized; physical display refresh and presentation cadence were not measured by this profile."
+  ],
+  "performanceClaims": {
+    "gpuTimingRequirement": "not-claimed",
+    "claims": []
+  },
+  "imageComparisons": [
+    {
+      "id": "diagnostic-runtime-transport",
+      "baseline": "final.design.png",
+      "candidate": "diagnostics.mosaic.png",
+      "maxDifferingRatio": {
+        "value": 1,
+        "unit": "ratio",
+        "label": "Gated",
+        "source": "structural ceiling; minimum separation is validated independently"
+      }
+    },
+    {
+      "id": "normal-runtime-route",
+      "baseline": "final.design.png",
+      "candidate": "diagnostic.normal.png",
+      "maxDifferingRatio": {
+        "value": 1,
+        "unit": "ratio",
+        "label": "Gated",
+        "source": "structural ceiling; mechanism metrics enforce minimum separation"
+      }
+    },
+    {
+      "id": "emissive-runtime-route",
+      "baseline": "final.design.png",
+      "candidate": "diagnostic.emissive.png",
+      "maxDifferingRatio": {
+        "value": 1,
+        "unit": "ratio",
+        "label": "Gated",
+        "source": "structural ceiling; mechanism metrics enforce minimum separation"
+      }
+    }
+  ]
+}

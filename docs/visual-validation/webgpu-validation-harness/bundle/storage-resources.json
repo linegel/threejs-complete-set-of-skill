@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 2,
+  "resources": [],
+  "totalResidentBytes": {
+    "value": 0,
+    "unit": "byte",
+    "label": "Derived",
+    "source": "LabController reports no storage resources for the static MRT subject"
+  },
+  "dispatchOwnership": [],
+  "synchronization": "none; no compute dispatches in this static validation subject",
+  "resetPolicy": "not-applicable"
+}

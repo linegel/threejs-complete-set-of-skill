@@ -1,0 +1,208 @@
+{
+  "schemaVersion": 2,
+  "textures": [
+    "output",
+    "normal",
+    "emissive",
+    "depth",
+    "capture-target"
+  ],
+  "geometry": [
+    "TorusKnotGeometry",
+    "PlaneGeometry",
+    "BoxGeometry"
+  ],
+  "buffers": [],
+  "histories": [],
+  "staging": [
+    "WebGPU readback staging is transient and its allocation bytes are not exposed"
+  ],
+  "readback": [
+    "capture-target"
+  ],
+  "pipelineEstimate": "unavailable from current renderer metrics",
+  "accountingScope": "lab-owned-render-targets-geometry-and-exposed-transients",
+  "completeness": "PARTIAL",
+  "inventoryCompleteness": "COMPLETE_LAB_IDENTITIES_OPAQUE_BACKEND_EXCLUDED",
+  "labOwnedNonTargetResources": [
+    {
+      "kind": "geometry",
+      "id": "2b485869-8f24-415a-be8e-5c00b240604b",
+      "byteAccounting": "DERIVED_AND_RUNTIME_RECONCILED_WHEN_RESIDENT"
+    },
+    {
+      "kind": "geometry",
+      "id": "55cd7482-bdc3-4dcd-a32a-d13492c25899",
+      "byteAccounting": "DERIVED_AND_RUNTIME_RECONCILED_WHEN_RESIDENT"
+    },
+    {
+      "kind": "geometry",
+      "id": "f5a039fc-9bc4-475b-b959-30033732798b",
+      "byteAccounting": "DERIVED_AND_RUNTIME_RECONCILED_WHEN_RESIDENT"
+    }
+  ],
+  "opaqueRendererInternalResidency": {
+    "status": "NOT_CLAIMED",
+    "reason": "No WebGPU API exposes complete physical renderer-internal residency."
+  },
+  "trackedRenderTargetBytes": {
+    "value": 30720000,
+    "unit": "byte",
+    "label": "Derived",
+    "source": "sum of exact logical lab-owned render-target allocations only"
+  },
+  "trackedPeakLiveRenderTargetBytes": {
+    "value": 30720000,
+    "unit": "byte",
+    "label": "Derived",
+    "source": "reported lab-owned render targets simultaneously live"
+  },
+  "uploadChurnPerFrame": {
+    "status": "NOT_CLAIMED",
+    "value": null,
+    "reason": "The current renderer metrics do not expose per-frame upload bytes."
+  },
+  "correctnessLaneArtifact": {
+    "sha256": "sha256:9f3681976cb090fa994e2031aff9492e1a39b7e846a7f8ac6c1982af578ed2dc",
+    "byteLength": {
+      "value": 1937,
+      "unit": "byte",
+      "label": "Measured",
+      "source": "correctness evidence-manifest ledger entry for resident-resources.json"
+    }
+  },
+  "performanceTierInventories": [
+    {
+      "tier": "target-performance",
+      "resourceDigest": "sha256:882141e85c12fdca89196d9394d3fdf3168705b9e08f342fe095ad0d7f5f9edc",
+      "trackedRenderTargetBytes": {
+        "value": 66355200,
+        "unit": "byte",
+        "label": "Derived",
+        "source": "validated hardware route tier/target-performance target live-byte sum"
+      },
+      "targets": [
+        {
+          "semantic": "output",
+          "textureUuid": "078773ae-b8dd-4935-84e6-3f0bf372d131",
+          "liveBytes": {
+            "value": 16588800,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "validated hardware route tier/target-performance LabController.describeResources"
+          }
+        },
+        {
+          "semantic": "normal",
+          "textureUuid": "bc5f60a1-9efd-4952-8023-eb93f783e290",
+          "liveBytes": {
+            "value": 16588800,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "validated hardware route tier/target-performance LabController.describeResources"
+          }
+        },
+        {
+          "semantic": "emissive",
+          "textureUuid": "afd7b621-f904-4884-b2f6-48baa3486bb2",
+          "liveBytes": {
+            "value": 16588800,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "validated hardware route tier/target-performance LabController.describeResources"
+          }
+        },
+        {
+          "semantic": "depth",
+          "textureUuid": "eaee82e3-f390-47f0-8ff6-d798e5c27b1e",
+          "liveBytes": {
+            "value": 8294400,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "validated hardware route tier/target-performance LabController.describeResources"
+          }
+        },
+        {
+          "semantic": "capture-target",
+          "textureUuid": "dd3b8d3a-8c9a-47b7-b850-529e0cbd86a3",
+          "liveBytes": {
+            "value": 8294400,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "validated hardware route tier/target-performance LabController.describeResources"
+          }
+        }
+      ],
+      "nonTargetResidency": {
+        "status": "NOT_CLAIMED",
+        "reason": "This projection claims only the validated target inventory; complete non-target and renderer-internal residency is unavailable."
+      }
+    },
+    {
+      "tier": "governor-stress",
+      "resourceDigest": "sha256:dd781339bb84936ab0da9a260474a00e6695becc3a4fcdad89af484d04075d27",
+      "trackedRenderTargetBytes": {
+        "value": 22809600,
+        "unit": "byte",
+        "label": "Derived",
+        "source": "validated hardware route tier/governor-stress target live-byte sum"
+      },
+      "targets": [
+        {
+          "semantic": "output",
+          "textureUuid": "44f750e1-8026-4907-8353-9c815529b93a",
+          "liveBytes": {
+            "value": 4147200,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "validated hardware route tier/governor-stress LabController.describeResources"
+          }
+        },
+        {
+          "semantic": "normal",
+          "textureUuid": "e95748df-67c8-4428-9445-b9fed5dd21a2",
+          "liveBytes": {
+            "value": 4147200,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "validated hardware route tier/governor-stress LabController.describeResources"
+          }
+        },
+        {
+          "semantic": "emissive",
+          "textureUuid": "4bc27aa8-a2fe-4079-847b-c3a6fcc1b975",
+          "liveBytes": {
+            "value": 4147200,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "validated hardware route tier/governor-stress LabController.describeResources"
+          }
+        },
+        {
+          "semantic": "depth",
+          "textureUuid": "533f1cc4-28ec-43b5-94fd-e95b8a88b8d9",
+          "liveBytes": {
+            "value": 2073600,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "validated hardware route tier/governor-stress LabController.describeResources"
+          }
+        },
+        {
+          "semantic": "capture-target",
+          "textureUuid": "f5bc5020-ad51-44ee-9216-56787d06f4c2",
+          "liveBytes": {
+            "value": 8294400,
+            "unit": "byte",
+            "label": "Measured",
+            "source": "validated hardware route tier/governor-stress LabController.describeResources"
+          }
+        }
+      ],
+      "nonTargetResidency": {
+        "status": "NOT_CLAIMED",
+        "reason": "This projection claims only the validated target inventory; complete non-target and renderer-internal residency is unavailable."
+      }
+    }
+  ]
+}

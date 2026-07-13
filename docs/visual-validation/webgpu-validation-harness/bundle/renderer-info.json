@@ -1,0 +1,615 @@
+{
+  "schemaVersion": 2,
+  "threeRevision": "0.185.1",
+  "renderer": "WebGPURenderer",
+  "backend": "WebGPU",
+  "captureProfile": "correctness",
+  "adapterClass": "software",
+  "outputColorSpace": "srgb",
+  "toneMapping": "NeutralToneMapping",
+  "toneMappingExposure": {
+    "value": 1,
+    "unit": "ratio",
+    "label": "Measured",
+    "source": "live renderer state"
+  },
+  "sampleCount": {
+    "value": 1,
+    "unit": "sample/pixel",
+    "label": "Measured",
+    "source": "live renderer state"
+  },
+  "depthMode": "standard",
+  "outputBufferType": "HalfFloatType",
+  "compatibilityMode": null,
+  "timestampSupport": false,
+  "adapterInfo": {
+    "vendor": "google",
+    "architecture": "swiftshader",
+    "subgroupMinSize": {
+      "value": 4,
+      "unit": "adapter property",
+      "label": "Measured",
+      "source": "GPUAdapter retained by the canonical renderer device request"
+    },
+    "subgroupMaxSize": {
+      "value": 4,
+      "unit": "adapter property",
+      "label": "Measured",
+      "source": "GPUAdapter retained by the canonical renderer device request"
+    },
+    "identitySource": "GPUAdapter retained by the canonical renderer device request"
+  },
+  "adapterFeatures": [
+    "bgra8unorm-storage",
+    "chromium-experimental-timestamp-query-inside-passes",
+    "clip-distances",
+    "core-features-and-limits",
+    "depth-clip-control",
+    "depth32float-stencil8",
+    "float32-blendable",
+    "float32-filterable",
+    "indirect-first-instance",
+    "rg11b10ufloat-renderable",
+    "subgroups",
+    "texture-component-swizzle",
+    "texture-compression-astc",
+    "texture-compression-astc-sliced-3d",
+    "texture-compression-bc",
+    "texture-compression-bc-sliced-3d",
+    "texture-compression-etc2",
+    "timestamp-query"
+  ],
+  "adapterLimits": {
+    "maxTextureDimension1D": {
+      "value": 8192,
+      "unit": "limit unit",
+      "label": "Measured",
+      "source": "GPUAdapter retained by the canonical renderer device request"
+    },
+    "maxTextureDimension2D": {
+      "value": 8192,
+      "unit": "limit unit",
+      "label": "Measured",
+      "source": "GPUAdapter retained by the canonical renderer device request"
+    },
+    "maxTextureDimension3D": {
+      "value": 2048,
+      "unit": "limit unit",
+      "label": "Measured",
+      "source": "GPUAdapter retained by the canonical renderer device request"
+    },
+    "maxTextureArrayLayers": {
+      "value": 256,
+      "unit": "limit unit",
+      "label": "Measured",
+      "source": "GPUAdapter retained by the canonical renderer device request"
+    },
+    "maxBindGroups": {
+      "value": 4,
+      "unit": "limit unit",
+      "label": "Measured",
+      "source": "GPUAdapter retained by the canonical renderer device request"
+    },
+    "maxBindGroupsPlusVertexBuffers": {
+      "value": 24,
+      "unit": "limit unit",
+      "label": "Measured",
+      "source": "GPUAdapter retained by the canonical renderer device request"
+    },
+    "maxBindingsPerBindGroup": {
+      "value": 1000,
+      "unit": "limit unit",
+      "label": "Measured",
+      "source": "GPUAdapter retained by the canonical renderer device request"
+    },
+    "maxDynamicUniformBuffersPerPipelineLayout": {
+      "value": 8,
+      "unit": "limit unit",
+      "label": "Measured",
+      "source": "GPUAdapter retained by the canonical renderer device request"
+    },
+    "maxDynamicStorageBuffersPerPipelineLayout": {
+      "value": 4,
+      "unit": "limit unit",
+      "label": "Measured",
+      "source": "GPUAdapter retained by the canonical renderer device request"
+    },
+    "maxSampledTexturesPerShaderStage": {
+      "value": 16,
+      "unit": "limit unit",
+      "label": "Measured",
+      "source": "GPUAdapter retained by the canonical renderer device request"
+    },
+    "maxSamplersPerShaderStage": {
+      "value": 16,
+      "unit": "limit unit",
+      "label": "Measured",
+      "source": "GPUAdapter retained by the canonical renderer device request"
+    },
+    "maxStorageBuffersPerShaderStage": {
+      "value": 10,
+      "unit": "limit unit",
+      "label": "Measured",
+      "source": "GPUAdapter retained by the canonical renderer device request"
+    },
+    "maxStorageTexturesPerShaderStage": {
+      "value": 4,
+      "unit": "limit unit",
+      "label": "Measured",
+      "source": "GPUAdapter retained by the canonical renderer device request"
+    },
+    "maxUniformBuffersPerShaderStage": {
+      "value": 12,
+      "unit": "limit unit",
+      "label": "Measured",
+      "source": "GPUAdapter retained by the canonical renderer device request"
+    },
+    "maxUniformBufferBindingSize": {
+      "value": 65536,
+      "unit": "limit unit",
+      "label": "Measured",
+      "source": "GPUAdapter retained by the canonical renderer device request"
+    },
+    "maxStorageBufferBindingSize": {
+      "value": 1073741824,
+      "unit": "limit unit",
+      "label": "Measured",
+      "source": "GPUAdapter retained by the canonical renderer device request"
+    },
+    "minUniformBufferOffsetAlignment": {
+      "value": 256,
+      "unit": "limit unit",
+      "label": "Measured",
+      "source": "GPUAdapter retained by the canonical renderer device request"
+    },
+    "minStorageBufferOffsetAlignment": {
+      "value": 256,
+      "unit": "limit unit",
+      "label": "Measured",
+      "source": "GPUAdapter retained by the canonical renderer device request"
+    },
+    "maxVertexBuffers": {
+      "value": 8,
+      "unit": "limit unit",
+      "label": "Measured",
+      "source": "GPUAdapter retained by the canonical renderer device request"
+    },
+    "maxBufferSize": {
+      "value": 1073741824,
+      "unit": "limit unit",
+      "label": "Measured",
+      "source": "GPUAdapter retained by the canonical renderer device request"
+    },
+    "maxVertexAttributes": {
+      "value": 16,
+      "unit": "limit unit",
+      "label": "Measured",
+      "source": "GPUAdapter retained by the canonical renderer device request"
+    },
+    "maxVertexBufferArrayStride": {
+      "value": 2048,
+      "unit": "limit unit",
+      "label": "Measured",
+      "source": "GPUAdapter retained by the canonical renderer device request"
+    },
+    "maxInterStageShaderVariables": {
+      "value": 28,
+      "unit": "limit unit",
+      "label": "Measured",
+      "source": "GPUAdapter retained by the canonical renderer device request"
+    },
+    "maxColorAttachments": {
+      "value": 8,
+      "unit": "limit unit",
+      "label": "Measured",
+      "source": "GPUAdapter retained by the canonical renderer device request"
+    },
+    "maxColorAttachmentBytesPerSample": {
+      "value": 128,
+      "unit": "limit unit",
+      "label": "Measured",
+      "source": "GPUAdapter retained by the canonical renderer device request"
+    },
+    "maxComputeWorkgroupStorageSize": {
+      "value": 32768,
+      "unit": "limit unit",
+      "label": "Measured",
+      "source": "GPUAdapter retained by the canonical renderer device request"
+    },
+    "maxComputeInvocationsPerWorkgroup": {
+      "value": 256,
+      "unit": "limit unit",
+      "label": "Measured",
+      "source": "GPUAdapter retained by the canonical renderer device request"
+    },
+    "maxComputeWorkgroupSizeX": {
+      "value": 256,
+      "unit": "limit unit",
+      "label": "Measured",
+      "source": "GPUAdapter retained by the canonical renderer device request"
+    },
+    "maxComputeWorkgroupSizeY": {
+      "value": 256,
+      "unit": "limit unit",
+      "label": "Measured",
+      "source": "GPUAdapter retained by the canonical renderer device request"
+    },
+    "maxComputeWorkgroupSizeZ": {
+      "value": 64,
+      "unit": "limit unit",
+      "label": "Measured",
+      "source": "GPUAdapter retained by the canonical renderer device request"
+    },
+    "maxComputeWorkgroupsPerDimension": {
+      "value": 65535,
+      "unit": "limit unit",
+      "label": "Measured",
+      "source": "GPUAdapter retained by the canonical renderer device request"
+    }
+  },
+  "initializationState": "await renderer.init completed; backend.isWebGPUBackend true",
+  "deviceLostObserved": false,
+  "uncapturedErrors": [],
+  "deviceErrors": [],
+  "rendererInfoSnapshots": [
+    {
+      "source": "LabController.getMetrics.rendererInfo",
+      "serializationPolicy": "enumerable-data-properties-json-safe-v1",
+      "numericCounters": "retained in capture-session.json; not promoted without per-counter provenance"
+    }
+  ],
+  "correctnessLaneArtifact": {
+    "sha256": "sha256:ddf3c46bd454ffac3337d762b266ccbe884acf1e4cac2de2add814dbc5360879",
+    "byteLength": {
+      "value": 8356,
+      "unit": "byte",
+      "label": "Measured",
+      "source": "correctness evidence-manifest ledger entry for renderer-info.json"
+    }
+  },
+  "performanceLane": {
+    "profile": "performance",
+    "automationSurface": "codex-in-app-browser",
+    "adapterClass": "hardware",
+    "adapterIdentity": {
+      "vendor": "apple",
+      "architecture": "metal-3",
+      "subgroupMinSize": {
+        "value": 32,
+        "unit": "adapter-property",
+        "label": "Measured",
+        "source": "hardware performance session adapter identity"
+      },
+      "subgroupMaxSize": {
+        "value": 32,
+        "unit": "adapter-property",
+        "label": "Measured",
+        "source": "hardware performance session adapter identity"
+      }
+    },
+    "browser": {
+      "webdriver": false,
+      "headless": false,
+      "visibilityState": "visible",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "userAgentDataPlatform": "macOS",
+      "language": "en-US"
+    },
+    "viewport": {
+      "width": {
+        "value": 1920,
+        "unit": "pixel",
+        "label": "Gated",
+        "source": "hardware performance contract"
+      },
+      "height": {
+        "value": 1080,
+        "unit": "pixel",
+        "label": "Gated",
+        "source": "hardware performance contract"
+      },
+      "dpr": {
+        "value": 1,
+        "unit": "ratio",
+        "label": "Gated",
+        "source": "hardware performance contract"
+      }
+    },
+    "refresh": {
+      "hz": {
+        "value": 120.48192771101236,
+        "unit": "Hz",
+        "label": "Measured",
+        "source": "foreground idle requestAnimationFrame median interval"
+      },
+      "measurementDuration": {
+        "value": 2006.899999999965,
+        "unit": "ms",
+        "label": "Measured",
+        "source": "foreground idle requestAnimationFrame timestamps"
+      },
+      "intervals": {
+        "values": [
+          8.399999999965075,
+          8.299999999988358,
+          8.300000000046566,
+          8.399999999965075,
+          8.299999999988358,
+          7.400000000023283,
+          8.599999999976717,
+          9.200000000011642,
+          8.100000000034925,
+          8.299999999988358,
+          8.399999999965075,
+          8.400000000023283,
+          7.7000000000116415,
+          8.200000000011642,
+          9.099999999976717,
+          8.299999999988358,
+          8.200000000011642,
+          7.2999999999883585,
+          9.700000000011642,
+          8,
+          8.400000000023283,
+          8.299999999988358,
+          8.399999999965075,
+          7.800000000046566,
+          7.7999999999883585,
+          9.399999999965075,
+          7.7000000000116415,
+          9.100000000034925,
+          8.099999999976717,
+          7.7999999999883585,
+          8.900000000023283,
+          8.399999999965075,
+          8.300000000046566,
+          8.399999999965075,
+          8.299999999988358,
+          8.300000000046566,
+          8.399999999965075,
+          8.299999999988358,
+          8.400000000023283,
+          8.200000000011642,
+          8.299999999988358,
+          8.400000000023283,
+          6.7999999999883585,
+          10.099999999976717,
+          8.100000000034925,
+          8.399999999965075,
+          8.299999999988358,
+          7.5,
+          9.400000000023283,
+          8.099999999976717,
+          8.400000000023283,
+          7.7999999999883585,
+          8.900000000023283,
+          8.200000000011642,
+          8.299999999988358,
+          8.399999999965075,
+          8.300000000046566,
+          8.399999999965075,
+          8.299999999988358,
+          8.300000000046566,
+          8.399999999965075,
+          8.299999999988358,
+          8.300000000046566,
+          8.399999999965075,
+          8.299999999988358,
+          8.200000000011642,
+          8.5,
+          8.299999999988358,
+          8,
+          8.700000000011642,
+          7.2000000000116415,
+          9.599999999976717,
+          8.100000000034925,
+          8.399999999965075,
+          8.300000000046566,
+          7.5,
+          9.399999999965075,
+          8.100000000034925,
+          7.7999999999883585,
+          8.099999999976717,
+          9.200000000011642,
+          8.299999999988358,
+          6.900000000023283,
+          8.799999999988358,
+          9.200000000011642,
+          8.399999999965075,
+          8.400000000023283,
+          8.299999999988358,
+          8.299999999988358,
+          8.400000000023283,
+          8.200000000011642,
+          7.899999999965075,
+          7.800000000046566,
+          9.599999999976717,
+          8,
+          8.5,
+          8.200000000011642,
+          8.399999999965075,
+          7.400000000023283,
+          8.700000000011642,
+          9.099999999976717,
+          8.100000000034925,
+          7.899999999965075,
+          8.900000000023283,
+          8.200000000011642,
+          8.399999999965075,
+          8,
+          8,
+          8.400000000023283,
+          8.299999999988358,
+          8.900000000023283,
+          8.399999999965075,
+          7.5,
+          9.400000000023283,
+          8,
+          7.2000000000116415,
+          8.699999999953434,
+          7.7000000000116415,
+          10.100000000034925,
+          7.899999999965075,
+          8.5,
+          8.299999999988358,
+          8.400000000023283,
+          8.200000000011642,
+          7.7999999999883585,
+          9.099999999976717,
+          8.100000000034925,
+          8.399999999965075,
+          8.100000000034925,
+          8.599999999976717,
+          7.2000000000116415,
+          9.700000000011642,
+          8,
+          8.399999999965075,
+          8.400000000023283,
+          7.099999999976717,
+          9.800000000046566,
+          7.899999999965075,
+          7.100000000034925,
+          8.299999999988358,
+          10,
+          7.2000000000116415,
+          9.299999999988358,
+          7.7999999999883585,
+          8.799999999988358,
+          6.900000000023283,
+          9.700000000011642,
+          7.7999999999883585,
+          7.5,
+          9.700000000011642,
+          7.7999999999883585,
+          7.899999999965075,
+          8.200000000011642,
+          9.400000000023283,
+          7.2000000000116415,
+          9.5,
+          7.099999999976717,
+          9.599999999976717,
+          7.300000000046566,
+          8,
+          9.699999999953434,
+          8.300000000046566,
+          8.299999999988358,
+          7.099999999976717,
+          8.799999999988358,
+          9.300000000046566,
+          8.099999999976717,
+          8.5,
+          8.099999999976717,
+          8.5,
+          6.900000000023283,
+          9.799999999988358,
+          8.299999999988358,
+          7.7000000000116415,
+          8.400000000023283,
+          7.7999999999883585,
+          9.700000000011642,
+          8,
+          7.599999999976717,
+          8.600000000034925,
+          8.299999999988358,
+          9,
+          7.7000000000116415,
+          7.7999999999883585,
+          8.5,
+          7.7999999999883585,
+          9.700000000011642,
+          8.399999999965075,
+          8.400000000023283,
+          8.299999999988358,
+          6.900000000023283,
+          8.799999999988358,
+          9.5,
+          6.5,
+          9.200000000011642,
+          7.899999999965075,
+          8.900000000023283,
+          7.400000000023283,
+          10,
+          8.199999999953434,
+          7.2000000000116415,
+          9.799999999988358,
+          6.7000000000116415,
+          9.100000000034925,
+          8.099999999976717,
+          8.599999999976717,
+          7.2000000000116415,
+          10.299999999988358,
+          7.900000000023283,
+          8.400000000023283,
+          8.399999999965075,
+          8.299999999988358,
+          8.300000000046566,
+          7.399999999965075,
+          9.5,
+          8.100000000034925,
+          6.699999999953434,
+          10.400000000023283,
+          6.7000000000116415,
+          9.899999999965075,
+          7.7000000000116415,
+          7,
+          9.900000000023283,
+          7.899999999965075,
+          8.300000000046566,
+          7.399999999965075,
+          9.200000000011642,
+          7.2999999999883585,
+          9.299999999988358,
+          9.100000000034925,
+          8.200000000011642,
+          8.399999999965075,
+          8.299999999988358,
+          7.800000000046566,
+          8.899999999965075,
+          8.299999999988358,
+          8,
+          8.700000000011642,
+          8.200000000011642,
+          6.900000000023283,
+          8.399999999965075
+        ],
+        "unit": "ms",
+        "label": "Measured",
+        "source": "foreground idle requestAnimationFrame timestamps"
+      },
+      "p50": {
+        "value": 8.299999999988358,
+        "unit": "ms",
+        "label": "Measured",
+        "source": "foreground idle requestAnimationFrame interval distribution"
+      },
+      "p95": {
+        "value": 9.700000000011642,
+        "unit": "ms",
+        "label": "Measured",
+        "source": "foreground idle requestAnimationFrame interval distribution"
+      },
+      "hostReserveP95": {
+        "value": 1.400000000023283,
+        "unit": "ms",
+        "label": "Measured",
+        "source": "idle host-shell p95 interval minus median refresh period"
+      }
+    },
+    "timestampSupport": true,
+    "colorContract": {
+      "resourceFormat": "rgba8unorm-srgb",
+      "copyFormat": "rgba8unorm",
+      "outputColorSpace": "srgb"
+    },
+    "captureSession": {
+      "documentSha256": "sha256:6642352a956dcb30c3481291e7d886dd4151e32d4aa4d9ce435567514f2a5cce",
+      "recordSha256": "sha256:383e5e1926f724754ec4c6a0206c164a6b8887a1afe53df5d596a0ae5febd4bc",
+      "servedLedgerSha256": "sha256:2dad0666d1584ee07002a8a687a31b9f1498ca48730fce3d4297e6b9be39295d"
+    },
+    "sourceClosureHash": "sha256:281b93606ce2ed351b58deb4e45ccce5f7a752de26e737c36211cf294c6bab95",
+    "buildRevision": "sha256:7db153853b7ed98bcba359e3bc796004340de59ff9864b67bd66cdeb6ee488f4",
+    "threeRevision": "0.185.1"
+  }
+}

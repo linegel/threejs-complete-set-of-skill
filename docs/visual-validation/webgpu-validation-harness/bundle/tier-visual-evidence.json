@@ -1,0 +1,418 @@
+{
+  "schemaVersion": 1,
+  "kind": "validation-harness-tier-visual-evidence-v1",
+  "binding": {
+    "reference": {
+      "recipeId": "tier.target-performance.final",
+      "recipeDigest": "sha256:900ab77c934cd65feda5656071234eb15bd40982c4cdb3acec962a75ba295c0f",
+      "filename": "tier.target-performance.final.png",
+      "pngSha256": "sha256:b02bb0fb1b7fae3d05d044ae5b7f55b0b06766ea4284c7dee2d2a9615e2f8ebe",
+      "transaction": {
+        "transactionId": "capture-13",
+        "sequence": 13,
+        "status": "COMMITTED",
+        "entryStateDigest": "sha256:7ae5da12b94305dc56c66a30b68e60d5f9e6ccabc5d6d1a1c5b3baf0fcc149d3",
+        "restoredStateDigest": "sha256:7ae5da12b94305dc56c66a30b68e60d5f9e6ccabc5d6d1a1c5b3baf0fcc149d3",
+        "restorationVerdict": "PASS"
+      },
+      "normalized": {
+        "artifact": {
+          "path": "normalized-readbacks/tier.target-performance.final.rgba8.padded.bin",
+          "sha256": "sha256:a491c8588835aa61128df20bb75502ae692ecad3552a7dbcb452e330d12f4db3",
+          "byteLength": 8294400
+        },
+        "compactRgbaSha256": "sha256:a491c8588835aa61128df20bb75502ae692ecad3552a7dbcb452e330d12f4db3",
+        "compactByteLength": 8294400,
+        "width": 1920,
+        "height": 1080
+      },
+      "captureEvidenceSha256": "sha256:c73bcbdbd8f30337190d52a8183b17ee052e1186b10ae9b22eb6fb12ee72ebbe",
+      "effectiveState": {
+        "schemaVersion": 1,
+        "scenario": "timing-and-governor",
+        "mode": "final",
+        "tier": "target-performance",
+        "camera": "design",
+        "seed": 1,
+        "timeSeconds": 0,
+        "viewport": {
+          "width": 1920,
+          "height": 1080,
+          "dpr": 1
+        },
+        "passScale": 1,
+        "outputNodeMode": "final",
+        "outputNodeId": "final-output-node",
+        "outputNodeUuid": "1a9f0f85-3591-458e-a15d-d49ad424a0b7",
+        "outputNodeType": "RenderOutputNode",
+        "cameraState": {
+          "matrixWorld": [
+            0.8632967941190821,
+            0,
+            -0.5046965873311557,
+            0,
+            -0.15616678089684655,
+            0.9509231803482525,
+            -0.26712738837618477,
+            0,
+            0.47992768393585217,
+            0.30942705937969406,
+            0.8209289330481682,
+            0,
+            3.8,
+            2.8,
+            6.5,
+            1
+          ],
+          "projectionMatrix": [
+            1.3579951288348662,
+            0,
+            0,
+            0,
+            0,
+            2.4142135623730954,
+            0,
+            0,
+            0,
+            0,
+            -1.0010010010010009,
+            -1,
+            0,
+            0,
+            -0.10010010010010009,
+            0
+          ]
+        },
+        "subjectMatrixWorld": [
+          0.9999999217789209,
+          0.00009785511599426215,
+          -0.0003832316899877715,
+          0,
+          0,
+          0.9689124217106447,
+          0.24740395925452294,
+          0,
+          0.0003955276879526058,
+          -0.24740393990231827,
+          0.9689123459212696,
+          0,
+          0,
+          1.25,
+          0,
+          1
+        ],
+        "markerPosition": [
+          -1.4899999999999998,
+          0.35,
+          -0.5
+        ],
+        "captureTarget": {
+          "width": 1920,
+          "height": 1080
+        },
+        "sceneTarget": {
+          "width": 1920,
+          "height": 1080
+        },
+        "rendererTarget": {
+          "kind": "presentation",
+          "textureUuid": null
+        },
+        "device": {
+          "controllerGeneration": 1,
+          "rendererDeviceGeneration": 1,
+          "deviceLossGeneration": 0,
+          "rendererDeviceStatus": "active",
+          "deviceLostObserved": false,
+          "backendDeviceIdentityVerified": true,
+          "nativeWebGPUBackend": true,
+          "uncapturedErrorCount": 0
+        }
+      },
+      "passScale": 1,
+      "resources": {
+        "captureTarget": {
+          "semantic": "capture-target",
+          "owner": "validation-capture",
+          "targetName": null,
+          "textureUuid": "85941f20-4195-47d5-b4dd-ecafe4dd1fc8",
+          "width": 1920,
+          "height": 1080,
+          "format": "rgba8unorm-srgb",
+          "bytes": 8294400,
+          "logicalBytes": 8294400,
+          "liveBytes": 8294400,
+          "liveness": "live"
+        },
+        "sceneMrt": [
+          {
+            "semantic": "output",
+            "owner": "scene-pass",
+            "targetName": null,
+            "textureUuid": "ba4d1fca-7dde-4a6a-96e1-5e4c13835a68",
+            "width": 1920,
+            "height": 1080,
+            "format": "rgba16float",
+            "bytes": 16588800,
+            "logicalBytes": 16588800,
+            "liveBytes": 16588800,
+            "liveness": "live"
+          },
+          {
+            "semantic": "normal",
+            "owner": "scene-pass",
+            "targetName": null,
+            "textureUuid": "5865858b-3de7-40ed-8ea4-9f992966e4b8",
+            "width": 1920,
+            "height": 1080,
+            "format": "rgba16float",
+            "bytes": 16588800,
+            "logicalBytes": 16588800,
+            "liveBytes": 16588800,
+            "liveness": "live"
+          },
+          {
+            "semantic": "emissive",
+            "owner": "scene-pass",
+            "targetName": null,
+            "textureUuid": "5e3474eb-9389-4348-a611-c56a08fb179e",
+            "width": 1920,
+            "height": 1080,
+            "format": "rgba16float",
+            "bytes": 16588800,
+            "logicalBytes": 16588800,
+            "liveBytes": 16588800,
+            "liveness": "live"
+          }
+        ]
+      }
+    },
+    "candidate": {
+      "recipeId": "tier.governor-stress.final",
+      "recipeDigest": "sha256:004f28366d2e556f7bda7ced3149b882b832acc985c091230a26e4fb7c4a70b0",
+      "filename": "tier.governor-stress.final.png",
+      "pngSha256": "sha256:aa1ab8e0e24b261f5bee8de03f2ab2ae2582c5f79a6aa69a0745792112369eab",
+      "transaction": {
+        "transactionId": "capture-14",
+        "sequence": 14,
+        "status": "COMMITTED",
+        "entryStateDigest": "sha256:7ae5da12b94305dc56c66a30b68e60d5f9e6ccabc5d6d1a1c5b3baf0fcc149d3",
+        "restoredStateDigest": "sha256:7ae5da12b94305dc56c66a30b68e60d5f9e6ccabc5d6d1a1c5b3baf0fcc149d3",
+        "restorationVerdict": "PASS"
+      },
+      "normalized": {
+        "artifact": {
+          "path": "normalized-readbacks/tier.governor-stress.final.rgba8.padded.bin",
+          "sha256": "sha256:4439848aacd03617c5a246a568bbd0332f5050f7aac9e530baea89175a79e1c5",
+          "byteLength": 8294400
+        },
+        "compactRgbaSha256": "sha256:4439848aacd03617c5a246a568bbd0332f5050f7aac9e530baea89175a79e1c5",
+        "compactByteLength": 8294400,
+        "width": 1920,
+        "height": 1080
+      },
+      "captureEvidenceSha256": "sha256:c2feb95d8fe024ad9cce581816ff5f1e74cd291af47cee7b4330b9648e2d99cc",
+      "effectiveState": {
+        "schemaVersion": 1,
+        "scenario": "timing-and-governor",
+        "mode": "final",
+        "tier": "governor-stress",
+        "camera": "design",
+        "seed": 1,
+        "timeSeconds": 0,
+        "viewport": {
+          "width": 1920,
+          "height": 1080,
+          "dpr": 1
+        },
+        "passScale": 0.5,
+        "outputNodeMode": "final",
+        "outputNodeId": "final-output-node",
+        "outputNodeUuid": "1a9f0f85-3591-458e-a15d-d49ad424a0b7",
+        "outputNodeType": "RenderOutputNode",
+        "cameraState": {
+          "matrixWorld": [
+            0.8632967941190821,
+            0,
+            -0.5046965873311557,
+            0,
+            -0.15616678089684655,
+            0.9509231803482525,
+            -0.26712738837618477,
+            0,
+            0.47992768393585217,
+            0.30942705937969406,
+            0.8209289330481682,
+            0,
+            3.8,
+            2.8,
+            6.5,
+            1
+          ],
+          "projectionMatrix": [
+            1.3579951288348662,
+            0,
+            0,
+            0,
+            0,
+            2.4142135623730954,
+            0,
+            0,
+            0,
+            0,
+            -1.0010010010010009,
+            -1,
+            0,
+            0,
+            -0.10010010010010009,
+            0
+          ]
+        },
+        "subjectMatrixWorld": [
+          0.9999999217789209,
+          0.00009785511599426215,
+          -0.0003832316899877715,
+          0,
+          0,
+          0.9689124217106447,
+          0.24740395925452294,
+          0,
+          0.0003955276879526058,
+          -0.24740393990231827,
+          0.9689123459212696,
+          0,
+          0,
+          1.25,
+          0,
+          1
+        ],
+        "markerPosition": [
+          -1.4899999999999998,
+          0.35,
+          -0.5
+        ],
+        "captureTarget": {
+          "width": 1920,
+          "height": 1080
+        },
+        "sceneTarget": {
+          "width": 960,
+          "height": 540
+        },
+        "rendererTarget": {
+          "kind": "presentation",
+          "textureUuid": null
+        },
+        "device": {
+          "controllerGeneration": 1,
+          "rendererDeviceGeneration": 1,
+          "deviceLossGeneration": 0,
+          "rendererDeviceStatus": "active",
+          "deviceLostObserved": false,
+          "backendDeviceIdentityVerified": true,
+          "nativeWebGPUBackend": true,
+          "uncapturedErrorCount": 0
+        }
+      },
+      "passScale": 0.5,
+      "resources": {
+        "captureTarget": {
+          "semantic": "capture-target",
+          "owner": "validation-capture",
+          "targetName": null,
+          "textureUuid": "85941f20-4195-47d5-b4dd-ecafe4dd1fc8",
+          "width": 1920,
+          "height": 1080,
+          "format": "rgba8unorm-srgb",
+          "bytes": 8294400,
+          "logicalBytes": 8294400,
+          "liveBytes": 8294400,
+          "liveness": "live"
+        },
+        "sceneMrt": [
+          {
+            "semantic": "output",
+            "owner": "scene-pass",
+            "targetName": null,
+            "textureUuid": "ba4d1fca-7dde-4a6a-96e1-5e4c13835a68",
+            "width": 960,
+            "height": 540,
+            "format": "rgba16float",
+            "bytes": 4147200,
+            "logicalBytes": 4147200,
+            "liveBytes": 4147200,
+            "liveness": "live"
+          },
+          {
+            "semantic": "normal",
+            "owner": "scene-pass",
+            "targetName": null,
+            "textureUuid": "5865858b-3de7-40ed-8ea4-9f992966e4b8",
+            "width": 960,
+            "height": 540,
+            "format": "rgba16float",
+            "bytes": 4147200,
+            "logicalBytes": 4147200,
+            "liveBytes": 4147200,
+            "liveness": "live"
+          },
+          {
+            "semantic": "emissive",
+            "owner": "scene-pass",
+            "targetName": null,
+            "textureUuid": "5e3474eb-9389-4348-a611-c56a08fb179e",
+            "width": 960,
+            "height": 540,
+            "format": "rgba16float",
+            "bytes": 4147200,
+            "logicalBytes": 4147200,
+            "liveBytes": 4147200,
+            "liveness": "live"
+          }
+        ]
+      }
+    }
+  },
+  "metrics": {
+    "meanRgbByteDifference": {
+      "value": 0.2557306134259259,
+      "unit": "mean-rgb-byte-difference",
+      "label": "Measured",
+      "source": "sha256:a491c8588835aa61128df20bb75502ae692ecad3552a7dbcb452e330d12f4db3 versus sha256:4439848aacd03617c5a246a568bbd0332f5050f7aac9e530baea89175a79e1c5"
+    },
+    "edgeMaskPixels": {
+      "value": 9721,
+      "unit": "pixels",
+      "label": "Measured",
+      "source": "reference-image RGB gradient mask with threshold 8 bytes"
+    },
+    "edgeMeanRgbByteDifference": {
+      "value": 0.2624901416178036,
+      "unit": "mean-rgb-byte-difference",
+      "label": "Measured",
+      "source": "reference-edge-mask minimum within a 2-pixel Chebyshev candidate neighborhood"
+    },
+    "edgeP95RgbByteDifference": {
+      "value": 1,
+      "unit": "mean-rgb-byte-difference",
+      "label": "Measured",
+      "source": "reference-edge-mask p95 of minima within a 2-pixel Chebyshev candidate neighborhood"
+    }
+  },
+  "gates": {
+    "meanRgbByteDifference": {
+      "value": 8,
+      "unit": "mean-rgb-byte-difference",
+      "label": "Gated",
+      "source": "frozen correctness-capture tier degradation gate"
+    },
+    "edgeP95RgbByteDifference": {
+      "value": 32,
+      "unit": "mean-rgb-byte-difference",
+      "label": "Gated",
+      "source": "frozen correctness-capture reference-edge p95 gate"
+    }
+  },
+  "bindingSha256": "sha256:889fe2e7fb56382f2a8351981b3bf113d6be1bcc1605fd2e05ba364948fdd481",
+  "verdict": "PASS"
+}
