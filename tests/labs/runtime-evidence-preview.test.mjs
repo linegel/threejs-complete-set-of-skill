@@ -2,8 +2,10 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
 import {
+  extractRuntimeBackendProof,
   halfFloatToNumber,
   isThreeR185Revision,
+  normalizedPreviewClaimVerdicts,
   pngDimensions,
   resolveWithin,
   visualizeRgba16Float,
@@ -48,4 +50,34 @@ test('runtime evidence accepts both Three revision spellings used by r185 artifa
   assert.equal(isThreeR185Revision('0.185.1'), true);
   assert.equal(isThreeR185Revision('184'), false);
   assert.equal(isThreeR185Revision('0.186.0'), false);
+});
+
+test('runtime evidence extracts native backend and bounded claims from capture sessions', () => {
+  const session = {
+    threeRevision: '0.185.1',
+    runtime: {
+      metrics: {
+        rendererBackend: 'WebGPUBackend',
+        rendererInfo: { rendererType: 'WebGPURenderer' },
+        rendererBackendEvidence: { isWebGPUBackend: true },
+      },
+    },
+    hookResult: {
+      visualDifferences: { verdict: 'PASS' },
+      coverageEvidence: { verdict: 'PASS' },
+    },
+  };
+  assert.deepEqual(extractRuntimeBackendProof(session), {
+    renderer: 'WebGPURenderer',
+    backend: 'WebGPUBackend',
+    isWebGPUBackend: true,
+    threeRevision: '0.185.1',
+  });
+  assert.deepEqual(normalizedPreviewClaimVerdicts(session), {
+    visualCorrectness: 'PASS',
+    mechanismCorrectness: 'PASS',
+    performanceCompliance: 'NOT_CLAIMED',
+    gpuAttribution: 'INSUFFICIENT_EVIDENCE',
+    lifecycleStability: 'INSUFFICIENT_EVIDENCE',
+  });
 });

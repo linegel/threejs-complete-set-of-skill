@@ -45,6 +45,28 @@
         { "source": "images/velocity.moving-positive-x.png", "output": "velocity.moving-positive-x.png", "encoding": "png-copy", "meaning": "Moving-velocity fixture with expected positive NDC X sign." },
         { "source": "images/temporal.history.png", "output": "temporal.history.png", "encoding": "png-copy", "meaning": "Temporal history target before camera-cut reset." }
       ]
+    },
+    {
+      "labId": "webgpu-touch-history-frost",
+      "expectedAcceptanceStatus": "incomplete",
+      "artifactDirectory": "artifacts/visual-validation/webgpu-touch-history-frost/correctness",
+      "backendProof": "capture-session.json",
+      "claimVerdicts": "capture-session.json",
+      "primaryImage": "final.design.png",
+      "primaryImageLabel": "Touch-history Frost native-WebGPU readback",
+      "limitations": [
+        "Correctness, camera, seed, temporal, full-tier 641x359 dispatch, aligned readback, and DPR extent gates pass on the current source closure.",
+        "The temporal one-step response is measured and bounded but intentionally subtle in the final frame; the raw history diagnostics provide the decisive mechanism view.",
+        "Lifecycle stability, a unified 14-file v2 release bundle, named-hardware timing, and final acceptance remain incomplete."
+      ],
+      "images": [
+        { "source": "final.design.png", "output": "final.design.png", "encoding": "png-copy", "meaning": "Final Frost composite from the complete refraction-and-Fresnel recipe." },
+        { "source": "no-post.design.png", "output": "no-post.design.png", "encoding": "png-copy", "meaning": "Same scene, camera, seed, and pointer trace with the Frost composition bypassed." },
+        { "source": "diagnostics.mosaic.png", "output": "diagnostics.mosaic.png", "encoding": "png-copy", "meaning": "Hash-bound mosaic of previous history, deposit, next history, and post-pointer Frost mask readbacks." },
+        { "source": "seed-0001.final.png", "output": "seed-0001.final.png", "encoding": "png-copy", "meaning": "Baseline uint32 seed with the fixed authored pointer trace." },
+        { "source": "seed-9e3779b9.final.png", "output": "seed-9e3779b9.final.png", "encoding": "png-copy", "meaning": "Stress uint32 seed with camera, trace, mechanism, and tier held fixed." },
+        { "source": "temporal.t001.png", "output": "temporal.t001.png", "encoding": "png-copy", "meaning": "Final output after exactly one 1/60-second pointer-history update." }
+      ]
     }
   ]
 }

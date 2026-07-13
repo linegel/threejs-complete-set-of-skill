@@ -74,19 +74,26 @@ function readJson(path) {
   return JSON.parse(readFileSync(path, 'utf8'));
 }
 
-function backendProof(document) {
-  const backend = document.backend ?? document.rendererInfo?.backend ?? null;
-  const isWebGPUBackend = backend?.isWebGPUBackend ?? document.isWebGPUBackend ?? document.rendererInfo?.isWebGPUBackend ?? false;
+export function extractRuntimeBackendProof(document) {
+  const captureMetrics = document.runtime?.metrics ?? null;
+  const backendEvidence = captureMetrics?.rendererBackendEvidence ?? null;
+  const backend = document.backend ?? document.rendererInfo?.backend ?? captureMetrics?.backend ?? null;
+  const isWebGPUBackend = backend?.isWebGPUBackend
+    ?? document.isWebGPUBackend
+    ?? document.rendererInfo?.isWebGPUBackend
+    ?? backendEvidence?.isWebGPUBackend
+    ?? false;
   const name = typeof backend === 'string'
     ? backend
     : backend?.name
       ?? document.rendererInfo?.backend
+      ?? captureMetrics?.rendererBackend
       ?? (backend?.isWebGPUBackend === true ? 'WebGPUBackend' : 'unknown');
   return {
-    renderer: document.renderer ?? (name === 'WebGPUBackend' ? 'WebGPURenderer' : 'unknown'),
+    renderer: document.renderer ?? captureMetrics?.rendererInfo?.rendererType ?? (name === 'WebGPUBackend' ? 'WebGPURenderer' : 'unknown'),
     backend: name,
     isWebGPUBackend: isWebGPUBackend === true,
-    threeRevision: document.threeRevision ?? null,
+    threeRevision: document.threeRevision ?? captureMetrics?.threeRevision ?? null,
   };
 }
 
@@ -94,8 +101,18 @@ export function isThreeR185Revision(revision) {
   return revision === '185' || revision === '0.185.1';
 }
 
-function normalizedClaimVerdicts(document) {
+export function normalizedPreviewClaimVerdicts(document) {
   if (document.claimVerdicts && typeof document.claimVerdicts === 'object') return document.claimVerdicts;
+  if (document.hookResult?.visualDifferences?.verdict === 'PASS'
+    && document.hookResult?.coverageEvidence?.verdict === 'PASS') {
+    return {
+      visualCorrectness: 'PASS',
+      mechanismCorrectness: 'PASS',
+      performanceCompliance: 'NOT_CLAIMED',
+      gpuAttribution: 'INSUFFICIENT_EVIDENCE',
+      lifecycleStability: 'INSUFFICIENT_EVIDENCE',
+    };
+  }
   return {
     mechanismCorrectness: document.verdict ?? 'INSUFFICIENT_EVIDENCE',
     performanceCompliance: document.performanceVerdict ?? document.verdict ?? 'INSUFFICIENT_EVIDENCE',
@@ -181,10 +198,18 @@ export function promoteRuntimeEvidence(configPath = DEFAULT_CONFIG) {
 
     const artifactDirectory = resolveWithin(REPO_ROOT, preview.artifactDirectory, 'artifact directory');
     const proofDocument = readJson(resolveWithin(artifactDirectory, preview.backendProof, 'backend proof'));
-    const runtime = backendProof(proofDocument);
+    const runtime = extractRuntimeBackendProof(proofDocument);
     if (!runtime.isWebGPUBackend) throw new Error(`${preview.labId} does not serialize renderer.backend.isWebGPUBackend === true`);
     if (runtime.threeRevision && !isThreeR185Revision(runtime.threeRevision)) {
       throw new Error(`${preview.labId} capture used Three.js ${runtime.threeRevision}`);
+    }
+    if (proofDocument.sourceClosure?.sourceHash) {
+      if (proofDocument.labId !== preview.labId) throw new Error(`${preview.labId} capture-session lab identity drifted`);
+      if (proofDocument.profile !== 'correctness') throw new Error(`${preview.labId} preview requires a correctness capture session`);
+      if (proofDocument.sourceClosure.sourceHash !== demo.sourceHash) throw new Error(`${preview.labId} capture-session source hash is stale`);
+      for (const [channel, errors] of [['page', proofDocument.pageErrors], ['console', proofDocument.consoleErrors], ['request', proofDocument.requestErrors]]) {
+        if (!Array.isArray(errors) || errors.length > 0) throw new Error(`${preview.labId} ${channel} error ledger is not empty`);
+      }
     }
 
     const claimDocument = readJson(resolveWithin(artifactDirectory, preview.claimVerdicts, 'claim verdicts'));
@@ -203,7 +228,7 @@ export function promoteRuntimeEvidence(configPath = DEFAULT_CONFIG) {
       canonicalSourceHash: demo.sourceHash,
       threeRevision: demo.threeRevision,
       runtime,
-      claimVerdicts: normalizedClaimVerdicts(claimDocument),
+      claimVerdicts: normalizedPreviewClaimVerdicts(claimDocument),
       primaryImage: preview.primaryImage,
       primaryImageLabel: preview.primaryImageLabel,
       images,
