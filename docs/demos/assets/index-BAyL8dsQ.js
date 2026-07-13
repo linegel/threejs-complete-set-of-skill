@@ -1,0 +1,1 @@
+import"./modulepreload-polyfill-Dezn_h7o.js";import{n as e}from"./main-BEpTiz-h.js";var t=await e({canvas:document.querySelector(`#scene`)});globalThis.labController=t.labController,globalThis.__LAB_CONTROLLER__=t.labController;

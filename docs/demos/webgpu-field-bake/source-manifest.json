@@ -39,6 +39,8 @@
   ],
   "publishedBundleHash": "sha256:18e8726033bc15c543ad25aee05f2163cd992f014437da26d287f70ee58d6910",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:8368f85620d1c52c16c30f26b10080991851f27294d4a4fac24ca285eec5592b",
-  "evidenceBundleId": null
+  "buildRevision": "sha256:36e4490fcd74f5f358440cf8a67dbb057ea2e2c73bcfde6078bc53b0a5e63ee2",
+  "evidenceBundleId": null,
+  "skill": "threejs-procedural-fields",
+  "publishPath": "/demos/webgpu-field-bake/"
 }
