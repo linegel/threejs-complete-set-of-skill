@@ -3,6 +3,7 @@ import { createHash } from "node:crypto";
 import { unpackAlignedRows } from "../../../labs/runtime/aligned-readback.mjs";
 import { encodeRgbaPng } from "../../../scripts/lib/png-rgba.mjs";
 import {
+  FROST_ALL_CAPTURE_RECIPES,
   FROST_CAPTURE_RECIPES,
   FROST_COVERAGE_PROBE_RECIPES,
   FROST_ROUTE_PROBE_RECIPES,
@@ -578,7 +579,7 @@ export async function captureLab(session) {
 
   const retained = new Map();
   const captures = [];
-  for (const recipe of [...FROST_CAPTURE_RECIPES, ...FROST_COVERAGE_PROBE_RECIPES, ...FROST_ROUTE_PROBE_RECIPES]) {
+  for (const recipe of FROST_ALL_CAPTURE_RECIPES) {
     const record = await retainRecipeCapture(session, recipe, description.recipeSetDigest);
     retained.set(recipe.id, record);
     captures.push(Object.freeze({

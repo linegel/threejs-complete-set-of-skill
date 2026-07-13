@@ -5,7 +5,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { buildDemoRegistry } from "../../../scripts/lib/lab-registry.mjs";
 import { validateEvidenceBundle } from "../../../scripts/lib/evidence-v2.mjs";
-import { FROST_CAPTURE_RECIPES } from "./capture-recipes.js";
+import { FROST_ALL_CAPTURE_RECIPES } from "./capture-recipes.js";
 
 const LAB_ID = "webgpu-touch-history-frost";
 const here = dirname(fileURLToPath(import.meta.url));
@@ -20,7 +20,7 @@ function requiredStandardOutputs(session) {
 }
 
 function validateFrozenRecipeSet(session) {
-  const expectedIds = FROST_CAPTURE_RECIPES.map(({ id }) => id);
+  const expectedIds = FROST_ALL_CAPTURE_RECIPES.map(({ id }) => id);
   const capturedIds = (session.hookResult?.captures ?? []).map(({ recipeId }) => recipeId);
   if (JSON.stringify(capturedIds) !== JSON.stringify(expectedIds)) {
     return `capture hook recipe set differs from the ${expectedIds.length}-recipe canonical order`;
@@ -125,7 +125,7 @@ export function evaluateFrostCaptureStatus({ session, expectedSourceHash, artifa
     }),
     provenClaims: Object.freeze(currentCapture ? [
       "native WebGPU renderer/device identity",
-      `${FROST_CAPTURE_RECIPES.length} transactionally isolated Frost correctness, coverage, and fixed-route recipes`,
+      `${FROST_ALL_CAPTURE_RECIPES.length} transactionally isolated Frost correctness, coverage, and fixed-route recipes`,
       "10 standard 1200x800 outputs from retained readbacks",
       "hash-bound four-source diagnostic mosaic",
       "camera, seed, temporal, and final/no-post difference gates",
