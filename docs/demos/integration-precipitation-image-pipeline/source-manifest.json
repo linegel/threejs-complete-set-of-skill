@@ -14,32 +14,35 @@
     "README.md"
   ],
   "sourceHashInputs": [
+    "labs/runtime/webgpu-device-identity.mjs",
     "README.md",
     "threejs-rain-snow-and-wet-surfaces/examples/integration-precipitation-image-pipeline",
     "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/precipitation-system.js",
     "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/weather-webgpu-lab.js"
   ],
   "browserEntry": "threejs-rain-snow-and-wet-surfaces/examples/integration-precipitation-image-pipeline/index.html",
-  "sourceHash": "sha256:5de5585573eafd9df333f25b0e7f13d31ae6254f4eb7bdadbc7c958040b58bdf",
+  "sourceHash": "sha256:57fa21726e6ecfd7df6177d4549b29665113ce326a03771ffd9aa4b71df5d40b",
   "publishedHashInputs": [
     "docs/demos/integration-precipitation-image-pipeline",
-    "docs/demos/assets/index-BY3iI31t.js",
+    "docs/demos/assets/index-CeCbRQns.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
     "docs/demos/assets/precipitation-system-CxUv8UiU.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js",
-    "docs/demos/assets/weather-webgpu-lab-DQhDQyfk.js"
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js",
+    "docs/demos/assets/weather-webgpu-lab-BuJ9tIWO.js",
+    "docs/demos/assets/webgpu-device-identity-uNUcs3Wh.js"
   ],
   "emittedAssetDependencies": [
-    "docs/demos/assets/index-BY3iI31t.js",
+    "docs/demos/assets/index-CeCbRQns.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
     "docs/demos/assets/precipitation-system-CxUv8UiU.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js",
-    "docs/demos/assets/weather-webgpu-lab-DQhDQyfk.js"
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js",
+    "docs/demos/assets/weather-webgpu-lab-BuJ9tIWO.js",
+    "docs/demos/assets/webgpu-device-identity-uNUcs3Wh.js"
   ],
-  "publishedBundleHash": "sha256:1d7ed951791ae44b7bc03817e02a662ea187e63e94a78590c8b6b4f42bb1a961",
+  "publishedBundleHash": "sha256:6e0616b2a87418535dcf18fc76b57f9bee64bee4a09760c3e6d2c067fb503c4e",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b",
+  "buildRevision": "sha256:302efdcae877cbedba44ae503a8dccaf081443a41c85f141b8b73cd6507e435e",
   "evidenceBundleId": null
 }

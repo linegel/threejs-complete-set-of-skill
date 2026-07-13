@@ -44,7 +44,8 @@ export async function captureLab(session) {
 
   await capture("final.design.png", { mode: "final", time: TEMPORAL_T0 });
   await capture("no-post.design.png", { mode: "host-scene-color", time: TEMPORAL_T0 });
-  await capture("diagnostics.mosaic.png", { mode: "owner-graph", time: TEMPORAL_T0 });
+  // owner-graph is a solid constant fill; frost-mask is the multi-color surface diagnostic.
+  await capture("diagnostics.mosaic.png", { mode: "frost-mask", time: TEMPORAL_T0 });
   await capture("camera.near.png", { camera: "near", time: TEMPORAL_T0 });
   await capture("camera.design.png", { camera: "design", time: TEMPORAL_T0 });
   await capture("camera.far.png", { camera: "far", time: TEMPORAL_T0 });
@@ -69,7 +70,7 @@ export async function captureLab(session) {
     schemaVersion: 2,
     acceptanceStatus: "incomplete",
     captures,
-    note: "Host temporal presentation readbacks. Frost/image-pipeline dependency accept and GPU timestamps remain incomplete.",
+    note: "Host temporal presentation readbacks (final/host-scene-color/frost-mask/surface-history). Dependency accepts and GPU timestamps remain incomplete.",
   };
 }
 

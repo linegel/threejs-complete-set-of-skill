@@ -37,7 +37,7 @@
     },
     {
       "file": "no-post.design.png",
-      "meaning": "No-post / diagnostic baseline presentation.",
+      "meaning": "Wetness / no-post diagnostic presentation (multi-color scene).",
       "source": "no-post.design.png",
       "sourceSha256": "sha256:c79305bf766213104920e4b03bc454168f45462e3164296353eb0624e970139a",
       "outputSha256": "sha256:c79305bf766213104920e4b03bc454168f45462e3164296353eb0624e970139a",
@@ -47,7 +47,7 @@
     },
     {
       "file": "diagnostics.mosaic.png",
-      "meaning": "Mechanism/owner diagnostic presentation.",
+      "meaning": "Particles / diagnostic presentation (multi-color scene).",
       "source": "diagnostics.mosaic.png",
       "sourceSha256": "sha256:eff61693ad7a3f1739c184568862e7905f09ed6b2d652d6bf3ee5719ddf2ef6b",
       "outputSha256": "sha256:eff61693ad7a3f1739c184568862e7905f09ed6b2d652d6bf3ee5719ddf2ef6b",

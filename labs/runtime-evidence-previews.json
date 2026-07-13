@@ -2,70 +2,6 @@
   "schemaVersion": 1,
   "previews": [
     {
-      "labId": "webgpu-pooled-effects",
-      "expectedAcceptanceStatus": "incomplete",
-      "artifactDirectory": "artifacts/visual-validation/webgpu-pooled-effects/correctness",
-      "backendProof": "renderer-info.json",
-      "claimVerdicts": "evidence-manifest.json",
-      "primaryImage": "final.design.png",
-      "primaryImageLabel": "Pooled effects final render-target readback",
-      "limitations": [
-        "Correctness capture wrote native-WebGPU presentation and mechanism readbacks including dense-swap and indirect-draw scenarios.",
-        "evidence-manifest schema remains incomplete relative to full v2 acceptance; lifecycleStability is FAIL and mechanism claims stay INSUFFICIENT_EVIDENCE.",
-        "GPU timestamp performance acceptance is not claimed from this bundle."
-      ],
-      "images": [
-        {
-          "source": "final.design.png",
-          "output": "final.design.png",
-          "encoding": "png-copy",
-          "meaning": "Final pooled-effects composite under the high tier."
-        },
-        {
-          "source": "no-post.design.png",
-          "output": "no-post.design.png",
-          "encoding": "png-copy",
-          "meaning": "No-post presentation baseline for the same route."
-        },
-        {
-          "source": "diagnostics.mosaic.png",
-          "output": "diagnostics.mosaic.png",
-          "encoding": "png-copy",
-          "meaning": "Diagnostic mosaic of emissive/bloom/normal channels."
-        },
-        {
-          "source": "mechanism.impact-sparks.png",
-          "output": "mechanism.impact-sparks.png",
-          "encoding": "png-copy",
-          "meaning": "Impact-sparks mechanism scenario readback."
-        },
-        {
-          "source": "mechanism.debris-dissolve.png",
-          "output": "mechanism.debris-dissolve.png",
-          "encoding": "png-copy",
-          "meaning": "Debris-dissolve mechanism scenario readback."
-        },
-        {
-          "source": "mechanism.gpu-pool-and-compaction.png",
-          "output": "mechanism.gpu-pool-and-compaction.png",
-          "encoding": "png-copy",
-          "meaning": "GPU pool and compaction mechanism scenario readback."
-        },
-        {
-          "source": "tier.ultra.png",
-          "output": "tier.ultra.png",
-          "encoding": "png-copy",
-          "meaning": "Ultra tier final frame."
-        },
-        {
-          "source": "tier.medium.png",
-          "output": "tier.medium.png",
-          "encoding": "png-copy",
-          "meaning": "Medium tier final frame."
-        }
-      ]
-    },
-    {
       "labId": "webgpu-quadtree-planet",
       "expectedAcceptanceStatus": "incomplete",
       "artifactDirectory": "artifacts/visual-validation/webgpu-quadtree-planet/correctness",
@@ -1045,6 +981,116 @@
           "output": "seed-9e3779b9.final.png",
           "encoding": "png-copy",
           "meaning": "Stress seed building variant."
+        }
+      ]
+    },
+    {
+      "labId": "procedural-district",
+      "expectedAcceptanceStatus": "incomplete",
+      "artifactDirectory": "artifacts/visual-validation/procedural-district/correctness",
+      "backendProof": "capture-session.json",
+      "claimVerdicts": "claim-verdicts.json",
+      "primaryImage": "final.design.png",
+      "primaryImageLabel": "Procedural district integration presentation",
+      "limitations": [
+        "Native WebGPU correctness capture includes standard presentation and tier presentation readbacks for the current source hash.",
+        "Nine primary dependency labs remain incomplete, so formal integration acceptance is blocked.",
+        "Field storage readback, lifecycle loop, and GPU timestamps remain INSUFFICIENT_EVIDENCE."
+      ],
+      "images": [
+        {
+          "source": "final.design.png",
+          "output": "final.design.png",
+          "encoding": "png-copy",
+          "meaning": "Final color-managed presentation readback."
+        },
+        {
+          "source": "no-post.design.png",
+          "output": "no-post.design.png",
+          "encoding": "png-copy",
+          "meaning": "No-post / diagnostic baseline presentation."
+        },
+        {
+          "source": "diagnostics.mosaic.png",
+          "output": "diagnostics.mosaic.png",
+          "encoding": "png-copy",
+          "meaning": "Mechanism/owner diagnostic presentation."
+        },
+        {
+          "source": "camera.near.png",
+          "output": "camera.near.png",
+          "encoding": "png-copy",
+          "meaning": "Near camera presentation."
+        },
+        {
+          "source": "camera.design.png",
+          "output": "camera.design.png",
+          "encoding": "png-copy",
+          "meaning": "Design camera presentation."
+        },
+        {
+          "source": "camera.far.png",
+          "output": "camera.far.png",
+          "encoding": "png-copy",
+          "meaning": "Far camera presentation."
+        },
+        {
+          "source": "seed-0001.final.png",
+          "output": "seed-0001.final.png",
+          "encoding": "png-copy",
+          "meaning": "Baseline seed presentation."
+        },
+        {
+          "source": "seed-9e3779b9.final.png",
+          "output": "seed-9e3779b9.final.png",
+          "encoding": "png-copy",
+          "meaning": "Stress seed presentation."
+        },
+        {
+          "source": "temporal.t000.png",
+          "output": "temporal.t000.png",
+          "encoding": "png-copy",
+          "meaning": "Temporal t=0 presentation."
+        },
+        {
+          "source": "temporal.t001.png",
+          "output": "temporal.t001.png",
+          "encoding": "png-copy",
+          "meaning": "Temporal t=1/60 presentation."
+        }
+      ]
+    },
+    {
+      "labId": "webgpu-bounded-water",
+      "expectedAcceptanceStatus": "incomplete",
+      "artifactDirectory": "artifacts/visual-validation/webgpu-bounded-water/correctness",
+      "backendProof": "capture-session.json",
+      "claimVerdicts": "claim-verdicts.json",
+      "primaryImage": "final.design.png",
+      "primaryImageLabel": "Bounded-water final readback",
+      "limitations": [
+        "Correctness capture records native r185 WebGPUBackend with device identity proof.",
+        "GPU timestamps, 50-cycle lifecycle, and full mechanism matrix remain incomplete.",
+        "Named-adapter performance compliance is NOT_CLAIMED."
+      ],
+      "images": [
+        {
+          "source": "final.design.png",
+          "output": "final.design.png",
+          "encoding": "png-copy",
+          "meaning": "Primary final readback."
+        },
+        {
+          "source": "no-post.design.png",
+          "output": "no-post.design.png",
+          "encoding": "png-copy",
+          "meaning": "No-post / alternate display path readback."
+        },
+        {
+          "source": "diagnostics.mosaic.png",
+          "output": "diagnostics.mosaic.png",
+          "encoding": "png-copy",
+          "meaning": "Diagnostics / mechanism display readback."
         }
       ]
     }

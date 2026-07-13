@@ -15,10 +15,11 @@ export const outputPlan = Object.freeze([
 
 const BASELINE_SEED = 0x00000001;
 const STRESS_SEED = 0x9e3779b9;
-// Weather diagnostics are black at t=0 after reset; warm long enough for
-// forcing/wetness/snowCoverage to light the presentation diagnostic path.
-const TEMPORAL_T0 = 1.0;
-const TEMPORAL_T1 = 1.0 + 1 / 60;
+// Weather must be advanced so wetness/particles are visible; pure t=0 after
+// reset is nearly empty. Use final-mode temporal pairs so frames are real
+// multi-color scene readbacks, not solid weather-diagnostic fills.
+const TEMPORAL_T0 = 2.0;
+const TEMPORAL_T1 = 2.0 + 1 / 60;
 
 async function select(session, {
   mode = "final",
@@ -43,17 +44,18 @@ export async function captureLab(session) {
   }
 
   await capture("final.design.png", { mode: "final", time: TEMPORAL_T0 });
-  // Owner-graph is a non-beauty diagnostic that remains non-blank.
-  await capture("no-post.design.png", { mode: "owner-graph", time: TEMPORAL_T0 });
-  // Warm weather-state (not cold reset) so the diagnostic channel is lit.
-  await capture("diagnostics.mosaic.png", { mode: "weather-state", time: TEMPORAL_T0 });
-  await capture("camera.near.png", { camera: "near", time: TEMPORAL_T0 });
-  await capture("camera.design.png", { camera: "design", time: TEMPORAL_T0 });
-  await capture("camera.far.png", { camera: "far", time: TEMPORAL_T0 });
-  await capture("seed-0001.final.png", { seed: BASELINE_SEED, time: TEMPORAL_T0 });
-  await capture("seed-9e3779b9.final.png", { seed: STRESS_SEED, time: TEMPORAL_T0 });
-  await capture("temporal.t000.png", { mode: "weather-state", time: TEMPORAL_T0 });
-  await capture("temporal.t001.png", { mode: "weather-state", time: TEMPORAL_T1 });
+  // Wetness shows real road geometry/material response (not a solid diagnostic fill).
+  await capture("no-post.design.png", { mode: "wetness", time: TEMPORAL_T0 });
+  // Particles mode is a multi-color scene diagnostic (rain/snow instances).
+  await capture("diagnostics.mosaic.png", { mode: "particles", time: TEMPORAL_T0 });
+  await capture("camera.near.png", { camera: "near", mode: "final", time: TEMPORAL_T0 });
+  await capture("camera.design.png", { camera: "design", mode: "final", time: TEMPORAL_T0 });
+  await capture("camera.far.png", { camera: "far", mode: "final", time: TEMPORAL_T0 });
+  await capture("seed-0001.final.png", { seed: BASELINE_SEED, mode: "final", time: TEMPORAL_T0 });
+  await capture("seed-9e3779b9.final.png", { seed: STRESS_SEED, mode: "final", time: TEMPORAL_T0 });
+  // Temporal pair: same final presentation at two times after weather has run.
+  await capture("temporal.t000.png", { mode: "final", time: TEMPORAL_T0 });
+  await capture("temporal.t001.png", { mode: "final", time: TEMPORAL_T1 });
 
   const locked = session.lockedState;
   if (locked) {
@@ -71,7 +73,7 @@ export async function captureLab(session) {
     schemaVersion: 2,
     acceptanceStatus: "incomplete",
     captures,
-    note: "Host-owned presentation readbacks. Dependency primaries and GPU timestamps remain incomplete.",
+    note: "Host-owned multi-color presentation readbacks (final/wetness/particles). Dependency primaries and GPU timestamps remain incomplete.",
   };
 }
 

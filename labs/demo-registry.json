@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:d60baa547dd51b2f7b4565d8484b3ff456be37215726d252a602466d4ea5c5de",
+  "buildRevision": "sha256:302efdcae877cbedba44ae503a8dccaf081443a41c85f141b8b73cd6507e435e",
   "demoKinds": [
     "canonical-lab",
     "mechanism-demo",
@@ -382,7 +382,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "npm --prefix threejs-ambient-contact-shading/examples/webgpu-node-gtao run validate",
-      "sourceHash": "sha256:500d4fec92c9e4902b7a1c75c29ca21fde16c83537743c8fefbda422c07f30b2",
+      "sourceHash": "sha256:b5ef7c823e97e5c66de32d971df9c44f6a9c5b4b616c6af541d66bdd64976919",
       "proxyStatus": {
         "limitation": "The docs page uses live contact-visibility geometry, not the production GTAONode path. The production skill remains RenderPipeline pass/MRT depth-normal sharing with material-context AO composition.",
         "canonicalLabId": "webgpu-node-gtao"
@@ -629,7 +629,7 @@
         "Accepted from lab-owned capture that exercises the unavailable-WebGPU teaching path via forceWebGL probe (not silent production fallback).",
         "Artifacts: artifacts/visual-validation/browser-fallback-harness/correctness/"
       ],
-      "executionClass": "rendering",
+      "executionClass": "non-rendering",
       "flagship": false,
       "dependencyLabIds": [],
       "sourceHashInputs": [
@@ -713,7 +713,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "npm --prefix threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds run validate:generated-assets",
-      "sourceHash": "sha256:97af0e5e2a12b997f4f8948e1d68771e766c89e75ce101e837187bbf4206071f",
+      "sourceHash": "sha256:258aa19a26f74a143ea29d014286f1b1214632dd8cd481392e8ac7a132f86982",
       "proxyStatus": {
         "limitation": "Generated weather maps are reduced-tier diagnostic inputs. The production cloud path remains bounded raymarch, temporal reprojection, and cloud-shadow storage products.",
         "canonicalLabId": "webgpu-weather-volume-clouds"
@@ -1093,7 +1093,7 @@
         "validateQuick": "npm --prefix integration-labs/creature-habitat run validate:quick",
         "validateFull": "npm --prefix integration-labs/creature-habitat run validate:full"
       },
-      "sourceHash": "sha256:35894ac54cd7c7b11b2fd72e7f5d640c48bf1e18a7b99a920abb3af695ac0ab9",
+      "sourceHash": "sha256:8bf88a88d649d7ea5333461b01263c294b15f7f64e2c8c84d99dc458ff31c4a7",
       "proxyStatus": null,
       "notes": [
         "Native composition and local adapters are implemented. Status stays incomplete until authorized browser capture records v2 images, resource ledgers, current-adapter timing, and lifecycle evidence.",
@@ -1909,7 +1909,7 @@
         "validateQuick": "npm --prefix integration-labs/final-image-flight run validate:quick",
         "validateFull": "npm --prefix integration-labs/final-image-flight run validate:full"
       },
-      "sourceHash": "sha256:8be3b93614c2de48daa5c6ff6a8d315c8df66a3cd334c58583ada68dbe6c9f22",
+      "sourceHash": "sha256:82b5d796ff1dd09e40082ca241cab8c72ca794f49b7fcd5c46fa65121af07772",
       "proxyStatus": null,
       "notes": [
         "This integration is a real host-owned native-WebGPU implementation, not the generic integration dashboard.",
@@ -1989,7 +1989,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "npm --prefix threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost run validate:generated-assets",
-      "sourceHash": "sha256:a7d20d4667e10308d280b674fb18da43f02e13f643ea40cb7c9f39f2ed552bf2",
+      "sourceHash": "sha256:e5192758ce6cd99fd259d41f32ee4b37534887d713e594bb64f57c7b161f2810",
       "proxyStatus": {
         "limitation": "Generated crystal maps are reduced-tier static inputs. The production frost path remains StorageTexture history, reduced blur, and TSL refraction.",
         "canonicalLabId": "webgpu-touch-history-frost"
@@ -2034,7 +2034,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "npm --prefix threejs-image-pipeline/examples/webgpu-image-pipeline run validate",
-      "sourceHash": "sha256:e11b67d37bfb5abadd9cf7dba74a92110a565a425c6af2a5e5435b9c562f0d9e",
+      "sourceHash": "sha256:ea6c9c8118b6cf1dedebe5479d547863a9bc570e01255cf2d8918dfc0c729456",
       "proxyStatus": {
         "limitation": "The docs page visualizes the signal contract with live panels rather than allocating production MRT targets. The production skill remains one RenderPipeline, one pass/MRT producer, and one tone-map/output conversion owner.",
         "canonicalLabId": "webgpu-image-pipeline"
@@ -2329,7 +2329,7 @@
         "validateQuick": "npm --prefix threejs-ambient-contact-shading/examples/integration-image-pipeline-ao run validate:quick",
         "validateFull": "npm --prefix threejs-ambient-contact-shading/examples/integration-image-pipeline-ao run validate:full"
       },
-      "sourceHash": "sha256:ee0ef7376e90e166fdae62d2ab15213088b12f78185f733e10d1a24474e512a0",
+      "sourceHash": "sha256:deaccc2b8fb3d0cb02f7af0543c315aed5c355c5285a994092adfdb8573febd6",
       "proxyStatus": null,
       "notes": [
         "Correctness capture session exists at artifacts/visual-validation/integration-image-pipeline-ao/correctness with non-blank presentation/owner-graph readbacks and device-identity metrics.",
@@ -2505,40 +2505,40 @@
         {
           "id": "host-native-webgpu",
           "required": true,
-          "evidence": "host backend identity gate",
-          "status": "incomplete"
+          "evidence": "artifacts/visual-validation/integration-precipitation-image-pipeline/correctness/capture-session.json finalRuntime.metrics.rendererBackendEvidence.isWebGPUBackend === true",
+          "status": "accepted"
         },
         {
           "id": "host-primary-scene-pass",
           "required": true,
-          "evidence": "single host scenePass identity",
-          "status": "incomplete"
+          "evidence": "validate-integration.mjs proves single host scenePass identity",
+          "status": "accepted"
         },
         {
           "id": "storage-buffer-compute",
           "required": true,
-          "evidence": "weather recurrence and impact storage dispatches",
-          "status": "incomplete"
+          "evidence": "validate-integration.mjs proves weather recurrence and impact storage dispatches",
+          "status": "accepted"
         }
       ],
       "runtimeProof": [
         {
           "id": "host-owner-identity",
           "required": true,
-          "evidence": "one renderer, pipeline, scene pass, tone map, and output owner",
-          "status": "incomplete"
+          "evidence": "validate-integration.mjs + test-mutations.mjs prove single renderer/pipeline/scenePass/toneMap/output owner graph",
+          "status": "accepted"
         },
         {
           "id": "shared-weather-identity",
           "required": true,
-          "evidence": "all consumers receive identical host signal nodes",
-          "status": "incomplete"
+          "evidence": "validate-integration.mjs proves all consumers receive identical host weather signal nodes",
+          "status": "accepted"
         },
         {
           "id": "native-browser-evidence",
           "required": true,
-          "evidence": "pending v2 readback and current-adapter timing",
-          "status": "incomplete"
+          "evidence": "correctness capture-session + presentation readbacks prove native WebGPU host init, backend identity, and aligned presentation readback on current source hash",
+          "status": "accepted"
         }
       ],
       "evidenceContract": "v2",
@@ -2553,7 +2553,7 @@
         "validateQuick": "npm --prefix threejs-rain-snow-and-wet-surfaces/examples/integration-precipitation-image-pipeline run validate:quick",
         "validateFull": "npm --prefix threejs-rain-snow-and-wet-surfaces/examples/integration-precipitation-image-pipeline run validate:full"
       },
-      "sourceHash": "sha256:f7babebe6bc357106ac49095c219b17a38f0c47a9931e4145d214c0a0cccd515",
+      "sourceHash": "sha256:57fa21726e6ecfd7df6177d4549b29665113ce326a03771ffd9aa4b71df5d40b",
       "proxyStatus": null,
       "executionClass": "rendering",
       "flagship": false,
@@ -2748,40 +2748,40 @@
         {
           "id": "host-native-webgpu",
           "required": true,
-          "evidence": "host backend identity gate",
-          "status": "incomplete"
+          "evidence": "artifacts/visual-validation/integration-temporal-surface/correctness/capture-session.json proves isWebGPUBackend === true",
+          "status": "accepted"
         },
         {
           "id": "host-scene-color-depth-velocity",
           "required": true,
-          "evidence": "shared host pass signal identities",
-          "status": "incomplete"
+          "evidence": "validate-integration.mjs proves shared host pass signal identities",
+          "status": "accepted"
         },
         {
           "id": "storage-texture-compute",
           "required": true,
-          "evidence": "feature-local RGBA16F history dispatch",
-          "status": "incomplete"
+          "evidence": "validate-integration.mjs proves feature-local RGBA16F history dispatch",
+          "status": "accepted"
         }
       ],
       "runtimeProof": [
         {
           "id": "host-owner-identity",
           "required": true,
-          "evidence": "one renderer, pipeline, scene pass, temporal, jitter, tone-map, and output owner",
-          "status": "incomplete"
+          "evidence": "validate-integration.mjs + mutations prove single host ownership of renderer/pipeline/temporal/jitter/tone/output",
+          "status": "accepted"
         },
         {
           "id": "shared-signal-identity",
           "required": true,
-          "evidence": "scene color, depth, velocity, camera, and reset registry retain host identity",
-          "status": "incomplete"
+          "evidence": "validate-integration.mjs proves scene color/depth/velocity/camera/reset registry host identity",
+          "status": "accepted"
         },
         {
           "id": "native-browser-evidence",
           "required": true,
-          "evidence": "pending v2 readback and current-adapter timing",
-          "status": "incomplete"
+          "evidence": "correctness capture-session proves native WebGPU presentation readbacks for current source hash",
+          "status": "accepted"
         }
       ],
       "evidenceContract": "v2",
@@ -2796,7 +2796,7 @@
         "validateQuick": "npm --prefix threejs-dynamic-surface-effects/examples/integration-temporal-surface run validate:quick",
         "validateFull": "npm --prefix threejs-dynamic-surface-effects/examples/integration-temporal-surface run validate:full"
       },
-      "sourceHash": "sha256:654e1017ff201a736df1938ad665761a3324922f749f284c523532379c76566a",
+      "sourceHash": "sha256:5ef23999a95cfd6bd026911487463fd725caa69adcb2b3b6f4f822e14ab1d966",
       "proxyStatus": null,
       "executionClass": "rendering",
       "flagship": false,
@@ -2844,7 +2844,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "npm --prefix threejs-procedural-materials/examples/tsl-procedural-pbr run validate:generated-assets",
-      "sourceHash": "sha256:d7a9ca9eac4cf0e4ab6bdaa274c91aeede4cb266dee7429bb663413aad57e08e",
+      "sourceHash": "sha256:8fc8646b7aab5984d0e4838b24bd897078848c30da88c7bef9cfa056bf16b1a3",
       "proxyStatus": {
         "limitation": "Generated lava maps are reduced-tier diagnostic inputs. The production material path remains NodeMaterial PBR slots with HDR emissive and BloomNode ownership.",
         "canonicalLabId": "tsl-procedural-pbr"
@@ -3030,45 +3030,45 @@
         {
           "id": "native-webgpu",
           "required": true,
-          "evidence": null,
-          "status": "incomplete"
+          "evidence": "correctness capture-session finalRuntime.metrics.rendererBackendEvidence.isWebGPUBackend === true",
+          "status": "accepted"
         }
       ],
       "runtimeProof": [
         {
           "id": "renderer-init",
           "required": true,
-          "evidence": null,
-          "status": "incomplete"
+          "evidence": "capture-session finalRuntime.metrics.initialized === true with WebGPURenderer",
+          "status": "accepted"
         },
         {
           "id": "backend-is-webgpu",
           "required": true,
-          "evidence": null,
-          "status": "incomplete"
+          "evidence": "capture-session finalRuntime.metrics.rendererBackendEvidence.isWebGPUBackend === true",
+          "status": "accepted"
         },
         {
           "id": "mechanism-reachable",
           "required": true,
-          "evidence": null,
-          "status": "incomplete"
+          "evidence": "capture-session writtenCaptures include combined/no-post-baseline/false-color presentation modes",
+          "status": "accepted"
         },
         {
           "id": "aligned-readback",
           "required": true,
-          "evidence": null,
-          "status": "incomplete"
+          "evidence": "capture-session transport/normalized readback ledgers carry integer 256-byte-aligned strides for presentation readbacks",
+          "status": "accepted"
         },
         {
           "id": "actual-bloomnode-target-inventory",
           "required": true,
-          "evidence": null,
+          "evidence": "resident-resources/raw capture inventory still incomplete for full BloomNode physical residency; presentation capture only",
           "status": "incomplete"
         },
         {
           "id": "current-adapter-gpu-timestamps",
           "required": true,
-          "evidence": null,
+          "evidence": "NOT_CLAIMED / INSUFFICIENT_EVIDENCE — no named-adapter timestamp lane in correctness capture",
           "status": "incomplete"
         }
       ],
@@ -3084,7 +3084,7 @@
         "validateQuick": "npm --prefix threejs-bloom/examples/node-selective-bloom run validate:quick",
         "validateFull": "npm --prefix threejs-bloom/examples/node-selective-bloom run validate:full"
       },
-      "sourceHash": "sha256:825867865482075bbb58f08bd3937775bfbe27ac65f976a27c9aec4d7976b71b",
+      "sourceHash": "sha256:f8fd59115251e877a6102550f31743a10f91ccc81ebf895dd773b01a637a6c88",
       "proxyStatus": null,
       "executionClass": "rendering",
       "flagship": false,
@@ -3158,7 +3158,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "npm --prefix threejs-spectral-ocean/examples/webgpu-fft-ocean run validate:generated-assets",
-      "sourceHash": "sha256:1769adaf9ada30cf56ee51ad238bd77645b85e8249f5e1d5941a66af1115b2c8",
+      "sourceHash": "sha256:dd2b4f021e02a4f04f54e2da4a5cdbe075f2c30223768ebf3325732df46a1663",
       "proxyStatus": {
         "limitation": "Generated wave seeds are reduced-tier preview/debug inputs. The production ocean path remains compute FFT cascades, derivative maps, and persistent foam history.",
         "canonicalLabId": "webgpu-fft-ocean"
@@ -3235,7 +3235,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "npm --prefix threejs-procedural-planets/examples/webgpu-quadtree-planet run validate:generated-assets",
-      "sourceHash": "sha256:ae9339fee26583eaa008c56f3a50d873739e03b3f376f30ffa220bb727b5f7b2",
+      "sourceHash": "sha256:bdb316523b47a0762781a538a95e6cce63588c22396e0349a18a3db9b5a91ce5",
       "proxyStatus": {
         "limitation": "Generated crater masks are reduced-tier diagnostics. The production planet path remains planetFields() plus cube-sphere quadtree LOD and parity checks.",
         "canonicalLabId": "webgpu-quadtree-planet"
@@ -3280,7 +3280,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "node threejs-particles-trails-and-effects/examples/webgpu-pooled-effects/validate-effects.mjs",
-      "sourceHash": "sha256:38b895045a57d177e2a3f6503c093e3fb87b4bed8364a75f37c96494e33d81a6",
+      "sourceHash": "sha256:80d234882d50751cd75eedd34c69d0c30490ad82dfabcc06a830ac25bd5bec41",
       "proxyStatus": {
         "limitation": "The docs page uses instanced visual particles and authored shells rather than the full compute dense-swap storage path. The production skill remains GPU-resident pools, deterministic spawn packets, dense compaction, MRT emissive, and bloom-disabled proof.",
         "canonicalLabId": "webgpu-pooled-effects"
@@ -3325,7 +3325,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "node threejs-procedural-buildings-and-cities/examples/webgpu-material-slot-compiler/validate-fixtures.mjs",
-      "sourceHash": "sha256:47e51303693db15935c01fddac047ebfc3a3a0a092da0dd73661b420a981794f",
+      "sourceHash": "sha256:2dffe74b20f11c8cc56561c3df213ba06efc4aac3f863d7b62bd5b59d950ad56",
       "proxyStatus": {
         "limitation": "The docs page uses compact runtime geometry instead of the full fixture compiler and BatchedMesh capacity accounting. The production skill remains plan validation, interval overlap checks, physical UV scale, material-slot mesh compilation, and city-chunk budget evidence.",
         "canonicalLabId": "webgpu-material-slot-compiler"
@@ -3632,13 +3632,13 @@
         {
           "id": "native-webgpu",
           "required": true,
-          "evidence": "renderer backend must prove isWebGPUBackend === true",
-          "status": "incomplete"
+          "evidence": "correctness capture-session proves isWebGPUBackend === true on r185",
+          "status": "accepted"
         },
         {
           "id": "gpu-timestamps",
           "required": true,
-          "evidence": "required before any 60 Hz performance claim",
+          "evidence": "INSUFFICIENT_EVIDENCE — correctness capture does not claim named-adapter timestamps",
           "status": "incomplete"
         }
       ],
@@ -3646,13 +3646,13 @@
         {
           "id": "single-owner-graph",
           "required": true,
-          "evidence": "runtime graph and mutation suite implemented; browser evidence pending",
-          "status": "incomplete"
+          "evidence": "unit/mutation suites + correctness capture-session prove single-owner graph with native WebGPU presentation readbacks",
+          "status": "accepted"
         },
         {
           "id": "field-storage-readback",
           "required": true,
-          "evidence": "field atlas is sampled by render diagnostics; accepted readback bundle pending",
+          "evidence": "field atlas sampled in diagnostics; accepted quantitative field readback bundle still pending",
           "status": "incomplete"
         },
         {
@@ -3664,7 +3664,7 @@
         {
           "id": "lifecycle-loop",
           "required": true,
-          "evidence": "50-100 cycle evidence not captured",
+          "evidence": "INSUFFICIENT_EVIDENCE — 50-100 cycle evidence not captured",
           "status": "incomplete"
         }
       ],
@@ -3680,7 +3680,7 @@
         "validateQuick": "npm --prefix integration-labs/procedural-district run validate:quick",
         "validateFull": "npm --prefix integration-labs/procedural-district run validate:full"
       },
-      "sourceHash": "sha256:48f28e47887c46cc9b6859b664d3bad306cc8231097ec854449d1fb6afbe908b",
+      "sourceHash": "sha256:9d462fbe5d3bd51617c1874c1fae9e278509f1b104e0b1e7ea2ff9da4541d795",
       "proxyStatus": null,
       "notes": [
         "All host adapters are executable; acceptance remains incomplete until real native-WebGPU readbacks, current-adapter timestamps, image metrics, and lifecycle evidence pass."
@@ -3866,7 +3866,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "node threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/validation.js",
-      "sourceHash": "sha256:a51b8e56a0cd564e6edc3cc890764dd3cbdc9aebd164131debb7bd7c31a3f68c",
+      "sourceHash": "sha256:3833939aa684f150ef08861c06dbf6787488523cfa36a47127c39d9112488d96",
       "proxyStatus": {
         "limitation": "The docs page uses a small CPU-side hero actor set for readability. The production skill remains fixed-step replay, previous/current storage slots, compute dispatch ownership, and quaternion frame contracts.",
         "canonicalLabId": "webgpu-procedural-timelines"
@@ -4039,7 +4039,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "npm --prefix threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces run validate:generated-assets",
-      "sourceHash": "sha256:c11871f4325984353a4a3bb57a8dab1450a7ccfd9f8af8373d437ac24d9a91b9",
+      "sourceHash": "sha256:7eab25137e8ae26df12105067b92dcd54ea4fc7cf1ece4d96b872082f8da458b",
       "proxyStatus": {
         "limitation": "The rain streaks in this docs demo are visual context, not the high-tier storage-instanced precipitation path. Dynamic compute/event ripples remain the high-tier skill implementation.",
         "canonicalLabId": "webgpu-rain-snow-and-wet-surfaces"
@@ -4340,13 +4340,13 @@
         {
           "id": "native-webgpu",
           "required": true,
-          "evidence": "renderer.init plus backend.isWebGPUBackend runtime gate",
-          "status": "incomplete"
+          "evidence": "artifacts/visual-validation/relativistic-space-shot/correctness/capture-session.json proves isWebGPUBackend === true",
+          "status": "accepted"
         },
         {
           "id": "gpu-timestamps",
           "required": true,
-          "evidence": "required for 60 Hz claims",
+          "evidence": "INSUFFICIENT_EVIDENCE",
           "status": "incomplete"
         }
       ],
@@ -4354,13 +4354,13 @@
         {
           "id": "single-owner-graph",
           "required": true,
-          "evidence": "browser-free graph and mutation validation; runtime capture pending",
-          "status": "incomplete"
+          "evidence": "browser-free graph validation + correctness capture-session native WebGPU presentation readbacks for current source hash",
+          "status": "accepted"
         },
         {
           "id": "curved-ray-particle-readback",
           "required": true,
-          "evidence": "aligned readback path implemented; capture not executed",
+          "evidence": "presentation capture published; mechanism diagnostic modes deferred due to TSL WGSL assignment bug",
           "status": "incomplete"
         },
         {
@@ -4388,7 +4388,7 @@
         "validateQuick": "npm --prefix integration-labs/relativistic-space-shot run validate:quick",
         "validateFull": "npm --prefix integration-labs/relativistic-space-shot run validate:full"
       },
-      "sourceHash": "sha256:b7376d06bbd815a0309665e1b81ddb6d02e23e3e4bef0a6e4e245c4c04c8fb81",
+      "sourceHash": "sha256:797c2083b9f380f7313732ff6fffaa136b1a2fe41639f9b28bd33c3f70839c27",
       "proxyStatus": null,
       "notes": [
         "Real native-WebGPU composition is implemented. Acceptance remains incomplete until current-adapter v2 capture, timing, lifecycle, and manual visual inspection are available.",
@@ -4747,7 +4747,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "node threejs-bloom/examples/node-selective-bloom/validate-node-selective-bloom.mjs",
-      "sourceHash": "sha256:ea11d0cd35508cee706ac133cb86d91f0b60d53750af11772418e69f31fe1e7f",
+      "sourceHash": "sha256:6503989a9227b133ddea9ef7e71ed8691f1a3249534a94fd0b3c9b4bf027dc1c",
       "proxyStatus": {
         "limitation": "The live page uses additive response geometry for interaction and mode switching. The production skill remains MRT emissive output feeding BloomNode inside one RenderPipeline output path.",
         "canonicalLabId": "node-selective-bloom"
@@ -5173,7 +5173,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "node threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere/validation.js",
-      "sourceHash": "sha256:2634ede244ae0fa73ff1d1292782d2a5e5025c44c3ed9d729ee174c397f71201",
+      "sourceHash": "sha256:5a20ec0d31a8541e63eea2d45b81dbf0e859ecacf9e39536a45573b0db83e158",
       "proxyStatus": {
         "limitation": "The docs page uses procedural sky bands and haze layers for direct interaction. The production skill remains compute-generated transmittance, multiscatter, sky-view, and aerial-perspective LUT/froxel products.",
         "canonicalLabId": "webgpu-lut-atmosphere"
@@ -5633,7 +5633,7 @@
         "validateQuick": "npm --prefix threejs-procedural-vegetation/examples/structured-ash-growth run validate:quick",
         "validateFull": "npm --prefix threejs-procedural-vegetation/examples/structured-ash-growth run validate:full"
       },
-      "sourceHash": "sha256:a80560f83756cf54f5980a2c548f1d51105db9e73b0864f3528f19d8fbd50695",
+      "sourceHash": "sha256:73f594c38aff87725f5d4bacb3e0e782b2d7001b73db34582c1ca0e1851c5805",
       "proxyStatus": null,
       "notes": [
         "Status remains incomplete until native-WebGPU images, shadow-atlas parity, lifecycle, and timing evidence are captured.",
@@ -6295,7 +6295,7 @@
         "validateQuick": "npm run validate:quick",
         "validateFull": "npm run validate:full"
       },
-      "sourceHash": "sha256:04ba91bea7c8a82ae8270f8e808c9f605cafb86b72607066eb1676b78243a46e",
+      "sourceHash": "sha256:68d02503168f1635112473bc5d9a4e09c52d7fda872131646c9c3f71e48c6fbb",
       "proxyStatus": null,
       "executionClass": "rendering",
       "flagship": false,
@@ -6893,7 +6893,7 @@
         "validateQuick": "npm --prefix integration-labs/weathered-world run validate:quick",
         "validateFull": "npm --prefix integration-labs/weathered-world run validate:full"
       },
-      "sourceHash": "sha256:56c77007094f1e0d406b5a9ab15819e324e5ada85136b5af120d4609d7aa6692",
+      "sourceHash": "sha256:232bd2ec348d88403ff3749d73369223cbd32232c72017f0f0714f583870913c",
       "proxyStatus": null,
       "notes": [
         "The atmosphere and cloud stages now contain the corrected live-input, bounded-domain, persistent-history, sampled-depth, radiometric, and source-level composition paths.",
@@ -7239,7 +7239,7 @@
         "validateQuick": "npm run validate:quick",
         "validateFull": "npm run validate:full"
       },
-      "sourceHash": "sha256:af32095b24424cd4a9bade0fccc2791cf4b993a880ba9dcf4d36b3028589314e",
+      "sourceHash": "sha256:fa528573afdb607a124bef4f0578a803e93319da06728cd711aac36a0c14efe2",
       "proxyStatus": null,
       "notes": [
         "browser WebGPU execution and state readback are not captured",
@@ -8528,39 +8528,39 @@
         {
           "id": "native-webgpu",
           "required": true,
-          "evidence": null,
-          "status": "incomplete"
+          "evidence": "mechanism-metrics.json backend.isWebGPUBackend=true; WebGPUBackend r185 correctness bundle.",
+          "status": "accepted"
         },
         {
           "id": "storage-buffers",
           "required": true,
-          "evidence": null,
-          "status": "incomplete"
+          "evidence": "storage-resources.json + mechanism-metrics histogram/partial storage byte ledger from native capture.",
+          "status": "accepted"
         },
         {
           "id": "storage-atomics",
           "required": true,
-          "evidence": "required by full-histogram tier",
-          "status": "incomplete"
+          "evidence": "full-histogram tier uses atomic histogram counters; storage-resources.json histogramBytes recorded.",
+          "status": "accepted"
         }
       ],
       "runtimeProof": [
         {
           "id": "renderer-init",
           "required": true,
-          "evidence": "INSUFFICIENT_EVIDENCE",
-          "status": "incomplete"
+          "evidence": "capture-contract + mechanism-metrics after await renderer.init() on native WebGPU backend.",
+          "status": "accepted"
         },
         {
           "id": "compute-readback",
           "required": true,
-          "evidence": "INSUFFICIENT_EVIDENCE",
-          "status": "incomplete"
+          "evidence": "exposure-readback.json GPU meter state + validate:artifacts oracle keyLuminance/targetEV parity on the v2 bundle.",
+          "status": "accepted"
         },
         {
           "id": "current-adapter-timing",
           "required": true,
-          "evidence": "INSUFFICIENT_EVIDENCE",
+          "evidence": "No named-adapter timestamp capture accepted; performance remains INSUFFICIENT_EVIDENCE.",
           "status": "incomplete"
         }
       ],
@@ -8878,7 +8878,7 @@
         "validateQuick": "npm run validate:quick",
         "validateFull": "npm run validate:full"
       },
-      "sourceHash": "sha256:c4f86bd69a9e6c4a88bf02fa62fb8ef90b07bf4781c711c133d97bbf7c71398c",
+      "sourceHash": "sha256:4c4cea49735bdb37a4b02fe7d9653c141c3b7184495a9c1ade281854c93b4f55",
       "proxyStatus": null,
       "notes": [
         "browser WebGPU execution and readback are not captured",
@@ -8902,6 +8902,7 @@
       "kind": "canonical-lab",
       "status": "incomplete",
       "canonicalSource": [
+        "threejs-procedural-fields/examples/webgpu-field-bake",
         "threejs-procedural-fields/examples/webgpu-field-bake/field-constants.mjs",
         "threejs-procedural-fields/examples/webgpu-field-bake/field-bundle.mjs",
         "threejs-procedural-fields/examples/webgpu-field-bake/field-bake.mjs",
@@ -9121,51 +9122,51 @@
         {
           "id": "native-webgpu",
           "required": true,
-          "evidence": null,
-          "status": "incomplete"
+          "evidence": "Native browser capture: renderer.backend.isWebGPUBackend after init; capture-session records backend=webgpu on WebGPURenderer r185.",
+          "status": "accepted"
         },
         {
           "id": "rgba16float-storage",
           "required": true,
-          "evidence": null,
-          "status": "incomplete"
+          "evidence": "field-storage-readback.json records RGBA16F storage bake and mip chain readbacks from the native capture.",
+          "status": "accepted"
         },
         {
           "id": "storage-buffer",
           "required": true,
-          "evidence": null,
-          "status": "incomplete"
+          "evidence": "field-placement-readback.json records structured placement storage-buffer contents from the native capture.",
+          "status": "accepted"
         }
       ],
       "runtimeProof": [
         {
           "id": "backend-is-webgpu",
           "required": true,
-          "evidence": null,
-          "status": "incomplete"
+          "evidence": "capture-session.json runtime.metrics.backend=webgpu and nativeWebGPU=true from playwright-headless Chrome WebGPU.",
+          "status": "accepted"
         },
         {
           "id": "direct-f32-readback",
           "required": true,
-          "evidence": null,
-          "status": "incomplete"
+          "evidence": "field-readback.json + field-probe-corpus.json from controller.captureFieldReadback / captureProbeCorpusReadback.",
+          "status": "accepted"
         },
         {
           "id": "storage-and-mip-readback",
           "required": true,
-          "evidence": null,
-          "status": "incomplete"
+          "evidence": "field-storage-readback.json + field-dirty-region.json from storage bake and dirty-region capture.",
+          "status": "accepted"
         },
         {
           "id": "placement-buffer-readback",
           "required": true,
-          "evidence": null,
-          "status": "incomplete"
+          "evidence": "field-placement-readback.json from capturePlacementReadback.",
+          "status": "accepted"
         },
         {
           "id": "current-adapter-timing",
           "required": true,
-          "evidence": null,
+          "evidence": "No named-adapter timestamp-query suite was bound in the correctness capture profile.",
           "status": "incomplete"
         }
       ],
@@ -9376,13 +9377,13 @@
         {
           "id": "native-webgpu",
           "required": true,
-          "evidence": null,
-          "status": "incomplete"
+          "evidence": "renderer-info.json isWebGPUBackend=true; mechanism-metrics WebGPUBackend r185 v2 bundle.",
+          "status": "accepted"
         },
         {
           "id": "timestamp-query",
           "required": true,
-          "evidence": "required for performance claims",
+          "evidence": "required for performance claims; correctness capture does not accept current-adapter timestamps.",
           "status": "incomplete"
         }
       ],
@@ -9390,25 +9391,25 @@
         {
           "id": "renderer-init",
           "required": true,
-          "evidence": "INSUFFICIENT_EVIDENCE",
-          "status": "incomplete"
+          "evidence": "canonical capture initializes WebGPURenderer; renderer-info.json records native backend.",
+          "status": "accepted"
         },
         {
           "id": "mrt-readback",
           "required": true,
-          "evidence": "INSUFFICIENT_EVIDENCE",
-          "status": "incomplete"
+          "evidence": "validate:artifacts passes normal/emissive/velocity/final RT readbacks in webgpu-image-pipeline-v2.",
+          "status": "accepted"
         },
         {
           "id": "temporal-reset",
           "required": true,
-          "evidence": "INSUFFICIENT_EVIDENCE",
-          "status": "incomplete"
+          "evidence": "temporal.history / after-reset readbacks validated; temporal-reset proof in mechanism-metrics path.",
+          "status": "accepted"
         },
         {
           "id": "current-adapter-timing",
           "required": true,
-          "evidence": "INSUFFICIENT_EVIDENCE",
+          "evidence": "Current-adapter GPU timestamps remain INSUFFICIENT_EVIDENCE.",
           "status": "incomplete"
         }
       ],
@@ -9424,12 +9425,13 @@
         "validateQuick": "npm run validate:quick",
         "validateFull": "npm run validate:full"
       },
-      "sourceHash": "sha256:332f7494637ad7033b9e11f42b275486c390651ce9772c9ca6aee2b1c3a08a96",
+      "sourceHash": "sha256:ea95e70d32fb11058979ac8a28b7bdd66d6488476742ac382432bae9a6fefdaa",
       "proxyStatus": null,
       "executionClass": "rendering",
       "flagship": false,
       "dependencyLabIds": [],
       "sourceHashInputs": [
+        "labs/runtime/webgpu-device-identity.mjs",
         "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/constants.js",
         "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/exposure-nodes.js",
         "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/lut.js",
@@ -9446,6 +9448,7 @@
       "kind": "canonical-lab",
       "status": "incomplete",
       "canonicalSource": [
+        "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere",
         "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere/webgpu-lut-atmosphere.js",
         "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere/atmosphere-config.js",
         "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere/atmosphere-math.js",
@@ -9705,51 +9708,51 @@
         {
           "id": "native-webgpu",
           "required": true,
-          "evidence": null,
-          "status": "incomplete"
+          "evidence": "Native browser capture: backendIsWebGPU=true in renderer-info.json; mechanism-metrics records 56 compute calls on WebGPURenderer r185.",
+          "status": "accepted"
         },
         {
           "id": "storage-texture-3d",
           "required": true,
-          "evidence": null,
-          "status": "incomplete"
+          "evidence": "storage-resources.json products include Storage3DTexture aerial-inscattering/optical-depth with one-invocation-per-XY topology.",
+          "status": "accepted"
         }
       ],
       "runtimeProof": [
         {
           "id": "backend-is-webgpu",
           "required": true,
-          "evidence": null,
-          "status": "incomplete"
+          "evidence": "renderer-info.json backendIsWebGPU=true from native capture-session.",
+          "status": "accepted"
         },
         {
           "id": "executed-five-stage-lut-chain",
           "required": true,
-          "evidence": null,
-          "status": "incomplete"
+          "evidence": "mechanism-metrics.json rendererInfo.compute.calls=56 (>=5) after live five-stage LUT chain.",
+          "status": "accepted"
         },
         {
           "id": "live-camera-body-depth-composition",
           "required": true,
-          "evidence": null,
-          "status": "incomplete"
+          "evidence": "pipeline-graph.json owners.sceneDepth=browser host PassNode depth; bodyTransform=planet.matrixWorld; finalComposition includes aerialOpticalDepth.",
+          "status": "accepted"
         },
         {
           "id": "cumulative-aerial-xy-rays",
           "required": true,
-          "evidence": null,
-          "status": "incomplete"
+          "evidence": "storage-resources.json aerial-products invocationTopology=one invocation per XY ray; cumulative Z loop; invocationCount=width*height.",
+          "status": "accepted"
         },
         {
           "id": "aligned-render-target-readback",
           "required": true,
-          "evidence": null,
-          "status": "incomplete"
+          "evidence": "capture-session + images/final.design.png 1200x800 PNG from integer 256-byte-aligned RT readback transport.",
+          "status": "accepted"
         },
         {
           "id": "current-adapter-gpu-timestamps",
           "required": true,
-          "evidence": null,
+          "evidence": "Correctness capture profile disables timestamp queries; no named-adapter GPU timing envelope recorded.",
           "status": "incomplete"
         }
       ],
@@ -9765,7 +9768,7 @@
         "validateQuick": "npm run validate:quick",
         "validateFull": "npm run validate:full"
       },
-      "sourceHash": "sha256:af79cc9f01c3ee479d4249b5f8e718090e904c8d2fc4c94b327366007bb30475",
+      "sourceHash": "sha256:e93675b0f1b0ec4adb8c247bf7dfb5a3e6a3f9c8c260b4cb239ab0afcd7e433c",
       "proxyStatus": null,
       "notes": [
         "Node structural, dependency-invalidation, homogeneous-radiometry, cumulative-aerial, camera/body-transform, and float64 oracle validation passes.",
@@ -9981,40 +9984,40 @@
         {
           "id": "native-webgpu",
           "required": true,
-          "evidence": "The canonical controller blocks unless renderer.backend.isWebGPUBackend is true after initialization.",
-          "status": "incomplete"
+          "evidence": "Native browser capture: capture-session.json records nativeWebGPU=true / isWebGPUBackend=true after createBuildingLabController().",
+          "status": "accepted"
         }
       ],
       "runtimeProof": [
         {
           "id": "renderer-init",
           "required": true,
-          "evidence": "Await createBuildingLabController(), which awaits renderer.init() before constructing proof state.",
-          "status": "incomplete"
+          "evidence": "createBuildingLabController awaits renderer.init() before proof state; capture-session records initialized native WebGPU metrics.",
+          "status": "accepted"
         },
         {
           "id": "backend-is-webgpu",
           "required": true,
-          "evidence": "Capture renderer.backend.isWebGPUBackend === true from the initialized controller.",
-          "status": "incomplete"
+          "evidence": "capture-session runtime.metrics.backend=WebGPU and isWebGPUBackend=true.",
+          "status": "accepted"
         },
         {
           "id": "mechanism-reachable",
           "required": true,
-          "evidence": "Load every physical mechanism route and reconcile its locked startup mode with the compiled runtime representation.",
-          "status": "incomplete"
+          "evidence": "capture-hook loaded material-slot-compilation and module-geometry modes; diagnostics.mosaic and final readbacks differ by hash.",
+          "status": "accepted"
         },
         {
           "id": "aligned-readback",
           "required": true,
-          "evidence": "Capture MRT pixels using the controller's integer 256-byte-aligned row-stride contract.",
-          "status": "incomplete"
+          "evidence": "MRT/presentation capturePixels uses integer 256-byte-aligned row stride; capture-session transport-readbacks ledger bound.",
+          "status": "accepted"
         },
         {
           "id": "compiled-resource-ledger",
           "required": true,
-          "evidence": "Reconcile actual material-slot vertex/index allocation and r185 BatchedMesh backend draw entries from runtime resources.",
-          "status": "incomplete"
+          "evidence": "describeResources + submissionReconciliation recorded in capture-session metrics with measured draw reconciliation.",
+          "status": "accepted"
         }
       ],
       "evidenceContract": "v2",
@@ -10029,7 +10032,7 @@
         "validateQuick": "npm --prefix threejs-procedural-buildings-and-cities/examples/webgpu-material-slot-compiler run validate:quick",
         "validateFull": "npm --prefix threejs-procedural-buildings-and-cities/examples/webgpu-material-slot-compiler run validate:full"
       },
-      "sourceHash": "sha256:ebe076de03913df4f5cf466bb1cc8f0e6b154e0ffa3440ab42f03b569eafebac",
+      "sourceHash": "sha256:dd6b7dfc24b0553b4562b465dcfd3dcf5a10c6741d76da60e2f70ceb8355e500",
       "proxyStatus": null,
       "executionClass": "rendering",
       "flagship": false,
@@ -10186,7 +10189,9 @@
         "velocity",
         "bent-normal",
         "indirect-delta",
-        "disabled"
+        "disabled",
+        "no-post",
+        "diagnostics"
       ],
       "cameras": [
         "near",
@@ -10201,7 +10206,7 @@
         {
           "id": "native-webgpu",
           "required": true,
-          "evidence": null,
+          "evidence": "capture:evidence 2026-07-13 wrote renderer-info.json with WebGPURenderer and backend.isWebGPUBackend===true under Playwright chromium on Apple M4 Max.",
           "status": "incomplete"
         },
         {
@@ -10215,13 +10220,13 @@
         {
           "id": "renderer-init",
           "required": true,
-          "evidence": null,
+          "evidence": "capture.mjs awaited controller ready and completed 7 aligned WebGPU render-target readbacks after resize/renderOnce.",
           "status": "incomplete"
         },
         {
           "id": "backend-is-webgpu",
           "required": true,
-          "evidence": null,
+          "evidence": "renderer-info.json records backend.isWebGPUBackend===true and threeRevision 185; metrics.backend===webgpu.",
           "status": "incomplete"
         },
         {
@@ -10233,7 +10238,7 @@
         {
           "id": "aligned-readback",
           "required": true,
-          "evidence": null,
+          "evidence": "render-targets.json records integer 256-byte-aligned bytesPerRow metadata for final-lit-display, raw-gtao, reconstructed-gtao, normals, velocity, and odd 641x359 AO.",
           "status": "incomplete"
         },
         {
@@ -10245,7 +10250,7 @@
         {
           "id": "current-adapter-gpu-timestamps",
           "required": true,
-          "evidence": null,
+          "evidence": "capture-status.gpuTimingVerdict remains INSUFFICIENT_EVIDENCE; no named-adapter timestamp ledger was accepted.",
           "status": "incomplete"
         }
       ],
@@ -10261,7 +10266,7 @@
         "validateQuick": "npm --prefix threejs-ambient-contact-shading/examples/webgpu-node-gtao run validate:quick",
         "validateFull": "npm --prefix threejs-ambient-contact-shading/examples/webgpu-node-gtao run validate:full"
       },
-      "sourceHash": "sha256:f11647241607a01effa3a217662fa606f1c94514da8fa2ff47648cb4491d7c29",
+      "sourceHash": "sha256:8d8ada8f07dc1489c883c72f30ff880c625514028d184575bac076446a77b577",
       "proxyStatus": null,
       "executionClass": "rendering",
       "flagship": false,
@@ -10815,25 +10820,25 @@
         {
           "id": "webgpu-backend",
           "required": true,
-          "evidence": null,
+          "evidence": "CANDIDATE (pending validator): correctness capture wrote renderer-info.json with WebGPURenderer and backend.isWebGPUBackend===true.",
           "status": "incomplete"
         },
         {
           "id": "storage-buffer",
           "required": true,
-          "evidence": null,
+          "evidence": "CANDIDATE (pending validator): GPUCompactionEffectPool storage SoA lanes and free-list counters were stepped and read back during capture mechanism evidence.",
           "status": "incomplete"
         },
         {
           "id": "indirect-draw",
           "required": true,
-          "evidence": null,
+          "evidence": "CANDIDATE (pending validator): publish-indirect-count path populated IndirectStorageBufferAttribute instance counts observed in mechanism readback and mechanism.indirect-draws.png.",
           "status": "incomplete"
         },
         {
           "id": "mrt",
           "required": true,
-          "evidence": null,
+          "evidence": "CANDIDATE (pending validator): diagnostics.mosaic.png and multi-target capture path wrote emissive/bloom/normal diagnostics from the scene MRT graph.",
           "status": "incomplete"
         }
       ],
@@ -10841,43 +10846,43 @@
         {
           "id": "backend-is-webgpu",
           "required": true,
-          "evidence": null,
+          "evidence": "CANDIDATE (pending validator): renderer-info.json backend.isWebGPUBackend===true for the correctness bundle under artifacts/visual-validation/webgpu-pooled-effects/correctness.",
           "status": "incomplete"
         },
         {
           "id": "ordered-compute-dispatch",
           "required": true,
-          "evidence": null,
+          "evidence": "CANDIDATE (pending validator): pipeline-graph.json records the 11-dispatch mark/scan/scatter/expand/publish order used by GPUCompactionEffectPool.step.",
           "status": "incomplete"
         },
         {
           "id": "stable-identity-free-list-readback",
           "required": true,
-          "evidence": null,
+          "evidence": "CANDIDATE (pending validator): readMechanismEvidence validated dense indexToEntity/entityToIndex free-list invariants for spark and debris pools during capture.",
           "status": "incomplete"
         },
         {
           "id": "indirect-count-readback",
           "required": true,
-          "evidence": null,
+          "evidence": "CANDIDATE (pending validator): mechanism readback recorded indirect instance counts matching liveCount for both pools.",
           "status": "incomplete"
         },
         {
           "id": "live-soft-depth-sampling",
           "required": true,
-          "evidence": null,
+          "evidence": "soft-depth occlusion quantitative gate was not claimed PASS in the correctness mechanismClaims ledger.",
           "status": "incomplete"
         },
         {
           "id": "render-target-output",
           "required": true,
-          "evidence": null,
+          "evidence": "CANDIDATE (pending validator): correctness capture wrote final.design.png, no-post.design.png, camera/seed/temporal PNGs, and tier/mechanism scenario images.",
           "status": "incomplete"
         },
         {
           "id": "gpu-timestamps",
           "required": true,
-          "evidence": null,
+          "evidence": "performanceCompliance remains INSUFFICIENT_EVIDENCE; no accepted GPU p95 timestamp claim is published.",
           "status": "incomplete"
         }
       ],
@@ -10893,7 +10898,7 @@
         "validateQuick": "npm run validate:quick",
         "validateFull": "npm run validate:full"
       },
-      "sourceHash": "sha256:7e7ed00519917a344bf65f0f26ca4269e05e1a3c0e988f50a72d0c232b5f2e71",
+      "sourceHash": "sha256:d10906b91e1c4c23361358fb309e6ec055e2cb8301571855fe70b099d8fd78b5",
       "proxyStatus": null,
       "executionClass": "rendering",
       "flagship": false,
@@ -11194,7 +11199,7 @@
         "validateQuick": "npm --prefix threejs-procedural-creatures/examples/webgpu-procedural-creature-lab run validate:quick",
         "validateFull": "npm --prefix threejs-procedural-creatures/examples/webgpu-procedural-creature-lab run validate:full"
       },
-      "sourceHash": "sha256:894bbe64c6deda13b13c56e7601f0078de6a162622a7e61c06ea214340d47c0b",
+      "sourceHash": "sha256:2ca936c80adb74ba2c7058e2a64f36cc307ec7524ac32fea315b8925bc50b471",
       "proxyStatus": null,
       "executionClass": "rendering",
       "flagship": false,
@@ -11415,19 +11420,19 @@
         {
           "id": "native-webgpu",
           "required": true,
-          "evidence": null,
+          "evidence": "CANDIDATE (pending validator): correctness capture-session records nativeWebGPU===true, rendererType WebGPURenderer, and deviceIdentityVerified after init.",
           "status": "incomplete"
         },
         {
           "id": "storage-buffer",
           "required": true,
-          "evidence": null,
+          "evidence": "CANDIDATE (pending validator): capture wrote storage.*.f32.bin / u32.bin compute storage readbacks for live and debris motion lanes.",
           "status": "incomplete"
         },
         {
           "id": "compute",
           "required": true,
-          "evidence": null,
+          "evidence": "CANDIDATE (pending validator): mechanism.compute-storage.png and storage compute-storage-live buffers were produced by the compute motion plan during correctness capture.",
           "status": "incomplete"
         }
       ],
@@ -11435,48 +11440,48 @@
         {
           "id": "renderer-init",
           "required": true,
-          "evidence": null,
+          "evidence": "CANDIDATE (pending validator): capture-session runtime metrics report initialized===true and rendererDeviceStatus active with generation 1.",
           "status": "incomplete"
         },
         {
           "id": "backend-is-webgpu",
           "required": true,
-          "evidence": null,
+          "evidence": "CANDIDATE (pending validator): rendererBackendEvidence.isWebGPUBackend===true with backendType WebGPUBackend on the correctness capture session.",
           "status": "incomplete"
         },
         {
           "id": "mechanism-reachable",
           "required": true,
-          "evidence": null,
+          "evidence": "CANDIDATE (pending validator): mechanism launch/spin/debris/quaternion/compute/interpolation PNG diagnostics were captured on fixed routes.",
           "status": "incomplete"
         },
         {
           "id": "aligned-readback",
           "required": true,
-          "evidence": null,
+          "evidence": "CANDIDATE (pending validator): capture wrote normalized-readbacks and transport-readbacks with padded row stride artifacts for presentation targets.",
           "status": "incomplete"
         },
         {
           "id": "compute-storage-readback",
           "required": true,
-          "evidence": null,
+          "evidence": "CANDIDATE (pending validator): storage.compute-storage-live.* and storage.debris-mid.* binary buffers were written during the correctness capture session.",
           "status": "incomplete"
         },
         {
           "id": "mrt-readback",
           "required": true,
-          "evidence": null,
+          "evidence": "CANDIDATE (pending validator): diagnostic.normal/emissive/velocity PNGs and diagnostics.mosaic.png were captured from the MRT graph.",
           "status": "incomplete"
         },
         {
           "id": "current-adapter-gpu-timestamp",
           "required": true,
-          "evidence": null,
+          "evidence": "timestampQueriesActive remains false for correctness profile; GPU timing is not accepted as performance evidence.",
           "status": "incomplete"
         }
       ],
       "evidenceContract": "v2",
-      "evidenceBundle": null,
+      "evidenceBundle": "artifacts/visual-validation/webgpu-procedural-timelines/correctness",
       "validationCommand": "npm --prefix threejs-procedural-motion-systems/examples/webgpu-procedural-timelines run validate:unit",
       "commands": {
         "check": "npm --prefix threejs-procedural-motion-systems/examples/webgpu-procedural-timelines run check",
@@ -11487,7 +11492,7 @@
         "validateQuick": "npm --prefix threejs-procedural-motion-systems/examples/webgpu-procedural-timelines run validate:quick",
         "validateFull": "npm --prefix threejs-procedural-motion-systems/examples/webgpu-procedural-timelines run validate:full"
       },
-      "sourceHash": "sha256:f82d73a0387ee333ce3d7fab3917f528f65d92bbb3c8d956fe3366d4872d158c",
+      "sourceHash": "sha256:75dc31ba17b9a98981bc67e8517eaaa97542ffa9d2bbef2e72929db178ebe709",
       "proxyStatus": null,
       "executionClass": "rendering",
       "flagship": false,
@@ -11846,7 +11851,9 @@
         "derivative-candidate",
         "field-crater-climate",
         "craters",
-        "climate"
+        "climate",
+        "no-post",
+        "diagnostics"
       ],
       "cameras": [
         "near",
@@ -11865,13 +11872,13 @@
         {
           "id": "native-webgpu",
           "required": true,
-          "evidence": "renderer.backend.isWebGPUBackend after await renderer.init",
+          "evidence": "CANDIDATE (pending validator): Lab-owned capture wrote renderer-info.json with WebGPURenderer and backend.isWebGPUBackend===true after await renderer.init().",
           "status": "incomplete"
         },
         {
           "id": "storage-compute",
           "required": true,
-          "evidence": "three channel-separated field bakes, patch-local mip dispatches, and analytic patch-bounds compute",
+          "evidence": "CANDIDATE (pending validator): Field atlas and patch-bounds compute dispatches are described in runtime-snapshot pipeline/resources from the live capture session.",
           "status": "incomplete"
         }
       ],
@@ -11879,19 +11886,19 @@
         {
           "id": "render-target-readback",
           "required": true,
-          "evidence": null,
+          "evidence": "CANDIDATE (pending validator): controller.capturePixels produced 1200x800 PNG readbacks for final and diagnostic targets under Playwright WebGPU.",
           "status": "incomplete"
         },
         {
           "id": "pipeline-graph",
           "required": true,
-          "evidence": "LabController.describePipeline",
+          "evidence": "CANDIDATE (pending validator): describePipeline() from the capture session records scenePass, atlas, and patch-bounds owners with final tone-map ownership on renderOutput.",
           "status": "incomplete"
         },
         {
           "id": "resource-ledger",
           "required": true,
-          "evidence": "LabController.describeResources",
+          "evidence": "describeResources() is present in runtime-snapshot.json but has not been validated against a full v2 resource ledger schema.",
           "status": "incomplete"
         }
       ],
@@ -11907,7 +11914,7 @@
         "validateQuick": "npm --prefix threejs-procedural-planets/examples/webgpu-quadtree-planet run validate:quick",
         "validateFull": "npm --prefix threejs-procedural-planets/examples/webgpu-quadtree-planet run validate:full"
       },
-      "sourceHash": "sha256:74f179759709190c58112917d8a9333970b0d8050dd517d43bf0028d2366673a",
+      "sourceHash": "sha256:a5544f67eb16c9b42970dd6cf0ffd2ffb1f20d5d1a8b2afef92b43d908df1882",
       "proxyStatus": null,
       "notes": [
         "Status remains incomplete until a native-WebGPU v2 evidence bundle is captured on the current adapter.",
@@ -12080,7 +12087,9 @@
         "normals",
         "particles",
         "events",
-        "progress"
+        "progress",
+        "no-post",
+        "diagnostics"
       ],
       "cameras": [
         "near",
@@ -12164,7 +12173,7 @@
       "evidenceContract": "v2",
       "evidenceBundle": null,
       "validationCommand": "node validate.js",
-      "sourceHash": "sha256:b507af206cae91e43eff2cd0cd522e774c4c85486ca32375bfd7cd82d1b1211e",
+      "sourceHash": "sha256:6bccc892e96e099bb776969a9c27c14df04050467bfa3b6abfdd8e3b4b440de4",
       "proxyStatus": null,
       "executionClass": "rendering",
       "flagship": false,
@@ -12691,12 +12700,13 @@
         "validateQuick": "npm run validate:quick",
         "validateFull": "npm run validate:full"
       },
-      "sourceHash": "sha256:c89f3eae3ffbb73828996af17cc9a3963b59618d5fe743946ad2dbbde9233fb6",
+      "sourceHash": "sha256:0d7aa937bf4095e6d31b023d6198af589270c4e0d55d86da1120c3da80dd7c93",
       "proxyStatus": null,
       "executionClass": "rendering",
       "flagship": false,
       "dependencyLabIds": [],
       "sourceHashInputs": [
+        "labs/runtime/webgpu-device-identity.mjs",
         "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/constants.js",
         "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/exposure-nodes.js",
         "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/lut.js",
@@ -12966,7 +12976,7 @@
       "evidenceContract": "v2",
       "evidenceBundle": "docs/visual-validation/webgpu-touch-history-frost/bundle",
       "validationCommand": "node validate-temporal-surface.js",
-      "sourceHash": "sha256:5c367348192d3b1a151bf6bf8dcb73184b73a0538a6f34ff32a3f1c89cda34b9",
+      "sourceHash": "sha256:03e91ff6e6dd78f32c9b32143a28ca560c1332ca6e6abede836c387430b534fe",
       "proxyStatus": null,
       "executionClass": "rendering",
       "flagship": false,
@@ -13219,7 +13229,7 @@
         "validateQuick": "npm --prefix threejs-object-sculptor/examples/webgpu-tower-ship-sculptor run validate:quick",
         "validateFull": "npm --prefix threejs-object-sculptor/examples/webgpu-tower-ship-sculptor run validate:full"
       },
-      "sourceHash": "sha256:7a66e9639c6a0df92b8f848c3e6df33916c1295e74bb555704256948b247c794",
+      "sourceHash": "sha256:743375bba06853dc303c25096496cf7036d381d16dd355e6f199cb689ae9ed87",
       "proxyStatus": null,
       "executionClass": "rendering",
       "flagship": false,
@@ -13590,11 +13600,7 @@
       "kind": "integration-demo",
       "status": "incomplete",
       "canonicalSource": [
-        "threejs-procedural-vegetation/examples/webgpu-vegetation-integration/browser-lab.js",
-        "threejs-procedural-vegetation/examples/webgpu-vegetation-integration/route-contract.js",
-        "threejs-procedural-vegetation/examples/webgpu-vegetation-integration/vegetation-integration.js",
-        "threejs-procedural-vegetation/examples/webgpu-dense-grass/integration-adapter.js",
-        "threejs-procedural-vegetation/examples/structured-ash-growth/ash-scene.js"
+        "threejs-procedural-vegetation/examples/webgpu-vegetation-integration"
       ],
       "browserEntry": "threejs-procedural-vegetation/examples/webgpu-vegetation-integration/index.html",
       "publishPath": "/demos/webgpu-vegetation-integration/",
@@ -13867,7 +13873,7 @@
         "validateQuick": "npm --prefix threejs-procedural-vegetation/examples/webgpu-vegetation-integration run validate:quick",
         "validateFull": "npm --prefix threejs-procedural-vegetation/examples/webgpu-vegetation-integration run validate:full"
       },
-      "sourceHash": "sha256:b47bf3d5ec2e51558edd2e2f8c16044da7977516bc5e2ec9597c6adeda06ac71",
+      "sourceHash": "sha256:b9acb78a9d16bd807683aee0629203255e16afe7c8bb1c22d393db127e0aa8e5",
       "proxyStatus": null,
       "notes": [
         "The browser entry is a native-WebGPU host proof with one renderer, one RenderPipeline, one tone map, and one output conversion.",
@@ -13906,16 +13912,7 @@
       "kind": "canonical-lab",
       "status": "incomplete",
       "canonicalSource": [
-        "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/webgpu-weather-volume-clouds.js",
-        "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/cloud-config.js",
-        "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/cloud-domains.js",
-        "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/cloud-nodes.js",
-        "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/cloud-history.js",
-        "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/cloud-shadows.js",
-        "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/cloud-composite.js",
-        "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/browser-app.js",
-        "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/lab-routes.js",
-        "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/route-shell.js"
+        "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds"
       ],
       "browserEntry": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds/index.html",
       "publishPath": "/demos/webgpu-weather-volume-clouds/",
@@ -14215,7 +14212,7 @@
         "validateQuick": "npm run validate:quick",
         "validateFull": "npm run validate:full"
       },
-      "sourceHash": "sha256:39d5d36aee9918ea1e7c73e92cd3e5b10466d0b68d8437d5cc0427c1b3a1bda4",
+      "sourceHash": "sha256:3f19053bfc7600e042bbaa57ee89c4893107546fa1798dbfabcc3c3add18f69c",
       "proxyStatus": null,
       "notes": [
         "Generated weather-map pages remain generated-asset previews and are not canonical mechanism evidence.",

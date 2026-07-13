@@ -7,29 +7,32 @@
     "threejs-bloom/examples/node-selective-bloom"
   ],
   "sourceHashInputs": [
+    "labs/runtime/webgpu-device-identity.mjs",
     "threejs-bloom/examples/node-selective-bloom"
   ],
   "browserEntry": "threejs-bloom/examples/node-selective-bloom/index.html",
-  "sourceHash": "sha256:43fc293261413ff04a42a2bf4b6e7fea038dc07fcf946ec55746579377b7b925",
+  "sourceHash": "sha256:f8fd59115251e877a6102550f31743a10f91ccc81ebf895dd773b01a637a6c88",
   "publishedHashInputs": [
     "docs/demos/node-selective-bloom",
-    "docs/demos/assets/BloomNode-qktuf1Q7.js",
-    "docs/demos/assets/index-agxSyXna.js",
+    "docs/demos/assets/BloomNode-B7VcMtwE.js",
+    "docs/demos/assets/index-BKfboxTU.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/node-selective-bloom-DURI2Cz7.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+    "docs/demos/assets/node-selective-bloom-CgqPPzv-.js",
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js",
+    "docs/demos/assets/webgpu-device-identity-uNUcs3Wh.js"
   ],
   "emittedAssetDependencies": [
-    "docs/demos/assets/BloomNode-qktuf1Q7.js",
-    "docs/demos/assets/index-agxSyXna.js",
+    "docs/demos/assets/BloomNode-B7VcMtwE.js",
+    "docs/demos/assets/index-BKfboxTU.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/node-selective-bloom-DURI2Cz7.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+    "docs/demos/assets/node-selective-bloom-CgqPPzv-.js",
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js",
+    "docs/demos/assets/webgpu-device-identity-uNUcs3Wh.js"
   ],
-  "publishedBundleHash": "sha256:f1b2a0158756ced405fe9815863340220da7ed6816b00f627f06895c682d9800",
+  "publishedBundleHash": "sha256:5456e10a16960481359e580533b3962774f524d783d113a1b1969d2baaab6f85",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b",
+  "buildRevision": "sha256:302efdcae877cbedba44ae503a8dccaf081443a41c85f141b8b73cd6507e435e",
   "evidenceBundleId": null
 }

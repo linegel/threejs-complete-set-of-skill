@@ -14,7 +14,7 @@
     "threejs-dynamic-surface-effects/examples/integration-temporal-surface/test-mutations.mjs",
     "README.md"
   ],
-  "canonicalSourceHash": "sha256:410742b902f2cff8a6219f419b48877ce69901ddbf20022d9c491b02782997b8",
+  "canonicalSourceHash": "sha256:5ef23999a95cfd6bd026911487463fd725caa69adcb2b3b6f4f822e14ab1d966",
   "threeRevision": "0.185.1",
   "runtime": {
     "renderer": "WebGPURenderer",
@@ -44,7 +44,7 @@
     },
     {
       "file": "no-post.design.png",
-      "meaning": "No-post / diagnostic baseline presentation.",
+      "meaning": "Wetness / no-post diagnostic presentation (multi-color scene).",
       "source": "no-post.design.png",
       "sourceSha256": "sha256:840ae4dafba75a42ce23b81b2497b174c57e9393a2fa4f17ae424143aa2e7494",
       "outputSha256": "sha256:840ae4dafba75a42ce23b81b2497b174c57e9393a2fa4f17ae424143aa2e7494",
@@ -54,10 +54,10 @@
     },
     {
       "file": "diagnostics.mosaic.png",
-      "meaning": "Mechanism/owner diagnostic presentation.",
+      "meaning": "Particles / diagnostic presentation (multi-color scene).",
       "source": "diagnostics.mosaic.png",
-      "sourceSha256": "sha256:f910758bd2afdd06051268b8b1e77f4af34b13af9dd99e8219f9a6e167107e79",
-      "outputSha256": "sha256:f910758bd2afdd06051268b8b1e77f4af34b13af9dd99e8219f9a6e167107e79",
+      "sourceSha256": "sha256:3b3eae99391eecef4b0577211c307014256bdeb0a5f2ee0ee0905aec0eb62fae",
+      "outputSha256": "sha256:3b3eae99391eecef4b0577211c307014256bdeb0a5f2ee0ee0905aec0eb62fae",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
@@ -134,7 +134,7 @@
     }
   ],
   "limitations": [
-    "Host temporal integration native WebGPU capture proves backend identity and non-blank warmed surface-history temporal readbacks on the current source hash.",
+    "Host temporal integration native WebGPU capture proves backend identity and warmed surface-history temporal readbacks on the current source hash.",
     "Primary dependencies (frost, image-pipeline, temporal-history) block formal integration acceptance.",
     "Named-adapter GPU timestamps remain incomplete."
   ]
