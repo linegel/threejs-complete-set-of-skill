@@ -32,6 +32,12 @@ function requireObject(value, label) {
   return value;
 }
 
+function deepFreeze(value) {
+  if (value === null || typeof value !== 'object' || Object.isFrozen(value)) return value;
+  for (const child of Object.values(value)) deepFreeze(child);
+  return Object.freeze(value);
+}
+
 function sha256(bytes) {
   return `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
 }
@@ -128,13 +134,62 @@ async function sourceArtifactPath(directory, path) {
   throw new Error(`source evidence artifact is missing: ${path}`);
 }
 
-async function copyBoundArtifact(sourceDirectory, stagingDirectory, entry) {
+async function readBoundArtifact(sourceDirectory, entry) {
   const source = await sourceArtifactPath(sourceDirectory, entry.path);
   const bytes = await readFile(source);
   if (bytes.byteLength !== entry.byteLength || sha256(bytes) !== entry.sha256) throw new Error(`source evidence artifact drifted: ${entry.path}`);
+  return bytes;
+}
+
+async function copyBoundArtifact(sourceDirectory, stagingDirectory, entry, projectedBytes = null) {
+  const bytes = projectedBytes ?? await readBoundArtifact(sourceDirectory, entry);
   const destination = join(stagingDirectory, entry.path);
   await mkdir(dirname(destination), { recursive: true });
   await writeFile(destination, bytes, { flag: 'wx' });
+}
+
+async function createArtifactProjections({ correctnessDirectory, rawManifest, laneJoin, projectEvidenceArtifacts }) {
+  if (projectEvidenceArtifacts === null) return new Map();
+  if (typeof projectEvidenceArtifacts !== 'function') throw new TypeError('projectEvidenceArtifacts must be a function or null');
+  const projectablePaths = new Set(NORMATIVE_JSON_PATHS.filter((path) => path !== 'evidence-manifest.json'));
+  const capturedFiles = new Map(rawManifest.files
+    .filter((entry) => entry.status === 'captured')
+    .map((entry) => [entry.path, entry]));
+  const artifacts = {};
+  for (const path of projectablePaths) {
+    const entry = capturedFiles.get(path);
+    if (!entry) continue;
+    const bytes = await readBoundArtifact(correctnessDirectory, entry);
+    try {
+      artifacts[path] = JSON.parse(bytes);
+    } catch (error) {
+      throw new Error(`projectable evidence artifact is not valid JSON: ${path}`, { cause: error });
+    }
+  }
+  const projected = await projectEvidenceArtifacts(deepFreeze({
+    artifacts,
+    rawManifest: structuredClone(rawManifest),
+    laneJoin: structuredClone(laneJoin),
+  }));
+  requireObject(projected, 'projected evidence artifacts');
+  const replacements = new Map();
+  for (const [path, artifact] of Object.entries(projected)) {
+    if (!projectablePaths.has(path)) throw new Error(`evidence projection cannot replace ${path}`);
+    const original = capturedFiles.get(path);
+    if (!original) throw new Error(`evidence projection cannot create missing artifact ${path}`);
+    requireObject(artifact, `projected evidence artifact ${path}`);
+    if (artifact.schemaVersion !== 2) throw new Error(`projected evidence artifact ${path} must use schemaVersion 2`);
+    const bytes = Buffer.from(`${JSON.stringify(artifact, null, 2)}\n`);
+    replacements.set(path, {
+      bytes,
+      entry: {
+        ...structuredClone(original),
+        sha256: sha256(bytes),
+        byteLength: bytes.byteLength,
+      },
+    });
+  }
+  return replacements;
 }
 
 export async function assemblePendingReleaseBundle({
@@ -145,6 +200,7 @@ export async function assemblePendingReleaseBundle({
   outputDirectory,
   physicalRoute,
   limitations,
+  projectEvidenceArtifacts = null,
 }) {
   if (existsSync(outputDirectory)) throw new Error(`release output already exists: ${outputDirectory}`);
   const correctness = validateEvidenceBundle(correctnessDirectory);
@@ -183,6 +239,12 @@ export async function assemblePendingReleaseBundle({
     || servedLedger.ledgerSha256 !== physicalWrapper.record.immutableBuild.servedLedgerHash) {
     throw new Error('lane join physical reference differs from the reviewed record or served ledger');
   }
+  const artifactProjections = await createArtifactProjections({
+    correctnessDirectory,
+    rawManifest: raw,
+    laneJoin,
+    projectEvidenceArtifacts,
+  });
   const route = structuredClone(physicalRoute);
   route.stateDigest = routeStateDigest(route);
   const releaseLimitations = structuredClone(limitations);
@@ -190,7 +252,10 @@ export async function assemblePendingReleaseBundle({
   await mkdir(parent, { recursive: true });
   const staging = await mkdtemp(join(parent, `.${basename(outputDirectory)}.staging-`));
 
-  for (const entry of raw.files) if (entry.status === 'captured') await copyBoundArtifact(correctnessDirectory, staging, entry);
+  for (const entry of raw.files) {
+    if (entry.status !== 'captured') continue;
+    await copyBoundArtifact(correctnessDirectory, staging, entry, artifactProjections.get(entry.path)?.bytes ?? null);
+  }
   for (const entry of raw.images) if (entry.status === 'captured') await copyBoundArtifact(correctnessDirectory, staging, entry);
 
   const physicalDocument = binding('sessions/physical-route.capture-session.json', physicalBytes, 'capture-session-document');
@@ -210,6 +275,7 @@ export async function assemblePendingReleaseBundle({
   const routeSet = raw.route.path === route.path && raw.route.stateDigest === route.stateDigest
     ? [structuredClone(raw.route)]
     : [structuredClone(raw.route), route];
+  const projectedFiles = raw.files.map((entry) => artifactProjections.get(entry.path)?.entry ?? structuredClone(entry));
   const manifest = {
     ...structuredClone(raw),
     bundleId: `${raw.labId}:release:${raw.sourceClosureHash.slice('sha256:'.length, 'sha256:'.length + 16)}:v2`,
@@ -220,7 +286,7 @@ export async function assemblePendingReleaseBundle({
     claimVerdicts: structuredClone(laneJoin.claimVerdicts),
     captureSessions: [structuredClone(raw.captureSessions[0]), physicalSession],
     files: orderByRequiredPrefix([
-      ...structuredClone(raw.files),
+      ...projectedFiles,
       capturedFile(physicalDocument),
       capturedFile(physicalLedger),
       capturedFile(joinedLedger),

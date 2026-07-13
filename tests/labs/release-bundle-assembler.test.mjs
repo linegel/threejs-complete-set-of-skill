@@ -170,6 +170,66 @@ test('offline assembler creates a validated nonpublishable multi-route release c
   }), /already exists/);
 });
 
+test('offline assembler applies bounded JSON projections and owns their final hashes', async () => {
+  const { directory, manifest } = makeRawCorrectnessBundle();
+  const root = mkdtempSync(join(tmpdir(), 'release-assembler-projection-'));
+  const review = physicalReview(manifest);
+  const inputs = writeInputs(root, manifest, review);
+  const sourceRendererInfo = JSON.parse(readFileSync(join(directory, 'renderer-info.json'), 'utf8'));
+  const sourceReference = manifest.files.find((entry) => entry.path === 'renderer-info.json');
+  const outputDirectory = join(root, 'release');
+  const result = await assemblePendingReleaseBundle({
+    correctnessDirectory: directory,
+    ...inputs,
+    outputDirectory,
+    physicalRoute: reviewedRoute(),
+    limitations: [],
+    projectEvidenceArtifacts({ artifacts, rawManifest, laneJoin }) {
+      assert.equal(Object.isFrozen(artifacts), true);
+      assert.equal(Object.isFrozen(artifacts['renderer-info.json']), true);
+      assert.equal(Object.isFrozen(rawManifest), true);
+      assert.equal(Object.isFrozen(laneJoin), true);
+      return {
+        'renderer-info.json': {
+          ...artifacts['renderer-info.json'],
+          releaseProjection: 'verified-lane-join',
+        },
+      };
+    },
+  });
+  const projectedBytes = readFileSync(join(outputDirectory, 'renderer-info.json'));
+  const projected = JSON.parse(projectedBytes);
+  const projectedReference = result.manifest.files.find((entry) => entry.path === 'renderer-info.json');
+  assert.equal(projected.releaseProjection, 'verified-lane-join');
+  assert.notEqual(projectedReference.sha256, sourceReference.sha256);
+  assert.equal(projectedReference.byteLength, projectedBytes.byteLength);
+  assert.deepEqual(JSON.parse(readFileSync(join(directory, 'renderer-info.json'), 'utf8')), sourceRendererInfo);
+  assert.equal(result.validation.valid, true, result.validation.errors.join('\n'));
+});
+
+test('offline assembler confines projections to existing normative JSON artifacts', async () => {
+  const { directory, manifest } = makeRawCorrectnessBundle();
+  const mutations = [
+    ['evidence manifest', { 'evidence-manifest.json': { schemaVersion: 2 } }, /cannot replace evidence-manifest/],
+    ['standard image', { 'final.design.png': { schemaVersion: 2 } }, /cannot replace final\.design/],
+    ['unknown file', { 'invented.json': { schemaVersion: 2 } }, /cannot replace invented/],
+    ['missing schema', { 'renderer-info.json': { renderer: 'WebGPURenderer' } }, /must use schemaVersion 2/],
+  ];
+  for (const [name, projection, expected] of mutations) {
+    const root = mkdtempSync(join(tmpdir(), `release-assembler-projection-${name.replaceAll(' ', '-')}-`));
+    const review = physicalReview(manifest);
+    const inputs = writeInputs(root, manifest, review);
+    await assert.rejects(() => assemblePendingReleaseBundle({
+      correctnessDirectory: directory,
+      ...inputs,
+      outputDirectory: join(root, 'release'),
+      physicalRoute: reviewedRoute(),
+      limitations: [],
+      projectEvidenceArtifacts: () => projection,
+    }), expected, name);
+  }
+});
+
 test('offline assembler rejects physical route state and source-identity substitutions', async () => {
   const { directory, manifest } = makeRawCorrectnessBundle();
   const root = mkdtempSync(join(tmpdir(), 'release-assembler-mutation-'));
