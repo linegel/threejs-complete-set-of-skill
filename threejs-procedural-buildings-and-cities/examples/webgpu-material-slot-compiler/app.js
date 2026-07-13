@@ -42,10 +42,23 @@ modeSelect.addEventListener("change", () => controller.setMode(modeSelect.value)
 tierSelect.addEventListener("change", () => controller.setTier(tierSelect.value));
 window.addEventListener("resize", () => controller.resize(window.innerWidth, window.innerHeight, Math.min(window.devicePixelRatio, 2)));
 
+let animating = true;
 async function frame() {
-  await controller.renderOnce();
-  const metrics = controller.getMetrics();
-  status.textContent = `${metrics.mode} · ${metrics.tier} · native WebGPU`;
-  requestAnimationFrame(frame);
+  if (!animating) return;
+  try {
+    await controller.renderOnce();
+    const metrics = controller.getMetrics();
+    status.textContent = `${metrics.mode} · ${metrics.tier} · native WebGPU`;
+  } catch (error) {
+    // Capture dispose races the idle animation loop; stop quietly.
+    animating = false;
+    return;
+  }
+  if (animating) requestAnimationFrame(frame);
 }
+const originalDispose = controller.dispose.bind(controller);
+controller.dispose = async (...args) => {
+  animating = false;
+  return originalDispose(...args);
+};
 requestAnimationFrame(frame);

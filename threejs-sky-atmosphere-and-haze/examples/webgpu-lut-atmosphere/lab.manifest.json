@@ -7,6 +7,7 @@
   "kind": "canonical-lab",
   "status": "incomplete",
   "canonicalSource": [
+    "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere",
     "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere/webgpu-lut-atmosphere.js",
     "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere/atmosphere-config.js",
     "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere/atmosphere-math.js",
@@ -19,70 +20,300 @@
   "browserEntry": "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere/index.html",
   "publishPath": "/demos/webgpu-lut-atmosphere/",
   "scenarios": [
-    { "id": "sea-level", "route": "scenario/sea-level/", "startup": { "camera": "sea-level", "mode": "final" }, "acceptanceStatus": "incomplete" },
-    { "id": "mountain", "route": "scenario/mountain/", "startup": { "camera": "mountain", "mode": "final" }, "acceptanceStatus": "incomplete" },
-    { "id": "low-orbit", "route": "scenario/low-orbit/", "startup": { "camera": "low-orbit", "mode": "final" }, "acceptanceStatus": "incomplete" },
-    { "id": "high-orbit", "route": "scenario/high-orbit/", "startup": { "camera": "high-orbit", "mode": "final" }, "acceptanceStatus": "incomplete" },
-    { "id": "night-side", "route": "scenario/night-side/", "startup": { "camera": "night-side", "mode": "final" }, "acceptanceStatus": "incomplete" },
-    { "id": "shell-entry", "route": "scenario/shell-entry/", "startup": { "camera": "shell-entry", "mode": "final" }, "acceptanceStatus": "incomplete" }
+    {
+      "id": "sea-level",
+      "route": "scenario/sea-level/",
+      "startup": {
+        "camera": "sea-level",
+        "mode": "final"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "mountain",
+      "route": "scenario/mountain/",
+      "startup": {
+        "camera": "mountain",
+        "mode": "final"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "low-orbit",
+      "route": "scenario/low-orbit/",
+      "startup": {
+        "camera": "low-orbit",
+        "mode": "final"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "high-orbit",
+      "route": "scenario/high-orbit/",
+      "startup": {
+        "camera": "high-orbit",
+        "mode": "final"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "night-side",
+      "route": "scenario/night-side/",
+      "startup": {
+        "camera": "night-side",
+        "mode": "final"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "shell-entry",
+      "route": "scenario/shell-entry/",
+      "startup": {
+        "camera": "shell-entry",
+        "mode": "final"
+      },
+      "acceptanceStatus": "incomplete"
+    }
   ],
   "mechanisms": [
-    { "id": "transmittance-and-multiscatter", "route": "mechanism/transmittance-and-multiscatter/", "startup": { "mode": "multiscatter" }, "acceptanceStatus": "incomplete" },
-    { "id": "irradiance-and-sky-view", "route": "mechanism/irradiance-and-sky-view/", "startup": { "mode": "sky-view" }, "acceptanceStatus": "incomplete" },
-    { "id": "aerial-perspective", "route": "mechanism/aerial-perspective/", "startup": { "mode": "aerial-inscattering" }, "acceptanceStatus": "incomplete" },
-    { "id": "depth-and-ecef", "route": "mechanism/depth-and-ecef/", "startup": { "mode": "depth" }, "acceptanceStatus": "incomplete" },
-    { "id": "sun-moon-and-lighting", "route": "mechanism/sun-moon-and-lighting/", "startup": { "mode": "irradiance" }, "acceptanceStatus": "incomplete" },
-    { "id": "sea-level-to-orbit", "route": "mechanism/sea-level-to-orbit/", "startup": { "camera": "sea-level", "mode": "final" }, "acceptanceStatus": "incomplete" }
+    {
+      "id": "transmittance-and-multiscatter",
+      "route": "mechanism/transmittance-and-multiscatter/",
+      "startup": {
+        "mode": "multiscatter"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "irradiance-and-sky-view",
+      "route": "mechanism/irradiance-and-sky-view/",
+      "startup": {
+        "mode": "sky-view"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "aerial-perspective",
+      "route": "mechanism/aerial-perspective/",
+      "startup": {
+        "mode": "aerial-inscattering"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "depth-and-ecef",
+      "route": "mechanism/depth-and-ecef/",
+      "startup": {
+        "mode": "depth"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "sun-moon-and-lighting",
+      "route": "mechanism/sun-moon-and-lighting/",
+      "startup": {
+        "mode": "irradiance"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "sea-level-to-orbit",
+      "route": "mechanism/sea-level-to-orbit/",
+      "startup": {
+        "camera": "sea-level",
+        "mode": "final"
+      },
+      "acceptanceStatus": "incomplete"
+    }
   ],
   "tiers": [
     {
       "id": "ultra",
       "targetClass": "current-adapter-unmeasured",
       "frameTargetMs": null,
-      "resolutionPolicy": { "transmittance": [256, 64], "skyView": [192, 108], "aerial": [192, 108, 48] },
-      "mechanismLimits": { "transmittanceSamples": 32, "aerialSamples": 24 },
-      "resourceLimits": { "aerialPayloads": 2, "aerialFormat": "RGBA16F" },
+      "resolutionPolicy": {
+        "transmittance": [
+          256,
+          64
+        ],
+        "skyView": [
+          192,
+          108
+        ],
+        "aerial": [
+          192,
+          108,
+          48
+        ]
+      },
+      "mechanismLimits": {
+        "transmittanceSamples": 32,
+        "aerialSamples": 24
+      },
+      "resourceLimits": {
+        "aerialPayloads": 2,
+        "aerialFormat": "RGBA16F"
+      },
       "degradationFromPrevious": [],
-      "preservedInvariants": ["rgb-inscattering-and-rgb-optical-depth", "single-output-owner", "meter-unit-boundary"],
+      "preservedInvariants": [
+        "rgb-inscattering-and-rgb-optical-depth",
+        "single-output-owner",
+        "meter-unit-boundary"
+      ],
       "acceptanceStatus": "incomplete"
     },
     {
       "id": "high",
       "targetClass": "current-adapter-unmeasured",
       "frameTargetMs": null,
-      "resolutionPolicy": { "transmittance": [192, 48], "skyView": [128, 64], "aerial": [160, 90, 32] },
-      "mechanismLimits": { "transmittanceSamples": 32, "aerialSamples": 24 },
-      "resourceLimits": { "aerialPayloads": 2, "aerialFormat": "RGBA16F" },
-      "degradationFromPrevious": ["lower LUT resolution", "fewer aerial depth slices"],
-      "preservedInvariants": ["rgb-inscattering-and-rgb-optical-depth", "single-output-owner", "meter-unit-boundary"],
+      "resolutionPolicy": {
+        "transmittance": [
+          192,
+          48
+        ],
+        "skyView": [
+          128,
+          64
+        ],
+        "aerial": [
+          160,
+          90,
+          32
+        ]
+      },
+      "mechanismLimits": {
+        "transmittanceSamples": 32,
+        "aerialSamples": 24
+      },
+      "resourceLimits": {
+        "aerialPayloads": 2,
+        "aerialFormat": "RGBA16F"
+      },
+      "degradationFromPrevious": [
+        "lower LUT resolution",
+        "fewer aerial depth slices"
+      ],
+      "preservedInvariants": [
+        "rgb-inscattering-and-rgb-optical-depth",
+        "single-output-owner",
+        "meter-unit-boundary"
+      ],
       "acceptanceStatus": "incomplete"
     },
     {
       "id": "mobile",
       "targetClass": "mobile-class-unmeasured",
       "frameTargetMs": null,
-      "resolutionPolicy": { "transmittance": [128, 32], "skyView": [96, 48], "aerial": [96, 54, 20] },
-      "mechanismLimits": { "transmittanceSamples": 32, "aerialSamples": 24 },
-      "resourceLimits": { "aerialPayloads": 2, "aerialFormat": "RGBA16F" },
-      "degradationFromPrevious": ["lower view-product resolution", "amortize dirty aerial slices"],
-      "preservedInvariants": ["rgb-inscattering-and-rgb-optical-depth", "single-output-owner", "meter-unit-boundary"],
+      "resolutionPolicy": {
+        "transmittance": [
+          128,
+          32
+        ],
+        "skyView": [
+          96,
+          48
+        ],
+        "aerial": [
+          96,
+          54,
+          20
+        ]
+      },
+      "mechanismLimits": {
+        "transmittanceSamples": 32,
+        "aerialSamples": 24
+      },
+      "resourceLimits": {
+        "aerialPayloads": 2,
+        "aerialFormat": "RGBA16F"
+      },
+      "degradationFromPrevious": [
+        "lower view-product resolution",
+        "amortize dirty aerial slices"
+      ],
+      "preservedInvariants": [
+        "rgb-inscattering-and-rgb-optical-depth",
+        "single-output-owner",
+        "meter-unit-boundary"
+      ],
       "acceptanceStatus": "incomplete"
     }
   ],
-  "modes": ["final", "no-post", "transmittance", "multiscatter", "irradiance", "sky-view", "aerial-inscattering", "aerial-optical-depth", "depth", "ecef"],
-  "cameras": ["sea-level", "mountain", "low-orbit", "high-orbit", "night-side", "shell-entry"],
-  "seeds": [1, 2654435769],
+  "modes": [
+    "final",
+    "no-post",
+    "transmittance",
+    "multiscatter",
+    "irradiance",
+    "sky-view",
+    "aerial-inscattering",
+    "aerial-optical-depth",
+    "depth",
+    "ecef"
+  ],
+  "cameras": [
+    "sea-level",
+    "mountain",
+    "low-orbit",
+    "high-orbit",
+    "night-side",
+    "shell-entry"
+  ],
+  "seeds": [
+    1,
+    2654435769
+  ],
   "capabilityRequirements": [
-    { "id": "native-webgpu", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "storage-texture-3d", "required": true, "evidence": null, "status": "incomplete" }
+    {
+      "id": "native-webgpu",
+      "required": true,
+      "evidence": "Native browser capture: backendIsWebGPU=true in renderer-info.json; mechanism-metrics records 56 compute calls on WebGPURenderer r185.",
+      "status": "accepted"
+    },
+    {
+      "id": "storage-texture-3d",
+      "required": true,
+      "evidence": "storage-resources.json products include Storage3DTexture aerial-inscattering/optical-depth with one-invocation-per-XY topology.",
+      "status": "accepted"
+    }
   ],
   "runtimeProof": [
-    { "id": "backend-is-webgpu", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "executed-five-stage-lut-chain", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "live-camera-body-depth-composition", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "cumulative-aerial-xy-rays", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "aligned-render-target-readback", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "current-adapter-gpu-timestamps", "required": true, "evidence": null, "status": "incomplete" }
+    {
+      "id": "backend-is-webgpu",
+      "required": true,
+      "evidence": "renderer-info.json backendIsWebGPU=true from native capture-session.",
+      "status": "accepted"
+    },
+    {
+      "id": "executed-five-stage-lut-chain",
+      "required": true,
+      "evidence": "mechanism-metrics.json rendererInfo.compute.calls=56 (>=5) after live five-stage LUT chain.",
+      "status": "accepted"
+    },
+    {
+      "id": "live-camera-body-depth-composition",
+      "required": true,
+      "evidence": "pipeline-graph.json owners.sceneDepth=browser host PassNode depth; bodyTransform=planet.matrixWorld; finalComposition includes aerialOpticalDepth.",
+      "status": "accepted"
+    },
+    {
+      "id": "cumulative-aerial-xy-rays",
+      "required": true,
+      "evidence": "storage-resources.json aerial-products invocationTopology=one invocation per XY ray; cumulative Z loop; invocationCount=width*height.",
+      "status": "accepted"
+    },
+    {
+      "id": "aligned-render-target-readback",
+      "required": true,
+      "evidence": "capture-session + images/final.design.png 1200x800 PNG from integer 256-byte-aligned RT readback transport.",
+      "status": "accepted"
+    },
+    {
+      "id": "current-adapter-gpu-timestamps",
+      "required": true,
+      "evidence": "Correctness capture profile disables timestamp queries; no named-adapter GPU timing envelope recorded.",
+      "status": "incomplete"
+    }
   ],
   "evidenceContract": "v2",
   "validationCommand": "node threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere/validation.js",

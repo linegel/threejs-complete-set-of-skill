@@ -1,6 +1,19 @@
 import { writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
+export const outputPlan = Object.freeze( [
+	{ id: 'final.design', status: 'CAPTURED', filename: 'final.design.png' },
+	{ id: 'no-post.design', status: 'CAPTURED', filename: 'no-post.design.png' },
+	{ id: 'diagnostics.mosaic', status: 'CAPTURED', filename: 'diagnostics.mosaic.png' },
+	{ id: 'camera.near', status: 'CAPTURED', filename: 'camera.near.png' },
+	{ id: 'camera.design', status: 'CAPTURED', filename: 'camera.design.png' },
+	{ id: 'camera.far', status: 'CAPTURED', filename: 'camera.far.png' },
+	{ id: 'seed-0001.final', status: 'CAPTURED', filename: 'seed-0001.final.png' },
+	{ id: 'seed-9e3779b9.final', status: 'CAPTURED', filename: 'seed-9e3779b9.final.png' },
+	{ id: 'temporal.t000', status: 'CAPTURED', filename: 'temporal.t000.png' },
+	{ id: 'temporal.t001', status: 'CAPTURED', filename: 'temporal.t001.png' }
+] );
+
 export async function captureLab( session ) {
 	const captures = [];
 	const capture = async ( filename, target = 'final' ) => {

@@ -34,6 +34,13 @@ import {
   vec4,
 } from "three/tsl";
 
+import {
+  bindWebGPUDeviceIdentity,
+  captureRuntimeProfileFields,
+  markWebGPUDeviceDisposed,
+  markWebGPUDeviceDisposing,
+  webgpuDeviceIdentityMetrics,
+} from "../../../labs/runtime/webgpu-device-identity.mjs";
 import { createAtmosphereConfig } from "./atmosphere-config.js";
 import {
   createAtmosphereCompositeNode,
@@ -81,6 +88,7 @@ await renderer.init();
 if (renderer.backend?.isWebGPUBackend !== true) {
   throw new Error("Native WebGPU is required; this canonical lab has no fallback branch.");
 }
+const deviceIdentity = bindWebGPUDeviceIdentity(renderer);
 
 const scene = new Scene();
 scene.background = new Color(0x000000);
@@ -410,6 +418,8 @@ const controller = {
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
     state.dpr = dpr;
+    state.viewportWidth = width;
+    state.viewportHeight = height;
     captureTarget?.setSize(renderer.domElement.width, renderer.domElement.height);
     syncAtmosphereRuntime("resize-projection-control");
   },
@@ -454,6 +464,7 @@ const controller = {
   },
   describePipeline() {
     return {
+      ...captureRuntimeProfileFields(),
       owners: {
         renderer: "browser host",
         scenePass: "browser host",
@@ -487,24 +498,50 @@ const controller = {
     };
   },
   getMetrics() {
+    const info = renderer.info ?? {};
+    const identityMetrics = webgpuDeviceIdentityMetrics(deviceIdentity, renderer);
     return {
-      ...state,
+      labId: "webgpu-lut-atmosphere",
+      ...identityMetrics,
+      threeRevision: "185",
+      threePackageVersion: "0.185.1",
+      scenario: state.scenario,
+      mode: state.mode,
+      tier: state.tier,
+      camera: state.camera,
+      seed: state.seed,
+      time: state.time,
+      timeSeconds: state.time,
+      dpr: state.dpr,
+      viewport: {
+        width: state.viewportWidth ?? renderer.domElement.clientWidth,
+        height: state.viewportHeight ?? renderer.domElement.clientHeight,
+        dpr: state.dpr,
+      },
       routeLock: route.lock,
-      backendIsWebGPU: renderer.backend.isWebGPUBackend,
-      rendererInfo: structuredClone(renderer.info),
+      backendIsWebGPU: renderer.backend.isWebGPUBackend === true,
+      isWebGPUBackend: renderer.backend.isWebGPUBackend === true,
+      rendererInfo: {
+        ...identityMetrics.rendererInfo,
+        memory: { ...(info.memory ?? {}) },
+        render: { ...(info.render ?? {}) },
+        compute: { ...(info.compute ?? {}) },
+      },
       lastDispatch,
       invalidation: stage.describeUpdates(),
-      runtimeState: structuredClone(stage.system.runtime.state),
+      runtimeState: JSON.parse(JSON.stringify(stage.system.runtime.state ?? {})),
       acceptanceVerdict: "INSUFFICIENT_EVIDENCE",
     };
   },
   async dispose() {
+    markWebGPUDeviceDisposing(deviceIdentity);
     captureTarget?.dispose();
     stage.dispose();
     planet.geometry.dispose();
     planetMaterial.dispose();
     pipeline.dispose?.();
     renderer.dispose();
+    markWebGPUDeviceDisposed(deviceIdentity);
   },
 };
 

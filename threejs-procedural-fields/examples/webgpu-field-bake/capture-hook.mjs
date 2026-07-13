@@ -197,6 +197,16 @@ export async function captureLab(session) {
   requireDistinct(captures, "seed-0001.final.png", "seed-9e3779b9.final.png");
   requireDistinct(captures, "temporal.t000.png", "temporal.t001.png");
 
+  // Restore the locked capture state so final metrics match the session lock.
+  await selectState(session, {
+    scenario: "field-and-gradient-gallery",
+    tier: "gpu-storage",
+    seed: 1,
+    camera: "design",
+    time: 0,
+    mode: "final",
+  });
+
   return Object.freeze({
     captures: Object.freeze(captures),
     mechanismProof: mechanismDiagnostics,

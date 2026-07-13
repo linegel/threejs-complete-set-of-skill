@@ -38,11 +38,17 @@ import {
 } from './compute-kernels.js';
 import { validateFftOceanSelfTests } from './validation.js';
 
-function submitCompute( renderer, nodes ) {
+async function submitCompute( renderer, nodes ) {
 	const previousRenderTarget = typeof renderer.getRenderTarget === 'function' ? renderer.getRenderTarget() : null;
 	try {
 		if ( renderer.initialized !== true ) throw new Error( 'Renderer must be initialized before ocean compute submission.' );
-		renderer.compute( nodes );
+		const result = renderer.compute( nodes );
+		if ( result && typeof result.then === 'function' ) await result;
+		// Fixture readbacks require a true GPU completion fence before texture copy.
+		const device = renderer.backend?.device;
+		if ( device?.queue?.onSubmittedWorkDone ) {
+			await device.queue.onSubmittedWorkDone();
+		}
 	} finally {
 		if ( typeof renderer.setRenderTarget === 'function' ) {
 			renderer.setRenderTarget( previousRenderTarget );

@@ -1475,6 +1475,7 @@ async function createApp() {
         camera: cameraId,
         seed,
         timeSeconds,
+        viewport: { width, height, dpr },
         nativeWebGPU: renderer.backend?.isWebGPUBackend === true,
         backend: renderer.backend?.isWebGPUBackend === true ? "webgpu" : "unknown",
         rendererBackend: "WebGPUBackend",

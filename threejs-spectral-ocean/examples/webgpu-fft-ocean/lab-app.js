@@ -14,6 +14,13 @@ import {
 } from 'three/webgpu';
 import { color } from 'three/tsl';
 import {
+	bindWebGPUDeviceIdentity,
+	captureRuntimeProfileFields,
+	markWebGPUDeviceDisposed,
+	markWebGPUDeviceDisposing,
+	webgpuDeviceIdentityMetrics
+} from '../../../labs/runtime/webgpu-device-identity.mjs';
+import {
 	OCEAN_DEBUG_MODES,
 	OCEAN_LAB_MANIFEST,
 	OCEAN_MECHANISM_ROUTES,
@@ -103,6 +110,7 @@ export class OceanLabController {
 			this.renderer = new WebGPURenderer( { canvas: this.canvas, antialias: false, outputBufferType: HalfFloatType } );
 			await this.renderer.init();
 			if ( this.renderer.backend?.isWebGPUBackend !== true ) throw new Error( 'Native WebGPU is required; no alternate renderer is activated.' );
+			this.deviceIdentity = bindWebGPUDeviceIdentity( this.renderer );
 			this.renderer.toneMapping = AgXToneMapping;
 		this.renderer.setPixelRatio( 1 );
 		this.renderer.setSize( Math.max( 1, this.canvas.clientWidth ), Math.max( 1, this.canvas.clientHeight ), false );
@@ -296,6 +304,9 @@ export class OceanLabController {
 
 	resize( width, height, dpr ) {
 		if ( ! [ width, height, dpr ].every( Number.isFinite ) || width < 1 || height < 1 || dpr <= 0 ) throw new Error( 'Invalid ocean resize request.' );
+		this.viewportWidth = width;
+		this.viewportHeight = height;
+		this.viewportDpr = dpr;
 		this.renderer.setPixelRatio( dpr );
 		this.renderer.setSize( width, height, false );
 		this.camera.aspect = width / height;
@@ -342,6 +353,7 @@ export class OceanLabController {
 	describePipeline() {
 		const dispatches = this.ocean.describeDispatches();
 		return {
+			...captureRuntimeProfileFields(),
 			owners: { renderer: OCEAN_LAB_MANIFEST.id, finalPipeline: OCEAN_LAB_MANIFEST.id, toneMap: OCEAN_LAB_MANIFEST.id, outputColorTransform: OCEAN_LAB_MANIFEST.id },
 			signals: [ { id: 'displacement', producer: OCEAN_LAB_MANIFEST.id }, { id: 'derivatives', producer: OCEAN_LAB_MANIFEST.id }, { id: 'jacobian', producer: OCEAN_LAB_MANIFEST.id }, { id: 'shared-foam-history', producer: OCEAN_LAB_MANIFEST.id } ],
 			sceneSubmissions: [ { id: 'ocean-scene', kind: 'lit-output', count: 1 } ],
@@ -386,16 +398,26 @@ export class OceanLabController {
 
 	getMetrics() {
 		return {
+			labId: OCEAN_LAB_MANIFEST.id,
+			...webgpuDeviceIdentityMetrics( this.deviceIdentity, this.renderer ),
 			backend: { isWebGPUBackend: this.renderer.backend?.isWebGPUBackend === true },
 			isWebGPUBackend: this.renderer.backend?.isWebGPUBackend === true,
 			backendIsWebGPU: this.renderer.backend?.isWebGPUBackend === true,
-			threeRevision: '0.185.1',
+			threeRevision: '185',
+			threePackageVersion: '0.185.1',
+			scenario: 'directional-sea',
 			tier: this.tier,
 			mode: this.mode,
 			mechanism: this.selection.mechanism ?? null,
 			camera: this.cameraId,
 			seed: this.seed,
 			time: this.time,
+			timeSeconds: this.time,
+			viewport: {
+				width: this.viewportWidth ?? this.renderer.domElement.clientWidth,
+				height: this.viewportHeight ?? this.renderer.domElement.clientHeight,
+				dpr: this.viewportDpr ?? this.renderer.getPixelRatio()
+			},
 			gpuReadback: this.ocean.gpuReadback,
 			dispatchesPerFrame: this.ocean.diagnostics.dispatchesPerFrame,
 			resourceBytes: this.describeResources().totalBytes,
@@ -408,6 +430,7 @@ export class OceanLabController {
 	async dispose() {
 		if ( this.disposed ) return;
 		this.disposed = true;
+		markWebGPUDeviceDisposing( this.deviceIdentity );
 		this.clearCpuQueryProbes();
 		this.pipeline?.dispose();
 		this.ocean?.dispose();
@@ -416,6 +439,7 @@ export class OceanLabController {
 		this.sky?.geometry.dispose();
 		this.sky?.material.dispose();
 		this.renderer?.dispose();
+		markWebGPUDeviceDisposed( this.deviceIdentity );
 	}
 }
 

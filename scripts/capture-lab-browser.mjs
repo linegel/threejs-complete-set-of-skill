@@ -920,14 +920,25 @@ export async function controllerCall(page, method, args = []) {
     if (typeof controller[methodName] !== 'function') throw new Error(`LabController has no ${methodName}() method`);
     const result = await controller[methodName](...methodArgs);
     // Playwright structured-clone cannot carry functions or renderer.info method bags.
-    if (result === undefined) return null;
-    return JSON.parse(JSON.stringify(result, (_key, value) => {
-      if (typeof value === 'function' || typeof value === 'symbol') return undefined;
-      if (typeof value === 'bigint') return Number(value);
-      if (value instanceof ArrayBuffer) return Array.from(new Uint8Array(value));
-      if (ArrayBuffer.isView(value)) return Array.from(value);
-      return value;
-    }));
+    if (result === undefined || result === null) return null;
+    if (typeof result !== 'object') return result;
+    try {
+      const seen = new WeakSet();
+      return JSON.parse(JSON.stringify(result, (_key, value) => {
+        if (typeof value === 'function' || typeof value === 'symbol') return undefined;
+        if (typeof value === 'bigint') return Number(value);
+        if (value instanceof ArrayBuffer) return Array.from(new Uint8Array(value));
+        if (ArrayBuffer.isView(value)) return Array.from(value);
+        if (value && typeof value === 'object') {
+          if (seen.has(value)) return undefined;
+          seen.add(value);
+        }
+        return value;
+      }));
+    } catch {
+      // ready()/initialize() may return the controller graph itself.
+      return null;
+    }
   }, { methodName: method, methodArgs: args, controllerGlobals: LAB_CONTROLLER_GLOBALS });
 }
 

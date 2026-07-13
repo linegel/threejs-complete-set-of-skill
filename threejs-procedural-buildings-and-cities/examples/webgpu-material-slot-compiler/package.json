@@ -5,7 +5,7 @@
     "check": "node --check app.js && node --check lab-controller.js && node --check compiler.js && node validate-routes.mjs",
     "validate:unit": "node validate-fixtures.mjs",
     "test:mutations": "node test-mutations.mjs",
-    "capture": "node ../../../scripts/capture-lab-browser.mjs --lab webgpu-material-slot-compiler --target presentation",
+    "capture": "node ../../../scripts/capture-lab-browser.mjs --lab webgpu-material-slot-compiler --target presentation --hook ./capture-hook.mjs",
     "validate:artifacts": "node evidence-status.mjs validate:artifacts",
     "validate:quick": "npm run check && npm run validate:unit && npm run test:mutations",
     "validate:full": "npm run validate:quick && npm run validate:artifacts"

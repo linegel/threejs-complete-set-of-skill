@@ -6,6 +6,7 @@
   "kind": "canonical-lab",
   "status": "incomplete",
   "canonicalSource": [
+    "threejs-procedural-fields/examples/webgpu-field-bake",
     "threejs-procedural-fields/examples/webgpu-field-bake/field-constants.mjs",
     "threejs-procedural-fields/examples/webgpu-field-bake/field-bundle.mjs",
     "threejs-procedural-fields/examples/webgpu-field-bake/field-bake.mjs",
@@ -14,70 +15,264 @@
   "browserEntry": "threejs-procedural-fields/examples/webgpu-field-bake/index.html",
   "publishPath": "/demos/webgpu-field-bake/",
   "scenarios": [
-    { "id": "field-and-gradient-gallery", "route": "/demos/webgpu-field-bake/mechanism/field-and-gradient-gallery/", "startup": { "scenario": "field-and-gradient-gallery" }, "acceptanceStatus": "incomplete" },
-    { "id": "domain-warp-jacobian", "route": "/demos/webgpu-field-bake/mechanism/domain-warp-jacobian/", "startup": { "scenario": "domain-warp-jacobian" }, "acceptanceStatus": "incomplete" },
-    { "id": "storage-bake-and-mips", "route": "/demos/webgpu-field-bake/mechanism/storage-bake-and-mips/", "startup": { "scenario": "storage-bake-and-mips" }, "acceptanceStatus": "incomplete" },
-    { "id": "direct-vs-baked", "route": "/demos/webgpu-field-bake/mechanism/direct-vs-baked/", "startup": { "scenario": "direct-vs-baked" }, "acceptanceStatus": "incomplete" },
-    { "id": "structured-placement", "route": "/demos/webgpu-field-bake/mechanism/structured-placement/", "startup": { "scenario": "structured-placement" }, "acceptanceStatus": "incomplete" },
-    { "id": "shared-cause-composition", "route": "/demos/webgpu-field-bake/mechanism/shared-cause-composition/", "startup": { "scenario": "shared-cause-composition" }, "acceptanceStatus": "incomplete" }
+    {
+      "id": "field-and-gradient-gallery",
+      "route": "/demos/webgpu-field-bake/mechanism/field-and-gradient-gallery/",
+      "startup": {
+        "scenario": "field-and-gradient-gallery"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "domain-warp-jacobian",
+      "route": "/demos/webgpu-field-bake/mechanism/domain-warp-jacobian/",
+      "startup": {
+        "scenario": "domain-warp-jacobian"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "storage-bake-and-mips",
+      "route": "/demos/webgpu-field-bake/mechanism/storage-bake-and-mips/",
+      "startup": {
+        "scenario": "storage-bake-and-mips"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "direct-vs-baked",
+      "route": "/demos/webgpu-field-bake/mechanism/direct-vs-baked/",
+      "startup": {
+        "scenario": "direct-vs-baked"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "structured-placement",
+      "route": "/demos/webgpu-field-bake/mechanism/structured-placement/",
+      "startup": {
+        "scenario": "structured-placement"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "shared-cause-composition",
+      "route": "/demos/webgpu-field-bake/mechanism/shared-cause-composition/",
+      "startup": {
+        "scenario": "shared-cause-composition"
+      },
+      "acceptanceStatus": "incomplete"
+    }
   ],
   "mechanisms": [
-    { "id": "field-and-gradient-gallery", "route": "/demos/webgpu-field-bake/mechanism/field-and-gradient-gallery/", "startup": { "scenario": "field-and-gradient-gallery" }, "acceptanceStatus": "incomplete" },
-    { "id": "domain-warp-jacobian", "route": "/demos/webgpu-field-bake/mechanism/domain-warp-jacobian/", "startup": { "scenario": "domain-warp-jacobian" }, "acceptanceStatus": "incomplete" },
-    { "id": "storage-bake-and-mips", "route": "/demos/webgpu-field-bake/mechanism/storage-bake-and-mips/", "startup": { "scenario": "storage-bake-and-mips" }, "acceptanceStatus": "incomplete" },
-    { "id": "direct-vs-baked", "route": "/demos/webgpu-field-bake/mechanism/direct-vs-baked/", "startup": { "scenario": "direct-vs-baked" }, "acceptanceStatus": "incomplete" },
-    { "id": "structured-placement", "route": "/demos/webgpu-field-bake/mechanism/structured-placement/", "startup": { "scenario": "structured-placement" }, "acceptanceStatus": "incomplete" },
-    { "id": "shared-cause-composition", "route": "/demos/webgpu-field-bake/mechanism/shared-cause-composition/", "startup": { "scenario": "shared-cause-composition" }, "acceptanceStatus": "incomplete" }
+    {
+      "id": "field-and-gradient-gallery",
+      "route": "/demos/webgpu-field-bake/mechanism/field-and-gradient-gallery/",
+      "startup": {
+        "scenario": "field-and-gradient-gallery"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "domain-warp-jacobian",
+      "route": "/demos/webgpu-field-bake/mechanism/domain-warp-jacobian/",
+      "startup": {
+        "scenario": "domain-warp-jacobian"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "storage-bake-and-mips",
+      "route": "/demos/webgpu-field-bake/mechanism/storage-bake-and-mips/",
+      "startup": {
+        "scenario": "storage-bake-and-mips"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "direct-vs-baked",
+      "route": "/demos/webgpu-field-bake/mechanism/direct-vs-baked/",
+      "startup": {
+        "scenario": "direct-vs-baked"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "structured-placement",
+      "route": "/demos/webgpu-field-bake/mechanism/structured-placement/",
+      "startup": {
+        "scenario": "structured-placement"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "shared-cause-composition",
+      "route": "/demos/webgpu-field-bake/mechanism/shared-cause-composition/",
+      "startup": {
+        "scenario": "shared-cause-composition"
+      },
+      "acceptanceStatus": "incomplete"
+    }
   ],
   "tiers": [
     {
       "id": "gpu-storage",
       "targetClass": "current-adapter correctness",
       "frameTargetMs": null,
-      "resolutionPolicy": { "fieldExtent": [641, 359], "explicitMipChain": true },
-      "mechanismLimits": { "path": "compute-storage", "dirtyUpdates": true },
-      "resourceLimits": { "format": "rgba16float", "bytesPerTexel": 8 },
+      "resolutionPolicy": {
+        "fieldExtent": [
+          641,
+          359
+        ],
+        "explicitMipChain": true
+      },
+      "mechanismLimits": {
+        "path": "compute-storage",
+        "dirtyUpdates": true
+      },
+      "resourceLimits": {
+        "format": "rgba16float",
+        "bytesPerTexel": 8
+      },
       "degradationFromPrevious": [],
-      "preservedInvariants": ["field identity", "analytic gradient", "deterministic seed", "classification guard"],
+      "preservedInvariants": [
+        "field identity",
+        "analytic gradient",
+        "deterministic seed",
+        "classification guard"
+      ],
       "acceptanceStatus": "incomplete"
     },
     {
       "id": "gpu-direct-evaluate",
       "targetClass": "current-adapter correctness",
       "frameTargetMs": null,
-      "resolutionPolicy": { "fieldExtent": null, "explicitMipChain": false },
-      "mechanismLimits": { "path": "direct-tsl", "sharedLocalBundle": true },
-      "resourceLimits": { "storageBytes": 0 },
-      "degradationFromPrevious": ["remove persistent storage and mip pyramid"],
-      "preservedInvariants": ["field identity", "analytic gradient", "deterministic seed", "classification guard"],
+      "resolutionPolicy": {
+        "fieldExtent": null,
+        "explicitMipChain": false
+      },
+      "mechanismLimits": {
+        "path": "direct-tsl",
+        "sharedLocalBundle": true
+      },
+      "resourceLimits": {
+        "storageBytes": 0
+      },
+      "degradationFromPrevious": [
+        "remove persistent storage and mip pyramid"
+      ],
+      "preservedInvariants": [
+        "field identity",
+        "analytic gradient",
+        "deterministic seed",
+        "classification guard"
+      ],
       "acceptanceStatus": "incomplete"
     },
     {
       "id": "precomputed-minimum",
       "targetClass": "native-WebGPU minimum",
       "frameTargetMs": null,
-      "resolutionPolicy": { "fieldExtent": [512, 512], "explicitMipChain": true },
-      "mechanismLimits": { "path": "precomputed-generated-data", "runtimeBake": false },
-      "resourceLimits": { "sampledTextures": 1, "storageTextures": 0, "storageBuffers": 0, "decodedBytes": 1048576, "gpuTimingRequiredForAcceptance": true },
-      "degradationFromPrevious": ["replace runtime evaluation with immutable generated field data"],
-      "preservedInvariants": ["field identity", "deterministic seed", "classification guard"],
+      "resolutionPolicy": {
+        "fieldExtent": [
+          512,
+          512
+        ],
+        "explicitMipChain": true
+      },
+      "mechanismLimits": {
+        "path": "precomputed-generated-data",
+        "runtimeBake": false
+      },
+      "resourceLimits": {
+        "sampledTextures": 1,
+        "storageTextures": 0,
+        "storageBuffers": 0,
+        "decodedBytes": 1048576,
+        "gpuTimingRequiredForAcceptance": true
+      },
+      "degradationFromPrevious": [
+        "replace runtime evaluation with immutable generated field data"
+      ],
+      "preservedInvariants": [
+        "field identity",
+        "deterministic seed",
+        "classification guard"
+      ],
       "acceptanceStatus": "incomplete"
     }
   ],
-  "modes": ["final", "coordinates", "warp", "macro-height", "gradient", "slope", "packed", "direct-vs-baked", "placement"],
-  "cameras": ["near", "design", "far"],
-  "seeds": [1, 2654435769],
+  "modes": [
+    "final",
+    "coordinates",
+    "warp",
+    "macro-height",
+    "gradient",
+    "slope",
+    "packed",
+    "direct-vs-baked",
+    "placement"
+  ],
+  "cameras": [
+    "near",
+    "design",
+    "far"
+  ],
+  "seeds": [
+    1,
+    2654435769
+  ],
   "capabilityRequirements": [
-    { "id": "native-webgpu", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "rgba16float-storage", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "storage-buffer", "required": true, "evidence": null, "status": "incomplete" }
+    {
+      "id": "native-webgpu",
+      "required": true,
+      "evidence": "Native browser capture: renderer.backend.isWebGPUBackend after init; capture-session records backend=webgpu on WebGPURenderer r185.",
+      "status": "accepted"
+    },
+    {
+      "id": "rgba16float-storage",
+      "required": true,
+      "evidence": "field-storage-readback.json records RGBA16F storage bake and mip chain readbacks from the native capture.",
+      "status": "accepted"
+    },
+    {
+      "id": "storage-buffer",
+      "required": true,
+      "evidence": "field-placement-readback.json records structured placement storage-buffer contents from the native capture.",
+      "status": "accepted"
+    }
   ],
   "runtimeProof": [
-    { "id": "backend-is-webgpu", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "direct-f32-readback", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "storage-and-mip-readback", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "placement-buffer-readback", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "current-adapter-timing", "required": true, "evidence": null, "status": "incomplete" }
+    {
+      "id": "backend-is-webgpu",
+      "required": true,
+      "evidence": "capture-session.json runtime.metrics.backend=webgpu and nativeWebGPU=true from playwright-headless Chrome WebGPU.",
+      "status": "accepted"
+    },
+    {
+      "id": "direct-f32-readback",
+      "required": true,
+      "evidence": "field-readback.json + field-probe-corpus.json from controller.captureFieldReadback / captureProbeCorpusReadback.",
+      "status": "accepted"
+    },
+    {
+      "id": "storage-and-mip-readback",
+      "required": true,
+      "evidence": "field-storage-readback.json + field-dirty-region.json from storage bake and dirty-region capture.",
+      "status": "accepted"
+    },
+    {
+      "id": "placement-buffer-readback",
+      "required": true,
+      "evidence": "field-placement-readback.json from capturePlacementReadback.",
+      "status": "accepted"
+    },
+    {
+      "id": "current-adapter-timing",
+      "required": true,
+      "evidence": "No named-adapter timestamp-query suite was bound in the correctness capture profile.",
+      "status": "incomplete"
+    }
   ],
   "evidenceContract": "v2",
   "validationCommand": "node threejs-procedural-fields/examples/webgpu-field-bake/validate-field-contract.mjs --allow-missing-gpu",

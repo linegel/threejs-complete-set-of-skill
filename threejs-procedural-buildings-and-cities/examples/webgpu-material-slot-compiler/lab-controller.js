@@ -1,6 +1,13 @@
 import * as THREE from "three/webgpu";
 import { color, emissive, float, mrt, normalView, output, pass, renderOutput } from "three/tsl";
 
+import {
+  bindWebGPUDeviceIdentity,
+  captureRuntimeProfileFields,
+  markWebGPUDeviceDisposed,
+  markWebGPUDeviceDisposing,
+  webgpuDeviceIdentityMetrics,
+} from "../../../labs/runtime/webgpu-device-identity.mjs";
 import { createBuildingPlan, FIXTURE_SETTINGS } from "./building-plan.js";
 import { compileBuilding, disposeCompiledBuilding } from "./compiler.js";
 import { compileCityChunk } from "./chunking.js";
@@ -151,6 +158,7 @@ export async function createBuildingLabController({
   if (renderer.backend.isWebGPUBackend !== true) {
     throw new Error("WebGPU is required for the canonical material-slot compiler lab; no fallback was activated.");
   }
+  const deviceIdentity = bindWebGPUDeviceIdentity(renderer);
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x10171d);
   const perspectiveCamera = new THREE.PerspectiveCamera(44, width / height, 0.1, 600);
@@ -376,6 +384,7 @@ export async function createBuildingLabController({
     },
     describePipeline() {
       return {
+        ...captureRuntimeProfileFields(),
         owners: {
           renderer: "webgpu-material-slot-compiler-standalone",
           renderPipeline: "webgpu-material-slot-compiler-standalone",
@@ -413,12 +422,21 @@ export async function createBuildingLabController({
     },
     getMetrics() {
       const expectedSceneDraws = expectedSceneBackendDrawItems(currentCompiled, 1); // ground
+      const info = renderer.info ?? {};
       return {
+        labId: "webgpu-material-slot-compiler",
+        ...webgpuDeviceIdentityMetrics(deviceIdentity, renderer),
+        threeRevision: "185",
+        threePackageVersion: "0.185.1",
         mode: currentMode,
         tier: currentTier,
         seed: currentSeed,
         camera: currentCamera,
         scenario: currentScenario,
+        timeSeconds: 0,
+        viewport: { width, height, dpr: appliedDpr },
+        backendIsWebGPU: renderer.backend?.isWebGPUBackend === true,
+        isWebGPUBackend: renderer.backend?.isWebGPUBackend === true,
         resolutionPolicy: {
           width,
           height,
@@ -440,13 +458,19 @@ export async function createBuildingLabController({
             measuredRendererDrawCalls: lastRenderMeasurement.drawCalls,
           },
         culling: currentCompiled?.getCullingState?.() ?? null,
-        rendererInfo: structuredClone(renderer.info),
+        rendererInfo: {
+          ...webgpuDeviceIdentityMetrics(deviceIdentity, renderer).rendererInfo,
+          memory: { ...(info.memory ?? {}) },
+          render: { ...(info.render ?? {}) },
+          compute: { ...(info.compute ?? {}) },
+        },
         gpuTiming: { verdict: "INSUFFICIENT_EVIDENCE", value: null, unit: "ms", label: "Measured", source: "timestamp readback not yet captured" },
       };
     },
     async dispose() {
       if (disposed) return;
       disposed = true;
+      markWebGPUDeviceDisposing(deviceIdentity);
       clearContent();
       ground.geometry.dispose();
       groundMaterial.dispose();
@@ -455,6 +479,7 @@ export async function createBuildingLabController({
       scenePass.dispose();
       renderPipeline.dispose();
       renderer.dispose();
+      markWebGPUDeviceDisposed(deviceIdentity);
     },
   };
 
