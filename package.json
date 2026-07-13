@@ -19,6 +19,7 @@
     "labs:test:mutations": "node --test tests/labs/*.test.mjs && node scripts/run-labs.mjs mutations",
     "labs:capture": "node scripts/run-labs.mjs capture",
     "labs:capture:browser": "node scripts/capture-lab-browser.mjs",
+    "labs:assemble:validation-harness": "node scripts/assemble-validation-harness-release.mjs",
     "labs:validate": "node scripts/run-labs.mjs validate",
     "labs:validate:quick": "node scripts/validate-lab-manifests.mjs && node scripts/run-labs.mjs quick",
     "labs:validate:full": "node scripts/validate-lab-manifests.mjs --require-complete && node scripts/run-labs.mjs full",
