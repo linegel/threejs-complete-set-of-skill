@@ -1086,12 +1086,13 @@ function assertGovernorTrace( governor ) {
 	if ( trace.cooldownWindows !== HARDWARE_PERFORMANCE_CONTRACT.governorCooldown.value ) fail( 'Quality governor cooldown differs from the fixed stress contract.' );
 	const states = requireArray( trace.states, 'governor.trace.states' );
 	if ( stableStringify( states ) !== stableStringify( [ 'target-performance', 'governor-stress' ] ) ) fail( 'Quality governor states differ from the fixed tier order.' );
+	if ( trace.initialState !== 'governor-stress' ) fail( 'Quality governor initial state must match the locked governor-stress route.' );
 	const windows = requireArray( trace.windows, 'governor.trace.windows' );
 	if ( windows.length !== trace.windowCount ) fail( 'Quality governor window population does not match windowCount.' );
 	const transitions = requireArray( trace.transitions, 'governor.trace.transitions' );
 	if ( transitions.length < HARDWARE_PERFORMANCE_CONTRACT.minimumGovernorTransitions.value ) fail( 'Quality governor did not exercise a real tier transition.' );
 
-	let stateIndex = 0;
+	let stateIndex = states.indexOf( trace.initialState );
 	let residence = 0;
 	let cooldown = 0;
 	let transitionIndex = 0;

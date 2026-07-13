@@ -2013,7 +2013,9 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 			const minimumResidenceWindows = 2;
 			const cooldownWindows = 2;
 			const states = [ 'target-performance', 'governor-stress' ];
-			let stateIndex = 0;
+			const initialState = tier;
+			let stateIndex = states.indexOf( initialState );
+			if ( stateIndex < 0 ) throw new Error( `Governor route tier ${ initialState } is not a declared governor state.` );
 			let residence = 0;
 			let cooldown = 0;
 			const windows = [];
@@ -2101,6 +2103,7 @@ export async function createNativeWebGPUValidationSubject( canvas, options = {} 
 				minimumResidenceWindows,
 				cooldownWindows,
 				states,
+				initialState,
 				windows,
 				transitions,
 				settledState: tier,

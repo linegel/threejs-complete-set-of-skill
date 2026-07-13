@@ -291,20 +291,21 @@ function governorTrace() {
 		minimumResidenceWindows: 2,
 		cooldownWindows: 2,
 		states: [ 'target-performance', 'governor-stress' ],
+		initialState: 'governor-stress',
 		windows: [
-			governorWindow( 0, 'target-performance', 'target-performance', 16, 'hold', 1, 0 ),
-			governorWindow( 1, 'target-performance', 'governor-stress', 16, 'degrade', 0, 2 ),
-			governorWindow( 2, 'governor-stress', 'governor-stress', 13, 'hold', 1, 1 ),
-			governorWindow( 3, 'governor-stress', 'governor-stress', 13, 'hold', 2, 0 ),
-			governorWindow( 4, 'governor-stress', 'governor-stress', 13, 'hold', 3, 0 ),
-			governorWindow( 5, 'governor-stress', 'governor-stress', 13, 'hold', 4, 0 )
+			governorWindow( 0, 'governor-stress', 'governor-stress', 10, 'hold', 1, 0 ),
+			governorWindow( 1, 'governor-stress', 'target-performance', 10, 'upgrade', 0, 2 ),
+			governorWindow( 2, 'target-performance', 'target-performance', 10, 'hold', 1, 1 ),
+			governorWindow( 3, 'target-performance', 'target-performance', 10, 'hold', 2, 0 ),
+			governorWindow( 4, 'target-performance', 'target-performance', 10, 'hold', 3, 0 ),
+			governorWindow( 5, 'target-performance', 'target-performance', 10, 'hold', 4, 0 )
 		],
 		transitions: [ {
 			window: 1,
-			from: 'target-performance',
-			to: 'governor-stress',
-			cause: 'gpu-p95-over-budget',
-			gpuP95: 16,
+			from: 'governor-stress',
+			to: 'target-performance',
+			cause: 'gpu-p95-below-hysteresis',
+			gpuP95: 10,
 			rebuildCpuSubmissionMs: 0.2,
 			rebuildGpuMs: 1.5,
 			rebuildTimestampRow: {
@@ -319,10 +320,10 @@ function governorTrace() {
 				independentPerFrameTotalAvailable: false
 			},
 			lastFrameResolveResidualMs: 0,
-			fromResourceBytes: 100,
-			toResourceBytes: 60
+			fromResourceBytes: 60,
+			toResourceBytes: 100
 		} ],
-		settledState: 'governor-stress',
+		settledState: 'target-performance',
 		oscillationDetected: false
 	};
 
@@ -341,7 +342,7 @@ function performanceSession() {
 			verdict: 'PASS',
 			oscillationDetected: false,
 			settled: true,
-			settledState: 'governor-stress',
+			settledState: 'target-performance',
 			settledResidenceWindows: numericDatum( 4, 'window', 'Measured', 'governor trace' ),
 			trace: governorTrace()
 		}
@@ -640,11 +641,12 @@ test( 'hardware performance mutations reject short, discontinuous, or fabricated
 		[ 'fabricated per-frame total', ( value ) => { value.sustainedWindows[ 0 ].gpuTimestampBatches[ 0 ].timestampRows[ 0 ].independentPerFrameTotalAvailable = true; }, /fabricates/ ],
 		[ 'unreconciled batch resolve', ( value ) => { value.sustainedWindows[ 0 ].gpuTimestampBatches[ 0 ].lastFrameResolveResidualMs = 0.002; }, /final-frame timestamp resolve/ ],
 		[ 'missing governor transition', ( value ) => { value.governor.trace.transitions = []; }, /did not exercise/ ],
+		[ 'wrong governor initial state', ( value ) => { value.governor.trace.initialState = 'target-performance'; }, /locked governor-stress route/ ],
 		[ 'forged governor p95', ( value ) => { value.governor.trace.windows[ 0 ].gpuP95 = 15; }, /does not reconcile/ ],
 		[ 'forged governor timestamp row', ( value ) => { value.governor.trace.windows[ 0 ].timestampRows[ 0 ].sceneMs += 1; }, /not derived/ ],
 		[ 'forged governor decision', ( value ) => { value.governor.trace.windows[ 1 ].decision = 'hold'; }, /decision does not follow/ ],
 		[ 'forged governor cooldown', ( value ) => { value.governor.trace.windows[ 2 ].cooldown = 0; }, /committed state counters/ ],
-		[ 'forged governor resource direction', ( value ) => { value.governor.trace.transitions[ 0 ].toResourceBytes = 120; }, /resource direction/ ],
+		[ 'forged governor resource direction', ( value ) => { value.governor.trace.transitions[ 0 ].toResourceBytes = 50; }, /resource direction/ ],
 		[ 'forged governor oscillation', ( value ) => { value.governor.trace.oscillationDetected = true; }, /oscillation verdict/ ],
 		[ 'forged governor settled residence', ( value ) => { value.governor.settledResidenceWindows.value = 5; }, /does not reconcile/ ],
 		[ 'unsettled governor', ( value ) => { value.governor.settled = false; }, /summary does not match/ ]
