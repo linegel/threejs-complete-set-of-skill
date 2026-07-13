@@ -103,6 +103,18 @@ moving the force centroid. This source oracle does not claim a resolved solid
 boundary; moving cut cells and Brinkman penalization remain separate obstacle
 candidates.
 
+The native owner prepares that same conservative per-cell field once and lets
+each cell gather its source only while the committed batch sequence is older.
+To remain inside the portable default limit of eight storage buffers per
+compute stage, x and z source increments travel through the reserved `.w`
+channels of the already-required west x-face and south z-face records. This was
+selected over elevated device limits, another source pass/ping-pong, semantic
+state aliasing, or record-times-cell gathering. The transaction ledger's
+sequence advances only in the successful atomic commit, so rejection retries
+the source without duplicate application. Open
+`?tier=budgeted&interactionRollback=1` to reject the first sourced candidate,
+prove the interaction cursor remains zero, then admit the identical source once.
+
 Run `node test-swe-core.mjs`. The test covers a non-flat 10,000-step lake at
 rest, a 240-step wet/dry dam break, closed-domain volume, positivity, CFL
 rejection, invalid-grid mutations, descriptor permutation, slot retention,

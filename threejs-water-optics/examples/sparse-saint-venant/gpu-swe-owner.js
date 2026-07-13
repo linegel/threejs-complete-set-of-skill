@@ -23,16 +23,26 @@ import {
 	vec4
 } from 'three/tsl';
 import { deriveSweGpuContract, validateSweGpuContract } from './gpu-swe-contract.js';
+import { applyPointImpulseBatchToSwe } from './interaction-source-core.js';
 import { assessCharacteristicCompatibility } from './offshore-boundary.js';
 
 const MASS_QUANTA_PER_METER = 100000;
 const DRY_TOLERANCE_METERS = 1e-5;
 const NEGATIVE_DEPTH_GATE_METERS = -1e-6;
 const FINITE_MAGNITUDE_GATE = 1e4;
+const IMPULSE_QUANTA_PER_NEWTON_SECOND = 1000;
 
 function paddedStateIndexNumber( contract, slot, localX, localZ ) {
 
 	return slot * contract.paddedSize * contract.paddedSize + localZ * contract.paddedSize + localX;
+
+}
+
+function impulseQuanta( value ) {
+
+	const quanta = Math.round( Math.abs( value ) * IMPULSE_QUANTA_PER_NEWTON_SECOND );
+	if ( ! Number.isSafeInteger( quanta ) || quanta > 0xffffffff ) throw new Error( 'GPU SWE interaction impulse exceeds the uint32 diagnostic envelope' );
+	return quanta;
 
 }
 
@@ -91,6 +101,50 @@ export function buildGpuSweInitialData( preparedCommit, contract, initialConditi
 
 }
 
+export function buildGpuInteractionSourceData( initial, contract, interactionBatch = null ) {
+
+	const sourceArray = new Float32Array( contract.stateRecords * 2 );
+	if ( interactionBatch === null || interactionBatch === undefined ) return Object.freeze( {
+		sourceArray,
+		sequence: 0,
+		applicationLedgerKeys: Object.freeze( [] ),
+		diagnostics: Object.freeze( { interactionCount: 0, nonzeroScatterWrites: 0, appliedLinearImpulseNs: Object.freeze( [ 0, 0, 0 ] ), appliedAngularImpulseNms: Object.freeze( [ 0, 0, 0 ] ), linearResidualNs: 0, angularResidualNms: 0 } )
+	} );
+	if ( ! Number.isInteger( interactionBatch.sequence ) || interactionBatch.sequence <= 0 ) throw new Error( 'GPU SWE interaction batch sequence must be a positive integer' );
+	const width = contract.tier.logicalTilesX * contract.tier.tileSize;
+	const height = contract.tier.logicalTilesZ * contract.tier.tileSize;
+	const receiverMask = new Uint8Array( width * height );
+	for ( const cell of initial.displayCells ) receiverMask[ cell.globalCellZ * width + cell.globalCellX ] = 1;
+	const applied = applyPointImpulseBatchToSwe( {
+		xDischargeM2ps: new Float64Array( width * height ),
+		zDischargeM2ps: new Float64Array( width * height ),
+		interactions: interactionBatch.interactions,
+		priorApplicationLedgerKeys: interactionBatch.priorApplicationLedgerKeys ?? [],
+		width,
+		height,
+		cellSizeMeters: contract.tier.cellSizeMeters,
+		originXMeters: interactionBatch.originXMeters,
+		originZMeters: interactionBatch.originZMeters,
+		waterDensityKgPerM3: interactionBatch.waterDensityKgPerM3,
+		receiverMask,
+		balanceReferencePointMeters: interactionBatch.balanceReferencePointMeters ?? [ 0, 0, 0 ]
+	} );
+	for ( const cell of initial.displayCells ) {
+
+		const denseIndex = cell.globalCellZ * width + cell.globalCellX;
+		sourceArray[ cell.stateIndex * 2 ] = applied.xDischargeM2ps[ denseIndex ];
+		sourceArray[ cell.stateIndex * 2 + 1 ] = applied.zDischargeM2ps[ denseIndex ];
+
+	}
+	return Object.freeze( {
+		sourceArray,
+		sequence: interactionBatch.sequence,
+		applicationLedgerKeys: applied.applicationLedgerKeys,
+		diagnostics: applied.diagnostics
+	} );
+
+}
+
 function createStorageBuffer( array, itemSize, name ) {
 
 	const buffer = new StorageBufferAttribute( array, itemSize );
@@ -132,7 +186,8 @@ export function createGpuSparseSweOwner( renderer, {
 	preparedCommit,
 	initialCondition,
 	gravityMps2 = 9.80665,
-	openBoundary = null
+	openBoundary = null,
+	interactionBatch = null
 } ) {
 
 	if ( renderer?.backend?.isWebGPUBackend !== true ) throw new Error( 'GPU sparse SWE requires an initialized native WebGPU renderer' );
@@ -140,10 +195,12 @@ export function createGpuSparseSweOwner( renderer, {
 	validateSweGpuContract( contract );
 	const boundary = validateOpenBoundary( openBoundary, contract, gravityMps2 );
 	const initial = buildGpuSweInitialData( preparedCommit, contract, initialCondition );
+	const initialInteractionSource = buildGpuInteractionSourceData( initial, contract, interactionBatch );
 	const stateCommittedBuffer = createStorageBuffer( initial.stateArray.slice(), 4, 'sparse-swe:committed-state' );
 	const stateCandidateBuffer = createStorageBuffer( initial.stateArray.slice(), 4, 'sparse-swe:candidate-state' );
 	const foamCommittedBuffer = createStorageBuffer( new Float32Array( contract.stateRecords ), 1, 'sparse-swe:committed-foam-coverage' );
 	const foamCandidateBuffer = createStorageBuffer( new Float32Array( contract.stateRecords ), 1, 'sparse-swe:candidate-foam-coverage' );
+	const interactionSourceBuffer = createStorageBuffer( initialInteractionSource.sourceArray, 2, 'sparse-swe:prepared-interaction-source' );
 	const descriptorBuffer = createStorageBuffer( initial.descriptorArray, 4, 'sparse-swe:tile-descriptors' );
 	const lookupBuffer = createStorageBuffer( initial.lookupArray, 1, 'sparse-swe:logical-tile-lookup' );
 	const displayIndexBuffer = createStorageBuffer( initial.displayIndexArray, 1, 'sparse-swe:display-state-indices' );
@@ -151,11 +208,12 @@ export function createGpuSparseSweOwner( renderer, {
 	const zFluxBuffer = createStorageBuffer( new Float32Array( contract.zFaceRecords * 4 ), 4, 'sparse-swe:z-face-flux' );
 	const xCorrectionBuffer = createStorageBuffer( new Float32Array( contract.xFaceRecords * 2 ), 2, 'sparse-swe:x-hydrostatic-correction' );
 	const zCorrectionBuffer = createStorageBuffer( new Float32Array( contract.zFaceRecords * 2 ), 2, 'sparse-swe:z-hydrostatic-correction' );
-	const diagnosticBuffer = new StorageBufferAttribute( 16, 1, Uint32Array );
+	const diagnosticBuffer = new StorageBufferAttribute( 22, 1, Uint32Array );
 	diagnosticBuffer.name = 'sparse-swe:transaction-diagnostics';
 	const resourceInventory = Object.freeze( {
 		statePingPong: stateCommittedBuffer.array.byteLength + stateCandidateBuffer.array.byteLength,
 		foamPingPong: foamCommittedBuffer.array.byteLength + foamCandidateBuffer.array.byteLength,
+		interactionSource: interactionSourceBuffer.array.byteLength,
 		xFaceFlux: xFluxBuffer.array.byteLength,
 		zFaceFlux: zFluxBuffer.array.byteLength,
 		xHydrostaticCorrection: xCorrectionBuffer.array.byteLength,
@@ -177,6 +235,7 @@ export function createGpuSparseSweOwner( renderer, {
 	const candidate = storage( stateCandidateBuffer, 'vec4', contract.stateRecords );
 	const foamCommitted = storage( foamCommittedBuffer, 'float', contract.stateRecords );
 	const foamCandidate = storage( foamCandidateBuffer, 'float', contract.stateRecords );
+	const interactionSource = storage( interactionSourceBuffer, 'vec2', contract.stateRecords ).toReadOnly();
 	const descriptors = storage( descriptorBuffer, 'ivec4', contract.tier.capacityTiles ).toReadOnly();
 	const lookup = storage( lookupBuffer, 'int', contract.tier.logicalTilesX * contract.tier.logicalTilesZ ).toReadOnly();
 	const displayIndices = storage( displayIndexBuffer, 'uint', initial.displayIndexArray.length ).toReadOnly();
@@ -184,7 +243,7 @@ export function createGpuSparseSweOwner( renderer, {
 	const zFlux = storage( zFluxBuffer, 'vec4', contract.zFaceRecords );
 	const xCorrection = storage( xCorrectionBuffer, 'vec2', contract.xFaceRecords );
 	const zCorrection = storage( zCorrectionBuffer, 'vec2', contract.zFaceRecords );
-	const diagnostics = storage( diagnosticBuffer, 'uint', 16 ).toAtomic();
+	const diagnostics = storage( diagnosticBuffer, 'uint', 22 ).toAtomic();
 
 	const tileSize = contract.tier.tileSize;
 	const paddedSize = contract.paddedSize;
@@ -197,6 +256,14 @@ export function createGpuSparseSweOwner( renderer, {
 	const gravity = float( gravityMps2 );
 	const dryTolerance = float( DRY_TOLERANCE_METERS );
 	const boundaryTimeSeconds = uniform( boundary?.phaseReferenceSeconds ?? 0 );
+	const interactionSequence = uint( initialInteractionSource.sequence );
+	const preparedImpulse = initialInteractionSource.diagnostics.appliedLinearImpulseNs;
+	const preparedImpulseQuanta = Object.freeze( {
+		xPositive: preparedImpulse[ 0 ] >= 0 ? impulseQuanta( preparedImpulse[ 0 ] ) : 0,
+		xNegative: preparedImpulse[ 0 ] < 0 ? impulseQuanta( preparedImpulse[ 0 ] ) : 0,
+		zPositive: preparedImpulse[ 2 ] >= 0 ? impulseQuanta( preparedImpulse[ 2 ] ) : 0,
+		zNegative: preparedImpulse[ 2 ] < 0 ? impulseQuanta( preparedImpulse[ 2 ] ) : 0
+	} );
 
 	const paddedIndex = ( slot, localX, localZ ) => slot.mul( uint( paddedCells ) ).add( localZ.mul( uint( paddedSize ) ) ).add( localX );
 	const localCoordinates = ( linear, width ) => {
@@ -338,7 +405,9 @@ export function createGpuSparseSweOwner( renderer, {
 
 			const localZ = coordinate.z.add( uint( 1 ) );
 			const face = hydrostaticFace( committed.element( paddedIndex( slot, coordinate.x, localZ ) ), committed.element( paddedIndex( slot, coordinate.x.add( uint( 1 ) ), localZ ) ), 'x' );
-			xFlux.element( linear ).assign( vec4( face.flux, 0 ) );
+			const sourceIndex = paddedIndex( slot, min( coordinate.x.add( uint( 1 ) ), uint( tileSize ) ), localZ );
+			const sourceX = select( coordinate.x.lessThan( uint( tileSize ) ), interactionSource.element( sourceIndex ).x, float( 0 ) );
+			xFlux.element( linear ).assign( vec4( face.flux, sourceX ) );
 			xCorrection.element( linear ).assign( face.correction );
 
 		} ).Else( () => { xFlux.element( linear ).assign( vec4( 0 ) ); xCorrection.element( linear ).assign( vec2( 0 ) ); } );
@@ -356,7 +425,9 @@ export function createGpuSparseSweOwner( renderer, {
 
 			const localX = coordinate.x.add( uint( 1 ) );
 			const face = hydrostaticFace( committed.element( paddedIndex( slot, localX, coordinate.z ) ), committed.element( paddedIndex( slot, localX, coordinate.z.add( uint( 1 ) ) ) ), 'z' );
-			zFlux.element( linear ).assign( vec4( face.flux, 0 ) );
+			const sourceIndex = paddedIndex( slot, localX, min( coordinate.z.add( uint( 1 ) ), uint( tileSize ) ) );
+			const sourceZ = select( coordinate.z.lessThan( uint( tileSize ) ), interactionSource.element( sourceIndex ).y, float( 0 ) );
+			zFlux.element( linear ).assign( vec4( face.flux, sourceZ ) );
 			zCorrection.element( linear ).assign( face.correction );
 
 		} ).Else( () => { zFlux.element( linear ).assign( vec4( 0 ) ); zCorrection.element( linear ).assign( vec2( 0 ) ); } );
@@ -387,8 +458,11 @@ export function createGpuSparseSweOwner( renderer, {
 			const southCorrection = zCorrection.element( southIndex );
 			const northCorrection = zCorrection.element( northIndex );
 			const nextDepth = prior.x.sub( east.x.sub( west.x ).mul( dt.mul( inverseDx ) ) ).sub( north.x.sub( south.x ).mul( dt.mul( inverseDx ) ) );
-			const nextMx = prior.y.sub( east.y.add( eastCorrection.x ).sub( west.y.add( westCorrection.y ) ).mul( dt.mul( inverseDx ) ) ).sub( north.z.sub( south.z ).mul( dt.mul( inverseDx ) ) );
-			const nextMz = prior.z.sub( east.z.sub( west.z ).mul( dt.mul( inverseDx ) ) ).sub( north.y.add( northCorrection.x ).sub( south.y.add( southCorrection.y ) ).mul( dt.mul( inverseDx ) ) );
+			const applyPreparedSource = interactionSequence.greaterThan( atomicLoad( diagnostics.element( uint( 21 ) ) ) );
+			const nextMx = prior.y.sub( east.y.add( eastCorrection.x ).sub( west.y.add( westCorrection.y ) ).mul( dt.mul( inverseDx ) ) ).sub( north.z.sub( south.z ).mul( dt.mul( inverseDx ) ) )
+				.add( select( applyPreparedSource, west.w, float( 0 ) ) );
+			const nextMz = prior.z.sub( east.z.sub( west.z ).mul( dt.mul( inverseDx ) ) ).sub( north.y.add( northCorrection.x ).sub( south.y.add( southCorrection.y ) ).mul( dt.mul( inverseDx ) ) )
+				.add( select( applyPreparedSource, south.w, float( 0 ) ) );
 			const newlyDry = nextDepth.greaterThanEqual( float( 0 ) ).and( nextDepth.lessThanEqual( dryTolerance ) );
 			candidate.element( stateIndex ).assign( vec4( select( newlyDry, max( nextDepth, float( 0 ) ), nextDepth ), select( newlyDry, float( 0 ), nextMx ), select( newlyDry, float( 0 ), nextMz ), prior.w ) );
 
@@ -562,6 +636,19 @@ export function createGpuSparseSweOwner( renderer, {
 			const receipt = uint( 0 ).toVar();
 			If( valid, () => {
 
+				const committedInteractionSequence = atomicLoad( diagnostics.element( uint( 21 ) ) );
+				const newInteractionBatch = interactionSequence.greaterThan( committedInteractionSequence );
+				If( newInteractionBatch, () => {
+
+					receipt.assign( atomicAdd( diagnostics.element( uint( 16 ) ), uint( preparedImpulseQuanta.xPositive ) ) );
+					receipt.assign( atomicAdd( diagnostics.element( uint( 17 ) ), uint( preparedImpulseQuanta.xNegative ) ) );
+					receipt.assign( atomicAdd( diagnostics.element( uint( 18 ) ), uint( preparedImpulseQuanta.zPositive ) ) );
+					receipt.assign( atomicAdd( diagnostics.element( uint( 19 ) ), uint( preparedImpulseQuanta.zNegative ) ) );
+					receipt.assign( atomicAdd( diagnostics.element( uint( 20 ) ), uint( 1 ) ) );
+					receipt.assign( atomicAdd( diagnostics.element( uint( 21 ) ), interactionSequence.sub( committedInteractionSequence ) ) );
+
+				} );
+
 				receipt.assign( atomicAdd( diagnostics.element( uint( 5 ) ), uint( 1 ) ) );
 				receipt.assign( atomicAdd( diagnostics.element( uint( 6 ) ), uint( 1 ) ) );
 
@@ -625,6 +712,10 @@ export function createGpuSparseSweOwner( renderer, {
 			boundaryInfluxDepthQuanta: values[ 10 ], boundaryOutfluxDepthQuanta: values[ 11 ],
 			internalFluxCancellationDepthQuanta: ( values[ 8 ] - values[ 9 ] ) - ( values[ 10 ] - values[ 11 ] ),
 			foamCoveredCells: values[ 12 ], foamSourceRateQuanta: values[ 13 ], foamClampCells: values[ 14 ], foamCoverageQuanta: values[ 15 ],
+			interactionImpulseXPositiveQuanta: values[ 16 ], interactionImpulseXNegativeQuanta: values[ 17 ],
+			interactionImpulseZPositiveQuanta: values[ 18 ], interactionImpulseZNegativeQuanta: values[ 19 ],
+			committedInteractionBatches: values[ 20 ], committedInteractionSequence: values[ 21 ],
+			impulseQuantumNewtonSeconds: 1 / IMPULSE_QUANTA_PER_NEWTON_SECOND,
 			massQuantumMeters: 1 / MASS_QUANTA_PER_METER,
 			diagnosticReadbackOnly: true,
 			frameCriticalReadbackCount: 0
@@ -640,12 +731,14 @@ export function createGpuSparseSweOwner( renderer, {
 		stateCandidateBuffer,
 		foamCommittedBuffer,
 		foamCandidateBuffer,
+		interactionSourceBuffer,
 		descriptorBuffer,
 		lookupBuffer,
 		displayIndexBuffer,
 		diagnosticBuffer,
 		committedStateNode: committed,
 		foamCommittedNode: foamCommitted,
+		initialInteractionSource,
 		displayIndexNode: displayIndices,
 		dispatchFixedStep,
 		dispatchRollbackMutationProbe,
@@ -671,6 +764,7 @@ export function createGpuSparseSweOwner( renderer, {
 				tierId, submittedTicks, dispatchCount, droppedTimeSeconds, diagnosticReadbackCount, rollbackMutationProbeCount, frameCriticalReadbackCount: 0,
 				disposed,
 				simulationTimeSeconds, openBoundary: boundary === null ? null : Object.freeze( { side: boundary.side, modeId: boundary.mode.modeId, compatibility: boundary.compatibility } ),
+				interactionSource: Object.freeze( { sequence: initialInteractionSource.sequence, interactionCount: initialInteractionSource.diagnostics.interactionCount, applicationLedgerKeys: initialInteractionSource.applicationLedgerKeys } ),
 				residentTileCount: initial.residentTileCount, residentCellCount: initial.residentCellCount,
 				logicalResourceBytes: contract.totalLogicalBytes, resourceInventory,
 				backendAllocatedBytes: null, backendAllocationClaim: 'unmeasured-backend-alignment-and-residency', dispatchOrder: contract.dispatchOrder
@@ -681,7 +775,7 @@ export function createGpuSparseSweOwner( renderer, {
 
 			if ( disposed ) return;
 			disposed = true;
-			for ( const buffer of [ stateCommittedBuffer, stateCandidateBuffer, foamCommittedBuffer, foamCandidateBuffer, descriptorBuffer, lookupBuffer, displayIndexBuffer, xFluxBuffer, zFluxBuffer, xCorrectionBuffer, zCorrectionBuffer, diagnosticBuffer ] ) buffer.dispose?.();
+			for ( const buffer of [ stateCommittedBuffer, stateCandidateBuffer, foamCommittedBuffer, foamCandidateBuffer, interactionSourceBuffer, descriptorBuffer, lookupBuffer, displayIndexBuffer, xFluxBuffer, zFluxBuffer, xCorrectionBuffer, zCorrectionBuffer, diagnosticBuffer ] ) buffer.dispose?.();
 
 		}
 	} );

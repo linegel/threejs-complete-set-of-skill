@@ -154,7 +154,7 @@ async function captureDiagnostic() {
 	try {
 
 		const diagnostic = await owner.captureDiagnostics();
-		lastDiagnosticSummary = `ledger gen ${ diagnostic.committedGeneration } · wet ${ diagnostic.wetCells } · invalid ${ diagnostic.invalidCells } · negative ${ diagnostic.negativeDepthCells } · accepted ${ diagnostic.acceptedCommits } · rejected ${ diagnostic.rejectedCommits } · foam ${ diagnostic.foamCoveredCells } cells / ${ diagnostic.foamCoverageQuanta } coverage q / ${ diagnostic.foamSourceRateQuanta } source q / clamps ${ diagnostic.foamClampCells } · depth q prior ${ diagnostic.priorDepthQuanta } / candidate ${ diagnostic.candidateDepthQuanta } · net flux ${ diagnostic.netFluxInfluxDepthQuanta } in / ${ diagnostic.netFluxOutfluxDepthQuanta } out · boundary ${ diagnostic.boundaryInfluxDepthQuanta } in / ${ diagnostic.boundaryOutfluxDepthQuanta } out · internal residual ${ diagnostic.internalFluxCancellationDepthQuanta }`;
+		lastDiagnosticSummary = `ledger gen ${ diagnostic.committedGeneration } · wet ${ diagnostic.wetCells } · invalid ${ diagnostic.invalidCells } · negative ${ diagnostic.negativeDepthCells } · accepted ${ diagnostic.acceptedCommits } · rejected ${ diagnostic.rejectedCommits } · interaction seq ${ diagnostic.committedInteractionSequence } / batches ${ diagnostic.committedInteractionBatches } / impulse q x ${ diagnostic.interactionImpulseXPositiveQuanta - diagnostic.interactionImpulseXNegativeQuanta } z ${ diagnostic.interactionImpulseZPositiveQuanta - diagnostic.interactionImpulseZNegativeQuanta } · foam ${ diagnostic.foamCoveredCells } cells / ${ diagnostic.foamCoverageQuanta } coverage q / ${ diagnostic.foamSourceRateQuanta } source q / clamps ${ diagnostic.foamClampCells } · depth q prior ${ diagnostic.priorDepthQuanta } / candidate ${ diagnostic.candidateDepthQuanta } · net flux ${ diagnostic.netFluxInfluxDepthQuanta } in / ${ diagnostic.netFluxOutfluxDepthQuanta } out · boundary ${ diagnostic.boundaryInfluxDepthQuanta } in / ${ diagnostic.boundaryOutfluxDepthQuanta } out · internal residual ${ diagnostic.internalFluxCancellationDepthQuanta }`;
 		status.textContent = `READY · NATIVE WEBGPU · ${ tierId.toUpperCase() } · ${ lastDiagnosticSummary }`;
 		return diagnostic;
 
@@ -276,17 +276,30 @@ async function disposeApp() {
 async function verifyNativeBootstrap( device ) {
 
 	status.textContent = 'VERIFYING NATIVE WEBGPU COMPUTE GRAPH…';
+	let interactionRollbackProof = null;
+	if ( params.get( 'interactionRollback' ) === '1' ) {
+
+		owner.dispatchRollbackMutationProbe();
+		await device.queue.onSubmittedWorkDone();
+		const rejected = await owner.captureDiagnostics();
+		if ( rejected.negativeDepthCells < 1 || rejected.committedGeneration !== 0 || rejected.acceptedCommits !== 0 || rejected.rejectedCommits !== 1
+			|| rejected.committedInteractionBatches !== 0 || rejected.committedInteractionSequence !== 0 ) throw new Error( `interaction rollback bootstrap mutation escaped: ${ JSON.stringify( rejected ) }` );
+		interactionRollbackProof = Object.freeze( { rejected } );
+
+	}
 	owner.dispatchFixedStep();
 	await device.queue.onSubmittedWorkDone();
 	if ( gpuErrors.length > 0 ) throw new Error( gpuErrors[ 0 ] );
 	const diagnostic = await owner.captureDiagnostics();
 	if ( gpuErrors.length > 0 ) throw new Error( gpuErrors[ 0 ] );
-	if ( diagnostic.invalidCells !== 0 || diagnostic.negativeDepthCells !== 0 || diagnostic.committedGeneration !== 1 || diagnostic.acceptedCommits !== 1 || diagnostic.rejectedCommits !== 0 ) {
+	const expectedRejectedCommits = interactionRollbackProof === null ? 0 : 1;
+	if ( diagnostic.invalidCells !== 0 || diagnostic.negativeDepthCells !== 0 || diagnostic.committedGeneration !== 1 || diagnostic.acceptedCommits !== 1 || diagnostic.rejectedCommits !== expectedRejectedCommits
+		|| diagnostic.committedInteractionBatches !== 1 || diagnostic.committedInteractionSequence !== 1 ) {
 
 		throw new Error( `bootstrap transaction rejected: ${ JSON.stringify( diagnostic ) }` );
 
 	}
-	return diagnostic;
+	return Object.freeze( { ...diagnostic, interactionRollbackProof } );
 
 }
 
@@ -315,16 +328,33 @@ async function boot() {
 	const boundaryDepthMeters = 0.105;
 	const boundaryWavenumber = 0.6;
 	const boundaryOmega = finiteDepthAngularFrequency( { wavenumberRadPerMeter: boundaryWavenumber, depthMeters: boundaryDepthMeters } );
+	const gridOriginXMeters = -totalCellsX * contract.tier.cellSizeMeters * 0.5;
+	const gridOriginZMeters = -totalCellsZ * contract.tier.cellSizeMeters * 0.5;
+	const sourceCellX = contract.tier.tileSize * 0.75 + 0.25;
+	const sourceCellZ = contract.tier.tileSize * 2.5 + 0.25;
+	const sourcePointMeters = [ gridOriginXMeters + ( sourceCellX + 0.5 ) * contract.tier.cellSizeMeters, 0, gridOriginZMeters + ( sourceCellZ + 0.5 ) * contract.tier.cellSizeMeters ];
 	owner = createGpuSparseSweOwner( renderer, {
 		tierId,
 		preparedCommit: sparseCommit,
 		initialCondition,
+		interactionBatch: {
+			sequence: 1,
+			waterDensityKgPerM3: 1025,
+			originXMeters: gridOriginXMeters,
+			originZMeters: gridOriginZMeters,
+			balanceReferencePointMeters: [ 0, 0, 0 ],
+			interactions: [ {
+				interactionId: 'diagnostic-skiff-panel-impulse', applicationLedgerKey: 'diagnostic-skiff-panel-impulse:1', applicationIntervalKey: 'sparse-swe:0..1', role: 'source',
+				targetStateEquation: 'saint-venant-horizontal-momentum',
+				payload: { tag: 'pointImpulse', timeSemantics: 'interval-integrated', linearImpulseNs: [ 1, 0, -0.35 ], applicationPointMeters: sourcePointMeters }
+			} ]
+		},
 		openBoundary: {
 			side: 'west',
 			mode: { modeId: 'minimum-tier-normal-swell', waveVectorRadPerMeter: [ boundaryWavenumber, 0 ], wavenumberRadPerMeter: boundaryWavenumber, amplitudeMeters: 0.015, phaseAtReferenceRadians: 0, intrinsicAngularFrequencyRadPerSecond: boundaryOmega },
 			meanCurrentMps: [ 0, 0 ], characteristicDepthMeters: boundaryDepthMeters, surfaceDatumMeters: 0,
 			phaseReferenceSeconds: 0,
-			gridOriginMeters: [ -totalCellsX * contract.tier.cellSizeMeters * 0.5, -totalCellsZ * contract.tier.cellSizeMeters * 0.5 ],
+			gridOriginMeters: [ gridOriginXMeters, gridOriginZMeters ],
 			reflectionAmplitudeGate: 0.02
 		}
 	} );
@@ -340,7 +370,8 @@ async function boot() {
 	rollbackButton.addEventListener( 'click', runRollbackMutation );
 	sustainedButton.addEventListener( 'click', () => runSustainedDiagnostic() );
 	window.__sparseSwe = Object.freeze( { ready: true, owner, contract, sparseCommit, setCamera, captureDiagnostic, runRollbackMutation, runSustainedDiagnostic, dispose: disposeApp, bootstrapDiagnostic, gpuErrors } );
-	status.textContent = `READY · NATIVE WEBGPU · ${ tierId.toUpperCase() } · verified gen ${ bootstrapDiagnostic.committedGeneration } · ${ owner.initial.residentTileCount }/${ contract.tier.logicalTilesX * contract.tier.logicalTilesZ } tiles · ${ owner.initial.residentCellCount } cells · ${ contract.totalLogicalBytes } logical bytes`;
+	const interactionRollbackSummary = bootstrapDiagnostic.interactionRollbackProof === null ? '' : ` · interaction rollback held seq ${ bootstrapDiagnostic.interactionRollbackProof.rejected.committedInteractionSequence } / batches ${ bootstrapDiagnostic.interactionRollbackProof.rejected.committedInteractionBatches } then retry committed seq ${ bootstrapDiagnostic.committedInteractionSequence } / batches ${ bootstrapDiagnostic.committedInteractionBatches }`;
+	status.textContent = `READY · NATIVE WEBGPU · ${ tierId.toUpperCase() } · verified gen ${ bootstrapDiagnostic.committedGeneration } · ${ owner.initial.residentTileCount }/${ contract.tier.logicalTilesX * contract.tier.logicalTilesZ } tiles · ${ owner.initial.residentCellCount } cells · ${ contract.totalLogicalBytes } logical bytes${ interactionRollbackSummary }`;
 	renderer.setAnimationLoop( ( time ) => {
 
 		resize();
