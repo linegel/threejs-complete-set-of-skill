@@ -20,7 +20,6 @@ function requiredStandardOutputs(session) {
 export function evaluateFrostCaptureStatus({ session, expectedSourceHash, artifactRoot } = {}) {
   const failures = [];
   const missingAcceptanceEvidence = [
-    "50-cycle create/render/resize/mode/tier/dispose lifecycle trace",
     "14-file unified v2 evidence bundle",
     "approved tracked release subset",
   ];
@@ -79,13 +78,18 @@ export function evaluateFrostCaptureStatus({ session, expectedSourceHash, artifa
   if (session.hookResult?.captures?.length !== 17) failures.push("capture hook did not retain all 17 standard and coverage recipes");
   if (session.hookResult?.visualDifferences?.verdict !== "PASS") failures.push("visual-difference gates did not pass");
   if (session.hookResult?.coverageEvidence?.verdict !== "PASS") failures.push("odd-size and DPR coverage gates did not pass");
+  if (session.hookResult?.lifecycleEvidence?.verdict !== "PASS"
+    || session.hookResult?.lifecycleEvidence?.cycles?.value !== 50
+    || session.hookResult?.lifecycleEvidence?.cycleSnapshots?.length !== 50) {
+    failures.push("50-cycle lifecycle evidence did not pass");
+  }
 
   const currentCapture = failures.length === 0;
   return Object.freeze({
     lab: LAB_ID,
     verdict: currentCapture ? "INSUFFICIENT_EVIDENCE" : "FAIL",
     reason: currentCapture
-      ? "Current-source native-WebGPU correctness and extent recipes pass, but lifecycle, unified v2, and promotion evidence remain incomplete."
+      ? "Current-source native-WebGPU correctness, extent recipes, and 50-cycle lifecycle pass, but unified v2 and promotion evidence remain incomplete."
       : "The available correctness capture cannot support a current-source claim.",
     captureSession: Object.freeze({
       currentSource: currentCapture,
@@ -95,6 +99,7 @@ export function evaluateFrostCaptureStatus({ session, expectedSourceHash, artifa
       frozenRecipes: session.hookResult?.captures?.length ?? 0,
       visualDifferenceVerdict: session.hookResult?.visualDifferences?.verdict ?? "INSUFFICIENT_EVIDENCE",
       coverageVerdict: session.hookResult?.coverageEvidence?.verdict ?? "INSUFFICIENT_EVIDENCE",
+      lifecycleVerdict: session.hookResult?.lifecycleEvidence?.verdict ?? "INSUFFICIENT_EVIDENCE",
     }),
     provenClaims: Object.freeze(currentCapture ? [
       "native WebGPU renderer/device identity",
@@ -104,6 +109,7 @@ export function evaluateFrostCaptureStatus({ session, expectedSourceHash, artifa
       "camera, seed, temporal, and final/no-post difference gates",
       "full-tier 641x359 bounded dispatch and aligned readback",
       "DPR 1/1.5/2 logical-to-physical extent sweep",
+      "50 fresh create/render/resize/mode/tier/dispose cycles with queue and two-frame settlement",
     ] : []),
     failures: Object.freeze(failures),
     missingAcceptanceEvidence: Object.freeze(missingAcceptanceEvidence),

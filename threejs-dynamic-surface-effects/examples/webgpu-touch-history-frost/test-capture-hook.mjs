@@ -6,6 +6,7 @@ import {
   outputPlan,
   rgbDifferenceMetrics,
   validateFrostCoverageEvidence,
+  validateFrostLifecycleEvidence,
 } from "./capture-hook.mjs";
 import { FROST_CAPTURE_RECIPES } from "./capture-recipes.js";
 
@@ -65,6 +66,48 @@ assert.deepEqual(rgbDifferenceMetrics(source(10, 4), source(20, 4)), {
 });
 assert.throws(() => rgbDifferenceMetrics(source(1, 1), { width: 1, height: 1, data: new Uint8Array(4) }), /equal dimensions/);
 assert.throws(() => validateFrostCoverageEvidence(new Map()), /omits probe.odd-size.final/);
+
+function lifecycleSnapshot(cycle) {
+  const digest = `sha256:${String(cycle % 10).repeat(64)}`;
+  return {
+    rowType: "settled-lifecycle-cycle-v2",
+    cycle,
+    beforeDispose: { storageBytes: 1024, deviceErrors: [] },
+    afterDispose: { disposed: true, storageBytes: 0, labOwnedListenerCount: 0, deviceLostObserved: false, deviceErrors: [] },
+    resourcesBeforeDispose: { residentStorageBytes: 1024, opaqueRendererInternalResidency: "NOT_CLAIMED" },
+    resourcesAfterDispose: {
+      retainedTargetBytes: 0,
+      retainedStorageBytes: 0,
+      retainedMaterialCount: 0,
+      retainedControlCount: 0,
+      retainedListenerCount: 0,
+      opaqueRendererInternalResidency: "NOT_CLAIMED",
+    },
+    dispose: {
+      status: "PASS",
+      completed: true,
+      evidence: {
+        status: "PASS",
+        rendererStateDisposition: "OWNED_RENDERER_DISPOSED",
+        rendererStateBeforeDigest: digest,
+        rendererStateAfterDigest: digest,
+      },
+    },
+    settle: { status: "PASS", observedAnimationFrames: 2, queueSettled: true, delayedErrors: [] },
+  };
+}
+
+const lifecycle = validateFrostLifecycleEvidence({
+  cycles: 50,
+  snapshots: Array.from({ length: 50 }, (_, cycle) => lifecycleSnapshot(cycle)),
+});
+assert.equal(lifecycle.verdict, "PASS");
+assert.equal(lifecycle.cycleSnapshots.length, 50);
+assert.equal(lifecycle.cycleSnapshots[0].disposeStatus, "PASS");
+assert.equal(lifecycle.cycleSnapshots[0].retainedStorageBytes.value, 0);
+const lifecycleLeak = { cycles: 50, snapshots: Array.from({ length: 50 }, (_, cycle) => lifecycleSnapshot(cycle)) };
+lifecycleLeak.snapshots[12].settle.delayedErrors.push("late device error");
+assert.throws(() => validateFrostLifecycleEvidence(lifecycleLeak), /did not settle/);
 
 const recipe = FROST_CAPTURE_RECIPES[0];
 const digest = `sha256:${"1".repeat(64)}`;

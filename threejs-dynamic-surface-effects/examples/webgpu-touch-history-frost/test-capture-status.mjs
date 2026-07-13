@@ -44,6 +44,11 @@ const session = {
     captures: Array.from({ length: 17 }, (_, index) => ({ index })),
     visualDifferences: { verdict: "PASS" },
     coverageEvidence: { verdict: "PASS" },
+    lifecycleEvidence: {
+      verdict: "PASS",
+      cycles: { value: 50 },
+      cycleSnapshots: Array.from({ length: 50 }, (_, index) => ({ index })),
+    },
   },
 };
 const stale = evaluateFrostCaptureStatus({

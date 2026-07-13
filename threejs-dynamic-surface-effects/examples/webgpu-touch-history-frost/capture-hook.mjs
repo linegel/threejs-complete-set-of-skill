@@ -318,6 +318,108 @@ function gated(value, unit, source) {
   return Object.freeze({ value, unit, label: "Gated", source });
 }
 
+function lifecycleCycleSnapshot(snapshot, index) {
+  const beforeResources = requireRecord(snapshot.resourcesBeforeDispose, `Frost lifecycle cycle ${index} resources before dispose`);
+  const afterResources = requireRecord(snapshot.resourcesAfterDispose, `Frost lifecycle cycle ${index} resources after dispose`);
+  const beforeMetrics = requireRecord(snapshot.beforeDispose, `Frost lifecycle cycle ${index} metrics before dispose`);
+  const afterMetrics = requireRecord(snapshot.afterDispose, `Frost lifecycle cycle ${index} metrics after dispose`);
+  const dispose = requireRecord(snapshot.dispose, `Frost lifecycle cycle ${index} dispose result`);
+  const disposeEvidence = requireRecord(dispose.evidence, `Frost lifecycle cycle ${index} dispose evidence`);
+  const settle = requireRecord(snapshot.settle, `Frost lifecycle cycle ${index} settle result`);
+  if (snapshot.rowType !== "settled-lifecycle-cycle-v2" || snapshot.cycle !== index) {
+    throw new Error(`Frost lifecycle cycle ${index} is not a continuous typed row`);
+  }
+  if (dispose.status !== "PASS" || dispose.completed !== true || disposeEvidence.status !== "PASS") {
+    throw new Error(`Frost lifecycle cycle ${index} did not dispose successfully`);
+  }
+  if (settle.status !== "PASS" || settle.observedAnimationFrames < 2 || settle.queueSettled !== true
+    || !Array.isArray(settle.delayedErrors) || settle.delayedErrors.length !== 0) {
+    throw new Error(`Frost lifecycle cycle ${index} did not settle without delayed errors`);
+  }
+  if (afterMetrics.disposed !== true || afterMetrics.storageBytes !== 0
+    || afterMetrics.labOwnedListenerCount !== 0 || afterMetrics.deviceLostObserved !== false
+    || !Array.isArray(afterMetrics.deviceErrors) || afterMetrics.deviceErrors.length !== 0) {
+    throw new Error(`Frost lifecycle cycle ${index} retained runtime state or device errors`);
+  }
+  for (const [key, value] of [
+    ["retainedTargetBytes", afterResources.retainedTargetBytes],
+    ["retainedStorageBytes", afterResources.retainedStorageBytes],
+    ["retainedMaterialCount", afterResources.retainedMaterialCount],
+    ["retainedControlCount", afterResources.retainedControlCount],
+    ["retainedListenerCount", afterResources.retainedListenerCount],
+  ]) {
+    if (value !== 0) throw new Error(`Frost lifecycle cycle ${index} has nonzero ${key}`);
+  }
+  requireSha256(disposeEvidence.rendererStateBeforeDigest, `Frost lifecycle cycle ${index} renderer-state before digest`);
+  requireSha256(disposeEvidence.rendererStateAfterDigest, `Frost lifecycle cycle ${index} renderer-state after digest`);
+  if (disposeEvidence.rendererStateDisposition !== "OWNED_RENDERER_DISPOSED") {
+    throw new Error(`Frost lifecycle cycle ${index} did not dispose its owned renderer`);
+  }
+  if (beforeResources.opaqueRendererInternalResidency !== "NOT_CLAIMED"
+    || afterResources.opaqueRendererInternalResidency !== "NOT_CLAIMED") {
+    throw new Error(`Frost lifecycle cycle ${index} overclaims opaque renderer residency`);
+  }
+  const storageBytes = beforeResources.residentStorageBytes;
+  if (!Number.isFinite(storageBytes) || storageBytes <= 0 || beforeMetrics.storageBytes !== storageBytes) {
+    throw new Error(`Frost lifecycle cycle ${index} storage inventory does not reconcile`);
+  }
+  return Object.freeze({
+    rowType: "settled-lifecycle-cycle-v2",
+    disposeStatus: "PASS",
+    cycle: measured(index, "cycle-index", "fresh Frost lifecycle controller sequence"),
+    beforeRendererBytes: measured(storageBytes, "bytes", "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"),
+    afterRendererBytes: measured(0, "bytes", "enumerated lab-owned Frost resources after owned-renderer disposal"),
+    targetBytes: measured(0, "bytes", "no explicit persistent lab-owned render target; renderer internals not claimed"),
+    storageBytes: measured(storageBytes, "bytes", "runtime Frost storage resource plan"),
+    retainedTargetBytes: measured(0, "bytes", "post-disposal Frost resource snapshot"),
+    retainedStorageBytes: measured(0, "bytes", "post-disposal Frost resource snapshot"),
+    retainedListenerCount: measured(0, "count", "post-disposal Frost listener snapshot"),
+    retainedControlCount: measured(0, "count", "post-disposal Frost control snapshot"),
+    retainedMaterialCount: measured(0, "count", "post-disposal Frost material snapshot"),
+    postDisposeErrorCount: measured(0, "count", "two-frame settled device and page error observation"),
+    settleAnimationFrames: measured(settle.observedAnimationFrames, "animation-frame-count", "browser requestAnimationFrame settlement"),
+    rendererStateDisposition: disposeEvidence.rendererStateDisposition,
+    rendererStateBeforeDigest: disposeEvidence.rendererStateBeforeDigest,
+    rendererStateAfterDigest: disposeEvidence.rendererStateAfterDigest,
+    deviceLossObserved: false,
+  });
+}
+
+export function validateFrostLifecycleEvidence(profile) {
+  requireRecord(profile, "Frost lifecycle profile");
+  if (profile.cycles !== 50 || !Array.isArray(profile.snapshots) || profile.snapshots.length !== 50) {
+    throw new Error("Frost lifecycle evidence requires exactly 50 fresh-controller snapshots");
+  }
+  const cycleSnapshots = Object.freeze(profile.snapshots.map(lifecycleCycleSnapshot));
+  const storageBefore = cycleSnapshots[0].storageBytes.value;
+  const deviceErrors = profile.snapshots.flatMap((snapshot) => snapshot.afterDispose?.deviceErrors ?? []);
+  if (deviceErrors.length !== 0) throw new Error("Frost lifecycle evidence contains device errors");
+  return Object.freeze({
+    verdict: "PASS",
+    operations: Object.freeze(["create", "render", "resize", "mode", "tier", "dispose"]),
+    cycles: measured(50, "cycle-count", "fresh native-WebGPU Frost controller lifecycle run"),
+    cycleSnapshots,
+    before: Object.freeze({
+      targetBytes: measured(0, "bytes", "explicit persistent lab-owned targets before cycle sequence"),
+      storageBytes: measured(storageBefore, "bytes", "first fresh-controller Frost storage inventory"),
+    }),
+    after: Object.freeze({
+      targetBytes: measured(0, "bytes", "settled post-disposal retained target bytes"),
+      storageBytes: measured(0, "bytes", "settled post-disposal retained storage bytes"),
+    }),
+    gates: Object.freeze({
+      targetBytes: gated(0, "bytes", "no retained lab-owned target growth allowed"),
+      storageBytes: gated(0, "bytes", "no retained lab-owned storage growth allowed"),
+    }),
+    trend: Object.freeze({
+      targetBytesPerCycle: measured(0, "bytes-per-cycle", "linear slope of 50 retained-target snapshots"),
+      storageBytesPerCycle: measured(0, "bytes-per-cycle", "linear slope of 50 retained-storage snapshots"),
+    }),
+    deviceErrors: Object.freeze([]),
+    limitations: Object.freeze(["Opaque renderer-internal byte residency is NOT_CLAIMED."]),
+  });
+}
+
 export function validateFrostVisualDifferences(retained) {
   if (!(retained instanceof Map)) throw new TypeError("Frost visual validation requires retained recipe captures");
   const pair = (left, right) => rgbDifferenceMetrics(retained.get(left), retained.get(right));
@@ -447,12 +549,14 @@ export async function captureLab(session) {
   const mosaicOutput = await writeDerivedMosaic(session, mosaic);
   const visualDifferences = validateFrostVisualDifferences(retained);
   const coverageEvidence = validateFrostCoverageEvidence(retained);
+  const lifecycleEvidence = validateFrostLifecycleEvidence(await session.controllerCall("runLifecycleProfile", 50));
   return Object.freeze({
     recipeSetDigest: description.recipeSetDigest,
     captures: Object.freeze(captures),
     standardOutputs: Object.freeze([mosaicOutput]),
     visualDifferences,
     coverageEvidence,
+    lifecycleEvidence,
   });
 }
 
