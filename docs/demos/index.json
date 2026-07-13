@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:36e4490fcd74f5f358440cf8a67dbb057ea2e2c73bcfde6078bc53b0a5e63ee2",
+  "buildRevision": "sha256:16a8b5868643f52a1e053ac5f8f1efbbf4c97028701cf3578e1acef775c65a89",
   "routes": [
     {
       "id": "browser-fallback-harness",
@@ -169,14 +169,14 @@
     {
       "id": "integration-image-pipeline-ao",
       "path": "/demos/integration-image-pipeline-ao/",
-      "status": "incomplete",
-      "sourceHash": "sha256:fb331bcadcdf3dd4b94e070f6f99561545be4ff42570a04d6d814fae93b229c6",
+      "status": "accepted",
+      "sourceHash": "sha256:4399f1417fde0b9b36d8c262a938d03b0c167b73301a03d5ca8be4aaffb072e0",
       "sourceHashInputs": [
         "labs/runtime/webgpu-device-identity.mjs",
         "threejs-ambient-contact-shading/examples/integration-image-pipeline-ao",
         "threejs-ambient-contact-shading/examples/webgpu-node-gtao/main.js"
       ],
-      "publishedBundleHash": "sha256:8ef5e2fb99a50aa6a943e35b6f00fc6ff3cd567b76c739b0990eda67f0f7f7ae",
+      "publishedBundleHash": "sha256:4bd47ba0459c059623c14472a48ad7c3f6f3b5b77bb5a03ca72556b6a63fb63c",
       "mechanisms": [
         "/demos/integration-image-pipeline-ao/mechanism/shared-gbuffer/",
         "/demos/integration-image-pipeline-ao/mechanism/indirect-only-application/",
@@ -426,12 +426,12 @@
     {
       "id": "semantic-mesh-writer",
       "path": "/demos/semantic-mesh-writer/",
-      "status": "incomplete",
+      "status": "accepted",
       "sourceHash": "sha256:29d2b3162053692b6582029c67743f09e8ea8f0087e44190b1fb6c3c782ac5da",
       "sourceHashInputs": [
         "threejs-procedural-geometry/examples/semantic-mesh-writer"
       ],
-      "publishedBundleHash": "sha256:111fa7fe274e20cf838dd4948e552ba9e74cbaf394b237758feb51a727dc5c8b",
+      "publishedBundleHash": "sha256:252a24d593e2ae920385f93d02e92b7e30df7cf379f034b89013c0f15c76a564",
       "mechanisms": [
         "/demos/semantic-mesh-writer/mechanism/frame-and-rail-profile/",
         "/demos/semantic-mesh-writer/mechanism/branch-rings/",
@@ -457,7 +457,7 @@
     {
       "id": "structured-ash-growth",
       "path": "/demos/structured-ash-growth/",
-      "status": "incomplete",
+      "status": "accepted",
       "sourceHash": "sha256:1ecd4ae09ca0243df7e0406982ed0b0329554bdebe1823896b481dcb8fe37a40",
       "sourceHashInputs": [
         "labs/runtime/strict-lab-controller.mjs",
@@ -467,7 +467,7 @@
         "threejs-procedural-vegetation/assets/structured-ash-growth/bark-roughness.jpg",
         "threejs-procedural-vegetation/examples/structured-ash-growth"
       ],
-      "publishedBundleHash": "sha256:0cd5fecc239df89b5a3b78c4b1bae485c40871bc04c2853918df5e8394296545",
+      "publishedBundleHash": "sha256:bedd73f7e5b0537c80c97d3dbd4489a34ea60259beb481d3fa750a861ebc517b",
       "mechanisms": [
         "/demos/structured-ash-growth/mechanism/structured-growth/",
         "/demos/structured-ash-growth/mechanism/leaf-origins-and-normals/",
@@ -622,7 +622,7 @@
       "id": "webgpu-bounded-water",
       "path": "/demos/webgpu-bounded-water/",
       "status": "incomplete",
-      "sourceHash": "sha256:15b30940d31462015cf107ebbfbd578a5e0bf1fc6866744d33e564b2f08f7ba0",
+      "sourceHash": "sha256:f098e536cbb664c11821b27b5c432c4d8b550e5ca5ed648031dff5fc2265a17b",
       "sourceHashInputs": [
         "labs/runtime/aligned-readback.mjs",
         "labs/runtime/numeric-evidence.mjs",
@@ -645,7 +645,7 @@
         "scripts/provider-demos.mjs",
         "threejs-water-optics/examples/webgpu-bounded-water"
       ],
-      "publishedBundleHash": "sha256:f2d8be8dd9c29811989caf6b8f3dcbf9a650aceb0bcd23f403d86efcb13c8cfb",
+      "publishedBundleHash": "sha256:eb8f2925b252f590b5cf8486831e9210a4d306e9731b35fe8a5e326b9fd2dacd",
       "mechanisms": [
         "/demos/webgpu-bounded-water/mechanism/heightfield-simulation/",
         "/demos/webgpu-bounded-water/mechanism/drops-and-object-ripples/",
@@ -732,7 +732,7 @@
     {
       "id": "webgpu-dense-grass",
       "path": "/demos/webgpu-dense-grass/",
-      "status": "incomplete",
+      "status": "accepted",
       "sourceHash": "sha256:b39b6b87e71d6e3b5926ef824cfc7e523c0a0da33968866b629096ba0ead0d6e",
       "sourceHashInputs": [
         "labs/runtime/strict-lab-controller.mjs",
@@ -742,7 +742,7 @@
         "threejs-procedural-vegetation/assets/generated-variants/meadow-density-c.png",
         "threejs-procedural-vegetation/examples/webgpu-dense-grass"
       ],
-      "publishedBundleHash": "sha256:1eebdc83bc2cae3fb3db9cfffffc64a31d786c6719ea7db01b10e71c8be830e2",
+      "publishedBundleHash": "sha256:769958f85b1023291ec86bdc5561b14abd7d57b4e371749e64bf122a6dcef333",
       "mechanisms": [
         "/demos/webgpu-dense-grass/mechanism/dense-grass-placement/",
         "/demos/webgpu-dense-grass/mechanism/dense-grass-wind-and-trampling/",
@@ -857,8 +857,8 @@
     {
       "id": "webgpu-image-pipeline",
       "path": "/demos/webgpu-image-pipeline/",
-      "status": "incomplete",
-      "sourceHash": "sha256:1abae9bb29b9f64aa5cd70ae7c916d0c0371304da94e7a6190630834b311c0ec",
+      "status": "accepted",
+      "sourceHash": "sha256:f55e0e6af55f99dffc4c5160bdecf74eb36a5d1daa196b7fa0366810565d348b",
       "sourceHashInputs": [
         "labs/runtime/webgpu-device-identity.mjs",
         "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/constants.js",
@@ -867,7 +867,7 @@
         "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/stage.js",
         "threejs-image-pipeline/examples/webgpu-image-pipeline"
       ],
-      "publishedBundleHash": "sha256:faabe9378ad01133253dcf27a4b56bca809789feff3e586fd154352faed201e3",
+      "publishedBundleHash": "sha256:abce7026a3d4b29fc4f73f2f978a3f585b5103dfddc1e2dff94e7ba3431efde8",
       "mechanisms": [
         "/demos/webgpu-image-pipeline/mechanism/signal-inspector/",
         "/demos/webgpu-image-pipeline/mechanism/ao-bloom-exposure-order/",
@@ -952,12 +952,12 @@
     {
       "id": "webgpu-node-gtao",
       "path": "/demos/webgpu-node-gtao/",
-      "status": "accepted",
+      "status": "incomplete",
       "sourceHash": "sha256:d151b7e9512ba31533653581a04ac7359ab067c8ae0963625f675ecdc4781455",
       "sourceHashInputs": [
         "threejs-ambient-contact-shading/examples/webgpu-node-gtao"
       ],
-      "publishedBundleHash": "sha256:b37d63d4fe22635873f7d78c760334aea81056b61111ff7808c546dfdca9389c",
+      "publishedBundleHash": "sha256:61b70669608b9f263d18d349c79210cd593b28d2ccb8a19e370e06275b237cf4",
       "mechanisms": [
         "/demos/webgpu-node-gtao/mechanism/scalar-gtao/",
         "/demos/webgpu-node-gtao/mechanism/bilateral-denoise-and-halo/",
@@ -1047,11 +1047,11 @@
       "id": "webgpu-procedural-creature-lab",
       "path": "/demos/webgpu-procedural-creature-lab/",
       "status": "incomplete",
-      "sourceHash": "sha256:2ca936c80adb74ba2c7058e2a64f36cc307ec7524ac32fea315b8925bc50b471",
+      "sourceHash": "sha256:0a63491b4d4001ff2bef75e7a00c05ba887642cdb15d58643d1cd02f6a41e560",
       "sourceHashInputs": [
         "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab"
       ],
-      "publishedBundleHash": "sha256:9ba58c43cbfe8346f617bec59c7a1f071e2e9ac421e34264791a10c3ae3baaf7",
+      "publishedBundleHash": "sha256:9627cb65305270936f0f959a87612291ff576dc31e79b389e4c3c4c01ae1ed32",
       "mechanisms": [
         "/demos/webgpu-procedural-creature-lab/mechanism/field-and-surface-certification/",
         "/demos/webgpu-procedural-creature-lab/mechanism/snap-and-ownership/",
@@ -1167,7 +1167,7 @@
     {
       "id": "webgpu-shadow-architecture-bench",
       "path": "/demos/webgpu-shadow-architecture-bench/",
-      "status": "incomplete",
+      "status": "accepted",
       "sourceHash": "sha256:b5720ffcb576439ae355f3ce8334a1d5c572150b82563c85bf2276b91012cf53",
       "sourceHashInputs": [
         "labs/runtime/webgpu-device-identity.mjs",
@@ -1178,7 +1178,7 @@
         "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/shadow-architectures.js",
         "threejs-scalable-real-time-shadows/examples/webgpu-shadow-architecture-bench"
       ],
-      "publishedBundleHash": "sha256:c2b9b2ea774bd2264b467729b039aaedda28f8665d524b124ef11bcb8327224a",
+      "publishedBundleHash": "sha256:21a9ced5ef641afdfebe8644702893de9846c1b98a77967daf9749819781a3c5",
       "mechanisms": [
         "/demos/webgpu-shadow-architecture-bench/mechanism/bounded-shadow/",
         "/demos/webgpu-shadow-architecture-bench/mechanism/csm/",
@@ -1198,7 +1198,7 @@
     {
       "id": "webgpu-shadow-pipeline-integration",
       "path": "/demos/webgpu-shadow-pipeline-integration/",
-      "status": "incomplete",
+      "status": "accepted",
       "sourceHash": "sha256:aa939380149e6a342b386e1a409c5f08636a10b6a07b5a235473f3ff04566328",
       "sourceHashInputs": [
         "labs/runtime/webgpu-device-identity.mjs",
@@ -1209,7 +1209,7 @@
         "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/shadow-architectures.js",
         "threejs-scalable-real-time-shadows/examples/webgpu-shadow-pipeline-integration"
       ],
-      "publishedBundleHash": "sha256:2330836d8aad2d571169dff8a4293d3fcfdd610783ee4542d0ffece4294c7e2e",
+      "publishedBundleHash": "sha256:ef971b783314e79effc5583a6a2add579a43041bd3d4bc1fb1f0ddc2b66c4514",
       "mechanisms": [
         "/demos/webgpu-shadow-pipeline-integration/mechanism/child-shadow-receiver-blend/",
         "/demos/webgpu-shadow-pipeline-integration/mechanism/sequential-shadow-updates/",
@@ -1225,8 +1225,8 @@
     {
       "id": "webgpu-temporal-history",
       "path": "/demos/webgpu-temporal-history/",
-      "status": "incomplete",
-      "sourceHash": "sha256:0d7aa937bf4095e6d31b023d6198af589270c4e0d55d86da1120c3da80dd7c93",
+      "status": "accepted",
+      "sourceHash": "sha256:39f9466604b4a394eed972080dcc689b24b1bdaed7a1d0c94de62a8b07b08022",
       "sourceHashInputs": [
         "labs/runtime/webgpu-device-identity.mjs",
         "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/constants.js",
@@ -1238,7 +1238,7 @@
         "threejs-image-pipeline/examples/webgpu-image-pipeline/lab-identity.js",
         "threejs-image-pipeline/examples/webgpu-temporal-history"
       ],
-      "publishedBundleHash": "sha256:1675e9323f46cb6d17a0f84522a125c64dc1dd0e8810182a16d9f78596d4e559",
+      "publishedBundleHash": "sha256:0c853c5bb65d20d9787442fe1f989f7bcaadb265ccdac4792fc86ea6cee2a785",
       "mechanisms": [
         "/demos/webgpu-temporal-history/mechanism/velocity-history-rejection-reset/"
       ],
@@ -1343,7 +1343,7 @@
     {
       "id": "webgpu-vegetation-integration",
       "path": "/demos/webgpu-vegetation-integration/",
-      "status": "incomplete",
+      "status": "accepted",
       "sourceHash": "sha256:8a87d3f3d13fec679b92809ee861d339bf5727a1774906d7723c2378afd5c615",
       "sourceHashInputs": [
         "labs/runtime/strict-lab-controller.mjs",
@@ -1361,7 +1361,7 @@
         "threejs-procedural-vegetation/examples/webgpu-dense-grass/integration-adapter.js",
         "threejs-procedural-vegetation/examples/webgpu-vegetation-integration"
       ],
-      "publishedBundleHash": "sha256:8cae6aa0be8567027bc2d156b3f0a4ec14d5a7acae86b88ffa578953da734d69",
+      "publishedBundleHash": "sha256:5bf940779fd3fb72e4c8593e6a395c2fe88de38bcbcb73420e097ee61289831a",
       "mechanisms": [
         "/demos/webgpu-vegetation-integration/mechanism/host-ownership/",
         "/demos/webgpu-vegetation-integration/mechanism/shared-weather/",
@@ -1527,7 +1527,7 @@
       "path": "/demos/image-pipeline-framegraph-demo/",
       "kind": "proxy-demo",
       "canonicalLabId": "webgpu-image-pipeline",
-      "sourceHash": "sha256:898dd1adc2c1f7470300fc330e9615e761f667351634673adfb52455bfeb00bb",
+      "sourceHash": "sha256:61eb316564ba9cdfced782e84d7630fcc64144231382820bd3bd44e76389ea85",
       "sourceHashInputs": [
         "labs/provider-proxies/generated-variants",
         "labs/provider-proxies/provider-demo.css",
@@ -1799,7 +1799,7 @@
       "path": "/demos/water-generated-caustics/",
       "kind": "generated-asset-demo",
       "canonicalLabId": "webgpu-bounded-water",
-      "sourceHash": "sha256:89e3bedf043068890682df54777f1bc3305a8a342094869319943367e1a56a2f",
+      "sourceHash": "sha256:3ec3f129278727f46ed0be8b7b12ba7121e0a6097542f6d728816894222b3ea5",
       "sourceHashInputs": [
         "labs/provider-proxies/generated-variants",
         "labs/provider-proxies/provider-demo.css",

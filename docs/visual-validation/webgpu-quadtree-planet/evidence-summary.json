@@ -22,7 +22,23 @@
     "renderer": "unknown",
     "backend": "WebGPU",
     "isWebGPUBackend": true,
-    "threeRevision": "0.185.1"
+    "threeRevision": "0.185.1",
+    "nativeWebGPU": true,
+    "initialized": true,
+    "adapterClass": "unknown",
+    "adapterIdentity": {
+      "source": "LabController.getMetrics",
+      "backendType": "WebGPU",
+      "deviceType": "unknown",
+      "deviceLabel": "",
+      "deviceIdentityVerified": false
+    },
+    "deviceIdentity": {
+      "verified": true,
+      "source": "renderer.backend.device-after-init",
+      "deviceType": "GPUDevice",
+      "generation": 1
+    }
   },
   "claimVerdicts": {
     "visualCorrectness": "INSUFFICIENT_EVIDENCE",

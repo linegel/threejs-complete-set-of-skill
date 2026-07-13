@@ -14,28 +14,31 @@
     "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus"
   ],
   "browserEntry": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/index.html",
-  "sourceHash": "sha256:e6ea9dcc3067a2e1575d988cae68898bb1d84324d296f7db9336b1abc25b2cd0",
+  "sourceHash": "sha256:5f7aa125f305d18e139f1c8cee2e4b2bed5b96f1764c27a7f07378a2608b1a42",
   "publishedHashInputs": [
     "docs/demos/webgpu-object-sculptor-corpus",
-    "docs/demos/assets/OrbitControls-CJtJSLBE.js",
+    "docs/demos/assets/OrbitControls-BPue_ISR.js",
     "docs/demos/assets/aligned-readback-XAnJComS.js",
+    "docs/demos/assets/index-GfveAfig.js",
     "docs/demos/assets/index-M60Or1av.css",
-    "docs/demos/assets/index-tSEG2Ghr.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js"
   ],
   "emittedAssetDependencies": [
-    "docs/demos/assets/OrbitControls-CJtJSLBE.js",
+    "docs/demos/assets/OrbitControls-BPue_ISR.js",
     "docs/demos/assets/aligned-readback-XAnJComS.js",
+    "docs/demos/assets/index-GfveAfig.js",
     "docs/demos/assets/index-M60Or1av.css",
-    "docs/demos/assets/index-tSEG2Ghr.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js"
   ],
-  "publishedBundleHash": "sha256:ecf87a89853bf1cc9223e16ff5e98ff490761d98602063bcf169c69ae19cd9cb",
+  "publishedBundleHash": "sha256:3b5d4c97c67dc834354b1bf6cbb7092a49e498f5a52b048565791b09765d9cfb",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b",
-  "evidenceBundleId": "correctness"
+  "buildRevision": "sha256:16a8b5868643f52a1e053ac5f8f1efbbf4c97028701cf3578e1acef775c65a89",
+  "evidenceBundleId": "correctness",
+  "skill": "threejs-object-sculptor",
+  "title": "Object Sculptor Multi-Subject Corpus",
+  "publishPath": "/demos/webgpu-object-sculptor-corpus/"
 }

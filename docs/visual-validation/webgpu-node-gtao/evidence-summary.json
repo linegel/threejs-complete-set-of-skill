@@ -13,7 +13,23 @@
     "renderer": "unknown",
     "backend": "WebGPU",
     "isWebGPUBackend": true,
-    "threeRevision": "0.185.1"
+    "threeRevision": "0.185.1",
+    "nativeWebGPU": true,
+    "initialized": true,
+    "adapterClass": "unknown",
+    "adapterIdentity": {
+      "source": "LabController.getMetrics",
+      "backendType": "WebGPU",
+      "deviceType": "unknown",
+      "deviceLabel": "",
+      "deviceIdentityVerified": false
+    },
+    "deviceIdentity": {
+      "verified": true,
+      "source": "renderer.backend.device-after-init",
+      "deviceType": "GPUDevice",
+      "generation": 1
+    }
   },
   "claimVerdicts": {
     "visualCorrectness": "INSUFFICIENT_EVIDENCE",
@@ -24,11 +40,11 @@
     "visualError": "PASS"
   },
   "primaryImage": "final.design.png",
-  "primaryImageLabel": "GTAO correctness presentation readback",
+  "primaryImageLabel": "GTAO correctness presentation",
   "images": [
     {
       "file": "final.design.png",
-      "meaning": "Final AO-applied presentation.",
+      "meaning": "final.design.png",
       "source": "final.design.png",
       "sourceSha256": "sha256:151b03675aa2b14030a3f783328ca81d6db4361bb23be9b532b0ff3572182b8c",
       "outputSha256": "sha256:151b03675aa2b14030a3f783328ca81d6db4361bb23be9b532b0ff3572182b8c",
@@ -38,7 +54,7 @@
     },
     {
       "file": "diagnostics.mosaic.png",
-      "meaning": "Raw-AO diagnostic presentation.",
+      "meaning": "diagnostics.mosaic.png",
       "source": "diagnostics.mosaic.png",
       "sourceSha256": "sha256:cbf1db13a0c86abdbdbf422db8064d6ed5896ca383a4e0852afb2c8a5db5e91b",
       "outputSha256": "sha256:cbf1db13a0c86abdbdbf422db8064d6ed5896ca383a4e0852afb2c8a5db5e91b",
@@ -47,8 +63,18 @@
       "encoding": "png-copy"
     },
     {
+      "file": "camera.near.png",
+      "meaning": "camera.near.png",
+      "source": "camera.near.png",
+      "sourceSha256": "sha256:0cdae2bcc388cb9e8ce5f3d9e03134b973938d547bbb4a7f8286352539217c69",
+      "outputSha256": "sha256:0cdae2bcc388cb9e8ce5f3d9e03134b973938d547bbb4a7f8286352539217c69",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
       "file": "camera.design.png",
-      "meaning": "Design camera presentation.",
+      "meaning": "camera.design.png",
       "source": "camera.design.png",
       "sourceSha256": "sha256:151b03675aa2b14030a3f783328ca81d6db4361bb23be9b532b0ff3572182b8c",
       "outputSha256": "sha256:151b03675aa2b14030a3f783328ca81d6db4361bb23be9b532b0ff3572182b8c",
@@ -57,8 +83,18 @@
       "encoding": "png-copy"
     },
     {
+      "file": "camera.far.png",
+      "meaning": "camera.far.png",
+      "source": "camera.far.png",
+      "sourceSha256": "sha256:f96aa70158b036c2def005efb70f3406211126cf3bd39b5c40363fa9511e9fca",
+      "outputSha256": "sha256:f96aa70158b036c2def005efb70f3406211126cf3bd39b5c40363fa9511e9fca",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
       "file": "seed-0001.final.png",
-      "meaning": "Baseline seed on moving-occluder.",
+      "meaning": "seed-0001.final.png",
       "source": "seed-0001.final.png",
       "sourceSha256": "sha256:05fd7944038380d040254167d962e97526be7286dc34f616c0e91a261b8f818e",
       "outputSha256": "sha256:05fd7944038380d040254167d962e97526be7286dc34f616c0e91a261b8f818e",
@@ -67,8 +103,28 @@
       "encoding": "png-copy"
     },
     {
+      "file": "seed-9e3779b9.final.png",
+      "meaning": "seed-9e3779b9.final.png",
+      "source": "seed-9e3779b9.final.png",
+      "sourceSha256": "sha256:79bdff1e59c014677a8c24259f14784336365a19d34528cec508d41814f9bee3",
+      "outputSha256": "sha256:79bdff1e59c014677a8c24259f14784336365a19d34528cec508d41814f9bee3",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "temporal.t000.png",
+      "meaning": "temporal.t000.png",
+      "source": "temporal.t000.png",
+      "sourceSha256": "sha256:05fd7944038380d040254167d962e97526be7286dc34f616c0e91a261b8f818e",
+      "outputSha256": "sha256:05fd7944038380d040254167d962e97526be7286dc34f616c0e91a261b8f818e",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
       "file": "temporal.t001.png",
-      "meaning": "Temporal sample after 0.35s motion.",
+      "meaning": "temporal.t001.png",
       "source": "temporal.t001.png",
       "sourceSha256": "sha256:fc1da6a941bced83bcffdfa43aad89b6377fda1c3bd5106e196b9c3fd858dafe",
       "outputSha256": "sha256:fc1da6a941bced83bcffdfa43aad89b6377fda1c3bd5106e196b9c3fd858dafe",
@@ -78,8 +134,6 @@
     }
   ],
   "limitations": [
-    "Current-source correctness capture validates (structuralVerdict PASS) with assembled raw-capture-session evidence-manifest.",
-    "visualCorrectness remains INSUFFICIENT_EVIDENCE; GPU timestamps and lifecycle are NOT_CLAIMED/INSUFFICIENT_EVIDENCE.",
-    "Not a publishable release-bundle; canonical acceptance remains incomplete."
+    "Correctness capture hash-bound; GPU timestamps incomplete."
   ]
 }

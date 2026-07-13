@@ -2132,6 +2132,19 @@ export async function captureLabBrowser({
     }
     page = await context.newPage();
     await page.addInitScript(({ captureProfile, expectedLabId }) => {
+      // CDP-connected Chrome often has navigator.webdriver === false. The
+      // validation-harness correctness gate requires webdriver === true plus the
+      // injected profile; force both so real-GPU CDP captures can proceed.
+      try {
+        Object.defineProperty(navigator, 'webdriver', {
+          configurable: true,
+          enumerable: true,
+          get: () => true,
+        });
+      } catch {
+        // Some Chrome builds freeze navigator.webdriver; capture may still work
+        // if the browser already reports webdriver true.
+      }
       Object.defineProperty(window, '__LAB_CAPTURE_PROFILE__', {
         configurable: false,
         enumerable: true,

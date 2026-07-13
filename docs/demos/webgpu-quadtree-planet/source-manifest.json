@@ -4,6 +4,7 @@
   "kind": "canonical-lab",
   "status": "incomplete",
   "canonicalSource": [
+    "threejs-procedural-planets/examples/webgpu-quadtree-planet",
     "threejs-procedural-planets/examples/webgpu-quadtree-planet/browser-lab.js",
     "threejs-procedural-planets/examples/webgpu-quadtree-planet/planet-fields.js",
     "threejs-procedural-planets/examples/webgpu-quadtree-planet/planet-field-atlas.js",
@@ -18,24 +19,27 @@
     "threejs-procedural-planets/examples/webgpu-quadtree-planet"
   ],
   "browserEntry": "threejs-procedural-planets/examples/webgpu-quadtree-planet/index.html",
-  "sourceHash": "sha256:6c5063ccb8e9b53f5e7e7b9202e8f4073745a7c3f27705001c4190bc9b4d762f",
+  "sourceHash": "sha256:4928ca7a78df196ce1a15165473dff8498bd7b4d2d3a8258b602370dde998fe9",
   "publishedHashInputs": [
     "docs/demos/webgpu-quadtree-planet",
-    "docs/demos/assets/index-uk7lPrFu.js",
-    "docs/demos/assets/integration-adapter-D1hpYAab2.js",
+    "docs/demos/assets/index-CkEl-Kyq.js",
+    "docs/demos/assets/integration-adapter-GS_XK2C2.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js"
   ],
   "emittedAssetDependencies": [
-    "docs/demos/assets/index-uk7lPrFu.js",
-    "docs/demos/assets/integration-adapter-D1hpYAab2.js",
+    "docs/demos/assets/index-CkEl-Kyq.js",
+    "docs/demos/assets/integration-adapter-GS_XK2C2.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js"
   ],
-  "publishedBundleHash": "sha256:ae6ba24f4799ee9a650da42741cf5204934def1f254ad372daeb28dff992cb61",
+  "publishedBundleHash": "sha256:d22145ff54661f42da6667ca1509d087c84d6eca7e579ece4bbf51764c440ff8",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b",
-  "evidenceBundleId": null
+  "buildRevision": "sha256:16a8b5868643f52a1e053ac5f8f1efbbf4c97028701cf3578e1acef775c65a89",
+  "evidenceBundleId": "correctness",
+  "skill": "threejs-procedural-planets",
+  "title": "Native WebGPU Quadtree Planet",
+  "publishPath": "/demos/webgpu-quadtree-planet/"
 }

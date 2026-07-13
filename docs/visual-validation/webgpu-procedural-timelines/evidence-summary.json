@@ -31,7 +31,54 @@
     "renderer": "unknown",
     "backend": "WebGPU",
     "isWebGPUBackend": true,
-    "threeRevision": "0.185.1"
+    "threeRevision": "0.185.1",
+    "nativeWebGPU": true,
+    "initialized": true,
+    "adapterClass": "unknown",
+    "adapterIdentity": {
+      "source": "renderer.backend.device-after-init",
+      "adapterClass": "unknown",
+      "backendType": "WebGPUBackend",
+      "deviceType": "GPUDevice",
+      "deviceLabel": "",
+      "deviceIdentityVerified": true,
+      "features": [
+        "bgra8unorm-storage",
+        "clip-distances",
+        "core-features-and-limits",
+        "depth-clip-control",
+        "depth32float-stencil8",
+        "dual-source-blending",
+        "float32-blendable",
+        "float32-filterable",
+        "indirect-first-instance",
+        "rg11b10ufloat-renderable",
+        "shader-f16",
+        "subgroups",
+        "texture-compression-astc",
+        "texture-compression-astc-sliced-3d",
+        "texture-compression-bc",
+        "texture-compression-bc-sliced-3d",
+        "texture-compression-etc2",
+        "texture-formats-tier1",
+        "texture-formats-tier2",
+        "timestamp-query"
+      ],
+      "limits": {
+        "maxBufferSize": 268435456,
+        "maxComputeInvocationsPerWorkgroup": 256,
+        "maxComputeWorkgroupSizeX": 256,
+        "maxComputeWorkgroupsPerDimension": 65535,
+        "maxStorageBufferBindingSize": 134217728,
+        "maxStorageBuffersPerShaderStage": 8
+      }
+    },
+    "deviceIdentity": {
+      "verified": true,
+      "source": "renderer.backend.device-after-init",
+      "deviceType": "GPUDevice",
+      "generation": 1
+    }
   },
   "claimVerdicts": {
     "visualCorrectness": "INSUFFICIENT_EVIDENCE",

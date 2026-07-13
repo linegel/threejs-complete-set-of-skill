@@ -28,24 +28,26 @@
     "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines"
   ],
   "browserEntry": "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/index.html",
-  "sourceHash": "sha256:3db072e5c8ac16ac2eb82b9cbffa767255b1035bce9adb40b4a0ad04b46b41bf",
+  "sourceHash": "sha256:75dc31ba17b9a98981bc67e8517eaaa97542ffa9d2bbef2e72929db178ebe709",
   "publishedHashInputs": [
     "docs/demos/webgpu-procedural-timelines",
-    "docs/demos/assets/index-C7F1AnE8.js",
-    "docs/demos/assets/main-CsPbDMZE.js",
+    "docs/demos/assets/index-c43JCY43.js",
+    "docs/demos/assets/main-BYtol3Qi.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js"
   ],
   "emittedAssetDependencies": [
-    "docs/demos/assets/index-C7F1AnE8.js",
-    "docs/demos/assets/main-CsPbDMZE.js",
+    "docs/demos/assets/index-c43JCY43.js",
+    "docs/demos/assets/main-BYtol3Qi.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js"
   ],
-  "publishedBundleHash": "sha256:f9e8756ac5d061ff4da4333db3decc3acf75890d3897d177cf8d9bd6dbe813c0",
+  "publishedBundleHash": "sha256:75debb9aee031b9381f49214cf212267b80a3d5888d886f6a059b0f1eea0f1b7",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b",
-  "evidenceBundleId": null
+  "buildRevision": "sha256:16a8b5868643f52a1e053ac5f8f1efbbf4c97028701cf3578e1acef775c65a89",
+  "evidenceBundleId": "correctness",
+  "skill": "threejs-procedural-motion-systems",
+  "publishPath": "/demos/webgpu-procedural-timelines/"
 }

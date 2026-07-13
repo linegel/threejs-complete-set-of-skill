@@ -10,28 +10,30 @@
     "threejs-ambient-contact-shading/examples/webgpu-node-gtao"
   ],
   "browserEntry": "threejs-ambient-contact-shading/examples/webgpu-node-gtao/index.html",
-  "sourceHash": "sha256:1f8f4fbc0e5e0f8be6eb8e1a38bcf095de1afe3447c57bf27c4c9f3a0374d450",
+  "sourceHash": "sha256:d151b7e9512ba31533653581a04ac7359ab067c8ae0963625f675ecdc4781455",
   "publishedHashInputs": [
     "docs/demos/webgpu-node-gtao",
-    "docs/demos/assets/GTAONode-DrPYssY_.js",
-    "docs/demos/assets/TRAANode-BHDUI1yA.js",
-    "docs/demos/assets/index-D6xqPDxM.js",
-    "docs/demos/assets/main-C-eg0su8.js",
+    "docs/demos/assets/GTAONode-IHocvv2Q.js",
+    "docs/demos/assets/TRAANode-s2X8LMY_.js",
+    "docs/demos/assets/index-CkhiOcdU.js",
+    "docs/demos/assets/main-CKAxEvOE.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js"
   ],
   "emittedAssetDependencies": [
-    "docs/demos/assets/GTAONode-DrPYssY_.js",
-    "docs/demos/assets/TRAANode-BHDUI1yA.js",
-    "docs/demos/assets/index-D6xqPDxM.js",
-    "docs/demos/assets/main-C-eg0su8.js",
+    "docs/demos/assets/GTAONode-IHocvv2Q.js",
+    "docs/demos/assets/TRAANode-s2X8LMY_.js",
+    "docs/demos/assets/index-CkhiOcdU.js",
+    "docs/demos/assets/main-CKAxEvOE.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js"
   ],
-  "publishedBundleHash": "sha256:0fdd1191e3f9b7ae31fc86bd4e0583e2f9eb5c308a0668c17a448d9cc0ffd7cd",
+  "publishedBundleHash": "sha256:61b70669608b9f263d18d349c79210cd593b28d2ccb8a19e370e06275b237cf4",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b",
-  "evidenceBundleId": null
+  "buildRevision": "sha256:16a8b5868643f52a1e053ac5f8f1efbbf4c97028701cf3578e1acef775c65a89",
+  "evidenceBundleId": "correctness",
+  "skill": "threejs-ambient-contact-shading",
+  "publishPath": "/demos/webgpu-node-gtao/"
 }

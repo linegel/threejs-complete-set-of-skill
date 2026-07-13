@@ -14,26 +14,28 @@
     "threejs-particles-trails-and-effects/examples/webgpu-pooled-effects"
   ],
   "browserEntry": "threejs-particles-trails-and-effects/examples/webgpu-pooled-effects/index.html",
-  "sourceHash": "sha256:acc472f7c027972d668998d5087a5d42534983271f7c156af24af4ec1a4e0ffb",
+  "sourceHash": "sha256:c1cfa5fb0841304840abfd5345fcbfeca96f981778f28c7dd86db982ac2a75d0",
   "publishedHashInputs": [
     "docs/demos/webgpu-pooled-effects",
-    "docs/demos/assets/BloomNode-qktuf1Q7.js",
-    "docs/demos/assets/index-sgeVz14H.js",
-    "docs/demos/assets/lab-BGP-o5Ut.js",
+    "docs/demos/assets/BloomNode-B7VcMtwE.js",
+    "docs/demos/assets/index-CQ8Aj9s_.js",
+    "docs/demos/assets/lab-qNnXBUOC.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js"
   ],
   "emittedAssetDependencies": [
-    "docs/demos/assets/BloomNode-qktuf1Q7.js",
-    "docs/demos/assets/index-sgeVz14H.js",
-    "docs/demos/assets/lab-BGP-o5Ut.js",
+    "docs/demos/assets/BloomNode-B7VcMtwE.js",
+    "docs/demos/assets/index-CQ8Aj9s_.js",
+    "docs/demos/assets/lab-qNnXBUOC.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js"
   ],
-  "publishedBundleHash": "sha256:52e59742f398cd107e12cbb17b13915016663baf160293da3e8a17fe5a5a601a",
+  "publishedBundleHash": "sha256:397e1487c38318dc5e2773b6bf2ec4db58929c4b17ddb1f962731b456c9ef50e",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b",
-  "evidenceBundleId": null
+  "buildRevision": "sha256:16a8b5868643f52a1e053ac5f8f1efbbf4c97028701cf3578e1acef775c65a89",
+  "evidenceBundleId": "correctness",
+  "skill": "threejs-particles-trails-and-effects",
+  "publishPath": "/demos/webgpu-pooled-effects/"
 }
