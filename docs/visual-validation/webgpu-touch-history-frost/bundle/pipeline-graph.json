@@ -1,0 +1,159 @@
+{
+  "schemaVersion": 2,
+  "owners": {
+    "renderer": "threejs-dynamic-surface-effects",
+    "scenePass": "host-scene",
+    "history": "threejs-dynamic-surface-effects",
+    "finalPipeline": "threejs-dynamic-surface-effects",
+    "toneMap": "RenderOutputNode",
+    "outputTransform": "RenderOutputNode"
+  },
+  "signals": [
+    {
+      "id": "scene-color",
+      "producer": "host-scene",
+      "consumers": [
+        "frost-composite"
+      ],
+      "reachable": true
+    },
+    {
+      "id": "history-update",
+      "producer": "threejs-dynamic-surface-effects",
+      "consumers": [
+        "frost-composite"
+      ],
+      "reachable": true
+    },
+    {
+      "id": "gaussian-blur",
+      "producer": "threejs-dynamic-surface-effects",
+      "consumers": [
+        "frost-composite"
+      ],
+      "reachable": true
+    },
+    {
+      "id": "crystal-field",
+      "producer": "threejs-dynamic-surface-effects",
+      "consumers": [
+        "frost-composite"
+      ],
+      "reachable": true
+    },
+    {
+      "id": "snell-refraction",
+      "producer": "threejs-dynamic-surface-effects",
+      "consumers": [
+        "frost-composite"
+      ],
+      "reachable": true
+    },
+    {
+      "id": "exact-dielectric-fresnel",
+      "producer": "threejs-dynamic-surface-effects",
+      "consumers": [
+        "frost-composite"
+      ],
+      "reachable": true
+    },
+    {
+      "id": "final-composite",
+      "producer": "threejs-dynamic-surface-effects",
+      "consumers": [
+        "frost-composite"
+      ],
+      "reachable": true
+    },
+    {
+      "id": "detail-refraction-normal",
+      "producer": "threejs-dynamic-surface-effects",
+      "consumers": [
+        "frost-composite"
+      ],
+      "reachable": true
+    },
+    {
+      "id": "frost-mask",
+      "producer": "threejs-dynamic-surface-effects",
+      "consumers": [
+        "frost-composite"
+      ],
+      "reachable": true
+    },
+    {
+      "id": "output",
+      "producer": "threejs-dynamic-surface-effects",
+      "consumers": [
+        "presentation"
+      ],
+      "reachable": true
+    }
+  ],
+  "sceneSubmissions": [
+    {
+      "id": "shared-scene-pass",
+      "owner": "host-scene",
+      "kind": "lit-scene",
+      "submissionCount": {
+        "value": 1,
+        "unit": "submissions-per-frame",
+        "label": "Measured",
+        "source": "LabController.describePipeline"
+      }
+    }
+  ],
+  "computeDispatches": [
+    {
+      "id": "history-update",
+      "owner": "threejs-dynamic-surface-effects",
+      "workgroups": {
+        "values": [
+          150,
+          100,
+          1
+        ],
+        "unit": "workgroups",
+        "label": "Derived",
+        "source": "ceil(history extent / 8x8 workgroup)"
+      },
+      "workgroupSize": {
+        "values": [
+          8,
+          8,
+          1
+        ],
+        "unit": "invocations",
+        "label": "Derived",
+        "source": "Frost compute declaration"
+      },
+      "updatePolicy": "full-field"
+    }
+  ],
+  "resources": [
+    {
+      "id": "touch-history-frost:history-read",
+      "owner": "threejs-dynamic-surface-effects",
+      "kind": "storage-texture",
+      "residentBytes": {
+        "value": 7680000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "history read extent * RGBA16F bytes per texel"
+      }
+    },
+    {
+      "id": "touch-history-frost:history-write",
+      "owner": "threejs-dynamic-surface-effects",
+      "kind": "storage-texture",
+      "residentBytes": {
+        "value": 7680000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "history write extent * RGBA16F bytes per texel"
+      }
+    }
+  ],
+  "finalToneMapOwner": "RenderOutputNode",
+  "finalOutputTransformOwner": "RenderOutputNode"
+}

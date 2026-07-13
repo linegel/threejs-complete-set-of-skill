@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 2,
+  "textures": [
+    null,
+    null
+  ],
+  "geometry": [
+    "BoxGeometry",
+    "SphereGeometry"
+  ],
+  "buffers": [],
+  "histories": [
+    "historyRead",
+    "historyWrite"
+  ],
+  "staging": [
+    "transient WebGPU readback staging; opaque byte residency not claimed"
+  ],
+  "readback": [
+    "frost-capture-target-1",
+    "frost-capture-target-2",
+    "frost-capture-target-3",
+    "frost-capture-target-4",
+    "frost-capture-target-5",
+    "frost-capture-target-6",
+    "frost-capture-target-7",
+    "frost-capture-target-8",
+    "frost-capture-target-9",
+    "frost-capture-target-10",
+    "frost-capture-target-11",
+    "frost-capture-target-12",
+    "frost-capture-target-13",
+    "frost-capture-target-14",
+    "frost-capture-target-15",
+    "frost-capture-target-16",
+    "frost-capture-target-17",
+    "frost-capture-target-18",
+    "frost-capture-target-19",
+    "frost-capture-target-20",
+    "frost-capture-target-21",
+    "frost-capture-target-22",
+    "frost-capture-target-23",
+    "frost-capture-target-24",
+    "frost-capture-target-25",
+    "frost-capture-target-26",
+    "frost-capture-target-27"
+  ],
+  "pipelineEstimate": "unavailable from current renderer metrics",
+  "accountingScope": "lab-owned-storage-and-transactional-targets",
+  "completeness": "PARTIAL",
+  "inventoryCompleteness": "explicit Frost storage complete; renderer internals partial",
+  "labOwnedNonTargetResources": [
+    "two RGBA16F history StorageTextures"
+  ],
+  "opaqueRendererInternalResidency": {
+    "status": "NOT_CLAIMED",
+    "reason": "Three r185 does not expose exact internal pipeline and cache byte residency."
+  },
+  "trackedRenderTargetBytes": {
+    "value": 56624476,
+    "unit": "bytes",
+    "label": "Derived",
+    "source": "sum of transactional capture target allocations across recipes"
+  },
+  "trackedPeakLiveRenderTargetBytes": {
+    "value": 3840000,
+    "unit": "bytes",
+    "label": "Derived",
+    "source": "one capture target live per isolated recipe"
+  },
+  "uploadChurnPerFrame": {
+    "status": "NOT_CLAIMED",
+    "value": null,
+    "reason": "Renderer upload bytes are not exposed by the correctness lane."
+  }
+}

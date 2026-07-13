@@ -1,0 +1,1101 @@
+{
+  "schemaVersion": 2,
+  "subjectAdapter": "WebGPUFrostLab",
+  "proofKind": "native-browser-runtime",
+  "captureProfile": "correctness",
+  "pipelineGraphDigest": "sha256:e8a971c929329fe5a5a508f7bc453e8f5221689ec586028402614b0de6216f13",
+  "runtimeReachability": {
+    "signals": [
+      "scene-color",
+      "history-update",
+      "gaussian-blur",
+      "crystal-field",
+      "snell-refraction",
+      "exact-dielectric-fresnel",
+      "final-composite",
+      "detail-refraction-normal",
+      "frost-mask",
+      "output"
+    ],
+    "resources": [
+      "touch-history-frost:history-read",
+      "touch-history-frost:history-write"
+    ],
+    "routes": [
+      "final.design",
+      "no-post.design",
+      "diagnostic.previous-history-ra",
+      "diagnostic.deposit-ra",
+      "diagnostic.next-history-ra",
+      "diagnostic.frost-mask-after-pointer",
+      "camera.near",
+      "camera.design",
+      "camera.far",
+      "seed-0001.final",
+      "seed-9e3779b9.final",
+      "temporal.t000",
+      "temporal.t001",
+      "probe.odd-size.final",
+      "probe.dpr-1.final",
+      "probe.dpr-1-5.final",
+      "probe.dpr-2.final",
+      "route.canonical",
+      "route.mechanism.history-and-deposit",
+      "route.mechanism.diffusion",
+      "route.mechanism.blur-and-reconstruction",
+      "route.mechanism.crystal-field-and-normals",
+      "route.mechanism.refraction-and-fresnel",
+      "route.mechanism.full-vs-dirty-vs-idle",
+      "route.tier.full",
+      "route.tier.balanced",
+      "route.tier.budgeted"
+    ]
+  },
+  "routeExecutions": [
+    {
+      "recipeId": "final.design",
+      "transactionId": "frost-capture-1",
+      "sequence": {
+        "value": 1,
+        "unit": "transaction-index",
+        "label": "Measured",
+        "source": "frozen Frost recipe order"
+      },
+      "computeDispatches": {
+        "value": 32,
+        "unit": "dispatches",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "renderSubmissions": {
+        "value": 1,
+        "unit": "submissions",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "restorationVerdict": "PASS"
+    },
+    {
+      "recipeId": "no-post.design",
+      "transactionId": "frost-capture-2",
+      "sequence": {
+        "value": 2,
+        "unit": "transaction-index",
+        "label": "Measured",
+        "source": "frozen Frost recipe order"
+      },
+      "computeDispatches": {
+        "value": 32,
+        "unit": "dispatches",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "renderSubmissions": {
+        "value": 1,
+        "unit": "submissions",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "restorationVerdict": "PASS"
+    },
+    {
+      "recipeId": "diagnostic.previous-history-ra",
+      "transactionId": "frost-capture-3",
+      "sequence": {
+        "value": 3,
+        "unit": "transaction-index",
+        "label": "Measured",
+        "source": "frozen Frost recipe order"
+      },
+      "computeDispatches": {
+        "value": 32,
+        "unit": "dispatches",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "renderSubmissions": {
+        "value": 1,
+        "unit": "submissions",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "restorationVerdict": "PASS"
+    },
+    {
+      "recipeId": "diagnostic.deposit-ra",
+      "transactionId": "frost-capture-4",
+      "sequence": {
+        "value": 4,
+        "unit": "transaction-index",
+        "label": "Measured",
+        "source": "frozen Frost recipe order"
+      },
+      "computeDispatches": {
+        "value": 32,
+        "unit": "dispatches",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "renderSubmissions": {
+        "value": 1,
+        "unit": "submissions",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "restorationVerdict": "PASS"
+    },
+    {
+      "recipeId": "diagnostic.next-history-ra",
+      "transactionId": "frost-capture-5",
+      "sequence": {
+        "value": 5,
+        "unit": "transaction-index",
+        "label": "Measured",
+        "source": "frozen Frost recipe order"
+      },
+      "computeDispatches": {
+        "value": 32,
+        "unit": "dispatches",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "renderSubmissions": {
+        "value": 1,
+        "unit": "submissions",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "restorationVerdict": "PASS"
+    },
+    {
+      "recipeId": "diagnostic.frost-mask-after-pointer",
+      "transactionId": "frost-capture-6",
+      "sequence": {
+        "value": 6,
+        "unit": "transaction-index",
+        "label": "Measured",
+        "source": "frozen Frost recipe order"
+      },
+      "computeDispatches": {
+        "value": 32,
+        "unit": "dispatches",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "renderSubmissions": {
+        "value": 1,
+        "unit": "submissions",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "restorationVerdict": "PASS"
+    },
+    {
+      "recipeId": "camera.near",
+      "transactionId": "frost-capture-7",
+      "sequence": {
+        "value": 7,
+        "unit": "transaction-index",
+        "label": "Measured",
+        "source": "frozen Frost recipe order"
+      },
+      "computeDispatches": {
+        "value": 24,
+        "unit": "dispatches",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "renderSubmissions": {
+        "value": 1,
+        "unit": "submissions",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "restorationVerdict": "PASS"
+    },
+    {
+      "recipeId": "camera.design",
+      "transactionId": "frost-capture-8",
+      "sequence": {
+        "value": 8,
+        "unit": "transaction-index",
+        "label": "Measured",
+        "source": "frozen Frost recipe order"
+      },
+      "computeDispatches": {
+        "value": 24,
+        "unit": "dispatches",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "renderSubmissions": {
+        "value": 1,
+        "unit": "submissions",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "restorationVerdict": "PASS"
+    },
+    {
+      "recipeId": "camera.far",
+      "transactionId": "frost-capture-9",
+      "sequence": {
+        "value": 9,
+        "unit": "transaction-index",
+        "label": "Measured",
+        "source": "frozen Frost recipe order"
+      },
+      "computeDispatches": {
+        "value": 24,
+        "unit": "dispatches",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "renderSubmissions": {
+        "value": 1,
+        "unit": "submissions",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "restorationVerdict": "PASS"
+    },
+    {
+      "recipeId": "seed-0001.final",
+      "transactionId": "frost-capture-10",
+      "sequence": {
+        "value": 10,
+        "unit": "transaction-index",
+        "label": "Measured",
+        "source": "frozen Frost recipe order"
+      },
+      "computeDispatches": {
+        "value": 40,
+        "unit": "dispatches",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "renderSubmissions": {
+        "value": 1,
+        "unit": "submissions",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "restorationVerdict": "PASS"
+    },
+    {
+      "recipeId": "seed-9e3779b9.final",
+      "transactionId": "frost-capture-11",
+      "sequence": {
+        "value": 11,
+        "unit": "transaction-index",
+        "label": "Measured",
+        "source": "frozen Frost recipe order"
+      },
+      "computeDispatches": {
+        "value": 40,
+        "unit": "dispatches",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "renderSubmissions": {
+        "value": 1,
+        "unit": "submissions",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "restorationVerdict": "PASS"
+    },
+    {
+      "recipeId": "temporal.t000",
+      "transactionId": "frost-capture-12",
+      "sequence": {
+        "value": 12,
+        "unit": "transaction-index",
+        "label": "Measured",
+        "source": "frozen Frost recipe order"
+      },
+      "computeDispatches": {
+        "value": 0,
+        "unit": "dispatches",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "renderSubmissions": {
+        "value": 1,
+        "unit": "submissions",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "restorationVerdict": "PASS"
+    },
+    {
+      "recipeId": "temporal.t001",
+      "transactionId": "frost-capture-13",
+      "sequence": {
+        "value": 13,
+        "unit": "transaction-index",
+        "label": "Measured",
+        "source": "frozen Frost recipe order"
+      },
+      "computeDispatches": {
+        "value": 1,
+        "unit": "dispatches",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "renderSubmissions": {
+        "value": 1,
+        "unit": "submissions",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "restorationVerdict": "PASS"
+    },
+    {
+      "recipeId": "probe.odd-size.final",
+      "transactionId": "frost-capture-14",
+      "sequence": {
+        "value": 14,
+        "unit": "transaction-index",
+        "label": "Measured",
+        "source": "frozen Frost recipe order"
+      },
+      "computeDispatches": {
+        "value": 24,
+        "unit": "dispatches",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "renderSubmissions": {
+        "value": 1,
+        "unit": "submissions",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "restorationVerdict": "PASS"
+    },
+    {
+      "recipeId": "probe.dpr-1.final",
+      "transactionId": "frost-capture-15",
+      "sequence": {
+        "value": 15,
+        "unit": "transaction-index",
+        "label": "Measured",
+        "source": "frozen Frost recipe order"
+      },
+      "computeDispatches": {
+        "value": 24,
+        "unit": "dispatches",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "renderSubmissions": {
+        "value": 1,
+        "unit": "submissions",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "restorationVerdict": "PASS"
+    },
+    {
+      "recipeId": "probe.dpr-1-5.final",
+      "transactionId": "frost-capture-16",
+      "sequence": {
+        "value": 16,
+        "unit": "transaction-index",
+        "label": "Measured",
+        "source": "frozen Frost recipe order"
+      },
+      "computeDispatches": {
+        "value": 24,
+        "unit": "dispatches",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "renderSubmissions": {
+        "value": 1,
+        "unit": "submissions",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "restorationVerdict": "PASS"
+    },
+    {
+      "recipeId": "probe.dpr-2.final",
+      "transactionId": "frost-capture-17",
+      "sequence": {
+        "value": 17,
+        "unit": "transaction-index",
+        "label": "Measured",
+        "source": "frozen Frost recipe order"
+      },
+      "computeDispatches": {
+        "value": 24,
+        "unit": "dispatches",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "renderSubmissions": {
+        "value": 1,
+        "unit": "submissions",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "restorationVerdict": "PASS"
+    },
+    {
+      "recipeId": "route.canonical",
+      "transactionId": "frost-capture-18",
+      "sequence": {
+        "value": 18,
+        "unit": "transaction-index",
+        "label": "Measured",
+        "source": "frozen Frost recipe order"
+      },
+      "computeDispatches": {
+        "value": 24,
+        "unit": "dispatches",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "renderSubmissions": {
+        "value": 1,
+        "unit": "submissions",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "restorationVerdict": "PASS"
+    },
+    {
+      "recipeId": "route.mechanism.history-and-deposit",
+      "transactionId": "frost-capture-19",
+      "sequence": {
+        "value": 19,
+        "unit": "transaction-index",
+        "label": "Measured",
+        "source": "frozen Frost recipe order"
+      },
+      "computeDispatches": {
+        "value": 24,
+        "unit": "dispatches",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "renderSubmissions": {
+        "value": 1,
+        "unit": "submissions",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "restorationVerdict": "PASS"
+    },
+    {
+      "recipeId": "route.mechanism.diffusion",
+      "transactionId": "frost-capture-20",
+      "sequence": {
+        "value": 20,
+        "unit": "transaction-index",
+        "label": "Measured",
+        "source": "frozen Frost recipe order"
+      },
+      "computeDispatches": {
+        "value": 24,
+        "unit": "dispatches",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "renderSubmissions": {
+        "value": 1,
+        "unit": "submissions",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "restorationVerdict": "PASS"
+    },
+    {
+      "recipeId": "route.mechanism.blur-and-reconstruction",
+      "transactionId": "frost-capture-21",
+      "sequence": {
+        "value": 21,
+        "unit": "transaction-index",
+        "label": "Measured",
+        "source": "frozen Frost recipe order"
+      },
+      "computeDispatches": {
+        "value": 24,
+        "unit": "dispatches",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "renderSubmissions": {
+        "value": 1,
+        "unit": "submissions",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "restorationVerdict": "PASS"
+    },
+    {
+      "recipeId": "route.mechanism.crystal-field-and-normals",
+      "transactionId": "frost-capture-22",
+      "sequence": {
+        "value": 22,
+        "unit": "transaction-index",
+        "label": "Measured",
+        "source": "frozen Frost recipe order"
+      },
+      "computeDispatches": {
+        "value": 24,
+        "unit": "dispatches",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "renderSubmissions": {
+        "value": 1,
+        "unit": "submissions",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "restorationVerdict": "PASS"
+    },
+    {
+      "recipeId": "route.mechanism.refraction-and-fresnel",
+      "transactionId": "frost-capture-23",
+      "sequence": {
+        "value": 23,
+        "unit": "transaction-index",
+        "label": "Measured",
+        "source": "frozen Frost recipe order"
+      },
+      "computeDispatches": {
+        "value": 24,
+        "unit": "dispatches",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "renderSubmissions": {
+        "value": 1,
+        "unit": "submissions",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "restorationVerdict": "PASS"
+    },
+    {
+      "recipeId": "route.mechanism.full-vs-dirty-vs-idle",
+      "transactionId": "frost-capture-24",
+      "sequence": {
+        "value": 24,
+        "unit": "transaction-index",
+        "label": "Measured",
+        "source": "frozen Frost recipe order"
+      },
+      "computeDispatches": {
+        "value": 24,
+        "unit": "dispatches",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "renderSubmissions": {
+        "value": 1,
+        "unit": "submissions",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "restorationVerdict": "PASS"
+    },
+    {
+      "recipeId": "route.tier.full",
+      "transactionId": "frost-capture-25",
+      "sequence": {
+        "value": 25,
+        "unit": "transaction-index",
+        "label": "Measured",
+        "source": "frozen Frost recipe order"
+      },
+      "computeDispatches": {
+        "value": 24,
+        "unit": "dispatches",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "renderSubmissions": {
+        "value": 1,
+        "unit": "submissions",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "restorationVerdict": "PASS"
+    },
+    {
+      "recipeId": "route.tier.balanced",
+      "transactionId": "frost-capture-26",
+      "sequence": {
+        "value": 26,
+        "unit": "transaction-index",
+        "label": "Measured",
+        "source": "frozen Frost recipe order"
+      },
+      "computeDispatches": {
+        "value": 24,
+        "unit": "dispatches",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "renderSubmissions": {
+        "value": 1,
+        "unit": "submissions",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "restorationVerdict": "PASS"
+    },
+    {
+      "recipeId": "route.tier.budgeted",
+      "transactionId": "frost-capture-27",
+      "sequence": {
+        "value": 27,
+        "unit": "transaction-index",
+        "label": "Measured",
+        "source": "frozen Frost recipe order"
+      },
+      "computeDispatches": {
+        "value": 24,
+        "unit": "dispatches",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "renderSubmissions": {
+        "value": 1,
+        "unit": "submissions",
+        "label": "Measured",
+        "source": "isolated recipe execution evidence"
+      },
+      "restorationVerdict": "PASS"
+    }
+  ],
+  "transactionalRouteStateMatrix": [
+    {
+      "recipeId": "route.canonical",
+      "kind": "canonical",
+      "path": "/demos/webgpu-touch-history-frost/",
+      "locks": {
+        "scenario": true,
+        "mechanism": false,
+        "tier": false
+      },
+      "startup": {
+        "scenario": "touch-history-frost",
+        "mechanism": "refraction-and-fresnel",
+        "tier": "balanced",
+        "mode": "final"
+      },
+      "transactionId": "frost-capture-18",
+      "normalizedRgbaSha256": "sha256:60db29666def4a261ea9a5c9ae6fecca93521a396aa53dff462b2188ceb20c43",
+      "sequence": {
+        "value": 1,
+        "unit": "route-index",
+        "label": "Measured",
+        "source": "canonical, mechanism, then tier route order"
+      },
+      "rgbRangeBytes": {
+        "value": 236,
+        "unit": "rgb-byte-range",
+        "label": "Measured",
+        "source": "route.canonical retained native-WebGPU readback"
+      }
+    },
+    {
+      "recipeId": "route.mechanism.history-and-deposit",
+      "kind": "mechanism",
+      "path": "/demos/webgpu-touch-history-frost/mechanism/history-and-deposit/",
+      "locks": {
+        "scenario": true,
+        "mechanism": true,
+        "tier": false
+      },
+      "startup": {
+        "scenario": "touch-history-frost",
+        "mechanism": "history-and-deposit",
+        "tier": "balanced",
+        "mode": "final"
+      },
+      "transactionId": "frost-capture-19",
+      "normalizedRgbaSha256": "sha256:21e81e8be3f92f674b2120a37333e1a56f1ffdb831ad0bbabe983adc3004037d",
+      "sequence": {
+        "value": 2,
+        "unit": "route-index",
+        "label": "Measured",
+        "source": "canonical, mechanism, then tier route order"
+      },
+      "rgbRangeBytes": {
+        "value": 236,
+        "unit": "rgb-byte-range",
+        "label": "Measured",
+        "source": "route.mechanism.history-and-deposit retained native-WebGPU readback"
+      }
+    },
+    {
+      "recipeId": "route.mechanism.diffusion",
+      "kind": "mechanism",
+      "path": "/demos/webgpu-touch-history-frost/mechanism/diffusion/",
+      "locks": {
+        "scenario": true,
+        "mechanism": true,
+        "tier": false
+      },
+      "startup": {
+        "scenario": "touch-history-frost",
+        "mechanism": "diffusion",
+        "tier": "balanced",
+        "mode": "final"
+      },
+      "transactionId": "frost-capture-20",
+      "normalizedRgbaSha256": "sha256:66afd058ea47d65cdd2ea370cd08c585d109fee1c65625b8fed9af46490504c2",
+      "sequence": {
+        "value": 3,
+        "unit": "route-index",
+        "label": "Measured",
+        "source": "canonical, mechanism, then tier route order"
+      },
+      "rgbRangeBytes": {
+        "value": 236,
+        "unit": "rgb-byte-range",
+        "label": "Measured",
+        "source": "route.mechanism.diffusion retained native-WebGPU readback"
+      }
+    },
+    {
+      "recipeId": "route.mechanism.blur-and-reconstruction",
+      "kind": "mechanism",
+      "path": "/demos/webgpu-touch-history-frost/mechanism/blur-and-reconstruction/",
+      "locks": {
+        "scenario": true,
+        "mechanism": true,
+        "tier": false
+      },
+      "startup": {
+        "scenario": "touch-history-frost",
+        "mechanism": "blur-and-reconstruction",
+        "tier": "balanced",
+        "mode": "final"
+      },
+      "transactionId": "frost-capture-21",
+      "normalizedRgbaSha256": "sha256:3e6c18b16e7bc6bad34dfeb51ad7de7c431d18b69f1d8381ef22b179fcff0544",
+      "sequence": {
+        "value": 4,
+        "unit": "route-index",
+        "label": "Measured",
+        "source": "canonical, mechanism, then tier route order"
+      },
+      "rgbRangeBytes": {
+        "value": 236,
+        "unit": "rgb-byte-range",
+        "label": "Measured",
+        "source": "route.mechanism.blur-and-reconstruction retained native-WebGPU readback"
+      }
+    },
+    {
+      "recipeId": "route.mechanism.crystal-field-and-normals",
+      "kind": "mechanism",
+      "path": "/demos/webgpu-touch-history-frost/mechanism/crystal-field-and-normals/",
+      "locks": {
+        "scenario": true,
+        "mechanism": true,
+        "tier": false
+      },
+      "startup": {
+        "scenario": "touch-history-frost",
+        "mechanism": "crystal-field-and-normals",
+        "tier": "balanced",
+        "mode": "final"
+      },
+      "transactionId": "frost-capture-22",
+      "normalizedRgbaSha256": "sha256:87b249596ddaeda8731ce5bb48b01b61bae23a98a2d7d696d5902fe9da22ee78",
+      "sequence": {
+        "value": 5,
+        "unit": "route-index",
+        "label": "Measured",
+        "source": "canonical, mechanism, then tier route order"
+      },
+      "rgbRangeBytes": {
+        "value": 236,
+        "unit": "rgb-byte-range",
+        "label": "Measured",
+        "source": "route.mechanism.crystal-field-and-normals retained native-WebGPU readback"
+      }
+    },
+    {
+      "recipeId": "route.mechanism.refraction-and-fresnel",
+      "kind": "mechanism",
+      "path": "/demos/webgpu-touch-history-frost/mechanism/refraction-and-fresnel/",
+      "locks": {
+        "scenario": true,
+        "mechanism": true,
+        "tier": false
+      },
+      "startup": {
+        "scenario": "touch-history-frost",
+        "mechanism": "refraction-and-fresnel",
+        "tier": "balanced",
+        "mode": "final"
+      },
+      "transactionId": "frost-capture-23",
+      "normalizedRgbaSha256": "sha256:60db29666def4a261ea9a5c9ae6fecca93521a396aa53dff462b2188ceb20c43",
+      "sequence": {
+        "value": 6,
+        "unit": "route-index",
+        "label": "Measured",
+        "source": "canonical, mechanism, then tier route order"
+      },
+      "rgbRangeBytes": {
+        "value": 236,
+        "unit": "rgb-byte-range",
+        "label": "Measured",
+        "source": "route.mechanism.refraction-and-fresnel retained native-WebGPU readback"
+      }
+    },
+    {
+      "recipeId": "route.mechanism.full-vs-dirty-vs-idle",
+      "kind": "mechanism",
+      "path": "/demos/webgpu-touch-history-frost/mechanism/full-vs-dirty-vs-idle/",
+      "locks": {
+        "scenario": true,
+        "mechanism": true,
+        "tier": false
+      },
+      "startup": {
+        "scenario": "touch-history-frost",
+        "mechanism": "full-vs-dirty-vs-idle",
+        "tier": "balanced",
+        "mode": "final"
+      },
+      "transactionId": "frost-capture-24",
+      "normalizedRgbaSha256": "sha256:21e81e8be3f92f674b2120a37333e1a56f1ffdb831ad0bbabe983adc3004037d",
+      "sequence": {
+        "value": 7,
+        "unit": "route-index",
+        "label": "Measured",
+        "source": "canonical, mechanism, then tier route order"
+      },
+      "rgbRangeBytes": {
+        "value": 236,
+        "unit": "rgb-byte-range",
+        "label": "Measured",
+        "source": "route.mechanism.full-vs-dirty-vs-idle retained native-WebGPU readback"
+      }
+    },
+    {
+      "recipeId": "route.tier.full",
+      "kind": "tier",
+      "path": "/demos/webgpu-touch-history-frost/tier/full/",
+      "locks": {
+        "scenario": true,
+        "mechanism": false,
+        "tier": true
+      },
+      "startup": {
+        "scenario": "touch-history-frost",
+        "mechanism": "refraction-and-fresnel",
+        "tier": "full",
+        "mode": "final"
+      },
+      "transactionId": "frost-capture-25",
+      "normalizedRgbaSha256": "sha256:d275cc3fca24b83a02370b1733d37ee8becf6aab47d4137673bf19473ab23c10",
+      "sequence": {
+        "value": 8,
+        "unit": "route-index",
+        "label": "Measured",
+        "source": "canonical, mechanism, then tier route order"
+      },
+      "rgbRangeBytes": {
+        "value": 236,
+        "unit": "rgb-byte-range",
+        "label": "Measured",
+        "source": "route.tier.full retained native-WebGPU readback"
+      }
+    },
+    {
+      "recipeId": "route.tier.balanced",
+      "kind": "tier",
+      "path": "/demos/webgpu-touch-history-frost/tier/balanced/",
+      "locks": {
+        "scenario": true,
+        "mechanism": false,
+        "tier": true
+      },
+      "startup": {
+        "scenario": "touch-history-frost",
+        "mechanism": "refraction-and-fresnel",
+        "tier": "balanced",
+        "mode": "final"
+      },
+      "transactionId": "frost-capture-26",
+      "normalizedRgbaSha256": "sha256:60db29666def4a261ea9a5c9ae6fecca93521a396aa53dff462b2188ceb20c43",
+      "sequence": {
+        "value": 9,
+        "unit": "route-index",
+        "label": "Measured",
+        "source": "canonical, mechanism, then tier route order"
+      },
+      "rgbRangeBytes": {
+        "value": 236,
+        "unit": "rgb-byte-range",
+        "label": "Measured",
+        "source": "route.tier.balanced retained native-WebGPU readback"
+      }
+    },
+    {
+      "recipeId": "route.tier.budgeted",
+      "kind": "tier",
+      "path": "/demos/webgpu-touch-history-frost/tier/budgeted/",
+      "locks": {
+        "scenario": true,
+        "mechanism": false,
+        "tier": true
+      },
+      "startup": {
+        "scenario": "touch-history-frost",
+        "mechanism": "refraction-and-fresnel",
+        "tier": "budgeted",
+        "mode": "final"
+      },
+      "transactionId": "frost-capture-27",
+      "normalizedRgbaSha256": "sha256:614ed3da2c4252cc7e0ae76e6f108300390037b7d099c4beeee38b9e68fd7b9b",
+      "sequence": {
+        "value": 10,
+        "unit": "route-index",
+        "label": "Measured",
+        "source": "canonical, mechanism, then tier route order"
+      },
+      "rgbRangeBytes": {
+        "value": 236,
+        "unit": "rgb-byte-range",
+        "label": "Measured",
+        "source": "route.tier.budgeted retained native-WebGPU readback"
+      }
+    }
+  ],
+  "negativeControls": {
+    "unknownModeRejected": true,
+    "captureParentRestored": true,
+    "oddSizeBoundsChecked": true
+  },
+  "diagnosticComparisons": [
+    {
+      "route": "diagnostic.previous-history-ra",
+      "measuredRange": {
+        "value": 77,
+        "unit": "rgb-byte-range",
+        "label": "Measured",
+        "source": "diagnostic.previous-history-ra retained native-WebGPU readback"
+      },
+      "minimumRangeGate": {
+        "value": 8,
+        "unit": "rgb-byte-range",
+        "label": "Gated",
+        "source": "frozen diagnostic non-constant gate"
+      },
+      "verdict": "PASS"
+    },
+    {
+      "route": "diagnostic.deposit-ra",
+      "measuredRange": {
+        "value": 156,
+        "unit": "rgb-byte-range",
+        "label": "Measured",
+        "source": "diagnostic.deposit-ra retained native-WebGPU readback"
+      },
+      "minimumRangeGate": {
+        "value": 8,
+        "unit": "rgb-byte-range",
+        "label": "Gated",
+        "source": "frozen diagnostic non-constant gate"
+      },
+      "verdict": "PASS"
+    },
+    {
+      "route": "diagnostic.next-history-ra",
+      "measuredRange": {
+        "value": 76,
+        "unit": "rgb-byte-range",
+        "label": "Measured",
+        "source": "diagnostic.next-history-ra retained native-WebGPU readback"
+      },
+      "minimumRangeGate": {
+        "value": 8,
+        "unit": "rgb-byte-range",
+        "label": "Gated",
+        "source": "frozen diagnostic non-constant gate"
+      },
+      "verdict": "PASS"
+    },
+    {
+      "route": "diagnostic.frost-mask-after-pointer",
+      "measuredRange": {
+        "value": 255,
+        "unit": "rgb-byte-range",
+        "label": "Measured",
+        "source": "diagnostic.frost-mask-after-pointer retained native-WebGPU readback"
+      },
+      "minimumRangeGate": {
+        "value": 8,
+        "unit": "rgb-byte-range",
+        "label": "Gated",
+        "source": "frozen diagnostic non-constant gate"
+      },
+      "verdict": "PASS"
+    }
+  ],
+  "metrics": [
+    {
+      "id": "recipe-count",
+      "measured": {
+        "value": 27,
+        "unit": "recipes",
+        "label": "Measured",
+        "source": "retained transactional recipe ledger"
+      }
+    },
+    {
+      "id": "transactional-route-state-count",
+      "measured": {
+        "value": 10,
+        "unit": "route-states",
+        "label": "Measured",
+        "source": "manifest-shaped transactional GPU state matrix; immutable URL execution is a separate lane"
+      }
+    },
+    {
+      "id": "lifecycle-cycle-count",
+      "measured": {
+        "value": 50,
+        "unit": "cycle-count",
+        "label": "Measured",
+        "source": "fresh native-WebGPU Frost controller lifecycle run"
+      }
+    },
+    {
+      "id": "odd-size-workgroups",
+      "measured": {
+        "values": [
+          81,
+          45,
+          1
+        ],
+        "unit": "workgroups",
+        "label": "Derived",
+        "source": "641x359 bounds-checked dispatch"
+      }
+    }
+  ],
+  "verdicts": {
+    "visualCorrectness": "INSUFFICIENT_EVIDENCE",
+    "mechanismCorrectness": "PASS",
+    "performanceCompliance": "NOT_CLAIMED",
+    "gpuAttribution": "NOT_CLAIMED",
+    "lifecycleStability": "PASS",
+    "visualError": "PASS"
+  },
+  "verdict": "PASS"
+}

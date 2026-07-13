@@ -49,18 +49,24 @@ function resize() {
 addEventListener("resize", resize);
 resize();
 
-let previousTime = 0;
-lab.renderer.setAnimationLoop((timestamp) => {
-  if (previousTime === 0) previousTime = timestamp;
-  let elapsed = Math.max(0, (timestamp - previousTime) / 1000);
-  previousTime = timestamp;
-  while (elapsed > 0) {
-    const step = Math.min(elapsed, 1 / 30);
-    lab.step(step);
-    elapsed -= step;
-  }
-  lab.renderOnce();
+const captureMode = new URLSearchParams(location.search).get("capture") === "1";
+if (captureMode) {
+  // Capture owns time/stepping; free-running RAF would desync locked capture state.
   status.textContent = JSON.stringify(lab.getMetrics(), null, 2);
-});
+} else {
+  let previousTime = 0;
+  lab.renderer.setAnimationLoop((timestamp) => {
+    if (previousTime === 0) previousTime = timestamp;
+    let elapsed = Math.max(0, (timestamp - previousTime) / 1000);
+    previousTime = timestamp;
+    while (elapsed > 0) {
+      const step = Math.min(elapsed, 1 / 30);
+      lab.step(step);
+      elapsed -= step;
+    }
+    lab.renderOnce();
+    status.textContent = JSON.stringify(lab.getMetrics(), null, 2);
+  });
+}
 
 addEventListener("pagehide", () => lab.dispose(), { once: true });

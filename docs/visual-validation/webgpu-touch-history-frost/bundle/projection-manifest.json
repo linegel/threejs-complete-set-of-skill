@@ -1,0 +1,687 @@
+{
+  "schemaVersion": 1,
+  "projectionKind": "tracked-release-projection-v1",
+  "policy": {
+    "id": "native-webgpu-tracked-release-v1",
+    "digest": "sha256:e349900d79da27cb5570ea959707f741e03ea7e206d85a717a1129b27268f6a4"
+  },
+  "labId": "webgpu-touch-history-frost",
+  "skill": "threejs-dynamic-surface-effects",
+  "threeRevision": "0.185.1",
+  "sourceClosureHash": "sha256:03e91ff6e6dd78f32c9b32143a28ca560c1332ca6e6abede836c387430b534fe",
+  "buildRevision": "sha256:3be70bc106d34b144e8dba1d3606db6b25b84025be5054ef4bb6e83ca230d1a7",
+  "sourceRelease": {
+    "path": "evidence-manifest.json",
+    "sha256": "sha256:31646cd2fea4a52efa2c277be8edac3e0a806e714654f4eb50fe175f9d6beec3",
+    "byteLength": 56335,
+    "promotionBindingDigest": "sha256:193b544f631235527c758de8b893e06aa2fee95ce05b958e6d2eefb1e2d5abf7",
+    "candidateBindingDigest": "sha256:5a80059582a8aa09c2bee8f5a1dfc78446a5a894d79e58e93ae6b82dbb3bf253",
+    "artifactLedgerDigest": "sha256:901092885b1f76255aae3e551845339babe1d44c3a442fa3d33041f3d62962c5",
+    "imageLedgerDigest": "sha256:2b64cc66fb16428193b8d31e6a7a11bcd4b8ee59fcc0a8132c0aed180c31e00c"
+  },
+  "sourceClosure": {
+    "algorithm": "demo-registry-transitive-source-closure-v2",
+    "roots": [
+      "labs/runtime/lifecycle-profile.mjs",
+      "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost"
+    ],
+    "files": [
+      {
+        "repositoryPath": "labs/runtime/lifecycle-profile.mjs",
+        "sha256": "sha256:6766925dfaf652c95ba55b20809621c5d10d42e89445504f15403ce84215cf66",
+        "byteLength": 6334
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/bootstrap.js",
+        "sha256": "sha256:e78d7681fa08948c7cf461d4d6da8d145de9b0f3c1e6a035e7b52e4dc02d6317",
+        "byteLength": 146
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/capture-frost-evidence.mjs",
+        "sha256": "sha256:99354c90725ec5b093c1d15e6c834b100c72e02830995786bb27be58942ed8e2",
+        "byteLength": 950
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/capture-hook.mjs",
+        "sha256": "sha256:d1175ed48bdce7cf3f644fb12f2c8e10976d48620adab287afff9868fa7d6390",
+        "byteLength": 31669
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/capture-recipes.js",
+        "sha256": "sha256:711954271d2babf4154d704bbc95329266eaaf4bfd1f6793447f3c50bc81ce16",
+        "byteLength": 25023
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/capture-status.mjs",
+        "sha256": "sha256:48982d23a2ab565c229603245c86caed8eae916162eaa59cc4aaa7cdc910c078",
+        "byteLength": 8369
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/capture-transaction.js",
+        "sha256": "sha256:835d2d66da15c3260033b25d4713ffa6409e432213208074b3c97d5ac583d28d",
+        "byteLength": 2593
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/finalize-frost-evidence.mjs",
+        "sha256": "sha256:d5acf79edc8b977895bfeb47962aab9f820930e6d6e7a0f73780237c8452cce9",
+        "byteLength": 9146
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/finalize-physical-review.mjs",
+        "sha256": "sha256:5462beec2486e684a359508b55e945af3ac664d959ff8d79e497344450ebcd61",
+        "byteLength": 7167
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/frost-evidence-artifacts.mjs",
+        "sha256": "sha256:faa9f6450a72dae4bcf5cc6afd723a5f8a3833a052012bfcf57988a58228d948",
+        "byteLength": 16943
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/frost-surface-effect.js",
+        "sha256": "sha256:96d0c4f3f53afb800b326ac6dfdbe251d3adea9ec43f8b34b8e2814da850032e",
+        "byteLength": 63530
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/frost-webgpu-lab.js",
+        "sha256": "sha256:77d07f14c47f07e1adb9bffd5559bea2e4202a24c55ff19c0fe96440f1563fc0",
+        "byteLength": 36642
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/generated-frost-crystals-browser.mjs",
+        "sha256": "sha256:3da08df9d876869e85d2aa6da7393e11b4b38e398cebc26ee9777f61a7f741a5",
+        "byteLength": 11103
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/generated-frost-crystals.html",
+        "sha256": "sha256:d95e3f481cf1917da6ba6fc0982018f0a7176164a3bd803b99705531b6ad977b",
+        "byteLength": 615
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/index.html",
+        "sha256": "sha256:d369d5356bc6911bc606d4bbb834c08c90dd90060d331f818998452464c77be3",
+        "byteLength": 629
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/main.js",
+        "sha256": "sha256:82a1fdbc6cbff3faf351db6a1909eeac02e47e08b8a0b5416bc1a452c99362da",
+        "byteLength": 4242
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/mechanism/blur-and-reconstruction/index.html",
+        "sha256": "sha256:da6e5720aea37ef1ddb09395a312b547f4dd2b2350c38c5d8e5f07f587960c42",
+        "byteLength": 521
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/mechanism/crystal-field-and-normals/index.html",
+        "sha256": "sha256:2c25a367a35adb37b566b008778246c86c4975d6b50afc83588c41dce415a62a",
+        "byteLength": 523
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/mechanism/diffusion/index.html",
+        "sha256": "sha256:fd4129989bff1beec3920ba8204c38bb1d9b48bf823bbd6440c7d41ca8f10c51",
+        "byteLength": 507
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/mechanism/full-vs-dirty-vs-idle/index.html",
+        "sha256": "sha256:7fee29a2b6edef219bbe9fbcce1ef88a20013c0f9b83ca51919a73dde2d1bfab",
+        "byteLength": 527
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/mechanism/history-and-deposit/index.html",
+        "sha256": "sha256:f8df308d2fedc29126a383fce5b47b249af2c51c10fe4c58b82c664a2d31365b",
+        "byteLength": 517
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/mechanism/refraction-and-fresnel/index.html",
+        "sha256": "sha256:6a5abefb45f6d3e6bd6c6d887aa709c941b4c642a6a184dee98dbd6a755384e8",
+        "byteLength": 520
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/package-lock.json",
+        "sha256": "sha256:02d262e899281a6627a37d84b3c8e3ef00c4911b0f31f030c147a3a05c37325f",
+        "byteLength": 1917
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/package.json",
+        "sha256": "sha256:289b6622d5d12b783f2e515f5ac37a3edc9793924ced652c94e4c15ce27a7fb4",
+        "byteLength": 1188
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/physical-observer.js",
+        "sha256": "sha256:fc5e114e74a27249c594df505eb897bb822b30b6672149fc6cee1b2cf5a6a560",
+        "byteLength": 1200
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/physical-review.html",
+        "sha256": "sha256:52021f093acaf20d2dda3cef15231492fea72468ea99e1a231f197fd3c1c49d1",
+        "byteLength": 2844
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/physical-review.js",
+        "sha256": "sha256:ee40a9f313c9056811ac3200686f93840cc3c71e2e309e796aef02c88ab33de2",
+        "byteLength": 11983
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/physical-route-matrix-review.html",
+        "sha256": "sha256:d09b8d7ddc9d922ad7899d3a7657391c273d811d8157c9bb0ff7ab072f052741",
+        "byteLength": 1238
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/physical-route-matrix-review.js",
+        "sha256": "sha256:edbf441636e26447404f71d03b9b3ebfad9d5a44c081545d312fb48d65756e4a",
+        "byteLength": 5864
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/physical-route-matrix.js",
+        "sha256": "sha256:c39bf8fd5ee86a4ababe22002da0758f6e32c1fc61fd878e1ddb584fccc3d565",
+        "byteLength": 3812
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/README.md",
+        "sha256": "sha256:1db4ee9f7a7f97186b2a46ae5c283a34da404bcf486c89c98847be80eac9aacc",
+        "byteLength": 3141
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/route-wrapper.js",
+        "sha256": "sha256:2eb4e4e6e6672ae257322d45c62588cb3b079a8fd448ef9d9872eeb556084c94",
+        "byteLength": 32
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/test-capture-hook.mjs",
+        "sha256": "sha256:369fc6eaecfccc7314036b860de8d964a54ffce92556f7ba8691198ca0b6c6dd",
+        "byteLength": 8068
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/test-capture-recipes.mjs",
+        "sha256": "sha256:88b4f2c42bbbb26fb51e130397cb95b5630f05d2dc09476c9c566b9b288d72d8",
+        "byteLength": 8262
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/test-capture-status.mjs",
+        "sha256": "sha256:2b030544d2781f24dc9843b51398030fda44d3b340b87c36087f6da8d7d74e42",
+        "byteLength": 3015
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/test-capture-transaction.mjs",
+        "sha256": "sha256:8db832859c0f91d9a593e56466bd5f799f37b682e6f0bdad8696e604ecfaaa7d",
+        "byteLength": 2577
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/test-crystal-field.mjs",
+        "sha256": "sha256:951e3f54f3a594bdb805c603b8a4f5e40e70d0079f8b47bed8a886c0b8b595d5",
+        "byteLength": 1787
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/test-finalize-physical-review.mjs",
+        "sha256": "sha256:405c733d5daba127e2abcf91a5f65b4354cba033152e73e2088fc41dca332ac5",
+        "byteLength": 6365
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/test-frost-evidence-artifacts.mjs",
+        "sha256": "sha256:31ffccd38efbbff12900178722f1a88ae1d133d1393caf411dd51275348021bb",
+        "byteLength": 5395
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/test-lifecycle-profile.mjs",
+        "sha256": "sha256:e90ec53ffb6ed4f3833759080ca059c7893115330f4112cb1a89e6c15024443c",
+        "byteLength": 1001
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/test-mutations.mjs",
+        "sha256": "sha256:eee3e4ee755002615929971f55328da057adb099f07d27f09ecd8b9ac768eade",
+        "byteLength": 7428
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/test-physical-review.mjs",
+        "sha256": "sha256:35caf5a866124cf99c2089eb1c47bbcf84534608bb1ce99d507979823d1fb8cb",
+        "byteLength": 3571
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/test-physical-route-matrix.mjs",
+        "sha256": "sha256:dfddda1adc6c88de78dc9a7954ab136bcb2cb13c894b5fadcbd13c83ba7d9240",
+        "byteLength": 2753
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/test-route-contract.mjs",
+        "sha256": "sha256:9b143c849382c5b6b5aded85058e5f773b5ea1f91476884128097ad3edaadcb1",
+        "byteLength": 3375
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/tier/balanced/index.html",
+        "sha256": "sha256:a01a5b275344456364ba684de18202d7d1aea9573f634d854b381b506caecf96",
+        "byteLength": 511
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/tier/budgeted/index.html",
+        "sha256": "sha256:d631f2ac00c38b8e41703f932a4a20d513c30a0da5247b153fb7c63aa811a008",
+        "byteLength": 511
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/tier/full/index.html",
+        "sha256": "sha256:82589406845870d8911a800a35668af64d6545c9eb7855875887d6dea5657d24",
+        "byteLength": 507
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/ui-shell.js",
+        "sha256": "sha256:d7a632842c2716309809a5ef6bac8f86ba5fd9bff2bbc913ad102cb5adb198a3",
+        "byteLength": 3619
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/validate-generated-frost-crystals.mjs",
+        "sha256": "sha256:7b82a6758b4dfcfcc4d5f0be47e8fdb8ddaa53e0be050617fff2ef6813eb14bf",
+        "byteLength": 15561
+      },
+      {
+        "repositoryPath": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/validate-temporal-surface.js",
+        "sha256": "sha256:ac3e755dca1ba5f4f743e95068f8731f881be6af6d1e1226f53c3f24b3147025",
+        "byteLength": 23800
+      }
+    ],
+    "threeRevision": "0.185.1",
+    "sourceHash": "sha256:03e91ff6e6dd78f32c9b32143a28ca560c1332ca6e6abede836c387430b534fe",
+    "buildRevision": "sha256:3be70bc106d34b144e8dba1d3606db6b25b84025be5054ef4bb6e83ca230d1a7"
+  },
+  "retainedFiles": [
+    {
+      "path": "visual-contract.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:c274c5ed963e28c34bc26ad726ca2a87e0523e18a1f0f72f05347a1ef984ccbd",
+      "byteLength": 921
+    },
+    {
+      "path": "renderer-info.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:1b2f7d4f369ecbee04ea02685d8944cfb37a7dac3ea8b342e6130f308c148406",
+      "byteLength": 413
+    },
+    {
+      "path": "pipeline-graph.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:26b19390f60d861d534662c4f313180bf31e2c4c071521d111986322716c27fd",
+      "byteLength": 3721
+    },
+    {
+      "path": "performance-envelope.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:62e1abb57e217febce5044e04788aae2967a749c9dd5c70432f279fc3c45e507",
+      "byteLength": 634
+    },
+    {
+      "path": "frame-trace.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:61e2604f805c8759b4999cc2b6ef8e27ea9446acb8902d2b4f38c58f787479e7",
+      "byteLength": 280
+    },
+    {
+      "path": "quality-governor.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:867e1ae2b57fad54e7562e9db38318de900e63e24072f22accc243a44066c73c",
+      "byteLength": 261
+    },
+    {
+      "path": "render-targets.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:fbcab33cf3eab574547851eadb93bf82fd74083f74dda28850a9fa11d04cf9fd",
+      "byteLength": 57002
+    },
+    {
+      "path": "storage-resources.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:02c51ee728642f896dea3b4c9966d90273a84c070180cb97e81062a5c6686992",
+      "byteLength": 1642
+    },
+    {
+      "path": "resident-resources.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:3b7ea82ac55a6ff7d13b4f6d9472309d3a56912ec1545b4131b1bab9c5e813c9",
+      "byteLength": 2162
+    },
+    {
+      "path": "bandwidth-model.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:8c45aa532f9ef3077e9465d45ccc407936b1c964ba5415d9088ac9c7e3a100c3",
+      "byteLength": 1079
+    },
+    {
+      "path": "visual-errors.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:98079e371ccc662c99da7387ca25fcaab32bfd3009c21d30f13ff4b2db6f3884",
+      "byteLength": 837
+    },
+    {
+      "path": "leak-loop.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:cb12053c22c0337c2f8b74afdfc19193d2f3f9da63223ed8f62c128ada4db98b",
+      "byteLength": 132989
+    },
+    {
+      "path": "mechanism-metrics.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:c913c5605ba5dc9063bd0cbd89e5e20de463d8b186d995654ca96a062ef536eb",
+      "byteLength": 31709
+    },
+    {
+      "path": "capture-write-ledger.json",
+      "status": "captured",
+      "kind": "capture-session-write-ledger",
+      "sha256": "sha256:9bd899095c22f2a802e83cb807b179aec980520cade3033912d406c48d35bdb6",
+      "byteLength": 34260
+    },
+    {
+      "path": "sessions/physical-route.write-ledger.json",
+      "status": "captured",
+      "kind": "capture-session-write-ledger",
+      "sha256": "sha256:59d3a6a2c24ef4e63f63dd8ad153ce5bc9629993e3e5a50fc9692944d1612d05",
+      "byteLength": 50739
+    }
+  ],
+  "retainedImages": [
+    {
+      "path": "final.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "final.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:4fddb7f7faf27042ed9d0ee454fb7dc9d10a42f2b6b1789803c5890246efccd9",
+      "byteLength": 422830
+    },
+    {
+      "path": "no-post.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "no-post.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:ef2281f199e74a704335d57e2e0416e0fac0391e09585bc06eb070f174082248",
+      "byteLength": 30403
+    },
+    {
+      "path": "diagnostics.mosaic.png",
+      "status": "captured",
+      "kind": "derived-image",
+      "role": "diagnostics.mosaic",
+      "mediaType": "image/png",
+      "sha256": "sha256:7e7c1bacbb62290c350488fe1956f4a0db81682df0bf46d0e36b0dc00055173c",
+      "byteLength": 89344,
+      "sourceCaptures": [
+        "diagnostic.previous-history-ra.png",
+        "diagnostic.deposit-ra.png",
+        "diagnostic.next-history-ra.png",
+        "diagnostic.frost-mask-after-pointer.png"
+      ],
+      "derivation": {
+        "method": "deterministic four-route Frost diagnostic mosaic",
+        "implementation": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/capture-hook.mjs",
+        "parametersDigest": "sha256:4ff67837abf23ea04c6116bcf097579b3799d377768ee31a1560892f47f13d4f"
+      }
+    },
+    {
+      "path": "camera.near.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.near",
+      "mediaType": "image/png",
+      "sha256": "sha256:e59c0dc2cabd1cd55cdadf1b2fdbc5513348135008bdefdb42e12fcd9881afb0",
+      "byteLength": 614911
+    },
+    {
+      "path": "camera.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:8dd9f2fe4831be2f6f96b2f656b6a186b9b2f7b33e79f78cf6d83fdd5d44507d",
+      "byteLength": 427949
+    },
+    {
+      "path": "camera.far.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.far",
+      "mediaType": "image/png",
+      "sha256": "sha256:0022e2f876f6bfbc3eea7b4d7579f2a156647fc6d02e68e6548a65cb5fde9691",
+      "byteLength": 305857
+    },
+    {
+      "path": "seed-0001.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "seed-0001.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:bb10e3eb2df368a9cc0a73f3a1c21044c3fd0b52cda70c0aedb08b9d71ab556e",
+      "byteLength": 367451
+    },
+    {
+      "path": "seed-9e3779b9.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "seed-9e3779b9.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:2b94c04964054e67530ffdf57b9fc3c310af2c5822e7ae24fcb77cc39466c7bd",
+      "byteLength": 377176
+    },
+    {
+      "path": "temporal.t000.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "temporal.t000",
+      "mediaType": "image/png",
+      "sha256": "sha256:cc15d90e66980086e9efddd12aacee31c2e33424916b147eaed55f3a152994f7",
+      "byteLength": 517709
+    },
+    {
+      "path": "temporal.t001.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "temporal.t001",
+      "mediaType": "image/png",
+      "sha256": "sha256:bf1535d7c3fd20ccf95a9832c45a44c7a2e52cd9eceb20b6bcc514be49fb8c2a",
+      "byteLength": 526071
+    },
+    {
+      "path": "diagnostic.deposit-ra.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "diagnostic.deposit-ra",
+      "mediaType": "image/png",
+      "sha256": "sha256:f5200126ffb4affc05fc7342b3767f7082cd9265fa64c920a1fcb8662df59cd2",
+      "byteLength": 30653
+    },
+    {
+      "path": "diagnostic.frost-mask-after-pointer.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "diagnostic.frost-mask-after-pointer",
+      "mediaType": "image/png",
+      "sha256": "sha256:4b2c20f2f64e8ece1e931910364e1b530c7aa17b6aa9cf21f6bcbf6da3df8cd2",
+      "byteLength": 206465
+    },
+    {
+      "path": "diagnostic.next-history-ra.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "diagnostic.next-history-ra",
+      "mediaType": "image/png",
+      "sha256": "sha256:125f386201454a1aeece7ea65c3226dd9dc31d2b4f93fa1e464a1146717e2652",
+      "byteLength": 55853
+    },
+    {
+      "path": "diagnostic.previous-history-ra.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "diagnostic.previous-history-ra",
+      "mediaType": "image/png",
+      "sha256": "sha256:02aeda96edfae9eda394201a08bd4301b39cc1a212b7b526cececfeb9b57ebb4",
+      "byteLength": 55457
+    },
+    {
+      "path": "probe.dpr-1-5.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "probe.dpr-1-5.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:d16a614323772a9d3b88e3f43adfe0a1c8fc901e726d2a59d884281f035b7f25",
+      "byteLength": 157458
+    },
+    {
+      "path": "probe.dpr-1.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "probe.dpr-1.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:921cd01833bdf34fcbb4e7c0aec5b819487adb8cb5083cf39e8540b7addf3fb9",
+      "byteLength": 81195
+    },
+    {
+      "path": "probe.dpr-2.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "probe.dpr-2.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:f0546ac2a97f1a5f3c7f5ff35e59764d6b0064bb53a5a28dca908f479032fa8b",
+      "byteLength": 251849
+    },
+    {
+      "path": "probe.odd-size.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "probe.odd-size.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:311e6fab5abf60e194a3eab11972e0057ee8953872bc25e31bbfb69141b3d8b3",
+      "byteLength": 117437
+    },
+    {
+      "path": "route.canonical.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "route.canonical",
+      "mediaType": "image/png",
+      "sha256": "sha256:ad427289735268ff6a88c2fa0e1a3b403e88455f7fe4e324398087fc83c6d34f",
+      "byteLength": 38928
+    },
+    {
+      "path": "route.mechanism.blur-and-reconstruction.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "route.mechanism.blur-and-reconstruction",
+      "mediaType": "image/png",
+      "sha256": "sha256:adf01dcdbe94ff8923f5272766246e16accbdedc7c9c8cbb9c1301bc90d27826",
+      "byteLength": 38416
+    },
+    {
+      "path": "route.mechanism.crystal-field-and-normals.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "route.mechanism.crystal-field-and-normals",
+      "mediaType": "image/png",
+      "sha256": "sha256:a92ad45d865eed1e740ad43c0bdede28fc0e83ce158f0c5f10937dbb32f67152",
+      "byteLength": 33502
+    },
+    {
+      "path": "route.mechanism.diffusion.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "route.mechanism.diffusion",
+      "mediaType": "image/png",
+      "sha256": "sha256:78192e2de6c5be100f20a7a6a615cb4c2be0d7d38d9703d8aafb9430405de097",
+      "byteLength": 30012
+    },
+    {
+      "path": "route.mechanism.full-vs-dirty-vs-idle.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "route.mechanism.full-vs-dirty-vs-idle",
+      "mediaType": "image/png",
+      "sha256": "sha256:58b712aad1a4dc4d3d4b518fea6bd34548c2342c7f210b10a1e9a27bf9874775",
+      "byteLength": 29981
+    },
+    {
+      "path": "route.mechanism.history-and-deposit.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "route.mechanism.history-and-deposit",
+      "mediaType": "image/png",
+      "sha256": "sha256:58b712aad1a4dc4d3d4b518fea6bd34548c2342c7f210b10a1e9a27bf9874775",
+      "byteLength": 29981
+    },
+    {
+      "path": "route.mechanism.refraction-and-fresnel.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "route.mechanism.refraction-and-fresnel",
+      "mediaType": "image/png",
+      "sha256": "sha256:ad427289735268ff6a88c2fa0e1a3b403e88455f7fe4e324398087fc83c6d34f",
+      "byteLength": 38928
+    },
+    {
+      "path": "route.tier.balanced.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "route.tier.balanced",
+      "mediaType": "image/png",
+      "sha256": "sha256:ad427289735268ff6a88c2fa0e1a3b403e88455f7fe4e324398087fc83c6d34f",
+      "byteLength": 38928
+    },
+    {
+      "path": "route.tier.budgeted.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "route.tier.budgeted",
+      "mediaType": "image/png",
+      "sha256": "sha256:712e180a3973af056c031a22f8ac56d9111db07aa6ba82de6e51a97fe8cab39e",
+      "byteLength": 39917
+    },
+    {
+      "path": "route.tier.full.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "route.tier.full",
+      "mediaType": "image/png",
+      "sha256": "sha256:9ea8e8495cfb2da6347ecac0fd7462538730111633aa8cb5b72c4c9cdabb418d",
+      "byteLength": 37099
+    }
+  ],
+  "omittedFiles": {
+    "ledgerDigest": "sha256:595085c5a30e865be4253cad0bbec6fed6534a8fe9868ace02dc4dea2b3338e0",
+    "count": 59,
+    "byteLength": 123321660,
+    "byKind": [
+      {
+        "kind": "capture-session-document",
+        "count": 2,
+        "byteLength": 414574
+      },
+      {
+        "kind": "raw-readback",
+        "count": 56,
+        "byteLength": 122903524
+      },
+      {
+        "kind": "supplementary-json",
+        "count": 1,
+        "byteLength": 3562
+      }
+    ]
+  },
+  "checkoutLimitations": [
+    {
+      "id": "detached-source-payloads",
+      "status": "ACTIVE",
+      "statement": "Raw readbacks and capture-session transcript bytes are omitted from the tracked projection. Checkout validation verifies their approved hash and byte-length commitments, not the detached bytes themselves.",
+      "affectedClaims": []
+    }
+  ],
+  "projectionDigest": "sha256:fd019711af5924005054df4298c44e49f647956bb765d62c38ab9c5284a9c343"
+}

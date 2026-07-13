@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 2,
+  "subject": "native WebGPU touch-history Frost surface",
+  "identity": [
+    "webgpu-touch-history-frost",
+    "185",
+    "touch-history-frost",
+    "refraction-and-fresnel",
+    "full"
+  ],
+  "invariants": [
+    "one scene pass and one final RenderPipeline owner",
+    "distinct previous/current RGBA16F history storage textures",
+    "same-frame compute, swap, and composite",
+    "odd-size bounds-checked dispatch and 256-byte-aligned readback"
+  ],
+  "requiredImages": [
+    "final.design.png",
+    "no-post.design.png",
+    "diagnostics.mosaic.png",
+    "camera.near.png",
+    "camera.design.png",
+    "camera.far.png",
+    "seed-0001.final.png",
+    "seed-9e3779b9.final.png",
+    "temporal.t000.png",
+    "temporal.t001.png"
+  ],
+  "performanceClaims": [],
+  "limitations": [
+    "Hardware performance and opaque renderer-internal residency are not claimed by the correctness lane."
+  ]
+}

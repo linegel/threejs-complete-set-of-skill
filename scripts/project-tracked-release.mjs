@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
 import { createHash } from 'node:crypto';
-import { existsSync, lstatSync } from 'node:fs';
+import { existsSync, lstatSync, readdirSync, readFileSync } from 'node:fs';
 import { mkdir, mkdtemp, readFile, rename, writeFile } from 'node:fs/promises';
-import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
+import { basename, dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { validateEvidenceBundle } from './lib/evidence-v2.mjs';
@@ -16,6 +16,47 @@ import {
 } from './lib/tracked-release-projection.mjs';
 
 const REPOSITORY_ROOT = fileURLToPath(new URL('../', import.meta.url));
+
+function sha256Bytes(bytes) {
+  return `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
+}
+
+function materializeSourceClosureFiles(sourceClosure, repositoryRoot) {
+  if (Array.isArray(sourceClosure?.files) && sourceClosure.files.length > 0) return sourceClosure;
+  const roots = sourceClosure?.roots;
+  if (!Array.isArray(roots) || roots.length === 0) throw new Error('source closure has no roots to materialize');
+  const excludedSegments = new Set(['.git', '.DS_Store', 'artifacts', 'node_modules']);
+  const excludedFiles = new Set(['lab.manifest.json', 'lab-manifest.json']);
+  const files = [];
+  const walk = (absolute) => {
+    const stat = lstatSync(absolute);
+    if (stat.isSymbolicLink()) return;
+    if (stat.isFile()) {
+      if (excludedFiles.has(basename(absolute))) return;
+      const bytes = readFileSync(absolute);
+      files.push({
+        repositoryPath: relative(repositoryRoot, absolute).split(sep).join('/'),
+        sha256: sha256Bytes(bytes),
+        byteLength: bytes.byteLength,
+      });
+      return;
+    }
+    if (!stat.isDirectory()) return;
+    for (const entry of readdirSync(absolute, { withFileTypes: true })) {
+      if (excludedSegments.has(entry.name) || excludedFiles.has(entry.name)) continue;
+      walk(join(absolute, entry.name));
+    }
+  };
+  for (const root of roots) {
+    const absolute = resolve(repositoryRoot, root);
+    if (!existsSync(absolute)) throw new Error(`source closure root missing: ${root}`);
+    walk(absolute);
+  }
+  files.sort((left, right) => left.repositoryPath.localeCompare(right.repositoryPath));
+  return { ...sourceClosure, files };
+}
+
+
 
 function option(name) {
   const index = process.argv.indexOf(name);
@@ -106,7 +147,7 @@ if (!correctnessDocument.sourceClosure) throw new Error('correctness capture ses
 const projection = createTrackedReleaseProjectionManifest({
   sourceManifest,
   sourceManifestBytes,
-  sourceClosure: correctnessDocument.sourceClosure,
+  sourceClosure: materializeSourceClosureFiles(correctnessDocument.sourceClosure, REPOSITORY_ROOT),
 });
 const retainedBytes = projection.retainedFiles.reduce((total, entry) => total + entry.byteLength, 0)
   + projection.retainedImages.reduce((total, entry) => total + entry.byteLength, 0)

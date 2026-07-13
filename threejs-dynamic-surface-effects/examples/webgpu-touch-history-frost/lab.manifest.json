@@ -4,7 +4,7 @@
   "skill": "threejs-dynamic-surface-effects",
   "threeRevision": "0.185.1",
   "kind": "canonical-lab",
-  "status": "incomplete",
+  "status": "accepted",
   "canonicalSource": [
     "frost-surface-effect.js",
     "frost-webgpu-lab.js",
@@ -15,49 +15,150 @@
   "browserEntry": "index.html",
   "publishPath": "/demos/webgpu-touch-history-frost/",
   "scenarios": [
-    { "id": "touch-history-frost", "route": "/demos/webgpu-touch-history-frost/", "startup": { "scenario": "touch-history-frost", "tier": "balanced" }, "acceptanceStatus": "incomplete" }
+    {
+      "id": "touch-history-frost",
+      "route": "/demos/webgpu-touch-history-frost/",
+      "startup": {
+        "scenario": "touch-history-frost",
+        "tier": "balanced"
+      },
+      "acceptanceStatus": "accepted"
+    }
   ],
   "mechanisms": [
-    { "id": "history-and-deposit", "route": "/demos/webgpu-touch-history-frost/mechanism/history-and-deposit/", "acceptanceStatus": "incomplete" },
-    { "id": "diffusion", "route": "/demos/webgpu-touch-history-frost/mechanism/diffusion/", "acceptanceStatus": "incomplete" },
-    { "id": "blur-and-reconstruction", "route": "/demos/webgpu-touch-history-frost/mechanism/blur-and-reconstruction/", "acceptanceStatus": "incomplete" },
-    { "id": "crystal-field-and-normals", "route": "/demos/webgpu-touch-history-frost/mechanism/crystal-field-and-normals/", "acceptanceStatus": "incomplete" },
-    { "id": "refraction-and-fresnel", "route": "/demos/webgpu-touch-history-frost/mechanism/refraction-and-fresnel/", "acceptanceStatus": "incomplete" },
-    { "id": "full-vs-dirty-vs-idle", "route": "/demos/webgpu-touch-history-frost/mechanism/full-vs-dirty-vs-idle/", "acceptanceStatus": "incomplete" }
+    {
+      "id": "history-and-deposit",
+      "route": "/demos/webgpu-touch-history-frost/mechanism/history-and-deposit/",
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "diffusion",
+      "route": "/demos/webgpu-touch-history-frost/mechanism/diffusion/",
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "blur-and-reconstruction",
+      "route": "/demos/webgpu-touch-history-frost/mechanism/blur-and-reconstruction/",
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "crystal-field-and-normals",
+      "route": "/demos/webgpu-touch-history-frost/mechanism/crystal-field-and-normals/",
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "refraction-and-fresnel",
+      "route": "/demos/webgpu-touch-history-frost/mechanism/refraction-and-fresnel/",
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "full-vs-dirty-vs-idle",
+      "route": "/demos/webgpu-touch-history-frost/mechanism/full-vs-dirty-vs-idle/",
+      "acceptanceStatus": "accepted"
+    }
   ],
   "tiers": [
     {
       "id": "full",
       "targetClass": "close-inspection",
       "frameTargetMs": null,
-      "resolutionPolicy": { "historyScale": 1, "blurScale": 0.5, "dprCap": 2 },
-      "mechanismLimits": { "workgroupSize": [8, 8, 1], "diffusion": true, "twoScaleRefraction": true },
-      "resourceLimits": { "historyFormat": "RGBA16F", "historySlots": 2, "bytesPerTexel": 8 },
+      "resolutionPolicy": {
+        "historyScale": 1,
+        "blurScale": 0.5,
+        "dprCap": 2
+      },
+      "mechanismLimits": {
+        "workgroupSize": [
+          8,
+          8,
+          1
+        ],
+        "diffusion": true,
+        "twoScaleRefraction": true
+      },
+      "resourceLimits": {
+        "historyFormat": "RGBA16F",
+        "historySlots": 2,
+        "bytesPerTexel": 8
+      },
       "degradationFromPrevious": [],
-      "preservedInvariants": ["persistent-history", "same-frame-response", "dt-correct-decay-and-deposit", "one-output-owner"],
-      "acceptanceStatus": "incomplete"
+      "preservedInvariants": [
+        "persistent-history",
+        "same-frame-response",
+        "dt-correct-decay-and-deposit",
+        "one-output-owner"
+      ],
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "balanced",
       "targetClass": "ordinary-inspection",
       "frameTargetMs": null,
-      "resolutionPolicy": { "historyScale": 0.5, "blurScale": 0.33, "dprCap": 1.5 },
-      "mechanismLimits": { "workgroupSize": [8, 8, 1], "diffusion": true, "twoScaleRefraction": true },
-      "resourceLimits": { "historyFormat": "RGBA16F", "historySlots": 2, "bytesPerTexel": 8 },
-      "degradationFromPrevious": ["half-resolution-history", "lower-blur-resolution"],
-      "preservedInvariants": ["persistent-history", "same-frame-response", "dt-correct-decay-and-deposit", "one-output-owner"],
-      "acceptanceStatus": "incomplete"
+      "resolutionPolicy": {
+        "historyScale": 0.5,
+        "blurScale": 0.33,
+        "dprCap": 1.5
+      },
+      "mechanismLimits": {
+        "workgroupSize": [
+          8,
+          8,
+          1
+        ],
+        "diffusion": true,
+        "twoScaleRefraction": true
+      },
+      "resourceLimits": {
+        "historyFormat": "RGBA16F",
+        "historySlots": 2,
+        "bytesPerTexel": 8
+      },
+      "degradationFromPrevious": [
+        "half-resolution-history",
+        "lower-blur-resolution"
+      ],
+      "preservedInvariants": [
+        "persistent-history",
+        "same-frame-response",
+        "dt-correct-decay-and-deposit",
+        "one-output-owner"
+      ],
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "budgeted",
       "targetClass": "small-projected-footprint",
       "frameTargetMs": null,
-      "resolutionPolicy": { "historyScale": 0.25, "blurScale": 0.25, "dprCap": 1 },
-      "mechanismLimits": { "workgroupSize": [8, 8, 1], "diffusion": true, "twoScaleRefraction": false },
-      "resourceLimits": { "historyFormat": "RGBA16F", "historySlots": 2, "bytesPerTexel": 8 },
-      "degradationFromPrevious": ["quarter-resolution-history", "single-scale-refraction"],
-      "preservedInvariants": ["persistent-history", "same-frame-response", "dt-correct-decay-and-deposit", "one-output-owner"],
-      "acceptanceStatus": "incomplete"
+      "resolutionPolicy": {
+        "historyScale": 0.25,
+        "blurScale": 0.25,
+        "dprCap": 1
+      },
+      "mechanismLimits": {
+        "workgroupSize": [
+          8,
+          8,
+          1
+        ],
+        "diffusion": true,
+        "twoScaleRefraction": false
+      },
+      "resourceLimits": {
+        "historyFormat": "RGBA16F",
+        "historySlots": 2,
+        "bytesPerTexel": 8
+      },
+      "degradationFromPrevious": [
+        "quarter-resolution-history",
+        "single-scale-refraction"
+      ],
+      "preservedInvariants": [
+        "persistent-history",
+        "same-frame-response",
+        "dt-correct-decay-and-deposit",
+        "one-output-owner"
+      ],
+      "acceptanceStatus": "accepted"
     }
   ],
   "modes": [
@@ -80,23 +181,82 @@
     "detail-refraction-offset",
     "final-without-refraction"
   ],
-  "cameras": ["near", "design", "far"],
-  "seeds": [1, 2654435769],
+  "cameras": [
+    "near",
+    "design",
+    "far"
+  ],
+  "seeds": [
+    1,
+    2654435769
+  ],
   "capabilityRequirements": [
-    { "id": "native-webgpu", "required": true, "evidence": "renderer backend gate after initialization", "status": "incomplete" },
-    { "id": "storage-texture", "required": true, "evidence": "real RGBA16F ping-pong history textures", "status": "incomplete" },
-    { "id": "compute", "required": true, "evidence": "guarded two-dimensional history update dispatch", "status": "incomplete" }
+    {
+      "id": "native-webgpu",
+      "required": true,
+      "evidence": "renderer backend gate after initialization",
+      "status": "accepted"
+    },
+    {
+      "id": "storage-texture",
+      "required": true,
+      "evidence": "real RGBA16F ping-pong history textures",
+      "status": "accepted"
+    },
+    {
+      "id": "compute",
+      "required": true,
+      "evidence": "guarded two-dimensional history update dispatch",
+      "status": "accepted"
+    }
   ],
   "runtimeProof": [
-    { "id": "renderer-init", "required": true, "evidence": "await renderer.init() in canonical browser controller", "status": "incomplete" },
-    { "id": "backend-is-webgpu", "required": true, "evidence": "renderer.backend.isWebGPUBackend === true", "status": "incomplete" },
-    { "id": "mechanism-reachable", "required": true, "evidence": "fixed mechanism routes select canonical graph state", "status": "incomplete" },
-    { "id": "odd-size-dispatch", "required": true, "evidence": "641x359 coverage with explicit 8x8 bounds", "status": "incomplete" },
-    { "id": "aligned-readback", "required": true, "evidence": "capturePixels derives integer 256-byte-aligned row stride", "status": "incomplete" },
-    { "id": "current-adapter-timing", "required": false, "evidence": "required before any performance acceptance", "status": "incomplete" }
+    {
+      "id": "renderer-init",
+      "required": true,
+      "evidence": "await renderer.init() in canonical browser controller",
+      "status": "accepted"
+    },
+    {
+      "id": "backend-is-webgpu",
+      "required": true,
+      "evidence": "renderer.backend.isWebGPUBackend === true",
+      "status": "accepted"
+    },
+    {
+      "id": "mechanism-reachable",
+      "required": true,
+      "evidence": "fixed mechanism routes select canonical graph state",
+      "status": "accepted"
+    },
+    {
+      "id": "odd-size-dispatch",
+      "required": true,
+      "evidence": "641x359 coverage with explicit 8x8 bounds",
+      "status": "accepted"
+    },
+    {
+      "id": "aligned-readback",
+      "required": true,
+      "evidence": "capturePixels derives integer 256-byte-aligned row stride",
+      "status": "accepted"
+    },
+    {
+      "id": "current-adapter-timing",
+      "required": false,
+      "evidence": "required before any performance acceptance",
+      "status": "incomplete"
+    },
+    {
+      "id": "render-or-compute-work",
+      "required": true,
+      "evidence": "unified-v2 approved release: Playwright correctness + Chrome hardware physical-route review + offline visual signoff",
+      "status": "accepted"
+    }
   ],
   "evidenceContract": "v2",
   "validationCommand": "node validate-temporal-surface.js",
   "sourceHash": null,
-  "proxyStatus": null
+  "proxyStatus": null,
+  "evidenceBundle": "docs/visual-validation/webgpu-touch-history-frost/bundle"
 }

@@ -1,0 +1,1418 @@
+{
+  "schemaVersion": 2,
+  "labId": "webgpu-touch-history-frost",
+  "bundleId": "webgpu-touch-history-frost:release:03e91ff6e6dd78f3:v2",
+  "bundleKind": "release-bundle",
+  "publishable": true,
+  "skill": "threejs-dynamic-surface-effects",
+  "threeRevision": "0.185.1",
+  "sourceClosureHash": "sha256:03e91ff6e6dd78f32c9b32143a28ca560c1332ca6e6abede836c387430b534fe",
+  "buildRevision": "sha256:3be70bc106d34b144e8dba1d3606db6b25b84025be5054ef4bb6e83ca230d1a7",
+  "route": {
+    "path": "/demos/webgpu-touch-history-frost/",
+    "scenario": "touch-history-frost",
+    "mechanism": "refraction-and-fresnel",
+    "mode": "final",
+    "tier": "full",
+    "camera": "design",
+    "seed": "0x00000001",
+    "timeSeconds": {
+      "value": 0,
+      "unit": "seconds",
+      "label": "Measured",
+      "source": "final correctness capture route state"
+    },
+    "stateDigest": "sha256:f08f7f64e40b665dc9c0bebb46d0b8d08907a5006494b291035121982bd34036"
+  },
+  "limitations": [
+    {
+      "id": "hardware-performance-not-claimed",
+      "status": "ACTIVE",
+      "statement": "The correctness and physical-route lanes do not claim named-hardware GPU timing or presentation cadence.",
+      "affectedClaims": [
+        "performanceCompliance",
+        "gpuAttribution"
+      ]
+    },
+    {
+      "id": "opaque-renderer-residency-not-claimed",
+      "status": "ACTIVE",
+      "statement": "Exact Three.js renderer-internal pipeline and cache byte residency is unavailable; lifecycle PASS covers lab-owned resources and observed renderer state only.",
+      "affectedClaims": [
+        "lifecycleStability"
+      ]
+    }
+  ],
+  "claimVerdicts": {
+    "visualCorrectness": "PASS",
+    "mechanismCorrectness": "PASS",
+    "performanceCompliance": "NOT_CLAIMED",
+    "gpuAttribution": "NOT_CLAIMED",
+    "lifecycleStability": "PASS",
+    "visualError": "PASS"
+  },
+  "captureSessions": [
+    {
+      "sessionId": "webgpu-touch-history-frost:correctness:03e91ff6e6dd78f3",
+      "profile": "correctness",
+      "automationSurface": "playwright-headless-chromium",
+      "adapterClass": "hardware",
+      "adapterIdentity": {
+        "kind": "gpu-adapter",
+        "digest": "sha256:343907b695263878a9b43a8269c5cdf8276e578e29f38f4b618c21b4bb345e62"
+      },
+      "deviceIdentity": {
+        "kind": "gpu-device",
+        "digest": "sha256:82ee97d950fafdba476be31cae15d6023375f6321d0af61ef7e05e0f7dbf1782"
+      },
+      "browserIdentity": {
+        "kind": "browser",
+        "digest": "sha256:f884bf516e6a3404673749d8a3219b478255fc54e76dd076fd0355cb0ef1c81f"
+      },
+      "osIdentity": {
+        "kind": "operating-system",
+        "digest": "sha256:f802955e2518e604a0d6a74d8c216cf6cf9b63b5aed4e4b4ab094dbc09e21d74"
+      },
+      "refreshIdentity": {
+        "kind": "display-refresh",
+        "digest": "sha256:7ace0993f284d569c196126de24436b3ee8b3c249bced873953dc0fd31269cc7"
+      },
+      "colorIdentity": {
+        "kind": "color-pipeline",
+        "digest": "sha256:9b63e52c8ec306b6087077d26b1d28e36cbb266bbec0a463e78c57ae07dc5017"
+      },
+      "limitationsDigest": "sha256:6dad113064754b2954da7c5e9376c138b9f46a1ddbfe8123829682a6e5e756c6",
+      "threeRevision": "0.185.1",
+      "sourceClosureHash": "sha256:03e91ff6e6dd78f32c9b32143a28ca560c1332ca6e6abede836c387430b534fe",
+      "buildRevision": "sha256:3be70bc106d34b144e8dba1d3606db6b25b84025be5054ef4bb6e83ca230d1a7",
+      "startedAt": "2026-07-13T12:36:47.523Z",
+      "finishedAt": "2026-07-13T12:36:57.820Z",
+      "routePath": "/demos/webgpu-touch-history-frost/",
+      "routeDigest": "sha256:db6ee64fb0ae6b9d1af5ca35ffe771a6752159e612b435dc839645c4cf2d74c5",
+      "stateDigest": "sha256:f08f7f64e40b665dc9c0bebb46d0b8d08907a5006494b291035121982bd34036",
+      "document": {
+        "kind": "capture-session-document",
+        "path": "capture-session.json",
+        "sha256": "sha256:8f9a94608666c3c4478997cf66527f0732ca7ef1fcd03e917310aa681abdbc4e",
+        "byteLength": 387504
+      },
+      "writeLedger": {
+        "kind": "capture-session-write-ledger",
+        "path": "capture-write-ledger.json",
+        "sha256": "sha256:9bd899095c22f2a802e83cb807b179aec980520cade3033912d406c48d35bdb6",
+        "byteLength": 34260
+      },
+      "rendererInitialized": true,
+      "isWebGPUBackend": true,
+      "timestampQuerySupported": false
+    },
+    {
+      "sessionId": "webgpu-touch-history-frost:physical-route:03e91ff6e6dd78f3",
+      "profile": "physical-route",
+      "automationSurface": "codex-in-app-browser",
+      "adapterClass": "hardware",
+      "adapterIdentity": {
+        "kind": "gpu-adapter",
+        "digest": "sha256:343907b695263878a9b43a8269c5cdf8276e578e29f38f4b618c21b4bb345e62"
+      },
+      "deviceIdentity": {
+        "kind": "gpu-device",
+        "digest": "sha256:5d302e91a154a4ae45a6df6f6df02b41ceb6aaeb5ec40b98d55368489e3eaf45"
+      },
+      "browserIdentity": {
+        "kind": "browser",
+        "digest": "sha256:62f63bcb95bd508f11fb53b379c7f4d225ff11cff117dac6f3052121234899b6"
+      },
+      "osIdentity": {
+        "kind": "operating-system",
+        "digest": "sha256:f953675ab7be483dd3f6dfb99173dabb30ba5565b5de21a3fd45d3d926c06a1d"
+      },
+      "refreshIdentity": {
+        "kind": "display-refresh",
+        "digest": "sha256:ef6172f4fc6a198426723f3ff4394009dbd030013a4b26ee093c24ffea66f3bc"
+      },
+      "colorIdentity": {
+        "kind": "color-pipeline",
+        "digest": "sha256:ba64e19952fd60f3fcf93ed05630df56dfc7672e6318522da104f8323fdeef57"
+      },
+      "limitationsDigest": "sha256:d00b4f9823f4b2ab6b435bfc4e675fe91ce93d7d523d82c4eb937793758d13df",
+      "threeRevision": "0.185.1",
+      "sourceClosureHash": "sha256:03e91ff6e6dd78f32c9b32143a28ca560c1332ca6e6abede836c387430b534fe",
+      "buildRevision": "sha256:3be70bc106d34b144e8dba1d3606db6b25b84025be5054ef4bb6e83ca230d1a7",
+      "startedAt": "2026-07-13T12:37:10.197Z",
+      "finishedAt": "2026-07-13T12:37:13.311Z",
+      "routePath": "/demos/webgpu-touch-history-frost/mechanism/refraction-and-fresnel/",
+      "routeDigest": "sha256:84a8b9b28f17c11cdcda4aa67d1d24b027365c5208ba9dd81bab2793849fafba",
+      "stateDigest": "sha256:7e5bdf856559f23e60709ab09bbbdcd2232eab1b1970dd61b370f548d30a9a48",
+      "document": {
+        "kind": "capture-session-document",
+        "path": "sessions/physical-route.capture-session.json",
+        "sha256": "sha256:5d988b5f4d64a2a1637e4376cf76b44d239183dd16a3fca95dfab0fa73d17487",
+        "byteLength": 27070
+      },
+      "writeLedger": {
+        "kind": "capture-session-write-ledger",
+        "path": "sessions/physical-route.write-ledger.json",
+        "sha256": "sha256:59d3a6a2c24ef4e63f63dd8ad153ce5bc9629993e3e5a50fc9692944d1612d05",
+        "byteLength": 50739
+      },
+      "rendererInitialized": true,
+      "isWebGPUBackend": true,
+      "timestampQuerySupported": false
+    }
+  ],
+  "files": [
+    {
+      "path": "visual-contract.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:c274c5ed963e28c34bc26ad726ca2a87e0523e18a1f0f72f05347a1ef984ccbd",
+      "byteLength": 921
+    },
+    {
+      "path": "evidence-manifest.json",
+      "status": "self-excluded",
+      "kind": "evidence-manifest",
+      "reason": "The evidence manifest cannot bind its own final serialized bytes."
+    },
+    {
+      "path": "renderer-info.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:1b2f7d4f369ecbee04ea02685d8944cfb37a7dac3ea8b342e6130f308c148406",
+      "byteLength": 413
+    },
+    {
+      "path": "pipeline-graph.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:26b19390f60d861d534662c4f313180bf31e2c4c071521d111986322716c27fd",
+      "byteLength": 3721
+    },
+    {
+      "path": "performance-envelope.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:62e1abb57e217febce5044e04788aae2967a749c9dd5c70432f279fc3c45e507",
+      "byteLength": 634
+    },
+    {
+      "path": "frame-trace.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:61e2604f805c8759b4999cc2b6ef8e27ea9446acb8902d2b4f38c58f787479e7",
+      "byteLength": 280
+    },
+    {
+      "path": "quality-governor.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:867e1ae2b57fad54e7562e9db38318de900e63e24072f22accc243a44066c73c",
+      "byteLength": 261
+    },
+    {
+      "path": "render-targets.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:fbcab33cf3eab574547851eadb93bf82fd74083f74dda28850a9fa11d04cf9fd",
+      "byteLength": 57002
+    },
+    {
+      "path": "storage-resources.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:02c51ee728642f896dea3b4c9966d90273a84c070180cb97e81062a5c6686992",
+      "byteLength": 1642
+    },
+    {
+      "path": "resident-resources.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:3b7ea82ac55a6ff7d13b4f6d9472309d3a56912ec1545b4131b1bab9c5e813c9",
+      "byteLength": 2162
+    },
+    {
+      "path": "bandwidth-model.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:8c45aa532f9ef3077e9465d45ccc407936b1c964ba5415d9088ac9c7e3a100c3",
+      "byteLength": 1079
+    },
+    {
+      "path": "visual-errors.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:98079e371ccc662c99da7387ca25fcaab32bfd3009c21d30f13ff4b2db6f3884",
+      "byteLength": 837
+    },
+    {
+      "path": "leak-loop.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:cb12053c22c0337c2f8b74afdfc19193d2f3f9da63223ed8f62c128ada4db98b",
+      "byteLength": 132989
+    },
+    {
+      "path": "mechanism-metrics.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:c913c5605ba5dc9063bd0cbd89e5e20de463d8b186d995654ca96a062ef536eb",
+      "byteLength": 31709
+    },
+    {
+      "path": "capture-session.json",
+      "status": "captured",
+      "kind": "capture-session-document",
+      "sha256": "sha256:8f9a94608666c3c4478997cf66527f0732ca7ef1fcd03e917310aa681abdbc4e",
+      "byteLength": 387504
+    },
+    {
+      "path": "capture-write-ledger.json",
+      "status": "captured",
+      "kind": "capture-session-write-ledger",
+      "sha256": "sha256:9bd899095c22f2a802e83cb807b179aec980520cade3033912d406c48d35bdb6",
+      "byteLength": 34260
+    },
+    {
+      "path": "lane-join.json",
+      "status": "captured",
+      "kind": "supplementary-json",
+      "sha256": "sha256:dfcf0ee91ddc4b17d5ed94faa864259d8e50243cfeee1c27f17a886eba70f941",
+      "byteLength": 3562
+    },
+    {
+      "path": "normalized-readbacks/camera.design.rgba8.padded.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:436e011d1a5ac8e15ac3f754e44e669c10817398621476aee7fd949e26734ebe",
+      "byteLength": 3891200
+    },
+    {
+      "path": "normalized-readbacks/camera.far.rgba8.padded.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:74451d2bae44ef211cbfab27e4b2c1873685ac1fdcff5c6db90e924a6b31e632",
+      "byteLength": 3891200
+    },
+    {
+      "path": "normalized-readbacks/camera.near.rgba8.padded.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:dbd66d1f3f3666c33893472a45727399336a40968546a0742743296a81940d5b",
+      "byteLength": 3891200
+    },
+    {
+      "path": "normalized-readbacks/diagnostic.deposit-ra.rgba8.padded.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:31f27c1950868882a646724a4867b93f1151e86795dfc3d47ac1951874da3d14",
+      "byteLength": 3891200
+    },
+    {
+      "path": "normalized-readbacks/diagnostic.frost-mask-after-pointer.rgba8.padded.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:3248c69b1166bf591a7a2c6a1cdeab4f1f5a44e922db342eaeef611b29d0b017",
+      "byteLength": 3891200
+    },
+    {
+      "path": "normalized-readbacks/diagnostic.next-history-ra.rgba8.padded.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:0f391a4ef318a078374fce00e1aca9730cef64f998f5e64332577adfa08658e8",
+      "byteLength": 3891200
+    },
+    {
+      "path": "normalized-readbacks/diagnostic.previous-history-ra.rgba8.padded.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:814d58471101b1235304b8f274be4efc2cdd00f5b870905893e4c7b7eeea367d",
+      "byteLength": 3891200
+    },
+    {
+      "path": "normalized-readbacks/diagnostics.mosaic.rgba8.compact.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:7bb85aa4192ac4b4b4666c3ec7fccd0ce86cb838c0cfc738f72ab75fcc250e47",
+      "byteLength": 3840000
+    },
+    {
+      "path": "normalized-readbacks/diagnostics.mosaic.rgba8.padded.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:a8f20d626aacb42a729d395fe9ce71271419d7d1b83d1cf70db714eff11113ee",
+      "byteLength": 3891200
+    },
+    {
+      "path": "normalized-readbacks/final.design.rgba8.padded.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:0724b8065ed8e6fc249e4011b29d6b2d60c14c0d158c6c686cfcaef0635ea193",
+      "byteLength": 3891200
+    },
+    {
+      "path": "normalized-readbacks/no-post.design.rgba8.padded.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:00e30c995641fe29e84e1abfa832e81164f5c39cb2334805447b4fca6ab706cb",
+      "byteLength": 3891200
+    },
+    {
+      "path": "normalized-readbacks/probe.dpr-1-5.final.rgba8.padded.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:c35da932e5db142fd2d2114da694023b05598df5c9edebd6d32f86382ed67337",
+      "byteLength": 1152000
+    },
+    {
+      "path": "normalized-readbacks/probe.dpr-1.final.rgba8.padded.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:4dbdb81f3c907907dd8eeb7b3f212618630110fc0ea67302df477803c644c415",
+      "byteLength": 537600
+    },
+    {
+      "path": "normalized-readbacks/probe.dpr-2.final.rgba8.padded.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:c409b78247b1d7f312bee17713b9b29f2bed897f7f6f0c97c35fd2df7109788f",
+      "byteLength": 1996800
+    },
+    {
+      "path": "normalized-readbacks/probe.odd-size.final.rgba8.padded.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:a2656b21c2c32ad3af97c06456488ae4d61c9c743dda28c29be6f9043b23530a",
+      "byteLength": 1010944
+    },
+    {
+      "path": "normalized-readbacks/route.canonical.rgba8.padded.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:60db29666def4a261ea9a5c9ae6fecca93521a396aa53dff462b2188ceb20c43",
+      "byteLength": 230400
+    },
+    {
+      "path": "normalized-readbacks/route.mechanism.blur-and-reconstruction.rgba8.padded.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:3e6c18b16e7bc6bad34dfeb51ad7de7c431d18b69f1d8381ef22b179fcff0544",
+      "byteLength": 230400
+    },
+    {
+      "path": "normalized-readbacks/route.mechanism.crystal-field-and-normals.rgba8.padded.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:87b249596ddaeda8731ce5bb48b01b61bae23a98a2d7d696d5902fe9da22ee78",
+      "byteLength": 230400
+    },
+    {
+      "path": "normalized-readbacks/route.mechanism.diffusion.rgba8.padded.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:66afd058ea47d65cdd2ea370cd08c585d109fee1c65625b8fed9af46490504c2",
+      "byteLength": 230400
+    },
+    {
+      "path": "normalized-readbacks/route.mechanism.full-vs-dirty-vs-idle.rgba8.padded.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:21e81e8be3f92f674b2120a37333e1a56f1ffdb831ad0bbabe983adc3004037d",
+      "byteLength": 230400
+    },
+    {
+      "path": "normalized-readbacks/route.mechanism.history-and-deposit.rgba8.padded.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:21e81e8be3f92f674b2120a37333e1a56f1ffdb831ad0bbabe983adc3004037d",
+      "byteLength": 230400
+    },
+    {
+      "path": "normalized-readbacks/route.mechanism.refraction-and-fresnel.rgba8.padded.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:60db29666def4a261ea9a5c9ae6fecca93521a396aa53dff462b2188ceb20c43",
+      "byteLength": 230400
+    },
+    {
+      "path": "normalized-readbacks/route.tier.balanced.rgba8.padded.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:60db29666def4a261ea9a5c9ae6fecca93521a396aa53dff462b2188ceb20c43",
+      "byteLength": 230400
+    },
+    {
+      "path": "normalized-readbacks/route.tier.budgeted.rgba8.padded.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:614ed3da2c4252cc7e0ae76e6f108300390037b7d099c4beeee38b9e68fd7b9b",
+      "byteLength": 230400
+    },
+    {
+      "path": "normalized-readbacks/route.tier.full.rgba8.padded.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:d275cc3fca24b83a02370b1733d37ee8becf6aab47d4137673bf19473ab23c10",
+      "byteLength": 230400
+    },
+    {
+      "path": "normalized-readbacks/seed-0001.final.rgba8.padded.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:c800a1f5515d52179227338caa8a29971559eda716cb4e743917d195cd2d8e42",
+      "byteLength": 3891200
+    },
+    {
+      "path": "normalized-readbacks/seed-9e3779b9.final.rgba8.padded.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:6beb8a573cdc17159739754e0bbe4d627af70d0a90c133c6ba6ccd506c4ee304",
+      "byteLength": 3891200
+    },
+    {
+      "path": "normalized-readbacks/temporal.t000.rgba8.padded.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:862b3b793c2904c5b5b195d68cc045fb35f1f4f5c81a17c96adf0c98185c5b43",
+      "byteLength": 3891200
+    },
+    {
+      "path": "normalized-readbacks/temporal.t001.rgba8.padded.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:194ebeb0ad63565933e838b3bc1984acfa9dccae6b8feea97c486f8aef46ac31",
+      "byteLength": 3891200
+    },
+    {
+      "path": "sessions/physical-route.capture-session.json",
+      "status": "captured",
+      "kind": "capture-session-document",
+      "sha256": "sha256:5d988b5f4d64a2a1637e4376cf76b44d239183dd16a3fca95dfab0fa73d17487",
+      "byteLength": 27070
+    },
+    {
+      "path": "sessions/physical-route.write-ledger.json",
+      "status": "captured",
+      "kind": "capture-session-write-ledger",
+      "sha256": "sha256:59d3a6a2c24ef4e63f63dd8ad153ce5bc9629993e3e5a50fc9692944d1612d05",
+      "byteLength": 50739
+    },
+    {
+      "path": "transport-readbacks/camera.design.rgba8.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:28f3200b2657c32dd46deb3c25b0182424342395bd57f057e76f755870e84853",
+      "byteLength": 3891136
+    },
+    {
+      "path": "transport-readbacks/camera.far.rgba8.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:38debb15212fc74c63a023759b34458bf520f577125a9d1a7c26fe655f4d8247",
+      "byteLength": 3891136
+    },
+    {
+      "path": "transport-readbacks/camera.near.rgba8.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:3fa8a1b1dd391d8111ded657fbdf3e7c8da5af260118e7fa66d2d765a1b53953",
+      "byteLength": 3891136
+    },
+    {
+      "path": "transport-readbacks/diagnostic.deposit-ra.rgba8.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:7f6a830f936bb41cb0338510b9377021603d367a6db4d25143b7ed6c9444b42c",
+      "byteLength": 3891136
+    },
+    {
+      "path": "transport-readbacks/diagnostic.frost-mask-after-pointer.rgba8.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:25f8e19cdcf180d640fc0285aeb3a52e5a82abdc1060bd394c10cddb56b7217c",
+      "byteLength": 3891136
+    },
+    {
+      "path": "transport-readbacks/diagnostic.next-history-ra.rgba8.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:8b88070039a209d9fadcf71515b9d12069cc0c0cd71b9d805ba1b88322a18d4f",
+      "byteLength": 3891136
+    },
+    {
+      "path": "transport-readbacks/diagnostic.previous-history-ra.rgba8.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:3ee4ea1e2c83d310a193a3cad745b0a9ed00ce79c00686d9a8629eccf15c9106",
+      "byteLength": 3891136
+    },
+    {
+      "path": "transport-readbacks/final.design.rgba8.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:eb1a186d176542c931cacbac7544c8aba29a53b2a800955661553d5c2ded2369",
+      "byteLength": 3891136
+    },
+    {
+      "path": "transport-readbacks/no-post.design.rgba8.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:17db57b6318efd9e052dde8cb64aa092c57afd98e0d9a77ef1775ce90d77a43c",
+      "byteLength": 3891136
+    },
+    {
+      "path": "transport-readbacks/probe.dpr-1-5.final.rgba8.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:a2794ac7c0eb52770280666415fa12d212bdeb9f150326979d298c76faf3a6c2",
+      "byteLength": 1151840
+    },
+    {
+      "path": "transport-readbacks/probe.dpr-1.final.rgba8.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:12ffd77f68355c8e637af2467c01af63d776c2c3023d909876129f3c90d73477",
+      "byteLength": 537408
+    },
+    {
+      "path": "transport-readbacks/probe.dpr-2.final.rgba8.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:20e265f2cc7598e0b102ff5b22012efa71cd7e3cbeabf63e299f39bc57e6961e",
+      "byteLength": 1996672
+    },
+    {
+      "path": "transport-readbacks/probe.odd-size.final.rgba8.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:38e220f8b16ca98c1ecbc9ba9b9c91abbd8d97b96a4c053215726b5d6630d754",
+      "byteLength": 1010692
+    },
+    {
+      "path": "transport-readbacks/route.canonical.rgba8.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:60db29666def4a261ea9a5c9ae6fecca93521a396aa53dff462b2188ceb20c43",
+      "byteLength": 230400
+    },
+    {
+      "path": "transport-readbacks/route.mechanism.blur-and-reconstruction.rgba8.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:3e6c18b16e7bc6bad34dfeb51ad7de7c431d18b69f1d8381ef22b179fcff0544",
+      "byteLength": 230400
+    },
+    {
+      "path": "transport-readbacks/route.mechanism.crystal-field-and-normals.rgba8.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:87b249596ddaeda8731ce5bb48b01b61bae23a98a2d7d696d5902fe9da22ee78",
+      "byteLength": 230400
+    },
+    {
+      "path": "transport-readbacks/route.mechanism.diffusion.rgba8.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:66afd058ea47d65cdd2ea370cd08c585d109fee1c65625b8fed9af46490504c2",
+      "byteLength": 230400
+    },
+    {
+      "path": "transport-readbacks/route.mechanism.full-vs-dirty-vs-idle.rgba8.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:21e81e8be3f92f674b2120a37333e1a56f1ffdb831ad0bbabe983adc3004037d",
+      "byteLength": 230400
+    },
+    {
+      "path": "transport-readbacks/route.mechanism.history-and-deposit.rgba8.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:21e81e8be3f92f674b2120a37333e1a56f1ffdb831ad0bbabe983adc3004037d",
+      "byteLength": 230400
+    },
+    {
+      "path": "transport-readbacks/route.mechanism.refraction-and-fresnel.rgba8.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:60db29666def4a261ea9a5c9ae6fecca93521a396aa53dff462b2188ceb20c43",
+      "byteLength": 230400
+    },
+    {
+      "path": "transport-readbacks/route.tier.balanced.rgba8.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:60db29666def4a261ea9a5c9ae6fecca93521a396aa53dff462b2188ceb20c43",
+      "byteLength": 230400
+    },
+    {
+      "path": "transport-readbacks/route.tier.budgeted.rgba8.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:614ed3da2c4252cc7e0ae76e6f108300390037b7d099c4beeee38b9e68fd7b9b",
+      "byteLength": 230400
+    },
+    {
+      "path": "transport-readbacks/route.tier.full.rgba8.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:d275cc3fca24b83a02370b1733d37ee8becf6aab47d4137673bf19473ab23c10",
+      "byteLength": 230400
+    },
+    {
+      "path": "transport-readbacks/seed-0001.final.rgba8.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:d69e85e076d3e8d91a4f85df9792d1c44515897edd0d59e427882eac9a29ad57",
+      "byteLength": 3891136
+    },
+    {
+      "path": "transport-readbacks/seed-9e3779b9.final.rgba8.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:770be10d4a075bf3bde951240db0f453fc899b69b098831dd2fcc8a6b91a99ef",
+      "byteLength": 3891136
+    },
+    {
+      "path": "transport-readbacks/temporal.t000.rgba8.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:5feba3dfe1b315ff494622a1cef8ef54d9082963902f4c246244d597ae58b2bd",
+      "byteLength": 3891136
+    },
+    {
+      "path": "transport-readbacks/temporal.t001.rgba8.bin",
+      "status": "captured",
+      "kind": "raw-readback",
+      "sha256": "sha256:40e080808d108cc5e2ee3b29449fcf2890d9e822fb7066028797a01636e37720",
+      "byteLength": 3891136
+    }
+  ],
+  "images": [
+    {
+      "path": "final.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "final.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:4fddb7f7faf27042ed9d0ee454fb7dc9d10a42f2b6b1789803c5890246efccd9",
+      "byteLength": 422830
+    },
+    {
+      "path": "no-post.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "no-post.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:ef2281f199e74a704335d57e2e0416e0fac0391e09585bc06eb070f174082248",
+      "byteLength": 30403
+    },
+    {
+      "path": "diagnostics.mosaic.png",
+      "status": "captured",
+      "kind": "derived-image",
+      "role": "diagnostics.mosaic",
+      "mediaType": "image/png",
+      "sha256": "sha256:7e7c1bacbb62290c350488fe1956f4a0db81682df0bf46d0e36b0dc00055173c",
+      "byteLength": 89344,
+      "sourceCaptures": [
+        "diagnostic.previous-history-ra.png",
+        "diagnostic.deposit-ra.png",
+        "diagnostic.next-history-ra.png",
+        "diagnostic.frost-mask-after-pointer.png"
+      ],
+      "derivation": {
+        "method": "deterministic four-route Frost diagnostic mosaic",
+        "implementation": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/capture-hook.mjs",
+        "parametersDigest": "sha256:4ff67837abf23ea04c6116bcf097579b3799d377768ee31a1560892f47f13d4f"
+      }
+    },
+    {
+      "path": "camera.near.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.near",
+      "mediaType": "image/png",
+      "sha256": "sha256:e59c0dc2cabd1cd55cdadf1b2fdbc5513348135008bdefdb42e12fcd9881afb0",
+      "byteLength": 614911
+    },
+    {
+      "path": "camera.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:8dd9f2fe4831be2f6f96b2f656b6a186b9b2f7b33e79f78cf6d83fdd5d44507d",
+      "byteLength": 427949
+    },
+    {
+      "path": "camera.far.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.far",
+      "mediaType": "image/png",
+      "sha256": "sha256:0022e2f876f6bfbc3eea7b4d7579f2a156647fc6d02e68e6548a65cb5fde9691",
+      "byteLength": 305857
+    },
+    {
+      "path": "seed-0001.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "seed-0001.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:bb10e3eb2df368a9cc0a73f3a1c21044c3fd0b52cda70c0aedb08b9d71ab556e",
+      "byteLength": 367451
+    },
+    {
+      "path": "seed-9e3779b9.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "seed-9e3779b9.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:2b94c04964054e67530ffdf57b9fc3c310af2c5822e7ae24fcb77cc39466c7bd",
+      "byteLength": 377176
+    },
+    {
+      "path": "temporal.t000.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "temporal.t000",
+      "mediaType": "image/png",
+      "sha256": "sha256:cc15d90e66980086e9efddd12aacee31c2e33424916b147eaed55f3a152994f7",
+      "byteLength": 517709
+    },
+    {
+      "path": "temporal.t001.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "temporal.t001",
+      "mediaType": "image/png",
+      "sha256": "sha256:bf1535d7c3fd20ccf95a9832c45a44c7a2e52cd9eceb20b6bcc514be49fb8c2a",
+      "byteLength": 526071
+    },
+    {
+      "path": "diagnostic.deposit-ra.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "diagnostic.deposit-ra",
+      "mediaType": "image/png",
+      "sha256": "sha256:f5200126ffb4affc05fc7342b3767f7082cd9265fa64c920a1fcb8662df59cd2",
+      "byteLength": 30653
+    },
+    {
+      "path": "diagnostic.frost-mask-after-pointer.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "diagnostic.frost-mask-after-pointer",
+      "mediaType": "image/png",
+      "sha256": "sha256:4b2c20f2f64e8ece1e931910364e1b530c7aa17b6aa9cf21f6bcbf6da3df8cd2",
+      "byteLength": 206465
+    },
+    {
+      "path": "diagnostic.next-history-ra.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "diagnostic.next-history-ra",
+      "mediaType": "image/png",
+      "sha256": "sha256:125f386201454a1aeece7ea65c3226dd9dc31d2b4f93fa1e464a1146717e2652",
+      "byteLength": 55853
+    },
+    {
+      "path": "diagnostic.previous-history-ra.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "diagnostic.previous-history-ra",
+      "mediaType": "image/png",
+      "sha256": "sha256:02aeda96edfae9eda394201a08bd4301b39cc1a212b7b526cececfeb9b57ebb4",
+      "byteLength": 55457
+    },
+    {
+      "path": "probe.dpr-1-5.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "probe.dpr-1-5.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:d16a614323772a9d3b88e3f43adfe0a1c8fc901e726d2a59d884281f035b7f25",
+      "byteLength": 157458
+    },
+    {
+      "path": "probe.dpr-1.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "probe.dpr-1.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:921cd01833bdf34fcbb4e7c0aec5b819487adb8cb5083cf39e8540b7addf3fb9",
+      "byteLength": 81195
+    },
+    {
+      "path": "probe.dpr-2.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "probe.dpr-2.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:f0546ac2a97f1a5f3c7f5ff35e59764d6b0064bb53a5a28dca908f479032fa8b",
+      "byteLength": 251849
+    },
+    {
+      "path": "probe.odd-size.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "probe.odd-size.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:311e6fab5abf60e194a3eab11972e0057ee8953872bc25e31bbfb69141b3d8b3",
+      "byteLength": 117437
+    },
+    {
+      "path": "route.canonical.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "route.canonical",
+      "mediaType": "image/png",
+      "sha256": "sha256:ad427289735268ff6a88c2fa0e1a3b403e88455f7fe4e324398087fc83c6d34f",
+      "byteLength": 38928
+    },
+    {
+      "path": "route.mechanism.blur-and-reconstruction.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "route.mechanism.blur-and-reconstruction",
+      "mediaType": "image/png",
+      "sha256": "sha256:adf01dcdbe94ff8923f5272766246e16accbdedc7c9c8cbb9c1301bc90d27826",
+      "byteLength": 38416
+    },
+    {
+      "path": "route.mechanism.crystal-field-and-normals.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "route.mechanism.crystal-field-and-normals",
+      "mediaType": "image/png",
+      "sha256": "sha256:a92ad45d865eed1e740ad43c0bdede28fc0e83ce158f0c5f10937dbb32f67152",
+      "byteLength": 33502
+    },
+    {
+      "path": "route.mechanism.diffusion.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "route.mechanism.diffusion",
+      "mediaType": "image/png",
+      "sha256": "sha256:78192e2de6c5be100f20a7a6a615cb4c2be0d7d38d9703d8aafb9430405de097",
+      "byteLength": 30012
+    },
+    {
+      "path": "route.mechanism.full-vs-dirty-vs-idle.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "route.mechanism.full-vs-dirty-vs-idle",
+      "mediaType": "image/png",
+      "sha256": "sha256:58b712aad1a4dc4d3d4b518fea6bd34548c2342c7f210b10a1e9a27bf9874775",
+      "byteLength": 29981
+    },
+    {
+      "path": "route.mechanism.history-and-deposit.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "route.mechanism.history-and-deposit",
+      "mediaType": "image/png",
+      "sha256": "sha256:58b712aad1a4dc4d3d4b518fea6bd34548c2342c7f210b10a1e9a27bf9874775",
+      "byteLength": 29981
+    },
+    {
+      "path": "route.mechanism.refraction-and-fresnel.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "route.mechanism.refraction-and-fresnel",
+      "mediaType": "image/png",
+      "sha256": "sha256:ad427289735268ff6a88c2fa0e1a3b403e88455f7fe4e324398087fc83c6d34f",
+      "byteLength": 38928
+    },
+    {
+      "path": "route.tier.balanced.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "route.tier.balanced",
+      "mediaType": "image/png",
+      "sha256": "sha256:ad427289735268ff6a88c2fa0e1a3b403e88455f7fe4e324398087fc83c6d34f",
+      "byteLength": 38928
+    },
+    {
+      "path": "route.tier.budgeted.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "route.tier.budgeted",
+      "mediaType": "image/png",
+      "sha256": "sha256:712e180a3973af056c031a22f8ac56d9111db07aa6ba82de6e51a97fe8cab39e",
+      "byteLength": 39917
+    },
+    {
+      "path": "route.tier.full.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "route.tier.full",
+      "mediaType": "image/png",
+      "sha256": "sha256:9ea8e8495cfb2da6347ecac0fd7462538730111633aa8cb5b72c4c9cdabb418d",
+      "byteLength": 37099
+    }
+  ],
+  "promotion": {
+    "status": "APPROVED",
+    "binding": {
+      "manifestCoreDigest": "sha256:bab28252ab16bd6c5702963e7bcac59db9a0fc4f84cb17f6c76b6a9385d330a5",
+      "sourceClosureHash": "sha256:03e91ff6e6dd78f32c9b32143a28ca560c1332ca6e6abede836c387430b534fe",
+      "buildRevision": "sha256:3be70bc106d34b144e8dba1d3606db6b25b84025be5054ef4bb6e83ca230d1a7",
+      "threeRevision": "0.185.1",
+      "route": {
+        "path": "/demos/webgpu-touch-history-frost/",
+        "scenario": "touch-history-frost",
+        "mechanism": "refraction-and-fresnel",
+        "mode": "final",
+        "tier": "full",
+        "camera": "design",
+        "seed": "0x00000001",
+        "timeSeconds": {
+          "value": 0,
+          "unit": "seconds",
+          "label": "Measured",
+          "source": "final correctness capture route state"
+        },
+        "stateDigest": "sha256:f08f7f64e40b665dc9c0bebb46d0b8d08907a5006494b291035121982bd34036"
+      },
+      "routeDigest": "sha256:db6ee64fb0ae6b9d1af5ca35ffe771a6752159e612b435dc839645c4cf2d74c5",
+      "limitations": [
+        {
+          "id": "hardware-performance-not-claimed",
+          "status": "ACTIVE",
+          "statement": "The correctness and physical-route lanes do not claim named-hardware GPU timing or presentation cadence.",
+          "affectedClaims": [
+            "performanceCompliance",
+            "gpuAttribution"
+          ]
+        },
+        {
+          "id": "opaque-renderer-residency-not-claimed",
+          "status": "ACTIVE",
+          "statement": "Exact Three.js renderer-internal pipeline and cache byte residency is unavailable; lifecycle PASS covers lab-owned resources and observed renderer state only.",
+          "affectedClaims": [
+            "lifecycleStability"
+          ]
+        }
+      ],
+      "limitationsDigest": "sha256:a746149e27c3f2e5da5942258bdc6a371dc9221828900f7a76cd6f8c03036381",
+      "claimVerdicts": {
+        "visualCorrectness": "PASS",
+        "mechanismCorrectness": "PASS",
+        "performanceCompliance": "NOT_CLAIMED",
+        "gpuAttribution": "NOT_CLAIMED",
+        "lifecycleStability": "PASS",
+        "visualError": "PASS"
+      },
+      "claimVerdictsDigest": "sha256:82291e1a38d836b96232fce2485bf5e70fdb940c7fd176065645a3d57f52267a",
+      "captureSessions": [
+        {
+          "sessionId": "webgpu-touch-history-frost:correctness:03e91ff6e6dd78f3",
+          "profile": "correctness",
+          "automationSurface": "playwright-headless-chromium",
+          "adapterClass": "hardware",
+          "adapterIdentity": {
+            "kind": "gpu-adapter",
+            "digest": "sha256:343907b695263878a9b43a8269c5cdf8276e578e29f38f4b618c21b4bb345e62"
+          },
+          "deviceIdentity": {
+            "kind": "gpu-device",
+            "digest": "sha256:82ee97d950fafdba476be31cae15d6023375f6321d0af61ef7e05e0f7dbf1782"
+          },
+          "browserIdentity": {
+            "kind": "browser",
+            "digest": "sha256:f884bf516e6a3404673749d8a3219b478255fc54e76dd076fd0355cb0ef1c81f"
+          },
+          "osIdentity": {
+            "kind": "operating-system",
+            "digest": "sha256:f802955e2518e604a0d6a74d8c216cf6cf9b63b5aed4e4b4ab094dbc09e21d74"
+          },
+          "refreshIdentity": {
+            "kind": "display-refresh",
+            "digest": "sha256:7ace0993f284d569c196126de24436b3ee8b3c249bced873953dc0fd31269cc7"
+          },
+          "colorIdentity": {
+            "kind": "color-pipeline",
+            "digest": "sha256:9b63e52c8ec306b6087077d26b1d28e36cbb266bbec0a463e78c57ae07dc5017"
+          },
+          "limitationsDigest": "sha256:6dad113064754b2954da7c5e9376c138b9f46a1ddbfe8123829682a6e5e756c6",
+          "threeRevision": "0.185.1",
+          "sourceClosureHash": "sha256:03e91ff6e6dd78f32c9b32143a28ca560c1332ca6e6abede836c387430b534fe",
+          "buildRevision": "sha256:3be70bc106d34b144e8dba1d3606db6b25b84025be5054ef4bb6e83ca230d1a7",
+          "startedAt": "2026-07-13T12:36:47.523Z",
+          "finishedAt": "2026-07-13T12:36:57.820Z",
+          "routePath": "/demos/webgpu-touch-history-frost/",
+          "routeDigest": "sha256:db6ee64fb0ae6b9d1af5ca35ffe771a6752159e612b435dc839645c4cf2d74c5",
+          "stateDigest": "sha256:f08f7f64e40b665dc9c0bebb46d0b8d08907a5006494b291035121982bd34036",
+          "document": {
+            "kind": "capture-session-document",
+            "path": "capture-session.json",
+            "sha256": "sha256:8f9a94608666c3c4478997cf66527f0732ca7ef1fcd03e917310aa681abdbc4e",
+            "byteLength": 387504
+          },
+          "writeLedger": {
+            "kind": "capture-session-write-ledger",
+            "path": "capture-write-ledger.json",
+            "sha256": "sha256:9bd899095c22f2a802e83cb807b179aec980520cade3033912d406c48d35bdb6",
+            "byteLength": 34260
+          },
+          "rendererInitialized": true,
+          "isWebGPUBackend": true,
+          "timestampQuerySupported": false
+        },
+        {
+          "sessionId": "webgpu-touch-history-frost:physical-route:03e91ff6e6dd78f3",
+          "profile": "physical-route",
+          "automationSurface": "codex-in-app-browser",
+          "adapterClass": "hardware",
+          "adapterIdentity": {
+            "kind": "gpu-adapter",
+            "digest": "sha256:343907b695263878a9b43a8269c5cdf8276e578e29f38f4b618c21b4bb345e62"
+          },
+          "deviceIdentity": {
+            "kind": "gpu-device",
+            "digest": "sha256:5d302e91a154a4ae45a6df6f6df02b41ceb6aaeb5ec40b98d55368489e3eaf45"
+          },
+          "browserIdentity": {
+            "kind": "browser",
+            "digest": "sha256:62f63bcb95bd508f11fb53b379c7f4d225ff11cff117dac6f3052121234899b6"
+          },
+          "osIdentity": {
+            "kind": "operating-system",
+            "digest": "sha256:f953675ab7be483dd3f6dfb99173dabb30ba5565b5de21a3fd45d3d926c06a1d"
+          },
+          "refreshIdentity": {
+            "kind": "display-refresh",
+            "digest": "sha256:ef6172f4fc6a198426723f3ff4394009dbd030013a4b26ee093c24ffea66f3bc"
+          },
+          "colorIdentity": {
+            "kind": "color-pipeline",
+            "digest": "sha256:ba64e19952fd60f3fcf93ed05630df56dfc7672e6318522da104f8323fdeef57"
+          },
+          "limitationsDigest": "sha256:d00b4f9823f4b2ab6b435bfc4e675fe91ce93d7d523d82c4eb937793758d13df",
+          "threeRevision": "0.185.1",
+          "sourceClosureHash": "sha256:03e91ff6e6dd78f32c9b32143a28ca560c1332ca6e6abede836c387430b534fe",
+          "buildRevision": "sha256:3be70bc106d34b144e8dba1d3606db6b25b84025be5054ef4bb6e83ca230d1a7",
+          "startedAt": "2026-07-13T12:37:10.197Z",
+          "finishedAt": "2026-07-13T12:37:13.311Z",
+          "routePath": "/demos/webgpu-touch-history-frost/mechanism/refraction-and-fresnel/",
+          "routeDigest": "sha256:84a8b9b28f17c11cdcda4aa67d1d24b027365c5208ba9dd81bab2793849fafba",
+          "stateDigest": "sha256:7e5bdf856559f23e60709ab09bbbdcd2232eab1b1970dd61b370f548d30a9a48",
+          "document": {
+            "kind": "capture-session-document",
+            "path": "sessions/physical-route.capture-session.json",
+            "sha256": "sha256:5d988b5f4d64a2a1637e4376cf76b44d239183dd16a3fca95dfab0fa73d17487",
+            "byteLength": 27070
+          },
+          "writeLedger": {
+            "kind": "capture-session-write-ledger",
+            "path": "sessions/physical-route.write-ledger.json",
+            "sha256": "sha256:59d3a6a2c24ef4e63f63dd8ad153ce5bc9629993e3e5a50fc9692944d1612d05",
+            "byteLength": 50739
+          },
+          "rendererInitialized": true,
+          "isWebGPUBackend": true,
+          "timestampQuerySupported": false
+        }
+      ],
+      "captureSessionSetDigest": "sha256:2513f43f58b1f8addcc46a88bff755b1de0ce0583291c5644c9bf75b84f2f377",
+      "artifactLedgerDigest": "sha256:901092885b1f76255aae3e551845339babe1d44c3a442fa3d33041f3d62962c5",
+      "imageLedgerDigest": "sha256:2b64cc66fb16428193b8d31e6a7a11bcd4b8ee59fcc0a8132c0aed180c31e00c",
+      "routeSet": [
+        {
+          "path": "/demos/webgpu-touch-history-frost/",
+          "scenario": "touch-history-frost",
+          "mechanism": "refraction-and-fresnel",
+          "mode": "final",
+          "tier": "full",
+          "camera": "design",
+          "seed": "0x00000001",
+          "timeSeconds": {
+            "value": 0,
+            "unit": "seconds",
+            "label": "Measured",
+            "source": "final correctness capture route state"
+          },
+          "stateDigest": "sha256:f08f7f64e40b665dc9c0bebb46d0b8d08907a5006494b291035121982bd34036"
+        },
+        {
+          "path": "/demos/webgpu-touch-history-frost/mechanism/refraction-and-fresnel/",
+          "scenario": "touch-history-frost",
+          "mechanism": "refraction-and-fresnel",
+          "mode": "final",
+          "tier": "balanced",
+          "camera": "design",
+          "seed": "0x00000001",
+          "timeSeconds": {
+            "value": 0,
+            "unit": "seconds",
+            "label": "Authored",
+            "source": "fixed refraction route startup state"
+          },
+          "stateDigest": "sha256:7e5bdf856559f23e60709ab09bbbdcd2232eab1b1970dd61b370f548d30a9a48"
+        }
+      ],
+      "routeSetDigest": "sha256:2614d022385442d6cf07f95ce3012f970ee78295d6e9563d5bb5707694d73266"
+    },
+    "bindingDigest": "sha256:193b544f631235527c758de8b893e06aa2fee95ce05b958e6d2eefb1e2d5abf7",
+    "visualSignoff": {
+      "status": "APPROVED",
+      "candidateBinding": {
+        "manifestCoreDigest": "sha256:5cac87757c881cb5dba5c122a15d9adaf4b4e68d4f0a47fce6101a473b9f220e",
+        "sourceClosureHash": "sha256:03e91ff6e6dd78f32c9b32143a28ca560c1332ca6e6abede836c387430b534fe",
+        "buildRevision": "sha256:3be70bc106d34b144e8dba1d3606db6b25b84025be5054ef4bb6e83ca230d1a7",
+        "threeRevision": "0.185.1",
+        "route": {
+          "path": "/demos/webgpu-touch-history-frost/",
+          "scenario": "touch-history-frost",
+          "mechanism": "refraction-and-fresnel",
+          "mode": "final",
+          "tier": "full",
+          "camera": "design",
+          "seed": "0x00000001",
+          "timeSeconds": {
+            "value": 0,
+            "unit": "seconds",
+            "label": "Measured",
+            "source": "final correctness capture route state"
+          },
+          "stateDigest": "sha256:f08f7f64e40b665dc9c0bebb46d0b8d08907a5006494b291035121982bd34036"
+        },
+        "routeDigest": "sha256:db6ee64fb0ae6b9d1af5ca35ffe771a6752159e612b435dc839645c4cf2d74c5",
+        "limitations": [
+          {
+            "id": "hardware-performance-not-claimed",
+            "status": "ACTIVE",
+            "statement": "The correctness and physical-route lanes do not claim named-hardware GPU timing or presentation cadence.",
+            "affectedClaims": [
+              "performanceCompliance",
+              "gpuAttribution"
+            ]
+          },
+          {
+            "id": "opaque-renderer-residency-not-claimed",
+            "status": "ACTIVE",
+            "statement": "Exact Three.js renderer-internal pipeline and cache byte residency is unavailable; lifecycle PASS covers lab-owned resources and observed renderer state only.",
+            "affectedClaims": [
+              "lifecycleStability"
+            ]
+          }
+        ],
+        "limitationsDigest": "sha256:a746149e27c3f2e5da5942258bdc6a371dc9221828900f7a76cd6f8c03036381",
+        "claimVerdicts": {
+          "visualCorrectness": "PASS",
+          "mechanismCorrectness": "PASS",
+          "performanceCompliance": "NOT_CLAIMED",
+          "gpuAttribution": "NOT_CLAIMED",
+          "lifecycleStability": "PASS",
+          "visualError": "PASS"
+        },
+        "claimVerdictsDigest": "sha256:82291e1a38d836b96232fce2485bf5e70fdb940c7fd176065645a3d57f52267a",
+        "captureSessions": [
+          {
+            "sessionId": "webgpu-touch-history-frost:correctness:03e91ff6e6dd78f3",
+            "profile": "correctness",
+            "automationSurface": "playwright-headless-chromium",
+            "adapterClass": "hardware",
+            "adapterIdentity": {
+              "kind": "gpu-adapter",
+              "digest": "sha256:343907b695263878a9b43a8269c5cdf8276e578e29f38f4b618c21b4bb345e62"
+            },
+            "deviceIdentity": {
+              "kind": "gpu-device",
+              "digest": "sha256:82ee97d950fafdba476be31cae15d6023375f6321d0af61ef7e05e0f7dbf1782"
+            },
+            "browserIdentity": {
+              "kind": "browser",
+              "digest": "sha256:f884bf516e6a3404673749d8a3219b478255fc54e76dd076fd0355cb0ef1c81f"
+            },
+            "osIdentity": {
+              "kind": "operating-system",
+              "digest": "sha256:f802955e2518e604a0d6a74d8c216cf6cf9b63b5aed4e4b4ab094dbc09e21d74"
+            },
+            "refreshIdentity": {
+              "kind": "display-refresh",
+              "digest": "sha256:7ace0993f284d569c196126de24436b3ee8b3c249bced873953dc0fd31269cc7"
+            },
+            "colorIdentity": {
+              "kind": "color-pipeline",
+              "digest": "sha256:9b63e52c8ec306b6087077d26b1d28e36cbb266bbec0a463e78c57ae07dc5017"
+            },
+            "limitationsDigest": "sha256:6dad113064754b2954da7c5e9376c138b9f46a1ddbfe8123829682a6e5e756c6",
+            "threeRevision": "0.185.1",
+            "sourceClosureHash": "sha256:03e91ff6e6dd78f32c9b32143a28ca560c1332ca6e6abede836c387430b534fe",
+            "buildRevision": "sha256:3be70bc106d34b144e8dba1d3606db6b25b84025be5054ef4bb6e83ca230d1a7",
+            "startedAt": "2026-07-13T12:36:47.523Z",
+            "finishedAt": "2026-07-13T12:36:57.820Z",
+            "routePath": "/demos/webgpu-touch-history-frost/",
+            "routeDigest": "sha256:db6ee64fb0ae6b9d1af5ca35ffe771a6752159e612b435dc839645c4cf2d74c5",
+            "stateDigest": "sha256:f08f7f64e40b665dc9c0bebb46d0b8d08907a5006494b291035121982bd34036",
+            "document": {
+              "kind": "capture-session-document",
+              "path": "capture-session.json",
+              "sha256": "sha256:8f9a94608666c3c4478997cf66527f0732ca7ef1fcd03e917310aa681abdbc4e",
+              "byteLength": 387504
+            },
+            "writeLedger": {
+              "kind": "capture-session-write-ledger",
+              "path": "capture-write-ledger.json",
+              "sha256": "sha256:9bd899095c22f2a802e83cb807b179aec980520cade3033912d406c48d35bdb6",
+              "byteLength": 34260
+            },
+            "rendererInitialized": true,
+            "isWebGPUBackend": true,
+            "timestampQuerySupported": false
+          },
+          {
+            "sessionId": "webgpu-touch-history-frost:physical-route:03e91ff6e6dd78f3",
+            "profile": "physical-route",
+            "automationSurface": "codex-in-app-browser",
+            "adapterClass": "hardware",
+            "adapterIdentity": {
+              "kind": "gpu-adapter",
+              "digest": "sha256:343907b695263878a9b43a8269c5cdf8276e578e29f38f4b618c21b4bb345e62"
+            },
+            "deviceIdentity": {
+              "kind": "gpu-device",
+              "digest": "sha256:5d302e91a154a4ae45a6df6f6df02b41ceb6aaeb5ec40b98d55368489e3eaf45"
+            },
+            "browserIdentity": {
+              "kind": "browser",
+              "digest": "sha256:62f63bcb95bd508f11fb53b379c7f4d225ff11cff117dac6f3052121234899b6"
+            },
+            "osIdentity": {
+              "kind": "operating-system",
+              "digest": "sha256:f953675ab7be483dd3f6dfb99173dabb30ba5565b5de21a3fd45d3d926c06a1d"
+            },
+            "refreshIdentity": {
+              "kind": "display-refresh",
+              "digest": "sha256:ef6172f4fc6a198426723f3ff4394009dbd030013a4b26ee093c24ffea66f3bc"
+            },
+            "colorIdentity": {
+              "kind": "color-pipeline",
+              "digest": "sha256:ba64e19952fd60f3fcf93ed05630df56dfc7672e6318522da104f8323fdeef57"
+            },
+            "limitationsDigest": "sha256:d00b4f9823f4b2ab6b435bfc4e675fe91ce93d7d523d82c4eb937793758d13df",
+            "threeRevision": "0.185.1",
+            "sourceClosureHash": "sha256:03e91ff6e6dd78f32c9b32143a28ca560c1332ca6e6abede836c387430b534fe",
+            "buildRevision": "sha256:3be70bc106d34b144e8dba1d3606db6b25b84025be5054ef4bb6e83ca230d1a7",
+            "startedAt": "2026-07-13T12:37:10.197Z",
+            "finishedAt": "2026-07-13T12:37:13.311Z",
+            "routePath": "/demos/webgpu-touch-history-frost/mechanism/refraction-and-fresnel/",
+            "routeDigest": "sha256:84a8b9b28f17c11cdcda4aa67d1d24b027365c5208ba9dd81bab2793849fafba",
+            "stateDigest": "sha256:7e5bdf856559f23e60709ab09bbbdcd2232eab1b1970dd61b370f548d30a9a48",
+            "document": {
+              "kind": "capture-session-document",
+              "path": "sessions/physical-route.capture-session.json",
+              "sha256": "sha256:5d988b5f4d64a2a1637e4376cf76b44d239183dd16a3fca95dfab0fa73d17487",
+              "byteLength": 27070
+            },
+            "writeLedger": {
+              "kind": "capture-session-write-ledger",
+              "path": "sessions/physical-route.write-ledger.json",
+              "sha256": "sha256:59d3a6a2c24ef4e63f63dd8ad153ce5bc9629993e3e5a50fc9692944d1612d05",
+              "byteLength": 50739
+            },
+            "rendererInitialized": true,
+            "isWebGPUBackend": true,
+            "timestampQuerySupported": false
+          }
+        ],
+        "captureSessionSetDigest": "sha256:2513f43f58b1f8addcc46a88bff755b1de0ce0583291c5644c9bf75b84f2f377",
+        "artifactLedgerDigest": "sha256:901092885b1f76255aae3e551845339babe1d44c3a442fa3d33041f3d62962c5",
+        "imageLedgerDigest": "sha256:2b64cc66fb16428193b8d31e6a7a11bcd4b8ee59fcc0a8132c0aed180c31e00c",
+        "routeSet": [
+          {
+            "path": "/demos/webgpu-touch-history-frost/",
+            "scenario": "touch-history-frost",
+            "mechanism": "refraction-and-fresnel",
+            "mode": "final",
+            "tier": "full",
+            "camera": "design",
+            "seed": "0x00000001",
+            "timeSeconds": {
+              "value": 0,
+              "unit": "seconds",
+              "label": "Measured",
+              "source": "final correctness capture route state"
+            },
+            "stateDigest": "sha256:f08f7f64e40b665dc9c0bebb46d0b8d08907a5006494b291035121982bd34036"
+          },
+          {
+            "path": "/demos/webgpu-touch-history-frost/mechanism/refraction-and-fresnel/",
+            "scenario": "touch-history-frost",
+            "mechanism": "refraction-and-fresnel",
+            "mode": "final",
+            "tier": "balanced",
+            "camera": "design",
+            "seed": "0x00000001",
+            "timeSeconds": {
+              "value": 0,
+              "unit": "seconds",
+              "label": "Authored",
+              "source": "fixed refraction route startup state"
+            },
+            "stateDigest": "sha256:7e5bdf856559f23e60709ab09bbbdcd2232eab1b1970dd61b370f548d30a9a48"
+          }
+        ],
+        "routeSetDigest": "sha256:2614d022385442d6cf07f95ce3012f970ee78295d6e9563d5bb5707694d73266"
+      },
+      "candidateBindingDigest": "sha256:5a80059582a8aa09c2bee8f5a1dfc78446a5a894d79e58e93ae6b82dbb3bf253",
+      "reviewer": "grok-evidence-33-37-orchestrator",
+      "reviewedAt": "2026-07-13T12:37:19.573Z",
+      "reviewDigest": "sha256:5f8d138776561b9f7221605651b8ceb1b5b260d34795356d279493ea5430112e",
+      "reviewedImages": [
+        "final.design.png",
+        "no-post.design.png",
+        "diagnostics.mosaic.png",
+        "camera.near.png",
+        "camera.design.png",
+        "camera.far.png",
+        "seed-0001.final.png",
+        "seed-9e3779b9.final.png",
+        "temporal.t000.png",
+        "temporal.t001.png"
+      ],
+      "notes": [
+        "Approved after direct inspection of correctness PNGs and hardware physical-route review.",
+        "final/no-post/diagnostics/camera/seed/temporal frames are non-blank 1200x800 with material channel range;",
+        "mechanism diagnostics and frost-mask mode are distinct from final presentation.",
+        "Performance and GPU timestamp attribution remain NOT_CLAIMED by design."
+      ]
+    }
+  },
+  "routeSet": [
+    {
+      "path": "/demos/webgpu-touch-history-frost/",
+      "scenario": "touch-history-frost",
+      "mechanism": "refraction-and-fresnel",
+      "mode": "final",
+      "tier": "full",
+      "camera": "design",
+      "seed": "0x00000001",
+      "timeSeconds": {
+        "value": 0,
+        "unit": "seconds",
+        "label": "Measured",
+        "source": "final correctness capture route state"
+      },
+      "stateDigest": "sha256:f08f7f64e40b665dc9c0bebb46d0b8d08907a5006494b291035121982bd34036"
+    },
+    {
+      "path": "/demos/webgpu-touch-history-frost/mechanism/refraction-and-fresnel/",
+      "scenario": "touch-history-frost",
+      "mechanism": "refraction-and-fresnel",
+      "mode": "final",
+      "tier": "balanced",
+      "camera": "design",
+      "seed": "0x00000001",
+      "timeSeconds": {
+        "value": 0,
+        "unit": "seconds",
+        "label": "Authored",
+        "source": "fixed refraction route startup state"
+      },
+      "stateDigest": "sha256:7e5bdf856559f23e60709ab09bbbdcd2232eab1b1970dd61b370f548d30a9a48"
+    }
+  ]
+}

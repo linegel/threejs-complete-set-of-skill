@@ -12,6 +12,7 @@ import {
   relative,
   resolve,
   sep,
+  basename,
 } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PROVIDER_DEMOS } from '../provider-demos.mjs';
@@ -75,6 +76,11 @@ const EXCLUDED_HASH_SEGMENTS = new Set([
   '.DS_Store',
   'artifacts',
   'node_modules',
+]);
+// Acceptance metadata may change after a capture without invalidating the runtime source ledger.
+const EXCLUDED_HASH_FILES = new Set([
+  'lab.manifest.json',
+  'lab-manifest.json',
 ]);
 
 const DEFAULT_SEEDS = Object.freeze([1, 0x9e3779b9]);
@@ -296,6 +302,10 @@ function normalizeRepoPath(value, manifestDir) {
   if (raw.startsWith('/')) throw new Error(`absolute repository path is forbidden: ${raw}`);
   if (raw.split('/').includes('..')) throw new Error(`path traversal is forbidden: ${raw}`);
 
+  // docs/ and artifacts/ paths are always repository-root relative (even before they exist).
+  if (raw.startsWith('docs/') || raw.startsWith('artifacts/') || raw.startsWith('labs/')) {
+    return raw.replace(/^\.\//, '');
+  }
   const rootCandidate = resolve(REPO_ROOT, raw);
   if (existsSync(rootCandidate)) return repoRelative(rootCandidate);
   const localCandidate = resolve(manifestDir, raw);
@@ -504,11 +514,15 @@ function walkSourceFiles(path) {
   if (!existsSync(path)) return [];
   const stat = lstatSync(path);
   if (stat.isSymbolicLink()) return [];
-  if (stat.isFile()) return [path];
+  if (stat.isFile()) {
+    if (EXCLUDED_HASH_FILES.has(basename(path))) return [];
+    return [path];
+  }
   if (!stat.isDirectory()) return [];
   const files = [];
   for (const entry of readdirSync(path, { withFileTypes: true })) {
     if (EXCLUDED_HASH_SEGMENTS.has(entry.name)) continue;
+    if (EXCLUDED_HASH_FILES.has(entry.name)) continue;
     files.push(...walkSourceFiles(join(path, entry.name)));
   }
   return files;

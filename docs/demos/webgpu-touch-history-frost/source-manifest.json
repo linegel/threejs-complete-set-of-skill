@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "labId": "webgpu-touch-history-frost",
   "kind": "canonical-lab",
-  "status": "incomplete",
+  "status": "accepted",
   "canonicalSource": [
     "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/frost-surface-effect.js",
     "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/frost-webgpu-lab.js",
@@ -11,27 +11,36 @@
     "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/index.html"
   ],
   "sourceHashInputs": [
+    "labs/runtime/lifecycle-profile.mjs",
     "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost"
   ],
   "browserEntry": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/index.html",
-  "sourceHash": "sha256:e541d9f92d87a2d58a4658fa3ef2e1dd49fa0ffd64ca1d9bd9f651dee5ada385",
+  "sourceHash": "sha256:03e91ff6e6dd78f32c9b32143a28ca560c1332ca6e6abede836c387430b534fe",
   "publishedHashInputs": [
     "docs/demos/webgpu-touch-history-frost",
-    "docs/demos/assets/frost-surface-effect-CpkjK4mw.js",
-    "docs/demos/assets/index-BOVhN_9u2.js",
+    "docs/demos/assets/frost-surface-effect-DC3Wu82M.js",
+    "docs/demos/assets/index-BNdE34b82.js",
+    "docs/demos/assets/lifecycle-profile-CbPBnctU.js",
+    "docs/demos/assets/main-pPOLtyEv.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+    "docs/demos/assets/physical-observer-D7GsB6KH.js",
+    "docs/demos/assets/preload-helper-DYl5dUZ5.js",
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js"
   ],
   "emittedAssetDependencies": [
-    "docs/demos/assets/frost-surface-effect-CpkjK4mw.js",
-    "docs/demos/assets/index-BOVhN_9u2.js",
+    "docs/demos/assets/frost-surface-effect-DC3Wu82M.js",
+    "docs/demos/assets/index-BNdE34b82.js",
+    "docs/demos/assets/lifecycle-profile-CbPBnctU.js",
+    "docs/demos/assets/main-pPOLtyEv.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+    "docs/demos/assets/physical-observer-D7GsB6KH.js",
+    "docs/demos/assets/preload-helper-DYl5dUZ5.js",
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js"
   ],
-  "publishedBundleHash": "sha256:2cc37c9fff3d86de75762e75ce0769c3cf4fbec30dda30e4d718a032afff2a9a",
+  "publishedBundleHash": "sha256:2499bcb963aa6426558c397ac3e80f8b09c2186daba3e151b2579b5038bd9a99",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b",
-  "evidenceBundleId": null
+  "buildRevision": "sha256:3be70bc106d34b144e8dba1d3606db6b25b84025be5054ef4bb6e83ca230d1a7",
+  "evidenceBundleId": "bundle"
 }

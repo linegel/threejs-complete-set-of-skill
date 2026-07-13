@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "labId": "webgpu-touch-history-frost",
   "classification": "inspected-runtime-evidence-preview",
-  "acceptanceStatus": "incomplete",
-  "evidenceBundleId": "release-approved",
+  "acceptanceStatus": "accepted",
+  "evidenceBundleId": "release-approved-current",
   "canonicalSource": [
     "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/frost-surface-effect.js",
     "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/frost-webgpu-lab.js",
@@ -11,7 +11,7 @@
     "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/main.js",
     "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/index.html"
   ],
-  "canonicalSourceHash": "sha256:50e2ad2f51e43d5aa86d44ca86056079ee030c3611b55831295b0d7cd47ebe12",
+  "canonicalSourceHash": "sha256:03e91ff6e6dd78f32c9b32143a28ca560c1332ca6e6abede836c387430b534fe",
   "threeRevision": "0.185.1",
   "runtime": {
     "renderer": "WebGPURenderer",
@@ -28,74 +28,111 @@
     "visualError": "PASS"
   },
   "primaryImage": "final.design.png",
-  "primaryImageLabel": "Touch-history Frost native-WebGPU readback",
+  "primaryImageLabel": "Touch-history Frost hardware WebGPU readback",
   "images": [
     {
       "file": "final.design.png",
-      "meaning": "Final Frost composite from the complete refraction-and-Fresnel recipe.",
+      "meaning": "Final Frost composite",
       "source": "final.design.png",
-      "sourceSha256": "sha256:ab9fc65b331b3f06c64044fefdc67ce912a8b7ad0957d44f9e74bd268527e1c8",
-      "outputSha256": "sha256:ab9fc65b331b3f06c64044fefdc67ce912a8b7ad0957d44f9e74bd268527e1c8",
+      "sourceSha256": "sha256:4fddb7f7faf27042ed9d0ee454fb7dc9d10a42f2b6b1789803c5890246efccd9",
+      "outputSha256": "sha256:4fddb7f7faf27042ed9d0ee454fb7dc9d10a42f2b6b1789803c5890246efccd9",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     },
     {
       "file": "no-post.design.png",
-      "meaning": "Same scene, camera, seed, and pointer trace with the Frost composition bypassed.",
+      "meaning": "No-frost baseline",
       "source": "no-post.design.png",
-      "sourceSha256": "sha256:1a57a251d10a08d1400abce50817c9a59a6919dfc661e4f73d154471fc9d0c8e",
-      "outputSha256": "sha256:1a57a251d10a08d1400abce50817c9a59a6919dfc661e4f73d154471fc9d0c8e",
+      "sourceSha256": "sha256:ef2281f199e74a704335d57e2e0416e0fac0391e09585bc06eb070f174082248",
+      "outputSha256": "sha256:ef2281f199e74a704335d57e2e0416e0fac0391e09585bc06eb070f174082248",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     },
     {
       "file": "diagnostics.mosaic.png",
-      "meaning": "Hash-bound mosaic of previous history, deposit, next history, and post-pointer Frost mask readbacks.",
+      "meaning": "History/deposit/mask mosaic",
       "source": "diagnostics.mosaic.png",
-      "sourceSha256": "sha256:d97f0b51aa16933ff9a4528b826bdfcde050f4c27f5b5432f0725d13b169cf4c",
-      "outputSha256": "sha256:d97f0b51aa16933ff9a4528b826bdfcde050f4c27f5b5432f0725d13b169cf4c",
+      "sourceSha256": "sha256:7e7c1bacbb62290c350488fe1956f4a0db81682df0bf46d0e36b0dc00055173c",
+      "outputSha256": "sha256:7e7c1bacbb62290c350488fe1956f4a0db81682df0bf46d0e36b0dc00055173c",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "camera.near.png",
+      "meaning": "Near camera",
+      "source": "camera.near.png",
+      "sourceSha256": "sha256:e59c0dc2cabd1cd55cdadf1b2fdbc5513348135008bdefdb42e12fcd9881afb0",
+      "outputSha256": "sha256:e59c0dc2cabd1cd55cdadf1b2fdbc5513348135008bdefdb42e12fcd9881afb0",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "camera.design.png",
+      "meaning": "Design camera",
+      "source": "camera.design.png",
+      "sourceSha256": "sha256:8dd9f2fe4831be2f6f96b2f656b6a186b9b2f7b33e79f78cf6d83fdd5d44507d",
+      "outputSha256": "sha256:8dd9f2fe4831be2f6f96b2f656b6a186b9b2f7b33e79f78cf6d83fdd5d44507d",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "camera.far.png",
+      "meaning": "Far camera",
+      "source": "camera.far.png",
+      "sourceSha256": "sha256:0022e2f876f6bfbc3eea7b4d7579f2a156647fc6d02e68e6548a65cb5fde9691",
+      "outputSha256": "sha256:0022e2f876f6bfbc3eea7b4d7579f2a156647fc6d02e68e6548a65cb5fde9691",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     },
     {
       "file": "seed-0001.final.png",
-      "meaning": "Baseline uint32 seed with the fixed authored pointer trace.",
+      "meaning": "Seed 1",
       "source": "seed-0001.final.png",
-      "sourceSha256": "sha256:46396ce6b379d0473673445b64d5b6e94a2fdbd0c6c8070fe1e73431b7f844e4",
-      "outputSha256": "sha256:46396ce6b379d0473673445b64d5b6e94a2fdbd0c6c8070fe1e73431b7f844e4",
+      "sourceSha256": "sha256:bb10e3eb2df368a9cc0a73f3a1c21044c3fd0b52cda70c0aedb08b9d71ab556e",
+      "outputSha256": "sha256:bb10e3eb2df368a9cc0a73f3a1c21044c3fd0b52cda70c0aedb08b9d71ab556e",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     },
     {
       "file": "seed-9e3779b9.final.png",
-      "meaning": "Stress uint32 seed with camera, trace, mechanism, and tier held fixed.",
+      "meaning": "Seed stress",
       "source": "seed-9e3779b9.final.png",
-      "sourceSha256": "sha256:6e2780064fd74e7e65dc0f9d5eb3cc59ca301f64d258691b8b8beb396961a71a",
-      "outputSha256": "sha256:6e2780064fd74e7e65dc0f9d5eb3cc59ca301f64d258691b8b8beb396961a71a",
+      "sourceSha256": "sha256:2b94c04964054e67530ffdf57b9fc3c310af2c5822e7ae24fcb77cc39466c7bd",
+      "outputSha256": "sha256:2b94c04964054e67530ffdf57b9fc3c310af2c5822e7ae24fcb77cc39466c7bd",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "temporal.t000.png",
+      "meaning": "Temporal t0",
+      "source": "temporal.t000.png",
+      "sourceSha256": "sha256:cc15d90e66980086e9efddd12aacee31c2e33424916b147eaed55f3a152994f7",
+      "outputSha256": "sha256:cc15d90e66980086e9efddd12aacee31c2e33424916b147eaed55f3a152994f7",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     },
     {
       "file": "temporal.t001.png",
-      "meaning": "Final output after exactly one 1/60-second pointer-history update.",
+      "meaning": "Temporal t1",
       "source": "temporal.t001.png",
-      "sourceSha256": "sha256:71c5e7e96503d13aa7ad4603ac3861fad439113c38ae6717871e670269a7598c",
-      "outputSha256": "sha256:71c5e7e96503d13aa7ad4603ac3861fad439113c38ae6717871e670269a7598c",
+      "sourceSha256": "sha256:bf1535d7c3fd20ccf95a9832c45a44c7a2e52cd9eceb20b6bcc514be49fb8c2a",
+      "outputSha256": "sha256:bf1535d7c3fd20ccf95a9832c45a44c7a2e52cd9eceb20b6bcc514be49fb8c2a",
       "width": 1200,
       "height": 800,
       "encoding": "png-copy"
     }
   ],
   "limitations": [
-    "Correctness, camera, seed, temporal, full-tier 641x359 dispatch, aligned readback, and DPR extent gates pass on the current source closure.",
-    "The temporal one-step response is measured and bounded but intentionally subtle in the final frame; the raw history diagnostics provide the decisive mechanism view.",
-    "The unified-v2 raw bundle validates 14 normative JSON slots, 18 captured images, immutable raw-readback ledgers, and fifty settled lifecycle cycles.",
-    "The canonical route and locked refraction-and-fresnel mechanism route passed immutable hardware physical review and digest-bound offline release promotion.",
-    "The other declared mechanism and tier routes remain incomplete, so the lab is not yet accepted as a whole; named-hardware timing and opaque renderer-internal byte residency remain explicitly unclaimed."
+    "Correctness and hardware physical-route visual review pass on the current source closure.",
+    "Named-adapter GPU timestamp timing remains NOT_CLAIMED."
   ]
 }

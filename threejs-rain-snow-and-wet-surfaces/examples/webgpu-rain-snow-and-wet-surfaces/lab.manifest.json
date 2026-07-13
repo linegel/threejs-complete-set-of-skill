@@ -16,68 +16,226 @@
   "browserEntry": "index.html",
   "publishPath": "/demos/webgpu-rain-snow-and-wet-surfaces/",
   "scenarios": [
-    { "id": "coupled-weather", "route": "/demos/webgpu-rain-snow-and-wet-surfaces/", "startup": { "scenario": "coupled-weather", "tier": "medium" }, "acceptanceStatus": "incomplete" }
+    {
+      "id": "coupled-weather",
+      "route": "/demos/webgpu-rain-snow-and-wet-surfaces/",
+      "startup": {
+        "scenario": "coupled-weather",
+        "tier": "medium"
+      },
+      "acceptanceStatus": "incomplete"
+    }
   ],
   "mechanisms": [
-    { "id": "precipitation-volume", "route": "/demos/webgpu-rain-snow-and-wet-surfaces/mechanism/precipitation-volume/", "acceptanceStatus": "incomplete" },
-    { "id": "analytic-vs-recurrent", "route": "/demos/webgpu-rain-snow-and-wet-surfaces/mechanism/analytic-vs-recurrent/", "acceptanceStatus": "incomplete" },
-    { "id": "wet-road-and-puddles", "route": "/demos/webgpu-rain-snow-and-wet-surfaces/mechanism/wet-road-and-puddles/", "acceptanceStatus": "incomplete" },
-    { "id": "impact-and-splashes", "route": "/demos/webgpu-rain-snow-and-wet-surfaces/mechanism/impact-and-splashes/", "acceptanceStatus": "incomplete" },
-    { "id": "snow-accumulation-and-caps", "route": "/demos/webgpu-rain-snow-and-wet-surfaces/mechanism/snow-accumulation-and-caps/", "acceptanceStatus": "incomplete" },
-    { "id": "weather-envelope-coupling", "route": "/demos/webgpu-rain-snow-and-wet-surfaces/mechanism/weather-envelope-coupling/", "acceptanceStatus": "incomplete" }
+    {
+      "id": "precipitation-volume",
+      "route": "/demos/webgpu-rain-snow-and-wet-surfaces/mechanism/precipitation-volume/",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "analytic-vs-recurrent",
+      "route": "/demos/webgpu-rain-snow-and-wet-surfaces/mechanism/analytic-vs-recurrent/",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "wet-road-and-puddles",
+      "route": "/demos/webgpu-rain-snow-and-wet-surfaces/mechanism/wet-road-and-puddles/",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "impact-and-splashes",
+      "route": "/demos/webgpu-rain-snow-and-wet-surfaces/mechanism/impact-and-splashes/",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "snow-accumulation-and-caps",
+      "route": "/demos/webgpu-rain-snow-and-wet-surfaces/mechanism/snow-accumulation-and-caps/",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "weather-envelope-coupling",
+      "route": "/demos/webgpu-rain-snow-and-wet-surfaces/mechanism/weather-envelope-coupling/",
+      "acceptanceStatus": "incomplete"
+    }
   ],
   "tiers": [
     {
       "id": "high",
       "targetClass": "close-inspection",
       "frameTargetMs": null,
-      "resolutionPolicy": { "receiverScale": 1, "dprCap": 2 },
-      "mechanismLimits": { "rainInstances": 24576, "snowInstances": 12288, "impactCapacity": 4096, "recurrentTurbulence": true },
-      "resourceLimits": { "precipitationDraws": 2, "splashDraws": 1 },
+      "resolutionPolicy": {
+        "receiverScale": 1,
+        "dprCap": 2
+      },
+      "mechanismLimits": {
+        "rainInstances": 24576,
+        "snowInstances": 12288,
+        "impactCapacity": 4096,
+        "recurrentTurbulence": true
+      },
+      "resourceLimits": {
+        "precipitationDraws": 2,
+        "splashDraws": 1
+      },
       "degradationFromPrevious": [],
-      "preservedInvariants": ["shared-weather-object", "world-stable-impacts", "integrated-surface-state", "single-field-snow-normal"],
+      "preservedInvariants": [
+        "shared-weather-object",
+        "world-stable-impacts",
+        "integrated-surface-state",
+        "single-field-snow-normal"
+      ],
       "acceptanceStatus": "incomplete"
     },
     {
       "id": "medium",
       "targetClass": "ordinary-inspection",
       "frameTargetMs": null,
-      "resolutionPolicy": { "receiverScale": 0.5, "dprCap": 1.5 },
-      "mechanismLimits": { "rainInstances": 12288, "snowInstances": 6144, "impactCapacity": 2048, "recurrentTurbulence": false },
-      "resourceLimits": { "precipitationDraws": 2, "splashDraws": 1 },
-      "degradationFromPrevious": ["halve-visible-samples", "disable-recurrent-turbulence"],
-      "preservedInvariants": ["shared-weather-object", "world-stable-impacts", "integrated-surface-state", "single-field-snow-normal"],
+      "resolutionPolicy": {
+        "receiverScale": 0.5,
+        "dprCap": 1.5
+      },
+      "mechanismLimits": {
+        "rainInstances": 12288,
+        "snowInstances": 6144,
+        "impactCapacity": 2048,
+        "recurrentTurbulence": false
+      },
+      "resourceLimits": {
+        "precipitationDraws": 2,
+        "splashDraws": 1
+      },
+      "degradationFromPrevious": [
+        "halve-visible-samples",
+        "disable-recurrent-turbulence"
+      ],
+      "preservedInvariants": [
+        "shared-weather-object",
+        "world-stable-impacts",
+        "integrated-surface-state",
+        "single-field-snow-normal"
+      ],
       "acceptanceStatus": "incomplete"
     },
     {
       "id": "budgeted",
       "targetClass": "small-projected-footprint",
       "frameTargetMs": null,
-      "resolutionPolicy": { "receiverScale": 0.25, "dprCap": 1 },
-      "mechanismLimits": { "rainInstances": 4096, "snowInstances": 2048, "impactCapacity": 512, "recurrentTurbulence": false },
-      "resourceLimits": { "precipitationDraws": 2, "splashDraws": 1 },
-      "degradationFromPrevious": ["reduce-visible-samples", "reduce-receiver-resolution", "bound-impact-ring"],
-      "preservedInvariants": ["shared-weather-object", "world-stable-impacts", "integrated-surface-state", "single-field-snow-normal"],
+      "resolutionPolicy": {
+        "receiverScale": 0.25,
+        "dprCap": 1
+      },
+      "mechanismLimits": {
+        "rainInstances": 4096,
+        "snowInstances": 2048,
+        "impactCapacity": 512,
+        "recurrentTurbulence": false
+      },
+      "resourceLimits": {
+        "precipitationDraws": 2,
+        "splashDraws": 1
+      },
+      "degradationFromPrevious": [
+        "reduce-visible-samples",
+        "reduce-receiver-resolution",
+        "bound-impact-ring"
+      ],
+      "preservedInvariants": [
+        "shared-weather-object",
+        "world-stable-impacts",
+        "integrated-surface-state",
+        "single-field-snow-normal"
+      ],
       "acceptanceStatus": "incomplete"
     }
   ],
-  "modes": ["final", "mask", "normals", "particles", "events", "progress"],
-  "cameras": ["near", "design", "far"],
-  "seeds": [1, 2654435769],
+  "modes": [
+    "final",
+    "mask",
+    "normals",
+    "particles",
+    "events",
+    "progress",
+    "no-post",
+    "diagnostics"
+  ],
+  "cameras": [
+    "near",
+    "design",
+    "far"
+  ],
+  "seeds": [
+    1,
+    2654435769
+  ],
   "capabilityRequirements": [
-    { "id": "native-webgpu", "required": true, "evidence": "renderer backend gate after initialization", "status": "incomplete" },
-    { "id": "storage-buffer", "required": true, "evidence": "immutable and recurrent storage-backed instance resources", "status": "incomplete" },
-    { "id": "compute", "required": true, "evidence": "recurrent weather and bounded impact dispatch graph", "status": "incomplete" }
+    {
+      "id": "native-webgpu",
+      "required": true,
+      "evidence": "renderer backend gate after initialization",
+      "status": "incomplete"
+    },
+    {
+      "id": "storage-buffer",
+      "required": true,
+      "evidence": "immutable and recurrent storage-backed instance resources",
+      "status": "incomplete"
+    },
+    {
+      "id": "compute",
+      "required": true,
+      "evidence": "recurrent weather and bounded impact dispatch graph",
+      "status": "incomplete"
+    }
   ],
   "runtimeProof": [
-    { "id": "renderer-init", "required": true, "evidence": "await renderer.init() in canonical browser controller", "status": "incomplete" },
-    { "id": "backend-is-webgpu", "required": true, "evidence": "renderer.backend.isWebGPUBackend === true", "status": "incomplete" },
-    { "id": "mechanism-reachable", "required": true, "evidence": "fixed mechanism routes change live visibility, material graph reachability, receiver work, and compute dispatch selection", "status": "incomplete" },
-    { "id": "world-stable-impact-receivers", "required": true, "evidence": "camera-independent world-cell scheduler queries registered upward/visible/unoccluded receivers before GPU event upload", "status": "incomplete" },
-    { "id": "runtime-seed-rebuild", "required": true, "evidence": "setSeed replaces precipitation seed/recurrent/impact storage and scheduler state", "status": "incomplete" },
-    { "id": "resource-derived-diagnostics", "required": true, "evidence": "normal diagnostics consume the live MRT attachment; masks/events/particles consume live material or storage nodes", "status": "incomplete" },
-    { "id": "aligned-readback", "required": true, "evidence": "capturePixels derives integer 256-byte-aligned row stride", "status": "incomplete" },
-    { "id": "current-adapter-timing", "required": false, "evidence": "required before any performance acceptance", "status": "incomplete" }
+    {
+      "id": "renderer-init",
+      "required": true,
+      "evidence": "await renderer.init() in canonical browser controller",
+      "status": "incomplete"
+    },
+    {
+      "id": "backend-is-webgpu",
+      "required": true,
+      "evidence": "renderer.backend.isWebGPUBackend === true",
+      "status": "incomplete"
+    },
+    {
+      "id": "mechanism-reachable",
+      "required": true,
+      "evidence": "fixed mechanism routes change live visibility, material graph reachability, receiver work, and compute dispatch selection",
+      "status": "incomplete"
+    },
+    {
+      "id": "world-stable-impact-receivers",
+      "required": true,
+      "evidence": "camera-independent world-cell scheduler queries registered upward/visible/unoccluded receivers before GPU event upload",
+      "status": "incomplete"
+    },
+    {
+      "id": "runtime-seed-rebuild",
+      "required": true,
+      "evidence": "setSeed replaces precipitation seed/recurrent/impact storage and scheduler state",
+      "status": "incomplete"
+    },
+    {
+      "id": "resource-derived-diagnostics",
+      "required": true,
+      "evidence": "normal diagnostics consume the live MRT attachment; masks/events/particles consume live material or storage nodes",
+      "status": "incomplete"
+    },
+    {
+      "id": "aligned-readback",
+      "required": true,
+      "evidence": "capturePixels derives integer 256-byte-aligned row stride",
+      "status": "incomplete"
+    },
+    {
+      "id": "current-adapter-timing",
+      "required": false,
+      "evidence": "required before any performance acceptance",
+      "status": "incomplete"
+    }
   ],
   "evidenceContract": "v2",
   "validationCommand": "node validate.js",

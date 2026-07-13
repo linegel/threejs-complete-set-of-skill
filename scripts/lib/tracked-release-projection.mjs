@@ -227,12 +227,23 @@ function appendError(errors, label, error) {
   }
 }
 
+function contentSourceClosureDigest(files, repositoryRoot) {
+  const hash = createHash('sha256');
+  for (const file of [...files].sort((left, right) => left.repositoryPath.localeCompare(right.repositoryPath))) {
+    const absolute = confinedPath(repositoryRoot, file.repositoryPath);
+    hash.update(file.repositoryPath);
+    hash.update('\0');
+    hash.update(readFileSync(absolute));
+    hash.update('\0');
+  }
+  return `sha256:${hash.digest('hex')}`;
+}
+
 function validateSourceClosure(projection, repositoryRoot, errors) {
   const closure = projection.sourceClosure;
   const files = Array.isArray(closure?.files) ? closure.files : [];
   const paths = files.map((file) => file.repositoryPath);
   if (new Set(paths).size !== paths.length) errors.push('source closure duplicates repository paths');
-  if (sourceClosureDigest(files) !== closure?.sourceHash) errors.push('source closure hash does not reconcile with its path/hash/length ledger');
   if (closure?.sourceHash !== projection.sourceClosureHash) errors.push('source closure hash differs from the projection sourceClosureHash');
   if (closure?.buildRevision !== projection.buildRevision) errors.push('source closure build revision differs from the projection buildRevision');
   if (closure?.threeRevision !== projection.threeRevision) errors.push('source closure Three.js revision differs from the projection');
@@ -246,6 +257,19 @@ function validateSourceClosure(projection, repositoryRoot, errors) {
     } catch (error) {
       errors.push(`source closure ${file.repositoryPath}: ${error.message}`);
     }
+  }
+  // demo-registry captures bind sourceHash to path+content bytes; path+sha256+length is a checkout ledger only.
+  if (closure?.algorithm === 'demo-registry-transitive-source-closure-v2') {
+    try {
+      if (files.length === 0) errors.push('demo-registry source closure requires a materialized path/hash/length ledger');
+      else if (contentSourceClosureDigest(files, repositoryRoot) !== closure?.sourceHash) {
+        errors.push('source closure hash does not reconcile with its path/content ledger');
+      }
+    } catch (error) {
+      errors.push(`source closure content digest: ${error.message}`);
+    }
+  } else if (sourceClosureDigest(files) !== closure?.sourceHash) {
+    errors.push('source closure hash does not reconcile with its path/hash/length ledger');
   }
   return true;
 }

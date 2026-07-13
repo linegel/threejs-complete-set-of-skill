@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 2,
+  "resources": [
+    {
+      "id": "touch-history-frost:history-read",
+      "kind": "StorageTexture",
+      "format": "RGBA16F",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "LabController.describeResources"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "LabController.describeResources"
+      },
+      "residentBytes": {
+        "value": 7680000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * 8 bytes per texel"
+      }
+    },
+    {
+      "id": "touch-history-frost:history-write",
+      "kind": "StorageTexture",
+      "format": "RGBA16F",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "LabController.describeResources"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "LabController.describeResources"
+      },
+      "residentBytes": {
+        "value": 7680000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * 8 bytes per texel"
+      }
+    }
+  ],
+  "totalResidentBytes": {
+    "value": 15360000,
+    "unit": "bytes",
+    "label": "Derived",
+    "source": "sum of distinct history storage textures"
+  },
+  "dispatchOwnership": [
+    "threejs-dynamic-surface-effects"
+  ],
+  "synchronization": "ordered renderer.compute before same-frame RenderPipeline.render",
+  "resetPolicy": "clear both histories on resize, tier change, and explicit reset"
+}

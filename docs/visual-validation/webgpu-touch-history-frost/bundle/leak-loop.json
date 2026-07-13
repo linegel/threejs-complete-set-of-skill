@@ -1,0 +1,4081 @@
+{
+  "schemaVersion": 2,
+  "verdict": "PASS",
+  "operations": [
+    "create",
+    "render",
+    "resize",
+    "mode",
+    "tier",
+    "dispose"
+  ],
+  "cycles": {
+    "value": 50,
+    "unit": "cycle-count",
+    "label": "Measured",
+    "source": "fresh native-WebGPU Frost controller lifecycle run"
+  },
+  "cycleSnapshots": [
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 0,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 3681904,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 3681904,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:820a7589af0efd4f614a38e87724f803ce36e932ab63c05ec94bc8c7eb51606f",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 1,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 518400,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 518400,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:8b5811f8ed2cdddcdd143dc2f9515837e92deb5662bc410ee82b60c031ccf050",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 2,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 480000,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 480000,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:c7389a4cc69bca1a553e5fc8474d2517ca6894e3b365ca6ca8a728d3b2493f9c",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 3,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 3681904,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 3681904,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:820a7589af0efd4f614a38e87724f803ce36e932ab63c05ec94bc8c7eb51606f",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 4,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 518400,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 518400,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:8b5811f8ed2cdddcdd143dc2f9515837e92deb5662bc410ee82b60c031ccf050",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 5,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 480000,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 480000,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:c7389a4cc69bca1a553e5fc8474d2517ca6894e3b365ca6ca8a728d3b2493f9c",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 6,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 3681904,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 3681904,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:820a7589af0efd4f614a38e87724f803ce36e932ab63c05ec94bc8c7eb51606f",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 7,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 518400,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 518400,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:8b5811f8ed2cdddcdd143dc2f9515837e92deb5662bc410ee82b60c031ccf050",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 8,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 480000,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 480000,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:c7389a4cc69bca1a553e5fc8474d2517ca6894e3b365ca6ca8a728d3b2493f9c",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 9,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 3681904,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 3681904,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:820a7589af0efd4f614a38e87724f803ce36e932ab63c05ec94bc8c7eb51606f",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 10,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 518400,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 518400,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:8b5811f8ed2cdddcdd143dc2f9515837e92deb5662bc410ee82b60c031ccf050",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 11,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 480000,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 480000,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:c7389a4cc69bca1a553e5fc8474d2517ca6894e3b365ca6ca8a728d3b2493f9c",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 12,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 3681904,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 3681904,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:820a7589af0efd4f614a38e87724f803ce36e932ab63c05ec94bc8c7eb51606f",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 13,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 518400,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 518400,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:8b5811f8ed2cdddcdd143dc2f9515837e92deb5662bc410ee82b60c031ccf050",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 14,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 480000,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 480000,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:c7389a4cc69bca1a553e5fc8474d2517ca6894e3b365ca6ca8a728d3b2493f9c",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 15,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 3681904,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 3681904,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:820a7589af0efd4f614a38e87724f803ce36e932ab63c05ec94bc8c7eb51606f",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 16,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 518400,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 518400,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:8b5811f8ed2cdddcdd143dc2f9515837e92deb5662bc410ee82b60c031ccf050",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 17,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 480000,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 480000,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:c7389a4cc69bca1a553e5fc8474d2517ca6894e3b365ca6ca8a728d3b2493f9c",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 18,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 3681904,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 3681904,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:820a7589af0efd4f614a38e87724f803ce36e932ab63c05ec94bc8c7eb51606f",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 19,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 518400,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 518400,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:8b5811f8ed2cdddcdd143dc2f9515837e92deb5662bc410ee82b60c031ccf050",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 20,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 480000,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 480000,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:c7389a4cc69bca1a553e5fc8474d2517ca6894e3b365ca6ca8a728d3b2493f9c",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 21,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 3681904,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 3681904,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:820a7589af0efd4f614a38e87724f803ce36e932ab63c05ec94bc8c7eb51606f",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 22,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 518400,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 518400,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:8b5811f8ed2cdddcdd143dc2f9515837e92deb5662bc410ee82b60c031ccf050",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 23,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 480000,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 480000,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:c7389a4cc69bca1a553e5fc8474d2517ca6894e3b365ca6ca8a728d3b2493f9c",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 24,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 3681904,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 3681904,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:820a7589af0efd4f614a38e87724f803ce36e932ab63c05ec94bc8c7eb51606f",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 25,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 518400,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 518400,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:8b5811f8ed2cdddcdd143dc2f9515837e92deb5662bc410ee82b60c031ccf050",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 26,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 480000,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 480000,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:c7389a4cc69bca1a553e5fc8474d2517ca6894e3b365ca6ca8a728d3b2493f9c",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 27,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 3681904,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 3681904,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:820a7589af0efd4f614a38e87724f803ce36e932ab63c05ec94bc8c7eb51606f",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 28,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 518400,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 518400,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:8b5811f8ed2cdddcdd143dc2f9515837e92deb5662bc410ee82b60c031ccf050",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 29,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 480000,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 480000,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:c7389a4cc69bca1a553e5fc8474d2517ca6894e3b365ca6ca8a728d3b2493f9c",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 30,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 3681904,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 3681904,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:820a7589af0efd4f614a38e87724f803ce36e932ab63c05ec94bc8c7eb51606f",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 31,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 518400,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 518400,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:8b5811f8ed2cdddcdd143dc2f9515837e92deb5662bc410ee82b60c031ccf050",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 32,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 480000,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 480000,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:c7389a4cc69bca1a553e5fc8474d2517ca6894e3b365ca6ca8a728d3b2493f9c",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 33,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 3681904,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 3681904,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:820a7589af0efd4f614a38e87724f803ce36e932ab63c05ec94bc8c7eb51606f",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 34,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 518400,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 518400,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:8b5811f8ed2cdddcdd143dc2f9515837e92deb5662bc410ee82b60c031ccf050",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 35,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 480000,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 480000,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:c7389a4cc69bca1a553e5fc8474d2517ca6894e3b365ca6ca8a728d3b2493f9c",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 36,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 3681904,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 3681904,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:820a7589af0efd4f614a38e87724f803ce36e932ab63c05ec94bc8c7eb51606f",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 37,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 518400,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 518400,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:8b5811f8ed2cdddcdd143dc2f9515837e92deb5662bc410ee82b60c031ccf050",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 38,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 480000,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 480000,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:c7389a4cc69bca1a553e5fc8474d2517ca6894e3b365ca6ca8a728d3b2493f9c",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 39,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 3681904,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 3681904,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:820a7589af0efd4f614a38e87724f803ce36e932ab63c05ec94bc8c7eb51606f",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 40,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 518400,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 518400,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:8b5811f8ed2cdddcdd143dc2f9515837e92deb5662bc410ee82b60c031ccf050",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 41,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 480000,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 480000,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:c7389a4cc69bca1a553e5fc8474d2517ca6894e3b365ca6ca8a728d3b2493f9c",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 42,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 3681904,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 3681904,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:820a7589af0efd4f614a38e87724f803ce36e932ab63c05ec94bc8c7eb51606f",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 43,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 518400,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 518400,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:8b5811f8ed2cdddcdd143dc2f9515837e92deb5662bc410ee82b60c031ccf050",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 44,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 480000,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 480000,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:c7389a4cc69bca1a553e5fc8474d2517ca6894e3b365ca6ca8a728d3b2493f9c",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 45,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 3681904,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 3681904,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:820a7589af0efd4f614a38e87724f803ce36e932ab63c05ec94bc8c7eb51606f",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 46,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 518400,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 518400,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:8b5811f8ed2cdddcdd143dc2f9515837e92deb5662bc410ee82b60c031ccf050",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 47,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 480000,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 480000,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:c7389a4cc69bca1a553e5fc8474d2517ca6894e3b365ca6ca8a728d3b2493f9c",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 48,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 3681904,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 3681904,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:820a7589af0efd4f614a38e87724f803ce36e932ab63c05ec94bc8c7eb51606f",
+      "deviceLossObserved": false
+    },
+    {
+      "rowType": "settled-lifecycle-cycle-v2",
+      "disposeStatus": "PASS",
+      "cycle": {
+        "value": 49,
+        "unit": "cycle-index",
+        "label": "Measured",
+        "source": "fresh Frost lifecycle controller sequence"
+      },
+      "beforeRendererBytes": {
+        "value": 518400,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost storage before disposal; opaque renderer residency not claimed"
+      },
+      "afterRendererBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "enumerated lab-owned Frost resources after owned-renderer disposal"
+      },
+      "targetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "no explicit persistent lab-owned render target; renderer internals not claimed"
+      },
+      "storageBytes": {
+        "value": 518400,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "runtime Frost storage resource plan"
+      },
+      "retainedTargetBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedStorageBytes": {
+        "value": 0,
+        "unit": "bytes",
+        "label": "Measured",
+        "source": "post-disposal Frost resource snapshot"
+      },
+      "retainedListenerCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost listener snapshot"
+      },
+      "retainedControlCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost control snapshot"
+      },
+      "retainedMaterialCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "post-disposal Frost material snapshot"
+      },
+      "postDisposeErrorCount": {
+        "value": 0,
+        "unit": "count",
+        "label": "Measured",
+        "source": "two-frame settled device and page error observation"
+      },
+      "settleAnimationFrames": {
+        "value": 2,
+        "unit": "animation-frame-count",
+        "label": "Measured",
+        "source": "browser requestAnimationFrame settlement"
+      },
+      "rendererStateDisposition": "OWNED_RENDERER_DISPOSED",
+      "rendererStateBeforeDigest": "sha256:5e684c676d51fb0713850523d439a5da9890d7cbb658105749d14a12def5ed05",
+      "rendererStateAfterDigest": "sha256:8b5811f8ed2cdddcdd143dc2f9515837e92deb5662bc410ee82b60c031ccf050",
+      "deviceLossObserved": false
+    }
+  ],
+  "before": {
+    "targetBytes": {
+      "value": 0,
+      "unit": "bytes",
+      "label": "Measured",
+      "source": "explicit persistent lab-owned targets before cycle sequence"
+    },
+    "storageBytes": {
+      "value": 3681904,
+      "unit": "bytes",
+      "label": "Measured",
+      "source": "first fresh-controller Frost storage inventory"
+    }
+  },
+  "after": {
+    "targetBytes": {
+      "value": 0,
+      "unit": "bytes",
+      "label": "Measured",
+      "source": "settled post-disposal retained target bytes"
+    },
+    "storageBytes": {
+      "value": 0,
+      "unit": "bytes",
+      "label": "Measured",
+      "source": "settled post-disposal retained storage bytes"
+    }
+  },
+  "gates": {
+    "targetBytes": {
+      "value": 0,
+      "unit": "bytes",
+      "label": "Gated",
+      "source": "no retained lab-owned target growth allowed"
+    },
+    "storageBytes": {
+      "value": 0,
+      "unit": "bytes",
+      "label": "Gated",
+      "source": "no retained lab-owned storage growth allowed"
+    }
+  },
+  "trend": {
+    "targetBytesPerCycle": {
+      "value": 0,
+      "unit": "bytes-per-cycle",
+      "label": "Measured",
+      "source": "linear slope of 50 retained-target snapshots"
+    },
+    "storageBytesPerCycle": {
+      "value": 0,
+      "unit": "bytes-per-cycle",
+      "label": "Measured",
+      "source": "linear slope of 50 retained-storage snapshots"
+    }
+  },
+  "deviceErrors": [],
+  "limitations": [
+    "Opaque renderer-internal byte residency is NOT_CLAIMED."
+  ],
+  "allowedCachePlateaus": []
+}

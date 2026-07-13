@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 2,
+  "metrics": [
+    {
+      "id": "diagnostic-similarity-to-flat-output",
+      "domain": "history diagnostics",
+      "truthSource": "minimum retained diagnostic RGB range",
+      "alignment": "exact 1200x800 recipe coordinates",
+      "mask": "all RGB pixels",
+      "measured": {
+        "value": 0.7019607843137254,
+        "unit": "similarity-ratio",
+        "label": "Derived",
+        "source": "1 - minimum diagnostic RGB range / 255"
+      },
+      "gate": {
+        "value": 0.99,
+        "unit": "similarity-ratio",
+        "label": "Gated",
+        "source": "diagnostics must materially differ from a constant image"
+      },
+      "verdict": "PASS",
+      "worstCaseArtifact": "diagnostics.mosaic.png"
+    }
+  ],
+  "spatialErrorMaps": [],
+  "worstCaseArtifacts": [
+    "diagnostics.mosaic.png"
+  ]
+}

@@ -1,0 +1,1963 @@
+{
+  "schemaVersion": 2,
+  "targets": [
+    {
+      "name": "frost-capture-target-1",
+      "owner": "threejs-dynamic-surface-effects",
+      "semantic": "final.design native WebGPU RGBA8 readback",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "final.design retained capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "final.design retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples-per-pixel",
+        "label": "Authored",
+        "source": "Frost correctness capture disables MSAA"
+      },
+      "memoryBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * RGBA8 bytes per texel"
+      },
+      "lifetime": "single transactional recipe readback",
+      "loadOp": "clear",
+      "storeOp": "store",
+      "readback": {
+        "rowBytes": {
+          "value": 4800,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "width * 4 RGBA8 bytes"
+        },
+        "bytesPerRow": {
+          "value": 4864,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU 256-byte texture-copy alignment"
+        },
+        "minimumByteLength": {
+          "value": 3891136,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned rows with compact final row"
+        },
+        "fullyPaddedByteLength": {
+          "value": 3891200,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned row stride * height"
+        },
+        "alignment": {
+          "value": 256,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU texture-copy row alignment"
+        }
+      },
+      "directlyReadBack": true
+    },
+    {
+      "name": "frost-capture-target-2",
+      "owner": "threejs-dynamic-surface-effects",
+      "semantic": "no-post.design native WebGPU RGBA8 readback",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "no-post.design retained capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "no-post.design retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples-per-pixel",
+        "label": "Authored",
+        "source": "Frost correctness capture disables MSAA"
+      },
+      "memoryBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * RGBA8 bytes per texel"
+      },
+      "lifetime": "single transactional recipe readback",
+      "loadOp": "clear",
+      "storeOp": "store",
+      "readback": {
+        "rowBytes": {
+          "value": 4800,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "width * 4 RGBA8 bytes"
+        },
+        "bytesPerRow": {
+          "value": 4864,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU 256-byte texture-copy alignment"
+        },
+        "minimumByteLength": {
+          "value": 3891136,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned rows with compact final row"
+        },
+        "fullyPaddedByteLength": {
+          "value": 3891200,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned row stride * height"
+        },
+        "alignment": {
+          "value": 256,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU texture-copy row alignment"
+        }
+      },
+      "directlyReadBack": true
+    },
+    {
+      "name": "frost-capture-target-3",
+      "owner": "threejs-dynamic-surface-effects",
+      "semantic": "diagnostic.previous-history-ra native WebGPU RGBA8 readback",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "diagnostic.previous-history-ra retained capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "diagnostic.previous-history-ra retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples-per-pixel",
+        "label": "Authored",
+        "source": "Frost correctness capture disables MSAA"
+      },
+      "memoryBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * RGBA8 bytes per texel"
+      },
+      "lifetime": "single transactional recipe readback",
+      "loadOp": "clear",
+      "storeOp": "store",
+      "readback": {
+        "rowBytes": {
+          "value": 4800,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "width * 4 RGBA8 bytes"
+        },
+        "bytesPerRow": {
+          "value": 4864,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU 256-byte texture-copy alignment"
+        },
+        "minimumByteLength": {
+          "value": 3891136,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned rows with compact final row"
+        },
+        "fullyPaddedByteLength": {
+          "value": 3891200,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned row stride * height"
+        },
+        "alignment": {
+          "value": 256,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU texture-copy row alignment"
+        }
+      },
+      "directlyReadBack": true
+    },
+    {
+      "name": "frost-capture-target-4",
+      "owner": "threejs-dynamic-surface-effects",
+      "semantic": "diagnostic.deposit-ra native WebGPU RGBA8 readback",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "diagnostic.deposit-ra retained capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "diagnostic.deposit-ra retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples-per-pixel",
+        "label": "Authored",
+        "source": "Frost correctness capture disables MSAA"
+      },
+      "memoryBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * RGBA8 bytes per texel"
+      },
+      "lifetime": "single transactional recipe readback",
+      "loadOp": "clear",
+      "storeOp": "store",
+      "readback": {
+        "rowBytes": {
+          "value": 4800,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "width * 4 RGBA8 bytes"
+        },
+        "bytesPerRow": {
+          "value": 4864,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU 256-byte texture-copy alignment"
+        },
+        "minimumByteLength": {
+          "value": 3891136,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned rows with compact final row"
+        },
+        "fullyPaddedByteLength": {
+          "value": 3891200,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned row stride * height"
+        },
+        "alignment": {
+          "value": 256,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU texture-copy row alignment"
+        }
+      },
+      "directlyReadBack": true
+    },
+    {
+      "name": "frost-capture-target-5",
+      "owner": "threejs-dynamic-surface-effects",
+      "semantic": "diagnostic.next-history-ra native WebGPU RGBA8 readback",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "diagnostic.next-history-ra retained capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "diagnostic.next-history-ra retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples-per-pixel",
+        "label": "Authored",
+        "source": "Frost correctness capture disables MSAA"
+      },
+      "memoryBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * RGBA8 bytes per texel"
+      },
+      "lifetime": "single transactional recipe readback",
+      "loadOp": "clear",
+      "storeOp": "store",
+      "readback": {
+        "rowBytes": {
+          "value": 4800,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "width * 4 RGBA8 bytes"
+        },
+        "bytesPerRow": {
+          "value": 4864,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU 256-byte texture-copy alignment"
+        },
+        "minimumByteLength": {
+          "value": 3891136,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned rows with compact final row"
+        },
+        "fullyPaddedByteLength": {
+          "value": 3891200,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned row stride * height"
+        },
+        "alignment": {
+          "value": 256,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU texture-copy row alignment"
+        }
+      },
+      "directlyReadBack": true
+    },
+    {
+      "name": "frost-capture-target-6",
+      "owner": "threejs-dynamic-surface-effects",
+      "semantic": "diagnostic.frost-mask-after-pointer native WebGPU RGBA8 readback",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "diagnostic.frost-mask-after-pointer retained capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "diagnostic.frost-mask-after-pointer retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples-per-pixel",
+        "label": "Authored",
+        "source": "Frost correctness capture disables MSAA"
+      },
+      "memoryBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * RGBA8 bytes per texel"
+      },
+      "lifetime": "single transactional recipe readback",
+      "loadOp": "clear",
+      "storeOp": "store",
+      "readback": {
+        "rowBytes": {
+          "value": 4800,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "width * 4 RGBA8 bytes"
+        },
+        "bytesPerRow": {
+          "value": 4864,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU 256-byte texture-copy alignment"
+        },
+        "minimumByteLength": {
+          "value": 3891136,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned rows with compact final row"
+        },
+        "fullyPaddedByteLength": {
+          "value": 3891200,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned row stride * height"
+        },
+        "alignment": {
+          "value": 256,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU texture-copy row alignment"
+        }
+      },
+      "directlyReadBack": true
+    },
+    {
+      "name": "frost-capture-target-7",
+      "owner": "threejs-dynamic-surface-effects",
+      "semantic": "camera.near native WebGPU RGBA8 readback",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "camera.near retained capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "camera.near retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples-per-pixel",
+        "label": "Authored",
+        "source": "Frost correctness capture disables MSAA"
+      },
+      "memoryBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * RGBA8 bytes per texel"
+      },
+      "lifetime": "single transactional recipe readback",
+      "loadOp": "clear",
+      "storeOp": "store",
+      "readback": {
+        "rowBytes": {
+          "value": 4800,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "width * 4 RGBA8 bytes"
+        },
+        "bytesPerRow": {
+          "value": 4864,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU 256-byte texture-copy alignment"
+        },
+        "minimumByteLength": {
+          "value": 3891136,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned rows with compact final row"
+        },
+        "fullyPaddedByteLength": {
+          "value": 3891200,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned row stride * height"
+        },
+        "alignment": {
+          "value": 256,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU texture-copy row alignment"
+        }
+      },
+      "directlyReadBack": true
+    },
+    {
+      "name": "frost-capture-target-8",
+      "owner": "threejs-dynamic-surface-effects",
+      "semantic": "camera.design native WebGPU RGBA8 readback",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "camera.design retained capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "camera.design retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples-per-pixel",
+        "label": "Authored",
+        "source": "Frost correctness capture disables MSAA"
+      },
+      "memoryBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * RGBA8 bytes per texel"
+      },
+      "lifetime": "single transactional recipe readback",
+      "loadOp": "clear",
+      "storeOp": "store",
+      "readback": {
+        "rowBytes": {
+          "value": 4800,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "width * 4 RGBA8 bytes"
+        },
+        "bytesPerRow": {
+          "value": 4864,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU 256-byte texture-copy alignment"
+        },
+        "minimumByteLength": {
+          "value": 3891136,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned rows with compact final row"
+        },
+        "fullyPaddedByteLength": {
+          "value": 3891200,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned row stride * height"
+        },
+        "alignment": {
+          "value": 256,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU texture-copy row alignment"
+        }
+      },
+      "directlyReadBack": true
+    },
+    {
+      "name": "frost-capture-target-9",
+      "owner": "threejs-dynamic-surface-effects",
+      "semantic": "camera.far native WebGPU RGBA8 readback",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "camera.far retained capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "camera.far retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples-per-pixel",
+        "label": "Authored",
+        "source": "Frost correctness capture disables MSAA"
+      },
+      "memoryBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * RGBA8 bytes per texel"
+      },
+      "lifetime": "single transactional recipe readback",
+      "loadOp": "clear",
+      "storeOp": "store",
+      "readback": {
+        "rowBytes": {
+          "value": 4800,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "width * 4 RGBA8 bytes"
+        },
+        "bytesPerRow": {
+          "value": 4864,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU 256-byte texture-copy alignment"
+        },
+        "minimumByteLength": {
+          "value": 3891136,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned rows with compact final row"
+        },
+        "fullyPaddedByteLength": {
+          "value": 3891200,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned row stride * height"
+        },
+        "alignment": {
+          "value": 256,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU texture-copy row alignment"
+        }
+      },
+      "directlyReadBack": true
+    },
+    {
+      "name": "frost-capture-target-10",
+      "owner": "threejs-dynamic-surface-effects",
+      "semantic": "seed-0001.final native WebGPU RGBA8 readback",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "seed-0001.final retained capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "seed-0001.final retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples-per-pixel",
+        "label": "Authored",
+        "source": "Frost correctness capture disables MSAA"
+      },
+      "memoryBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * RGBA8 bytes per texel"
+      },
+      "lifetime": "single transactional recipe readback",
+      "loadOp": "clear",
+      "storeOp": "store",
+      "readback": {
+        "rowBytes": {
+          "value": 4800,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "width * 4 RGBA8 bytes"
+        },
+        "bytesPerRow": {
+          "value": 4864,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU 256-byte texture-copy alignment"
+        },
+        "minimumByteLength": {
+          "value": 3891136,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned rows with compact final row"
+        },
+        "fullyPaddedByteLength": {
+          "value": 3891200,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned row stride * height"
+        },
+        "alignment": {
+          "value": 256,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU texture-copy row alignment"
+        }
+      },
+      "directlyReadBack": true
+    },
+    {
+      "name": "frost-capture-target-11",
+      "owner": "threejs-dynamic-surface-effects",
+      "semantic": "seed-9e3779b9.final native WebGPU RGBA8 readback",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "seed-9e3779b9.final retained capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "seed-9e3779b9.final retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples-per-pixel",
+        "label": "Authored",
+        "source": "Frost correctness capture disables MSAA"
+      },
+      "memoryBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * RGBA8 bytes per texel"
+      },
+      "lifetime": "single transactional recipe readback",
+      "loadOp": "clear",
+      "storeOp": "store",
+      "readback": {
+        "rowBytes": {
+          "value": 4800,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "width * 4 RGBA8 bytes"
+        },
+        "bytesPerRow": {
+          "value": 4864,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU 256-byte texture-copy alignment"
+        },
+        "minimumByteLength": {
+          "value": 3891136,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned rows with compact final row"
+        },
+        "fullyPaddedByteLength": {
+          "value": 3891200,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned row stride * height"
+        },
+        "alignment": {
+          "value": 256,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU texture-copy row alignment"
+        }
+      },
+      "directlyReadBack": true
+    },
+    {
+      "name": "frost-capture-target-12",
+      "owner": "threejs-dynamic-surface-effects",
+      "semantic": "temporal.t000 native WebGPU RGBA8 readback",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "temporal.t000 retained capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "temporal.t000 retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples-per-pixel",
+        "label": "Authored",
+        "source": "Frost correctness capture disables MSAA"
+      },
+      "memoryBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * RGBA8 bytes per texel"
+      },
+      "lifetime": "single transactional recipe readback",
+      "loadOp": "clear",
+      "storeOp": "store",
+      "readback": {
+        "rowBytes": {
+          "value": 4800,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "width * 4 RGBA8 bytes"
+        },
+        "bytesPerRow": {
+          "value": 4864,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU 256-byte texture-copy alignment"
+        },
+        "minimumByteLength": {
+          "value": 3891136,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned rows with compact final row"
+        },
+        "fullyPaddedByteLength": {
+          "value": 3891200,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned row stride * height"
+        },
+        "alignment": {
+          "value": 256,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU texture-copy row alignment"
+        }
+      },
+      "directlyReadBack": true
+    },
+    {
+      "name": "frost-capture-target-13",
+      "owner": "threejs-dynamic-surface-effects",
+      "semantic": "temporal.t001 native WebGPU RGBA8 readback",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "temporal.t001 retained capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "temporal.t001 retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples-per-pixel",
+        "label": "Authored",
+        "source": "Frost correctness capture disables MSAA"
+      },
+      "memoryBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * RGBA8 bytes per texel"
+      },
+      "lifetime": "single transactional recipe readback",
+      "loadOp": "clear",
+      "storeOp": "store",
+      "readback": {
+        "rowBytes": {
+          "value": 4800,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "width * 4 RGBA8 bytes"
+        },
+        "bytesPerRow": {
+          "value": 4864,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU 256-byte texture-copy alignment"
+        },
+        "minimumByteLength": {
+          "value": 3891136,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned rows with compact final row"
+        },
+        "fullyPaddedByteLength": {
+          "value": 3891200,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned row stride * height"
+        },
+        "alignment": {
+          "value": 256,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU texture-copy row alignment"
+        }
+      },
+      "directlyReadBack": true
+    },
+    {
+      "name": "frost-capture-target-14",
+      "owner": "threejs-dynamic-surface-effects",
+      "semantic": "probe.odd-size.final native WebGPU RGBA8 readback",
+      "width": {
+        "value": 641,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "probe.odd-size.final retained capture metadata"
+      },
+      "height": {
+        "value": 359,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "probe.odd-size.final retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples-per-pixel",
+        "label": "Authored",
+        "source": "Frost correctness capture disables MSAA"
+      },
+      "memoryBytes": {
+        "value": 920476,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * RGBA8 bytes per texel"
+      },
+      "lifetime": "single transactional recipe readback",
+      "loadOp": "clear",
+      "storeOp": "store",
+      "readback": {
+        "rowBytes": {
+          "value": 2564,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "width * 4 RGBA8 bytes"
+        },
+        "bytesPerRow": {
+          "value": 2816,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU 256-byte texture-copy alignment"
+        },
+        "minimumByteLength": {
+          "value": 1010692,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned rows with compact final row"
+        },
+        "fullyPaddedByteLength": {
+          "value": 1010944,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned row stride * height"
+        },
+        "alignment": {
+          "value": 256,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU texture-copy row alignment"
+        }
+      },
+      "directlyReadBack": true
+    },
+    {
+      "name": "frost-capture-target-15",
+      "owner": "threejs-dynamic-surface-effects",
+      "semantic": "probe.dpr-1.final native WebGPU RGBA8 readback",
+      "width": {
+        "value": 400,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "probe.dpr-1.final retained capture metadata"
+      },
+      "height": {
+        "value": 300,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "probe.dpr-1.final retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples-per-pixel",
+        "label": "Authored",
+        "source": "Frost correctness capture disables MSAA"
+      },
+      "memoryBytes": {
+        "value": 480000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * RGBA8 bytes per texel"
+      },
+      "lifetime": "single transactional recipe readback",
+      "loadOp": "clear",
+      "storeOp": "store",
+      "readback": {
+        "rowBytes": {
+          "value": 1600,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "width * 4 RGBA8 bytes"
+        },
+        "bytesPerRow": {
+          "value": 1792,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU 256-byte texture-copy alignment"
+        },
+        "minimumByteLength": {
+          "value": 537408,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned rows with compact final row"
+        },
+        "fullyPaddedByteLength": {
+          "value": 537600,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned row stride * height"
+        },
+        "alignment": {
+          "value": 256,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU texture-copy row alignment"
+        }
+      },
+      "directlyReadBack": true
+    },
+    {
+      "name": "frost-capture-target-16",
+      "owner": "threejs-dynamic-surface-effects",
+      "semantic": "probe.dpr-1-5.final native WebGPU RGBA8 readback",
+      "width": {
+        "value": 600,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "probe.dpr-1-5.final retained capture metadata"
+      },
+      "height": {
+        "value": 450,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "probe.dpr-1-5.final retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples-per-pixel",
+        "label": "Authored",
+        "source": "Frost correctness capture disables MSAA"
+      },
+      "memoryBytes": {
+        "value": 1080000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * RGBA8 bytes per texel"
+      },
+      "lifetime": "single transactional recipe readback",
+      "loadOp": "clear",
+      "storeOp": "store",
+      "readback": {
+        "rowBytes": {
+          "value": 2400,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "width * 4 RGBA8 bytes"
+        },
+        "bytesPerRow": {
+          "value": 2560,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU 256-byte texture-copy alignment"
+        },
+        "minimumByteLength": {
+          "value": 1151840,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned rows with compact final row"
+        },
+        "fullyPaddedByteLength": {
+          "value": 1152000,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned row stride * height"
+        },
+        "alignment": {
+          "value": 256,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU texture-copy row alignment"
+        }
+      },
+      "directlyReadBack": true
+    },
+    {
+      "name": "frost-capture-target-17",
+      "owner": "threejs-dynamic-surface-effects",
+      "semantic": "probe.dpr-2.final native WebGPU RGBA8 readback",
+      "width": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "probe.dpr-2.final retained capture metadata"
+      },
+      "height": {
+        "value": 600,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "probe.dpr-2.final retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples-per-pixel",
+        "label": "Authored",
+        "source": "Frost correctness capture disables MSAA"
+      },
+      "memoryBytes": {
+        "value": 1920000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * RGBA8 bytes per texel"
+      },
+      "lifetime": "single transactional recipe readback",
+      "loadOp": "clear",
+      "storeOp": "store",
+      "readback": {
+        "rowBytes": {
+          "value": 3200,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "width * 4 RGBA8 bytes"
+        },
+        "bytesPerRow": {
+          "value": 3328,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU 256-byte texture-copy alignment"
+        },
+        "minimumByteLength": {
+          "value": 1996672,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned rows with compact final row"
+        },
+        "fullyPaddedByteLength": {
+          "value": 1996800,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned row stride * height"
+        },
+        "alignment": {
+          "value": 256,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU texture-copy row alignment"
+        }
+      },
+      "directlyReadBack": true
+    },
+    {
+      "name": "frost-capture-target-18",
+      "owner": "threejs-dynamic-surface-effects",
+      "semantic": "route.canonical native WebGPU RGBA8 readback",
+      "width": {
+        "value": 320,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "route.canonical retained capture metadata"
+      },
+      "height": {
+        "value": 180,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "route.canonical retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples-per-pixel",
+        "label": "Authored",
+        "source": "Frost correctness capture disables MSAA"
+      },
+      "memoryBytes": {
+        "value": 230400,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * RGBA8 bytes per texel"
+      },
+      "lifetime": "single transactional recipe readback",
+      "loadOp": "clear",
+      "storeOp": "store",
+      "readback": {
+        "rowBytes": {
+          "value": 1280,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "width * 4 RGBA8 bytes"
+        },
+        "bytesPerRow": {
+          "value": 1280,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU 256-byte texture-copy alignment"
+        },
+        "minimumByteLength": {
+          "value": 230400,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned rows with compact final row"
+        },
+        "fullyPaddedByteLength": {
+          "value": 230400,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned row stride * height"
+        },
+        "alignment": {
+          "value": 256,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU texture-copy row alignment"
+        }
+      },
+      "directlyReadBack": true
+    },
+    {
+      "name": "frost-capture-target-19",
+      "owner": "threejs-dynamic-surface-effects",
+      "semantic": "route.mechanism.history-and-deposit native WebGPU RGBA8 readback",
+      "width": {
+        "value": 320,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "route.mechanism.history-and-deposit retained capture metadata"
+      },
+      "height": {
+        "value": 180,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "route.mechanism.history-and-deposit retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples-per-pixel",
+        "label": "Authored",
+        "source": "Frost correctness capture disables MSAA"
+      },
+      "memoryBytes": {
+        "value": 230400,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * RGBA8 bytes per texel"
+      },
+      "lifetime": "single transactional recipe readback",
+      "loadOp": "clear",
+      "storeOp": "store",
+      "readback": {
+        "rowBytes": {
+          "value": 1280,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "width * 4 RGBA8 bytes"
+        },
+        "bytesPerRow": {
+          "value": 1280,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU 256-byte texture-copy alignment"
+        },
+        "minimumByteLength": {
+          "value": 230400,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned rows with compact final row"
+        },
+        "fullyPaddedByteLength": {
+          "value": 230400,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned row stride * height"
+        },
+        "alignment": {
+          "value": 256,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU texture-copy row alignment"
+        }
+      },
+      "directlyReadBack": true
+    },
+    {
+      "name": "frost-capture-target-20",
+      "owner": "threejs-dynamic-surface-effects",
+      "semantic": "route.mechanism.diffusion native WebGPU RGBA8 readback",
+      "width": {
+        "value": 320,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "route.mechanism.diffusion retained capture metadata"
+      },
+      "height": {
+        "value": 180,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "route.mechanism.diffusion retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples-per-pixel",
+        "label": "Authored",
+        "source": "Frost correctness capture disables MSAA"
+      },
+      "memoryBytes": {
+        "value": 230400,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * RGBA8 bytes per texel"
+      },
+      "lifetime": "single transactional recipe readback",
+      "loadOp": "clear",
+      "storeOp": "store",
+      "readback": {
+        "rowBytes": {
+          "value": 1280,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "width * 4 RGBA8 bytes"
+        },
+        "bytesPerRow": {
+          "value": 1280,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU 256-byte texture-copy alignment"
+        },
+        "minimumByteLength": {
+          "value": 230400,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned rows with compact final row"
+        },
+        "fullyPaddedByteLength": {
+          "value": 230400,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned row stride * height"
+        },
+        "alignment": {
+          "value": 256,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU texture-copy row alignment"
+        }
+      },
+      "directlyReadBack": true
+    },
+    {
+      "name": "frost-capture-target-21",
+      "owner": "threejs-dynamic-surface-effects",
+      "semantic": "route.mechanism.blur-and-reconstruction native WebGPU RGBA8 readback",
+      "width": {
+        "value": 320,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "route.mechanism.blur-and-reconstruction retained capture metadata"
+      },
+      "height": {
+        "value": 180,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "route.mechanism.blur-and-reconstruction retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples-per-pixel",
+        "label": "Authored",
+        "source": "Frost correctness capture disables MSAA"
+      },
+      "memoryBytes": {
+        "value": 230400,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * RGBA8 bytes per texel"
+      },
+      "lifetime": "single transactional recipe readback",
+      "loadOp": "clear",
+      "storeOp": "store",
+      "readback": {
+        "rowBytes": {
+          "value": 1280,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "width * 4 RGBA8 bytes"
+        },
+        "bytesPerRow": {
+          "value": 1280,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU 256-byte texture-copy alignment"
+        },
+        "minimumByteLength": {
+          "value": 230400,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned rows with compact final row"
+        },
+        "fullyPaddedByteLength": {
+          "value": 230400,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned row stride * height"
+        },
+        "alignment": {
+          "value": 256,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU texture-copy row alignment"
+        }
+      },
+      "directlyReadBack": true
+    },
+    {
+      "name": "frost-capture-target-22",
+      "owner": "threejs-dynamic-surface-effects",
+      "semantic": "route.mechanism.crystal-field-and-normals native WebGPU RGBA8 readback",
+      "width": {
+        "value": 320,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "route.mechanism.crystal-field-and-normals retained capture metadata"
+      },
+      "height": {
+        "value": 180,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "route.mechanism.crystal-field-and-normals retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples-per-pixel",
+        "label": "Authored",
+        "source": "Frost correctness capture disables MSAA"
+      },
+      "memoryBytes": {
+        "value": 230400,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * RGBA8 bytes per texel"
+      },
+      "lifetime": "single transactional recipe readback",
+      "loadOp": "clear",
+      "storeOp": "store",
+      "readback": {
+        "rowBytes": {
+          "value": 1280,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "width * 4 RGBA8 bytes"
+        },
+        "bytesPerRow": {
+          "value": 1280,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU 256-byte texture-copy alignment"
+        },
+        "minimumByteLength": {
+          "value": 230400,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned rows with compact final row"
+        },
+        "fullyPaddedByteLength": {
+          "value": 230400,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned row stride * height"
+        },
+        "alignment": {
+          "value": 256,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU texture-copy row alignment"
+        }
+      },
+      "directlyReadBack": true
+    },
+    {
+      "name": "frost-capture-target-23",
+      "owner": "threejs-dynamic-surface-effects",
+      "semantic": "route.mechanism.refraction-and-fresnel native WebGPU RGBA8 readback",
+      "width": {
+        "value": 320,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "route.mechanism.refraction-and-fresnel retained capture metadata"
+      },
+      "height": {
+        "value": 180,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "route.mechanism.refraction-and-fresnel retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples-per-pixel",
+        "label": "Authored",
+        "source": "Frost correctness capture disables MSAA"
+      },
+      "memoryBytes": {
+        "value": 230400,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * RGBA8 bytes per texel"
+      },
+      "lifetime": "single transactional recipe readback",
+      "loadOp": "clear",
+      "storeOp": "store",
+      "readback": {
+        "rowBytes": {
+          "value": 1280,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "width * 4 RGBA8 bytes"
+        },
+        "bytesPerRow": {
+          "value": 1280,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU 256-byte texture-copy alignment"
+        },
+        "minimumByteLength": {
+          "value": 230400,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned rows with compact final row"
+        },
+        "fullyPaddedByteLength": {
+          "value": 230400,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned row stride * height"
+        },
+        "alignment": {
+          "value": 256,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU texture-copy row alignment"
+        }
+      },
+      "directlyReadBack": true
+    },
+    {
+      "name": "frost-capture-target-24",
+      "owner": "threejs-dynamic-surface-effects",
+      "semantic": "route.mechanism.full-vs-dirty-vs-idle native WebGPU RGBA8 readback",
+      "width": {
+        "value": 320,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "route.mechanism.full-vs-dirty-vs-idle retained capture metadata"
+      },
+      "height": {
+        "value": 180,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "route.mechanism.full-vs-dirty-vs-idle retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples-per-pixel",
+        "label": "Authored",
+        "source": "Frost correctness capture disables MSAA"
+      },
+      "memoryBytes": {
+        "value": 230400,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * RGBA8 bytes per texel"
+      },
+      "lifetime": "single transactional recipe readback",
+      "loadOp": "clear",
+      "storeOp": "store",
+      "readback": {
+        "rowBytes": {
+          "value": 1280,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "width * 4 RGBA8 bytes"
+        },
+        "bytesPerRow": {
+          "value": 1280,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU 256-byte texture-copy alignment"
+        },
+        "minimumByteLength": {
+          "value": 230400,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned rows with compact final row"
+        },
+        "fullyPaddedByteLength": {
+          "value": 230400,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned row stride * height"
+        },
+        "alignment": {
+          "value": 256,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU texture-copy row alignment"
+        }
+      },
+      "directlyReadBack": true
+    },
+    {
+      "name": "frost-capture-target-25",
+      "owner": "threejs-dynamic-surface-effects",
+      "semantic": "route.tier.full native WebGPU RGBA8 readback",
+      "width": {
+        "value": 320,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "route.tier.full retained capture metadata"
+      },
+      "height": {
+        "value": 180,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "route.tier.full retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples-per-pixel",
+        "label": "Authored",
+        "source": "Frost correctness capture disables MSAA"
+      },
+      "memoryBytes": {
+        "value": 230400,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * RGBA8 bytes per texel"
+      },
+      "lifetime": "single transactional recipe readback",
+      "loadOp": "clear",
+      "storeOp": "store",
+      "readback": {
+        "rowBytes": {
+          "value": 1280,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "width * 4 RGBA8 bytes"
+        },
+        "bytesPerRow": {
+          "value": 1280,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU 256-byte texture-copy alignment"
+        },
+        "minimumByteLength": {
+          "value": 230400,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned rows with compact final row"
+        },
+        "fullyPaddedByteLength": {
+          "value": 230400,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned row stride * height"
+        },
+        "alignment": {
+          "value": 256,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU texture-copy row alignment"
+        }
+      },
+      "directlyReadBack": true
+    },
+    {
+      "name": "frost-capture-target-26",
+      "owner": "threejs-dynamic-surface-effects",
+      "semantic": "route.tier.balanced native WebGPU RGBA8 readback",
+      "width": {
+        "value": 320,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "route.tier.balanced retained capture metadata"
+      },
+      "height": {
+        "value": 180,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "route.tier.balanced retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples-per-pixel",
+        "label": "Authored",
+        "source": "Frost correctness capture disables MSAA"
+      },
+      "memoryBytes": {
+        "value": 230400,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * RGBA8 bytes per texel"
+      },
+      "lifetime": "single transactional recipe readback",
+      "loadOp": "clear",
+      "storeOp": "store",
+      "readback": {
+        "rowBytes": {
+          "value": 1280,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "width * 4 RGBA8 bytes"
+        },
+        "bytesPerRow": {
+          "value": 1280,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU 256-byte texture-copy alignment"
+        },
+        "minimumByteLength": {
+          "value": 230400,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned rows with compact final row"
+        },
+        "fullyPaddedByteLength": {
+          "value": 230400,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned row stride * height"
+        },
+        "alignment": {
+          "value": 256,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU texture-copy row alignment"
+        }
+      },
+      "directlyReadBack": true
+    },
+    {
+      "name": "frost-capture-target-27",
+      "owner": "threejs-dynamic-surface-effects",
+      "semantic": "route.tier.budgeted native WebGPU RGBA8 readback",
+      "width": {
+        "value": 320,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "route.tier.budgeted retained capture metadata"
+      },
+      "height": {
+        "value": 180,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "route.tier.budgeted retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples-per-pixel",
+        "label": "Authored",
+        "source": "Frost correctness capture disables MSAA"
+      },
+      "memoryBytes": {
+        "value": 230400,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * RGBA8 bytes per texel"
+      },
+      "lifetime": "single transactional recipe readback",
+      "loadOp": "clear",
+      "storeOp": "store",
+      "readback": {
+        "rowBytes": {
+          "value": 1280,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "width * 4 RGBA8 bytes"
+        },
+        "bytesPerRow": {
+          "value": 1280,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU 256-byte texture-copy alignment"
+        },
+        "minimumByteLength": {
+          "value": 230400,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned rows with compact final row"
+        },
+        "fullyPaddedByteLength": {
+          "value": 230400,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "aligned row stride * height"
+        },
+        "alignment": {
+          "value": 256,
+          "unit": "bytes",
+          "label": "Gated",
+          "source": "WebGPU texture-copy row alignment"
+        }
+      },
+      "directlyReadBack": true
+    }
+  ],
+  "accountingScope": "transactional-capture-targets-only",
+  "completeness": "PARTIAL",
+  "trackedRenderTargetBytes": {
+    "value": 56624476,
+    "unit": "bytes",
+    "label": "Derived",
+    "source": "sum of 27 transactional RGBA8 capture target extents"
+  },
+  "trackedPeakLiveRenderTargetBytes": {
+    "value": 3840000,
+    "unit": "bytes",
+    "label": "Derived",
+    "source": "one transactional capture target is live at a time"
+  }
+}

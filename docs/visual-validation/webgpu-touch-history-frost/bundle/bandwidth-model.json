@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 2,
+  "passes": [
+    {
+      "id": "history-update",
+      "lower": {
+        "value": 15360000,
+        "unit": "bytes-per-active-update",
+        "label": "Derived",
+        "source": "one history read plus one history write"
+      },
+      "upper": {
+        "value": 15360000,
+        "unit": "bytes-per-active-update",
+        "label": "Derived",
+        "source": "explicit uncompressed storage traffic only"
+      }
+    }
+  ],
+  "lowerBoundBytesPerFrame": {
+    "value": 15360000,
+    "unit": "bytes-per-active-update",
+    "label": "Derived",
+    "source": "explicit history read/write lower bound"
+  },
+  "upperBoundBytesPerFrame": {
+    "value": 15360000,
+    "unit": "bytes-per-active-update",
+    "label": "Derived",
+    "source": "explicit history read/write upper bound without cache modeling"
+  },
+  "bytesPerSecond": null,
+  "assumptions": [
+    "Only explicit RGBA16F history traffic is modeled; cache, scene targets, and physical compression are unclaimed."
+  ],
+  "hardwareCountersAvailable": false,
+  "verdict": "INSUFFICIENT_EVIDENCE"
+}
