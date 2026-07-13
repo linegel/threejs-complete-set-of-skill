@@ -7,6 +7,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const html = readFileSync(resolve(here, "physical-review.html"), "utf8");
 const client = readFileSync(resolve(here, "physical-review.js"), "utf8");
 const entry = readFileSync(resolve(here, "main.js"), "utf8");
+const shell = readFileSync(resolve(here, "ui-shell.js"), "utf8");
 const observer = readFileSync(resolve(here, "physical-observer.js"), "utf8");
 const wrapper = readFileSync(resolve(here, "route-wrapper.js"), "utf8");
 const matrixHtml = readFileSync(resolve(here, "physical-route-matrix-review.html"), "utf8");
@@ -23,6 +24,10 @@ assert(client.includes('capturePixels("presentation")'), "review captures must r
 assert(client.includes("servedLedgerHash: null"), "browser record must remain pending offline ledger binding");
 assert(client.includes('performanceCompliance: "NOT_CLAIMED"'));
 assert(client.includes("await controller.dispose()"));
+assert(shell.includes("<details data-controls>"), "the runtime controls must live in an opt-in disclosure");
+assert(!shell.includes("<details data-controls open>"), "the runtime controls must not obstruct the canvas by default");
+assert(shell.includes("[data-control-panel]"), "expanded controls need an explicit panel boundary");
+assert(shell.includes("<details data-metrics>"), "raw metrics must remain a second opt-in disclosure");
 assert(entry.includes("globalThis.__THREEJS_LAB__ = lab"));
 assert(entry.includes('document.documentElement.dataset.ready = "true"'));
 assert(observer.includes('get("physicalReview") === "1"'));
