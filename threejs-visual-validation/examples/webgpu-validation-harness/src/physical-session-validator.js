@@ -39,6 +39,15 @@ const CORRECTNESS_RECIPE_SET_DIGEST = stableHash( {
 	recipeKind: CORRECTNESS_CAPTURE_RECIPE_KIND,
 	recipes: CORRECTNESS_CAPTURE_RECIPES
 } );
+const PERFORMANCE_TIER_SCENE_SCALES = Object.freeze( Object.fromEntries(
+	[ 'target-performance', 'governor-stress' ].map( ( tier ) => {
+
+		const recipe = CORRECTNESS_CAPTURE_RECIPES.find( ( candidate ) => candidate.id === `tier.${ tier }.final` );
+		if ( recipe === undefined ) throw new Error( `Missing correctness recipe for performance tier ${ tier }.` );
+		return [ tier, recipe.expectedSceneScale ];
+
+	} )
+) );
 const CORRECTNESS_PARENT_LOCK = TIER_ROUTE_LOCKS[ 'webgpu-correctness' ];
 const CORRECTNESS_PARENT_STATE = Object.freeze( Object.fromEntries(
 	[ 'scenario', 'mode', 'tier', 'camera', 'seed', 'timeSeconds' ].map( ( key ) => [ key, CORRECTNESS_PARENT_LOCK[ key ] ] )
@@ -386,6 +395,37 @@ function resourceTargetIndex( ledger, label ) {
 	const trackedTargetBytes = [ ...index.values() ].reduce( ( sum, target ) => sum + target.liveBytes, 0 );
 	if ( ledger.trackedRenderTargetBytes !== trackedTargetBytes ) fail( `${ label }.trackedRenderTargetBytes does not reconcile with live target identities.` );
 	return index;
+
+}
+
+function assertHardwarePerformanceRouteResources( session ) {
+
+	const bytesByTier = {};
+	for ( let index = 0; index < HARDWARE_PERFORMANCE_ROUTE_PLAN.length; index ++ ) {
+
+		const plan = HARDWARE_PERFORMANCE_ROUTE_PLAN[ index ];
+		const route = session.routes[ index ];
+		const label = `routes[${ index }].resources`;
+		const targets = resourceTargetIndex( route.resources, label );
+		const sceneScale = PERFORMANCE_TIER_SCENE_SCALES[ plan.id ];
+		if ( Number.isFinite( sceneScale ) === false || sceneScale <= 0 || sceneScale > 1 ) fail( `${ label } has no frozen scene scale for ${ plan.id }.` );
+		const fullWidth = Math.round( plan.startup.width * plan.startup.dpr );
+		const fullHeight = Math.round( plan.startup.height * plan.startup.dpr );
+		const sceneWidth = Math.max( 1, Math.floor( fullWidth * sceneScale ) );
+		const sceneHeight = Math.max( 1, Math.floor( fullHeight * sceneScale ) );
+		for ( const semantic of REQUIRED_RESOURCE_SEMANTICS ) {
+
+			const target = targets.get( semantic );
+			const expectedWidth = semantic === 'capture-target' ? fullWidth : sceneWidth;
+			const expectedHeight = semantic === 'capture-target' ? fullHeight : sceneHeight;
+			if ( target.width !== expectedWidth || target.height !== expectedHeight ) fail( `${ label}.${ semantic} extent ${ target.width }x${ target.height } does not match locked tier ${ plan.id } extent ${ expectedWidth }x${ expectedHeight }.` );
+
+		}
+		bytesByTier[ plan.id ] = route.resources.trackedRenderTargetBytes;
+
+	}
+	if ( bytesByTier[ 'target-performance' ] <= bytesByTier[ 'governor-stress' ] ) fail( 'Hardware performance tier resource inventories do not preserve the declared degradation order.' );
+	return Object.freeze( bytesByTier );
 
 }
 
@@ -1075,7 +1115,7 @@ function assertGovernorTimestampRow( row, sample, label ) {
 
 }
 
-function assertGovernorTrace( governor ) {
+function assertGovernorTrace( governor, tierResourceBytes ) {
 
 	const trace = requireObject( governor.trace, 'governor.trace' );
 	if ( trace.adapterClass !== 'hardware' ) fail( 'Quality governor trace requires a hardware adapter.' );
@@ -1151,6 +1191,7 @@ function assertGovernorTrace( governor ) {
 			if ( requireFinite( transition.lastFrameResolveResidualMs, `${ label } transition lastFrameResolveResidualMs`, 0 ) > 0.001 ) fail( `${ label } transition rebuild timestamp does not reconcile.` );
 			const fromResourceBytes = requireFinite( transition.fromResourceBytes, `${ label } transition fromResourceBytes`, 0 );
 			const toResourceBytes = requireFinite( transition.toResourceBytes, `${ label } transition toResourceBytes`, 0 );
+			if ( fromResourceBytes !== tierResourceBytes[ from ] || toResourceBytes !== tierResourceBytes[ to ] ) fail( `${ label } transition resource bytes do not match the locked tier resource inventories.` );
 			if ( decision === 'degrade' ? toResourceBytes >= fromResourceBytes : toResourceBytes <= fromResourceBytes ) fail( `${ label } transition resource direction contradicts the tier change.` );
 			stateIndex = nextStateIndex;
 			residence = 0;
@@ -1183,6 +1224,7 @@ export function validateHardwarePerformanceSession( session ) {
 	const build = assertCaptureEnvironment( session );
 	assertRouteSequence( session, HARDWARE_PERFORMANCE_ROUTE_PLAN, build );
 	assertServedBytes( session, build, HARDWARE_PERFORMANCE_ROUTE_PLAN );
+	const tierResourceBytes = assertHardwarePerformanceRouteResources( session );
 	if ( session.viewport?.width !== 1920 || session.viewport?.height !== 1080 || session.viewport?.dpr !== 1 ) fail( 'Hardware performance capture must use 1920x1080 at DPR 1.' );
 	if ( numeric( session.refresh?.measurementDuration, 'refresh.measurementDuration', 'Measured' ) < HARDWARE_PERFORMANCE_CONTRACT.idleRefreshMinimumDuration.value ) fail( 'Idle-rAF refresh measurement is shorter than two seconds.' );
 	if ( numeric( session.hostReserve?.p95, 'hostReserve.p95', 'Measured' ) < 0 ) fail( 'Measured host reserve is invalid.' );
@@ -1207,7 +1249,7 @@ export function validateHardwarePerformanceSession( session ) {
 	if ( windows.length < HARDWARE_PERFORMANCE_CONTRACT.minimumSustainedWindows.value ) fail( 'Hardware performance evidence requires at least two sustained windows.' );
 	const windowSummaries = windows.map( ( window, index ) => assertPerformanceWindow( window, index, refreshP50 ) );
 	const governor = requireObject( session.governor, 'governor' );
-	const governorSummary = assertGovernorTrace( governor );
+	const governorSummary = assertGovernorTrace( governor, tierResourceBytes );
 	const presentationSamples = windowSummaries.flatMap( ( window ) => window.presentationSamples );
 	const cpuSamples = windowSummaries.flatMap( ( window ) => window.cpuSamples );
 	const gpuSamples = windowSummaries.flatMap( ( window ) => window.gpuSamples );

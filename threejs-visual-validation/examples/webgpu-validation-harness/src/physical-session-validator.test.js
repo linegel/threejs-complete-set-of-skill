@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { test } from 'node:test';
 
 import { numericDatum } from './physical-evidence-common.js';
-import { createCorrectnessCaptureSessionFixture } from './correctness-capture-session.fixture.js';
+import { createCorrectnessCaptureSessionFixture, createCorrectnessResourceLedgerFixture } from './correctness-capture-session.fixture.js';
 import { HARDWARE_PERFORMANCE_CONTRACT, HARDWARE_PERFORMANCE_ROUTE_PLAN, PHYSICAL_ROUTE_PLAN } from './in-app-evidence-plan.js';
 import { createRuntimeGovernorTrace, createRuntimePerformanceTrace } from './physical-performance-trace.js';
 import { projectValidationHarnessPerformanceEvidence } from './performance-evidence-projection.js';
@@ -58,7 +58,9 @@ function routeRecord( plan ) {
 
 	const sourceBytesPerRow = Math.ceil( plan.startup.width * 4 / 256 ) * 256;
 	const pipelineGraph = { route: plan.key, owner: 'native-validation-subject' };
-	const resources = { route: plan.key, targets: [ 'output', 'normal', 'emissive', 'depth', 'capture-target' ] };
+	const resources = plan.runtimeProfile === 'performance'
+		? createCorrectnessResourceLedgerFixture( plan.startup.width, plan.startup.height, plan.id === 'governor-stress' ? 0.5 : 1 )
+		: { route: plan.key, targets: [ 'output', 'normal', 'emissive', 'depth', 'capture-target' ] };
 	return {
 		key: plan.key,
 		kind: plan.kind,
@@ -285,6 +287,8 @@ function governorWindow( window, measuredTier, tier, gpuP95, decision, residence
 
 function governorTrace() {
 
+	const targetResourceBytes = createCorrectnessResourceLedgerFixture( 1920, 1080, 1 ).trackedRenderTargetBytes;
+	const stressResourceBytes = createCorrectnessResourceLedgerFixture( 1920, 1080, 0.5 ).trackedRenderTargetBytes;
 	return {
 		adapterClass: 'hardware',
 		windowCount: 6,
@@ -323,8 +327,8 @@ function governorTrace() {
 				independentPerFrameTotalAvailable: false
 			},
 			lastFrameResolveResidualMs: 0,
-			fromResourceBytes: 60,
-			toResourceBytes: 100
+			fromResourceBytes: stressResourceBytes,
+			toResourceBytes: targetResourceBytes
 		} ],
 		settledState: 'target-performance',
 		oscillationDetected: false
@@ -709,6 +713,35 @@ test( 'offline performance projection binds the exact hardware and tier-evidence
 test( 'hardware performance mutations reject short, discontinuous, or fabricated traces', () => {
 
 	const mutations = [
+		[ 'descriptor-only route resources', ( value ) => {
+
+			value.routes[ 0 ].resources = { route: 'tier/target-performance', targets: [ 'output' ] };
+			value.routes[ 0 ].resourceDigest = hashPhysicalRecord( value.routes[ 0 ].resources );
+
+		}, /live schema-v1 resource ledger/ ],
+		[ 'wrong target tier extent', ( value ) => {
+
+			const target = value.routes[ 0 ].resources.renderTargets.find( ( row ) => row.semantic === 'output' );
+			target.width = 960;
+			target.bytes = target.width * target.height * target.bytesPerTexel;
+			target.logicalBytes = target.bytes;
+			target.liveBytes = target.bytes;
+			value.routes[ 0 ].resources.trackedRenderTargetBytes = value.routes[ 0 ].resources.renderTargets.reduce( ( sum, row ) => sum + row.liveBytes, 0 );
+			value.routes[ 0 ].resourceDigest = hashPhysicalRecord( value.routes[ 0 ].resources );
+
+		}, /does not match locked tier target-performance extent/ ],
+		[ 'wrong stress tier extent', ( value ) => {
+
+			value.routes[ 1 ].resources = createCorrectnessResourceLedgerFixture( 1920, 1080, 1 );
+			value.routes[ 1 ].resourceDigest = hashPhysicalRecord( value.routes[ 1 ].resources );
+
+		}, /does not match locked tier governor-stress extent/ ],
+		[ 'unreconciled resource total', ( value ) => {
+
+			value.routes[ 0 ].resources.trackedRenderTargetBytes ++;
+			value.routes[ 0 ].resourceDigest = hashPhysicalRecord( value.routes[ 0 ].resources );
+
+		}, /does not reconcile with live target identities/ ],
 		[ 'wrong viewport', ( value ) => { value.viewport.width = 1200; }, /1920x1080/ ],
 		[ 'short refresh probe', ( value ) => { value.refresh.measurementDuration.value = 1000; }, /shorter than two seconds/ ],
 		[ 'authored host reserve', ( value ) => { value.hostReserve.p95.label = 'Authored'; }, /Measured/ ],
@@ -774,7 +807,7 @@ test( 'hardware performance mutations reject short, discontinuous, or fabricated
 		[ 'forged governor timestamp row', ( value ) => { value.governor.trace.windows[ 0 ].timestampRows[ 0 ].sceneMs += 1; }, /not derived/ ],
 		[ 'forged governor decision', ( value ) => { value.governor.trace.windows[ 1 ].decision = 'hold'; }, /decision does not follow/ ],
 		[ 'forged governor cooldown', ( value ) => { value.governor.trace.windows[ 2 ].cooldown = 0; }, /committed state counters/ ],
-		[ 'forged governor resource direction', ( value ) => { value.governor.trace.transitions[ 0 ].toResourceBytes = 50; }, /resource direction/ ],
+		[ 'forged governor resource binding', ( value ) => { value.governor.trace.transitions[ 0 ].toResourceBytes = value.governor.trace.transitions[ 0 ].fromResourceBytes + 1; }, /do not match the locked tier resource inventories/ ],
 		[ 'forged governor oscillation', ( value ) => { value.governor.trace.oscillationDetected = true; }, /oscillation verdict/ ],
 		[ 'forged governor settled residence', ( value ) => { value.governor.settledResidenceWindows.value = 5; }, /does not reconcile/ ],
 		[ 'unsettled governor', ( value ) => { value.governor.settled = false; }, /summary does not match/ ]
