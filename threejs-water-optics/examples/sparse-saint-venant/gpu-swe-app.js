@@ -68,7 +68,8 @@ function initialCondition( { globalCellX, globalCellZ } ) {
 	const island = 0.115 * Math.exp( -( normalizedX * normalizedX * 5 + normalizedZ * normalizedZ * 7 ) );
 	const bedElevationMeters = -0.105 + island + normalizedX * 0.012;
 	const freeSurface = 0;
-	return { depthMeters: Math.max( 0, freeSurface - bedElevationMeters ), xDischargeM2ps: 0, zDischargeM2ps: 0, bedElevationMeters };
+	const depthMeters = Math.max( 0, freeSurface - bedElevationMeters );
+	return { depthMeters, xDischargeM2ps: depthMeters * 0.08, zDischargeM2ps: 0, bedElevationMeters };
 
 }
 
@@ -101,11 +102,12 @@ function buildDisplayMesh() {
 	const stateIndex = owner.displayIndexNode.element( instanceIndex.toUint() );
 	const state = owner.committedStateNode.element( stateIndex );
 	const foamCoverage = owner.foamCommittedNode.element( stateIndex );
+	const obstacleFraction = owner.obstacleNode.element( stateIndex ).x;
 	const receiverCoverage = clamp( owner.receiverCommittedNode.element( stateIndex ).div( receiverCapacityKgPerM2 ), 0, 1 );
 	const depthRatio = clamp( state.x.div( float( contract.tier.maximumDepthMeters ) ), 0, 1 );
 	const baseWetColor = mix( color( 0x45e0e8 ), color( 0x0756a8 ), depthRatio );
 	const wetColor = mix( baseWetColor, color( 0x2a877e ), receiverCoverage.mul( float( 1 ).sub( depthRatio ) ).mul( 0.35 ) );
-	const foamedWaterColor = mix( wetColor, color( 0xf4fbf1 ), clamp( foamCoverage.mul( 1.4 ), 0, 1 ) );
+	const foamedWaterColor = mix( mix( wetColor, color( 0x263b43 ), obstacleFraction.mul( 0.8 ) ), color( 0xf4fbf1 ), clamp( foamCoverage.mul( 1.4 ), 0, 1 ) );
 	const baseDryColor = mix( color( 0xc6a56c ), color( 0x426653 ), clamp( state.w.add( 0.12 ).mul( 5 ), 0, 1 ) );
 	const dryColor = mix( baseDryColor, color( 0x304f3d ), receiverCoverage.mul( 0.7 ) );
 	material.colorNode = select( state.x.lessThan( -1e-6 ), color( 0xff00cc ), select( state.x.greaterThan( 1e-5 ), foamedWaterColor, dryColor ) );
@@ -158,7 +160,7 @@ async function captureDiagnostic() {
 	try {
 
 		const diagnostic = await owner.captureDiagnostics();
-		lastDiagnosticSummary = `ledger gen ${ diagnostic.committedGeneration } · wet ${ diagnostic.wetCells } · invalid ${ diagnostic.invalidCells } · negative ${ diagnostic.negativeDepthCells } · accepted ${ diagnostic.acceptedCommits } · rejected ${ diagnostic.rejectedCommits } · interaction seq ${ diagnostic.committedInteractionSequence } / batches ${ diagnostic.committedInteractionBatches } / impulse q x ${ diagnostic.interactionImpulseXPositiveQuanta - diagnostic.interactionImpulseXNegativeQuanta } z ${ diagnostic.interactionImpulseZPositiveQuanta - diagnostic.interactionImpulseZNegativeQuanta } · receiver seq ${ diagnostic.committedReceiverExchangeSequence } / batches ${ diagnostic.committedReceiverExchangeBatches } / wet ${ diagnostic.receiverWetCells } / coverage q ${ diagnostic.receiverCoverageQuanta } / transfer depth q ${ diagnostic.receiverTransferDepthQuanta } / invalid ${ diagnostic.receiverInvalidCells } / runoff q ${ diagnostic.receiverRunoffQuanta } · foam ${ diagnostic.foamCoveredCells } cells / ${ diagnostic.foamCoverageQuanta } coverage q / ${ diagnostic.foamSourceRateQuanta } source q / clamps ${ diagnostic.foamClampCells } · depth q prior ${ diagnostic.priorDepthQuanta } / candidate ${ diagnostic.candidateDepthQuanta } · net flux ${ diagnostic.netFluxInfluxDepthQuanta } in / ${ diagnostic.netFluxOutfluxDepthQuanta } out · boundary ${ diagnostic.boundaryInfluxDepthQuanta } in / ${ diagnostic.boundaryOutfluxDepthQuanta } out · internal residual ${ diagnostic.internalFluxCancellationDepthQuanta }`;
+		lastDiagnosticSummary = `ledger gen ${ diagnostic.committedGeneration } · wet ${ diagnostic.wetCells } · invalid ${ diagnostic.invalidCells } · negative ${ diagnostic.negativeDepthCells } · accepted ${ diagnostic.acceptedCommits } · rejected ${ diagnostic.rejectedCommits } · interaction seq ${ diagnostic.committedInteractionSequence } / batches ${ diagnostic.committedInteractionBatches } / impulse q x ${ diagnostic.interactionImpulseXPositiveQuanta - diagnostic.interactionImpulseXNegativeQuanta } z ${ diagnostic.interactionImpulseZPositiveQuanta - diagnostic.interactionImpulseZNegativeQuanta } · receiver seq ${ diagnostic.committedReceiverExchangeSequence } / batches ${ diagnostic.committedReceiverExchangeBatches } / wet ${ diagnostic.receiverWetCells } / coverage q ${ diagnostic.receiverCoverageQuanta } / transfer depth q ${ diagnostic.receiverTransferDepthQuanta } / invalid ${ diagnostic.receiverInvalidCells } / runoff q ${ diagnostic.receiverRunoffQuanta } · obstacle cells ${ diagnostic.activeObstacleCells } / reaction q x ${ diagnostic.obstacleReactionXPositiveQuanta - diagnostic.obstacleReactionXNegativeQuanta } z ${ diagnostic.obstacleReactionZPositiveQuanta - diagnostic.obstacleReactionZNegativeQuanta } / energy q ${ diagnostic.obstacleDissipatedEnergyQuanta } / committed reaction q x ${ diagnostic.committedObstacleReactionXPositiveQuanta - diagnostic.committedObstacleReactionXNegativeQuanta } z ${ diagnostic.committedObstacleReactionZPositiveQuanta - diagnostic.committedObstacleReactionZNegativeQuanta } / committed steps ${ diagnostic.committedObstacleSteps } / committed energy q ${ diagnostic.committedObstacleDissipatedEnergyQuanta } · foam ${ diagnostic.foamCoveredCells } cells / ${ diagnostic.foamCoverageQuanta } coverage q / ${ diagnostic.foamSourceRateQuanta } source q / clamps ${ diagnostic.foamClampCells } · depth q prior ${ diagnostic.priorDepthQuanta } / candidate ${ diagnostic.candidateDepthQuanta } · net flux ${ diagnostic.netFluxInfluxDepthQuanta } in / ${ diagnostic.netFluxOutfluxDepthQuanta } out · boundary ${ diagnostic.boundaryInfluxDepthQuanta } in / ${ diagnostic.boundaryOutfluxDepthQuanta } out · internal residual ${ diagnostic.internalFluxCancellationDepthQuanta }`;
 		status.textContent = `READY · NATIVE WEBGPU · ${ tierId.toUpperCase() } · ${ lastDiagnosticSummary }`;
 		return diagnostic;
 
@@ -188,7 +190,9 @@ async function runRollbackMutation() {
 			&& after.acceptedCommits === before.acceptedCommits
 			&& after.rejectedCommits === before.rejectedCommits + 1
 			&& after.committedReceiverExchangeSequence === before.committedReceiverExchangeSequence
-			&& after.committedReceiverExchangeBatches === before.committedReceiverExchangeBatches;
+			&& after.committedReceiverExchangeBatches === before.committedReceiverExchangeBatches
+			&& after.committedObstacleSteps === before.committedObstacleSteps
+			&& after.committedObstacleDissipatedEnergyQuanta === before.committedObstacleDissipatedEnergyQuanta;
 		if ( ! rollbackPassed ) throw new Error( `rollback mutation was admitted: before=${ JSON.stringify( before ) } after=${ JSON.stringify( after ) }` );
 		lastDiagnosticSummary = `ROLLBACK PASS · injected negative ${ after.negativeDepthCells } · generation held ${ after.committedGeneration } · accepted held ${ after.acceptedCommits } · rejected ${ before.rejectedCommits }→${ after.rejectedCommits }`;
 		status.textContent = `READY · NATIVE WEBGPU · ${ tierId.toUpperCase() } · ${ lastDiagnosticSummary }`;
@@ -227,6 +231,7 @@ async function runSustainedDiagnostic( presentationFrames = 120 ) {
 			&& after.committedGeneration > before.committedGeneration
 			&& after.committedReceiverExchangeSequence === before.committedReceiverExchangeSequence
 			&& after.committedReceiverExchangeBatches === before.committedReceiverExchangeBatches
+			&& after.committedObstacleSteps > before.committedObstacleSteps
 			&& descriptionAfter.frameCriticalReadbackCount === 0
 			&& gpuErrors.length === 0;
 		if ( ! passed ) throw new Error( `sustained diagnostic failed: before=${ JSON.stringify( before ) } after=${ JSON.stringify( after ) } errors=${ JSON.stringify( gpuErrors ) }` );
@@ -292,7 +297,8 @@ async function verifyNativeBootstrap( device ) {
 		const rejected = await owner.captureDiagnostics();
 		if ( rejected.negativeDepthCells < 1 || rejected.committedGeneration !== 0 || rejected.acceptedCommits !== 0 || rejected.rejectedCommits !== 1
 			|| rejected.committedInteractionBatches !== 0 || rejected.committedInteractionSequence !== 0
-			|| rejected.committedReceiverExchangeBatches !== 0 || rejected.committedReceiverExchangeSequence !== 0 ) throw new Error( `joint interaction/receiver rollback bootstrap mutation escaped: ${ JSON.stringify( rejected ) }` );
+			|| rejected.committedReceiverExchangeBatches !== 0 || rejected.committedReceiverExchangeSequence !== 0
+			|| rejected.committedObstacleSteps !== 0 || rejected.committedObstacleDissipatedEnergyQuanta !== 0 ) throw new Error( `joint interaction/receiver/obstacle rollback bootstrap mutation escaped: ${ JSON.stringify( rejected ) }` );
 		interactionRollbackProof = Object.freeze( { rejected } );
 
 	}
@@ -304,7 +310,8 @@ async function verifyNativeBootstrap( device ) {
 	const expectedRejectedCommits = interactionRollbackProof === null ? 0 : 1;
 	if ( diagnostic.invalidCells !== 0 || diagnostic.negativeDepthCells !== 0 || diagnostic.committedGeneration !== 1 || diagnostic.acceptedCommits !== 1 || diagnostic.rejectedCommits !== expectedRejectedCommits
 		|| diagnostic.committedInteractionBatches !== 1 || diagnostic.committedInteractionSequence !== 1
-		|| diagnostic.committedReceiverExchangeBatches !== 1 || diagnostic.committedReceiverExchangeSequence !== 1 || diagnostic.receiverInvalidCells !== 0 ) {
+		|| diagnostic.committedReceiverExchangeBatches !== 1 || diagnostic.committedReceiverExchangeSequence !== 1 || diagnostic.receiverInvalidCells !== 0
+		|| diagnostic.committedObstacleSteps !== 1 ) {
 
 		throw new Error( `bootstrap transaction rejected: ${ JSON.stringify( diagnostic ) }` );
 
@@ -389,10 +396,24 @@ async function boot() {
 			applicationIntervalKey: 'coastal-clock:0..1',
 			commitGroupId: 'water-receiver:0..1'
 		},
+		obstacleField: {
+			normalDragRatePerSecond: 10,
+			tangentDragRatePerSecond: 0.8,
+			waterDensityKgPerM3: 1025,
+			reactionOwnerId: 'coastal-breakwater-momentum',
+			sample: ( { globalCellX, globalCellZ } ) => {
+
+				const pilingX = Math.round( contract.tier.tileSize * 0.75 );
+				const firstZ = Math.round( contract.tier.tileSize * 2.2 );
+				const lastZ = Math.round( contract.tier.tileSize * 2.9 );
+				return globalCellX === pilingX && globalCellZ >= firstZ && globalCellZ <= lastZ ? { fraction: 0.68, normalX: 1, normalZ: 0 } : null;
+
+			}
+		},
 		openBoundary: {
 			side: 'west',
 			mode: { modeId: 'minimum-tier-normal-swell', waveVectorRadPerMeter: [ boundaryWavenumber, 0 ], wavenumberRadPerMeter: boundaryWavenumber, amplitudeMeters: 0.015, phaseAtReferenceRadians: 0, intrinsicAngularFrequencyRadPerSecond: boundaryOmega },
-			meanCurrentMps: [ 0, 0 ], characteristicDepthMeters: boundaryDepthMeters, surfaceDatumMeters: 0,
+			meanCurrentMps: [ 0.08, 0 ], characteristicDepthMeters: boundaryDepthMeters, surfaceDatumMeters: 0,
 			phaseReferenceSeconds: 0,
 			gridOriginMeters: [ gridOriginXMeters, gridOriginZMeters ],
 			reflectionAmplitudeGate: 0.02

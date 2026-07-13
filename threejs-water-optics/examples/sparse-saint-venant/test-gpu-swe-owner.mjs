@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { buildGpuInteractionSourceData, buildGpuReceiverExchangeData, buildGpuSweInitialData } from './gpu-swe-owner.js';
+import { buildGpuInteractionSourceData, buildGpuObstacleData, buildGpuReceiverExchangeData, buildGpuSweInitialData } from './gpu-swe-owner.js';
 import { deriveSweGpuContract } from './gpu-swe-contract.js';
 import { commitSparseTiles, createSparseTileDomain, prepareSparseTileCommit } from './sparse-tile-domain.js';
 
@@ -64,13 +64,24 @@ assert.ok( receiverExchange.diagnostics.receiverCellCount > 0 );
 assert.ok( receiverExchange.diagnostics.massResidualKg < 1e-12 );
 assert.ok( receiverExchange.diagnostics.momentumResidualNs < 1e-12 );
 
+const obstacle = buildGpuObstacleData( initial, contract, {
+	normalDragRatePerSecond: 8,
+	tangentDragRatePerSecond: 0.8,
+	waterDensityKgPerM3: 1025,
+	sample: ( cell ) => cell.globalCellX === 30 && cell.globalCellZ >= 24 && cell.globalCellZ <= 28 ? { fraction: 0.65, normalX: 1, normalZ: 0 } : null
+} );
+assert.equal( obstacle.activeObstacleCells, 5 );
+assert.equal( obstacle.obstacleArray.length, contract.stateRecords * 4 );
+assert.throws( () => buildGpuObstacleData( initial, contract, { normalDragRatePerSecond: 1, tangentDragRatePerSecond: 1, waterDensityKgPerM3: 1025, sample: () => ( { fraction: 1, normalX: 1, normalZ: 0 } ) } ), /wall-flux route/ );
+assert.throws( () => buildGpuObstacleData( initial, contract, { normalDragRatePerSecond: 1, tangentDragRatePerSecond: 1, waterDensityKgPerM3: 1025, sample: () => ( { fraction: 0.5, normalX: 0.5, normalZ: 0 } ) } ), /unit length/ );
+
 assert.throws( () => buildGpuSweInitialData( prepared, contract, () => ( { depthMeters: -1, bedElevationMeters: 0 } ) ), /invalid/ );
 assert.throws( () => buildGpuSweInitialData( prepared, contract, () => ( { depthMeters: contract.tier.maximumDepthMeters + 0.01, bedElevationMeters: 0 } ) ), /depth/ );
 
 const source = await readFile( new URL( './gpu-swe-owner.js', import.meta.url ), 'utf8' );
 for ( const required of [
 	'sparse-swe:halo-and-boundary', 'sparse-swe:x-face-flux', 'sparse-swe:z-face-flux',
-	'sparse-swe:cell-update', 'sparse-swe:receiver-surface-exchange', 'sparse-swe:foam-transport-reaction', 'sparse-swe:inject-rollback-mutation', 'sparse-swe:candidate-validation', 'sparse-swe:atomic-commit',
+	'sparse-swe:cell-update', 'sparse-swe:receiver-and-obstacle-exchange', 'sparse-swe:foam-transport-reaction', 'sparse-swe:inject-rollback-mutation', 'sparse-swe:candidate-validation', 'sparse-swe:atomic-commit',
 	'for ( const dispatch of stepGraph ) renderer.compute( dispatch )', 'receipt.assign( atomicAdd',
 	'dispatchRollbackMutationProbe', 'resourceInventory', 'backendAllocatedBytes: null',
 	'getArrayBufferAsync( diagnosticBuffer', 'frameCriticalReadbackCount: 0', 'disposed,',
@@ -79,8 +90,9 @@ for ( const required of [
 for ( const required of [ 'foamPingPong', 'foamCommittedBuffer', 'foamCandidateBuffer', 'foamCoveredCells', 'foamSourceRateQuanta', 'foamClampCells', 'foamCoverageQuanta' ] ) assert.ok( source.includes( required ), `GPU foam transaction is missing '${ required }'` );
 for ( const required of [ 'netFluxInfluxDepthQuanta', 'netFluxOutfluxDepthQuanta', 'boundaryInfluxDepthQuanta', 'boundaryOutfluxDepthQuanta', 'internalFluxCancellationDepthQuanta', 'expectedPlusInflux', 'candidatePlusOutflux' ] ) assert.ok( source.includes( required ), `GPU SWE open-boundary ledger is missing '${ required }'` );
 for ( const required of [ 'buildGpuInteractionSourceData', 'interactionSourceBuffer', 'applyPreparedSource', 'west.w', 'south.w', 'committedInteractionBatches', 'committedInteractionSequence', 'interactionImpulseXPositiveQuanta', 'acceptance: \'all-or-none-with-water-candidate\'' ] ) assert.ok( source.includes( required ) || ( required.includes( 'acceptance:' ) && ( await readFile( new URL( './interaction-source-core.js', import.meta.url ), 'utf8' ) ).includes( required ) ), `GPU SWE interaction source is missing '${ required }'` );
-for ( const required of [ 'buildGpuReceiverExchangeData', 'receiverLiquidPingPong', 'receiverCommittedBuffer', 'receiverCandidateBuffer', 'inundationTransferBuffer', 'receiverSurfaceExchange', 'receiverTransferDepthQuanta', 'committedReceiverExchangeBatches', 'committedReceiverExchangeSequence', 'receiverWetCells', 'receiverCoverageQuanta', 'receiverRunoffQuanta' ] ) assert.ok( source.includes( required ), `GPU receiver transaction is missing '${ required }'` );
+for ( const required of [ 'buildGpuReceiverExchangeData', 'receiverLiquidPingPong', 'receiverCommittedBuffer', 'receiverCandidateBuffer', 'inundationTransferBuffer', 'receiverAndObstacleExchange', 'receiverTransferDepthQuanta', 'committedReceiverExchangeBatches', 'committedReceiverExchangeSequence', 'receiverWetCells', 'receiverCoverageQuanta', 'receiverRunoffQuanta' ] ) assert.ok( source.includes( required ), `GPU receiver transaction is missing '${ required }'` );
+for ( const required of [ 'buildGpuObstacleData', 'obstacleBuffer', 'obstacleImpulseScale', 'receiverAndObstacleExchange', 'activeObstacleCells', 'obstacleDissipatedEnergyQuanta', 'committedObstacleReactionXPositiveQuanta', 'committedObstacleDissipatedEnergyQuanta', 'committedObstacleSteps' ] ) assert.ok( source.includes( required ), `GPU obstacle transaction is missing '${ required }'` );
 assert.ok( ! source.includes( 'atomicStore(' ), 'Three r185 atomicStore lowering must not reintroduce invalid void-as-uint WGSL' );
 assert.ok( source.indexOf( 'getArrayBufferAsync( diagnosticBuffer' ) > source.indexOf( 'async function captureDiagnostics' ), 'GPU readback escaped the diagnostic-only method' );
 
-console.log( `GPU SWE owner contract passed: ${ initial.residentTileCount } resident tiles, ${ initial.residentCellCount } cells, ${ contract.dispatchOrder.length } ordered dispatches, one 4-cell exact-once source, ${ receiverExchange.diagnostics.receiverCellCount } receiver exchanges, 2 rejection controls` );
+console.log( `GPU SWE owner contract passed: ${ initial.residentTileCount } resident tiles, ${ initial.residentCellCount } cells, ${ contract.dispatchOrder.length } ordered dispatches, one 4-cell exact-once source, ${ receiverExchange.diagnostics.receiverCellCount } receiver exchanges, ${ obstacle.activeObstacleCells } obstacle cells, 4 rejection controls` );

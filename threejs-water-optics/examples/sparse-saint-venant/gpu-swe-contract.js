@@ -53,6 +53,20 @@ export const SWE_RECEIVER_GPU_DECISION = Object.freeze( {
 	] )
 } );
 
+export const SWE_OBSTACLE_GPU_DECISION = Object.freeze( {
+	problemId: 'gpu-subcell-obstacle-placement',
+	axes: Object.freeze( [ 'reactionClosure', 'geometryTruth', 'transactionAtomicity', 'mobileDispatchCost', 'bindingPortability', 'heroEscalation' ] ),
+	selectedCandidateId: 'fused-local-source-pass',
+	candidates: Object.freeze( [
+		Object.freeze( { id: 'material-mask', family: 'visual material obstacle mask', scores: [ 0, 2, 0, 5, 5, 0 ], hardGate: 'fail:no-water-reaction' } ),
+		Object.freeze( { id: 'cpu-drag-upload', family: 'CPU obstacle drag with GPU state upload', scores: [ 5, 4, 2, 1, 5, 3 ], hardGate: 'fail:split-state-authority' } ),
+		Object.freeze( { id: 'dedicated-compute-pass', family: 'separate obstacle reaction compute pass', scores: [ 5, 4, 5, 2, 5, 4 ], hardGate: 'pass' } ),
+		Object.freeze( { id: 'face-flux-porosity', family: 'porosity embedded in both face-flux passes', scores: [ 5, 4, 5, 4, 2, 4 ], hardGate: 'fail:duplicates-cell-reaction-and-bindings' } ),
+		Object.freeze( { id: 'fused-local-source-pass', family: 'cell-local obstacle drag fused with receiver exchange', scores: [ 5, 4, 5, 5, 5, 4 ], hardGate: 'pass' } ),
+		Object.freeze( { id: 'moving-cut-cell', family: 'geometric moving cut-cell boundary', scores: [ 5, 5, 5, 1, 2, 5 ], hardGate: 'pass:hero-boundary-escalation' } )
+	] )
+} );
+
 export const SWE_GPU_TIERS = Object.freeze( {
 	full: Object.freeze( { tileSize: 16, capacityTiles: 32, logicalTilesX: 8, logicalTilesZ: 6, cellSizeMeters: 0.16, fixedTimeStepSeconds: 1 / 144, maximumDepthMeters: 0.45, maximumVelocityMps: 1.25, maximumCatchUpSteps: 2, cflGate: 0.35 } ),
 	budgeted: Object.freeze( { tileSize: 12, capacityTiles: 24, logicalTilesX: 8, logicalTilesZ: 6, cellSizeMeters: 0.22, fixedTimeStepSeconds: 1 / 72, maximumDepthMeters: 0.32, maximumVelocityMps: 0.85, maximumCatchUpSteps: 2, cflGate: 0.35 } ),
@@ -67,7 +81,8 @@ export const SWE_GPU_LAYOUT = Object.freeze( {
 	interactionSource: Object.freeze( { type: 'vec2<f32>', channels: Object.freeze( [ 'xDischargeIncrementM2ps', 'zDischargeIncrementM2ps' ] ) } ),
 	receiverLiquid: Object.freeze( { type: 'f32', unit: 'kg m^-2', copies: 2 } ),
 	inundationTransfer: Object.freeze( { type: 'f32', unit: 'kg m^-2', timeSemantics: 'interval-integrated' } ),
-	diagnostic: Object.freeze( { type: 'u32', channels: Object.freeze( [ 'invalidCells', 'negativeDepthCells', 'wetCells', 'priorDepthQuanta', 'candidateDepthQuanta', 'committedGeneration', 'acceptedCommits', 'rejectedCommits', 'netFluxInfluxDepthQuanta', 'netFluxOutfluxDepthQuanta', 'boundaryInfluxDepthQuanta', 'boundaryOutfluxDepthQuanta', 'foamCoveredCells', 'foamSourceRateQuanta', 'foamClampCells', 'foamCoverageQuanta', 'interactionImpulseXPositiveQuanta', 'interactionImpulseXNegativeQuanta', 'interactionImpulseZPositiveQuanta', 'interactionImpulseZNegativeQuanta', 'committedInteractionBatches', 'committedInteractionSequence', 'receiverTransferDepthQuanta', 'receiverInvalidCells', 'receiverCandidateMassQuanta', 'committedReceiverExchangeBatches', 'committedReceiverExchangeSequence', 'receiverWetCells', 'receiverCoverageQuanta', 'receiverRunoffQuanta' ] ) } )
+	obstacle: Object.freeze( { type: 'vec4<f32>', channels: Object.freeze( [ 'solidFraction', 'normalX', 'normalZ', 'reserved' ] ) } ),
+	diagnostic: Object.freeze( { type: 'u32', channels: Object.freeze( [ 'invalidCells', 'negativeDepthCells', 'wetCells', 'priorDepthQuanta', 'candidateDepthQuanta', 'committedGeneration', 'acceptedCommits', 'rejectedCommits', 'netFluxInfluxDepthQuanta', 'netFluxOutfluxDepthQuanta', 'boundaryInfluxDepthQuanta', 'boundaryOutfluxDepthQuanta', 'foamCoveredCells', 'foamSourceRateQuanta', 'foamClampCells', 'foamCoverageQuanta', 'interactionImpulseXPositiveQuanta', 'interactionImpulseXNegativeQuanta', 'interactionImpulseZPositiveQuanta', 'interactionImpulseZNegativeQuanta', 'committedInteractionBatches', 'committedInteractionSequence', 'receiverTransferDepthQuanta', 'receiverInvalidCells', 'receiverCandidateMassQuanta', 'committedReceiverExchangeBatches', 'committedReceiverExchangeSequence', 'receiverWetCells', 'receiverCoverageQuanta', 'receiverRunoffQuanta', 'obstacleReactionXPositiveQuanta', 'obstacleReactionXNegativeQuanta', 'obstacleReactionZPositiveQuanta', 'obstacleReactionZNegativeQuanta', 'activeObstacleCells', 'obstacleDissipatedEnergyQuanta', 'committedObstacleReactionXPositiveQuanta', 'committedObstacleReactionXNegativeQuanta', 'committedObstacleReactionZPositiveQuanta', 'committedObstacleReactionZNegativeQuanta', 'committedObstacleDissipatedEnergyQuanta', 'committedObstacleSteps' ] ) } )
 } );
 
 export function resolveSweGpuTier( tierId ) {
@@ -94,6 +109,7 @@ export function deriveSweGpuContract( tierId, gravityMps2 = 9.80665 ) {
 		interactionSource: stateRecords * 8,
 		receiverLiquidPingPong: stateRecords * 4 * 2,
 		inundationTransfer: stateRecords * 4,
+		obstacle: stateRecords * 16,
 		xFaceFlux: xFaceRecords * 16,
 		zFaceFlux: zFaceRecords * 16,
 		xHydrostaticCorrection: xFaceRecords * 8,
@@ -101,7 +117,7 @@ export function deriveSweGpuContract( tierId, gravityMps2 = 9.80665 ) {
 		descriptors: tier.capacityTiles * 16,
 		logicalLookup: tier.logicalTilesX * tier.logicalTilesZ * 4,
 		displayIndices: tier.capacityTiles * tier.tileSize * tier.tileSize * 4,
-		diagnostics: 30 * 4
+		diagnostics: 42 * 4
 	} );
 	const totalLogicalBytes = Object.values( resourceBytes ).reduce( ( sum, bytes ) => sum + bytes, 0 );
 	return Object.freeze( {
@@ -119,8 +135,8 @@ export function deriveSweGpuContract( tierId, gravityMps2 = 9.80665 ) {
 		resourceBytes,
 		totalLogicalBytes,
 		portableStorageBufferLimitPerStage: 8,
-		storageBindingsPerStage: Object.freeze( { resetValidation: 1, haloAndBoundary: 4, xFaceFlux: 5, zFaceFlux: 5, cellUpdate: 8, receiverSurfaceExchange: 6, foamTransportReaction: 6, candidateValidation: 7, atomicCommit: 8 } ),
-		dispatchOrder: Object.freeze( [ 'reset-validation', 'halo-and-boundary', 'x-face-flux', 'z-face-flux', 'cell-update', 'receiver-surface-exchange', 'foam-transport-reaction', 'candidate-validation', 'atomic-commit' ] )
+		storageBindingsPerStage: Object.freeze( { resetValidation: 1, haloAndBoundary: 4, xFaceFlux: 5, zFaceFlux: 5, cellUpdate: 8, receiverAndObstacleExchange: 7, foamTransportReaction: 6, candidateValidation: 7, atomicCommit: 8 } ),
+		dispatchOrder: Object.freeze( [ 'reset-validation', 'halo-and-boundary', 'x-face-flux', 'z-face-flux', 'cell-update', 'receiver-and-obstacle-exchange', 'foam-transport-reaction', 'candidate-validation', 'atomic-commit' ] )
 	} );
 
 }
@@ -141,11 +157,15 @@ export function validateSweGpuContract( contract ) {
 	if ( SWE_RECEIVER_GPU_DECISION.candidates.length < 5 ) throw new Error( 'SWE receiver GPU decision compares fewer than five architectures' );
 	if ( SWE_RECEIVER_GPU_DECISION.selectedCandidateId !== 'water-cell-aligned-buffer-owner' ) throw new Error( 'SWE receiver GPU winner drifted' );
 	if ( SWE_RECEIVER_GPU_DECISION.candidates.find( ( candidate ) => candidate.id === SWE_RECEIVER_GPU_DECISION.selectedCandidateId )?.hardGate !== 'pass' ) throw new Error( 'SWE receiver GPU winner fails its hard gate' );
+	if ( SWE_OBSTACLE_GPU_DECISION.candidates.length < 5 ) throw new Error( 'SWE obstacle GPU decision compares fewer than five architectures' );
+	if ( SWE_OBSTACLE_GPU_DECISION.selectedCandidateId !== 'fused-local-source-pass' ) throw new Error( 'SWE obstacle GPU winner drifted' );
+	if ( SWE_OBSTACLE_GPU_DECISION.candidates.find( ( candidate ) => candidate.id === SWE_OBSTACLE_GPU_DECISION.selectedCandidateId )?.hardGate !== 'pass' ) throw new Error( 'SWE obstacle GPU winner fails its hard gate' );
 	if ( contract.tier.fixedTimeStepSeconds > contract.stableTimeStepSeconds ) throw new Error( `SWE ${ contract.tierId } fixed step exceeds its derived unsplit CFL bound` );
-	if ( contract.dispatchOrder.join( '>' ) !== 'reset-validation>halo-and-boundary>x-face-flux>z-face-flux>cell-update>receiver-surface-exchange>foam-transport-reaction>candidate-validation>atomic-commit' ) throw new Error( 'SWE GPU dispatch dependency order drifted' );
+	if ( contract.dispatchOrder.join( '>' ) !== 'reset-validation>halo-and-boundary>x-face-flux>z-face-flux>cell-update>receiver-and-obstacle-exchange>foam-transport-reaction>candidate-validation>atomic-commit' ) throw new Error( 'SWE GPU dispatch dependency order drifted' );
 	if ( contract.resourceBytes.statePingPong !== contract.stateRecords * 16 * 2 ) throw new Error( 'SWE state ping-pong byte accounting drifted' );
 	if ( contract.resourceBytes.interactionSource !== contract.stateRecords * 8 ) throw new Error( 'SWE interaction source byte accounting drifted' );
 	if ( contract.resourceBytes.receiverLiquidPingPong !== contract.stateRecords * 4 * 2 || contract.resourceBytes.inundationTransfer !== contract.stateRecords * 4 ) throw new Error( 'SWE receiver liquid byte accounting drifted' );
+	if ( contract.resourceBytes.obstacle !== contract.stateRecords * 16 ) throw new Error( 'SWE obstacle byte accounting drifted' );
 	if ( contract.resourceBytes.diagnostics !== SWE_GPU_LAYOUT.diagnostic.channels.length * 4 ) throw new Error( 'SWE diagnostic byte accounting drifted' );
 	if ( Math.max( ...Object.values( contract.storageBindingsPerStage ) ) > contract.portableStorageBufferLimitPerStage ) throw new Error( 'SWE compute stage exceeds the portable storage-buffer binding limit' );
 	if ( contract.xFaceRecords !== contract.tier.capacityTiles * ( contract.tier.tileSize + 1 ) * contract.tier.tileSize ) throw new Error( 'SWE x-face ownership count drifted' );
