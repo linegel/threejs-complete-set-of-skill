@@ -294,6 +294,13 @@ assert.notDeepEqual(historyPlan.graph.reachableNodes, diffusionPlan.graph.reacha
 const benchmarkPlan = effect.setMechanism("full-vs-dirty-vs-idle") && effect.createResourcePlan();
 assert.equal(benchmarkPlan.benchmarkLedger.name, "touch-history-frost:benchmark-ledger");
 assert.equal(benchmarkPlan.residentStorageBytes, benchmarkPlan.storageBytes.total + 8);
+effect.setMechanism("refraction-and-fresnel");
+effect.setTier("budgeted");
+assert.throws(
+  () => effect.setDebugView("detail refraction offset"),
+  /unknown frost debug view/,
+  "budgeted routes must reject the removed second refraction scale",
+);
 assert.throws(() => effect.setTier("imaginary"), /unknown frost tier/);
 assert.deepEqual(Object.keys(FROST_QUALITY_TIERS), ["full", "balanced", "budgeted"]);
 effect.dispose();

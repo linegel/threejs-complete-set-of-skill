@@ -3,7 +3,7 @@
   "scripts": {
     "check": "node --check *.js && node --check *.mjs",
     "validate": "npm run validate:quick",
-    "validate:unit": "node validate-temporal-surface.js && node test-crystal-field.mjs && node test-capture-recipes.mjs && node test-capture-transaction.mjs && node test-capture-hook.mjs && node test-capture-status.mjs && node test-lifecycle-profile.mjs && node test-frost-evidence-artifacts.mjs && node test-physical-review.mjs && node test-finalize-physical-review.mjs",
+    "validate:unit": "node validate-temporal-surface.js && node test-route-contract.mjs && node test-crystal-field.mjs && node test-capture-recipes.mjs && node test-capture-transaction.mjs && node test-capture-hook.mjs && node test-capture-status.mjs && node test-lifecycle-profile.mjs && node test-frost-evidence-artifacts.mjs && node test-physical-review.mjs && node test-finalize-physical-review.mjs",
     "test:capture-recipes": "node test-capture-recipes.mjs",
     "test:capture-transaction": "node test-capture-transaction.mjs",
     "test:mutations": "node test-mutations.mjs",

@@ -60,6 +60,12 @@ export const FROST_LAB_MODES = Object.freeze(Object.keys(FROST_MODE_TO_DEBUG_VIE
 export const FROST_LAB_ID = "webgpu-touch-history-frost";
 export const FROST_SCENARIO_ID = "touch-history-frost";
 const FROST_RUNTIME_PROFILES = Object.freeze(["correctness", "performance"]);
+const FROST_DEFAULT_ROUTE_STATE = Object.freeze({
+  scenario: FROST_SCENARIO_ID,
+  mechanism: "refraction-and-fresnel",
+  tier: "balanced",
+  mode: "final",
+});
 
 export function describeRendererAdapter(backend, device) {
   const adapter = backend?.adapter ?? null;
@@ -121,17 +127,41 @@ export function parseFrostLabRoute(pathname = "/", search = "") {
   const segments = pathname.split("/").filter(Boolean);
   const mechanismIndex = segments.lastIndexOf("mechanism");
   const tierIndex = segments.lastIndexOf("tier");
-  const mechanism = params.get("mechanism")
-    ?? (mechanismIndex >= 0 ? segments[mechanismIndex + 1] : null)
-    ?? "history-and-deposit";
-  const tier = params.get("tier")
-    ?? (tierIndex >= 0 ? segments[tierIndex + 1] : null)
-    ?? "balanced";
+  if (mechanismIndex >= 0 && tierIndex >= 0) {
+    throw new RangeError("frost routes cannot lock mechanism and tier simultaneously");
+  }
+  if (params.has("mechanism") || params.has("tier")) {
+    throw new RangeError("frost fixed startup state must be selected by the route path, not query parameters");
+  }
+  const routeKind = mechanismIndex >= 0 ? "mechanism" : (tierIndex >= 0 ? "tier" : "canonical");
+  const routeIndex = routeKind === "mechanism" ? mechanismIndex : tierIndex;
+  const routeTail = routeIndex >= 0 ? segments.slice(routeIndex + 1) : [];
+  const validRouteTail = routeTail.length === 1
+    || (routeTail.length === 2 && routeTail[1] === "index.html");
+  if (routeIndex >= 0 && !validRouteTail) {
+    throw new RangeError(`frost ${routeKind} route contains unexpected path segments`);
+  }
+  const mechanism = routeKind === "mechanism"
+    ? segments[mechanismIndex + 1]
+    : FROST_DEFAULT_ROUTE_STATE.mechanism;
+  const tier = routeKind === "tier"
+    ? segments[tierIndex + 1]
+    : FROST_DEFAULT_ROUTE_STATE.tier;
   if (!FROST_MECHANISMS.includes(mechanism)) {
     throw new RangeError(`unknown frost mechanism "${mechanism}"`);
   }
   if (!FROST_QUALITY_TIERS[tier]) throw new RangeError(`unknown frost tier "${tier}"`);
-  return { mechanism, tier };
+  return Object.freeze({
+    ...FROST_DEFAULT_ROUTE_STATE,
+    mechanism,
+    tier,
+    routeKind,
+    locks: Object.freeze({
+      scenario: true,
+      mechanism: routeKind === "mechanism",
+      tier: routeKind === "tier",
+    }),
+  });
 }
 
 function createBackdropScene() {
@@ -211,6 +241,7 @@ export class WebGPUFrostLab {
     mechanism = "history-and-deposit",
     seed = 1,
     runtimeProfile = "correctness",
+    routeLocks = {},
   } = {}) {
     this.canvas = canvas;
     if (!FROST_RUNTIME_PROFILES.includes(runtimeProfile)) {
@@ -222,6 +253,11 @@ export class WebGPUFrostLab {
     if (!this.tier) throw new RangeError(`unknown frost tier "${tier}"`);
     if (!FROST_MECHANISMS.includes(mechanism)) throw new RangeError(`unknown frost mechanism "${mechanism}"`);
     this.mechanism = mechanism;
+    this.routeLocks = Object.freeze({
+      scenario: routeLocks.scenario === true,
+      mechanism: routeLocks.mechanism === true,
+      tier: routeLocks.tier === true,
+    });
     this.seed = seed >>> 0;
     this.mode = "final";
     this.cameraId = "design";
@@ -295,6 +331,7 @@ export class WebGPUFrostLab {
       seed: this.seed,
     });
     await this.effect.initialize();
+    this.effect.setDebugView(FROST_MODE_TO_DEBUG_VIEW.final);
     this.renderPipeline = this.effect.renderPipeline;
     this.captureRecipeSetDigest = await sha256FrostEvidence(FROST_ALL_CAPTURE_RECIPES);
     this.mode = FROST_DEBUG_VIEW_TO_MODE[this.effect.debugView] ?? "final";
@@ -321,11 +358,17 @@ export class WebGPUFrostLab {
 
   async setScenario(id) {
     if (id !== FROST_SCENARIO_ID) throw new RangeError(`unknown frost scenario "${id}"`);
+    if (this.routeLocks.scenario && id !== this.scenario) {
+      throw new RangeError(`frost scenario route is locked to "${this.scenario}"`);
+    }
     this.scenario = id;
   }
 
   async setMechanism(id) {
     if (!FROST_MECHANISMS.includes(id)) throw new RangeError(`unknown frost mechanism "${id}"`);
+    if (this.routeLocks.mechanism && id !== this.mechanism) {
+      throw new RangeError(`frost mechanism route is locked to "${this.mechanism}"`);
+    }
     this.mechanism = id;
     const profile = this.effect.setMechanism(id);
     this.mode = FROST_DEBUG_VIEW_TO_MODE[profile.startupDebugView] ?? "final";
@@ -340,6 +383,9 @@ export class WebGPUFrostLab {
   async setTier(id) {
     const tier = FROST_QUALITY_TIERS[id];
     if (!tier) throw new RangeError(`unknown frost tier "${id}"`);
+    if (this.routeLocks.tier && id !== this.tier.id) {
+      throw new RangeError(`frost tier route is locked to "${this.tier.id}"`);
+    }
     this.tier = tier;
     this.effect.setTier(id);
     this.mode = FROST_DEBUG_VIEW_TO_MODE[this.effect.debugView] ?? "final";

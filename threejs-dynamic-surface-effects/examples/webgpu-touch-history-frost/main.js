@@ -8,7 +8,14 @@ const metricsDetails = document.querySelector("[data-metrics]");
 const route = parseFrostLabRoute(location.pathname, location.search);
 const runtimeProfile = globalThis.__LAB_CAPTURE_PROFILE__?.id ?? "correctness";
 const automatedCapture = new URLSearchParams(location.search).get("capture") === "1";
-const lab = await createFrostLab({ canvas, ...route, seed: 0x00000001, runtimeProfile });
+const lab = await createFrostLab({
+  canvas,
+  mechanism: route.mechanism,
+  tier: route.tier,
+  routeLocks: route.locks,
+  seed: 0x00000001,
+  runtimeProfile,
+});
 
 globalThis.labController = lab;
 globalThis.__LAB_CONTROLLER__ = lab;
@@ -37,8 +44,8 @@ function refreshModes() {
   populate(modeSelect, lab.getAvailableModes(), lab.mode);
 }
 refreshModes();
-const mechanismLocked = location.pathname.split("/").includes("mechanism");
-const tierLocked = location.pathname.split("/").includes("tier");
+const mechanismLocked = route.locks.mechanism;
+const tierLocked = route.locks.tier;
 mechanismSelect.disabled = mechanismLocked;
 tierSelect.disabled = tierLocked;
 if (!mechanismLocked) mechanismSelect.addEventListener("change", async () => {
