@@ -1,20 +1,11 @@
-import { createHash } from 'node:crypto';
-
 import { assertPerformanceClaimEvidence } from '../../../../scripts/lib/evidence-runtime-claims.mjs';
+import { parseLedgerBoundCanonicalJson } from './ledger-bound-json.js';
 import { createRuntimeGovernorTrace, createRuntimePerformanceTrace } from './physical-performance-trace.js';
 import { createPerformanceEvidenceArtifacts } from './runtime-v2-bundle.js';
-
-const SHA256 = /^sha256:[a-f0-9]{64}$/;
 
 function fail( message ) {
 
 	throw new Error( message );
-
-}
-
-function sha256( bytes ) {
-
-	return `sha256:${ createHash( 'sha256' ).update( bytes ).digest( 'hex' ) }`;
 
 }
 
@@ -37,33 +28,17 @@ function deepFreeze( value ) {
 
 }
 
-function parseTierVisualEvidence( bytes, ledgerEntry ) {
-
-	if ( bytes instanceof Uint8Array === false || bytes.byteLength < 1 ) fail( 'Tier visual evidence bytes are missing.' );
-	const ledger = requireObject( ledgerEntry, 'Tier visual evidence ledger entry' );
-	if ( ledger.path !== 'tier-visual-evidence.json' || ledger.status !== 'captured' || ledger.kind !== 'supplementary-json' ) fail( 'Tier visual evidence ledger identity is invalid.' );
-	if ( ledger.byteLength !== bytes.byteLength || SHA256.test( ledger.sha256 ?? '' ) === false || ledger.sha256 !== sha256( bytes ) ) fail( 'Tier visual evidence bytes differ from the correctness ledger.' );
-	let document;
-	try {
-
-		document = JSON.parse( Buffer.from( bytes ).toString( 'utf8' ) );
-
-	} catch ( error ) {
-
-		fail( `Tier visual evidence is invalid JSON: ${ error.message }` );
-
-	}
-	const canonicalBytes = Buffer.from( `${ JSON.stringify( document, null, 2 ) }\n` );
-	if ( canonicalBytes.equals( Buffer.from( bytes ) ) === false ) fail( 'Tier visual evidence is not canonical two-space JSON.' );
-	return { document, sha256: ledger.sha256, byteLength: ledger.byteLength };
-
-}
-
 export function projectValidationHarnessPerformanceEvidence( input ) {
 
 	const verifiedPerformance = requireObject( input?.verifiedPerformance, 'Verified performance input' );
 	const correctnessIdentity = requireObject( input?.correctnessIdentity, 'Correctness identity' );
-	const tier = parseTierVisualEvidence( input.tierVisualEvidenceBytes, input.tierVisualEvidenceLedgerEntry );
+	const tier = parseLedgerBoundCanonicalJson( {
+		label: 'Tier visual evidence',
+		bytes: input.tierVisualEvidenceBytes,
+		ledgerEntry: input.tierVisualEvidenceLedgerEntry,
+		expectedPath: 'tier-visual-evidence.json',
+		expectedKind: 'supplementary-json'
+	} );
 	const performanceIdentity = verifiedPerformance.record?.immutableBuild;
 	for ( const key of [ 'sourceClosureHash', 'buildRevision', 'threeRevision' ] ) {
 
