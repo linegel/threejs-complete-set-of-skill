@@ -3,6 +3,8 @@ import { createFrostLab, FROST_LAB_MODES, parseFrostLabRoute } from "./frost-web
 
 const canvas = document.querySelector("canvas");
 const status = document.querySelector("[data-status]");
+const readiness = document.querySelector("[data-readiness]");
+const metricsDetails = document.querySelector("[data-metrics]");
 const route = parseFrostLabRoute(location.pathname, location.search);
 const runtimeProfile = globalThis.__LAB_CAPTURE_PROFILE__?.id ?? "correctness";
 const automatedCapture = new URLSearchParams(location.search).get("capture") === "1";
@@ -11,6 +13,7 @@ const lab = await createFrostLab({ canvas, ...route, seed: 0x00000001, runtimePr
 globalThis.labController = lab;
 globalThis.__LAB_CONTROLLER__ = lab;
 globalThis.__LAB_READY__ = true;
+readiness.textContent = "WebGPU ready";
 
 function populate(select, values, selected) {
   for (const value of values) {
@@ -87,6 +90,7 @@ addEventListener("resize", resize);
 resize();
 
 let previousTime = 0;
+let nextMetricsUpdate = 0;
 if (!automatedCapture) {
   lab.renderer.setAnimationLoop((timestamp) => {
     if (previousTime === 0) previousTime = timestamp;
@@ -98,7 +102,10 @@ if (!automatedCapture) {
       elapsed -= step;
     }
     lab.renderOnce();
-    status.textContent = JSON.stringify(lab.getMetrics(), null, 2);
+    if (metricsDetails.open && timestamp >= nextMetricsUpdate) {
+      status.textContent = JSON.stringify(lab.getMetrics(), null, 2);
+      nextMetricsUpdate = timestamp + 250;
+    }
   });
 }
 
