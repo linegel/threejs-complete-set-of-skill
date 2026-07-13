@@ -3,11 +3,21 @@
   "version": "1.0.0",
   "packageManager": "npm@10.9.4",
   "description": "Agent skill pack for Three.js WebGPU/TSL procedural graphics, image pipelines, and visual validation.",
-  "main": "index.js",
   "engines": {
     "node": "22.22.0",
     "npm": "10.9.4"
   },
+  "files": [
+    "skills/",
+    "threejs-*/SKILL.md",
+    "threejs-*/references/",
+    "threejs-*/assets/",
+    "threejs-object-sculptor/scripts/*.py",
+    "!threejs-object-sculptor/scripts/test_*.py",
+    "skills.sh.json",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "toolchain:preflight": "node scripts/toolchain-preflight.mjs",
     "browser:install": "PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium",
@@ -22,7 +32,7 @@
     "labs:assemble:validation-harness": "node scripts/assemble-validation-harness-release.mjs",
     "labs:validate": "node scripts/run-labs.mjs validate",
     "labs:validate:quick": "node scripts/validate-lab-manifests.mjs && node scripts/run-labs.mjs quick",
-    "labs:validate:full": "node scripts/validate-lab-manifests.mjs --require-complete && node scripts/run-labs.mjs full",
+    "labs:validate:full": "node scripts/validate-lab-manifests.mjs && node scripts/run-labs.mjs full",
     "pages:build": "node scripts/build-pages.mjs && node scripts/generate-seo-images.mjs && node scripts/build-lab-pages.mjs && node scripts/build-evidence-pages.mjs && node scripts/generate-responsive-images.mjs && node scripts/validate-site-presentation.mjs && node scripts/validate-site-seo.mjs",
     "pages:build-evidence": "node scripts/build-evidence-pages.mjs",
     "pages:generate-seo-images": "node scripts/generate-seo-images.mjs",
@@ -37,8 +47,13 @@
     "pages:validate-seo": "node scripts/validate-site-seo.mjs",
     "pages:validate-source-hashes": "node scripts/validate-pages-source-hashes.mjs",
     "skills:list": "npx skills@latest add linegel/threejs-complete-set-of-skill --list",
-    "test:skills": "node scripts/validate-skills-manifest.mjs",
-    "test": "npm run test:skills && npm run labs:check"
+    "skills:sync": "node scripts/sync-skill-distribution.mjs",
+    "skills:check": "node scripts/validate-skills-manifest.mjs && node scripts/validate-skill-distribution.mjs && node --test tests/skills/*.test.mjs",
+    "skills:pack": "npm run skills:check && npm pack",
+    "skills:pack:dry-run": "npm run skills:check && npm pack --dry-run --json --ignore-scripts",
+    "test:skills": "npm run skills:check",
+    "check:all": "npm run skills:check && npm run labs:check && npm run pages:build",
+    "test": "npm run skills:check"
   },
   "keywords": [
     "skills",
