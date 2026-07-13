@@ -78,7 +78,7 @@ function requireRecomputed(actual, expected, label, tolerance = 1e-9) {
   }
 }
 
-function validateTraceSegment(segment, label, refreshPeriod, {
+function validateTraceSegment(segment, label, deadlineInterval, {
   minimumCpuSamples,
   minimumPresentationSamples,
   measuredPresentation = false,
@@ -105,7 +105,7 @@ function validateTraceSegment(segment, label, refreshPeriod, {
   requireRecomputed(presentationP95, percentile(presentationSamples, 0.95), `${label}.presentationP95`);
   requireRecomputed(
     deadlineMissRatio,
-    presentationSamples.filter((sample) => sample > refreshPeriod).length / presentationSamples.length,
+    presentationSamples.filter((sample) => sample > deadlineInterval).length / presentationSamples.length,
     `${label}.deadlineMissRatio`,
   );
   return { cpuP95, deadlineMissRatio };
@@ -359,8 +359,11 @@ export function assertPerformanceClaimEvidence(json, manifest) {
   const envelope = requireRecord(json['performance-envelope.json'], 'performance-envelope.json');
   const trace = requireRecord(json['frame-trace.json'], 'frame-trace.json');
   if (envelope.gpuTimingRequirement !== 'required') throw new Error('performance PASS requires GPU timing');
-  const refreshPeriod = requireDatum(envelope.refreshPeriod, 'performance-envelope.json.refreshPeriod', {
+  requireDatum(envelope.refreshPeriod, 'performance-envelope.json.refreshPeriod', {
     unit: 'ms', labels: ['Derived'], minimum: Number.MIN_VALUE,
+  });
+  const deadlineInterval = requireDatum(envelope.deadlineInterval, 'performance-envelope.json.deadlineInterval', {
+    unit: 'ms', labels: ['Gated'], minimum: Number.MIN_VALUE,
   });
   const cpuGate = requireDatum(envelope.cpuP95Gate, 'performance-envelope.json.cpuP95Gate', {
     unit: 'ms', labels: ['Gated'], minimum: Number.MIN_VALUE,
@@ -372,15 +375,15 @@ export function assertPerformanceClaimEvidence(json, manifest) {
     unit: 'ratio', labels: ['Gated'], minimum: 0, maximum: 1,
   });
 
-  validateTraceSegment(trace.warmup, 'frame-trace.json.warmup', refreshPeriod, {
+  validateTraceSegment(trace.warmup, 'frame-trace.json.warmup', deadlineInterval, {
     minimumCpuSamples: 30,
     minimumPresentationSamples: 1,
   });
-  validateTraceSegment(trace.cold, 'frame-trace.json.cold', refreshPeriod, {
+  validateTraceSegment(trace.cold, 'frame-trace.json.cold', deadlineInterval, {
     minimumCpuSamples: 1,
     minimumPresentationSamples: 1,
   });
-  const sustained = validateTraceSegment(trace.sustained, 'frame-trace.json.sustained', refreshPeriod, {
+  const sustained = validateTraceSegment(trace.sustained, 'frame-trace.json.sustained', deadlineInterval, {
     minimumCpuSamples: 120,
     minimumPresentationSamples: 120,
     measuredPresentation: true,
@@ -412,12 +415,12 @@ export function assertPerformanceClaimEvidence(json, manifest) {
   requireRecomputed(gpuP50, percentile(gpuSamples, 0.5), 'frame-trace.json.gpuP50');
   requireRecomputed(gpuP95, percentile(gpuSamples, 0.95), 'frame-trace.json.gpuP95');
   const renderTimestamp = requireDatum(trace.renderTimestamp, 'frame-trace.json.renderTimestamp', {
-    unit: 'ms', labels: ['Measured'], minimum: Number.MIN_VALUE,
+    unit: 'ms', labels: ['Derived', 'Measured'], minimum: Number.MIN_VALUE,
   });
   if (!/timestamp/i.test(trace.renderTimestamp.source)) throw new Error('GPU p95 source must identify timestamp queries');
   requireRecomputed(renderTimestamp, gpuP95, 'frame-trace.json.renderTimestamp');
   const cadence = requireDatum(trace.presentationCadence, 'frame-trace.json.presentationCadence', {
-    unit: 'frame/s', labels: ['Measured'], minimum: Number.MIN_VALUE,
+    unit: 'frame/s', labels: ['Derived', 'Measured'], minimum: Number.MIN_VALUE,
   });
   if (!/requestAnimationFrame|rAF/i.test(trace.presentationCadence.source) || cadence <= 0) {
     throw new Error('performance PASS requires measured requestAnimationFrame presentation cadence');

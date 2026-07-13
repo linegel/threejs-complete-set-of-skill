@@ -258,6 +258,7 @@ function normativeArtifacts() {
       gpuSceneEnvelope: numeric(15, 'ms', 'Derived', 'refresh period minus reserve'),
       cpuP95Gate: numeric(12, 'ms', 'Gated', 'fixture 60 Hz CPU stage gate'),
       gpuP95Gate: numeric(12, 'ms', 'Gated', 'fixture 60 Hz GPU stage gate'),
+      deadlineInterval: numeric(25, 'ms', 'Gated', 'fixture sustained cadence deadline'),
       deadlineMissRatioGate: numeric(0.01, 'ratio', 'Gated', 'fixture sustained cadence gate'),
       verdict: 'PASS',
     },

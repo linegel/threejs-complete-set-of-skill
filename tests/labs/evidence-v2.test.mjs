@@ -303,6 +303,20 @@ test('unified release performance PASS requires complete sustained populations a
   assert(stagesResult.errors.some((error) => error.includes('gpuStageAttribution must be an object')));
 });
 
+test('unified release performance uses its gated deadline and permits derived estimators', () => {
+  const directory = createUnifiedReleaseBundleFixture();
+  rewriteBoundFixtureJson(directory, 'frame-trace.json', (trace) => {
+    trace.sustained.presentationSamples.values.fill(20);
+    trace.sustained.presentationP95.value = 20;
+    trace.sustained.deadlineMissRatio.value = 0;
+    trace.renderTimestamp.label = 'Derived';
+    trace.presentationCadence.value = 50;
+    trace.presentationCadence.label = 'Derived';
+  });
+  const result = validateEvidenceBundle(directory, { requireRequiredClaimsPass: true });
+  assert.equal(result.valid, true, result.errors.join('\n'));
+});
+
 test('unified release performance PASS requires exercised stable governor evidence', () => {
   const unexercised = createUnifiedReleaseBundleFixture();
   rewriteBoundFixtureJson(unexercised, 'quality-governor.json', (governor) => {
