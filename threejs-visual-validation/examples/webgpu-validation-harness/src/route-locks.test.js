@@ -11,6 +11,7 @@ import {
 	TIER_ROUTE_LOCKS
 } from './route-locks.js';
 import {
+	createControllerRealmBridge,
 	createLifecycleRunnerForwarder,
 	createPlaywrightCorrectnessHost,
 	PLAYWRIGHT_CORRECTNESS_HOST_GLOBAL
@@ -61,6 +62,35 @@ test( 'locked wrapper forwards the fresh-controller lifecycle runner', async () 
 	assert.deepEqual( await runLifecycle( 64 ), { cycles: 64, replacement: true } );
 	delete child.__THREEJS_LAB_LIFECYCLE__;
 	await assert.rejects( runLifecycle( 1 ), /lifecycle runner is unavailable/ );
+
+} );
+
+test( 'locked wrapper clones controller evidence into its parent realm', async () => {
+
+	const pixels = new Uint8Array( [ 1, 2, 3, 4 ] );
+	const evidence = { route: { tier: 'webgpu-correctness' }, pixels };
+	const calls = [];
+	const child = {
+		labId: 'webgpu-validation-harness',
+		async captureRecipe( id ) {
+
+			calls.push( { receiver: this, id } );
+			return evidence;
+
+		}
+	};
+	const bridge = createControllerRealmBridge( child );
+	const cloned = await bridge.captureRecipe( 'final.design' );
+	assert.notEqual( cloned, evidence );
+	assert.notEqual( cloned.route, evidence.route );
+	assert.notEqual( cloned.pixels, pixels );
+	assert.deepEqual( cloned, evidence );
+	assert.equal( cloned.pixels instanceof Uint8Array, true );
+	assert.equal( bridge.labId, child.labId );
+	assert.equal( bridge.then, undefined, 'the bridge must not be assimilated as a promise' );
+	assert.deepEqual( calls, [ { receiver: child, id: 'final.design' } ] );
+	assert.throws( () => createControllerRealmBridge( null ), /child controller/ );
+	assert.throws( () => createControllerRealmBridge( child, null ), /structured clone/ );
 
 } );
 

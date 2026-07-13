@@ -74,6 +74,23 @@ export function createLifecycleRunnerForwarder( frame ) {
 
 }
 
+export function createControllerRealmBridge( controller, clone = structuredClone ) {
+
+	if ( controller === null || typeof controller !== 'object' ) throw new Error( 'Controller realm bridge requires a child controller.' );
+	if ( typeof clone !== 'function' ) throw new Error( 'Controller realm bridge requires a structured clone function.' );
+	return new Proxy( Object.create( null ), {
+		get( _target, property ) {
+
+			if ( property === 'then' ) return undefined;
+			const value = controller[ property ];
+			if ( typeof value !== 'function' ) return clone( value );
+			return async ( ...args ) => clone( await value.apply( controller, args ) );
+
+		}
+	} );
+
+}
+
 export async function mountLockedRoute( { kind, id, root = document.body } ) {
 
 	const lock = getRouteLock( kind, id );
@@ -100,12 +117,13 @@ export async function mountLockedRoute( { kind, id, root = document.body } ) {
 	} );
 
 	const controller = await waitForController( frame );
-	window.__THREEJS_LAB__ = controller;
+	const publishedController = createControllerRealmBridge( controller );
+	window.__THREEJS_LAB__ = publishedController;
 	window.__THREEJS_LAB_LIFECYCLE__ = createLifecycleRunnerForwarder( frame );
 	window.__THREEJS_LAB_ROUTE_LOCK__ = lock;
 	document.documentElement.dataset.ready = 'true';
 	document.documentElement.dataset.routeKind = kind;
 	document.documentElement.dataset.routeId = id;
-	return controller;
+	return publishedController;
 
 }
