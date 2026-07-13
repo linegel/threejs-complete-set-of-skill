@@ -7,6 +7,7 @@
   "kind": "canonical-lab",
   "status": "incomplete",
   "canonicalSource": [
+    "threejs-procedural-planets/examples/webgpu-quadtree-planet",
     "threejs-procedural-planets/examples/webgpu-quadtree-planet/browser-lab.js",
     "threejs-procedural-planets/examples/webgpu-quadtree-planet/planet-fields.js",
     "threejs-procedural-planets/examples/webgpu-quadtree-planet/planet-field-atlas.js",
@@ -20,69 +21,383 @@
   "browserEntry": "threejs-procedural-planets/examples/webgpu-quadtree-planet/index.html",
   "publishPath": "/demos/webgpu-quadtree-planet/",
   "scenarios": [
-    { "id": "field-crater-climate", "route": "/demos/webgpu-quadtree-planet/?scenario=field-crater-climate", "startup": { "scenario": "field-crater-climate" }, "acceptanceStatus": "incomplete" },
-    { "id": "cross-face-quadtree", "route": "/demos/webgpu-quadtree-planet/?scenario=cross-face-quadtree", "startup": { "scenario": "cross-face-quadtree" }, "acceptanceStatus": "incomplete" },
-    { "id": "balance-and-stitching", "route": "/demos/webgpu-quadtree-planet/?scenario=balance-and-stitching", "startup": { "scenario": "balance-and-stitching" }, "acceptanceStatus": "incomplete" },
-    { "id": "field-atlas", "route": "/demos/webgpu-quadtree-planet/?scenario=field-atlas", "startup": { "scenario": "field-atlas" }, "acceptanceStatus": "incomplete" },
-    { "id": "solid-body-material", "route": "/demos/webgpu-quadtree-planet/?scenario=solid-body-material", "startup": { "scenario": "solid-body-material" }, "acceptanceStatus": "incomplete" },
-    { "id": "gas-and-ice-giants", "route": "/demos/webgpu-quadtree-planet/?scenario=gas-and-ice-giants", "startup": { "scenario": "gas-and-ice-giants" }, "acceptanceStatus": "incomplete" },
-    { "id": "orbit-to-surface", "route": "/demos/webgpu-quadtree-planet/?scenario=orbit-to-surface", "startup": { "scenario": "orbit-to-surface" }, "acceptanceStatus": "incomplete" }
+    {
+      "id": "field-crater-climate",
+      "route": "/demos/webgpu-quadtree-planet/?scenario=field-crater-climate",
+      "startup": {
+        "scenario": "field-crater-climate"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "cross-face-quadtree",
+      "route": "/demos/webgpu-quadtree-planet/?scenario=cross-face-quadtree",
+      "startup": {
+        "scenario": "cross-face-quadtree"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "balance-and-stitching",
+      "route": "/demos/webgpu-quadtree-planet/?scenario=balance-and-stitching",
+      "startup": {
+        "scenario": "balance-and-stitching"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "field-atlas",
+      "route": "/demos/webgpu-quadtree-planet/?scenario=field-atlas",
+      "startup": {
+        "scenario": "field-atlas"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "solid-body-material",
+      "route": "/demos/webgpu-quadtree-planet/?scenario=solid-body-material",
+      "startup": {
+        "scenario": "solid-body-material"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "gas-and-ice-giants",
+      "route": "/demos/webgpu-quadtree-planet/?scenario=gas-and-ice-giants",
+      "startup": {
+        "scenario": "gas-and-ice-giants"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "orbit-to-surface",
+      "route": "/demos/webgpu-quadtree-planet/?scenario=orbit-to-surface",
+      "startup": {
+        "scenario": "orbit-to-surface"
+      },
+      "acceptanceStatus": "incomplete"
+    }
   ],
   "mechanisms": [
-    { "id": "field-crater-climate", "route": "/demos/webgpu-quadtree-planet/mechanism/field-crater-climate/", "startup": { "scenario": "field-crater-climate", "mode": "field-crater-climate" }, "acceptanceStatus": "incomplete" },
-    { "id": "cross-face-quadtree", "route": "/demos/webgpu-quadtree-planet/mechanism/cross-face-quadtree/", "startup": { "scenario": "cross-face-quadtree", "mode": "patch-level" }, "acceptanceStatus": "incomplete" },
-    { "id": "balance-and-stitching", "route": "/demos/webgpu-quadtree-planet/mechanism/balance-and-stitching/", "startup": { "scenario": "balance-and-stitching", "mode": "transition-mask" }, "acceptanceStatus": "incomplete" },
-    { "id": "field-atlas", "route": "/demos/webgpu-quadtree-planet/mechanism/field-atlas/", "startup": { "scenario": "field-atlas", "mode": "derivative-candidate" }, "acceptanceStatus": "incomplete" },
-    { "id": "solid-body-material", "route": "/demos/webgpu-quadtree-planet/mechanism/solid-body-material/", "startup": { "scenario": "solid-body-material", "mode": "final" }, "acceptanceStatus": "incomplete" },
-    { "id": "gas-and-ice-giants", "route": "/demos/webgpu-quadtree-planet/mechanism/gas-and-ice-giants/", "startup": { "scenario": "gas-and-ice-giants", "mode": "final", "camera": "giants" }, "acceptanceStatus": "incomplete" },
-    { "id": "orbit-to-surface", "route": "/demos/webgpu-quadtree-planet/mechanism/orbit-to-surface/", "startup": { "scenario": "orbit-to-surface", "mode": "final" }, "acceptanceStatus": "incomplete" }
+    {
+      "id": "field-crater-climate",
+      "route": "/demos/webgpu-quadtree-planet/mechanism/field-crater-climate/",
+      "startup": {
+        "scenario": "field-crater-climate",
+        "mode": "field-crater-climate"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "cross-face-quadtree",
+      "route": "/demos/webgpu-quadtree-planet/mechanism/cross-face-quadtree/",
+      "startup": {
+        "scenario": "cross-face-quadtree",
+        "mode": "patch-level"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "balance-and-stitching",
+      "route": "/demos/webgpu-quadtree-planet/mechanism/balance-and-stitching/",
+      "startup": {
+        "scenario": "balance-and-stitching",
+        "mode": "transition-mask"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "field-atlas",
+      "route": "/demos/webgpu-quadtree-planet/mechanism/field-atlas/",
+      "startup": {
+        "scenario": "field-atlas",
+        "mode": "derivative-candidate"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "solid-body-material",
+      "route": "/demos/webgpu-quadtree-planet/mechanism/solid-body-material/",
+      "startup": {
+        "scenario": "solid-body-material",
+        "mode": "final"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "gas-and-ice-giants",
+      "route": "/demos/webgpu-quadtree-planet/mechanism/gas-and-ice-giants/",
+      "startup": {
+        "scenario": "gas-and-ice-giants",
+        "mode": "final",
+        "camera": "giants"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "orbit-to-surface",
+      "route": "/demos/webgpu-quadtree-planet/mechanism/orbit-to-surface/",
+      "startup": {
+        "scenario": "orbit-to-surface",
+        "mode": "final"
+      },
+      "acceptanceStatus": "incomplete"
+    }
   ],
   "tiers": [
     {
       "id": "full",
       "targetClass": "Current-adapter correctness trial; performance unmeasured",
       "frameTargetMs": null,
-      "resolutionPolicy": { "dprCap": { "value": 2, "unit": "ratio", "label": "Authored", "source": "quality route" } },
-      "mechanismLimits": { "gridSide": { "value": 33, "unit": "vertices", "label": "Authored", "source": "PLANET_TIER_CONFIG.full" }, "maxLevel": { "value": 7, "unit": "levels", "label": "Authored", "source": "PLANET_TIER_CONFIG.full" }, "splitPixelError": { "value": 8, "unit": "physical pixels", "label": "Authored", "source": "PLANET_TIER_CONFIG.full" }, "mergePixelError": { "value": 4.5, "unit": "physical pixels", "label": "Authored", "source": "PLANET_TIER_CONFIG.full" } },
-      "resourceLimits": { "atlasTileSide": { "value": 33, "unit": "core texels", "label": "Authored", "source": "field atlas full tier" }, "atlasGutter": { "value": 4, "unit": "base-level texels", "label": "Derived", "source": "declared warp/filter/derivative/footprint support" } },
+      "resolutionPolicy": {
+        "dprCap": {
+          "value": 2,
+          "unit": "ratio",
+          "label": "Authored",
+          "source": "quality route"
+        }
+      },
+      "mechanismLimits": {
+        "gridSide": {
+          "value": 33,
+          "unit": "vertices",
+          "label": "Authored",
+          "source": "PLANET_TIER_CONFIG.full"
+        },
+        "maxLevel": {
+          "value": 7,
+          "unit": "levels",
+          "label": "Authored",
+          "source": "PLANET_TIER_CONFIG.full"
+        },
+        "splitPixelError": {
+          "value": 8,
+          "unit": "physical pixels",
+          "label": "Authored",
+          "source": "PLANET_TIER_CONFIG.full"
+        },
+        "mergePixelError": {
+          "value": 4.5,
+          "unit": "physical pixels",
+          "label": "Authored",
+          "source": "PLANET_TIER_CONFIG.full"
+        }
+      },
+      "resourceLimits": {
+        "atlasTileSide": {
+          "value": 33,
+          "unit": "core texels",
+          "label": "Authored",
+          "source": "field atlas full tier"
+        },
+        "atlasGutter": {
+          "value": 4,
+          "unit": "base-level texels",
+          "label": "Derived",
+          "source": "declared warp/filter/derivative/footprint support"
+        }
+      },
       "degradationFromPrevious": [],
-      "preservedInvariants": ["native WebGPU", "shared field function", "2:1 balance", "transition masks", "single tone/output owner"],
+      "preservedInvariants": [
+        "native WebGPU",
+        "shared field function",
+        "2:1 balance",
+        "transition masks",
+        "single tone/output owner"
+      ],
       "acceptanceStatus": "incomplete"
     },
     {
       "id": "balanced",
       "targetClass": "Current-adapter correctness trial; performance unmeasured",
       "frameTargetMs": null,
-      "resolutionPolicy": { "dprCap": { "value": 1.5, "unit": "ratio", "label": "Authored", "source": "quality route" } },
-      "mechanismLimits": { "gridSide": { "value": 17, "unit": "vertices", "label": "Authored", "source": "PLANET_TIER_CONFIG.balanced" }, "maxLevel": { "value": 6, "unit": "levels", "label": "Authored", "source": "PLANET_TIER_CONFIG.balanced" }, "splitPixelError": { "value": 9, "unit": "physical pixels", "label": "Authored", "source": "PLANET_TIER_CONFIG.balanced" }, "mergePixelError": { "value": 5, "unit": "physical pixels", "label": "Authored", "source": "PLANET_TIER_CONFIG.balanced" } },
-      "resourceLimits": { "atlasTileSide": { "value": 17, "unit": "core texels", "label": "Authored", "source": "field atlas balanced tier" }, "atlasGutter": { "value": 4, "unit": "base-level texels", "label": "Derived", "source": "declared warp/filter/derivative/footprint support" } },
-      "degradationFromPrevious": ["reduce shared-grid side", "raise split/merge error thresholds", "reduce maximum camera-selected level"],
-      "preservedInvariants": ["native WebGPU", "shared field function", "2:1 balance", "transition masks", "single tone/output owner"],
+      "resolutionPolicy": {
+        "dprCap": {
+          "value": 1.5,
+          "unit": "ratio",
+          "label": "Authored",
+          "source": "quality route"
+        }
+      },
+      "mechanismLimits": {
+        "gridSide": {
+          "value": 17,
+          "unit": "vertices",
+          "label": "Authored",
+          "source": "PLANET_TIER_CONFIG.balanced"
+        },
+        "maxLevel": {
+          "value": 6,
+          "unit": "levels",
+          "label": "Authored",
+          "source": "PLANET_TIER_CONFIG.balanced"
+        },
+        "splitPixelError": {
+          "value": 9,
+          "unit": "physical pixels",
+          "label": "Authored",
+          "source": "PLANET_TIER_CONFIG.balanced"
+        },
+        "mergePixelError": {
+          "value": 5,
+          "unit": "physical pixels",
+          "label": "Authored",
+          "source": "PLANET_TIER_CONFIG.balanced"
+        }
+      },
+      "resourceLimits": {
+        "atlasTileSide": {
+          "value": 17,
+          "unit": "core texels",
+          "label": "Authored",
+          "source": "field atlas balanced tier"
+        },
+        "atlasGutter": {
+          "value": 4,
+          "unit": "base-level texels",
+          "label": "Derived",
+          "source": "declared warp/filter/derivative/footprint support"
+        }
+      },
+      "degradationFromPrevious": [
+        "reduce shared-grid side",
+        "raise split/merge error thresholds",
+        "reduce maximum camera-selected level"
+      ],
+      "preservedInvariants": [
+        "native WebGPU",
+        "shared field function",
+        "2:1 balance",
+        "transition masks",
+        "single tone/output owner"
+      ],
       "acceptanceStatus": "incomplete"
     },
     {
       "id": "reduced-webgpu",
       "targetClass": "Minimum native-WebGPU resident trial; performance unmeasured",
       "frameTargetMs": null,
-      "resolutionPolicy": { "dprCap": { "value": 1, "unit": "ratio", "label": "Authored", "source": "quality route" } },
-      "mechanismLimits": { "gridSide": { "value": 17, "unit": "vertices", "label": "Authored", "source": "PLANET_TIER_CONFIG.reduced-webgpu" }, "maxLevel": { "value": 4, "unit": "levels", "label": "Authored", "source": "PLANET_TIER_CONFIG.reduced-webgpu" }, "splitPixelError": { "value": 11, "unit": "physical pixels", "label": "Authored", "source": "PLANET_TIER_CONFIG.reduced-webgpu" }, "mergePixelError": { "value": 6, "unit": "physical pixels", "label": "Authored", "source": "PLANET_TIER_CONFIG.reduced-webgpu" } },
-      "resourceLimits": { "atlasTileSide": { "value": 17, "unit": "core texels", "label": "Authored", "source": "field atlas reduced tier" }, "atlasGutter": { "value": 4, "unit": "base-level texels", "label": "Derived", "source": "declared warp/filter/derivative/footprint support" } },
-      "degradationFromPrevious": ["raise split/merge error thresholds", "reduce maximum camera-selected level", "permit root-level horizon-hidden leaves"],
-      "preservedInvariants": ["native WebGPU", "shared field function", "2:1 balance", "transition masks", "single tone/output owner"],
+      "resolutionPolicy": {
+        "dprCap": {
+          "value": 1,
+          "unit": "ratio",
+          "label": "Authored",
+          "source": "quality route"
+        }
+      },
+      "mechanismLimits": {
+        "gridSide": {
+          "value": 17,
+          "unit": "vertices",
+          "label": "Authored",
+          "source": "PLANET_TIER_CONFIG.reduced-webgpu"
+        },
+        "maxLevel": {
+          "value": 4,
+          "unit": "levels",
+          "label": "Authored",
+          "source": "PLANET_TIER_CONFIG.reduced-webgpu"
+        },
+        "splitPixelError": {
+          "value": 11,
+          "unit": "physical pixels",
+          "label": "Authored",
+          "source": "PLANET_TIER_CONFIG.reduced-webgpu"
+        },
+        "mergePixelError": {
+          "value": 6,
+          "unit": "physical pixels",
+          "label": "Authored",
+          "source": "PLANET_TIER_CONFIG.reduced-webgpu"
+        }
+      },
+      "resourceLimits": {
+        "atlasTileSide": {
+          "value": 17,
+          "unit": "core texels",
+          "label": "Authored",
+          "source": "field atlas reduced tier"
+        },
+        "atlasGutter": {
+          "value": 4,
+          "unit": "base-level texels",
+          "label": "Derived",
+          "source": "declared warp/filter/derivative/footprint support"
+        }
+      },
+      "degradationFromPrevious": [
+        "raise split/merge error thresholds",
+        "reduce maximum camera-selected level",
+        "permit root-level horizon-hidden leaves"
+      ],
+      "preservedInvariants": [
+        "native WebGPU",
+        "shared field function",
+        "2:1 balance",
+        "transition masks",
+        "single tone/output owner"
+      ],
       "acceptanceStatus": "incomplete"
     }
   ],
-  "modes": ["final", "height", "patch-level", "transition-mask", "derivative-candidate", "field-crater-climate", "craters", "climate"],
-  "cameras": ["near", "design", "far", "orbit", "horizon", "surface", "giants"],
-  "seeds": [1, 2654435769],
+  "modes": [
+    "final",
+    "height",
+    "patch-level",
+    "transition-mask",
+    "derivative-candidate",
+    "field-crater-climate",
+    "craters",
+    "climate",
+    "no-post",
+    "diagnostics"
+  ],
+  "cameras": [
+    "near",
+    "design",
+    "far",
+    "orbit",
+    "horizon",
+    "surface",
+    "giants"
+  ],
+  "seeds": [
+    1,
+    2654435769
+  ],
   "capabilityRequirements": [
-    { "id": "native-webgpu", "required": true, "evidence": "renderer.backend.isWebGPUBackend after await renderer.init", "status": "incomplete" },
-    { "id": "storage-compute", "required": true, "evidence": "three channel-separated field bakes, patch-local mip dispatches, and analytic patch-bounds compute", "status": "incomplete" }
+    {
+      "id": "native-webgpu",
+      "required": true,
+      "evidence": "Lab-owned capture wrote renderer-info.json with WebGPURenderer and backend.isWebGPUBackend===true after await renderer.init().",
+      "status": "accepted"
+    },
+    {
+      "id": "storage-compute",
+      "required": true,
+      "evidence": "Field atlas and patch-bounds compute dispatches are described in runtime-snapshot pipeline/resources from the live capture session.",
+      "status": "accepted"
+    }
   ],
   "runtimeProof": [
-    { "id": "render-target-readback", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "pipeline-graph", "required": true, "evidence": "LabController.describePipeline", "status": "incomplete" },
-    { "id": "resource-ledger", "required": true, "evidence": "LabController.describeResources", "status": "incomplete" }
+    {
+      "id": "render-target-readback",
+      "required": true,
+      "evidence": "controller.capturePixels produced 1200x800 PNG readbacks for final and diagnostic targets under Playwright WebGPU.",
+      "status": "accepted"
+    },
+    {
+      "id": "pipeline-graph",
+      "required": true,
+      "evidence": "describePipeline() from the capture session records scenePass, atlas, and patch-bounds owners with final tone-map ownership on renderOutput.",
+      "status": "accepted"
+    },
+    {
+      "id": "resource-ledger",
+      "required": true,
+      "evidence": "describeResources() is present in runtime-snapshot.json but has not been validated against a full v2 resource ledger schema.",
+      "status": "incomplete"
+    }
   ],
   "evidenceContract": "v2",
   "evidenceBundle": null,

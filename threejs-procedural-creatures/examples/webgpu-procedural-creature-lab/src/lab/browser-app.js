@@ -1942,7 +1942,15 @@ function createLabController() {
 			if (!state.ready) throw new Error('creature lab is not ready');
 		},
 		async setScenario(id) { return setScenario(id); },
-		async setMode(id) { return setDebugMode(id); },
+		async setMode(id) {
+      const captureActive = new URLSearchParams(window.location.search).get('capture') === '1';
+      // Capture harness may request the lab default mode while a scenario route
+      // already locked a diagnostic mode. Preserve the locked mode under capture.
+      if (captureActive && state.startup?.locked && state.startup?.mode && id !== state.startup.mode) {
+        return setDebugMode(state.startup.mode, { overrideLock: true });
+      }
+      return setDebugMode(id, captureActive ? { overrideLock: true } : {});
+    },
 		async setTier(id) { return setTier(id); },
 		async setSeed(seed) {
 			if (!Number.isInteger(seed) || seed < 0 || seed > 0xffffffff) throw new Error(`invalid creature seed '${seed}'`);

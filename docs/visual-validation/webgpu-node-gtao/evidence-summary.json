@@ -7,7 +7,7 @@
   "canonicalSource": [
     "threejs-ambient-contact-shading/examples/webgpu-node-gtao"
   ],
-  "canonicalSourceHash": "sha256:13b12376bae7428325bcf963253dd9a063e46f1191f7cb3db038604f35c093bc",
+  "canonicalSourceHash": "sha256:f11647241607a01effa3a217662fa606f1c94514da8fa2ff47648cb4491d7c29",
   "threeRevision": "0.185.1",
   "runtime": {
     "renderer": "WebGPURenderer",
@@ -29,8 +29,8 @@
       "file": "final.design.png",
       "meaning": "Display-referred lit output with GTAO applied.",
       "source": "final-lit-display.raw",
-      "sourceSha256": "sha256:c07ca8fafb29602b49a6d9cfb3c9276a6c15d18e981e1e9fe03d19857c580cba",
-      "outputSha256": "sha256:19eceb9c725c27fa73a29b714163440f23bcc46775c4873d1762ba96d205ba34",
+      "sourceSha256": "sha256:d36a7a4e47e0132a893a1400c7146925aaf9c87de9f850e87bc72d13bccf5f1f",
+      "outputSha256": "sha256:229a832f57a02ac66dff5360e190a8c1e8525f82de7c2de613672f37703c73e1",
       "width": 1200,
       "height": 800,
       "encoding": "rgba8",
@@ -65,8 +65,8 @@
       "file": "reconstructed-gtao.png",
       "meaning": "Reconstructed and denoised GTAO visibility diagnostic.",
       "source": "reconstructed-gtao.raw",
-      "sourceSha256": "sha256:68fe23faf037f4d8c56c638b6ce55bb35905ffa7360f23e7e48e2ad70a72530e",
-      "outputSha256": "sha256:a2272ccade3f9e17a54f53dc2c54ac7296ca0ed573f8f9b3813003c0e4d51e09",
+      "sourceSha256": "sha256:525adf7b65f7f08b017fa97819c806e2b12c502046ef170c13bbb702b7d8efab",
+      "outputSha256": "sha256:c05c9ed305854642257ea056bf9923f3e6f7dda8b17585c70354d99b0a7947ac",
       "width": 1200,
       "height": 800,
       "encoding": "rgba8",
@@ -99,7 +99,8 @@
     }
   ],
   "limitations": [
-    "Mechanism and visual-correctness claims remain INSUFFICIENT_EVIDENCE.",
-    "No accepted named-adapter GPU timestamps or lifecycle loop are present."
+    "Fresh correctness capture produced native-WebGPU raw readbacks for lit, baseline, raw GTAO, reconstructed GTAO, normal, and velocity targets.",
+    "Mechanism quantitative gates remain INSUFFICIENT_EVIDENCE; no accepted named-adapter GPU timestamps or lifecycle loop are promoted.",
+    "Full v2 evidence-manifest acceptance is not claimed from this raw-readback candidate bundle."
   ]
 }

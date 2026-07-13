@@ -5,45 +5,208 @@
   "threeRevision": "0.185.1",
   "kind": "canonical-lab",
   "status": "incomplete",
-  "canonicalSource": ["threejs-ambient-contact-shading/examples/webgpu-node-gtao"],
+  "canonicalSource": [
+    "threejs-ambient-contact-shading/examples/webgpu-node-gtao"
+  ],
   "browserEntry": "threejs-ambient-contact-shading/examples/webgpu-node-gtao/index.html",
   "publishPath": "/demos/webgpu-node-gtao/",
   "scenarios": [
-    { "id": "wall-receiver", "acceptanceStatus": "incomplete" },
-    { "id": "thin-silhouette", "acceptanceStatus": "incomplete" },
-    { "id": "sky-edge", "acceptanceStatus": "incomplete" },
-    { "id": "emissive-direct", "acceptanceStatus": "incomplete" },
-    { "id": "non-square-projection", "acceptanceStatus": "incomplete" },
-    { "id": "moving-occluder", "acceptanceStatus": "incomplete" },
-    { "id": "bent-normal-wall", "acceptanceStatus": "incomplete" }
+    {
+      "id": "wall-receiver",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "thin-silhouette",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "sky-edge",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "emissive-direct",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "non-square-projection",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "moving-occluder",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "bent-normal-wall",
+      "acceptanceStatus": "incomplete"
+    }
   ],
   "mechanisms": [
-    { "id": "scalar-gtao", "route": "mechanism/scalar-gtao/", "acceptanceStatus": "incomplete" },
-    { "id": "bilateral-denoise-and-halo", "route": "mechanism/bilateral-denoise-and-halo/", "acceptanceStatus": "incomplete" },
-    { "id": "temporal-ao", "route": "mechanism/temporal-ao/", "acceptanceStatus": "incomplete" },
-    { "id": "bent-normal-wall", "route": "mechanism/bent-normal-wall/", "acceptanceStatus": "incomplete" },
-    { "id": "indirect-only-application", "route": "mechanism/indirect-only-application/", "acceptanceStatus": "incomplete" },
-    { "id": "depth-conventions", "route": "mechanism/depth-conventions/", "acceptanceStatus": "incomplete" }
+    {
+      "id": "scalar-gtao",
+      "route": "mechanism/scalar-gtao/",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "bilateral-denoise-and-halo",
+      "route": "mechanism/bilateral-denoise-and-halo/",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "temporal-ao",
+      "route": "mechanism/temporal-ao/",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "bent-normal-wall",
+      "route": "mechanism/bent-normal-wall/",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "indirect-only-application",
+      "route": "mechanism/indirect-only-application/",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "depth-conventions",
+      "route": "mechanism/depth-conventions/",
+      "acceptanceStatus": "incomplete"
+    }
   ],
   "tiers": [
-    { "id": "ultra", "targetClass": "current-adapter", "frameTargetMs": null, "resolutionPolicy": { "aoScale": 0.5 }, "mechanismLimits": { "samples": 16 }, "resourceLimits": {}, "degradationFromPrevious": [], "preservedInvariants": ["indirect-only-application", "standard-depth"], "acceptanceStatus": "incomplete" },
-    { "id": "high", "targetClass": "current-adapter", "frameTargetMs": null, "resolutionPolicy": { "aoScale": 0.5 }, "mechanismLimits": { "samples": 12 }, "resourceLimits": {}, "degradationFromPrevious": ["reduce samples"], "preservedInvariants": ["indirect-only-application", "standard-depth"], "acceptanceStatus": "incomplete" },
-    { "id": "medium", "targetClass": "current-adapter", "frameTargetMs": null, "resolutionPolicy": { "aoScale": 0.33 }, "mechanismLimits": { "samples": 8, "reconstruction": "raw" }, "resourceLimits": {}, "degradationFromPrevious": ["reduce AO resolution", "remove denoise from active graph"], "preservedInvariants": ["indirect-only-application", "standard-depth"], "acceptanceStatus": "incomplete" }
+    {
+      "id": "ultra",
+      "targetClass": "current-adapter",
+      "frameTargetMs": null,
+      "resolutionPolicy": {
+        "aoScale": 0.5
+      },
+      "mechanismLimits": {
+        "samples": 16
+      },
+      "resourceLimits": {},
+      "degradationFromPrevious": [],
+      "preservedInvariants": [
+        "indirect-only-application",
+        "standard-depth"
+      ],
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "high",
+      "targetClass": "current-adapter",
+      "frameTargetMs": null,
+      "resolutionPolicy": {
+        "aoScale": 0.5
+      },
+      "mechanismLimits": {
+        "samples": 12
+      },
+      "resourceLimits": {},
+      "degradationFromPrevious": [
+        "reduce samples"
+      ],
+      "preservedInvariants": [
+        "indirect-only-application",
+        "standard-depth"
+      ],
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "medium",
+      "targetClass": "current-adapter",
+      "frameTargetMs": null,
+      "resolutionPolicy": {
+        "aoScale": 0.33
+      },
+      "mechanismLimits": {
+        "samples": 8,
+        "reconstruction": "raw"
+      },
+      "resourceLimits": {},
+      "degradationFromPrevious": [
+        "reduce AO resolution",
+        "remove denoise from active graph"
+      ],
+      "preservedInvariants": [
+        "indirect-only-application",
+        "standard-depth"
+      ],
+      "acceptanceStatus": "incomplete"
+    }
   ],
-  "modes": ["final", "raw-ao", "denoised-ao", "normal", "raw-depth", "linear-view-z", "sky-classification", "velocity", "bent-normal", "indirect-delta", "disabled"],
-  "cameras": ["near", "design", "far"],
-  "seeds": [1, 2654435769],
+  "modes": [
+    "final",
+    "raw-ao",
+    "denoised-ao",
+    "normal",
+    "raw-depth",
+    "linear-view-z",
+    "sky-classification",
+    "velocity",
+    "bent-normal",
+    "indirect-delta",
+    "disabled"
+  ],
+  "cameras": [
+    "near",
+    "design",
+    "far"
+  ],
+  "seeds": [
+    1,
+    2654435769
+  ],
   "capabilityRequirements": [
-    { "id": "native-webgpu", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "standard-depth", "required": true, "evidence": null, "status": "incomplete" }
+    {
+      "id": "native-webgpu",
+      "required": true,
+      "evidence": "capture:evidence 2026-07-13 wrote renderer-info.json with WebGPURenderer and backend.isWebGPUBackend===true under Playwright chromium on Apple M4 Max.",
+      "status": "accepted"
+    },
+    {
+      "id": "standard-depth",
+      "required": true,
+      "evidence": null,
+      "status": "incomplete"
+    }
   ],
   "runtimeProof": [
-    { "id": "renderer-init", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "backend-is-webgpu", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "mechanism-reachable", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "aligned-readback", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "one-prepass-one-lit-pass", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "current-adapter-gpu-timestamps", "required": true, "evidence": null, "status": "incomplete" }
+    {
+      "id": "renderer-init",
+      "required": true,
+      "evidence": "capture.mjs awaited controller ready and completed 7 aligned WebGPU render-target readbacks after resize/renderOnce.",
+      "status": "accepted"
+    },
+    {
+      "id": "backend-is-webgpu",
+      "required": true,
+      "evidence": "renderer-info.json records backend.isWebGPUBackend===true and threeRevision 185; metrics.backend===webgpu.",
+      "status": "accepted"
+    },
+    {
+      "id": "mechanism-reachable",
+      "required": true,
+      "evidence": null,
+      "status": "incomplete"
+    },
+    {
+      "id": "aligned-readback",
+      "required": true,
+      "evidence": "render-targets.json records integer 256-byte-aligned bytesPerRow metadata for final-lit-display, raw-gtao, reconstructed-gtao, normals, velocity, and odd 641x359 AO.",
+      "status": "accepted"
+    },
+    {
+      "id": "one-prepass-one-lit-pass",
+      "required": true,
+      "evidence": null,
+      "status": "incomplete"
+    },
+    {
+      "id": "current-adapter-gpu-timestamps",
+      "required": true,
+      "evidence": "capture-status.gpuTimingVerdict remains INSUFFICIENT_EVIDENCE; no named-adapter timestamp ledger was accepted.",
+      "status": "incomplete"
+    }
   ],
   "evidenceContract": "v2",
   "evidenceBundle": null,

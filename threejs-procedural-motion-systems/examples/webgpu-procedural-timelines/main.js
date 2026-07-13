@@ -865,6 +865,11 @@ export class ProceduralTimelineDemo {
         return {
           labId: "webgpu-procedural-timelines",
           threeRevision: REVISION,
+          viewport: {
+            width: { value: demo.logicalWidth, unit: "px", label: "Measured", source: "LabController.logicalWidth after resize" },
+            height: { value: demo.logicalHeight, unit: "px", label: "Measured", source: "LabController.logicalHeight after resize" },
+            dpr: { value: demo.requestedDpr, unit: "1", label: "Measured", source: "LabController.requestedDpr after resize" },
+          },
           runtimeProfile: demo.runtimeProfile,
           performanceTimestampMode: demo.performanceTimestampMode,
           timestampQueriesRequired: demo.timestampQueriesRequired,

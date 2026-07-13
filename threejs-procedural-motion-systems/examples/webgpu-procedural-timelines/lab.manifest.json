@@ -29,69 +29,246 @@
   "browserEntry": "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/index.html",
   "publishPath": "/demos/webgpu-procedural-timelines/",
   "scenarios": [
-    { "id": "launch-and-staging", "acceptanceStatus": "incomplete" },
-    { "id": "spin-docking", "acceptanceStatus": "incomplete" },
-    { "id": "debris-release", "acceptanceStatus": "incomplete" }
+    {
+      "id": "launch-and-staging",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "spin-docking",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "debris-release",
+      "acceptanceStatus": "incomplete"
+    }
   ],
   "mechanisms": [
-    { "id": "launch-and-staging", "route": "mechanism/launch-and-staging/", "acceptanceStatus": "incomplete" },
-    { "id": "spin-docking", "route": "mechanism/spin-docking/", "acceptanceStatus": "incomplete" },
-    { "id": "debris-release", "route": "mechanism/debris-release/", "acceptanceStatus": "incomplete" },
-    { "id": "quaternion-and-reparent", "route": "mechanism/quaternion-and-reparent/", "acceptanceStatus": "incomplete" },
-    { "id": "compute-storage", "route": "mechanism/compute-storage/", "acceptanceStatus": "incomplete" },
-    { "id": "interpolation-and-velocity", "route": "mechanism/interpolation-and-velocity/", "acceptanceStatus": "incomplete" }
+    {
+      "id": "launch-and-staging",
+      "route": "mechanism/launch-and-staging/",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "spin-docking",
+      "route": "mechanism/spin-docking/",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "debris-release",
+      "route": "mechanism/debris-release/",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "quaternion-and-reparent",
+      "route": "mechanism/quaternion-and-reparent/",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "compute-storage",
+      "route": "mechanism/compute-storage/",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "interpolation-and-velocity",
+      "route": "mechanism/interpolation-and-velocity/",
+      "acceptanceStatus": "incomplete"
+    }
   ],
   "tiers": [
     {
       "id": "full",
       "targetClass": "current native-WebGPU adapter",
       "frameTargetMs": null,
-      "resolutionPolicy": { "dprCap": { "value": 2, "unit": "ratio", "label": "Authored", "source": "motion lab tier" } },
-      "mechanismLimits": { "instanceCapacity": { "value": 4096, "unit": "instances", "label": "Authored", "source": "motion lab tier" } },
-      "resourceLimits": { "motionStorageBytes": { "value": 851968, "unit": "bytes", "label": "Derived", "source": "4096 * 208" } },
+      "resolutionPolicy": {
+        "dprCap": {
+          "value": 2,
+          "unit": "ratio",
+          "label": "Authored",
+          "source": "motion lab tier"
+        }
+      },
+      "mechanismLimits": {
+        "instanceCapacity": {
+          "value": 4096,
+          "unit": "instances",
+          "label": "Authored",
+          "source": "motion lab tier"
+        }
+      },
+      "resourceLimits": {
+        "motionStorageBytes": {
+          "value": 851968,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "4096 * 208"
+        }
+      },
       "degradationFromPrevious": [],
-      "preservedInvariants": ["fixed-step semantics", "exact terminal lock", "previous/current transforms"],
+      "preservedInvariants": [
+        "fixed-step semantics",
+        "exact terminal lock",
+        "previous/current transforms"
+      ],
       "acceptanceStatus": "incomplete"
     },
     {
       "id": "balanced",
       "targetClass": "current native-WebGPU adapter",
       "frameTargetMs": null,
-      "resolutionPolicy": { "dprCap": { "value": 1.5, "unit": "ratio", "label": "Authored", "source": "motion lab tier" } },
-      "mechanismLimits": { "instanceCapacity": { "value": 2048, "unit": "instances", "label": "Authored", "source": "motion lab tier" } },
-      "resourceLimits": { "motionStorageBytes": { "value": 425984, "unit": "bytes", "label": "Derived", "source": "2048 * 208" } },
-      "degradationFromPrevious": ["halve recurrent instance capacity", "lower DPR cap"],
-      "preservedInvariants": ["fixed-step semantics", "exact terminal lock", "previous/current transforms"],
+      "resolutionPolicy": {
+        "dprCap": {
+          "value": 1.5,
+          "unit": "ratio",
+          "label": "Authored",
+          "source": "motion lab tier"
+        }
+      },
+      "mechanismLimits": {
+        "instanceCapacity": {
+          "value": 2048,
+          "unit": "instances",
+          "label": "Authored",
+          "source": "motion lab tier"
+        }
+      },
+      "resourceLimits": {
+        "motionStorageBytes": {
+          "value": 425984,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "2048 * 208"
+        }
+      },
+      "degradationFromPrevious": [
+        "halve recurrent instance capacity",
+        "lower DPR cap"
+      ],
+      "preservedInvariants": [
+        "fixed-step semantics",
+        "exact terminal lock",
+        "previous/current transforms"
+      ],
       "acceptanceStatus": "incomplete"
     },
     {
       "id": "test-minimum",
       "targetClass": "correctness fixture",
       "frameTargetMs": null,
-      "resolutionPolicy": { "dprCap": { "value": 1, "unit": "ratio", "label": "Authored", "source": "motion lab tier" } },
-      "mechanismLimits": { "instanceCapacity": { "value": 64, "unit": "instances", "label": "Authored", "source": "motion lab tier" } },
-      "resourceLimits": { "motionStorageBytes": { "value": 13312, "unit": "bytes", "label": "Derived", "source": "64 * 208" } },
-      "degradationFromPrevious": ["reduce recurrent instance capacity to fixture scale", "lower DPR cap"],
-      "preservedInvariants": ["native WebGPU", "fixed-step semantics", "exact terminal lock", "previous/current transforms"],
+      "resolutionPolicy": {
+        "dprCap": {
+          "value": 1,
+          "unit": "ratio",
+          "label": "Authored",
+          "source": "motion lab tier"
+        }
+      },
+      "mechanismLimits": {
+        "instanceCapacity": {
+          "value": 64,
+          "unit": "instances",
+          "label": "Authored",
+          "source": "motion lab tier"
+        }
+      },
+      "resourceLimits": {
+        "motionStorageBytes": {
+          "value": 13312,
+          "unit": "bytes",
+          "label": "Derived",
+          "source": "64 * 208"
+        }
+      },
+      "degradationFromPrevious": [
+        "reduce recurrent instance capacity to fixture scale",
+        "lower DPR cap"
+      ],
+      "preservedInvariants": [
+        "native WebGPU",
+        "fixed-step semantics",
+        "exact terminal lock",
+        "previous/current transforms"
+      ],
       "acceptanceStatus": "incomplete"
     }
   ],
-  "modes": ["final", "velocity", "emissive", "normal"],
-  "cameras": ["near", "design", "far"],
-  "seeds": [1, 2654435769],
+  "modes": [
+    "final",
+    "velocity",
+    "emissive",
+    "normal"
+  ],
+  "cameras": [
+    "near",
+    "design",
+    "far"
+  ],
+  "seeds": [
+    1,
+    2654435769
+  ],
   "capabilityRequirements": [
-    { "id": "native-webgpu", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "storage-buffer", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "compute", "required": true, "evidence": null, "status": "incomplete" }
+    {
+      "id": "native-webgpu",
+      "required": true,
+      "evidence": "correctness capture-session records nativeWebGPU===true, rendererType WebGPURenderer, and deviceIdentityVerified after init.",
+      "status": "accepted"
+    },
+    {
+      "id": "storage-buffer",
+      "required": true,
+      "evidence": "capture wrote storage.*.f32.bin / u32.bin compute storage readbacks for live and debris motion lanes.",
+      "status": "accepted"
+    },
+    {
+      "id": "compute",
+      "required": true,
+      "evidence": "mechanism.compute-storage.png and storage compute-storage-live buffers were produced by the compute motion plan during correctness capture.",
+      "status": "accepted"
+    }
   ],
   "runtimeProof": [
-    { "id": "renderer-init", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "backend-is-webgpu", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "mechanism-reachable", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "aligned-readback", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "compute-storage-readback", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "mrt-readback", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "current-adapter-gpu-timestamp", "required": true, "evidence": null, "status": "incomplete" }
+    {
+      "id": "renderer-init",
+      "required": true,
+      "evidence": "capture-session runtime metrics report initialized===true and rendererDeviceStatus active with generation 1.",
+      "status": "accepted"
+    },
+    {
+      "id": "backend-is-webgpu",
+      "required": true,
+      "evidence": "rendererBackendEvidence.isWebGPUBackend===true with backendType WebGPUBackend on the correctness capture session.",
+      "status": "accepted"
+    },
+    {
+      "id": "mechanism-reachable",
+      "required": true,
+      "evidence": "mechanism launch/spin/debris/quaternion/compute/interpolation PNG diagnostics were captured on fixed routes.",
+      "status": "accepted"
+    },
+    {
+      "id": "aligned-readback",
+      "required": true,
+      "evidence": "capture wrote normalized-readbacks and transport-readbacks with padded row stride artifacts for presentation targets.",
+      "status": "accepted"
+    },
+    {
+      "id": "compute-storage-readback",
+      "required": true,
+      "evidence": "storage.compute-storage-live.* and storage.debris-mid.* binary buffers were written during the correctness capture session.",
+      "status": "accepted"
+    },
+    {
+      "id": "mrt-readback",
+      "required": true,
+      "evidence": "diagnostic.normal/emissive/velocity PNGs and diagnostics.mosaic.png were captured from the MRT graph.",
+      "status": "accepted"
+    },
+    {
+      "id": "current-adapter-gpu-timestamp",
+      "required": true,
+      "evidence": "timestampQueriesActive remains false for correctness profile; GPU timing is not accepted as performance evidence.",
+      "status": "incomplete"
+    }
   ],
   "evidenceContract": "v2",
   "evidenceBundle": null,

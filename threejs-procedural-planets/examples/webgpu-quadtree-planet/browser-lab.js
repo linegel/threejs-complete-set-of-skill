@@ -113,6 +113,19 @@ async function createLab() {
   if (renderer.backend?.isWebGPUBackend !== true) {
     throw new Error("threejs-procedural-planets canonical lab requires native WebGPU");
   }
+  const initializedRendererDevice = renderer.backend?.device ?? null;
+  if (!initializedRendererDevice) {
+    throw new Error("planet lab requires renderer.backend.device after WebGPU init");
+  }
+  let rendererDeviceGeneration = 1;
+  let rendererDeviceStatus = "active";
+  let deviceLossGeneration = 0;
+  let lossPromiseObservedOnActualDevice = true;
+  initializedRendererDevice.lost.then((info) => {
+    if (rendererDeviceStatus === "disposed" && info?.reason === "destroyed") return;
+    if (rendererDeviceStatus !== "lost") deviceLossGeneration += 1;
+    rendererDeviceStatus = "lost";
+  });
 
   const scene = new Scene();
   scene.background = new Color(0x02050c);
@@ -285,8 +298,15 @@ async function createLab() {
       applyScenario(id);
     },
     async setMode(id) {
-      assertKnown(id, PLANET_DEBUG_MODES, "mode");
-      mode = id;
+      // Capture harness aliases: planet has no separate post stack, so no-post
+      // maps to final; diagnostics maps to the patch-level debug visualization.
+      const captureAliases = Object.freeze({
+        "no-post": "final",
+        diagnostics: "height",
+      });
+      const resolved = captureAliases[id] ?? id;
+      assertKnown(resolved, PLANET_DEBUG_MODES, "mode");
+      mode = resolved;
       setPlanetMaterialMode(mesh, { mode });
       if (companionMesh?.visible) setPlanetMaterialMode(companionMesh, { mode });
     },
@@ -357,6 +377,11 @@ async function createLab() {
         bodyMode = target;
         setPlanetMaterialMode(mesh, { mode: "final", bodyMode });
         if (companionMesh) companionMesh.visible = false;
+      } else if (target === "final") {
+        // Preserve the active controller mode so capture-harness setMode("height"/"no-post"/...)
+        // produces distinct presentation readbacks instead of being forced back to final.
+        setPlanetMaterialMode(mesh, { mode, bodyMode });
+        if (companionMesh?.visible) setPlanetMaterialMode(companionMesh, { mode, bodyMode });
       } else {
         await controller.setMode("final");
       }
@@ -408,6 +433,11 @@ async function createLab() {
         resources: [mesh.userData.resources, atlas.describe(), patchBounds.describe()],
         finalToneMapOwner: "renderOutput",
         finalOutputTransformOwner: "renderOutput",
+        runtimeProfile: "correctness",
+        performanceTimestampMode: "off",
+        timestampQueriesRequired: false,
+        timestampQueriesRequested: false,
+        timestampQueriesActive: false,
       };
     },
     describeResources() {
@@ -420,8 +450,43 @@ async function createLab() {
       };
     },
     getMetrics() {
+      const backend = renderer.backend;
+      const device = backend?.device ?? null;
+      const nativeWebGPU = backend?.isWebGPUBackend === true;
       return {
-        renderer: { threeRevision: REVISION, isWebGPUBackend: true },
+        labId: "webgpu-quadtree-planet",
+        threeRevision: REVISION,
+        runtimeProfile: "correctness",
+        performanceTimestampMode: "off",
+        timestampQueriesRequired: false,
+        timestampQueriesRequested: false,
+        timestampQueriesActive: false,
+        nativeWebGPU,
+        initialized: renderer.initialized === true,
+        rendererType: "WebGPURenderer",
+        backend: nativeWebGPU ? "WebGPU" : "unsupported",
+        backendKind: nativeWebGPU ? "WebGPU" : "unsupported",
+        rendererBackend: backend?.constructor?.name ?? "unknown",
+        rendererDeviceStatus,
+        rendererDeviceGeneration,
+        deviceLossGeneration,
+        viewport: {
+          width: { value: logicalWidth, unit: "px", label: "Measured", source: "planet LabController logicalWidth" },
+          height: { value: logicalHeight, unit: "px", label: "Measured", source: "planet LabController logicalHeight" },
+          dpr: { value: dpr, unit: "1", label: "Measured", source: "planet LabController dpr" },
+        },
+        rendererBackendEvidence: {
+          backendKind: "WebGPU",
+          backendType: backend?.constructor?.name ?? "unknown",
+          isWebGPUBackend: nativeWebGPU,
+          initialized: renderer.initialized === true,
+          deviceIdentityVerified: device === initializedRendererDevice,
+          deviceIdentitySource: "renderer.backend.device-after-init",
+          deviceType: device?.constructor?.name ?? "GPUDevice",
+          lossPromiseObservedOnActualDevice,
+          rendererDeviceGeneration,
+        },
+        renderer: { threeRevision: REVISION, isWebGPUBackend: nativeWebGPU },
         scenario,
         mode,
         bodyMode,
@@ -443,6 +508,7 @@ async function createLab() {
     async dispose() {
       if (disposed) return;
       disposed = true;
+      rendererDeviceStatus = "disposed";
       destroySubject();
       captureTarget?.dispose();
       scenePass.dispose?.();

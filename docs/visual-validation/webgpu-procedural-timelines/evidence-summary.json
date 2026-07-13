@@ -1,0 +1,140 @@
+{
+  "schemaVersion": 1,
+  "labId": "webgpu-procedural-timelines",
+  "classification": "inspected-runtime-evidence-preview",
+  "acceptanceStatus": "incomplete",
+  "evidenceBundleId": "correctness",
+  "canonicalSource": [
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/timeline.js",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/quaternion-helpers.js",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/gpu-instance-motion.js",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/route-state.js",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/main.js",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/browser.mjs",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/capture-hook.mjs",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/capture.mjs",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/validate-artifacts.mjs",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/index.html",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/mechanism/launch-and-staging/index.html",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/mechanism/spin-docking/index.html",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/mechanism/debris-release/index.html",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/mechanism/quaternion-and-reparent/index.html",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/mechanism/compute-storage/index.html",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/mechanism/interpolation-and-velocity/index.html",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/tier/full/index.html",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/tier/balanced/index.html",
+    "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/tier/test-minimum/index.html"
+  ],
+  "canonicalSourceHash": "sha256:f82d73a0387ee333ce3d7fab3917f528f65d92bbb3c8d956fe3366d4872d158c",
+  "threeRevision": "0.185.1",
+  "runtime": {
+    "renderer": "unknown",
+    "backend": "WebGPU",
+    "isWebGPUBackend": true,
+    "threeRevision": "0.185.1"
+  },
+  "claimVerdicts": {
+    "mechanismCorrectness": "INSUFFICIENT_EVIDENCE",
+    "performanceCompliance": "INSUFFICIENT_EVIDENCE",
+    "lifecycleStability": "INSUFFICIENT_EVIDENCE"
+  },
+  "primaryImage": "final.design.png",
+  "primaryImageLabel": "Procedural timelines final presentation readback",
+  "images": [
+    {
+      "file": "final.design.png",
+      "meaning": "Final presentation readback.",
+      "source": "final.design.png",
+      "sourceSha256": "sha256:b7e28df88e0c7e75c407f1f5d2891da939bba1f3caf98ef0832b8157d2bca45b",
+      "outputSha256": "sha256:b7e28df88e0c7e75c407f1f5d2891da939bba1f3caf98ef0832b8157d2bca45b",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "diagnostics.mosaic.png",
+      "meaning": "Diagnostic mosaic of normal/emissive/velocity panels.",
+      "source": "diagnostics.mosaic.png",
+      "sourceSha256": "sha256:7742dc1cbaf8419ca04fbaebfa3fc13fedda98db705cfa32cbf6c1e19149bed6",
+      "outputSha256": "sha256:7742dc1cbaf8419ca04fbaebfa3fc13fedda98db705cfa32cbf6c1e19149bed6",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "diagnostic.normal.png",
+      "meaning": "Normal diagnostic readback.",
+      "source": "diagnostic.normal.png",
+      "sourceSha256": "sha256:9eae4e0888a60aac3e0cff00e51f368f6788f299bac22a62cfaee1a30d184cea",
+      "outputSha256": "sha256:9eae4e0888a60aac3e0cff00e51f368f6788f299bac22a62cfaee1a30d184cea",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "diagnostic.emissive.png",
+      "meaning": "Emissive diagnostic readback.",
+      "source": "diagnostic.emissive.png",
+      "sourceSha256": "sha256:3881f3a053e0f413e583e604104730944422cca43ea8c42acad6008bdfc5d16e",
+      "outputSha256": "sha256:3881f3a053e0f413e583e604104730944422cca43ea8c42acad6008bdfc5d16e",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "diagnostic.velocity.png",
+      "meaning": "Velocity diagnostic readback.",
+      "source": "diagnostic.velocity.png",
+      "sourceSha256": "sha256:50fbeac28b662dd37b5fb3d7c0ed635d4d64117577c0fee0da220440470bf3d0",
+      "outputSha256": "sha256:50fbeac28b662dd37b5fb3d7c0ed635d4d64117577c0fee0da220440470bf3d0",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "camera.design.png",
+      "meaning": "Design camera presentation.",
+      "source": "camera.design.png",
+      "sourceSha256": "sha256:bdab217f8b1c4b0c6fd35c1c18fe0b9eb840d5bcd923fb07476237b886c8cf8d",
+      "outputSha256": "sha256:bdab217f8b1c4b0c6fd35c1c18fe0b9eb840d5bcd923fb07476237b886c8cf8d",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "mechanism.launch-and-staging.png",
+      "meaning": "Launch-and-staging mechanism diagnostic.",
+      "source": "mechanism.launch-and-staging.png",
+      "sourceSha256": "sha256:c10b4877f50f0a2bbb372ec7039b425367f6818bfa6215c0b2f5efe741d6e696",
+      "outputSha256": "sha256:c10b4877f50f0a2bbb372ec7039b425367f6818bfa6215c0b2f5efe741d6e696",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "mechanism.spin-docking.png",
+      "meaning": "Spin-docking mechanism diagnostic.",
+      "source": "mechanism.spin-docking.png",
+      "sourceSha256": "sha256:b6ea3340dcde2196fbe819b55da8b75e04a19ee7b8a50156a92c59a87b0e141a",
+      "outputSha256": "sha256:b6ea3340dcde2196fbe819b55da8b75e04a19ee7b8a50156a92c59a87b0e141a",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "mechanism.compute-storage.png",
+      "meaning": "Compute-storage mechanism diagnostic.",
+      "source": "mechanism.compute-storage.png",
+      "sourceSha256": "sha256:00b184505d811e5ebd74e6b46c4697cfcf84737be2bf04edd735b8c01d0f1482",
+      "outputSha256": "sha256:00b184505d811e5ebd74e6b46c4697cfcf84737be2bf04edd735b8c01d0f1482",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    }
+  ],
+  "limitations": [
+    "Correctness capture produced presentation, camera, seed, temporal, and mechanism diagnostic PNGs plus storage-buffer readbacks under native WebGPU.",
+    "Capture status remains incomplete; current-adapter GPU timestamps are not accepted as performance evidence.",
+    "No full v2 accepted evidence-manifest is claimed from this correctness session."
+  ]
+}

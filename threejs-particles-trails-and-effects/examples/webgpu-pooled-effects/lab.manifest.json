@@ -15,75 +15,279 @@
   "browserEntry": "threejs-particles-trails-and-effects/examples/webgpu-pooled-effects/index.html",
   "publishPath": "/demos/webgpu-pooled-effects/",
   "scenarios": [
-    { "id": "reentry-shell-and-wake", "route": "mechanism/reentry-shell-and-wake/", "acceptanceStatus": "incomplete" },
-    { "id": "impact-sparks", "route": "mechanism/impact-sparks/", "acceptanceStatus": "incomplete" },
-    { "id": "debris-dissolve", "route": "mechanism/debris-dissolve/", "acceptanceStatus": "incomplete" },
-    { "id": "gpu-pool-and-compaction", "route": "mechanism/gpu-pool-and-compaction/", "acceptanceStatus": "incomplete" },
-    { "id": "indirect-draws", "route": "mechanism/indirect-draws/", "acceptanceStatus": "incomplete" },
-    { "id": "hdr-emissive-and-depth", "route": "mechanism/hdr-emissive-and-depth/", "acceptanceStatus": "incomplete" },
-    { "id": "tier-benchmark", "route": "mechanism/tier-benchmark/", "acceptanceStatus": "incomplete" }
+    {
+      "id": "reentry-shell-and-wake",
+      "route": "mechanism/reentry-shell-and-wake/",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "impact-sparks",
+      "route": "mechanism/impact-sparks/",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "debris-dissolve",
+      "route": "mechanism/debris-dissolve/",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "gpu-pool-and-compaction",
+      "route": "mechanism/gpu-pool-and-compaction/",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "indirect-draws",
+      "route": "mechanism/indirect-draws/",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "hdr-emissive-and-depth",
+      "route": "mechanism/hdr-emissive-and-depth/",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "tier-benchmark",
+      "route": "mechanism/tier-benchmark/",
+      "acceptanceStatus": "incomplete"
+    }
   ],
   "mechanisms": [
-    { "id": "reentry-shell-and-wake", "route": "mechanism/reentry-shell-and-wake", "startup": { "scenario": "reentry-shell-and-wake" }, "acceptanceStatus": "incomplete" },
-    { "id": "impact-sparks", "route": "mechanism/impact-sparks", "startup": { "scenario": "impact-sparks" }, "acceptanceStatus": "incomplete" },
-    { "id": "debris-dissolve", "route": "mechanism/debris-dissolve", "startup": { "scenario": "debris-dissolve" }, "acceptanceStatus": "incomplete" },
-    { "id": "gpu-pool-and-compaction", "route": "mechanism/gpu-pool-and-compaction", "startup": { "scenario": "gpu-pool-and-compaction" }, "acceptanceStatus": "incomplete" },
-    { "id": "indirect-draws", "route": "mechanism/indirect-draws", "startup": { "scenario": "indirect-draws" }, "acceptanceStatus": "incomplete" },
-    { "id": "hdr-emissive-and-depth", "route": "mechanism/hdr-emissive-and-depth", "startup": { "scenario": "hdr-emissive-and-depth" }, "acceptanceStatus": "incomplete" },
-    { "id": "tier-benchmark", "route": "mechanism/tier-benchmark", "startup": { "scenario": "tier-benchmark" }, "acceptanceStatus": "incomplete" }
+    {
+      "id": "reentry-shell-and-wake",
+      "route": "mechanism/reentry-shell-and-wake",
+      "startup": {
+        "scenario": "reentry-shell-and-wake"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "impact-sparks",
+      "route": "mechanism/impact-sparks",
+      "startup": {
+        "scenario": "impact-sparks"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "debris-dissolve",
+      "route": "mechanism/debris-dissolve",
+      "startup": {
+        "scenario": "debris-dissolve"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "gpu-pool-and-compaction",
+      "route": "mechanism/gpu-pool-and-compaction",
+      "startup": {
+        "scenario": "gpu-pool-and-compaction"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "indirect-draws",
+      "route": "mechanism/indirect-draws",
+      "startup": {
+        "scenario": "indirect-draws"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "hdr-emissive-and-depth",
+      "route": "mechanism/hdr-emissive-and-depth",
+      "startup": {
+        "scenario": "hdr-emissive-and-depth"
+      },
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "tier-benchmark",
+      "route": "mechanism/tier-benchmark",
+      "startup": {
+        "scenario": "tier-benchmark"
+      },
+      "acceptanceStatus": "incomplete"
+    }
   ],
   "tiers": [
     {
       "id": "ultra",
       "targetClass": "current-adapter authored workload",
       "frameTargetMs": null,
-      "resolutionPolicy": { "sceneScale": 1, "bloomScale": 0.5, "dprCap": 2 },
-      "mechanismLimits": { "poolCap": 65536, "shellLayers": 5, "wakeFamilies": 3, "fieldOctaves": 3 },
-      "resourceLimits": { "gpuTimingRequiredForAcceptance": true },
+      "resolutionPolicy": {
+        "sceneScale": 1,
+        "bloomScale": 0.5,
+        "dprCap": 2
+      },
+      "mechanismLimits": {
+        "poolCap": 65536,
+        "shellLayers": 5,
+        "wakeFamilies": 3,
+        "fieldOctaves": 3
+      },
+      "resourceLimits": {
+        "gpuTimingRequiredForAcceptance": true
+      },
       "degradationFromPrevious": [],
-      "preservedInvariants": ["event physics", "mark-scan-scatter", "indirect draw", "depth occlusion", "HDR hierarchy"],
+      "preservedInvariants": [
+        "event physics",
+        "mark-scan-scatter",
+        "indirect draw",
+        "depth occlusion",
+        "HDR hierarchy"
+      ],
       "acceptanceStatus": "incomplete"
     },
     {
       "id": "high",
       "targetClass": "current-adapter authored workload",
       "frameTargetMs": null,
-      "resolutionPolicy": { "sceneScale": 1, "bloomScale": 0.5, "dprCap": 1.5 },
-      "mechanismLimits": { "poolCap": 24576, "shellLayers": 4, "wakeFamilies": 2, "fieldOctaves": 2 },
-      "resourceLimits": { "gpuTimingRequiredForAcceptance": true },
-      "degradationFromPrevious": ["lower active capacity", "merge one shell layer", "remove one field octave"],
-      "preservedInvariants": ["event physics", "mark-scan-scatter", "indirect draw", "depth occlusion", "HDR hierarchy"],
+      "resolutionPolicy": {
+        "sceneScale": 1,
+        "bloomScale": 0.5,
+        "dprCap": 1.5
+      },
+      "mechanismLimits": {
+        "poolCap": 24576,
+        "shellLayers": 4,
+        "wakeFamilies": 2,
+        "fieldOctaves": 2
+      },
+      "resourceLimits": {
+        "gpuTimingRequiredForAcceptance": true
+      },
+      "degradationFromPrevious": [
+        "lower active capacity",
+        "merge one shell layer",
+        "remove one field octave"
+      ],
+      "preservedInvariants": [
+        "event physics",
+        "mark-scan-scatter",
+        "indirect draw",
+        "depth occlusion",
+        "HDR hierarchy"
+      ],
       "acceptanceStatus": "incomplete"
     },
     {
       "id": "medium",
       "targetClass": "current-adapter authored workload",
       "frameTargetMs": null,
-      "resolutionPolicy": { "sceneScale": 1, "bloomScale": 0.25, "dprCap": 1 },
-      "mechanismLimits": { "poolCap": 8192, "shellLayers": 2, "wakeFamilies": 1, "fieldOctaves": 1 },
-      "resourceLimits": { "gpuTimingRequiredForAcceptance": true },
-      "degradationFromPrevious": ["lower active capacity", "primary wake only", "single field octave"],
-      "preservedInvariants": ["event physics", "mark-scan-scatter", "indirect draw", "depth occlusion", "HDR hierarchy"],
+      "resolutionPolicy": {
+        "sceneScale": 1,
+        "bloomScale": 0.25,
+        "dprCap": 1
+      },
+      "mechanismLimits": {
+        "poolCap": 8192,
+        "shellLayers": 2,
+        "wakeFamilies": 1,
+        "fieldOctaves": 1
+      },
+      "resourceLimits": {
+        "gpuTimingRequiredForAcceptance": true
+      },
+      "degradationFromPrevious": [
+        "lower active capacity",
+        "primary wake only",
+        "single field octave"
+      ],
+      "preservedInvariants": [
+        "event physics",
+        "mark-scan-scatter",
+        "indirect draw",
+        "depth occlusion",
+        "HDR hierarchy"
+      ],
       "acceptanceStatus": "incomplete"
     }
   ],
-  "modes": ["final", "no-post", "raw-emissive", "bloom-only", "normal"],
-  "cameras": ["near", "design", "far"],
-  "seeds": [1, 2654435769],
+  "modes": [
+    "final",
+    "no-post",
+    "raw-emissive",
+    "bloom-only",
+    "normal"
+  ],
+  "cameras": [
+    "near",
+    "design",
+    "far"
+  ],
+  "seeds": [
+    1,
+    2654435769
+  ],
   "capabilityRequirements": [
-    { "id": "webgpu-backend", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "storage-buffer", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "indirect-draw", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "mrt", "required": true, "evidence": null, "status": "incomplete" }
+    {
+      "id": "webgpu-backend",
+      "required": true,
+      "evidence": "correctness capture wrote renderer-info.json with WebGPURenderer and backend.isWebGPUBackend===true.",
+      "status": "accepted"
+    },
+    {
+      "id": "storage-buffer",
+      "required": true,
+      "evidence": "GPUCompactionEffectPool storage SoA lanes and free-list counters were stepped and read back during capture mechanism evidence.",
+      "status": "accepted"
+    },
+    {
+      "id": "indirect-draw",
+      "required": true,
+      "evidence": "publish-indirect-count path populated IndirectStorageBufferAttribute instance counts observed in mechanism readback and mechanism.indirect-draws.png.",
+      "status": "accepted"
+    },
+    {
+      "id": "mrt",
+      "required": true,
+      "evidence": "diagnostics.mosaic.png and multi-target capture path wrote emissive/bloom/normal diagnostics from the scene MRT graph.",
+      "status": "accepted"
+    }
   ],
   "runtimeProof": [
-    { "id": "backend-is-webgpu", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "ordered-compute-dispatch", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "stable-identity-free-list-readback", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "indirect-count-readback", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "live-soft-depth-sampling", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "render-target-output", "required": true, "evidence": null, "status": "incomplete" },
-    { "id": "gpu-timestamps", "required": true, "evidence": null, "status": "incomplete" }
+    {
+      "id": "backend-is-webgpu",
+      "required": true,
+      "evidence": "renderer-info.json backend.isWebGPUBackend===true for the correctness bundle under artifacts/visual-validation/webgpu-pooled-effects/correctness.",
+      "status": "accepted"
+    },
+    {
+      "id": "ordered-compute-dispatch",
+      "required": true,
+      "evidence": "pipeline-graph.json records the 11-dispatch mark/scan/scatter/expand/publish order used by GPUCompactionEffectPool.step.",
+      "status": "accepted"
+    },
+    {
+      "id": "stable-identity-free-list-readback",
+      "required": true,
+      "evidence": "readMechanismEvidence validated dense indexToEntity/entityToIndex free-list invariants for spark and debris pools during capture.",
+      "status": "accepted"
+    },
+    {
+      "id": "indirect-count-readback",
+      "required": true,
+      "evidence": "mechanism readback recorded indirect instance counts matching liveCount for both pools.",
+      "status": "accepted"
+    },
+    {
+      "id": "live-soft-depth-sampling",
+      "required": true,
+      "evidence": "soft-depth occlusion quantitative gate was not claimed PASS in the correctness mechanismClaims ledger.",
+      "status": "incomplete"
+    },
+    {
+      "id": "render-target-output",
+      "required": true,
+      "evidence": "correctness capture wrote final.design.png, no-post.design.png, camera/seed/temporal PNGs, and tier/mechanism scenario images.",
+      "status": "accepted"
+    },
+    {
+      "id": "gpu-timestamps",
+      "required": true,
+      "evidence": "performanceCompliance remains INSUFFICIENT_EVIDENCE; no accepted GPU p95 timestamp claim is published.",
+      "status": "incomplete"
+    }
   ],
   "evidenceContract": "v2",
   "evidenceBundle": null,
