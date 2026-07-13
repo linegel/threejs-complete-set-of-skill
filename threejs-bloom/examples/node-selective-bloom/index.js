@@ -13,6 +13,13 @@ import {
 	vec4
 } from 'three/tsl';
 import { bloom } from 'three/addons/tsl/display/BloomNode.js';
+import {
+	bindWebGPUDeviceIdentity,
+	captureRuntimeProfileFields,
+	markWebGPUDeviceDisposed,
+	markWebGPUDeviceDisposing,
+	webgpuDeviceIdentityMetrics,
+} from '../../../labs/runtime/webgpu-device-identity.mjs';
 
 const LAB_ID = 'node-selective-bloom';
 
@@ -1061,6 +1068,7 @@ export async function createNodeSelectiveBloomExample( {
 	renderer.toneMappingExposure = 1;
 	await renderer.init();
 	if ( renderer.backend.isWebGPUBackend !== true ) throw new Error( 'threejs-bloom requires native WebGPU.' );
+	const deviceIdentity = bindWebGPUDeviceIdentity( renderer );
 
 	let quality = selectQualityTier( renderer, requestedQuality );
 	const controls = { ...BLOOM_CONTROLS, ...controlOverrides };
@@ -1229,12 +1237,15 @@ export async function createNodeSelectiveBloomExample( {
 
 	}
 
+	let cameraId = 'design';
+
 	async function setCamera( id ) {
 
 		if ( id === 'near' ) camera.position.set( 3.7, 2.2, 5 );
 		else if ( id === 'design' ) camera.position.set( 5.8, 3.2, 7.4 );
 		else if ( id === 'far' ) camera.position.set( 8.7, 5, 11 );
 		else throw new Error( `Unknown bloom camera: ${ id }` );
+		cameraId = id;
 		camera.lookAt( 0, 0.8, 0 );
 		camera.updateMatrixWorld();
 
@@ -1394,6 +1405,7 @@ export async function createNodeSelectiveBloomExample( {
 		const bloomReachable = stage.stageKind === BLOOM_STAGE_KINDS.BLOOM && [ DEBUG_MODES.COMBINED, DEBUG_MODES.BLOOM_ONLY ].includes( debugMode );
 		return {
 			schemaVersion: 2,
+			...captureRuntimeProfileFields(),
 			owners: {
 				renderer: 'node-selective-bloom',
 				pipeline: 'node-selective-bloom',
@@ -1432,14 +1444,17 @@ export async function createNodeSelectiveBloomExample( {
 
 	function getMetrics() {
 
+		const size = renderer.getSize( new THREE.Vector2() );
 		return {
 			labId: LAB_ID,
-			backend: renderer.backend.isWebGPUBackend === true ? 'webgpu' : 'unsupported',
+			...webgpuDeviceIdentityMetrics( deviceIdentity, renderer ),
 			threeRevision: THREE.REVISION,
 			tier: quality.name,
 			scenario: scenarioId,
 			mode: debugMode,
 			mechanism: mechanismId,
+			camera: cameraId,
+			cameraId,
 			seed: currentSeed,
 			timeSeconds,
 			lastResetCause,
@@ -1447,7 +1462,11 @@ export async function createNodeSelectiveBloomExample( {
 			stageKind: stage.stageKind,
 			acceptanceMetrics: computeBloomAcceptanceMetrics(),
 			gpuTiming: { verdict: 'INSUFFICIENT_EVIDENCE', samples: [] },
-			rendererInfo: renderer.info
+			viewport: {
+				width: size.x,
+				height: size.y,
+				dpr: renderer.getPixelRatio(),
+			},
 		};
 
 	}
@@ -1455,11 +1474,13 @@ export async function createNodeSelectiveBloomExample( {
 	async function dispose() {
 
 		stop();
+		markWebGPUDeviceDisposing( deviceIdentity );
 		stage.dispose();
 		renderPipeline.dispose();
 		presentationTarget.dispose();
 		disposeObjectTree( scene );
 		renderer.dispose();
+		markWebGPUDeviceDisposed( deviceIdentity );
 
 	}
 

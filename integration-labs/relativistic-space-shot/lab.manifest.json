@@ -7,6 +7,8 @@
   "kind": "integration-demo",
   "status": "incomplete",
   "canonicalSource": [
+    "integration-labs/relativistic-space-shot/index.html",
+    "integration-labs/relativistic-space-shot/styles.css",
     "integration-labs/relativistic-space-shot/main.mjs",
     "integration-labs/relativistic-space-shot/browser.mjs",
     "integration-labs/relativistic-space-shot/host-stages.mjs",
@@ -14,6 +16,7 @@
     "integration-labs/relativistic-space-shot/owner-graph.mjs",
     "integration-labs/relativistic-space-shot/quality-governor.mjs",
     "integration-labs/relativistic-space-shot/contract.json",
+    "integration-labs/relativistic-space-shot/capture.mjs",
     "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig/main.mjs",
     "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/main.js",
     "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/timeline.js",
@@ -26,33 +29,234 @@
   "browserEntry": "integration-labs/relativistic-space-shot/index.html",
   "publishPath": "/demos/relativistic-space-shot/",
   "scenarios": [
-    {"id": "shot", "route": "/demos/relativistic-space-shot/", "startup": {"tier": "balanced", "mode": "final"}, "acceptanceStatus": "incomplete"}
+    {
+      "id": "shot",
+      "route": "/demos/relativistic-space-shot/",
+      "startup": {
+        "tier": "balanced",
+        "mode": "final"
+      },
+      "acceptanceStatus": "incomplete"
+    }
   ],
   "mechanisms": [
-    {"id": "curved-ray-hdr", "acceptanceStatus": "incomplete"},
-    {"id": "motion-event-packets", "acceptanceStatus": "incomplete"},
-    {"id": "gpu-particle-pools", "acceptanceStatus": "incomplete"},
-    {"id": "shared-emissive-bloom", "acceptanceStatus": "incomplete"},
-    {"id": "single-temporal-exposure-output", "acceptanceStatus": "incomplete"},
-    {"id": "owner-graph", "acceptanceStatus": "incomplete"}
+    {
+      "id": "curved-ray-hdr",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "motion-event-packets",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "gpu-particle-pools",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "shared-emissive-bloom",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "single-temporal-exposure-output",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "owner-graph",
+      "acceptanceStatus": "incomplete"
+    }
   ],
   "tiers": [
-    {"id": "hero", "targetClass": "60-hz-flagship", "frameTargetMs": {"value": 16.67, "unit": "ms", "label": "Gated", "source": "integration 60 Hz contract"}, "resolutionPolicy": {"sceneScale": 1, "rayScale": 1, "bloomScale": 0.5, "dprCap": 2}, "mechanismLimits": {"curvedRayTier": "hero", "curvedRayMaxSteps": 160, "particleTier": "ultra", "sparkPoolCapacity": 65536, "debrisPoolCapacity": 8192, "sparkEventCount": 4096, "debrisEventCount": 512, "exposureTier": "full-histogram", "temporal": true}, "resourceLimits": {"status": "runtime inventory required"}, "degradationFromPrevious": [], "preservedInvariants": ["bounded finite rays", "deterministic event packets", "GPU particle identity", "shared emissive", "single temporal/tone/output owner"], "acceptanceStatus": "incomplete"},
-    {"id": "balanced", "targetClass": "60-hz-balanced", "frameTargetMs": {"value": 16.67, "unit": "ms", "label": "Gated", "source": "integration 60 Hz contract"}, "resolutionPolicy": {"sceneScale": 1, "rayScale": 1, "bloomScale": 0.33, "dprCap": 1.5}, "mechanismLimits": {"curvedRayTier": "standard", "curvedRayMaxSteps": 96, "particleTier": "high", "sparkPoolCapacity": 24576, "debrisPoolCapacity": 3072, "sparkEventCount": 2048, "debrisEventCount": 256, "exposureTier": "balanced-log-reduction", "temporal": true}, "resourceLimits": {"status": "runtime inventory required"}, "degradationFromPrevious": ["reduce curved-ray integration detail", "reduce particle secondary detail", "lower bloom resolution", "simplify exposure metering"], "preservedInvariants": ["bounded finite rays", "deterministic event packets", "GPU particle identity", "shared emissive", "single temporal/tone/output owner"], "acceptanceStatus": "incomplete"},
-    {"id": "budgeted", "targetClass": "60-hz-budgeted", "frameTargetMs": {"value": 16.67, "unit": "ms", "label": "Gated", "source": "integration 60 Hz contract"}, "resolutionPolicy": {"sceneScale": 1, "rayScale": 1, "bloomScale": 0.25, "dprCap": 1}, "mechanismLimits": {"curvedRayTier": "background", "curvedRayMaxSteps": 48, "particleTier": "medium", "sparkPoolCapacity": 8192, "debrisPoolCapacity": 1024, "sparkEventCount": 1024, "debrisEventCount": 128, "exposureTier": "minimum-fixed-shot", "temporal": true}, "resourceLimits": {"status": "runtime inventory required"}, "degradationFromPrevious": ["reduce optional integration samples", "reduce particle pools, counts, and layers", "lower bloom resolution", "use fixed-shot exposure", "disable optional decoration"], "preservedInvariants": ["bounded finite rays", "deterministic event packets", "GPU particle identity", "shared emissive", "single temporal/tone/output owner", "finite termination physics"], "acceptanceStatus": "incomplete"}
+    {
+      "id": "balanced",
+      "targetClass": "60-hz-balanced",
+      "frameTargetMs": {
+        "value": 16.67,
+        "unit": "ms",
+        "label": "Gated",
+        "source": "integration 60 Hz contract"
+      },
+      "resolutionPolicy": {
+        "sceneScale": 1,
+        "rayScale": 1,
+        "bloomScale": 0.33,
+        "dprCap": 1.5
+      },
+      "mechanismLimits": {
+        "curvedRayTier": "standard",
+        "curvedRayMaxSteps": 96,
+        "particleTier": "high",
+        "sparkPoolCapacity": 24576,
+        "debrisPoolCapacity": 3072,
+        "sparkEventCount": 2048,
+        "debrisEventCount": 256,
+        "exposureTier": "balanced-log-reduction",
+        "temporal": true
+      },
+      "resourceLimits": {
+        "status": "runtime inventory required"
+      },
+      "degradationFromPrevious": [
+        "reduce curved-ray integration detail",
+        "reduce particle secondary detail",
+        "lower bloom resolution",
+        "simplify exposure metering"
+      ],
+      "preservedInvariants": [
+        "bounded finite rays",
+        "deterministic event packets",
+        "GPU particle identity",
+        "shared emissive",
+        "single temporal/tone/output owner"
+      ],
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "hero",
+      "targetClass": "60-hz-flagship",
+      "frameTargetMs": {
+        "value": 16.67,
+        "unit": "ms",
+        "label": "Gated",
+        "source": "integration 60 Hz contract"
+      },
+      "resolutionPolicy": {
+        "sceneScale": 1,
+        "rayScale": 1,
+        "bloomScale": 0.5,
+        "dprCap": 2
+      },
+      "mechanismLimits": {
+        "curvedRayTier": "hero",
+        "curvedRayMaxSteps": 160,
+        "particleTier": "ultra",
+        "sparkPoolCapacity": 65536,
+        "debrisPoolCapacity": 8192,
+        "sparkEventCount": 4096,
+        "debrisEventCount": 512,
+        "exposureTier": "full-histogram",
+        "temporal": true
+      },
+      "resourceLimits": {
+        "status": "runtime inventory required"
+      },
+      "degradationFromPrevious": [],
+      "preservedInvariants": [
+        "bounded finite rays",
+        "deterministic event packets",
+        "GPU particle identity",
+        "shared emissive",
+        "single temporal/tone/output owner"
+      ],
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "budgeted",
+      "targetClass": "60-hz-budgeted",
+      "frameTargetMs": {
+        "value": 16.67,
+        "unit": "ms",
+        "label": "Gated",
+        "source": "integration 60 Hz contract"
+      },
+      "resolutionPolicy": {
+        "sceneScale": 1,
+        "rayScale": 1,
+        "bloomScale": 0.25,
+        "dprCap": 1
+      },
+      "mechanismLimits": {
+        "curvedRayTier": "background",
+        "curvedRayMaxSteps": 48,
+        "particleTier": "medium",
+        "sparkPoolCapacity": 8192,
+        "debrisPoolCapacity": 1024,
+        "sparkEventCount": 1024,
+        "debrisEventCount": 128,
+        "exposureTier": "minimum-fixed-shot",
+        "temporal": true
+      },
+      "resourceLimits": {
+        "status": "runtime inventory required"
+      },
+      "degradationFromPrevious": [
+        "reduce optional integration samples",
+        "reduce particle pools, counts, and layers",
+        "lower bloom resolution",
+        "use fixed-shot exposure",
+        "disable optional decoration"
+      ],
+      "preservedInvariants": [
+        "bounded finite rays",
+        "deterministic event packets",
+        "GPU particle identity",
+        "shared emissive",
+        "single temporal/tone/output owner",
+        "finite termination physics"
+      ],
+      "acceptanceStatus": "incomplete"
+    }
   ],
-  "modes": ["final", "no-post", "curved-ray", "integration-pressure", "velocity", "particles", "emissive", "bloom", "exposure", "temporal-confidence", "owner-graph"],
-  "cameras": ["near", "design", "far"],
-  "seeds": [1, 2654435769],
+  "modes": [
+    "final",
+    "no-post",
+    "curved-ray",
+    "integration-pressure",
+    "velocity",
+    "particles",
+    "emissive",
+    "bloom",
+    "exposure",
+    "temporal-confidence",
+    "owner-graph"
+  ],
+  "cameras": [
+    "near",
+    "design",
+    "far"
+  ],
+  "seeds": [
+    1,
+    2654435769
+  ],
   "capabilityRequirements": [
-    {"id": "native-webgpu", "required": true, "evidence": "renderer.init plus backend.isWebGPUBackend runtime gate", "status": "incomplete"},
-    {"id": "gpu-timestamps", "required": true, "evidence": "required for 60 Hz claims", "status": "incomplete"}
+    {
+      "id": "native-webgpu",
+      "required": true,
+      "evidence": "browser path initializes WebGPURenderer; correctness capture session not yet hash-bound (shader/runtime capture still failing under full integration load)",
+      "status": "incomplete"
+    },
+    {
+      "id": "gpu-timestamps",
+      "required": true,
+      "evidence": "INSUFFICIENT_EVIDENCE",
+      "status": "incomplete"
+    }
   ],
   "runtimeProof": [
-    {"id": "single-owner-graph", "required": true, "evidence": "browser-free graph and mutation validation; runtime capture pending", "status": "incomplete"},
-    {"id": "curved-ray-particle-readback", "required": true, "evidence": "aligned readback path implemented; capture not executed", "status": "incomplete"},
-    {"id": "current-adapter-timing", "required": true, "evidence": "INSUFFICIENT_EVIDENCE", "status": "incomplete"},
-    {"id": "lifecycle", "required": true, "evidence": "INSUFFICIENT_EVIDENCE", "status": "incomplete"}
+    {
+      "id": "single-owner-graph",
+      "required": true,
+      "evidence": "browser-free graph and mutation validation pass; runtime capture incomplete",
+      "status": "incomplete"
+    },
+    {
+      "id": "curved-ray-particle-readback",
+      "required": true,
+      "evidence": "aligned readback path implemented; full correctness capture not yet published for current source hash",
+      "status": "incomplete"
+    },
+    {
+      "id": "current-adapter-timing",
+      "required": true,
+      "evidence": "INSUFFICIENT_EVIDENCE",
+      "status": "incomplete"
+    },
+    {
+      "id": "lifecycle",
+      "required": true,
+      "evidence": "INSUFFICIENT_EVIDENCE",
+      "status": "incomplete"
+    }
   ],
   "evidenceContract": "v2",
   "evidenceBundle": null,
@@ -68,5 +272,8 @@
   },
   "sourceHash": null,
   "proxyStatus": null,
-  "notes": ["Real native-WebGPU composition is implemented. Acceptance remains incomplete until current-adapter v2 capture, timing, lifecycle, and manual visual inspection are available.", "Stock r185 TRAANode requires scene color, depth, and velocity at drawing-buffer extent. All tiers keep sceneScale and rayScale at 1 in the one-shared-pass graph; actual degradation changes integration steps, particle pools/counts, DPR, BloomNode scale, and exposure-meter complexity."]
+  "notes": [
+    "Real native-WebGPU composition is implemented. Acceptance remains incomplete until current-adapter v2 capture, timing, lifecycle, and manual visual inspection are available.",
+    "Stock r185 TRAANode requires scene color, depth, and velocity at drawing-buffer extent. All tiers keep sceneScale and rayScale at 1 in the one-shared-pass graph; actual degradation changes integration steps, particle pools/counts, DPR, BloomNode scale, and exposure-meter complexity."
+  ]
 }

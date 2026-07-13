@@ -309,7 +309,7 @@ assert.equal(historyPlan.graph.diffusion, false);
 assert.equal(diffusionPlan.graph.diffusion, true);
 assert.notDeepEqual(historyPlan.graph.reachableNodes, diffusionPlan.graph.reachableNodes);
 const benchmarkPlan = effect.setMechanism("full-vs-dirty-vs-idle") && effect.createResourcePlan();
-assert.equal(benchmarkPlan.benchmarkLedger.name, "touch-history-frost:benchmark-ledger");
+assert.equal(benchmarkPlan.benchmarkLedger.name, "touch_history_frost_benchmark_ledger");
 assert.equal(benchmarkPlan.benchmarkLedger.width, 4);
 assert.equal(benchmarkPlan.benchmarkLedger.bytes, 32);
 assert.equal(benchmarkPlan.benchmarkLedger.decision.selected, "full-field");

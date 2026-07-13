@@ -48,6 +48,12 @@ export function createRelativisticMotionStage({
     instanceCount,
     sceneUnitsPerMeter: 0.001,
   });
+  // Bind the host WebGPU device generation before any seek/dispatch so capture
+  // setSeed/setTime paths do not hit an unbound motion plan.
+  core.motionPlan.bindRendererDevice(renderer, {
+    deviceGeneration: 1,
+    isDeviceGenerationActive: (generation) => generation === 1 && renderer.backend?.isWebGPUBackend === true,
+  });
   const flow = new Vector3();
   let currentSeed = seed >>> 0;
   let consumedEventCount = 0;

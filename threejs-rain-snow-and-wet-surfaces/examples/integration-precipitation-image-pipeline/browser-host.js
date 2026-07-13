@@ -30,6 +30,13 @@ import {
 } from "three/tsl";
 
 import {
+  bindWebGPUDeviceIdentity,
+  captureRuntimeProfileFields,
+  markWebGPUDeviceDisposed,
+  markWebGPUDeviceDisposing,
+  webgpuDeviceIdentityMetrics,
+} from "../../../labs/runtime/webgpu-device-identity.mjs";
+import {
   createPrecipitationImagePipelineIntegration,
   createWeatherIntegrationSignals,
 } from "./precipitation-image-pipeline-integration.js";
@@ -98,6 +105,7 @@ export class PrecipitationImagePipelineBrowserHost {
     if (this.renderer.backend?.isWebGPUBackend !== true) {
       throw new Error("precipitation integration requires native WebGPU; fallback is blocked");
     }
+    this.deviceIdentity = bindWebGPUDeviceIdentity(this.renderer);
     this.renderer.toneMapping = AgXToneMapping;
     this.renderer.toneMappingExposure = 1;
     const width = Math.max(1, this.canvas.clientWidth || this.canvas.width || 1200);
@@ -297,6 +305,7 @@ export class PrecipitationImagePipelineBrowserHost {
   describePipeline() {
     return {
       ...this.integration.describePipeline(),
+      ...captureRuntimeProfileFields(),
       hostOutputNodeStable: true,
       outputColorTransform: this.renderPipeline.outputColorTransform,
       toneMapping: "AgXToneMapping",
@@ -317,7 +326,7 @@ export class PrecipitationImagePipelineBrowserHost {
     return {
       labId: this.labId,
       status: "native-webgpu-runtime; evidence incomplete",
-      rendererBackend: this.renderer.backend?.isWebGPUBackend === true ? "WebGPU" : "unsupported",
+      ...webgpuDeviceIdentityMetrics(this.deviceIdentity, this.renderer),
       threeRevision: REVISION,
       scenario: this.scenario,
       mechanism: this.mechanism,
@@ -325,17 +334,25 @@ export class PrecipitationImagePipelineBrowserHost {
       tier: this.tier,
       mode: this.mode,
       camera: this.cameraId,
+      cameraId: this.cameraId,
       seed: this.seed,
       time: this.time,
-      routeSelection: { scenario: this.scenario, mechanism: this.mechanism, tier: this.tier },
+      timeSeconds: this.time,
+      routeSelection: { labId: this.labId, scenario: this.scenario, mechanism: this.mechanism, tier: this.tier },
       integration: this.integration.getMetrics(),
       currentAdapterTiming: "INSUFFICIENT_EVIDENCE",
+      viewport: {
+        width: this.renderer.domElement.width,
+        height: this.renderer.domElement.height,
+        dpr: this.renderer.getPixelRatio(),
+      },
     };
   }
 
   async dispose() {
     if (this.disposed) return;
     this.disposed = true;
+    markWebGPUDeviceDisposing(this.deviceIdentity);
     this.renderer?.setAnimationLoop(null);
     this.integration?.dispose();
     this.marker?.geometry.dispose();
@@ -343,5 +360,6 @@ export class PrecipitationImagePipelineBrowserHost {
     this.captureTarget?.dispose();
     this.renderPipeline?.dispose?.();
     this.renderer?.dispose();
+    markWebGPUDeviceDisposed(this.deviceIdentity);
   }
 }

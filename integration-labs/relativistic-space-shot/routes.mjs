@@ -48,7 +48,12 @@ export function parseRelativisticRoute(locationLike = globalThis.location) {
   const pathname = locationLike?.pathname ?? "/";
   const params = new URLSearchParams(locationLike?.search ?? "");
   const mechanismValue = segment(pathname, "mechanism") ?? params.get("mechanism");
-  const tierValue = segment(pathname, "tier") ?? params.get("tier") ?? "balanced";
+  const tierSegment = segment(pathname, "tier");
+  const tierParam = params.get("tier");
+  const tierValue = tierSegment ?? tierParam ?? "balanced";
+  // Only lock the tier when the URL explicitly selects a tier route/query.
+  // The primary browser entry stays free so capture can sweep hero/balanced/budgeted.
+  const tierLocked = tierSegment !== null || tierParam !== null;
   const mechanism = mechanismValue === null
     ? null
     : exact(mechanismValue, RELATIVISTIC_MECHANISMS, "mechanism");
@@ -63,7 +68,7 @@ export function parseRelativisticRoute(locationLike = globalThis.location) {
     mechanism,
     tier,
     mode,
-    tierLocked: true,
+    tierLocked,
     modeLocked: mechanism !== null,
   });
 }

@@ -18,62 +18,179 @@
   "browserEntry": "index.html",
   "publishPath": "/demos/integration-precipitation-image-pipeline/",
   "scenarios": [
-    { "id": "shared-weather-primary-pass", "route": "/demos/integration-precipitation-image-pipeline/?scenario=shared-weather-primary-pass", "acceptanceStatus": "incomplete" },
-    { "id": "recurrent-weather-primary-pass", "route": "/demos/integration-precipitation-image-pipeline/?scenario=recurrent-weather-primary-pass", "acceptanceStatus": "incomplete" }
+    {
+      "id": "shared-weather-primary-pass",
+      "route": "/demos/integration-precipitation-image-pipeline/?scenario=shared-weather-primary-pass",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "recurrent-weather-primary-pass",
+      "route": "/demos/integration-precipitation-image-pipeline/?scenario=recurrent-weather-primary-pass",
+      "acceptanceStatus": "incomplete"
+    }
   ],
   "mechanisms": [
-    { "id": "shared-signal-identity", "route": "/demos/integration-precipitation-image-pipeline/mechanism/shared-signal-identity/", "acceptanceStatus": "incomplete" },
-    { "id": "host-output-ownership", "route": "/demos/integration-precipitation-image-pipeline/mechanism/host-output-ownership/", "acceptanceStatus": "incomplete" },
-    { "id": "single-scene-submission", "route": "/demos/integration-precipitation-image-pipeline/mechanism/single-scene-submission/", "acceptanceStatus": "incomplete" },
-    { "id": "weather-compute-before-host-render", "route": "/demos/integration-precipitation-image-pipeline/mechanism/weather-compute-before-host-render/", "acceptanceStatus": "incomplete" }
+    {
+      "id": "shared-signal-identity",
+      "route": "/demos/integration-precipitation-image-pipeline/mechanism/shared-signal-identity/",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "host-output-ownership",
+      "route": "/demos/integration-precipitation-image-pipeline/mechanism/host-output-ownership/",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "single-scene-submission",
+      "route": "/demos/integration-precipitation-image-pipeline/mechanism/single-scene-submission/",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "weather-compute-before-host-render",
+      "route": "/demos/integration-precipitation-image-pipeline/mechanism/weather-compute-before-host-render/",
+      "acceptanceStatus": "incomplete"
+    }
   ],
   "tiers": [
     {
       "id": "high",
       "targetClass": "integration-close-inspection",
       "frameTargetMs": null,
-      "resolutionPolicy": { "receiverScale": 1 },
-      "mechanismLimits": { "rainInstances": 24576, "snowInstances": 12288, "impactCapacity": 4096 },
-      "resourceLimits": { "sceneSubmissions": 1, "rendererOwners": 1, "outputOwners": 1 },
+      "resolutionPolicy": {
+        "receiverScale": 1
+      },
+      "mechanismLimits": {
+        "rainInstances": 24576,
+        "snowInstances": 12288,
+        "impactCapacity": 4096
+      },
+      "resourceLimits": {
+        "sceneSubmissions": 1,
+        "rendererOwners": 1,
+        "outputOwners": 1
+      },
       "degradationFromPrevious": [],
-      "preservedInvariants": ["shared-weather-identity", "one-scene-pass", "one-output-owner"],
+      "preservedInvariants": [
+        "shared-weather-identity",
+        "one-scene-pass",
+        "one-output-owner"
+      ],
       "acceptanceStatus": "incomplete"
     },
     {
       "id": "medium",
       "targetClass": "integration-ordinary-inspection",
       "frameTargetMs": null,
-      "resolutionPolicy": { "receiverScale": 0.5 },
-      "mechanismLimits": { "rainInstances": 12288, "snowInstances": 6144, "impactCapacity": 2048 },
-      "resourceLimits": { "sceneSubmissions": 1, "rendererOwners": 1, "outputOwners": 1 },
-      "degradationFromPrevious": ["reduce-precipitation-samples", "disable-recurrent-turbulence"],
-      "preservedInvariants": ["shared-weather-identity", "one-scene-pass", "one-output-owner"],
+      "resolutionPolicy": {
+        "receiverScale": 0.5
+      },
+      "mechanismLimits": {
+        "rainInstances": 12288,
+        "snowInstances": 6144,
+        "impactCapacity": 2048
+      },
+      "resourceLimits": {
+        "sceneSubmissions": 1,
+        "rendererOwners": 1,
+        "outputOwners": 1
+      },
+      "degradationFromPrevious": [
+        "reduce-precipitation-samples",
+        "disable-recurrent-turbulence"
+      ],
+      "preservedInvariants": [
+        "shared-weather-identity",
+        "one-scene-pass",
+        "one-output-owner"
+      ],
       "acceptanceStatus": "incomplete"
     },
     {
       "id": "budgeted",
       "targetClass": "integration-small-footprint",
       "frameTargetMs": null,
-      "resolutionPolicy": { "receiverScale": 0.25 },
-      "mechanismLimits": { "rainInstances": 4096, "snowInstances": 2048, "impactCapacity": 512 },
-      "resourceLimits": { "sceneSubmissions": 1, "rendererOwners": 1, "outputOwners": 1 },
-      "degradationFromPrevious": ["reduce-receiver-resolution", "bound-impact-capacity"],
-      "preservedInvariants": ["shared-weather-identity", "one-scene-pass", "one-output-owner"],
+      "resolutionPolicy": {
+        "receiverScale": 0.25
+      },
+      "mechanismLimits": {
+        "rainInstances": 4096,
+        "snowInstances": 2048,
+        "impactCapacity": 512
+      },
+      "resourceLimits": {
+        "sceneSubmissions": 1,
+        "rendererOwners": 1,
+        "outputOwners": 1
+      },
+      "degradationFromPrevious": [
+        "reduce-receiver-resolution",
+        "bound-impact-capacity"
+      ],
+      "preservedInvariants": [
+        "shared-weather-identity",
+        "one-scene-pass",
+        "one-output-owner"
+      ],
       "acceptanceStatus": "incomplete"
     }
   ],
-  "modes": ["final", "weather-state", "particles", "wetness", "snow", "impacts", "owner-graph"],
-  "cameras": ["near", "design", "far"],
-  "seeds": [1, 2654435769],
+  "modes": [
+    "final",
+    "weather-state",
+    "particles",
+    "wetness",
+    "snow",
+    "impacts",
+    "owner-graph"
+  ],
+  "cameras": [
+    "near",
+    "design",
+    "far"
+  ],
+  "seeds": [
+    1,
+    2654435769
+  ],
   "capabilityRequirements": [
-    { "id": "host-native-webgpu", "required": true, "evidence": "host backend identity gate", "status": "incomplete" },
-    { "id": "host-primary-scene-pass", "required": true, "evidence": "single host scenePass identity", "status": "incomplete" },
-    { "id": "storage-buffer-compute", "required": true, "evidence": "weather recurrence and impact storage dispatches", "status": "incomplete" }
+    {
+      "id": "host-native-webgpu",
+      "required": true,
+      "evidence": "correctness capture-session proves host rendererBackendEvidence.isWebGPUBackend === true",
+      "status": "incomplete"
+    },
+    {
+      "id": "host-primary-scene-pass",
+      "required": true,
+      "evidence": "unit+mutation suites prove single host scenePass; browser capture does not re-prove graph ownership",
+      "status": "incomplete"
+    },
+    {
+      "id": "storage-buffer-compute",
+      "required": true,
+      "evidence": "integration unit contracts prove weather/impact storage dispatches; browser capture is presentation-only",
+      "status": "incomplete"
+    }
   ],
   "runtimeProof": [
-    { "id": "host-owner-identity", "required": true, "evidence": "one renderer, pipeline, scene pass, tone map, and output owner", "status": "incomplete" },
-    { "id": "shared-weather-identity", "required": true, "evidence": "all consumers receive identical host signal nodes", "status": "incomplete" },
-    { "id": "native-browser-evidence", "required": true, "evidence": "pending v2 readback and current-adapter timing", "status": "incomplete" }
+    {
+      "id": "host-owner-identity",
+      "required": true,
+      "evidence": "validate-integration + mutations prove one renderer/pipeline/scene/tone/output owner",
+      "status": "incomplete"
+    },
+    {
+      "id": "shared-weather-identity",
+      "required": true,
+      "evidence": "validate-integration proves identical host weather signal nodes for all consumers",
+      "status": "incomplete"
+    },
+    {
+      "id": "native-browser-evidence",
+      "required": true,
+      "evidence": "artifacts/visual-validation/integration-precipitation-image-pipeline/correctness/capture-session.json native WebGPU presentation readbacks for current source hash",
+      "status": "incomplete"
+    }
   ],
   "evidenceContract": "v2",
   "validationCommand": "node validate-integration.mjs",

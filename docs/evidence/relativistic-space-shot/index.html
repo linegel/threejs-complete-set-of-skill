@@ -35,16 +35,16 @@
   <p><span class="status status--incomplete">incomplete</span></p>
   <h1>Relativistic Space Shot</h1>
   <p class="lede">This report separates published implementation state from accepted evidence. Every value below comes from the schema-v2 registry, the emitted source manifest, or promoted same-lab artifacts.</p>
-  <div class="actions"><a href="/demos/relativistic-space-shot/">Open demo</a><a href="/skills/threejs-image-pipeline.html">Owning skill</a><a href="/demos/relativistic-space-shot/source-manifest.json">Published source manifest</a><a href="/demos/registry.json">Registry JSON</a><a href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/integration-labs/relativistic-space-shot/main.mjs">Canonical source</a></div>
+  <div class="actions"><a href="/demos/relativistic-space-shot/">Open demo</a><a href="/skills/threejs-image-pipeline.html">Owning skill</a><a href="/demos/relativistic-space-shot/source-manifest.json">Published source manifest</a><a href="/demos/registry.json">Registry JSON</a><a href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/integration-labs/relativistic-space-shot/index.html">Canonical source</a></div>
   <dl class="facts">
     <div><dt>Lab id</dt><dd><code>relativistic-space-shot</code></dd></div>
     <div><dt>Kind</dt><dd>Integration Demo</dd></div>
     <div><dt>Owning skill</dt><dd>Image Pipeline</dd></div>
     <div><dt>Execution</dt><dd>rendering</dd></div>
     <div><dt>Three.js</dt><dd>0.185.1</dd></div>
-    <div><dt>Source hash</dt><dd><code>sha256:5fe1522e9185fbdff551194ad251caeb878b925459a9a59cd10d0bcc4995d89f</code></dd></div>
-    <div><dt>Published bundle hash</dt><dd><code>sha256:b1efee23625a0afbbc9502fcfc668b0a7f25d40cc6bde491f0d4a147af344150</code></dd></div>
-    <div><dt>Build revision</dt><dd><code>sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b</code></dd></div>
+    <div><dt>Source hash</dt><dd><code>sha256:8ec6d37cf98d6c3f93bfeffc7e45d9aa60cdfb591786d75b45764d69f6195def</code></dd></div>
+    <div><dt>Published bundle hash</dt><dd><code>sha256:16f39f79d49b4f5aad93e14c55c4891d83cfffd234033c5d85b30ee208801bf5</code></dd></div>
+    <div><dt>Build revision</dt><dd><code>sha256:b9a3789cce08ca979f23b56d5ce0c4132c720aa24f80bf479959a88ec14bd9c2</code></dd></div>
     <div><dt>Renderer</dt><dd>Not promoted</dd></div>
     <div><dt>Backend</dt><dd>Not promoted</dd></div>
     <div><dt>Evidence contract</dt><dd>v2</dd></div>
@@ -55,49 +55,13 @@
 
   <section class="section" aria-labelledby="media-title"><h2 id="media-title">Promoted same-lab media</h2><p class="empty">No same-lab evidence image is promoted for this report. The page intentionally shows status and proof requirements instead of substitute art.</p></section>
 
-  <section class="section" aria-labelledby="requirements-title"><h2 id="requirements-title">Required capability and runtime proof</h2><h3>Capabilities</h3><div class="requirement-grid"><article class="requirement"><header><code>native-webgpu</code><span class="status status--incomplete">incomplete</span></header><p>renderer.init plus backend.isWebGPUBackend runtime gate</p></article><article class="requirement"><header><code>gpu-timestamps</code><span class="status status--incomplete">incomplete</span></header><p>required for 60 Hz claims</p></article></div><h3 style="margin-top:28px">Runtime proof</h3><div class="requirement-grid"><article class="requirement"><header><code>single-owner-graph</code><span class="status status--incomplete">incomplete</span></header><p>browser-free graph and mutation validation; runtime capture pending</p></article><article class="requirement"><header><code>curved-ray-particle-readback</code><span class="status status--incomplete">incomplete</span></header><p>aligned readback path implemented; capture not executed</p></article><article class="requirement"><header><code>current-adapter-timing</code><span class="status status--incomplete">incomplete</span></header><p>INSUFFICIENT_EVIDENCE</p></article><article class="requirement"><header><code>lifecycle</code><span class="status status--incomplete">incomplete</span></header><p>INSUFFICIENT_EVIDENCE</p></article></div></section>
+  <section class="section" aria-labelledby="requirements-title"><h2 id="requirements-title">Required capability and runtime proof</h2><h3>Capabilities</h3><div class="requirement-grid"><article class="requirement"><header><code>native-webgpu</code><span class="status status--incomplete">incomplete</span></header><p>browser path initializes WebGPURenderer; correctness capture session not yet hash-bound (shader/runtime capture still failing under full integration load)</p></article><article class="requirement"><header><code>gpu-timestamps</code><span class="status status--incomplete">incomplete</span></header><p>INSUFFICIENT_EVIDENCE</p></article></div><h3 style="margin-top:28px">Runtime proof</h3><div class="requirement-grid"><article class="requirement"><header><code>single-owner-graph</code><span class="status status--incomplete">incomplete</span></header><p>browser-free graph and mutation validation pass; runtime capture incomplete</p></article><article class="requirement"><header><code>curved-ray-particle-readback</code><span class="status status--incomplete">incomplete</span></header><p>aligned readback path implemented; full correctness capture not yet published for current source hash</p></article><article class="requirement"><header><code>current-adapter-timing</code><span class="status status--incomplete">incomplete</span></header><p>INSUFFICIENT_EVIDENCE</p></article><article class="requirement"><header><code>lifecycle</code><span class="status status--incomplete">incomplete</span></header><p>INSUFFICIENT_EVIDENCE</p></article></div></section>
 
   <section class="section" aria-labelledby="capture-title"><h2 id="capture-title">Capture state</h2><div class="table-wrap"><table><thead><tr><th>Field</th><th>Published value</th></tr></thead><tbody><tr><td>Primary route</td><td><code>/demos/relativistic-space-shot/</code></td></tr><tr><td>Cameras</td><td><code>near, design, far</code></td></tr><tr><td>Seeds</td><td><code>0x00000001, 0x9e3779b9</code></td></tr><tr><td>Modes</td><td><code>final, no-post, curved-ray, integration-pressure, velocity, particles, emissive, bloom, exposure, temporal-confidence, owner-graph</code></td></tr><tr><td>Capture time</td><td><code>Not present in the promoted report data</code></td></tr><tr><td>Adapter identity</td><td><code>Not promoted</code></td></tr><tr><td>Raw readback hashes</td><td><code>Not promoted</code></td></tr></tbody></table></div></section>
 
-  <section class="section" aria-labelledby="routes-title"><h2 id="routes-title">Fixed routes</h2><div class="table-wrap"><table><thead><tr><th>Kind</th><th>Id</th><th>Startup state</th><th>Status</th></tr></thead><tbody><tr><td>scenario</td><td><a href="/demos/relativistic-space-shot/scenario/shot/"><code>shot</code></a></td><td><code>{&quot;tier&quot;:&quot;balanced&quot;,&quot;mode&quot;:&quot;final&quot;}</code></td><td>incomplete</td></tr><tr><td>mechanism</td><td><a href="/demos/relativistic-space-shot/mechanism/curved-ray-hdr/"><code>curved-ray-hdr</code></a></td><td><code>{&quot;mechanism&quot;:&quot;curved-ray-hdr&quot;}</code></td><td>incomplete</td></tr><tr><td>mechanism</td><td><a href="/demos/relativistic-space-shot/mechanism/motion-event-packets/"><code>motion-event-packets</code></a></td><td><code>{&quot;mechanism&quot;:&quot;motion-event-packets&quot;}</code></td><td>incomplete</td></tr><tr><td>mechanism</td><td><a href="/demos/relativistic-space-shot/mechanism/gpu-particle-pools/"><code>gpu-particle-pools</code></a></td><td><code>{&quot;mechanism&quot;:&quot;gpu-particle-pools&quot;}</code></td><td>incomplete</td></tr><tr><td>mechanism</td><td><a href="/demos/relativistic-space-shot/mechanism/shared-emissive-bloom/"><code>shared-emissive-bloom</code></a></td><td><code>{&quot;mechanism&quot;:&quot;shared-emissive-bloom&quot;}</code></td><td>incomplete</td></tr><tr><td>mechanism</td><td><a href="/demos/relativistic-space-shot/mechanism/single-temporal-exposure-output/"><code>single-temporal-exposure-output</code></a></td><td><code>{&quot;mechanism&quot;:&quot;single-temporal-exposure-output&quot;}</code></td><td>incomplete</td></tr><tr><td>mechanism</td><td><a href="/demos/relativistic-space-shot/mechanism/owner-graph/"><code>owner-graph</code></a></td><td><code>{&quot;mechanism&quot;:&quot;owner-graph&quot;}</code></td><td>incomplete</td></tr><tr><td>tier</td><td><a href="/demos/relativistic-space-shot/tier/hero/"><code>hero</code></a></td><td><code>{&quot;tier&quot;:&quot;hero&quot;}</code></td><td>incomplete</td></tr><tr><td>tier</td><td><a href="/demos/relativistic-space-shot/tier/balanced/"><code>balanced</code></a></td><td><code>{&quot;tier&quot;:&quot;balanced&quot;}</code></td><td>incomplete</td></tr><tr><td>tier</td><td><a href="/demos/relativistic-space-shot/tier/budgeted/"><code>budgeted</code></a></td><td><code>{&quot;tier&quot;:&quot;budgeted&quot;}</code></td><td>incomplete</td></tr></tbody></table></div></section>
+  <section class="section" aria-labelledby="routes-title"><h2 id="routes-title">Fixed routes</h2><div class="table-wrap"><table><thead><tr><th>Kind</th><th>Id</th><th>Startup state</th><th>Status</th></tr></thead><tbody><tr><td>scenario</td><td><a href="/demos/relativistic-space-shot/scenario/shot/"><code>shot</code></a></td><td><code>{&quot;tier&quot;:&quot;balanced&quot;,&quot;mode&quot;:&quot;final&quot;}</code></td><td>incomplete</td></tr><tr><td>mechanism</td><td><a href="/demos/relativistic-space-shot/mechanism/curved-ray-hdr/"><code>curved-ray-hdr</code></a></td><td><code>{&quot;mechanism&quot;:&quot;curved-ray-hdr&quot;}</code></td><td>incomplete</td></tr><tr><td>mechanism</td><td><a href="/demos/relativistic-space-shot/mechanism/motion-event-packets/"><code>motion-event-packets</code></a></td><td><code>{&quot;mechanism&quot;:&quot;motion-event-packets&quot;}</code></td><td>incomplete</td></tr><tr><td>mechanism</td><td><a href="/demos/relativistic-space-shot/mechanism/gpu-particle-pools/"><code>gpu-particle-pools</code></a></td><td><code>{&quot;mechanism&quot;:&quot;gpu-particle-pools&quot;}</code></td><td>incomplete</td></tr><tr><td>mechanism</td><td><a href="/demos/relativistic-space-shot/mechanism/shared-emissive-bloom/"><code>shared-emissive-bloom</code></a></td><td><code>{&quot;mechanism&quot;:&quot;shared-emissive-bloom&quot;}</code></td><td>incomplete</td></tr><tr><td>mechanism</td><td><a href="/demos/relativistic-space-shot/mechanism/single-temporal-exposure-output/"><code>single-temporal-exposure-output</code></a></td><td><code>{&quot;mechanism&quot;:&quot;single-temporal-exposure-output&quot;}</code></td><td>incomplete</td></tr><tr><td>mechanism</td><td><a href="/demos/relativistic-space-shot/mechanism/owner-graph/"><code>owner-graph</code></a></td><td><code>{&quot;mechanism&quot;:&quot;owner-graph&quot;}</code></td><td>incomplete</td></tr><tr><td>tier</td><td><a href="/demos/relativistic-space-shot/tier/balanced/"><code>balanced</code></a></td><td><code>{&quot;tier&quot;:&quot;balanced&quot;}</code></td><td>incomplete</td></tr><tr><td>tier</td><td><a href="/demos/relativistic-space-shot/tier/hero/"><code>hero</code></a></td><td><code>{&quot;tier&quot;:&quot;hero&quot;}</code></td><td>incomplete</td></tr><tr><td>tier</td><td><a href="/demos/relativistic-space-shot/tier/budgeted/"><code>budgeted</code></a></td><td><code>{&quot;tier&quot;:&quot;budgeted&quot;}</code></td><td>incomplete</td></tr></tbody></table></div></section>
 
-  <section class="section" aria-labelledby="tiers-title"><h2 id="tiers-title">Locked tier contracts</h2><details><summary>hero · incomplete</summary><pre>{
-  &quot;targetClass&quot;: &quot;60-hz-flagship&quot;,
-  &quot;frameTargetMs&quot;: {
-    &quot;value&quot;: 16.67,
-    &quot;unit&quot;: &quot;ms&quot;,
-    &quot;label&quot;: &quot;Gated&quot;,
-    &quot;source&quot;: &quot;integration 60 Hz contract&quot;
-  },
-  &quot;resolutionPolicy&quot;: {
-    &quot;sceneScale&quot;: 1,
-    &quot;rayScale&quot;: 1,
-    &quot;bloomScale&quot;: 0.5,
-    &quot;dprCap&quot;: 2
-  },
-  &quot;mechanismLimits&quot;: {
-    &quot;curvedRayTier&quot;: &quot;hero&quot;,
-    &quot;curvedRayMaxSteps&quot;: 160,
-    &quot;particleTier&quot;: &quot;ultra&quot;,
-    &quot;sparkPoolCapacity&quot;: 65536,
-    &quot;debrisPoolCapacity&quot;: 8192,
-    &quot;sparkEventCount&quot;: 4096,
-    &quot;debrisEventCount&quot;: 512,
-    &quot;exposureTier&quot;: &quot;full-histogram&quot;,
-    &quot;temporal&quot;: true
-  },
-  &quot;resourceLimits&quot;: {
-    &quot;status&quot;: &quot;runtime inventory required&quot;
-  },
-  &quot;degradationFromPrevious&quot;: [],
-  &quot;preservedInvariants&quot;: [
-    &quot;bounded finite rays&quot;,
-    &quot;deterministic event packets&quot;,
-    &quot;GPU particle identity&quot;,
-    &quot;shared emissive&quot;,
-    &quot;single temporal/tone/output owner&quot;
-  ]
-}</pre></details><details><summary>balanced · incomplete</summary><pre>{
+  <section class="section" aria-labelledby="tiers-title"><h2 id="tiers-title">Locked tier contracts</h2><details><summary>balanced · incomplete</summary><pre>{
   &quot;targetClass&quot;: &quot;60-hz-balanced&quot;,
   &quot;frameTargetMs&quot;: {
     &quot;value&quot;: 16.67,
@@ -131,6 +95,42 @@
     &quot;lower bloom resolution&quot;,
     &quot;simplify exposure metering&quot;
   ],
+  &quot;preservedInvariants&quot;: [
+    &quot;bounded finite rays&quot;,
+    &quot;deterministic event packets&quot;,
+    &quot;GPU particle identity&quot;,
+    &quot;shared emissive&quot;,
+    &quot;single temporal/tone/output owner&quot;
+  ]
+}</pre></details><details><summary>hero · incomplete</summary><pre>{
+  &quot;targetClass&quot;: &quot;60-hz-flagship&quot;,
+  &quot;frameTargetMs&quot;: {
+    &quot;value&quot;: 16.67,
+    &quot;unit&quot;: &quot;ms&quot;,
+    &quot;label&quot;: &quot;Gated&quot;,
+    &quot;source&quot;: &quot;integration 60 Hz contract&quot;
+  },
+  &quot;resolutionPolicy&quot;: {
+    &quot;sceneScale&quot;: 1,
+    &quot;rayScale&quot;: 1,
+    &quot;bloomScale&quot;: 0.5,
+    &quot;dprCap&quot;: 2
+  },
+  &quot;mechanismLimits&quot;: {
+    &quot;curvedRayTier&quot;: &quot;hero&quot;,
+    &quot;curvedRayMaxSteps&quot;: 160,
+    &quot;particleTier&quot;: &quot;ultra&quot;,
+    &quot;sparkPoolCapacity&quot;: 65536,
+    &quot;debrisPoolCapacity&quot;: 8192,
+    &quot;sparkEventCount&quot;: 4096,
+    &quot;debrisEventCount&quot;: 512,
+    &quot;exposureTier&quot;: &quot;full-histogram&quot;,
+    &quot;temporal&quot;: true
+  },
+  &quot;resourceLimits&quot;: {
+    &quot;status&quot;: &quot;runtime inventory required&quot;
+  },
+  &quot;degradationFromPrevious&quot;: [],
   &quot;preservedInvariants&quot;: [
     &quot;bounded finite rays&quot;,
     &quot;deterministic event packets&quot;,
@@ -184,7 +184,7 @@
 }</pre></details></section>
 
   <section class="section" aria-labelledby="limitations-title"><h2 id="limitations-title">Limitations</h2><ul class="limitations"><li>No tracked accepted v2 runtime bundle is published for this source hash.</li><li>2 required capability records remain incomplete.</li><li>4 required runtime-proof records remain incomplete.</li><li>No current-hardware performance claim is published without named-adapter timestamp evidence.</li></ul></section>
-  <footer class="site-footer"><span>relativistic-space-shot · sha256:5fe1522e9185</span><span><a href="/evidence/">All evidence reports</a></span></footer>
+  <footer class="site-footer"><span>relativistic-space-shot · sha256:8ec6d37cf98d</span><span><a href="/evidence/">All evidence reports</a></span></footer>
 </div></main>
 </body>
 </html>

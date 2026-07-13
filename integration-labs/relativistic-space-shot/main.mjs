@@ -30,6 +30,13 @@ import {
   velocity,
 } from "three/tsl";
 
+import {
+  bindWebGPUDeviceIdentity,
+  captureRuntimeProfileFields,
+  markWebGPUDeviceDisposed,
+  markWebGPUDeviceDisposing,
+  webgpuDeviceIdentityMetrics,
+} from "../../labs/runtime/webgpu-device-identity.mjs";
 import { createSpaceIntegratorStage } from "../../threejs-black-holes-and-space-effects/examples/tsl-curved-ray/space-transfer-stage.js";
 import { CURVED_RAY_QUALITY_TIERS } from "../../threejs-black-holes-and-space-effects/examples/tsl-curved-ray/curved-ray-accretion.js";
 import { createPooledEffectsStage } from "../../threejs-particles-trails-and-effects/examples/webgpu-pooled-effects/lab.mjs";
@@ -101,6 +108,7 @@ export async function createRelativisticSpaceShotLab({
     renderer.dispose();
     throw new Error("Relativistic Space Shot requires native WebGPU; no fallback is activated");
   }
+  const deviceIdentity = bindWebGPUDeviceIdentity(renderer);
 
   const scene = new Scene();
   scene.background = new Color(0x010207);
@@ -358,7 +366,10 @@ export async function createRelativisticSpaceShotLab({
     });
     const validation = validateRelativisticSpaceShotGraph(graph);
     if (!validation.valid) throw new Error(validation.errors.join("\n"));
-    return graph;
+    return {
+      ...graph,
+      ...captureRuntimeProfileFields(),
+    };
   }
 
   function updateDebug() {
@@ -384,8 +395,15 @@ export async function createRelativisticSpaceShotLab({
 
   rebuildModeNodes();
   applyMode(mode);
-  await scenePass.compileAsync(renderer);
+  // Prepare curved-ray probes before scene compile; incomplete texture images
+  // during PassNode.compileAsync otherwise throw on texture.complete === null.
   await spaceStage.prepare(renderer, camera);
+  try {
+    await scenePass.compileAsync(renderer);
+  } catch (error) {
+    // First host render warms bindings when a contributor texture is not yet fully declared.
+    renderPipeline.render();
+  }
 
   const labController = {
     get labId() { return LAB_ID; },
@@ -468,15 +486,21 @@ export async function createRelativisticSpaceShotLab({
         await renderFrame(captureTarget, 0);
         const padded = await renderer.readRenderTargetPixelsAsync(captureTarget, 0, 0, captureTarget.width, captureTarget.height);
         const unpacked = unpackAlignedReadback(padded, captureTarget.width, captureTarget.height, 4);
+        // Return compact RGBA so capture-lab-browser does not re-unpack padded rows.
         return {
           target,
           width: captureTarget.width,
           height: captureTarget.height,
           format: "rgba8unorm",
-          encoding: renderer.outputColorSpace,
+          colorEncoding: "srgb",
+          outputColorSpace: renderer.outputColorSpace,
+          colorManaged: true,
           pixels: unpacked.pixels,
-          readbackLayout: unpacked.layout,
-          sourceByteLength: unpacked.sourceByteLength,
+          data: unpacked.pixels,
+          bytesPerPixel: 4,
+          bytesPerRow: captureTarget.width * 4,
+          sourceBytesPerRow: captureTarget.width * 4,
+          sourceByteLength: unpacked.pixels.byteLength,
         };
       } finally {
         applyMode(previousMode);
@@ -503,7 +527,7 @@ export async function createRelativisticSpaceShotLab({
       return {
         labId: LAB_ID,
         threeRevision: REVISION,
-        backend: renderer.backend?.isWebGPUBackend === true ? "WebGPU" : "unsupported",
+        ...webgpuDeviceIdentityMetrics(deviceIdentity, renderer),
         scenario,
         mechanism,
         tier,
@@ -525,6 +549,11 @@ export async function createRelativisticSpaceShotLab({
             : mode,
         gpuTimingVerdict: "INSUFFICIENT_EVIDENCE",
         lifecycleVerdict: "INSUFFICIENT_EVIDENCE",
+        viewport: {
+          width: renderer.domElement.width,
+          height: renderer.domElement.height,
+          dpr,
+        },
       };
     },
     async resolveGpuTimings() {
@@ -540,6 +569,7 @@ export async function createRelativisticSpaceShotLab({
     async dispose() {
       if (disposed) return;
       disposed = true;
+      markWebGPUDeviceDisposing(deviceIdentity);
       renderer.setAnimationLoop(null);
       timer.dispose?.();
       cameraStage.dispose();
@@ -554,10 +584,12 @@ export async function createRelativisticSpaceShotLab({
       renderPipeline.dispose();
       renderer.dispose();
       captureTarget = null;
+      markWebGPUDeviceDisposed(deviceIdentity);
     },
   };
 
-  if (startAnimationLoop) {
+  const captureMode = new URLSearchParams(globalThis.location?.search ?? "").get("capture") === "1";
+  if (startAnimationLoop && !captureMode) {
     let frameInFlight = false;
     renderer.setAnimationLoop((timestamp) => {
       timer.update(timestamp);

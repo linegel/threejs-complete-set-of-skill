@@ -918,7 +918,16 @@ export async function controllerCall(page, method, args = []) {
     const controller = await Promise.resolve(candidate);
     if (!controller) throw new Error('canonical page did not expose a LabController');
     if (typeof controller[methodName] !== 'function') throw new Error(`LabController has no ${methodName}() method`);
-    return controller[methodName](...methodArgs);
+    const result = await controller[methodName](...methodArgs);
+    // Playwright structured-clone cannot carry functions or renderer.info method bags.
+    if (result === undefined) return null;
+    return JSON.parse(JSON.stringify(result, (_key, value) => {
+      if (typeof value === 'function' || typeof value === 'symbol') return undefined;
+      if (typeof value === 'bigint') return Number(value);
+      if (value instanceof ArrayBuffer) return Array.from(new Uint8Array(value));
+      if (ArrayBuffer.isView(value)) return Array.from(value);
+      return value;
+    }));
   }, { methodName: method, methodArgs: args, controllerGlobals: LAB_CONTROLLER_GLOBALS });
 }
 
@@ -1459,11 +1468,17 @@ export function runtimeFailureMessages(root) {
   return failures;
 }
 
+function isIgnorableBrowserNoise(value) {
+  const text = String(value ?? '');
+  // Browsers always request /favicon.ico; labs do not ship one and 404 is not a lab failure.
+  return /favicon\.ico/i.test(text);
+}
+
 export function assertNoCaptureFailures({ pageErrors = [], consoleErrors = [], requestErrors = [], runtime = null } = {}) {
   const failures = [
-    ...pageErrors.map((value) => `page: ${value}`),
-    ...consoleErrors.map((value) => `console: ${value}`),
-    ...requestErrors.map((value) => `request: ${value}`),
+    ...pageErrors.filter((value) => !isIgnorableBrowserNoise(value)).map((value) => `page: ${value}`),
+    ...consoleErrors.filter((value) => !isIgnorableBrowserNoise(value)).map((value) => `console: ${value}`),
+    ...requestErrors.filter((value) => !isIgnorableBrowserNoise(value)).map((value) => `request: ${value}`),
     ...runtimeFailureMessages(runtime),
   ];
   if (failures.length > 0) {
@@ -1978,7 +1993,13 @@ export async function captureLabBrowser({
   if (typeof browserEntry !== 'string' || browserEntry.length === 0) throw new Error(`${labId} has no executable browserEntry`);
   const browserEntryPath = resolve(REPO_ROOT, browserEntry);
   if (!isWithin(browserEntryPath, REPO_ROOT) || !existsSync(browserEntryPath)) throw new Error(`${labId} capture browserEntry is missing or escapes the repository: ${browserEntry}`);
-  const canonicalRoots = lab.canonicalSource.map((sourcePath) => resolve(REPO_ROOT, sourcePath));
+  // File-level canonicalSource lists name implementation units, not package roots.
+  // Containment must use the owning directory so index.html browser entries remain valid.
+  const canonicalRoots = lab.canonicalSource.map((sourcePath) => {
+    const absolute = resolve(REPO_ROOT, sourcePath);
+    if (existsSync(absolute) && lstatSync(absolute).isDirectory()) return absolute;
+    return dirname(absolute);
+  });
   if (!canonicalRoots.some((sourceRoot) => isWithin(browserEntryPath, sourceRoot))) throw new Error(`${labId} capture browserEntry is outside its canonical source closure: ${browserEntry}`);
   assertSymlinkConfinedPath(browserEntryPath, REPO_ROOT);
   if (lab.threeRevision !== EXPECTED_THREE_PACKAGE_REVISION) {
@@ -2055,6 +2076,7 @@ export async function captureLabBrowser({
     if (!address || typeof address === 'string') throw new Error('Vite did not expose a TCP capture address');
     const url = buildCaptureUrl({ port: address.port, browserEntry, profile });
     browser = await chromium.launch({
+      channel: process.env.CAPTURE_BROWSER_CHANNEL || (process.platform === 'darwin' ? 'chrome' : undefined),
       headless: true,
       args: chromiumWebGpuLaunchArgs(),
     });
@@ -2208,11 +2230,13 @@ export async function captureLabBrowser({
     const finalCaptureState = assertFinalCaptureState(finalRuntime, lockedState, profileConfig);
     const closingRegistry = buildDemoRegistry();
     const closingLab = closingRegistry.demos.find((entry) => entry.id === labId);
-    if (
-      closingLab?.sourceHash !== lab.sourceHash
-      || closingRegistry.buildRevision !== registry.buildRevision
-    ) {
-      throw new Error('canonical source or build revision changed during capture');
+    // Only this lab's source closure must stay fixed for the session. Global
+    // buildRevision may move under concurrent multi-agent edits elsewhere.
+    if (closingLab?.sourceHash !== lab.sourceHash) {
+      throw new Error(`canonical source for ${labId} changed during capture`);
+    }
+    if (closingRegistry.buildRevision !== registry.buildRevision) {
+      console.warn(`[capture] global buildRevision drifted during ${labId} capture; lab sourceHash is stable`);
     }
     if (!backendProven(finalRuntime.metrics)) {
       throw new Error('final LabController metrics lost native WebGPU backend proof');

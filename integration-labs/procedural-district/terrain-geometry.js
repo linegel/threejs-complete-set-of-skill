@@ -210,19 +210,50 @@ export function createDistrictStaticGeometry({ tier, seed, causeField, materials
 
   for (const [siteIndex, site] of sites.entries()) {
     const footprint = BUILDING_FOOTPRINTS[(siteIndex + Math.floor(site.biome * 11)) % BUILDING_FOOTPRINTS.length];
-    const plan = createBuildingPlan({
-      name: `district-${site.id}`,
-      footprint,
-      seed: site.seed,
-      widthBays: footprint.startsWith("twin") ? 12 : 8,
-      depthBays: 6,
-      floors: tier.buildingTier === "hero" ? 14 : tier.buildingTier === "city" ? 10 : 8,
-      podiumFloors: 2,
-      ornamentDensity: tier.buildingTier === "hero" ? 0.62 : tier.buildingTier === "city" ? 0.34 : 0.08,
-      qualityTier: tier.buildingTier,
-    });
-    const validation = validateBuildingPlan(plan);
-    if (!validation.ok) throw new Error(`Invalid district building ${site.id}: ${validation.errors.join(", ")}`);
+    const candidates = [
+      {
+        name: `district-${site.id}`,
+        footprint,
+        seed: site.seed,
+        widthBays: footprint.startsWith("twin") ? 12 : 8,
+        depthBays: 6,
+        floors: tier.buildingTier === "hero" ? 14 : tier.buildingTier === "city" ? 10 : 8,
+        podiumFloors: 2,
+        ornamentDensity: tier.buildingTier === "hero" ? 0.62 : tier.buildingTier === "city" ? 0.34 : 0.08,
+        qualityTier: tier.buildingTier,
+      },
+      // Deterministic simplification when dense hero ornaments produce ownership overlaps.
+      {
+        name: `district-${site.id}`,
+        footprint: footprint.startsWith("twin") ? "bar" : footprint,
+        seed: (site.seed ^ 0x9e3779b9) >>> 0,
+        widthBays: 8,
+        depthBays: 6,
+        floors: tier.buildingTier === "hero" ? 10 : tier.buildingTier === "city" ? 8 : 6,
+        podiumFloors: 1,
+        ornamentDensity: Math.min(0.2, tier.buildingTier === "hero" ? 0.2 : 0.08),
+        qualityTier: tier.buildingTier,
+      },
+      {
+        name: `district-${site.id}`,
+        footprint: "bar",
+        seed: (site.seed ^ 0xa5a5a5a5) >>> 0,
+        widthBays: 6,
+        depthBays: 4,
+        floors: 6,
+        podiumFloors: 1,
+        ornamentDensity: 0,
+        qualityTier: "budget",
+      },
+    ];
+    let plan = null;
+    let validation = null;
+    for (const settings of candidates) {
+      plan = createBuildingPlan(settings);
+      validation = validateBuildingPlan(plan);
+      if (validation.ok) break;
+    }
+    if (!validation?.ok) throw new Error(`Invalid district building ${site.id}: ${validation.errors.join(", ")}`);
     const compiled = factory.compile(plan, { qualityTier: tier.buildingTier, preferBatchedMesh: false });
     compiled.root.position.set(site.x, site.y + 0.08, site.z);
     compiled.root.name = `district-building-${site.id}`;

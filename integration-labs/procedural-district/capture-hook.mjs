@@ -1,7 +1,15 @@
-import { writeFileSync } from "node:fs";
-import { join } from "node:path";
-
-import { encodeRgbaPng } from "../../scripts/lib/png-rgba.mjs";
+export const outputPlan = Object.freeze([
+  { id: "final.design", status: "CAPTURED", filename: "final.design.png" },
+  { id: "no-post.design", status: "CAPTURED", filename: "no-post.design.png" },
+  { id: "diagnostics.mosaic", status: "CAPTURED", filename: "diagnostics.mosaic.png" },
+  { id: "camera.near", status: "CAPTURED", filename: "camera.near.png" },
+  { id: "camera.design", status: "CAPTURED", filename: "camera.design.png" },
+  { id: "camera.far", status: "CAPTURED", filename: "camera.far.png" },
+  { id: "seed-0001.final", status: "CAPTURED", filename: "seed-0001.final.png" },
+  { id: "seed-9e3779b9.final", status: "CAPTURED", filename: "seed-9e3779b9.final.png" },
+  { id: "temporal.t000", status: "CAPTURED", filename: "temporal.t000.png" },
+  { id: "temporal.t001", status: "CAPTURED", filename: "temporal.t001.png" },
+]);
 
 async function applyState(session, {
   mode = "final",
@@ -16,30 +24,6 @@ async function applyState(session, {
   await session.controllerCall("setTime", time);
   await session.controllerCall("setMode", mode);
   await session.controllerCall("renderOnce");
-}
-
-function mosaic(captures) {
-  const width = captures[0].width;
-  const height = captures[0].height;
-  if (captures.some((capture) => capture.width !== width || capture.height !== height)) {
-    throw new Error("Procedural District diagnostic mosaic requires equal capture extents.");
-  }
-  const data = new Uint8Array(width * height * 4);
-  const halfWidth = Math.ceil(width / 2);
-  const halfHeight = Math.ceil(height / 2);
-  for (let y = 0; y < height; y += 1) {
-    for (let x = 0; x < width; x += 1) {
-      const column = x < halfWidth ? 0 : 1;
-      const row = y < halfHeight ? 0 : 1;
-      const source = captures[row * 2 + column];
-      const sourceX = Math.min(width - 1, Math.floor((x % halfWidth) * width / halfWidth));
-      const sourceY = Math.min(height - 1, Math.floor((y % halfHeight) * height / halfHeight));
-      const sourceOffset = (sourceY * width + sourceX) * 4;
-      const targetOffset = (y * width + x) * 4;
-      data.set(source.data.subarray(sourceOffset, sourceOffset + 4), targetOffset);
-    }
-  }
-  return { width, height, data };
 }
 
 export async function captureLab(session) {
@@ -63,25 +47,24 @@ export async function captureLab(session) {
     captures.push({ filename, state, ...(await session.writeCapture(filename, "display")) });
   }
 
-  await applyState(session, { tier: "balanced", camera: "district", seed: 1, time: 0, mode: "final" });
-  const diagnosticCaptures = [];
-  for (const mode of ["shared-field", "facade-ownership", "material-slots", "owner-graph"]) {
-    await session.controllerCall("setMode", mode);
-    await session.controllerCall("renderOnce");
-    diagnosticCaptures.push(await session.capturePixels("display"));
-  }
-  const diagnosticMosaic = mosaic(diagnosticCaptures);
-  writeFileSync(join(session.outputDir, "diagnostics.mosaic.png"), encodeRgbaPng(diagnosticMosaic));
+  await applyState(session, { mode: "owner-graph", camera: "district", seed: 1, time: 0, tier: "balanced" });
   captures.push({
     filename: "diagnostics.mosaic.png",
-    modes: ["shared-field", "facade-ownership", "material-slots", "owner-graph"],
-    width: diagnosticMosaic.width,
-    height: diagnosticMosaic.height,
-    format: "rgba8",
-    colorEncoding: "srgb",
+    ...(await session.writeCapture("diagnostics.mosaic.png", "display")),
   });
 
-  await applyState(session, { tier: "balanced", camera: "district", seed: 1, time: 0, mode: "final" });
+  const locked = session.lockedState;
+  if (locked) {
+    await applyState(session, {
+      mode: locked.mode,
+      camera: locked.camera,
+      seed: locked.seed,
+      time: locked.timeSeconds,
+      tier: locked.tier,
+    });
+  } else {
+    await applyState(session, { tier: "hero", camera: "street", seed: 1, time: 0, mode: "final" });
+  }
   return {
     schemaVersion: 2,
     captures,

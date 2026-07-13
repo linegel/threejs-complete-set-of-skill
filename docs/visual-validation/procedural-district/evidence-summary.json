@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 1,
+  "labId": "procedural-district",
+  "classification": "inspected-runtime-evidence-preview",
+  "acceptanceStatus": "incomplete",
+  "evidenceBundleId": "correctness",
+  "canonicalSource": [
+    "integration-labs/procedural-district"
+  ],
+  "canonicalSourceHash": "sha256:6a379d78e9b135eaa03985dc00ea81cc6481959f21bfa624995c7e0ada7780d5",
+  "threeRevision": "0.185.1",
+  "runtime": {
+    "renderer": "WebGPURenderer",
+    "backend": "WebGPU",
+    "isWebGPUBackend": true,
+    "threeRevision": "0.185.1"
+  },
+  "claimVerdicts": {
+    "visualCorrectness": "INSUFFICIENT_EVIDENCE",
+    "mechanismCorrectness": "INSUFFICIENT_EVIDENCE",
+    "performanceCompliance": "NOT_CLAIMED",
+    "gpuAttribution": "NOT_CLAIMED",
+    "lifecycleStability": "INSUFFICIENT_EVIDENCE"
+  },
+  "primaryImage": "final.design.png",
+  "primaryImageLabel": "Procedural district integration presentation",
+  "images": [
+    {
+      "file": "final.design.png",
+      "meaning": "Final color-managed presentation readback.",
+      "source": "final.design.png",
+      "sourceSha256": "sha256:2dc847522b7667a38000db9bca009d7e30934f8185f11cf950e34a2ef3143830",
+      "outputSha256": "sha256:2dc847522b7667a38000db9bca009d7e30934f8185f11cf950e34a2ef3143830",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "no-post.design.png",
+      "meaning": "No-post / diagnostic baseline presentation.",
+      "source": "no-post.design.png",
+      "sourceSha256": "sha256:458528f18690869daaa036090552671388ca8374999ac4fefbe30edac312376f",
+      "outputSha256": "sha256:458528f18690869daaa036090552671388ca8374999ac4fefbe30edac312376f",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "diagnostics.mosaic.png",
+      "meaning": "Mechanism/owner diagnostic presentation.",
+      "source": "diagnostics.mosaic.png",
+      "sourceSha256": "sha256:a57d55f3c4064f82274490b2c5019125e4148c3225b761dbfbcb6fbc79881f89",
+      "outputSha256": "sha256:a57d55f3c4064f82274490b2c5019125e4148c3225b761dbfbcb6fbc79881f89",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "camera.near.png",
+      "meaning": "Near camera presentation.",
+      "source": "camera.near.png",
+      "sourceSha256": "sha256:80e5dd85b19738bb04cf1cb6ce75614b0d45f9ec8a1488e3bf0a6a8458ae0f90",
+      "outputSha256": "sha256:80e5dd85b19738bb04cf1cb6ce75614b0d45f9ec8a1488e3bf0a6a8458ae0f90",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "camera.design.png",
+      "meaning": "Design camera presentation.",
+      "source": "camera.design.png",
+      "sourceSha256": "sha256:1884691d7780d548064ea261b6dc81a452f4bb5aefee14186c0b052249c6d5c7",
+      "outputSha256": "sha256:1884691d7780d548064ea261b6dc81a452f4bb5aefee14186c0b052249c6d5c7",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "camera.far.png",
+      "meaning": "Far camera presentation.",
+      "source": "camera.far.png",
+      "sourceSha256": "sha256:8e77f807ed93fbac3ea0f02b73df45fe43b390697059f33bcac5aec30d1786ba",
+      "outputSha256": "sha256:8e77f807ed93fbac3ea0f02b73df45fe43b390697059f33bcac5aec30d1786ba",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "seed-0001.final.png",
+      "meaning": "Baseline seed presentation.",
+      "source": "seed-0001.final.png",
+      "sourceSha256": "sha256:49e8b67118dd9f818a65bf34a8c0b6fd80a4e41b22ffda9ae02f1132e4e38f45",
+      "outputSha256": "sha256:49e8b67118dd9f818a65bf34a8c0b6fd80a4e41b22ffda9ae02f1132e4e38f45",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "seed-9e3779b9.final.png",
+      "meaning": "Stress seed presentation.",
+      "source": "seed-9e3779b9.final.png",
+      "sourceSha256": "sha256:5b05b3de6aa57e3bad639278d9500a1ca977558558e299ec68daea30794d2f51",
+      "outputSha256": "sha256:5b05b3de6aa57e3bad639278d9500a1ca977558558e299ec68daea30794d2f51",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "temporal.t000.png",
+      "meaning": "Temporal t=0 presentation.",
+      "source": "temporal.t000.png",
+      "sourceSha256": "sha256:f2688ace148af8df0d0bb66c6ed0d9956aac92828302facf45d06da1970248fa",
+      "outputSha256": "sha256:f2688ace148af8df0d0bb66c6ed0d9956aac92828302facf45d06da1970248fa",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    },
+    {
+      "file": "temporal.t001.png",
+      "meaning": "Temporal t=1/60 presentation.",
+      "source": "temporal.t001.png",
+      "sourceSha256": "sha256:750735eeaa2635419f652d245569426f311a8dce485f3cf9810c249dd7b438eb",
+      "outputSha256": "sha256:750735eeaa2635419f652d245569426f311a8dce485f3cf9810c249dd7b438eb",
+      "width": 1200,
+      "height": 800,
+      "encoding": "png-copy"
+    }
+  ],
+  "limitations": [
+    "Native WebGPU correctness capture includes standard presentation and tier presentation readbacks for the current source hash.",
+    "Nine primary dependency labs remain incomplete, so formal integration acceptance is blocked.",
+    "Field storage readback, lifecycle loop, and GPU timestamps remain INSUFFICIENT_EVIDENCE."
+  ]
+}

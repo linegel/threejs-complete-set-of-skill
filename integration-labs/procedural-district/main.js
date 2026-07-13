@@ -22,6 +22,13 @@ import {
 } from "three/tsl";
 
 import {
+  bindWebGPUDeviceIdentity,
+  captureRuntimeProfileFields,
+  markWebGPUDeviceDisposed,
+  markWebGPUDeviceDisposing,
+  webgpuDeviceIdentityMetrics,
+} from "../../labs/runtime/webgpu-device-identity.mjs";
+import {
   AO_TIERS,
   createGTAOStage,
 } from "../../threejs-ambient-contact-shading/examples/webgpu-node-gtao/main.js";
@@ -213,6 +220,7 @@ export async function createProceduralDistrictLab({
   if (renderer.backend.isWebGPUBackend !== true) {
     throw new Error("Procedural District requires a native WebGPU backend; no fallback is activated.");
   }
+  const deviceIdentity = bindWebGPUDeviceIdentity(renderer);
   if (renderer.reversedDepthBuffer === true) {
     throw new Error("Procedural District uses the r185 standard-depth GTAO contract.");
   }
@@ -568,12 +576,15 @@ export async function createProceduralDistrictLab({
   }
 
   function describePipeline() {
-    return createDistrictRuntimeGraph({
-      mode,
-      tier: tierId,
-      resources: buildResourceRecords(),
-      fieldDispatches: fieldStage.dispatchRecords,
-    });
+    return {
+      ...createDistrictRuntimeGraph({
+        mode,
+        tier: tierId,
+        resources: buildResourceRecords(),
+        fieldDispatches: fieldStage.dispatchRecords,
+      }),
+      ...captureRuntimeProfileFields(),
+    };
   }
 
   function describeResources() {
@@ -616,7 +627,7 @@ export async function createProceduralDistrictLab({
     return {
       schemaVersion: 2,
       labId: LAB_ID,
-      backend: renderer.backend.isWebGPUBackend === true ? "webgpu" : "unsupported",
+      ...webgpuDeviceIdentityMetrics(deviceIdentity, renderer),
       threeRevision: String(renderer.constructor.REVISION ?? "185"),
       scenario,
       mechanism,
@@ -640,7 +651,6 @@ export async function createProceduralDistrictLab({
       invariantValidation,
       materialState: materialStage.describe(),
       weatherState: { ...weatherStage.weather },
-      rendererInfo: renderer.info,
       claimVerdicts: {
         nativeWebGPU: "PASS",
         fullCanonicalMaterialHost: "NOT_CLAIMED",
@@ -657,12 +667,20 @@ export async function createProceduralDistrictLab({
         mode,
         tier: tierId,
       },
+      camera: cameraId,
+      cameraId,
+      viewport: {
+        width: renderer.domElement.width,
+        height: renderer.domElement.height,
+        dpr: appliedDpr,
+      },
     };
   }
 
   async function dispose() {
     if (disposed) return;
     disposed = true;
+    markWebGPUDeviceDisposing(deviceIdentity);
     displayTarget?.renderTarget?.dispose?.();
     displayTarget?.dispose?.();
     renderPipeline.dispose();
@@ -673,6 +691,7 @@ export async function createProceduralDistrictLab({
     materialStage.dispose();
     fieldStage.dispose();
     renderer.dispose();
+    markWebGPUDeviceDisposed(deviceIdentity);
   }
 
   await setScenario(initialScenario);

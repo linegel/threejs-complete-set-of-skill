@@ -18,63 +18,200 @@
   "browserEntry": "index.html",
   "publishPath": "/demos/integration-temporal-surface/",
   "scenarios": [
-    { "id": "host-scene-linear-frost", "route": "/demos/integration-temporal-surface/?scenario=host-scene-linear-frost", "acceptanceStatus": "incomplete" },
-    { "id": "host-temporal-reset-coupling", "route": "/demos/integration-temporal-surface/?scenario=host-temporal-reset-coupling", "acceptanceStatus": "incomplete" }
+    {
+      "id": "host-scene-linear-frost",
+      "route": "/demos/integration-temporal-surface/?scenario=host-scene-linear-frost",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "host-temporal-reset-coupling",
+      "route": "/demos/integration-temporal-surface/?scenario=host-temporal-reset-coupling",
+      "acceptanceStatus": "incomplete"
+    }
   ],
   "mechanisms": [
-    { "id": "shared-scene-color", "route": "/demos/integration-temporal-surface/mechanism/shared-scene-color/", "acceptanceStatus": "incomplete" },
-    { "id": "shared-depth-velocity-camera", "route": "/demos/integration-temporal-surface/mechanism/shared-depth-velocity-camera/", "acceptanceStatus": "incomplete" },
-    { "id": "feature-local-history", "route": "/demos/integration-temporal-surface/mechanism/feature-local-history/", "acceptanceStatus": "incomplete" },
-    { "id": "host-reset-registry", "route": "/demos/integration-temporal-surface/mechanism/host-reset-registry/", "acceptanceStatus": "incomplete" },
-    { "id": "host-output-ownership", "route": "/demos/integration-temporal-surface/mechanism/host-output-ownership/", "acceptanceStatus": "incomplete" }
+    {
+      "id": "shared-scene-color",
+      "route": "/demos/integration-temporal-surface/mechanism/shared-scene-color/",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "shared-depth-velocity-camera",
+      "route": "/demos/integration-temporal-surface/mechanism/shared-depth-velocity-camera/",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "feature-local-history",
+      "route": "/demos/integration-temporal-surface/mechanism/feature-local-history/",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "host-reset-registry",
+      "route": "/demos/integration-temporal-surface/mechanism/host-reset-registry/",
+      "acceptanceStatus": "incomplete"
+    },
+    {
+      "id": "host-output-ownership",
+      "route": "/demos/integration-temporal-surface/mechanism/host-output-ownership/",
+      "acceptanceStatus": "incomplete"
+    }
   ],
   "tiers": [
     {
       "id": "full",
       "targetClass": "integration-close-inspection",
       "frameTargetMs": null,
-      "resolutionPolicy": { "historyScale": 1, "blurScale": 0.5 },
-      "mechanismLimits": { "workgroupSize": [8, 8, 1], "twoScaleRefraction": true },
-      "resourceLimits": { "sceneSubmissions": 1, "rendererOwners": 1, "outputOwners": 1, "featureHistorySlots": 2 },
+      "resolutionPolicy": {
+        "historyScale": 1,
+        "blurScale": 0.5
+      },
+      "mechanismLimits": {
+        "workgroupSize": [
+          8,
+          8,
+          1
+        ],
+        "twoScaleRefraction": true
+      },
+      "resourceLimits": {
+        "sceneSubmissions": 1,
+        "rendererOwners": 1,
+        "outputOwners": 1,
+        "featureHistorySlots": 2
+      },
       "degradationFromPrevious": [],
-      "preservedInvariants": ["shared-host-signals", "feature-local-history", "one-output-owner"],
+      "preservedInvariants": [
+        "shared-host-signals",
+        "feature-local-history",
+        "one-output-owner"
+      ],
       "acceptanceStatus": "incomplete"
     },
     {
       "id": "balanced",
       "targetClass": "integration-ordinary-inspection",
       "frameTargetMs": null,
-      "resolutionPolicy": { "historyScale": 0.5, "blurScale": 0.33 },
-      "mechanismLimits": { "workgroupSize": [8, 8, 1], "twoScaleRefraction": true },
-      "resourceLimits": { "sceneSubmissions": 1, "rendererOwners": 1, "outputOwners": 1, "featureHistorySlots": 2 },
-      "degradationFromPrevious": ["half-resolution-feature-history", "lower-blur-scale"],
-      "preservedInvariants": ["shared-host-signals", "feature-local-history", "one-output-owner"],
+      "resolutionPolicy": {
+        "historyScale": 0.5,
+        "blurScale": 0.33
+      },
+      "mechanismLimits": {
+        "workgroupSize": [
+          8,
+          8,
+          1
+        ],
+        "twoScaleRefraction": true
+      },
+      "resourceLimits": {
+        "sceneSubmissions": 1,
+        "rendererOwners": 1,
+        "outputOwners": 1,
+        "featureHistorySlots": 2
+      },
+      "degradationFromPrevious": [
+        "half-resolution-feature-history",
+        "lower-blur-scale"
+      ],
+      "preservedInvariants": [
+        "shared-host-signals",
+        "feature-local-history",
+        "one-output-owner"
+      ],
       "acceptanceStatus": "incomplete"
     },
     {
       "id": "budgeted",
       "targetClass": "integration-small-footprint",
       "frameTargetMs": null,
-      "resolutionPolicy": { "historyScale": 0.25, "blurScale": 0.25 },
-      "mechanismLimits": { "workgroupSize": [8, 8, 1], "twoScaleRefraction": false },
-      "resourceLimits": { "sceneSubmissions": 1, "rendererOwners": 1, "outputOwners": 1, "featureHistorySlots": 2 },
-      "degradationFromPrevious": ["quarter-resolution-feature-history", "single-scale-refraction"],
-      "preservedInvariants": ["shared-host-signals", "feature-local-history", "one-output-owner"],
+      "resolutionPolicy": {
+        "historyScale": 0.25,
+        "blurScale": 0.25
+      },
+      "mechanismLimits": {
+        "workgroupSize": [
+          8,
+          8,
+          1
+        ],
+        "twoScaleRefraction": false
+      },
+      "resourceLimits": {
+        "sceneSubmissions": 1,
+        "rendererOwners": 1,
+        "outputOwners": 1,
+        "featureHistorySlots": 2
+      },
+      "degradationFromPrevious": [
+        "quarter-resolution-feature-history",
+        "single-scale-refraction"
+      ],
+      "preservedInvariants": [
+        "shared-host-signals",
+        "feature-local-history",
+        "one-output-owner"
+      ],
       "acceptanceStatus": "incomplete"
     }
   ],
-  "modes": ["final", "host-scene-color", "surface-history", "frost-mask", "refraction", "host-velocity", "reset-reason", "owner-graph"],
-  "cameras": ["near", "design", "far"],
-  "seeds": [1, 2654435769],
+  "modes": [
+    "final",
+    "host-scene-color",
+    "surface-history",
+    "frost-mask",
+    "refraction",
+    "host-velocity",
+    "reset-reason",
+    "owner-graph"
+  ],
+  "cameras": [
+    "near",
+    "design",
+    "far"
+  ],
+  "seeds": [
+    1,
+    2654435769
+  ],
   "capabilityRequirements": [
-    { "id": "host-native-webgpu", "required": true, "evidence": "host backend identity gate", "status": "incomplete" },
-    { "id": "host-scene-color-depth-velocity", "required": true, "evidence": "shared host pass signal identities", "status": "incomplete" },
-    { "id": "storage-texture-compute", "required": true, "evidence": "feature-local RGBA16F history dispatch", "status": "incomplete" }
+    {
+      "id": "host-native-webgpu",
+      "required": true,
+      "evidence": "correctness capture-session proves host isWebGPUBackend === true",
+      "status": "incomplete"
+    },
+    {
+      "id": "host-scene-color-depth-velocity",
+      "required": true,
+      "evidence": "unit contracts prove shared host signal identities; browser capture is presentation-only",
+      "status": "incomplete"
+    },
+    {
+      "id": "storage-texture-compute",
+      "required": true,
+      "evidence": "unit contracts prove feature-local history dispatch; browser capture is presentation-only",
+      "status": "incomplete"
+    }
   ],
   "runtimeProof": [
-    { "id": "host-owner-identity", "required": true, "evidence": "one renderer, pipeline, scene pass, temporal, jitter, tone-map, and output owner", "status": "incomplete" },
-    { "id": "shared-signal-identity", "required": true, "evidence": "scene color, depth, velocity, camera, and reset registry retain host identity", "status": "incomplete" },
-    { "id": "native-browser-evidence", "required": true, "evidence": "pending v2 readback and current-adapter timing", "status": "incomplete" }
+    {
+      "id": "host-owner-identity",
+      "required": true,
+      "evidence": "validate-integration + mutations prove single host ownership of renderer/pipeline/temporal/jitter/tone/output",
+      "status": "incomplete"
+    },
+    {
+      "id": "shared-signal-identity",
+      "required": true,
+      "evidence": "unit contracts prove scene color/depth/velocity/camera/reset registry host identity",
+      "status": "incomplete"
+    },
+    {
+      "id": "native-browser-evidence",
+      "required": true,
+      "evidence": "artifacts/visual-validation/integration-temporal-surface/correctness/capture-session.json native WebGPU presentation readbacks for current source hash",
+      "status": "incomplete"
+    }
   ],
   "evidenceContract": "v2",
   "validationCommand": "node validate-integration.mjs",

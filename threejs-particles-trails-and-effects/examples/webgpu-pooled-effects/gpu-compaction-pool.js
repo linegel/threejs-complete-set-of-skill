@@ -209,6 +209,11 @@ export function validateCompactionReadback({
   return true;
 }
 
+
+function wgslSafeName(value) {
+  return String(value).replace(/[^A-Za-z0-9_]/g, "_");
+}
+
 function createFloatLane(capacity, itemSize = 4) {
   return new StorageInstancedBufferAttribute(capacity, itemSize);
 }
@@ -268,7 +273,7 @@ function makeKernelSet(pool, sourceSet, destinationSet, label) {
   const blockOffsets = storage(pool.blockOffsets, "uint", blockCount);
   const entityToIndex = storage(pool.entityToIndex, "uint", capacity);
   const freeIds = storage(pool.freeIds, "uint", capacity);
-  const freeCount = storage(pool.freeCount, "uint", 1);
+  const freeCount = storage(pool.freeCount, "uint", 1).toAtomic();
   const counters = storage(pool.counters, "uvec4", 1);
   const indirect = storage(pool.indirect, "uint", 5);
 
@@ -279,7 +284,7 @@ function makeKernelSet(pool, sourceSet, destinationSet, label) {
     indirect.element(uint(2)).assign(uint(0));
     indirect.element(uint(3)).assign(uint(0));
     indirect.element(uint(4)).assign(uint(0));
-  })().compute(1).setName(`${label}:reset-counters`);
+  })().compute(1).setName(wgslSafeName(`${label}_reset-counters`));
 
   // Kept separate from integration so no compute entry point binds more than
   // the WebGPU-guaranteed eight storage buffers per shader stage.
@@ -291,7 +296,7 @@ function makeKernelSet(pool, sourceSet, destinationSet, label) {
     destination.axisSpin.element(index).assign(vec4(0));
     destination.entityId.element(index).assign(uint(DEAD_ENTITY));
     entityToIndex.element(index).assign(uint(DEAD_ENTITY));
-  })().compute(capacity, [workgroupSize]).setName(`${label}:clear-destination`);
+  })().compute(capacity, [workgroupSize]).setName(wgslSafeName(`${label}_clear-destination`));
 
   const integrateAndMark = Fn(() => {
     const index = instanceIndex;
@@ -336,7 +341,7 @@ function makeKernelSet(pool, sourceSet, destinationSet, label) {
       });
     });
     marks.element(index).assign(select(survives, uint(1), uint(0)));
-  })().compute(capacity, [workgroupSize]).setName(`${label}:integrate-mark`);
+  })().compute(capacity, [workgroupSize]).setName(wgslSafeName(`${label}_integrate-mark`));
 
   const scanBlocks = Fn(() => {
     const index = instanceIndex;
@@ -373,7 +378,7 @@ function makeKernelSet(pool, sourceSet, destinationSet, label) {
     }
 
     localDestinations.element(index).assign(shared.element(localIndex));
-  })().compute(capacity, [workgroupSize]).setName(`${label}:exclusive-scan-blocks`);
+  })().compute(capacity, [workgroupSize]).setName(wgslSafeName(`${label}_exclusive-scan-blocks`));
 
   const scanBlockOffsets = Fn(() => {
     const running = uint(0).toVar(`${label}BlockRunningTotal`);
@@ -385,7 +390,7 @@ function makeKernelSet(pool, sourceSet, destinationSet, label) {
       },
     );
     counters.element(uint(0)).x.assign(running);
-  })().compute(1).setName(`${label}:exclusive-scan-block-sums`);
+  })().compute(1).setName(wgslSafeName(`${label}_exclusive-scan-block-sums`));
 
   const scatterMotion = Fn(() => {
     const sourceIndex = instanceIndex;
@@ -400,7 +405,7 @@ function makeKernelSet(pool, sourceSet, destinationSet, label) {
         source.velocityLifetime.element(sourceIndex),
       );
     });
-  })().compute(capacity, [workgroupSize]).setName(`${label}:scatter-motion-lanes`);
+  })().compute(capacity, [workgroupSize]).setName(wgslSafeName(`${label}_scatter-motion-lanes`));
 
   const scatterAppearance = Fn(() => {
     const sourceIndex = instanceIndex;
@@ -415,7 +420,7 @@ function makeKernelSet(pool, sourceSet, destinationSet, label) {
         source.axisSpin.element(sourceIndex),
       );
     });
-  })().compute(capacity, [workgroupSize]).setName(`${label}:scatter-appearance-lanes`);
+  })().compute(capacity, [workgroupSize]).setName(wgslSafeName(`${label}_scatter-appearance-lanes`));
 
   const scatterIdentity = Fn(() => {
     const sourceIndex = instanceIndex;
@@ -427,7 +432,7 @@ function makeKernelSet(pool, sourceSet, destinationSet, label) {
       destination.entityId.element(destinationIndex).assign(entity);
       entityToIndex.element(entity).assign(destinationIndex);
     });
-  })().compute(capacity, [workgroupSize]).setName(`${label}:scatter-stable-identity`);
+  })().compute(capacity, [workgroupSize]).setName(wgslSafeName(`${label}_scatter-stable-identity`));
 
   const expandEventState = Fn(() => {
     const localIndex = instanceIndex;
@@ -473,7 +478,7 @@ function makeKernelSet(pool, sourceSet, destinationSet, label) {
         vec4(axis, mix(1.5, 7.0, r2)),
       );
     });
-  })().compute(capacity, [workgroupSize]).setName(`${label}:expand-event-state`);
+  })().compute(capacity, [workgroupSize]).setName(wgslSafeName(`${label}_expand-event-state`));
 
   const expandEventIdentity = Fn(() => {
     const localIndex = instanceIndex;
@@ -492,7 +497,7 @@ function makeKernelSet(pool, sourceSet, destinationSet, label) {
       destination.entityId.element(destinationIndex).assign(entity);
       entityToIndex.element(entity).assign(destinationIndex);
     });
-  })().compute(capacity, [workgroupSize]).setName(`${label}:expand-stable-identity`);
+  })().compute(capacity, [workgroupSize]).setName(wgslSafeName(`${label}_expand-stable-identity`));
 
   const publishIndirect = Fn(() => {
     const survivorCount = counters.element(uint(0)).x;
@@ -503,7 +508,7 @@ function makeKernelSet(pool, sourceSet, destinationSet, label) {
     counters.element(uint(0)).z.assign(live);
     counters.element(uint(0)).w.assign(pool.eventCountNode.sub(spawned));
     indirect.element(uint(1)).assign(live);
-  })().compute(1).setName(`${label}:publish-indirect-count`);
+  })().compute(1).setName(wgslSafeName(`${label}_publish-indirect-count`));
 
   return {
     reset,
@@ -544,7 +549,7 @@ function makeResetKernels(pool) {
       state.appearance.element(index).assign(vec4(0));
       state.axisSpin.element(index).assign(vec4(0));
       state.entityId.element(index).assign(uint(DEAD_ENTITY));
-    })().compute(pool.capacity, [pool.workgroupSize]).setName(`${pool.kind}:reset-${label}`);
+    })().compute(pool.capacity, [pool.workgroupSize]).setName(wgslSafeName(`${pool.kind}_reset-${label}`));
   };
   const entityToIndex = storage(pool.entityToIndex, "uint", pool.capacity);
   const freeIds = storage(pool.freeIds, "uint", pool.capacity);
@@ -552,8 +557,8 @@ function makeResetKernels(pool) {
     const index = instanceIndex;
     entityToIndex.element(index).assign(uint(DEAD_ENTITY));
     freeIds.element(index).assign(index);
-  })().compute(pool.capacity, [pool.workgroupSize]).setName(`${pool.kind}:reset-identity-free-stack`);
-  const freeCount = storage(pool.freeCount, "uint", 1);
+  })().compute(pool.capacity, [pool.workgroupSize]).setName(wgslSafeName(`${pool.kind}_reset-identity-free-stack`));
+  const freeCount = storage(pool.freeCount, "uint", 1).toAtomic();
   const counters = storage(pool.counters, "uvec4", 1);
   const indirect = storage(pool.indirect, "uint", 5);
   const resetControl = Fn(() => {
@@ -564,7 +569,7 @@ function makeResetKernels(pool) {
     indirect.element(uint(2)).assign(uint(0));
     indirect.element(uint(3)).assign(uint(0));
     indirect.element(uint(4)).assign(uint(0));
-  })().compute(1).setName(`${pool.kind}:reset-control`);
+  })().compute(1).setName(wgslSafeName(`${pool.kind}_reset-control`));
   return {
     stateA: clearState(pool.stateA, "state-A"),
     stateB: clearState(pool.stateB, "state-B"),
@@ -647,8 +652,8 @@ export class GPUCompactionEffectPool {
     this.indexCount = indexedGeometry?.index?.count ?? 6;
     this.indirect.array.set([this.indexCount, 0, 0, 0, 0]);
     this.indirect.needsUpdate = true;
-    this.kernelsAB = makeKernelSet(this, this.stateA, this.stateB, `${kind}:A-to-B`);
-    this.kernelsBA = makeKernelSet(this, this.stateB, this.stateA, `${kind}:B-to-A`);
+    this.kernelsAB = makeKernelSet(this, this.stateA, this.stateB, `${kind}_A_to_B`);
+    this.kernelsBA = makeKernelSet(this, this.stateB, this.stateA, `${kind}_B_to_A`);
     this.resetKernels = makeResetKernels(this);
   }
 

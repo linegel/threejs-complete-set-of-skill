@@ -42,9 +42,9 @@
     <div><dt>Owning skill</dt><dd>Water Optics</dd></div>
     <div><dt>Execution</dt><dd>rendering</dd></div>
     <div><dt>Three.js</dt><dd>0.185.1</dd></div>
-    <div><dt>Source hash</dt><dd><code>sha256:fb027f0dee11f916fabf2fb8147509a5c9829ad57b41b514bfc0a7e63551690d</code></dd></div>
-    <div><dt>Published bundle hash</dt><dd><code>sha256:19e5dd8c822cdc71f169d37c3c09dfef6e35ccd552ee984e74540be9e0667e95</code></dd></div>
-    <div><dt>Build revision</dt><dd><code>sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b</code></dd></div>
+    <div><dt>Source hash</dt><dd><code>sha256:7faab983ec26421f8364263044fe2eafe9e6fb65efbb731e825dbd501beabbba</code></dd></div>
+    <div><dt>Published bundle hash</dt><dd><code>sha256:f4fb80f3b261d67869b699de3fe661d4d4367b771d33b07291e2d9c1dcd17d18</code></dd></div>
+    <div><dt>Build revision</dt><dd><code>sha256:b9a3789cce08ca979f23b56d5ce0c4132c720aa24f80bf479959a88ec14bd9c2</code></dd></div>
     <div><dt>Renderer</dt><dd>Not promoted</dd></div>
     <div><dt>Backend</dt><dd>Not promoted</dd></div>
     <div><dt>Evidence contract</dt><dd>v2</dd></div>
@@ -66,13 +66,15 @@
   &quot;frameTargetMs&quot;: null,
   &quot;resolutionPolicy&quot;: {
     &quot;simulationResolution&quot;: 512,
+    &quot;causticResolution&quot;: 512,
     &quot;meshSegments&quot;: 192,
     &quot;dpr&quot;: 1
   },
   &quot;mechanismLimits&quot;: {
     &quot;maxSubsteps&quot;: 4,
     &quot;analyticBands&quot;: 5,
-    &quot;microBands&quot;: 4
+    &quot;microBands&quot;: 4,
+    &quot;causticUpdateEverySimulationSteps&quot;: 1
   },
   &quot;resourceLimits&quot;: {
     &quot;derivedPersistentGpuBytes&quot;: 9437344,
@@ -92,21 +94,24 @@
   &quot;frameTargetMs&quot;: null,
   &quot;resolutionPolicy&quot;: {
     &quot;simulationResolution&quot;: 256,
+    &quot;causticResolution&quot;: 192,
     &quot;meshSegments&quot;: 128,
     &quot;dpr&quot;: 1
   },
   &quot;mechanismLimits&quot;: {
     &quot;maxSubsteps&quot;: 3,
     &quot;analyticBands&quot;: 4,
-    &quot;microBands&quot;: 3
+    &quot;microBands&quot;: 3,
+    &quot;causticUpdateEverySimulationSteps&quot;: 1
   },
   &quot;resourceLimits&quot;: {
-    &quot;derivedPersistentGpuBytes&quot;: 2359456,
+    &quot;derivedPersistentGpuBytes&quot;: 2015392,
     &quot;eventSnapshotBytes&quot;: 64,
     &quot;gpuProbeBytes&quot;: 64
   },
   &quot;degradationFromPrevious&quot;: [
     &quot;simulation 512→256&quot;,
+    &quot;receiver caustics 512→192&quot;,
     &quot;mesh 192→128&quot;,
     &quot;max substeps 4→3&quot;,
     &quot;analytic bands 5→4&quot;,
@@ -124,21 +129,25 @@
   &quot;frameTargetMs&quot;: null,
   &quot;resolutionPolicy&quot;: {
     &quot;simulationResolution&quot;: 192,
+    &quot;causticResolution&quot;: 96,
     &quot;meshSegments&quot;: 96,
     &quot;dpr&quot;: 1
   },
   &quot;mechanismLimits&quot;: {
     &quot;maxSubsteps&quot;: 3,
     &quot;analyticBands&quot;: 3,
-    &quot;microBands&quot;: 2
+    &quot;microBands&quot;: 2,
+    &quot;causticUpdateEverySimulationSteps&quot;: 2
   },
   &quot;resourceLimits&quot;: {
-    &quot;derivedPersistentGpuBytes&quot;: 1327264,
+    &quot;derivedPersistentGpuBytes&quot;: 995488,
     &quot;eventSnapshotBytes&quot;: 64,
     &quot;gpuProbeBytes&quot;: 64
   },
   &quot;degradationFromPrevious&quot;: [
     &quot;simulation 256→192&quot;,
+    &quot;receiver caustics 192→96&quot;,
+    &quot;caustic cadence 1→2 simulation steps&quot;,
     &quot;mesh 128→96&quot;,
     &quot;analytic bands 4→3&quot;,
     &quot;micro bands 3→2&quot;
@@ -155,21 +164,25 @@
   &quot;frameTargetMs&quot;: null,
   &quot;resolutionPolicy&quot;: {
     &quot;simulationResolution&quot;: 96,
+    &quot;causticResolution&quot;: 48,
     &quot;meshSegments&quot;: 48,
     &quot;dpr&quot;: 1
   },
   &quot;mechanismLimits&quot;: {
     &quot;maxSubsteps&quot;: 2,
     &quot;analyticBands&quot;: 2,
-    &quot;microBands&quot;: 0
+    &quot;microBands&quot;: 0,
+    &quot;causticUpdateEverySimulationSteps&quot;: 4
   },
   &quot;resourceLimits&quot;: {
-    &quot;derivedPersistentGpuBytes&quot;: 331936,
+    &quot;derivedPersistentGpuBytes&quot;: 248992,
     &quot;eventSnapshotBytes&quot;: 64,
     &quot;gpuProbeBytes&quot;: 64
   },
   &quot;degradationFromPrevious&quot;: [
     &quot;simulation 192→96&quot;,
+    &quot;receiver caustics 96→48&quot;,
+    &quot;caustic cadence 2→4 simulation steps&quot;,
     &quot;mesh 96→48&quot;,
     &quot;max substeps 3→2&quot;,
     &quot;analytic bands 3→2&quot;,
@@ -185,7 +198,7 @@
 }</pre></details></section>
 
   <section class="section" aria-labelledby="limitations-title"><h2 id="limitations-title">Limitations</h2><ul class="limitations"><li>No tracked accepted v2 runtime bundle is published for this source hash.</li><li>1 required capability record remain incomplete.</li><li>6 required runtime-proof records remain incomplete.</li><li>No current-hardware performance claim is published without named-adapter timestamp evidence.</li></ul></section>
-  <footer class="site-footer"><span>webgpu-bounded-water · sha256:fb027f0dee11</span><span><a href="/evidence/">All evidence reports</a></span></footer>
+  <footer class="site-footer"><span>webgpu-bounded-water · sha256:7faab983ec26</span><span><a href="/evidence/">All evidence reports</a></span></footer>
 </div></main>
 </body>
 </html>

@@ -30,6 +30,13 @@ import {
   velocity,
 } from "three/tsl";
 
+import {
+  bindWebGPUDeviceIdentity,
+  captureRuntimeProfileFields,
+  markWebGPUDeviceDisposed,
+  markWebGPUDeviceDisposing,
+  webgpuDeviceIdentityMetrics,
+} from "../../../labs/runtime/webgpu-device-identity.mjs";
 import { createTemporalSurfaceIntegration } from "./temporal-surface-integration.js";
 import {
   TEMPORAL_CAMERAS,
@@ -112,6 +119,7 @@ export class TemporalSurfaceBrowserHost {
     if (this.renderer.backend?.isWebGPUBackend !== true) {
       throw new Error("temporal-surface integration requires native WebGPU; fallback is blocked");
     }
+    this.deviceIdentity = bindWebGPUDeviceIdentity(this.renderer);
     this.renderer.toneMapping = AgXToneMapping;
     this.renderer.toneMappingExposure = 1;
     const width = Math.max(1, this.canvas.clientWidth || this.canvas.width || 1200);
@@ -343,6 +351,7 @@ export class TemporalSurfaceBrowserHost {
   describePipeline() {
     return {
       ...this.integration.describePipeline(),
+      ...captureRuntimeProfileFields(),
       hostOutputNodeStable: true,
       registeredSceneLinearStage: this.activeRegistration?.id ?? null,
       outputColorTransform: this.renderPipeline.outputColorTransform,
@@ -364,24 +373,32 @@ export class TemporalSurfaceBrowserHost {
     return {
       labId: this.labId,
       status: "native-webgpu-runtime; evidence incomplete",
-      rendererBackend: this.renderer.backend?.isWebGPUBackend === true ? "WebGPU" : "unsupported",
+      ...webgpuDeviceIdentityMetrics(this.deviceIdentity, this.renderer),
       threeRevision: REVISION,
       scenario: this.scenario,
       mechanism: this.mechanism,
       tier: this.tier,
       mode: this.mode,
       camera: this.cameraId,
+      cameraId: this.cameraId,
       seed: this.seed,
       time: this.time,
-      routeSelection: { scenario: this.scenario, mechanism: this.mechanism, tier: this.tier },
+      timeSeconds: this.time,
+      routeSelection: { labId: this.labId, scenario: this.scenario, mechanism: this.mechanism, tier: this.tier },
       integration: this.integration.getMetrics(),
       currentAdapterTiming: "INSUFFICIENT_EVIDENCE",
+      viewport: {
+        width: this.renderer.domElement.width,
+        height: this.renderer.domElement.height,
+        dpr: this.renderer.getPixelRatio(),
+      },
     };
   }
 
   async dispose() {
     if (this.disposed) return;
     this.disposed = true;
+    markWebGPUDeviceDisposing(this.deviceIdentity);
     this.renderer?.setAnimationLoop(null);
     this.integration?.dispose();
     for (const mesh of [this.box, this.sphere]) {
@@ -391,5 +408,6 @@ export class TemporalSurfaceBrowserHost {
     this.captureTarget?.dispose();
     this.renderPipeline?.dispose?.();
     this.renderer?.dispose();
+    markWebGPUDeviceDisposed(this.deviceIdentity);
   }
 }

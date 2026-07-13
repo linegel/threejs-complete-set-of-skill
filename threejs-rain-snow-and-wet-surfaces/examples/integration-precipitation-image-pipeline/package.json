@@ -4,7 +4,7 @@
     "check": "node --check precipitation-image-pipeline-integration.js && node --check browser-host.js && node --check main.js && node --check route-state.mjs && node --check validate-integration.mjs && node --check test-mutations.mjs",
     "validate:unit": "node validate-integration.mjs",
     "test:mutations": "node test-mutations.mjs",
-    "capture": "node ../../../scripts/capture-lab-browser.mjs --lab integration-precipitation-image-pipeline --target presentation",
+    "capture": "node ../../../scripts/capture-lab-browser.mjs --lab integration-precipitation-image-pipeline --target presentation --hook capture-hook.mjs",
     "validate:artifacts": "node evidence-status.mjs validate:artifacts",
     "validate:quick": "npm run check && npm run validate:unit && npm run test:mutations",
     "validate:full": "npm run validate:quick && npm run validate:artifacts"

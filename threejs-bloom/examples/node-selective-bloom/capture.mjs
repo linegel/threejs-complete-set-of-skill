@@ -28,8 +28,16 @@ try {
 	const base = server.resolvedUrls?.local?.[ 0 ];
 	if ( ! base ) throw new Error( 'Vite did not expose a local URL.' );
 	browser = await chromium.launch( {
+		channel: 'chrome',
 		headless: true,
-		args: [ '--enable-unsafe-webgpu', '--enable-features=Vulkan,UseSkiaRenderer', '--disable-gpu-sandbox' ]
+		args: [
+			'--enable-unsafe-webgpu',
+			'--disable-gpu-sandbox',
+			'--ignore-gpu-blocklist',
+			'--use-angle=metal',
+			'--enable-features=Vulkan,WebGPU',
+			'--no-sandbox',
+		],
 	} );
 	const page = await browser.newPage( { viewport: { width: 1200, height: 800 }, deviceScaleFactor: 1 } );
 	const browserErrors = [];

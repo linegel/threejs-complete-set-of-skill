@@ -215,13 +215,13 @@
     {
       "id": "native-webgpu",
       "required": true,
-      "evidence": "renderer backend must prove isWebGPUBackend === true",
+      "evidence": "correctness capture-session proves isWebGPUBackend === true on r185",
       "status": "incomplete"
     },
     {
       "id": "gpu-timestamps",
       "required": true,
-      "evidence": "required before any 60 Hz performance claim",
+      "evidence": "INSUFFICIENT_EVIDENCE \u2014 correctness capture does not claim named-adapter timestamps",
       "status": "incomplete"
     }
   ],
@@ -229,13 +229,13 @@
     {
       "id": "single-owner-graph",
       "required": true,
-      "evidence": "runtime graph and mutation suite implemented; browser evidence pending",
+      "evidence": "unit/mutation suites prove owner graph; browser presentation capture bound to current hash",
       "status": "incomplete"
     },
     {
       "id": "field-storage-readback",
       "required": true,
-      "evidence": "field atlas is sampled by render diagnostics; accepted readback bundle pending",
+      "evidence": "field atlas sampled in diagnostics; accepted quantitative field readback bundle still pending",
       "status": "incomplete"
     },
     {
@@ -247,7 +247,7 @@
     {
       "id": "lifecycle-loop",
       "required": true,
-      "evidence": "50-100 cycle evidence not captured",
+      "evidence": "INSUFFICIENT_EVIDENCE \u2014 50-100 cycle evidence not captured",
       "status": "incomplete"
     }
   ],
@@ -269,4 +269,3 @@
     "All host adapters are executable; acceptance remains incomplete until real native-WebGPU readbacks, current-adapter timestamps, image metrics, and lifecycle evidence pass."
   ]
 }
-

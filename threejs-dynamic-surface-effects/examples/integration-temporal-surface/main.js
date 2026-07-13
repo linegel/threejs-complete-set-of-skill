@@ -20,26 +20,29 @@ async function boot() {
   observer.observe(canvas);
   await resize();
 
+  const captureMode = new URLSearchParams(globalThis.location.search).get("capture") === "1";
   let previous = performance.now();
   let busy = false;
   let frame = 0;
-  controller.renderer.setAnimationLoop((timestamp) => {
-    if (busy) return;
-    busy = true;
-    const delta = Math.min(0.05, Math.max(0, (timestamp - previous) / 1000));
-    previous = timestamp;
-    Promise.resolve(controller.step(delta))
-      .then(() => controller.renderOnce())
-      .then(() => {
-        if (++frame % 20 === 0) status.textContent = JSON.stringify(controller.getMetrics(), null, 2);
-      })
-      .catch((error) => {
-        controller.renderer.setAnimationLoop(null);
-        status.textContent = String(error.stack || error.message);
-        globalThis.__labError = error;
-      })
-      .finally(() => { busy = false; });
-  });
+  if (!captureMode) {
+    controller.renderer.setAnimationLoop((timestamp) => {
+      if (busy) return;
+      busy = true;
+      const delta = Math.min(0.05, Math.max(0, (timestamp - previous) / 1000));
+      previous = timestamp;
+      Promise.resolve(controller.step(delta))
+        .then(() => controller.renderOnce())
+        .then(() => {
+          if (++frame % 20 === 0) status.textContent = JSON.stringify(controller.getMetrics(), null, 2);
+        })
+        .catch((error) => {
+          controller.renderer.setAnimationLoop(null);
+          status.textContent = String(error.stack || error.message);
+          globalThis.__labError = error;
+        })
+        .finally(() => { busy = false; });
+    });
+  }
   status.textContent = JSON.stringify(controller.getMetrics(), null, 2);
   globalThis.addEventListener("beforeunload", () => {
     observer.disconnect();

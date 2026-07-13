@@ -6,3 +6,4 @@ export * from './ownership.mjs';
 export * from './physics-integration-contracts.mjs';
 export * from './runtime-contract-values.mjs';
 export * from './strict-lab-controller.mjs';
+export * from './webgpu-device-identity.mjs';

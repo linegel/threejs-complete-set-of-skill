@@ -94,7 +94,13 @@ export function createProceduralStarTexture(seed = 1, width = 256, height = 128)
     data[pixel * 4 + 2] = star ? Math.min(255, value + Math.round(35 * random())) : value + 2;
     data[pixel * 4 + 3] = 255;
   }
-  return configureColorTexture(new DataTexture(data, width, height, RGBAFormat, UnsignedByteType));
+  const texture = new DataTexture(data, width, height, RGBAFormat, UnsignedByteType);
+  // WebGPU Textures.updateTexture requires a non-null image with complete === true.
+  if (texture.image && texture.image.complete !== true) {
+    texture.image.complete = true;
+  }
+  texture.needsUpdate = true;
+  return configureColorTexture(texture, { mipmaps: false });
 }
 
 function requireMode(mode) {

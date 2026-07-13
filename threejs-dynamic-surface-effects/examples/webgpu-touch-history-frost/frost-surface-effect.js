@@ -847,10 +847,10 @@ function createHistoryComputeNodes({ width, height, historyA, historyB, settings
     dispatch,
     workgroupCount,
     workgroupSize,
-    clearA: createClearNode(historyA, "touch-history-frost:clear-a"),
-    clearB: createClearNode(historyB, "touch-history-frost:clear-b"),
-    updateAB: createUpdateNode(historyA, historyB, "touch-history-frost:update-a-to-b"),
-    updateBA: createUpdateNode(historyB, historyA, "touch-history-frost:update-b-to-a"),
+    clearA: createClearNode(historyA, "touch_history_frost_clear_a"),
+    clearB: createClearNode(historyB, "touch_history_frost_clear_b"),
+    updateAB: createUpdateNode(historyA, historyB, "touch_history_frost_update_a_to_b"),
+    updateBA: createUpdateNode(historyB, historyA, "touch_history_frost_update_b_to_a"),
   };
 }
 
@@ -870,7 +870,7 @@ function createBenchmarkLedgerComputeNode(target, policyDecision) {
     writeCandidate(1, "dirty-tiles");
     writeCandidate(2, "many-event-binning");
     writeCandidate(3, "idle-suspend");
-  })().compute([1, 1, 1], [1, 1, 1]).setName("touch-history-frost:benchmark-ledger");
+  })().compute([1, 1, 1], [1, 1, 1]).setName("touch_history_frost_benchmark_ledger");
 }
 
 function exactDielectricFresnelNode(cosIncident, incidentIor, transmittedIor) {
@@ -1212,15 +1212,15 @@ export class WebGPUTouchHistoryFrostEffect {
     this.ownsRenderPipeline = !renderPipeline;
     this.scene = scene;
     this.camera = camera;
-    this.historyA = createHistoryStorageTexture(this.width, this.height, "touch-history-frost:history-a");
-    this.historyB = createHistoryStorageTexture(this.width, this.height, "touch-history-frost:history-b");
+    this.historyA = createHistoryStorageTexture(this.width, this.height, "touch_history_frost_history_a");
+    this.historyB = createHistoryStorageTexture(this.width, this.height, "touch_history_frost_history_b");
     this.historyRead = this.historyA;
     this.historyWrite = this.historyB;
     this.readSlot = "A";
     this.historyReadTextureNode = texture(this.historyRead);
     this.historyWriteTextureNode = texture(this.historyWrite);
-    this.historyReadTextureNode.name = "touch-history-frost:current-history-node";
-    this.historyWriteTextureNode.name = "touch-history-frost:previous-history-node";
+    this.historyReadTextureNode.name = "touch_history_frost_current_history_node";
+    this.historyWriteTextureNode.name = "touch_history_frost_previous_history_node";
     this.historyReadTextureNode.previousHistoryNode = this.historyWriteTextureNode;
     this.historyTextureNode = this.historyReadTextureNode;
     assertDistinctHistoryBindings({
@@ -1437,8 +1437,8 @@ export class WebGPUTouchHistoryFrostEffect {
     this.displayHeight = extents.displayHeight;
     this.width = extents.historyWidth;
     this.height = extents.historyHeight;
-    this.historyA = createHistoryStorageTexture(this.width, this.height, "touch-history-frost:history-a");
-    this.historyB = createHistoryStorageTexture(this.width, this.height, "touch-history-frost:history-b");
+    this.historyA = createHistoryStorageTexture(this.width, this.height, "touch_history_frost_history_a");
+    this.historyB = createHistoryStorageTexture(this.width, this.height, "touch_history_frost_history_b");
     this.historyRead = this.historyA;
     this.historyWrite = this.historyB;
     this.readSlot = "A";
@@ -1624,7 +1624,7 @@ export class WebGPUTouchHistoryFrostEffect {
       this.benchmarkLedgerTexture = createHistoryStorageTexture(
         FROST_UPDATE_POLICIES.length,
         1,
-        "touch-history-frost:benchmark-ledger",
+        "touch_history_frost_benchmark_ledger",
       );
       this.benchmarkLedgerNode = createBenchmarkLedgerComputeNode(
         this.benchmarkLedgerTexture,
