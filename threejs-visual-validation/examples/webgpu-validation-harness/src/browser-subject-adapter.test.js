@@ -588,10 +588,12 @@ test( 'timestamp populations are resolved once per sustained batch', () => {
 			{ uid: 'r:12:41:f3', stage: 'final-output', durationMs: 0.75 },
 			{ uid: 'r:13:17:f3', stage: 'scene-mrt', durationMs: 2 }
 		],
-		resolvedLastFrameTotalMs: 2.75
+		resolvedLastFrameTotalMs: 4.25
 	} );
 	assert.deepEqual( sharedRendererFrame.rows.map( ( row ) => row.frameId ), [ 3, 3 ] );
 	assert.deepEqual( sharedRendererFrame.totalSamples, [ 1.5, 2.75 ] );
+	assert.equal( sharedRendererFrame.lastFrameResolveResidualMs, 0 );
+	assert.match( sharedRendererFrame.reconciliationScope, /all timestamp contexts in final renderer frame 3/ );
 
 } );
 

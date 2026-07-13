@@ -167,15 +167,19 @@ export function summarizeTimestampBatch( { entries, resolvedLastFrameTotalMs } )
 	};
 	const totalSamples = rows.map( ( row ) => row.totalMs );
 	if ( Number.isFinite( resolvedLastFrameTotalMs ) === false || resolvedLastFrameTotalMs < 0 ) throw new Error( 'Timestamp batch has no finite resolved final-frame total.' );
+	const finalRendererFrameId = rows.at( -1 ).frameId;
+	const derivedFinalRendererFrameTotalMs = rows
+		.filter( ( row ) => row.frameId === finalRendererFrameId )
+		.reduce( ( sum, row ) => sum + row.totalMs, 0 );
 	return {
 		rows,
 		totalSamples,
 		stageSamples,
 		stageContextIds: Object.fromEntries( stageContextIds ),
 		resolveCount: 1,
-		lastFrameResolveResidualMs: Math.abs( resolvedLastFrameTotalMs - totalSamples.at( -1 ) ),
+		lastFrameResolveResidualMs: Math.abs( resolvedLastFrameTotalMs - derivedFinalRendererFrameTotalMs ),
 		independentPerFrameTotalsAvailable: false,
-		reconciliationScope: 'Every frame is explicitly stage-bound and summed; Three r185 independently returns only the final-frame aggregate, checked separately.'
+		reconciliationScope: `Every submission is explicitly stage-bound and summed; Three r185 independently returns the aggregate of all timestamp contexts in final renderer frame ${ finalRendererFrameId }, checked separately.`
 	};
 
 }
