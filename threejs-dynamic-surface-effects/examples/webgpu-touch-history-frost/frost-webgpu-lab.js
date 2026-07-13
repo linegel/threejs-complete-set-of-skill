@@ -27,6 +27,7 @@ import {
   FROST_ALL_CAPTURE_RECIPES,
   FROST_CAPTURE_RECIPES,
   FROST_COVERAGE_PROBE_RECIPES,
+  FROST_ROUTE_PROBE_RECIPES,
   resolveFrostCaptureRecipe,
 } from "./capture-recipes.js";
 import {
@@ -598,6 +599,7 @@ export class WebGPUFrostLab {
       recipeSetDigest: this.captureRecipeSetDigest,
       recipes: FROST_CAPTURE_RECIPES,
       coverageProbes: FROST_COVERAGE_PROBE_RECIPES,
+      routeProbes: FROST_ROUTE_PROBE_RECIPES,
     });
   }
 

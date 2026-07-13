@@ -1,3 +1,5 @@
+import { FROST_MECHANISMS, FROST_QUALITY_TIERS } from "./frost-surface-effect.js";
+
 export const FROST_CAPTURE_RECIPE_KIND = "touch-history-frost-correctness-recipe-v1";
 export const FROST_CAPTURE_RECIPE_SCHEMA_VERSION = 1;
 
@@ -31,6 +33,13 @@ const DEFAULT_VIEWPORT = Object.freeze({
   dpr: 1,
   physicalWidth: 1200,
   physicalHeight: 800,
+});
+const ROUTE_PROBE_VIEWPORT = Object.freeze({
+  width: 320,
+  height: 180,
+  dpr: 1,
+  physicalWidth: 320,
+  physicalHeight: 180,
 });
 const TRANSACTION = Object.freeze({
   owner: "webgpu-touch-history-frost",
@@ -99,7 +108,7 @@ function recipe(id, target, overrides = {}) {
     filename: `${id}.png`,
     target,
     scenario: "touch-history-frost",
-    mechanism: "refraction-and-fresnel",
+    mechanism: overrides.mechanism ?? "refraction-and-fresnel",
     tier: overrides.tier ?? "balanced",
     camera: overrides.camera ?? "design",
     seed: overrides.seed ?? 0x00000001,
@@ -151,7 +160,53 @@ export const FROST_COVERAGE_PROBE_RECIPES = Object.freeze([
   }),
 ]);
 
-export const FROST_ALL_CAPTURE_RECIPES = Object.freeze([...RECIPES, ...FROST_COVERAGE_PROBE_RECIPES]);
+function routeProbe(id, route, overrides = {}) {
+  return Object.freeze({
+    ...recipe(id, "final", {
+      trace: CAMERA_TRACE,
+      viewport: ROUTE_PROBE_VIEWPORT,
+      mechanism: overrides.mechanism,
+      tier: overrides.tier,
+    }),
+    mechanism: overrides.mechanism,
+    tier: overrides.tier,
+    route: Object.freeze({
+      kind: route.kind,
+      path: route.path,
+      locks: Object.freeze({ ...route.locks }),
+      startup: Object.freeze({
+        scenario: "touch-history-frost",
+        mechanism: overrides.mechanism,
+        tier: overrides.tier,
+        mode: "final",
+      }),
+    }),
+  });
+}
+
+export const FROST_ROUTE_PROBE_RECIPES = Object.freeze([
+  routeProbe("route.canonical", {
+    kind: "canonical",
+    path: "/demos/webgpu-touch-history-frost/",
+    locks: { scenario: true, mechanism: false, tier: false },
+  }, { mechanism: "refraction-and-fresnel", tier: "balanced" }),
+  ...FROST_MECHANISMS.map((mechanism) => routeProbe(`route.mechanism.${mechanism}`, {
+    kind: "mechanism",
+    path: `/demos/webgpu-touch-history-frost/mechanism/${mechanism}/`,
+    locks: { scenario: true, mechanism: true, tier: false },
+  }, { mechanism, tier: "balanced" })),
+  ...Object.keys(FROST_QUALITY_TIERS).map((tier) => routeProbe(`route.tier.${tier}`, {
+    kind: "tier",
+    path: `/demos/webgpu-touch-history-frost/tier/${tier}/`,
+    locks: { scenario: true, mechanism: false, tier: true },
+  }, { mechanism: "refraction-and-fresnel", tier })),
+]);
+
+export const FROST_ALL_CAPTURE_RECIPES = Object.freeze([
+  ...RECIPES,
+  ...FROST_COVERAGE_PROBE_RECIPES,
+  ...FROST_ROUTE_PROBE_RECIPES,
+]);
 const RECIPE_BY_ID = new Map(FROST_ALL_CAPTURE_RECIPES.map((entry) => [entry.id, entry]));
 if (RECIPE_BY_ID.size !== FROST_ALL_CAPTURE_RECIPES.length) throw new Error("frost capture recipe IDs must be unique");
 
@@ -342,6 +397,90 @@ export function validateFrostCoverageProbeRecipes(probes = FROST_COVERAGE_PROBE_
   return true;
 }
 
+export function validateFrostRouteProbeRecipes(
+  probes = FROST_ROUTE_PROBE_RECIPES,
+  { requireFrozen = probes === FROST_ROUTE_PROBE_RECIPES } = {},
+) {
+  const expected = [
+    {
+      id: "route.canonical",
+      kind: "canonical",
+      path: "/demos/webgpu-touch-history-frost/",
+      mechanism: "refraction-and-fresnel",
+      tier: "balanced",
+      locks: { scenario: true, mechanism: false, tier: false },
+    },
+    ...FROST_MECHANISMS.map((mechanism) => ({
+      id: `route.mechanism.${mechanism}`,
+      kind: "mechanism",
+      path: `/demos/webgpu-touch-history-frost/mechanism/${mechanism}/`,
+      mechanism,
+      tier: "balanced",
+      locks: { scenario: true, mechanism: true, tier: false },
+    })),
+    ...Object.keys(FROST_QUALITY_TIERS).map((tier) => ({
+      id: `route.tier.${tier}`,
+      kind: "tier",
+      path: `/demos/webgpu-touch-history-frost/tier/${tier}/`,
+      mechanism: "refraction-and-fresnel",
+      tier,
+      locks: { scenario: true, mechanism: false, tier: true },
+    })),
+  ];
+  if (!Array.isArray(probes) || probes.length !== expected.length) {
+    throw new Error("Frost route probes must cover canonical, six mechanism, and three tier routes");
+  }
+  for (const [index, entry] of probes.entries()) {
+    const wanted = expected[index];
+    const label = `Frost route probe ${entry?.id ?? index}`;
+    requireExactKeys(entry, [
+      "schemaVersion", "recipeKind", "id", "filename", "target", "scenario", "camera", "seed",
+      "mechanism", "tier", "viewport", "initialTimeSeconds", "trace", "initialTraceLength",
+      "temporalTraceLength", "expectedTimeSeconds", "historySource", "diagnosticModes", "transaction", "route",
+    ], label);
+    if (entry.id !== wanted.id
+      || entry.target !== "final"
+      || entry.mechanism !== wanted.mechanism
+      || entry.tier !== wanted.tier
+      || entry.route?.kind !== wanted.kind
+      || entry.route?.path !== wanted.path
+      || JSON.stringify(entry.route?.locks) !== JSON.stringify(wanted.locks)) {
+      throw new Error(`Frost route probe ${index} identity or lock drifted`);
+    }
+    if (entry.schemaVersion !== FROST_CAPTURE_RECIPE_SCHEMA_VERSION
+      || entry.recipeKind !== FROST_CAPTURE_RECIPE_KIND
+      || entry.filename !== `${entry.id}.png`
+      || entry.scenario !== "touch-history-frost"
+      || entry.camera !== "design"
+      || entry.seed !== 0x00000001
+      || entry.initialTimeSeconds !== 0
+      || entry.initialTraceLength !== CAMERA_TRACE.length
+      || entry.temporalTraceLength !== 0
+      || entry.trace.length !== CAMERA_TRACE.length
+      || JSON.stringify(entry.trace) !== JSON.stringify(CAMERA_TRACE)
+      || Math.abs(entry.expectedTimeSeconds - CAMERA_TRACE.reduce((sum, step) => sum + step.deltaSeconds, 0)) > 1e-12
+      || !entry.historySource.includes("storage-texture compute history update")
+      || entry.diagnosticModes.length !== 0
+      || entry.transaction.parentRouteMutationAllowed !== false) {
+      throw new Error(`Frost route probe ${entry.id} deterministic capture contract drifted`);
+    }
+    if (JSON.stringify(entry.route.startup) !== JSON.stringify({
+      scenario: "touch-history-frost",
+      mechanism: wanted.mechanism,
+      tier: wanted.tier,
+      mode: "final",
+    })) {
+      throw new Error(`Frost route probe ${entry.id} startup state drifted`);
+    }
+    validateViewport(entry.viewport, `Frost route probe ${entry.id}.viewport`);
+    if (JSON.stringify(entry.viewport) !== JSON.stringify(ROUTE_PROBE_VIEWPORT)) {
+      throw new Error(`Frost route probe ${entry.id} extent drifted`);
+    }
+    if (requireFrozen) requireDeepFrozen(entry, `Frost route probe ${entry.id}`);
+  }
+  return true;
+}
+
 export function validateFrostStandardOutputPlan(
   plan = FROST_STANDARD_OUTPUT_PLAN,
   { requireFrozen = plan === FROST_STANDARD_OUTPUT_PLAN } = {},
@@ -375,4 +514,5 @@ export function resolveFrostCaptureRecipe(id) {
 
 validateFrostCaptureRecipes();
 validateFrostCoverageProbeRecipes();
+validateFrostRouteProbeRecipes();
 validateFrostStandardOutputPlan();

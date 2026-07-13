@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 
 import {
   FROST_ALL_CAPTURE_RECIPES,
@@ -6,12 +7,15 @@ import {
   FROST_CAPTURE_RECIPE_IDS,
   FROST_COVERAGE_PROBE_RECIPES,
   FROST_DIAGNOSTIC_RECIPE_MODES,
+  FROST_ROUTE_PROBE_RECIPES,
   FROST_STANDARD_OUTPUT_PLAN,
   resolveFrostCaptureRecipe,
   validateFrostCaptureRecipes,
   validateFrostCoverageProbeRecipes,
+  validateFrostRouteProbeRecipes,
   validateFrostStandardOutputPlan,
 } from "./capture-recipes.js";
+import { parseFrostLabRoute } from "./frost-webgpu-lab.js";
 
 function mutableRecipes() {
   return structuredClone(FROST_CAPTURE_RECIPES);
@@ -20,6 +24,7 @@ function mutableRecipes() {
 assert.equal(validateFrostCaptureRecipes(), true);
 assert.equal(validateFrostCoverageProbeRecipes(), true);
 assert.equal(validateFrostStandardOutputPlan(), true);
+assert.equal(validateFrostRouteProbeRecipes(), true);
 assert.deepEqual(FROST_CAPTURE_RECIPE_IDS, [
   "final.design",
   "no-post.design",
@@ -36,13 +41,49 @@ assert.deepEqual(FROST_CAPTURE_RECIPE_IDS, [
   "temporal.t001",
 ]);
 assert.equal(Object.isFrozen(FROST_CAPTURE_RECIPES), true);
-assert.equal(FROST_ALL_CAPTURE_RECIPES.length, 17);
+assert.equal(FROST_ALL_CAPTURE_RECIPES.length, 27);
 assert.deepEqual(FROST_COVERAGE_PROBE_RECIPES.map(({ id }) => id), [
   "probe.odd-size.final",
   "probe.dpr-1.final",
   "probe.dpr-1-5.final",
   "probe.dpr-2.final",
 ]);
+assert.deepEqual(FROST_ROUTE_PROBE_RECIPES.map(({ id }) => id), [
+  "route.canonical",
+  "route.mechanism.history-and-deposit",
+  "route.mechanism.diffusion",
+  "route.mechanism.blur-and-reconstruction",
+  "route.mechanism.crystal-field-and-normals",
+  "route.mechanism.refraction-and-fresnel",
+  "route.mechanism.full-vs-dirty-vs-idle",
+  "route.tier.full",
+  "route.tier.balanced",
+  "route.tier.budgeted",
+]);
+const manifest = JSON.parse(readFileSync(new URL("./lab.manifest.json", import.meta.url), "utf8"));
+assert.deepEqual(
+  FROST_ROUTE_PROBE_RECIPES.map(({ route }) => route.path),
+  [
+    manifest.scenarios[0].route,
+    ...manifest.mechanisms.map(({ route }) => route),
+    ...manifest.tiers.map(({ id }) => `${manifest.publishPath}tier/${id}/`),
+  ],
+  "route probe matrix must be derived from the manifest-shaped route inventory",
+);
+for (const probe of FROST_ROUTE_PROBE_RECIPES) {
+  const resolved = parseFrostLabRoute(probe.route.path);
+  assert.deepEqual(
+    {
+      scenario: resolved.scenario,
+      mechanism: resolved.mechanism,
+      tier: resolved.tier,
+      mode: resolved.mode,
+      locks: resolved.locks,
+    },
+    { ...probe.route.startup, locks: probe.route.locks },
+    `${probe.id} probe must match the canonical URL resolver`,
+  );
+}
 assert.deepEqual(resolveFrostCaptureRecipe("probe.odd-size.final").viewport, {
   width: 641,
   height: 359,
@@ -86,6 +127,21 @@ assert.equal(resolveFrostCaptureRecipe("temporal.t000").trace.length, 0);
 assert.equal(resolveFrostCaptureRecipe("temporal.t001").temporalTraceLength, 1);
 assert.equal(resolveFrostCaptureRecipe("temporal.t001").trace.at(-1).deltaSeconds, 1 / 60);
 assert.throws(() => resolveFrostCaptureRecipe("invented"), /unknown frost capture recipe/);
+
+for (const [name, mutate, pattern] of [
+  ["missing-route", (probes) => { probes.pop(); }, /must cover canonical/],
+  ["route-path-drift", (probes) => { probes[1].route.path = "/wrong/"; }, /identity or lock drifted/],
+  ["route-lock-drift", (probes) => { probes[1].route.locks.mechanism = false; }, /identity or lock drifted/],
+  ["route-tier-drift", (probes) => { probes.at(-1).tier = "balanced"; }, /identity or lock drifted/],
+]) {
+  const probes = structuredClone(FROST_ROUTE_PROBE_RECIPES);
+  mutate(probes);
+  assert.throws(
+    () => validateFrostRouteProbeRecipes(probes, { requireFrozen: false }),
+    pattern,
+    `${name} mutation must fail`,
+  );
+}
 
 for (const [name, mutate, pattern] of [
   ["duplicate-id", (recipes) => { recipes[1].id = recipes[0].id; }, /standard output order|unique/],
