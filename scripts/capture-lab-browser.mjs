@@ -69,8 +69,20 @@ const EXPECTED_THREE_PACKAGE_REVISION = '0.185.1';
 const EXPECTED_THREE_RUNTIME_REVISION = '185';
 
 export function chromiumWebGpuLaunchArgs() {
-  const args = ['--enable-unsafe-webgpu', '--disable-gpu-sandbox'];
-  if (platform() !== 'darwin') args.splice(1, 0, '--enable-features=Vulkan,UseSkiaRenderer');
+  // Prefer the host GPU. On macOS that means system Chrome + Metal angle,
+  // not SwiftShader / software WebGPU. Playwright channel "chrome" points at
+  // the installed Google Chrome; do not invent a separate browser stack.
+  const args = [
+    '--enable-unsafe-webgpu',
+    '--enable-webgpu-developer-features',
+    '--disable-gpu-sandbox',
+    '--ignore-gpu-blocklist',
+  ];
+  if (platform() === 'darwin') {
+    args.push('--use-angle=metal', '--enable-features=Metal');
+  } else {
+    args.splice(1, 0, '--enable-features=Vulkan,UseSkiaRenderer');
+  }
   return args;
 }
 
@@ -1497,17 +1509,17 @@ export function assertNoCaptureFailures({ pageErrors = [], consoleErrors = [], r
   }
 }
 
-async function collectBrowserRecord(browser, page, metrics) {
+async function collectBrowserRecord(browser, page, metrics, automationSurface = 'playwright-headless-chromium') {
   const navigatorRecord = await page.evaluate(() => ({
     userAgent: navigator.userAgent,
     platform: navigator.platform,
   }));
   return Object.freeze({
-    name: 'Chromium',
+    name: automationSurface === 'playwright-cdp-chrome' ? 'Google Chrome (CDP)' : 'Chromium',
     version: browser.version(),
     userAgent: navigatorRecord.userAgent,
     platform: navigatorRecord.platform,
-    automationSurface: 'playwright-headless-chromium',
+    automationSurface,
     adapterClass: classifyAdapter(metrics),
     adapterIdentity: observedAdapterIdentity(metrics),
   });
@@ -2075,6 +2087,7 @@ export async function captureLabBrowser({
   let browser = null;
   let page = null;
   let controllerDisposed = false;
+  let ownsBrowser = true;
   const pageErrors = [];
   const consoleErrors = [];
   const requestErrors = [];
@@ -2086,15 +2099,37 @@ export async function captureLabBrowser({
     const address = vite.httpServer.address();
     if (!address || typeof address === 'string') throw new Error('Vite did not expose a TCP capture address');
     const url = buildCaptureUrl({ port: address.port, browserEntry, profile });
-    browser = await chromium.launch({
-      channel: process.env.CAPTURE_BROWSER_CHANNEL || (process.platform === 'darwin' ? 'chrome' : undefined),
-      headless: true,
-      args: chromiumWebGpuLaunchArgs(),
-    });
-    const context = await browser.newContext({
-      viewport: { width: profileConfig.width, height: profileConfig.height },
-      deviceScaleFactor: profileConfig.dpr,
-    });
+    const cdpEndpoint = process.env.CAPTURE_CDP_ENDPOINT;
+    // Prefer an already-running Chrome with real GPU (e.g. CDP :9222). Launching
+    // a fresh Playwright Chrome profile is a fallback only — that path often
+    // injects software SwiftShader and times out when Chrome is already open.
+    ownsBrowser = !cdpEndpoint;
+    browser = cdpEndpoint
+      ? await chromium.connectOverCDP(cdpEndpoint)
+      : await chromium.launch({
+          channel: process.env.CAPTURE_BROWSER_CHANNEL || (process.platform === 'darwin' ? 'chrome' : undefined),
+          headless: process.env.CAPTURE_HEADED === '1' ? false : true,
+          args: chromiumWebGpuLaunchArgs(),
+        });
+    const automationSurface = process.env.CAPTURE_AUTOMATION_SURFACE
+      || (cdpEndpoint ? 'playwright-cdp-chrome' : 'playwright-headless-chromium');
+    // CDP: reuse the default context of the user's Chrome. Fresh Playwright
+    // launch: create an isolated context as before.
+    const context = cdpEndpoint
+      ? (browser.contexts()[0] ?? await browser.newContext({
+          viewport: { width: profileConfig.width, height: profileConfig.height },
+          deviceScaleFactor: profileConfig.dpr,
+        }))
+      : await browser.newContext({
+          viewport: { width: profileConfig.width, height: profileConfig.height },
+          deviceScaleFactor: profileConfig.dpr,
+        });
+    if (cdpEndpoint) {
+      await context.setViewportSize?.({
+        width: profileConfig.width,
+        height: profileConfig.height,
+      }).catch(() => {});
+    }
     page = await context.newPage();
     await page.addInitScript(({ captureProfile, expectedLabId }) => {
       Object.defineProperty(window, '__LAB_CAPTURE_PROFILE__', {
@@ -2177,7 +2212,7 @@ export async function captureLabBrowser({
     const observedState = extractCaptureState(runtime.metrics);
     assertCaptureState(observedState, lockedState);
     assertNoCaptureFailures({ pageErrors, consoleErrors, requestErrors, runtime });
-    const browserRecord = await collectBrowserRecord(browser, page, runtime.metrics);
+    const browserRecord = await collectBrowserRecord(browser, page, runtime.metrics, automationSurface);
     const persistCapture = async (filename, captureTarget, readCapture, recipeId = null) => {
       const capture = await readCapture();
       if (capture.target !== captureTarget) {
@@ -2202,7 +2237,7 @@ export async function captureLabBrowser({
       finalUrl,
       requestedUrl: url,
       captureProfile: Object.freeze({ id: profile, ...profileConfig }),
-      automationSurface: 'playwright-headless-chromium',
+      automationSurface,
       sourceClosure: registrySourceClosure,
       sourceClosureHash: registrySourceClosure.sourceHash,
       buildRevision: registrySourceClosure.buildRevision,
@@ -2322,7 +2357,7 @@ export async function captureLabBrowser({
       threeRevision: EXPECTED_THREE_PACKAGE_REVISION,
       profile,
       profileConfig,
-      automationSurface: 'playwright-headless-chromium',
+      automationSurface,
       adapterClass: browserRecord.adapterClass,
       adapterIdentity: browserRecord.adapterIdentity,
       browser: browserRecord,
@@ -2377,7 +2412,14 @@ export async function captureLabBrowser({
     if (page && !controllerDisposed) {
       try { await controllerCall(page, 'dispose'); } catch { /* page may already be closed or blocked */ }
     }
-    if (browser) await browser.close();
+    try { await page?.close(); } catch { /* ignore */ }
+    // CDP: disconnect Playwright only when we own the launch. Never kill the
+    // user's already-open Google Chrome on :9222.
+    if (browser && ownsBrowser) {
+      await browser.close();
+    } else if (browser && !ownsBrowser) {
+      try { await browser.close(); } catch { /* disconnect best-effort */ }
+    }
     await vite.close();
   }
 }

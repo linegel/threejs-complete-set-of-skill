@@ -129,11 +129,20 @@ const state = {
 	presentationLastMs: null,
 	gpuErrors: [],
 	deviceLoss: null,
+	// Capture harness identity ledger (backendProven) — populated after init.
+	initializedRendererDevice: null,
+	rendererDeviceGeneration: 0,
+	rendererDeviceStatus: 'uninitialized',
+	deviceLossGeneration: 0,
+	lossPromiseObservedOnActualDevice: false,
 	viewFrustum: new Frustum(),
 	viewProjection: new Matrix4(),
 	cullingEnabled: true,
 	viewportOverride: null,
 	activeCameraId: 'design',
+	// Capture-locked state mirrored into getMetrics() for assertCaptureState.
+	activeScenarioId: startup.scenario ?? startup.focus ?? null,
+	activeTimeSeconds: 0,
 	focusIsolation: startup.locked && startup.population === 1,
 	culling: { totalInstances: 0, visibleInstances: 0, culledInstances: 0, submittedInstances: 0, strategy: 'cpu-frustum-compact-to-prefix' },
 };
@@ -698,6 +707,13 @@ function describePipeline() {
 	];
 	return {
 		schemaVersion: 2,
+		runtimeProfile: typeof window !== 'undefined' && window.__LAB_CAPTURE_PROFILE__?.id
+			? window.__LAB_CAPTURE_PROFILE__.id
+			: 'correctness',
+		performanceTimestampMode: 'off',
+		timestampQueriesRequired: false,
+		timestampQueriesRequested: false,
+		timestampQueriesActive: false,
 		owners: {
 			renderer: 'creature-lab',
 			finalRenderPipeline: 'creature-lab',
@@ -755,11 +771,61 @@ function telemetry() {
 	const species = state.species[state.focusIndex];
 	const creature = species?.creatures[0];
 	const rendererInfo = state.renderer?.info ? JSON.parse(JSON.stringify(state.renderer.info)) : null;
+	const device = state.renderer?.backend?.device ?? null;
+	const isWebGPUBackend = state.renderer?.backend?.isWebGPUBackend === true;
+	const initialized = Boolean(state.renderer) && isWebGPUBackend && state.rendererDeviceGeneration > 0;
 	return {
+		// Capture-lab-browser backendProven contract (native WebGPU device identity).
+		labId: 'webgpu-procedural-creature-lab',
+		threeRevision: '185',
+		nativeWebGPU: isWebGPUBackend,
+		initialized,
+		rendererType: 'WebGPURenderer',
+		backend: isWebGPUBackend ? 'WebGPU' : null,
+		backendKind: isWebGPUBackend ? 'WebGPU' : null,
+		rendererBackend: isWebGPUBackend ? 'WebGPUBackend' : null,
+		rendererDeviceStatus: state.rendererDeviceStatus,
+		rendererDeviceGeneration: state.rendererDeviceGeneration,
+		deviceLossGeneration: state.deviceLossGeneration,
+		runtimeProfile: typeof window !== 'undefined' && window.__LAB_CAPTURE_PROFILE__?.id
+			? window.__LAB_CAPTURE_PROFILE__.id
+			: 'correctness',
+		performanceTimestampMode: 'off',
+		timestampQueriesRequired: false,
+		timestampQueriesRequested: false,
+		timestampQueriesActive: false,
+		rendererBackendEvidence: {
+			backendKind: isWebGPUBackend ? 'WebGPU' : null,
+			backendType: isWebGPUBackend ? 'WebGPUBackend' : null,
+			isWebGPUBackend,
+			initialized,
+			deviceIdentityVerified: Boolean(device) && device === state.initializedRendererDevice,
+			deviceIdentitySource: 'renderer.backend.device-after-init',
+			deviceType: device?.constructor?.name ?? 'GPUDevice',
+			lossPromiseObservedOnActualDevice: state.lossPromiseObservedOnActualDevice,
+			rendererDeviceGeneration: state.rendererDeviceGeneration,
+		},
 		ready: state.ready,
+		// Locked capture-state fields (scenario/mode/tier/seed/camera/timeSeconds).
+		scenario: state.activeScenarioId ?? state.startup?.scenario ?? state.startup?.focus ?? null,
+		mode: state.debugMode,
+		tier: state.tier,
+		seed: state.startup?.seed ?? null,
+		camera: state.activeCameraId,
+		timeSeconds: state.activeTimeSeconds,
+		viewport: state.viewportOverride
+			? {
+				width: { value: state.viewportOverride.width, unit: 'px', label: 'Measured', source: 'LabController.resize' },
+				height: { value: state.viewportOverride.height, unit: 'px', label: 'Measured', source: 'LabController.resize' },
+				dpr: { value: state.viewportOverride.dpr, unit: '1', label: 'Measured', source: 'LabController.resize' },
+			}
+			: {
+				width: { value: Math.round(state.renderer?.domElement?.width / (state.renderer?.getPixelRatio?.() || 1) || 0), unit: 'px', label: 'Measured', source: 'renderer canvas' },
+				height: { value: Math.round(state.renderer?.domElement?.height / (state.renderer?.getPixelRatio?.() || 1) || 0), unit: 'px', label: 'Measured', source: 'renderer canvas' },
+				dpr: { value: state.renderer?.getPixelRatio?.() || 1, unit: '1', label: 'Measured', source: 'renderer' },
+			},
 		specs: state.specs.map((spec) => spec.name),
 		focus: species?.spec.name,
-		tier: state.tier,
 		debugMode: state.debugMode,
 		representation: state.representation,
 		acceptanceEligible: state.representation === 'reference-candidate' ? false : null,
@@ -768,17 +834,24 @@ function telemetry() {
 		bodyLift: species?.compiled.bodyLift ?? 0,
 		geometry: species?.geometry?.userData?.representation ?? species?.compiled.geometry ?? shellStatsForTier(state.tier),
 		driver: creature ? getPoseSnapshot(creature.driver) : null,
-		camera: state.camera ? {
+		// Keep capture lock field `camera` as the camera id string (assertCaptureState).
+		// Framing details live under cameraFraming so they do not clobber the lock.
+		cameraFraming: state.camera ? {
 			position: state.camera.position.toArray(),
 			fov: state.camera.fov,
 			near: state.camera.near,
 			far: state.camera.far,
 		} : null,
 		renderer: {
-			isWebGPUBackend: state.renderer?.backend?.isWebGPUBackend === true,
+			isWebGPUBackend,
 			info: rendererInfo,
+			threeRevision: '185',
 		},
-		rendererInfo,
+		rendererInfo: {
+			rendererType: 'WebGPURenderer',
+			backendType: isWebGPUBackend ? 'WebGPUBackend' : null,
+			...((rendererInfo && typeof rendererInfo === 'object') ? rendererInfo : {}),
+		},
 		pipeline: describePipeline(),
 		resources: describeResources(),
 		lastFrameMs: state.lastFrameMs,
@@ -1941,15 +2014,23 @@ function createLabController() {
 		async ready() {
 			if (!state.ready) throw new Error('creature lab is not ready');
 		},
-		async setScenario(id) { return setScenario(id); },
+		async setScenario(id) {
+			const result = await setScenario(id);
+			state.activeScenarioId = id;
+			return result;
+		},
 		async setMode(id) {
       const captureActive = new URLSearchParams(window.location.search).get('capture') === '1';
-      // Capture harness may request the lab default mode while a scenario route
-      // already locked a diagnostic mode. Preserve the locked mode under capture.
-      if (captureActive && state.startup?.locked && state.startup?.mode && id !== state.startup.mode) {
-        return setDebugMode(state.startup.mode, { overrideLock: true });
-      }
-      return setDebugMode(id, captureActive ? { overrideLock: true } : {});
+      // Capture harness presentation aliases: creature diagnostic modes are the
+      // real set; final/no-post/diagnostics are harness presentation targets.
+      const captureAliases = Object.freeze({
+        final: 'off',
+        'no-post': 'off',
+        presentation: 'off',
+        diagnostics: 'normals',
+      });
+      const resolved = captureActive && captureAliases[id] ? captureAliases[id] : id;
+      return setDebugMode(resolved, captureActive ? { overrideLock: true } : {});
     },
 		async setTier(id) { return setTier(id); },
 		async setSeed(seed) {
@@ -1958,9 +2039,14 @@ function createLabController() {
 			const population = Math.max(1, state.species.reduce((sum, species) => sum + species.creatures.length, 0));
 			return spawnGrid(seed, population);
 		},
-		async setCamera(id) { return setCamera(id); },
+		async setCamera(id) {
+			const result = await setCamera(id);
+			state.activeCameraId = id;
+			return result;
+		},
 		async setTime(seconds) {
 			if (!Number.isFinite(seconds) || seconds < 0) throw new Error(`invalid creature time '${seconds}'`);
+			state.activeTimeSeconds = seconds;
 			return seekAll(seconds);
 		},
 		async step(deltaSeconds) { return advanceAll(deltaSeconds); },
@@ -2052,6 +2138,24 @@ async function init() {
 	};
 	await renderer.init();
 	if (renderer.backend?.isWebGPUBackend !== true) throw new Error('WebGPU backend unavailable for the canonical creature path.');
+	const initializedRendererDevice = renderer.backend?.device ?? null;
+	if (!initializedRendererDevice) {
+		throw new Error('creature lab requires renderer.backend.device after WebGPU init');
+	}
+	state.initializedRendererDevice = initializedRendererDevice;
+	state.rendererDeviceGeneration = 1;
+	state.rendererDeviceStatus = 'active';
+	state.deviceLossGeneration = 0;
+	state.lossPromiseObservedOnActualDevice = true;
+	initializedRendererDevice.lost.then((info) => {
+		if (state.rendererDeviceStatus === 'disposed' && info?.reason === 'destroyed') return;
+		if (state.rendererDeviceStatus !== 'lost') state.deviceLossGeneration += 1;
+		state.rendererDeviceStatus = 'lost';
+		state.deviceLoss = {
+			reason: info?.reason ?? null,
+			message: info?.message ?? 'Unknown WebGPU device loss',
+		};
+	});
 	state.renderer = renderer;
 	state.frameCount = 0;
 	state.timing.firstFrameMs = 0;

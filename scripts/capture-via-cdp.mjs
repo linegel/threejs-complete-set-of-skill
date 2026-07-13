@@ -19,9 +19,26 @@ if (typeof endpoint !== 'string' || endpoint.length === 0) {
   throw new Error('CAPTURE_CDP_ENDPOINT is required (e.g. http://127.0.0.1:9222)');
 }
 
+// Reuse the already-running Google Chrome (GPU / Metal). Do not launch a second
+// Playwright profile — that path injects --enable-unsafe-swiftshader and often
+// has no navigator.gpu, and it fights the existing CDP session on :9222.
+const connected = await chromium.connectOverCDP(endpoint);
 chromium.launch = async function launchOverExistingChrome(_options = {}) {
-  return chromium.connectOverCDP(endpoint);
+  return connected;
 };
+// capture-lab-browser always browser.close()s; for CDP that must only drop the
+// Playwright connection, never kill the user's Chrome.
+const originalClose = connected.close.bind(connected);
+connected.close = async function disconnectOnly() {
+  try {
+    await connected.removeAllListeners?.();
+  } catch {
+    // ignore
+  }
+  // Playwright's close() on a CDP connection disconnects; do not spawn/kill Chrome.
+  return originalClose();
+};
+process.env.CAPTURE_AUTOMATION_SURFACE = process.env.CAPTURE_AUTOMATION_SURFACE || 'playwright-cdp-chrome';
 
 function option(name, fallback = null) {
   const index = process.argv.indexOf(name);

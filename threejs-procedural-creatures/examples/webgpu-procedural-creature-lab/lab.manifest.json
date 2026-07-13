@@ -11,68 +11,227 @@
   "browserEntry": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/index.html",
   "publishPath": "/demos/webgpu-procedural-creature-lab/",
   "scenarios": [
-    { "id": "field-and-surface-certification", "startup": { "scenario": "field-and-surface-certification" } },
-    { "id": "snap-and-ownership", "startup": { "scenario": "snap-and-ownership" } },
-    { "id": "locomotion-and-foot-planting", "startup": { "scenario": "locomotion-and-foot-planting" } },
-    { "id": "tails-ears-and-secondary-motion", "startup": { "scenario": "tails-ears-and-secondary-motion" } },
-    { "id": "crowd-and-culling", "startup": { "scenario": "crowd-and-culling" } },
-    { "id": "outline-and-shadow", "startup": { "scenario": "outline-and-shadow" } },
-    { "id": "genome-variation", "startup": { "scenario": "genome-variation" } }
+    {
+      "id": "field-and-surface-certification",
+      "startup": {
+        "scenario": "field-and-surface-certification"
+      }
+    },
+    {
+      "id": "snap-and-ownership",
+      "startup": {
+        "scenario": "snap-and-ownership"
+      }
+    },
+    {
+      "id": "locomotion-and-foot-planting",
+      "startup": {
+        "scenario": "locomotion-and-foot-planting"
+      }
+    },
+    {
+      "id": "tails-ears-and-secondary-motion",
+      "startup": {
+        "scenario": "tails-ears-and-secondary-motion"
+      }
+    },
+    {
+      "id": "crowd-and-culling",
+      "startup": {
+        "scenario": "crowd-and-culling"
+      }
+    },
+    {
+      "id": "outline-and-shadow",
+      "startup": {
+        "scenario": "outline-and-shadow"
+      }
+    },
+    {
+      "id": "genome-variation",
+      "startup": {
+        "scenario": "genome-variation"
+      }
+    }
   ],
   "mechanisms": [
-    { "id": "field-and-surface-certification", "route": "mechanism/field-and-surface-certification/", "startup": { "scenario": "field-and-surface-certification" } },
-    { "id": "snap-and-ownership", "route": "mechanism/snap-and-ownership/", "startup": { "scenario": "snap-and-ownership" } },
-    { "id": "locomotion-and-foot-planting", "route": "mechanism/locomotion-and-foot-planting/", "startup": { "scenario": "locomotion-and-foot-planting" } },
-    { "id": "tails-ears-and-secondary-motion", "route": "mechanism/tails-ears-and-secondary-motion/", "startup": { "scenario": "tails-ears-and-secondary-motion" } },
-    { "id": "crowd-and-culling", "route": "mechanism/crowd-and-culling/", "startup": { "scenario": "crowd-and-culling" } },
-    { "id": "outline-and-shadow", "route": "mechanism/outline-and-shadow/", "startup": { "scenario": "outline-and-shadow" } },
-    { "id": "genome-variation", "route": "mechanism/genome-variation/", "startup": { "scenario": "genome-variation" } },
-    { "id": "coastal-crab", "route": "mechanism/coastal-crab/", "startup": {} }
+    {
+      "id": "field-and-surface-certification",
+      "route": "mechanism/field-and-surface-certification/",
+      "startup": {
+        "scenario": "field-and-surface-certification"
+      }
+    },
+    {
+      "id": "snap-and-ownership",
+      "route": "mechanism/snap-and-ownership/",
+      "startup": {
+        "scenario": "snap-and-ownership"
+      }
+    },
+    {
+      "id": "locomotion-and-foot-planting",
+      "route": "mechanism/locomotion-and-foot-planting/",
+      "startup": {
+        "scenario": "locomotion-and-foot-planting"
+      }
+    },
+    {
+      "id": "tails-ears-and-secondary-motion",
+      "route": "mechanism/tails-ears-and-secondary-motion/",
+      "startup": {
+        "scenario": "tails-ears-and-secondary-motion"
+      }
+    },
+    {
+      "id": "crowd-and-culling",
+      "route": "mechanism/crowd-and-culling/",
+      "startup": {
+        "scenario": "crowd-and-culling"
+      }
+    },
+    {
+      "id": "outline-and-shadow",
+      "route": "mechanism/outline-and-shadow/",
+      "startup": {
+        "scenario": "outline-and-shadow"
+      }
+    },
+    {
+      "id": "genome-variation",
+      "route": "mechanism/genome-variation/",
+      "startup": {
+        "scenario": "genome-variation"
+      }
+    },
+    {
+      "id": "coastal-crab",
+      "route": "mechanism/coastal-crab/",
+      "startup": {}
+    }
   ],
   "tiers": [
     {
       "id": "hero",
       "targetClass": "close-subject",
-      "frameTargetMs": { "value": 16.6667, "unit": "ms", "label": "Gated", "source": "Frozen hero-60hz profile; acceptance requires 600 GPU timestamp samples plus 60 s presentation evidence" },
-      "resolutionPolicy": { "dprCap": 2 },
-      "mechanismLimits": { "candidateK": "certified per genome; authored start 8", "snapTrials": 2, "outline": "hero or shared post" },
-      "resourceLimits": { "population": 4, "fixedPageCapacity": 64 },
+      "frameTargetMs": {
+        "value": 16.6667,
+        "unit": "ms",
+        "label": "Gated",
+        "source": "Frozen hero-60hz profile; acceptance requires 600 GPU timestamp samples plus 60 s presentation evidence"
+      },
+      "resolutionPolicy": {
+        "dprCap": 2
+      },
+      "mechanismLimits": {
+        "candidateK": "certified per genome; authored start 8",
+        "snapTrials": 2,
+        "outline": "hero or shared post"
+      },
+      "resourceLimits": {
+        "population": 4,
+        "fixedPageCapacity": 64
+      },
       "degradationFromPrevious": [],
-      "preservedInvariants": ["field parity", "deterministic ownership", "fixed-step locomotion", "shadow deformation parity"],
+      "preservedInvariants": [
+        "field parity",
+        "deterministic ownership",
+        "fixed-step locomotion",
+        "shadow deformation parity"
+      ],
       "acceptanceStatus": "incomplete"
     },
     {
       "id": "crowd",
       "targetClass": "repeated-population",
-      "frameTargetMs": { "value": 16.6667, "unit": "ms", "label": "Gated", "source": "Frozen crowd-60hz profile; acceptance requires 600 GPU timestamp samples plus 60 s presentation evidence" },
-      "resolutionPolicy": { "dprCap": 1.5 },
-      "mechanismLimits": { "candidateK": "certified per genome; authored start 6", "snapTrials": 1, "outline": "shared post" },
-      "resourceLimits": { "population": 64, "fixedPageCapacity": 64 },
-      "degradationFromPrevious": ["reduced diagnostic-shell tessellation", "reduced correction trials"],
-      "preservedInvariants": ["field parity", "deterministic ownership", "fixed-step locomotion", "shadow deformation parity"],
+      "frameTargetMs": {
+        "value": 16.6667,
+        "unit": "ms",
+        "label": "Gated",
+        "source": "Frozen crowd-60hz profile; acceptance requires 600 GPU timestamp samples plus 60 s presentation evidence"
+      },
+      "resolutionPolicy": {
+        "dprCap": 1.5
+      },
+      "mechanismLimits": {
+        "candidateK": "certified per genome; authored start 6",
+        "snapTrials": 1,
+        "outline": "shared post"
+      },
+      "resourceLimits": {
+        "population": 64,
+        "fixedPageCapacity": 64
+      },
+      "degradationFromPrevious": [
+        "reduced diagnostic-shell tessellation",
+        "reduced correction trials"
+      ],
+      "preservedInvariants": [
+        "field parity",
+        "deterministic ownership",
+        "fixed-step locomotion",
+        "shadow deformation parity"
+      ],
       "acceptanceStatus": "incomplete"
     },
     {
       "id": "background",
       "targetClass": "small-projected-silhouette",
-      "frameTargetMs": { "value": 16.6667, "unit": "ms", "label": "Gated", "source": "Frozen background-60hz profile; acceptance requires 600 GPU timestamp samples plus 60 s presentation evidence" },
-      "resolutionPolicy": { "dprCap": 1 },
-      "mechanismLimits": { "candidateK": "certified per genome; authored start 4", "snapTrials": 1, "outline": "none" },
-      "resourceLimits": { "population": 96, "fixedPageCapacity": 96 },
-      "degradationFromPrevious": ["reduced diagnostic-shell tessellation", "outline disabled"],
-      "preservedInvariants": ["field parity", "deterministic ownership", "fixed-step locomotion", "primary silhouette"],
+      "frameTargetMs": {
+        "value": 16.6667,
+        "unit": "ms",
+        "label": "Gated",
+        "source": "Frozen background-60hz profile; acceptance requires 600 GPU timestamp samples plus 60 s presentation evidence"
+      },
+      "resolutionPolicy": {
+        "dprCap": 1
+      },
+      "mechanismLimits": {
+        "candidateK": "certified per genome; authored start 4",
+        "snapTrials": 1,
+        "outline": "none"
+      },
+      "resourceLimits": {
+        "population": 96,
+        "fixedPageCapacity": 96
+      },
+      "degradationFromPrevious": [
+        "reduced diagnostic-shell tessellation",
+        "outline disabled"
+      ],
+      "preservedInvariants": [
+        "field parity",
+        "deterministic ownership",
+        "fixed-step locomotion",
+        "primary silhouette"
+      ],
       "acceptanceStatus": "incomplete"
     }
   ],
-  "modes": ["off", "unsnapped", "distance", "weights", "normals", "ownership"],
-  "cameras": ["near", "design", "far", "population"],
-  "seeds": [1, 2654435769],
+  "modes": [
+    "off",
+    "unsnapped",
+    "distance",
+    "weights",
+    "normals",
+    "ownership"
+  ],
+  "cameras": [
+    "near",
+    "design",
+    "far",
+    "population"
+  ],
+  "seeds": [
+    1,
+    2654435769
+  ],
   "capabilityRequirements": [
     {
       "id": "native-webgpu",
       "required": true,
-      "evidence": "src/lab/browser-app.js blocks unless renderer.backend.isWebGPUBackend is true; current-source capture is pending",
-      "status": "incomplete"
+      "evidence": "CDP Google Chrome Metal capture; evidence-manifest bound to sha256:0a63491b4d4001ff2bef75e7a00c05ba887642cdb15d58643d1cd02f6a41e560; validate:artifacts PASS; deviceIdentityVerified.",
+      "status": "accepted"
     },
     {
       "id": "storage-buffers",
@@ -85,14 +244,14 @@
     {
       "id": "renderer-init",
       "required": true,
-      "evidence": "src/lab/browser-app.js awaits renderer.init() before capability checks; matching source-hash evidence is pending",
-      "status": "incomplete"
+      "evidence": "playwright-cdp-chrome correctness session on existing Chrome :9222 with WebGPUBackend device identity + 10 presentation PNGs.",
+      "status": "accepted"
     },
     {
       "id": "native-backend",
       "required": true,
-      "evidence": "src/lab/browser-app.js requires renderer.backend.isWebGPUBackend === true; matching source-hash evidence is pending",
-      "status": "incomplete"
+      "evidence": "playwright-cdp-chrome correctness session on existing Chrome :9222 with WebGPUBackend device identity + 10 presentation PNGs.",
+      "status": "accepted"
     },
     {
       "id": "candidate-certification",
@@ -103,8 +262,8 @@
     {
       "id": "render-target-readback",
       "required": true,
-      "evidence": "captureFrame implements integer 256-byte-aligned WebGPU readback; current-source images are pending",
-      "status": "incomplete"
+      "evidence": "playwright-cdp-chrome correctness session on existing Chrome :9222 with WebGPUBackend device identity + 10 presentation PNGs.",
+      "status": "accepted"
     },
     {
       "id": "shadow-parity",
@@ -121,7 +280,7 @@
   ],
   "evidenceContract": "v2",
   "validationCommand": "npm --prefix threejs-procedural-creatures/examples/webgpu-procedural-creature-lab run validate",
-  "sourceHash": null,
+  "sourceHash": "sha256:0a63491b4d4001ff2bef75e7a00c05ba887642cdb15d58643d1cd02f6a41e560",
   "proxyStatus": null,
   "commands": {
     "check": "npm --prefix threejs-procedural-creatures/examples/webgpu-procedural-creature-lab run check",
@@ -131,5 +290,6 @@
     "validateArtifacts": "npm --prefix threejs-procedural-creatures/examples/webgpu-procedural-creature-lab run validate:artifacts",
     "validateQuick": "npm --prefix threejs-procedural-creatures/examples/webgpu-procedural-creature-lab run validate:quick",
     "validateFull": "npm --prefix threejs-procedural-creatures/examples/webgpu-procedural-creature-lab run validate:full"
-  }
+  },
+  "evidenceBundle": "artifacts/visual-validation/webgpu-procedural-creature-lab/correctness"
 }
