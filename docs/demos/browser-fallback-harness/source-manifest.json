@@ -2,10 +2,11 @@
   "schemaVersion": 2,
   "labId": "browser-fallback-harness",
   "kind": "canonical-lab",
-  "status": "incomplete",
+  "status": "accepted",
   "canonicalSource": [
     "threejs-compatibility-fallbacks/examples/browser-fallback-harness/fallback-core.mjs",
     "threejs-compatibility-fallbacks/examples/browser-fallback-harness/fallback-fixtures.json",
+    "threejs-compatibility-fallbacks/examples/browser-fallback-harness/route-state.mjs",
     "threejs-compatibility-fallbacks/examples/browser-fallback-harness/app.mjs",
     "threejs-compatibility-fallbacks/examples/browser-fallback-harness/compatibility-renderer.mjs",
     "threejs-compatibility-fallbacks/examples/browser-fallback-harness/capture.mjs",
@@ -15,32 +16,32 @@
     "threejs-compatibility-fallbacks/examples/browser-fallback-harness"
   ],
   "browserEntry": "threejs-compatibility-fallbacks/examples/browser-fallback-harness/index.html",
-  "sourceHash": "sha256:434be6d369e5ecdaa1b4c5ba763f7d946aeb7b0f7ea993b30eacec531a8ef79c",
+  "sourceHash": "sha256:011de00a6e6b3405f93f63bb7732538384e03e8ede5c5e53eacd4edee65d6a81",
   "publishedHashInputs": [
     "docs/demos/browser-fallback-harness",
-    "docs/demos/assets/compatibility-renderer-BHplG0Ms.js",
+    "docs/demos/assets/compatibility-renderer-CrxVRi9V.js",
     "docs/demos/assets/fallback-core-BxY89vzU.js",
     "docs/demos/assets/fallback-fixtures-C__puiF4.json",
     "docs/demos/assets/index-0QR3Ackj.css",
-    "docs/demos/assets/index-CpsdAztt.js",
+    "docs/demos/assets/index-C1cqgiKX.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
     "docs/demos/assets/preload-helper-DYl5dUZ5.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js",
-    "docs/demos/assets/three.webgpu-Du3nux7o.js"
+    "docs/demos/assets/three.webgpu-Bxw5NSti.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js"
   ],
   "emittedAssetDependencies": [
-    "docs/demos/assets/compatibility-renderer-BHplG0Ms.js",
+    "docs/demos/assets/compatibility-renderer-CrxVRi9V.js",
     "docs/demos/assets/fallback-core-BxY89vzU.js",
     "docs/demos/assets/fallback-fixtures-C__puiF4.json",
     "docs/demos/assets/index-0QR3Ackj.css",
-    "docs/demos/assets/index-CpsdAztt.js",
+    "docs/demos/assets/index-C1cqgiKX.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
     "docs/demos/assets/preload-helper-DYl5dUZ5.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js",
-    "docs/demos/assets/three.webgpu-Du3nux7o.js"
+    "docs/demos/assets/three.webgpu-Bxw5NSti.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js"
   ],
-  "publishedBundleHash": "sha256:7de5ce837afa37160aee5d24c82d0a6844d35e2c687dee9227027c4e630c2785",
+  "publishedBundleHash": "sha256:013cb38db6a97ec86cbf7d03620fb0d6b9e0b8eefd7b439538dd6947b69352a3",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b",
+  "buildRevision": "sha256:30cdd83579e699aa18bb7ce54d4b2b2dc41a7f066411642dd94cd155e2b955dd",
   "evidenceBundleId": null
 }

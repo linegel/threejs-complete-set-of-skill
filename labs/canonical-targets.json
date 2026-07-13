@@ -13,7 +13,7 @@
       "id": "browser-fallback-harness",
       "kind": "canonical-lab",
       "canonicalDir": "threejs-compatibility-fallbacks/examples/browser-fallback-harness",
-      "executionClass": "rendering",
+      "executionClass": "non-rendering",
       "flagship": false,
       "dependencyLabIds": []
     },
@@ -71,7 +71,10 @@
       "canonicalDir": "threejs-ambient-contact-shading/examples/integration-image-pipeline-ao",
       "executionClass": "rendering",
       "flagship": false,
-      "dependencyLabIds": ["webgpu-node-gtao", "webgpu-image-pipeline"]
+      "dependencyLabIds": [
+        "webgpu-node-gtao",
+        "webgpu-image-pipeline"
+      ]
     },
     {
       "id": "integration-precipitation-image-pipeline",
@@ -79,7 +82,10 @@
       "canonicalDir": "threejs-rain-snow-and-wet-surfaces/examples/integration-precipitation-image-pipeline",
       "executionClass": "rendering",
       "flagship": false,
-      "dependencyLabIds": ["webgpu-rain-snow-and-wet-surfaces", "webgpu-image-pipeline"]
+      "dependencyLabIds": [
+        "webgpu-rain-snow-and-wet-surfaces",
+        "webgpu-image-pipeline"
+      ]
     },
     {
       "id": "integration-temporal-surface",
@@ -87,7 +93,11 @@
       "canonicalDir": "threejs-dynamic-surface-effects/examples/integration-temporal-surface",
       "executionClass": "rendering",
       "flagship": false,
-      "dependencyLabIds": ["webgpu-touch-history-frost", "webgpu-image-pipeline", "webgpu-temporal-history"]
+      "dependencyLabIds": [
+        "webgpu-touch-history-frost",
+        "webgpu-image-pipeline",
+        "webgpu-temporal-history"
+      ]
     },
     {
       "id": "node-selective-bloom",
@@ -346,7 +356,11 @@
       "canonicalDir": "threejs-scalable-real-time-shadows/examples/webgpu-shadow-pipeline-integration",
       "executionClass": "rendering",
       "flagship": false,
-      "dependencyLabIds": ["webgpu-cached-clipmap-shadow", "webgpu-shadow-architecture-bench", "webgpu-image-pipeline"]
+      "dependencyLabIds": [
+        "webgpu-cached-clipmap-shadow",
+        "webgpu-shadow-architecture-bench",
+        "webgpu-image-pipeline"
+      ]
     },
     {
       "id": "webgpu-temporal-history",
@@ -386,7 +400,11 @@
       "canonicalDir": "threejs-procedural-vegetation/examples/webgpu-vegetation-integration",
       "executionClass": "rendering",
       "flagship": false,
-      "dependencyLabIds": ["webgpu-dense-grass", "structured-ash-growth", "webgpu-image-pipeline"]
+      "dependencyLabIds": [
+        "webgpu-dense-grass",
+        "structured-ash-growth",
+        "webgpu-image-pipeline"
+      ]
     },
     {
       "id": "webgpu-weather-volume-clouds",
@@ -401,47 +419,211 @@
     {
       "id": "final-image-flight",
       "canonicalDir": "integration-labs/final-image-flight",
-      "skills": ["threejs-camera-controls-and-rigs", "threejs-procedural-motion-systems", "threejs-image-pipeline", "threejs-ambient-contact-shading", "threejs-bloom", "threejs-exposure-color-grading", "threejs-scalable-real-time-shadows", "threejs-visual-validation"],
-      "tiers": ["hero", "balanced", "budgeted"],
-      "scenarios": ["flight"],
-      "mechanisms": ["camera-motion-ownership", "ao-prepass-lit-pair", "shared-emissive-bloom", "exposure-output-order", "shadow-contribution", "owner-graph"],
-      "modes": ["final", "no-post", "velocity", "ao", "emissive", "bloom", "exposure", "shadow-contribution", "owner-graph"]
+      "skills": [
+        "threejs-camera-controls-and-rigs",
+        "threejs-procedural-motion-systems",
+        "threejs-image-pipeline",
+        "threejs-ambient-contact-shading",
+        "threejs-bloom",
+        "threejs-exposure-color-grading",
+        "threejs-scalable-real-time-shadows",
+        "threejs-visual-validation"
+      ],
+      "tiers": [
+        "hero",
+        "balanced",
+        "budgeted"
+      ],
+      "scenarios": [
+        "flight"
+      ],
+      "mechanisms": [
+        "camera-motion-ownership",
+        "ao-prepass-lit-pair",
+        "shared-emissive-bloom",
+        "exposure-output-order",
+        "shadow-contribution",
+        "owner-graph"
+      ],
+      "modes": [
+        "final",
+        "no-post",
+        "velocity",
+        "ao",
+        "emissive",
+        "bloom",
+        "exposure",
+        "shadow-contribution",
+        "owner-graph"
+      ]
     },
     {
       "id": "weathered-world",
       "canonicalDir": "integration-labs/weathered-world",
-      "skills": ["threejs-procedural-planets", "threejs-sky-atmosphere-and-haze", "threejs-volumetric-clouds", "threejs-spectral-ocean", "threejs-water-optics", "threejs-rain-snow-and-wet-surfaces", "threejs-procedural-vegetation", "threejs-scalable-real-time-shadows", "threejs-image-pipeline"],
-      "tiers": ["hero", "balanced", "budgeted"],
-      "scenarios": ["world"],
-      "mechanisms": ["shared-world-units", "shared-weather-envelope", "atmosphere-cloud-hdr", "ocean-bounded-water-ownership", "cloud-opaque-shadow-separation", "owner-graph"],
-      "modes": ["final", "no-post", "weather-envelope", "atmosphere", "cloud-optical-depth", "ocean", "bounded-water", "precipitation", "wetness", "snow", "vegetation-wind", "shadow-contribution", "owner-graph"]
+      "skills": [
+        "threejs-procedural-planets",
+        "threejs-sky-atmosphere-and-haze",
+        "threejs-volumetric-clouds",
+        "threejs-spectral-ocean",
+        "threejs-water-optics",
+        "threejs-rain-snow-and-wet-surfaces",
+        "threejs-procedural-vegetation",
+        "threejs-scalable-real-time-shadows",
+        "threejs-image-pipeline"
+      ],
+      "tiers": [
+        "hero",
+        "balanced",
+        "budgeted"
+      ],
+      "scenarios": [
+        "world"
+      ],
+      "mechanisms": [
+        "shared-world-units",
+        "shared-weather-envelope",
+        "atmosphere-cloud-hdr",
+        "ocean-bounded-water-ownership",
+        "cloud-opaque-shadow-separation",
+        "owner-graph"
+      ],
+      "modes": [
+        "final",
+        "no-post",
+        "weather-envelope",
+        "atmosphere",
+        "cloud-optical-depth",
+        "ocean",
+        "bounded-water",
+        "precipitation",
+        "wetness",
+        "snow",
+        "vegetation-wind",
+        "shadow-contribution",
+        "owner-graph"
+      ]
     },
     {
       "id": "procedural-district",
       "canonicalDir": "integration-labs/procedural-district",
-      "skills": ["threejs-procedural-fields", "threejs-procedural-geometry", "threejs-procedural-materials", "threejs-procedural-buildings-and-cities", "threejs-rain-snow-and-wet-surfaces", "threejs-scalable-real-time-shadows", "threejs-ambient-contact-shading", "threejs-image-pipeline"],
-      "tiers": ["hero", "balanced", "budgeted"],
-      "scenarios": ["district"],
-      "mechanisms": ["shared-cause-field", "structural-topology", "facade-ownership", "material-slot-weather", "ao-shadow-order", "owner-graph"],
-      "modes": ["final", "no-post", "shared-field", "facade-ownership", "material-slots", "weather-state", "shadow-contribution", "ao", "owner-graph"]
+      "skills": [
+        "threejs-procedural-fields",
+        "threejs-procedural-geometry",
+        "threejs-procedural-materials",
+        "threejs-procedural-buildings-and-cities",
+        "threejs-rain-snow-and-wet-surfaces",
+        "threejs-scalable-real-time-shadows",
+        "threejs-ambient-contact-shading",
+        "threejs-image-pipeline"
+      ],
+      "tiers": [
+        "hero",
+        "balanced",
+        "budgeted"
+      ],
+      "scenarios": [
+        "district"
+      ],
+      "mechanisms": [
+        "shared-cause-field",
+        "structural-topology",
+        "facade-ownership",
+        "material-slot-weather",
+        "ao-shadow-order",
+        "owner-graph"
+      ],
+      "modes": [
+        "final",
+        "no-post",
+        "shared-field",
+        "facade-ownership",
+        "material-slots",
+        "weather-state",
+        "shadow-contribution",
+        "ao",
+        "owner-graph"
+      ]
     },
     {
       "id": "creature-habitat",
       "canonicalDir": "integration-labs/creature-habitat",
-      "skills": ["threejs-procedural-creatures", "threejs-procedural-vegetation", "threejs-water-optics", "threejs-rain-snow-and-wet-surfaces", "threejs-camera-controls-and-rigs", "threejs-scalable-real-time-shadows", "threejs-image-pipeline"],
-      "tiers": ["hero", "balanced", "budgeted"],
-      "scenarios": ["habitat"],
-      "mechanisms": ["shared-world-wind", "contact-ripple-trampling", "immutable-spawn-storage", "subject-consistent-culling-shadow-outline", "owner-graph"],
-      "modes": ["final", "no-post", "contact-events", "water-ripples", "vegetation-trampling", "culling", "outline", "shadow-parity", "owner-graph"]
+      "skills": [
+        "threejs-procedural-creatures",
+        "threejs-procedural-vegetation",
+        "threejs-water-optics",
+        "threejs-rain-snow-and-wet-surfaces",
+        "threejs-camera-controls-and-rigs",
+        "threejs-scalable-real-time-shadows",
+        "threejs-image-pipeline"
+      ],
+      "tiers": [
+        "hero",
+        "balanced",
+        "budgeted"
+      ],
+      "scenarios": [
+        "habitat"
+      ],
+      "mechanisms": [
+        "shared-world-wind",
+        "contact-ripple-trampling",
+        "immutable-spawn-storage",
+        "subject-consistent-culling-shadow-outline",
+        "owner-graph"
+      ],
+      "modes": [
+        "final",
+        "no-post",
+        "contact-events",
+        "water-ripples",
+        "vegetation-trampling",
+        "culling",
+        "outline",
+        "shadow-parity",
+        "owner-graph"
+      ]
     },
     {
       "id": "relativistic-space-shot",
       "canonicalDir": "integration-labs/relativistic-space-shot",
-      "skills": ["threejs-black-holes-and-space-effects", "threejs-particles-trails-and-effects", "threejs-camera-controls-and-rigs", "threejs-procedural-motion-systems", "threejs-bloom", "threejs-exposure-color-grading", "threejs-image-pipeline"],
-      "tiers": ["hero", "balanced", "budgeted"],
-      "scenarios": ["shot"],
-      "mechanisms": ["curved-ray-hdr", "motion-event-packets", "gpu-particle-pools", "shared-emissive-bloom", "single-temporal-exposure-output", "owner-graph"],
-      "modes": ["final", "no-post", "curved-ray", "integration-pressure", "velocity", "particles", "emissive", "bloom", "exposure", "temporal-confidence", "owner-graph"]
+      "skills": [
+        "threejs-black-holes-and-space-effects",
+        "threejs-particles-trails-and-effects",
+        "threejs-camera-controls-and-rigs",
+        "threejs-procedural-motion-systems",
+        "threejs-bloom",
+        "threejs-exposure-color-grading",
+        "threejs-image-pipeline"
+      ],
+      "tiers": [
+        "hero",
+        "balanced",
+        "budgeted"
+      ],
+      "scenarios": [
+        "shot"
+      ],
+      "mechanisms": [
+        "curved-ray-hdr",
+        "motion-event-packets",
+        "gpu-particle-pools",
+        "shared-emissive-bloom",
+        "single-temporal-exposure-output",
+        "owner-graph"
+      ],
+      "modes": [
+        "final",
+        "no-post",
+        "curved-ray",
+        "integration-pressure",
+        "velocity",
+        "particles",
+        "emissive",
+        "bloom",
+        "exposure",
+        "temporal-confidence",
+        "owner-graph"
+      ]
     }
   ],
   "targets": [
@@ -449,8 +631,34 @@
       "skill": "threejs-choose-skills",
       "id": "router-manifest-lab",
       "canonicalDir": "threejs-choose-skills/examples/router-manifest-lab",
-      "scenarios": ["ocean-planet", "rainy-city", "forest", "black-hole-shot", "post-pipeline-dashboard", "ocean-fauna", "route-away-unsupported", "over-budget-17.5-to-16.5", "missing-webgpu", "duplicate-output-owner", "duplicate-velocity-owner", "fabricated-tier", "post-before-physical-cause", "inventory-drift", "unsupported-route-away", "automatic-fallback"],
-      "mechanisms": ["inventory-intersection", "capability-gate", "causal-ordering", "exclusive-ownership", "tier-provenance", "stage-budget-aggregation", "route-away", "fallback-quarantine"],
+      "scenarios": [
+        "ocean-planet",
+        "rainy-city",
+        "forest",
+        "black-hole-shot",
+        "post-pipeline-dashboard",
+        "ocean-fauna",
+        "route-away-unsupported",
+        "over-budget-17.5-to-16.5",
+        "missing-webgpu",
+        "duplicate-output-owner",
+        "duplicate-velocity-owner",
+        "fabricated-tier",
+        "post-before-physical-cause",
+        "inventory-drift",
+        "unsupported-route-away",
+        "automatic-fallback"
+      ],
+      "mechanisms": [
+        "inventory-intersection",
+        "capability-gate",
+        "causal-ordering",
+        "exclusive-ownership",
+        "tier-provenance",
+        "stage-budget-aggregation",
+        "route-away",
+        "fallback-quarantine"
+      ],
       "tiers": [],
       "nonRenderingScenarioSuite": true
     },
@@ -458,8 +666,22 @@
       "skill": "threejs-debugging",
       "id": "debugging-contract-lab",
       "canonicalDir": "threejs-debugging/examples/debugging-contract-lab",
-      "scenarios": ["ordinary-scene-design", "older-release-suspicious-output", "merged-but-unreleased", "closed-but-unrelated", "installed-source-docs-disagree", "current-release-reproduces-without-match", "local-usage-error"],
-      "mechanisms": ["activation-gate", "version-matrix", "release-containment", "candidate-classification", "decision-boundary"],
+      "scenarios": [
+        "ordinary-scene-design",
+        "older-release-suspicious-output",
+        "merged-but-unreleased",
+        "closed-but-unrelated",
+        "installed-source-docs-disagree",
+        "current-release-reproduces-without-match",
+        "local-usage-error"
+      ],
+      "mechanisms": [
+        "activation-gate",
+        "version-matrix",
+        "release-containment",
+        "candidate-classification",
+        "decision-boundary"
+      ],
       "tiers": [],
       "nonRenderingScenarioSuite": true
     },
@@ -467,194 +689,521 @@
       "skill": "threejs-compatibility-fallbacks",
       "id": "browser-fallback-harness",
       "canonicalDir": "threejs-compatibility-fallbacks/examples/browser-fallback-harness",
-      "scenarios": ["blocked-default", "native-budget-reduction", "precomputed-static", "cpu-offline", "feature-removed", "maintained-legacy", "invariant-loss-comparison"],
-      "mechanisms": ["explicit-activation-gate", "ordered-degradation-trace", "bounded-water-loss-oracle", "invariant-ledger", "force-webgl-branch-isolation", "maintenance-acceptance"],
+      "scenarios": [
+        "blocked-default",
+        "native-budget-reduction",
+        "precomputed-static",
+        "cpu-offline",
+        "feature-removed",
+        "maintained-legacy",
+        "invariant-loss-comparison"
+      ],
+      "mechanisms": [
+        "explicit-activation-gate",
+        "ordered-degradation-trace",
+        "bounded-water-loss-oracle",
+        "invariant-ledger",
+        "force-webgl-branch-isolation",
+        "maintenance-acceptance"
+      ],
       "tiers": []
     },
     {
       "skill": "threejs-visual-validation",
       "id": "webgpu-validation-harness",
       "canonicalDir": "threejs-visual-validation/examples/webgpu-validation-harness",
-      "scenarios": ["browser-capture", "pipeline-graph-inspector", "resource-ledger", "timing-and-governor", "lifecycle-and-leaks", "visual-error-metrics", "mutation-gallery", "artifact-inspector"],
-      "mechanisms": ["aligned-readback", "claim-verdicts", "gpu-timestamps", "resource-inventory", "visual-errors", "lifecycle-trend"],
-      "tiers": ["schema-fixture", "webgpu-correctness", "target-performance", "governor-stress", "release"]
+      "scenarios": [
+        "browser-capture",
+        "pipeline-graph-inspector",
+        "resource-ledger",
+        "timing-and-governor",
+        "lifecycle-and-leaks",
+        "visual-error-metrics",
+        "mutation-gallery",
+        "artifact-inspector"
+      ],
+      "mechanisms": [
+        "aligned-readback",
+        "claim-verdicts",
+        "gpu-timestamps",
+        "resource-inventory",
+        "visual-errors",
+        "lifecycle-trend"
+      ],
+      "tiers": [
+        "schema-fixture",
+        "webgpu-correctness",
+        "target-performance",
+        "governor-stress",
+        "release"
+      ]
     },
     {
       "skill": "threejs-object-sculptor",
       "id": "webgpu-tower-ship-sculptor",
       "canonicalDir": "threejs-object-sculptor/examples/webgpu-tower-ship-sculptor",
-      "scenarios": ["reference-reconstruction", "staged-sculpt", "action-ready"],
-      "mechanisms": ["final", "blockout", "hierarchy", "materials", "interaction"],
-      "tiers": ["full", "budgeted", "minimum"]
+      "scenarios": [
+        "reference-reconstruction",
+        "staged-sculpt",
+        "action-ready"
+      ],
+      "mechanisms": [
+        "final",
+        "blockout",
+        "hierarchy",
+        "materials",
+        "interaction"
+      ],
+      "tiers": [
+        "full",
+        "budgeted",
+        "minimum"
+      ]
     },
     {
       "skill": "threejs-object-sculptor",
       "id": "webgpu-object-sculptor-corpus",
       "canonicalDir": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus",
-      "scenarios": ["articulated-desk-lamp", "potted-bonsai", "ceramic-teapot"],
-      "mechanisms": ["final", "blockout", "hierarchy", "materials", "action-ready"],
-      "tiers": ["full", "budgeted", "minimum"]
+      "scenarios": [
+        "articulated-desk-lamp",
+        "potted-bonsai",
+        "ceramic-teapot"
+      ],
+      "mechanisms": [
+        "final",
+        "blockout",
+        "hierarchy",
+        "materials",
+        "action-ready"
+      ],
+      "tiers": [
+        "full",
+        "budgeted",
+        "minimum"
+      ]
     },
     {
       "skill": "threejs-camera-controls-and-rigs",
       "id": "webgpu-camera-rig",
       "canonicalDir": "threejs-camera-controls-and-rigs/examples/webgpu-camera-rig",
-      "mechanisms": ["scale-aware-framing", "handoff-and-replay", "pointer-orbit-and-collision", "floating-origin", "projection-and-depth", "shared-jitter-and-velocity"],
-      "tiers": ["full", "budgeted", "minimum"]
+      "mechanisms": [
+        "scale-aware-framing",
+        "handoff-and-replay",
+        "pointer-orbit-and-collision",
+        "floating-origin",
+        "projection-and-depth",
+        "shared-jitter-and-velocity"
+      ],
+      "tiers": [
+        "full",
+        "budgeted",
+        "minimum"
+      ]
     },
     {
       "skill": "threejs-procedural-motion-systems",
       "id": "webgpu-procedural-timelines",
       "canonicalDir": "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines",
-      "mechanisms": ["launch-and-staging", "spin-docking", "debris-release", "quaternion-and-reparent", "compute-storage", "interpolation-and-velocity"],
-      "tiers": ["full", "balanced", "test-minimum"]
+      "mechanisms": [
+        "launch-and-staging",
+        "spin-docking",
+        "debris-release",
+        "quaternion-and-reparent",
+        "compute-storage",
+        "interpolation-and-velocity"
+      ],
+      "tiers": [
+        "full",
+        "balanced",
+        "test-minimum"
+      ]
     },
     {
       "skill": "threejs-ambient-contact-shading",
       "id": "webgpu-node-gtao",
       "canonicalDir": "threejs-ambient-contact-shading/examples/webgpu-node-gtao",
-      "mechanisms": ["scalar-gtao", "bilateral-denoise-and-halo", "temporal-ao", "bent-normal-wall", "indirect-only-application", "depth-conventions"],
-      "tiers": ["ultra", "high", "medium"]
+      "mechanisms": [
+        "scalar-gtao",
+        "bilateral-denoise-and-halo",
+        "temporal-ao",
+        "bent-normal-wall",
+        "indirect-only-application",
+        "depth-conventions"
+      ],
+      "tiers": [
+        "ultra",
+        "high",
+        "medium"
+      ]
     },
     {
       "skill": "threejs-bloom",
       "id": "node-selective-bloom",
       "canonicalDir": "threejs-bloom/examples/node-selective-bloom",
-      "mechanisms": ["threshold-and-knee", "point-spread-function", "emissive-hierarchy", "transparent-emitters", "depth-and-occlusion", "shared-emissive-integration"],
-      "tiers": ["full", "balanced", "mobile", "reduced-readable-base"]
+      "mechanisms": [
+        "threshold-and-knee",
+        "point-spread-function",
+        "emissive-hierarchy",
+        "transparent-emitters",
+        "depth-and-occlusion",
+        "shared-emissive-integration"
+      ],
+      "tiers": [
+        "full",
+        "balanced",
+        "mobile",
+        "reduced-readable-base"
+      ]
     },
     {
       "skill": "threejs-exposure-color-grading",
       "id": "webgpu-exposure-color-pipeline",
       "canonicalDir": "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline",
-      "mechanisms": ["log-luminance-reduction", "histogram-and-percentiles", "adaptation", "metering-masks", "tone-mapping", "lut-grading"],
-      "tiers": ["full-histogram", "balanced-log-reduction", "minimum-fixed-shot"]
+      "mechanisms": [
+        "log-luminance-reduction",
+        "histogram-and-percentiles",
+        "adaptation",
+        "metering-masks",
+        "tone-mapping",
+        "lut-grading"
+      ],
+      "tiers": [
+        "full-histogram",
+        "balanced-log-reduction",
+        "minimum-fixed-shot"
+      ]
     },
     {
       "skill": "threejs-image-pipeline",
       "id": "webgpu-image-pipeline",
       "canonicalDir": "threejs-image-pipeline/examples/webgpu-image-pipeline",
-      "mechanisms": ["signal-inspector", "ao-bloom-exposure-order", "temporal-velocity-and-history", "output-and-color-ownership", "resource-budget", "diagnostic-extra-pass"],
-      "tiers": ["full", "reduced", "debug"]
+      "mechanisms": [
+        "signal-inspector",
+        "ao-bloom-exposure-order",
+        "temporal-velocity-and-history",
+        "output-and-color-ownership",
+        "resource-budget",
+        "diagnostic-extra-pass"
+      ],
+      "tiers": [
+        "full",
+        "reduced",
+        "debug"
+      ]
     },
     {
       "skill": "threejs-scalable-real-time-shadows",
       "id": "webgpu-cached-clipmap-shadow",
       "canonicalDir": "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow",
-      "mechanisms": ["bounded-shadow", "csm", "tiled-shadow", "cached-clipmap", "texel-snap-and-pan", "bias-sweep", "targeted-invalidation", "scheduler-fairness", "caster-position-parity"],
-      "tiers": ["ultra", "high", "reduced"]
+      "mechanisms": [
+        "bounded-shadow",
+        "csm",
+        "tiled-shadow",
+        "cached-clipmap",
+        "texel-snap-and-pan",
+        "bias-sweep",
+        "targeted-invalidation",
+        "scheduler-fairness",
+        "caster-position-parity"
+      ],
+      "tiers": [
+        "ultra",
+        "high",
+        "reduced"
+      ]
     },
     {
       "skill": "threejs-sky-atmosphere-and-haze",
       "id": "webgpu-lut-atmosphere",
       "canonicalDir": "threejs-sky-atmosphere-and-haze/examples/webgpu-lut-atmosphere",
-      "mechanisms": ["transmittance-and-multiscatter", "irradiance-and-sky-view", "aerial-perspective", "depth-and-ecef", "sun-moon-and-lighting", "sea-level-to-orbit"],
-      "tiers": ["ultra", "high", "mobile"]
+      "mechanisms": [
+        "transmittance-and-multiscatter",
+        "irradiance-and-sky-view",
+        "aerial-perspective",
+        "depth-and-ecef",
+        "sun-moon-and-lighting",
+        "sea-level-to-orbit"
+      ],
+      "tiers": [
+        "ultra",
+        "high",
+        "mobile"
+      ]
     },
     {
       "skill": "threejs-volumetric-clouds",
       "id": "webgpu-weather-volume-clouds",
       "canonicalDir": "threejs-volumetric-clouds/examples/webgpu-weather-volume-clouds",
-      "mechanisms": ["flagship-transport", "density-and-bounds", "cloud-shadows", "temporal-and-upsample", "tier-benchmark", "atmosphere-composition", "failure-diagnostics"],
-      "tiers": ["ultra", "high", "default", "mobile"]
+      "mechanisms": [
+        "flagship-transport",
+        "density-and-bounds",
+        "cloud-shadows",
+        "temporal-and-upsample",
+        "tier-benchmark",
+        "atmosphere-composition",
+        "failure-diagnostics"
+      ],
+      "tiers": [
+        "ultra",
+        "high",
+        "default",
+        "mobile"
+      ]
     },
     {
       "skill": "threejs-spectral-ocean",
       "id": "webgpu-fft-ocean",
       "canonicalDir": "threejs-spectral-ocean/examples/webgpu-fft-ocean",
-      "mechanisms": ["spectrum-and-fft", "dispersion-and-cascades", "derivatives-and-jacobian", "whitecaps-and-foam", "above-and-below-surface", "cpu-query-parity"],
-      "tiers": ["ultra", "high", "medium", "low"]
+      "mechanisms": [
+        "spectrum-and-fft",
+        "dispersion-and-cascades",
+        "derivatives-and-jacobian",
+        "whitecaps-and-foam",
+        "above-and-below-surface",
+        "cpu-query-parity"
+      ],
+      "tiers": [
+        "ultra",
+        "high",
+        "medium",
+        "low"
+      ]
     },
     {
       "skill": "threejs-water-optics",
       "id": "webgpu-bounded-water",
       "canonicalDir": "threejs-water-optics/examples/webgpu-bounded-water",
-      "mechanisms": ["heightfield-simulation", "drops-and-object-ripples", "differential-caustics", "refraction-and-absorption", "fresnel-and-tir", "buoyancy-spray-and-masks"],
-      "tiers": ["ultra", "high", "medium", "low"]
+      "mechanisms": [
+        "heightfield-simulation",
+        "drops-and-object-ripples",
+        "differential-caustics",
+        "refraction-and-absorption",
+        "fresnel-and-tir",
+        "buoyancy-spray-and-masks"
+      ],
+      "tiers": [
+        "ultra",
+        "high",
+        "medium",
+        "low"
+      ]
     },
     {
       "skill": "threejs-rain-snow-and-wet-surfaces",
       "id": "webgpu-rain-snow-and-wet-surfaces",
       "canonicalDir": "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces",
-      "mechanisms": ["precipitation-volume", "analytic-vs-recurrent", "wet-road-and-puddles", "impact-and-splashes", "snow-accumulation-and-caps", "weather-envelope-coupling"],
-      "tiers": ["high", "medium", "budgeted"]
+      "mechanisms": [
+        "precipitation-volume",
+        "analytic-vs-recurrent",
+        "wet-road-and-puddles",
+        "impact-and-splashes",
+        "snow-accumulation-and-caps",
+        "weather-envelope-coupling"
+      ],
+      "tiers": [
+        "high",
+        "medium",
+        "budgeted"
+      ]
     },
     {
       "skill": "threejs-dynamic-surface-effects",
       "id": "webgpu-touch-history-frost",
       "canonicalDir": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost",
-      "mechanisms": ["history-and-deposit", "diffusion", "blur-and-reconstruction", "crystal-field-and-normals", "refraction-and-fresnel", "full-vs-dirty-vs-idle"],
-      "tiers": ["full", "balanced", "budgeted"]
+      "mechanisms": [
+        "history-and-deposit",
+        "diffusion",
+        "blur-and-reconstruction",
+        "crystal-field-and-normals",
+        "refraction-and-fresnel",
+        "full-vs-dirty-vs-idle"
+      ],
+      "tiers": [
+        "full",
+        "balanced",
+        "budgeted"
+      ]
     },
     {
       "skill": "threejs-procedural-fields",
       "id": "webgpu-field-bake",
       "canonicalDir": "threejs-procedural-fields/examples/webgpu-field-bake",
-      "mechanisms": ["field-and-gradient-gallery", "domain-warp-jacobian", "storage-bake-and-mips", "direct-vs-baked", "structured-placement", "shared-cause-composition"],
-      "tiers": ["gpu-storage", "gpu-direct-evaluate", "precomputed-minimum"]
+      "mechanisms": [
+        "field-and-gradient-gallery",
+        "domain-warp-jacobian",
+        "storage-bake-and-mips",
+        "direct-vs-baked",
+        "structured-placement",
+        "shared-cause-composition"
+      ],
+      "tiers": [
+        "gpu-storage",
+        "gpu-direct-evaluate",
+        "precomputed-minimum"
+      ]
     },
     {
       "skill": "threejs-procedural-materials",
       "id": "tsl-procedural-pbr",
       "canonicalDir": "threejs-procedural-materials/examples/tsl-procedural-pbr",
-      "mechanisms": ["pbr-identity", "specular-aa-and-filtering", "atlas-array-and-triplanar", "instanced-dissolve", "shadow-parity", "wet-rock-and-occlusion"],
-      "tiers": ["ultra", "high", "mobile"]
+      "mechanisms": [
+        "pbr-identity",
+        "specular-aa-and-filtering",
+        "atlas-array-and-triplanar",
+        "instanced-dissolve",
+        "shadow-parity",
+        "wet-rock-and-occlusion"
+      ],
+      "tiers": [
+        "ultra",
+        "high",
+        "mobile"
+      ]
     },
     {
       "skill": "threejs-procedural-geometry",
       "id": "semantic-mesh-writer",
       "canonicalDir": "threejs-procedural-geometry/examples/semantic-mesh-writer",
-      "mechanisms": ["frame-and-rail-profile", "branch-rings", "semantic-groups-and-materials", "batching-comparison", "dynamic-updates", "indirect-draw"],
-      "tiers": ["hero", "standard", "crowd"]
+      "mechanisms": [
+        "frame-and-rail-profile",
+        "branch-rings",
+        "semantic-groups-and-materials",
+        "batching-comparison",
+        "dynamic-updates",
+        "indirect-draw"
+      ],
+      "tiers": [
+        "hero",
+        "standard",
+        "crowd"
+      ]
     },
     {
       "skill": "threejs-procedural-buildings-and-cities",
       "id": "webgpu-material-slot-compiler",
       "canonicalDir": "threejs-procedural-buildings-and-cities/examples/webgpu-material-slot-compiler",
-      "mechanisms": ["massing-grammar", "exposed-edge-analysis", "facade-ownership", "module-geometry", "material-slot-compilation", "city-chunks-and-lod"],
-      "tiers": ["hero", "city", "distant"]
+      "mechanisms": [
+        "massing-grammar",
+        "exposed-edge-analysis",
+        "facade-ownership",
+        "module-geometry",
+        "material-slot-compilation",
+        "city-chunks-and-lod"
+      ],
+      "tiers": [
+        "hero",
+        "city",
+        "distant"
+      ]
     },
     {
       "skill": "threejs-procedural-planets",
       "id": "webgpu-quadtree-planet",
       "canonicalDir": "threejs-procedural-planets/examples/webgpu-quadtree-planet",
-      "mechanisms": ["field-crater-climate", "cross-face-quadtree", "balance-and-stitching", "field-atlas", "solid-body-material", "gas-and-ice-giants", "orbit-to-surface"],
-      "tiers": ["full", "balanced", "reduced-webgpu"]
+      "mechanisms": [
+        "field-crater-climate",
+        "cross-face-quadtree",
+        "balance-and-stitching",
+        "field-atlas",
+        "solid-body-material",
+        "gas-and-ice-giants",
+        "orbit-to-surface"
+      ],
+      "tiers": [
+        "full",
+        "balanced",
+        "reduced-webgpu"
+      ]
     },
     {
       "skill": "threejs-procedural-vegetation",
       "id": "webgpu-dense-grass",
       "canonicalDir": "threejs-procedural-vegetation/examples/webgpu-dense-grass",
-      "mechanisms": ["dense-grass-placement", "dense-grass-wind-and-trampling", "dense-grass-lod-and-impostors"],
-      "tiers": ["dense/ultra", "dense/high", "dense/medium", "dense/low"]
+      "mechanisms": [
+        "dense-grass-placement",
+        "dense-grass-wind-and-trampling",
+        "dense-grass-lod-and-impostors"
+      ],
+      "tiers": [
+        "dense/ultra",
+        "dense/high",
+        "dense/medium",
+        "dense/low"
+      ]
     },
     {
       "skill": "threejs-procedural-vegetation",
       "id": "structured-ash-growth",
       "canonicalDir": "threejs-procedural-vegetation/examples/structured-ash-growth",
-      "mechanisms": ["structured-growth", "leaf-origins-and-normals", "forest-storage-and-lod", "vegetation-shadow-parity"],
-      "tiers": ["growth/hero", "growth/forest", "growth/background"]
+      "mechanisms": [
+        "structured-growth",
+        "leaf-origins-and-normals",
+        "forest-storage-and-lod",
+        "vegetation-shadow-parity"
+      ],
+      "tiers": [
+        "growth/hero",
+        "growth/forest",
+        "growth/background"
+      ]
     },
     {
       "skill": "threejs-procedural-creatures",
       "id": "webgpu-procedural-creature-lab",
       "canonicalDir": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab",
-      "mechanisms": ["field-and-surface-certification", "snap-and-ownership", "locomotion-and-foot-planting", "tails-ears-and-secondary-motion", "crowd-and-culling", "outline-and-shadow", "genome-variation", "coastal-crab"],
-      "tiers": ["hero", "crowd", "background"]
+      "mechanisms": [
+        "field-and-surface-certification",
+        "snap-and-ownership",
+        "locomotion-and-foot-planting",
+        "tails-ears-and-secondary-motion",
+        "crowd-and-culling",
+        "outline-and-shadow",
+        "genome-variation",
+        "coastal-crab"
+      ],
+      "tiers": [
+        "hero",
+        "crowd",
+        "background"
+      ]
     },
     {
       "skill": "threejs-particles-trails-and-effects",
       "id": "webgpu-pooled-effects",
       "canonicalDir": "threejs-particles-trails-and-effects/examples/webgpu-pooled-effects",
-      "mechanisms": ["reentry-shell-and-wake", "impact-sparks", "debris-dissolve", "gpu-pool-and-compaction", "indirect-draws", "hdr-emissive-and-depth", "tier-benchmark"],
-      "tiers": ["ultra", "high", "medium"]
+      "mechanisms": [
+        "reentry-shell-and-wake",
+        "impact-sparks",
+        "debris-dissolve",
+        "gpu-pool-and-compaction",
+        "indirect-draws",
+        "hdr-emissive-and-depth",
+        "tier-benchmark"
+      ],
+      "tiers": [
+        "ultra",
+        "high",
+        "medium"
+      ]
     },
     {
       "skill": "threejs-black-holes-and-space-effects",
       "id": "tsl-curved-ray",
       "canonicalDir": "threejs-black-holes-and-space-effects/examples/tsl-curved-ray",
-      "mechanisms": ["accretion-disk", "ellis-wormhole", "schwarzschild-lensing", "integration-convergence", "temporal-reconstruction", "lens-cache"],
-      "tiers": ["hero", "standard", "background", "distant"]
+      "mechanisms": [
+        "accretion-disk",
+        "ellis-wormhole",
+        "schwarzschild-lensing",
+        "integration-convergence",
+        "temporal-reconstruction",
+        "lens-cache"
+      ],
+      "tiers": [
+        "hero",
+        "standard",
+        "background",
+        "distant"
+      ]
     }
   ]
 }

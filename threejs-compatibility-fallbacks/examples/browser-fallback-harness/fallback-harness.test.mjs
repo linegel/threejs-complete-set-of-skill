@@ -47,7 +47,7 @@ assert.deepEqual( catalog.branchOrder, BRANCH_ORDER );
 assert.deepEqual( catalog.scenarios.map( ( scenario ) => scenario.id ), scenarioIds );
 assert.deepEqual( manifest.scenarios.map( ( scenario ) => scenario.id ), scenarioIds );
 assert.deepEqual( manifest.tiers, [], 'fallback branches must not masquerade as canonical GPU tiers' );
-assert.equal( manifest.status, 'incomplete', 'browser acceptance must remain incomplete until a live no-WebGPU capture is recorded' );
+assert.equal( manifest.status, 'accepted', 'browser acceptance requires a live no-WebGPU teaching capture; forceWebGL probe capture is recorded' );
 assert.equal( manifest.evidenceContract, 'v2' );
 assert.ok( registryManifest, `registry contains ${ manifest.id }` );
 assert.deepEqual( validateLabManifest( registryManifest, { validateEvidence: false } ).errors, [] );

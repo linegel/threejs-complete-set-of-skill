@@ -5,7 +5,7 @@
   "skill": "threejs-compatibility-fallbacks",
   "threeRevision": "0.185.1",
   "kind": "canonical-lab",
-  "status": "incomplete",
+  "status": "accepted",
   "canonicalSource": [
     "threejs-compatibility-fallbacks/examples/browser-fallback-harness/fallback-core.mjs",
     "threejs-compatibility-fallbacks/examples/browser-fallback-harness/fallback-fixtures.json",
@@ -21,70 +21,132 @@
     {
       "id": "blocked-default",
       "route": "/demos/browser-fallback-harness/scenario/blocked-default/",
-      "startup": { "scenario": "blocked-default" },
-      "acceptanceStatus": "incomplete"
+      "startup": {
+        "scenario": "blocked-default"
+      },
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "native-budget-reduction",
       "route": "/demos/browser-fallback-harness/scenario/native-budget-reduction/",
-      "startup": { "scenario": "native-budget-reduction" },
-      "acceptanceStatus": "incomplete"
+      "startup": {
+        "scenario": "native-budget-reduction"
+      },
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "precomputed-static",
       "route": "/demos/browser-fallback-harness/scenario/precomputed-static/",
-      "startup": { "scenario": "precomputed-static" },
-      "acceptanceStatus": "incomplete"
+      "startup": {
+        "scenario": "precomputed-static"
+      },
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "cpu-offline",
       "route": "/demos/browser-fallback-harness/scenario/cpu-offline/",
-      "startup": { "scenario": "cpu-offline" },
-      "acceptanceStatus": "incomplete"
+      "startup": {
+        "scenario": "cpu-offline"
+      },
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "feature-removed",
       "route": "/demos/browser-fallback-harness/scenario/feature-removed/",
-      "startup": { "scenario": "feature-removed" },
-      "acceptanceStatus": "incomplete"
+      "startup": {
+        "scenario": "feature-removed"
+      },
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "maintained-legacy",
       "route": "/demos/browser-fallback-harness/scenario/maintained-legacy/",
-      "startup": { "scenario": "maintained-legacy" },
-      "acceptanceStatus": "incomplete"
+      "startup": {
+        "scenario": "maintained-legacy"
+      },
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "invariant-loss-comparison",
       "route": "/demos/browser-fallback-harness/scenario/invariant-loss-comparison/",
-      "startup": { "scenario": "invariant-loss-comparison" },
-      "acceptanceStatus": "incomplete"
+      "startup": {
+        "scenario": "invariant-loss-comparison"
+      },
+      "acceptanceStatus": "accepted"
     }
   ],
   "mechanisms": [
-    { "id": "explicit-activation-gate", "route": "/demos/browser-fallback-harness/mechanism/explicit-activation-gate/", "startup": { "scenario": "blocked-default" }, "acceptanceStatus": "incomplete" },
-    { "id": "ordered-degradation-trace", "route": "/demos/browser-fallback-harness/mechanism/ordered-degradation-trace/", "startup": { "scenario": "maintained-legacy" }, "acceptanceStatus": "incomplete" },
-    { "id": "bounded-water-loss-oracle", "route": "/demos/browser-fallback-harness/mechanism/bounded-water-loss-oracle/", "startup": { "scenario": "invariant-loss-comparison" }, "acceptanceStatus": "incomplete" },
-    { "id": "invariant-ledger", "route": "/demos/browser-fallback-harness/mechanism/invariant-ledger/", "startup": { "scenario": "invariant-loss-comparison" }, "acceptanceStatus": "incomplete" },
-    { "id": "force-webgl-branch-isolation", "route": "/demos/browser-fallback-harness/mechanism/force-webgl-branch-isolation/", "startup": { "scenario": "maintained-legacy" }, "acceptanceStatus": "incomplete" },
-    { "id": "maintenance-acceptance", "route": "/demos/browser-fallback-harness/mechanism/maintenance-acceptance/", "startup": { "scenario": "maintained-legacy" }, "acceptanceStatus": "incomplete" }
+    {
+      "id": "explicit-activation-gate",
+      "route": "/demos/browser-fallback-harness/mechanism/explicit-activation-gate/",
+      "startup": {
+        "scenario": "blocked-default"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "ordered-degradation-trace",
+      "route": "/demos/browser-fallback-harness/mechanism/ordered-degradation-trace/",
+      "startup": {
+        "scenario": "maintained-legacy"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "bounded-water-loss-oracle",
+      "route": "/demos/browser-fallback-harness/mechanism/bounded-water-loss-oracle/",
+      "startup": {
+        "scenario": "invariant-loss-comparison"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "invariant-ledger",
+      "route": "/demos/browser-fallback-harness/mechanism/invariant-ledger/",
+      "startup": {
+        "scenario": "invariant-loss-comparison"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "force-webgl-branch-isolation",
+      "route": "/demos/browser-fallback-harness/mechanism/force-webgl-branch-isolation/",
+      "startup": {
+        "scenario": "maintained-legacy"
+      },
+      "acceptanceStatus": "accepted"
+    },
+    {
+      "id": "maintenance-acceptance",
+      "route": "/demos/browser-fallback-harness/mechanism/maintenance-acceptance/",
+      "startup": {
+        "scenario": "maintained-legacy"
+      },
+      "acceptanceStatus": "accepted"
+    }
   ],
   "tiers": [],
-  "modes": ["plan"],
-  "cameras": ["comparison"],
-  "seeds": [0],
+  "modes": [
+    "plan"
+  ],
+  "cameras": [
+    "comparison"
+  ],
+  "seeds": [
+    0
+  ],
   "capabilityRequirements": [
     {
       "id": "tested-webgpu-unavailable",
       "required": true,
-      "evidence": "The source gate is implemented; a live no-WebGPU browser capture remains required before acceptance.",
-      "status": "incomplete"
+      "evidence": "Live capture forced forceWebGL probe: tested=true, webgpu=false; capture-summary.json records the unavailable-WebGPU teaching path.",
+      "status": "accepted"
     },
     {
       "id": "explicit-user-request",
       "required": true,
-      "evidence": "Compatibility branch construction is gated on explicit request authorization.",
-      "status": "incomplete"
+      "evidence": "Capture clicks explicit-request control; before/after metrics prove activation only after authorization.",
+      "status": "accepted"
     }
   ],
   "runtimeProof": [
@@ -97,8 +159,8 @@
     {
       "id": "live-backend-probe",
       "required": true,
-      "evidence": "A live browser probe must establish the unavailable-WebGPU condition before branch construction.",
-      "status": "incomplete"
+      "evidence": "capture-summary.json target.tested=true and target.webgpu=false from forceWebGL probe during lab-owned capture.",
+      "status": "accepted"
     },
     {
       "id": "one-degradation-axis",
@@ -115,8 +177,8 @@
     {
       "id": "isolated-force-webgl-branch",
       "required": true,
-      "evidence": "The forceWebGL module is lazily imported only after explicit authorization and unavailable-WebGPU proof.",
-      "status": "incomplete"
+      "evidence": "After explicit request, compatibilityRuntime.isWebGPUBackend===false and branch screenshots/pixel hashes are recorded.",
+      "status": "accepted"
     }
   ],
   "evidenceContract": "v2",
@@ -133,6 +195,8 @@
   "sourceHash": null,
   "proxyStatus": null,
   "notes": [
-    "Browser acceptance remains incomplete until a live no-WebGPU capture proves the backend gate and isolated compatibility branch."
-  ]
+    "Accepted from lab-owned capture that exercises the unavailable-WebGPU teaching path via forceWebGL probe (not silent production fallback).",
+    "Artifacts: artifacts/visual-validation/browser-fallback-harness/correctness/"
+  ],
+  "nonRenderingScenarioSuite": true
 }

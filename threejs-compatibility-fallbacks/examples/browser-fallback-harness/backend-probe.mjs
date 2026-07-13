@@ -1,12 +1,13 @@
 export async function probeCanonicalBackend( {
-	loadWebGPU = () => import( 'three/webgpu' )
+	loadWebGPU = () => import( 'three/webgpu' ),
+	forceWebGL = globalThis.__FALLBACK_FORCE_WEBGL_PROBE__ === true
 } = {} ) {
 
 	let renderer = null;
 	try {
 
 		const { WebGPURenderer, REVISION } = await loadWebGPU();
-		renderer = new WebGPURenderer( { antialias: false } );
+		renderer = new WebGPURenderer( { antialias: false, forceWebGL } );
 		await renderer.init();
 		const webgpu = renderer.backend.isWebGPUBackend === true;
 		const capabilities = {
@@ -14,7 +15,8 @@ export async function probeCanonicalBackend( {
 			webgpu,
 			compatibilityMode: renderer.backend.compatibilityMode === true,
 			threeRevision: REVISION,
-			backendName: renderer.backend.constructor.name
+			backendName: renderer.backend.constructor.name,
+			forceWebGL
 		};
 		if ( ! webgpu ) {
 

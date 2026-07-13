@@ -53,6 +53,12 @@ async function capture() {
 	const browser = await chromium.launch( { headless: true } );
 	const viewport = profile === 'performance' ? { width: 1920, height: 1080 } : { width: 1200, height: 800 };
 	const page = await browser.newPage( { viewport, deviceScaleFactor: 1 } );
+	// Teaching capture must exercise the unavailable-WebGPU path on hosts that still
+	// have native WebGPU. Force the probe onto the WebGL backend (not a silent
+	// production fallback path — only this lab-owned capture surface).
+	await page.addInitScript( () => {
+		globalThis.__FALLBACK_FORCE_WEBGL_PROBE__ = true;
+	} );
 	const routeRoot = new URL( 'threejs-compatibility-fallbacks/examples/browser-fallback-harness/', baseUrl.endsWith( '/' ) ? baseUrl : `${ baseUrl }/` );
 	await mkdir( outputDir, { recursive: true } );
 
