@@ -115,6 +115,16 @@ the source without duplicate application. Open
 `?tier=budgeted&interactionRollback=1` to reject the first sourced candidate,
 prove the interaction cursor remains zero, then admit the identical source once.
 
+`inundation-exchange-core.js` owns the water side of exposed-surface wetness.
+It compares six exchange families and selects a capacity-, uptake-, and
+available-water-limited mass transfer. The prepared water depth loses exactly
+the kilograms delivered to the receiver; dry, unowned, and full receiver cells
+do not create a transfer. Each interval-end `massTransfer` names both state
+versions, its physical cell area, exact-once key, conservation/commit group,
+and following-interval runoff rule. The weather/receiver owner consumes those
+records into its separate `kg/m²` inventory. Water and receiver candidates must
+commit all-or-none; a material never writes either state.
+
 Run `node test-swe-core.mjs`. The test covers a non-flat 10,000-step lake at
 rest, a 240-step wet/dry dam break, closed-domain volume, positivity, CFL
 rejection, invalid-grid mutations, descriptor permutation, slot retention,
