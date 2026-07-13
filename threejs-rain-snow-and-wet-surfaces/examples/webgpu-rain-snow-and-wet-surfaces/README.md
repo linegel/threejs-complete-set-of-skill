@@ -24,6 +24,17 @@ The manifest deliberately remains `incomplete` until the root capture runner
 produces v2 native-WebGPU readback, timing, and lifecycle evidence. No synthetic
 timing or screenshots are substituted.
 
+`receiver-liquid-inventory.js` is the browser-free reference for the single
+surface-state owner. It compares six state families and stores liquid mass per
+physical area in `kg/m²`; `[0,1]` material wetness is derived saturation, not a
+second state equation. Interval-integrated transfers validate their receiver,
+state version, cell footprint, interval phase, and exact-once key before any
+candidate mutation. Capacity overflow plus drainage become runoff for the
+following accepted interval, infiltration and evaporation remain separate, and
+all losses use an exact exponential update with a closed mass ledger. A
+generated ripple or micro-normal may consume the committed saturation but can
+never author this inventory.
+
 Run static and numeric validation:
 
 ```bash

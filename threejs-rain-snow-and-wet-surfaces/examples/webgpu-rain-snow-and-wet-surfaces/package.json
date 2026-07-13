@@ -1,9 +1,9 @@
 {
   "type": "module",
   "scripts": {
-    "check": "node --check precipitation-system.js && node --check weather-webgpu-lab.js && node --check route-wrapper.js && node --check main.js && node --check test-runtime-contracts.mjs",
+    "check": "node --check precipitation-system.js && node --check receiver-liquid-inventory.js && node --check weather-webgpu-lab.js && node --check route-wrapper.js && node --check main.js && node --check test-runtime-contracts.mjs && node --check test-receiver-liquid-inventory.mjs",
     "validate": "npm run validate:quick",
-    "validate:unit": "node validate.js && node test-runtime-contracts.mjs",
+    "validate:unit": "node validate.js && node test-runtime-contracts.mjs && node test-receiver-liquid-inventory.mjs",
     "test:mutations": "node test-mutations.mjs",
     "capture": "node ../../../scripts/capture-lab-browser.mjs --lab webgpu-rain-snow-and-wet-surfaces --target final",
     "validate:artifacts": "node capture-status.mjs",
