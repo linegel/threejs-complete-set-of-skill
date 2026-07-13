@@ -4,18 +4,25 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Evidence: Native WebGPU validation harness | WebGPU Lab</title>
-<meta name="description" content="Evidence report for Native WebGPU validation harness: incomplete canonical-lab, source hash, Three.js revision, claim verdicts, required proofs, routes, media…" />
+<meta name="description" content="Evidence report for Native WebGPU validation harness: accepted canonical-lab, source hash, Three.js revision, claim verdicts, required proofs, routes, media…" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <link rel="canonical" href="https://threejs-skills.com/evidence/webgpu-validation-harness/" />
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 <meta property="og:type" content="article" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
 <meta property="og:title" content="Evidence: Native WebGPU validation harness | WebGPU Lab" />
-<meta property="og:description" content="Evidence report for Native WebGPU validation harness: incomplete canonical-lab, source hash, Three.js revision, claim verdicts, required proofs, routes, media…" />
+<meta property="og:description" content="Evidence report for Native WebGPU validation harness: accepted canonical-lab, source hash, Three.js revision, claim verdicts, required proofs, routes, media…" />
 <meta property="og:url" content="https://threejs-skills.com/evidence/webgpu-validation-harness/" />
-<meta name="twitter:card" content="summary" />
+<meta property="og:image" content="https://threejs-skills.com/visual-validation/webgpu-validation-harness/final.design.png" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="800" />
+<meta property="og:image:alt" content="Native WebGPU validation harness: Final presentation readback from the correctness lane." />
+<meta name="twitter:image" content="https://threejs-skills.com/visual-validation/webgpu-validation-harness/final.design.png" />
+<meta name="twitter:image:alt" content="Native WebGPU validation harness: Final presentation readback from the correctness lane." />
+<meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Evidence: Native WebGPU validation harness | WebGPU Lab" />
-<meta name="twitter:description" content="Evidence report for Native WebGPU validation harness: incomplete canonical-lab, source hash, Three.js revision, claim verdicts, required proofs, routes, media…" />
+<meta name="twitter:description" content="Evidence report for Native WebGPU validation harness: accepted canonical-lab, source hash, Three.js revision, claim verdicts, required proofs, routes, media…" />
 <style>
 @font-face{font-family:'Evidence Sans';src:url('/assets/vendor/katex/fonts/KaTeX_SansSerif-Regular.woff2') format('woff2');font-weight:400;font-display:swap}
 @font-face{font-family:'Evidence Sans';src:url('/assets/vendor/katex/fonts/KaTeX_SansSerif-Bold.woff2') format('woff2');font-weight:700;font-display:swap}
@@ -26,42 +33,82 @@
 @media(max-width:480px){.wrap{width:min(100% - 24px,1160px)}.facts{grid-template-columns:1fr}h1{font-size:40px}.claim{align-items:flex-start;flex-direction:column}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 </style>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":["TechArticle","Dataset"],"@id":"https://threejs-skills.com/evidence/webgpu-validation-harness/#report","name":"Evidence report: Native WebGPU validation harness","description":"Evidence report for Native WebGPU validation harness: incomplete canonical-lab, source hash, Three.js revision, claim verdicts, required proofs, routes, media…","url":"https://threejs-skills.com/evidence/webgpu-validation-harness/","inLanguage":"en","isPartOf":{"@id":"https://threejs-skills.com/#software"},"about":["threejs-visual-validation","webgpu-validation-harness","Three.js","WebGPU","TSL"]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":["TechArticle","Dataset"],"@id":"https://threejs-skills.com/evidence/webgpu-validation-harness/#report","name":"Evidence report: Native WebGPU validation harness","description":"Evidence report for Native WebGPU validation harness: accepted canonical-lab, source hash, Three.js revision, claim verdicts, required proofs, routes, media…","url":"https://threejs-skills.com/evidence/webgpu-validation-harness/","inLanguage":"en","isPartOf":{"@id":"https://threejs-skills.com/#software"},"about":["threejs-visual-validation","webgpu-validation-harness","Three.js","WebGPU","TSL"],"image":"https://threejs-skills.com/visual-validation/webgpu-validation-harness/final.design.png"}</script>
 </head>
 <body>
 <header class="site-nav"><div class="wrap"><a href="/">Three.js WebGPU Skill Pack</a><nav aria-label="Primary"><a href="/#skills">Skills</a><a href="/#labs">Labs</a><a href="/evidence/">Evidence</a><a href="/about/">Method</a></nav></div></header>
 <main><div class="wrap">
   <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Skill Pack</a> / <a href="/evidence/">Evidence</a> / webgpu-validation-harness</nav>
-  <p><span class="status status--incomplete">incomplete</span></p>
+  <p><span class="status status--accepted">accepted</span></p>
   <h1>Native WebGPU validation harness</h1>
   <p class="lede">This report separates published implementation state from accepted evidence. Every value below comes from the schema-v2 registry, the emitted source manifest, or promoted same-lab artifacts.</p>
-  <div class="actions"><a href="/demos/webgpu-validation-harness/">Open demo</a><a href="/skills/threejs-visual-validation.html">Owning skill</a><a href="/demos/webgpu-validation-harness/source-manifest.json">Published source manifest</a><a href="/demos/registry.json">Registry JSON</a><a href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-visual-validation">Canonical source</a></div>
+  <div class="actions"><a href="/demos/webgpu-validation-harness/">Open demo</a><a href="/skills/threejs-visual-validation.html">Owning skill</a><a href="/demos/webgpu-validation-harness/source-manifest.json">Published source manifest</a><a href="/demos/registry.json">Registry JSON</a><a href="/visual-validation/webgpu-validation-harness/evidence-summary.json">Promoted evidence summary</a><a href="/visual-validation/webgpu-validation-harness/bundle/evidence-manifest.json">Tracked v2 bundle manifest</a><a href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-visual-validation">Canonical source</a></div>
   <dl class="facts">
     <div><dt>Lab id</dt><dd><code>webgpu-validation-harness</code></dd></div>
     <div><dt>Kind</dt><dd>Canonical Lab</dd></div>
     <div><dt>Owning skill</dt><dd>Visual Validation</dd></div>
     <div><dt>Execution</dt><dd>rendering</dd></div>
     <div><dt>Three.js</dt><dd>0.185.1</dd></div>
-    <div><dt>Source hash</dt><dd><code>sha256:1e1a50d6f63a2ca0930c75ea9f7b89502ccc00c4c1823dfb625ddba09bc2f9b9</code></dd></div>
-    <div><dt>Published bundle hash</dt><dd><code>sha256:6d08fd8916eefbb493eb42c010ce0704898ea6094b76658861e46a841e1029c7</code></dd></div>
-    <div><dt>Build revision</dt><dd><code>sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b</code></dd></div>
-    <div><dt>Renderer</dt><dd>Not promoted</dd></div>
-    <div><dt>Backend</dt><dd>Not promoted</dd></div>
+    <div><dt>Source hash</dt><dd><code>sha256:443835b1db637aeaa87745ba074f252191687d431a3c7dbcfcb525c2e36a8bd5</code></dd></div>
+    <div><dt>Published bundle hash</dt><dd><code>sha256:95d5d07960dc5c166603d6f3fa0170f5b8a586a506e30b642b16877022554031</code></dd></div>
+    <div><dt>Build revision</dt><dd><code>sha256:1d6096e51a0824e5ee5a93591899c8453dfcc8a568c982d77b711f8cccf0ae76</code></dd></div>
+    <div><dt>Renderer</dt><dd>WebGPURenderer</dd></div>
+    <div><dt>Backend</dt><dd>WebGPU</dd></div>
     <div><dt>Evidence contract</dt><dd>v2</dd></div>
-    <div><dt>Tracked release bundle</dt><dd>Absent</dd></div>
+    <div><dt>Tracked release bundle</dt><dd>Present</dd></div>
   </dl>
 
-  <section class="section" aria-labelledby="claims-title"><h2 id="claims-title">Claim verdicts</h2><div class="claim-grid"><div class="claim"><code>canonicalAcceptance</code><span class="verdict--insufficient-evidence">INSUFFICIENT_EVIDENCE</span></div><div class="claim"><code>hardwarePerformance</code><span class="verdict--not-claimed">NOT_CLAIMED</span></div></div></section>
+  <section class="section" aria-labelledby="claims-title"><h2 id="claims-title">Claim verdicts</h2><div class="claim-grid"><div class="claim"><code>visualCorrectness</code><span class="verdict--pass">PASS</span></div><div class="claim"><code>mechanismCorrectness</code><span class="verdict--pass">PASS</span></div><div class="claim"><code>performanceCompliance</code><span class="verdict--pass">PASS</span></div><div class="claim"><code>gpuAttribution</code><span class="verdict--pass">PASS</span></div><div class="claim"><code>lifecycleStability</code><span class="verdict--pass">PASS</span></div><div class="claim"><code>visualError</code><span class="verdict--pass">PASS</span></div></div></section>
 
-  <section class="section" aria-labelledby="media-title"><h2 id="media-title">Promoted same-lab media</h2><p class="empty">No same-lab evidence image is promoted for this report. The page intentionally shows status and proof requirements instead of substitute art.</p></section>
+  <section class="section" aria-labelledby="media-title"><h2 id="media-title">Promoted same-lab media</h2><div class="gallery"><figure><picture class="responsive-preview">
+          <source type="image/avif" srcset="/visual-validation/webgpu-validation-harness/final.design.avif" />
+          <source type="image/webp" srcset="/visual-validation/webgpu-validation-harness/final.design.webp" />
+          <img data-responsive-preview src="/visual-validation/webgpu-validation-harness/final.design.png" alt="Native WebGPU validation harness: Final presentation readback from the correctness lane." width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><figcaption><strong>Final presentation readback from the correctness lane.</strong><span>inspected-runtime-evidence-preview · sha256:4a02ce8c369fd0a8fc9416f392d0a1decbce7f377f238b07ae0db85b0a07c794</span></figcaption></figure><figure><picture class="responsive-preview">
+          <source type="image/avif" srcset="/visual-validation/webgpu-validation-harness/no-post.design.avif" />
+          <source type="image/webp" srcset="/visual-validation/webgpu-validation-harness/no-post.design.webp" />
+          <img data-responsive-preview src="/visual-validation/webgpu-validation-harness/no-post.design.png" alt="Native WebGPU validation harness: No-post baseline from the same locked route." width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><figcaption><strong>No-post baseline from the same locked route.</strong><span>inspected-runtime-evidence-preview · sha256:97918f2bb0666edfe4f6f5513fda9e39dd6448f967cef0d526996c82cf434902</span></figcaption></figure><figure><picture class="responsive-preview">
+          <source type="image/avif" srcset="/visual-validation/webgpu-validation-harness/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="/visual-validation/webgpu-validation-harness/diagnostics.mosaic.webp" />
+          <img data-responsive-preview src="/visual-validation/webgpu-validation-harness/diagnostics.mosaic.png" alt="Native WebGPU validation harness: Diagnostic mosaic proving distinct mechanism outputs." width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><figcaption><strong>Diagnostic mosaic proving distinct mechanism outputs.</strong><span>inspected-runtime-evidence-preview · sha256:c5f7614a27d9b8635a76e3abec2233a01288c86e4eec1ad192a978fd7775a485</span></figcaption></figure><figure><picture class="responsive-preview">
+          <source type="image/avif" srcset="/visual-validation/webgpu-validation-harness/camera.near.avif" />
+          <source type="image/webp" srcset="/visual-validation/webgpu-validation-harness/camera.near.webp" />
+          <img data-responsive-preview src="/visual-validation/webgpu-validation-harness/camera.near.png" alt="Native WebGPU validation harness: Near camera fixed-view readback." width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><figcaption><strong>Near camera fixed-view readback.</strong><span>inspected-runtime-evidence-preview · sha256:52a0cc139fd69acf04f87c76d243ae51afb3211f6c1b95799116fb6544631955</span></figcaption></figure><figure><picture class="responsive-preview">
+          <source type="image/avif" srcset="/visual-validation/webgpu-validation-harness/camera.design.avif" />
+          <source type="image/webp" srcset="/visual-validation/webgpu-validation-harness/camera.design.webp" />
+          <img data-responsive-preview src="/visual-validation/webgpu-validation-harness/camera.design.png" alt="Native WebGPU validation harness: Design camera fixed-view readback." width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><figcaption><strong>Design camera fixed-view readback.</strong><span>inspected-runtime-evidence-preview · sha256:4a02ce8c369fd0a8fc9416f392d0a1decbce7f377f238b07ae0db85b0a07c794</span></figcaption></figure><figure><picture class="responsive-preview">
+          <source type="image/avif" srcset="/visual-validation/webgpu-validation-harness/camera.far.avif" />
+          <source type="image/webp" srcset="/visual-validation/webgpu-validation-harness/camera.far.webp" />
+          <img data-responsive-preview src="/visual-validation/webgpu-validation-harness/camera.far.png" alt="Native WebGPU validation harness: Far camera fixed-view readback." width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><figcaption><strong>Far camera fixed-view readback.</strong><span>inspected-runtime-evidence-preview · sha256:b86e6300205d33a80196513884f4a739d6957b570aa61d3c0d7ec54248ee1f63</span></figcaption></figure><figure><picture class="responsive-preview">
+          <source type="image/avif" srcset="/visual-validation/webgpu-validation-harness/seed-0001.final.avif" />
+          <source type="image/webp" srcset="/visual-validation/webgpu-validation-harness/seed-0001.final.webp" />
+          <img data-responsive-preview src="/visual-validation/webgpu-validation-harness/seed-0001.final.png" alt="Native WebGPU validation harness: Representative seed final frame." width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><figcaption><strong>Representative seed final frame.</strong><span>inspected-runtime-evidence-preview · sha256:4a02ce8c369fd0a8fc9416f392d0a1decbce7f377f238b07ae0db85b0a07c794</span></figcaption></figure><figure><picture class="responsive-preview">
+          <source type="image/avif" srcset="/visual-validation/webgpu-validation-harness/seed-9e3779b9.final.avif" />
+          <source type="image/webp" srcset="/visual-validation/webgpu-validation-harness/seed-9e3779b9.final.webp" />
+          <img data-responsive-preview src="/visual-validation/webgpu-validation-harness/seed-9e3779b9.final.png" alt="Native WebGPU validation harness: Stress seed final frame." width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><figcaption><strong>Stress seed final frame.</strong><span>inspected-runtime-evidence-preview · sha256:7c79d3065117a6e3838a4910ab2b8e36ff72e58fde061b3ab8a27cfa01a79912</span></figcaption></figure><figure><picture class="responsive-preview">
+          <source type="image/avif" srcset="/visual-validation/webgpu-validation-harness/temporal.t000.avif" />
+          <source type="image/webp" srcset="/visual-validation/webgpu-validation-harness/temporal.t000.webp" />
+          <img data-responsive-preview src="/visual-validation/webgpu-validation-harness/temporal.t000.png" alt="Native WebGPU validation harness: Temporal sample t0." width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><figcaption><strong>Temporal sample t0.</strong><span>inspected-runtime-evidence-preview · sha256:4a02ce8c369fd0a8fc9416f392d0a1decbce7f377f238b07ae0db85b0a07c794</span></figcaption></figure><figure><picture class="responsive-preview">
+          <source type="image/avif" srcset="/visual-validation/webgpu-validation-harness/temporal.t001.avif" />
+          <source type="image/webp" srcset="/visual-validation/webgpu-validation-harness/temporal.t001.webp" />
+          <img data-responsive-preview src="/visual-validation/webgpu-validation-harness/temporal.t001.png" alt="Native WebGPU validation harness: Temporal sample t1." width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><figcaption><strong>Temporal sample t1.</strong><span>inspected-runtime-evidence-preview · sha256:ce0e24010b49f1201ca720bc0002c6cefbae4ef49ae586f971dfa486f5a1bf21</span></figcaption></figure></div></section>
 
-  <section class="section" aria-labelledby="requirements-title"><h2 id="requirements-title">Required capability and runtime proof</h2><h3>Capabilities</h3><div class="requirement-grid"><article class="requirement"><header><code>native-webgpu</code><span class="status status--incomplete">incomplete</span></header><p>renderer.backend.isWebGPUBackend after await renderer.init()</p></article><article class="requirement"><header><code>render-target-readback</code><span class="status status--incomplete">incomplete</span></header><p>RGBA8 capture target copied through an aligned WebGPU row layout</p></article></div><h3 style="margin-top:28px">Runtime proof</h3><div class="requirement-grid"><article class="requirement"><header><code>renderer-init</code><span class="status status--incomplete">incomplete</span></header><p>Native browser subject initialization and backend gate</p></article><article class="requirement"><header><code>mrt-readback</code><span class="status status--incomplete">incomplete</span></header><p>Actual output, normal, and emissive render-target readback</p></article><article class="requirement"><header><code>schema-v2</code><span class="status status--incomplete">incomplete</span></header><p>Fourteen semantic JSON artifacts plus required real images</p></article><article class="requirement"><header><code>lifecycle</code><span class="status status--incomplete">incomplete</span></header><p>50-100 create/render/resize/mode/tier/dispose cycles</p></article></div></section>
+  <section class="section" aria-labelledby="requirements-title"><h2 id="requirements-title">Required capability and runtime proof</h2><h3>Capabilities</h3><div class="requirement-grid"><article class="requirement"><header><code>native-webgpu</code><span class="status status--accepted">accepted</span></header><p>renderer.backend.isWebGPUBackend after await renderer.init()</p></article><article class="requirement"><header><code>render-target-readback</code><span class="status status--accepted">accepted</span></header><p>RGBA8 capture target copied through an aligned WebGPU row layout</p></article></div><h3 style="margin-top:28px">Runtime proof</h3><div class="requirement-grid"><article class="requirement"><header><code>renderer-init</code><span class="status status--accepted">accepted</span></header><p>Native browser subject initialization and backend gate</p></article><article class="requirement"><header><code>backend-is-webgpu</code><span class="status status--accepted">accepted</span></header><p>Every correctness and physical route records renderer.backend.isWebGPUBackend === true after await renderer.init()</p></article><article class="requirement"><header><code>mechanism-reachable</code><span class="status status--accepted">accepted</span></header><p>Runtime graph inspection and all 19 immutable route locks prove the selected mechanism is reachable from the active output</p></article><article class="requirement"><header><code>render-or-compute-work</code><span class="status status--accepted">accepted</span></header><p>Measured scene and output submissions, native render-target pixels, and hardware timestamp populations prove executed GPU work</p></article><article class="requirement"><header><code>aligned-readback</code><span class="status status--accepted">accepted</span></header><p>Retained transport and normalized readbacks record exact integer row strides, 256-byte alignment, byte lengths, and PNG hashes</p></article><article class="requirement"><header><code>mrt-readback</code><span class="status status--accepted">accepted</span></header><p>Actual output, normal, and emissive render-target readback</p></article><article class="requirement"><header><code>schema-v2</code><span class="status status--accepted">accepted</span></header><p>Fourteen semantic JSON artifacts plus required real images</p></article><article class="requirement"><header><code>lifecycle</code><span class="status status--accepted">accepted</span></header><p>50-100 create/render/resize/mode/tier/dispose cycles</p></article></div></section>
 
-  <section class="section" aria-labelledby="capture-title"><h2 id="capture-title">Capture state</h2><div class="table-wrap"><table><thead><tr><th>Field</th><th>Published value</th></tr></thead><tbody><tr><td>Primary route</td><td><code>/demos/webgpu-validation-harness/</code></td></tr><tr><td>Cameras</td><td><code>near, design, far</code></td></tr><tr><td>Seeds</td><td><code>0x00000001, 0x9e3779b9</code></td></tr><tr><td>Modes</td><td><code>final, no-post, normal, emissive</code></td></tr><tr><td>Capture time</td><td><code>Not present in the promoted report data</code></td></tr><tr><td>Adapter identity</td><td><code>Not promoted</code></td></tr><tr><td>Raw readback hashes</td><td><code>Not promoted</code></td></tr></tbody></table></div></section>
+  <section class="section" aria-labelledby="capture-title"><h2 id="capture-title">Capture state</h2><div class="table-wrap"><table><thead><tr><th>Field</th><th>Published value</th></tr></thead><tbody><tr><td>Primary route</td><td><code>/demos/webgpu-validation-harness/</code></td></tr><tr><td>Cameras</td><td><code>near, design, far</code></td></tr><tr><td>Seeds</td><td><code>0x00000001, 0x9e3779b9</code></td></tr><tr><td>Modes</td><td><code>final, no-post, normal, emissive</code></td></tr><tr><td>Capture time</td><td><code>Not present in the promoted report data</code></td></tr><tr><td>Adapter identity</td><td><code>Not promoted</code></td></tr><tr><td>Raw readback hashes</td><td><code>Not present in the promoted preview summary</code></td></tr></tbody></table></div></section>
 
-  <section class="section" aria-labelledby="routes-title"><h2 id="routes-title">Fixed routes</h2><div class="table-wrap"><table><thead><tr><th>Kind</th><th>Id</th><th>Startup state</th><th>Status</th></tr></thead><tbody><tr><td>scenario</td><td><a href="/demos/webgpu-validation-harness/scenario/browser-capture/"><code>browser-capture</code></a></td><td><code>{&quot;scenario&quot;:&quot;browser-capture&quot;}</code></td><td>incomplete</td></tr><tr><td>scenario</td><td><a href="/demos/webgpu-validation-harness/scenario/pipeline-graph-inspector/"><code>pipeline-graph-inspector</code></a></td><td><code>{&quot;scenario&quot;:&quot;pipeline-graph-inspector&quot;}</code></td><td>incomplete</td></tr><tr><td>scenario</td><td><a href="/demos/webgpu-validation-harness/scenario/resource-ledger/"><code>resource-ledger</code></a></td><td><code>{&quot;scenario&quot;:&quot;resource-ledger&quot;}</code></td><td>incomplete</td></tr><tr><td>scenario</td><td><a href="/demos/webgpu-validation-harness/scenario/timing-and-governor/"><code>timing-and-governor</code></a></td><td><code>{&quot;scenario&quot;:&quot;timing-and-governor&quot;}</code></td><td>incomplete</td></tr><tr><td>scenario</td><td><a href="/demos/webgpu-validation-harness/scenario/lifecycle-and-leaks/"><code>lifecycle-and-leaks</code></a></td><td><code>{&quot;scenario&quot;:&quot;lifecycle-and-leaks&quot;}</code></td><td>incomplete</td></tr><tr><td>scenario</td><td><a href="/demos/webgpu-validation-harness/scenario/visual-error-metrics/"><code>visual-error-metrics</code></a></td><td><code>{&quot;scenario&quot;:&quot;visual-error-metrics&quot;}</code></td><td>incomplete</td></tr><tr><td>scenario</td><td><a href="/demos/webgpu-validation-harness/scenario/mutation-gallery/"><code>mutation-gallery</code></a></td><td><code>{&quot;scenario&quot;:&quot;mutation-gallery&quot;}</code></td><td>incomplete</td></tr><tr><td>scenario</td><td><a href="/demos/webgpu-validation-harness/scenario/artifact-inspector/"><code>artifact-inspector</code></a></td><td><code>{&quot;scenario&quot;:&quot;artifact-inspector&quot;}</code></td><td>incomplete</td></tr><tr><td>mechanism</td><td><a href="/demos/webgpu-validation-harness/mechanism/aligned-readback/"><code>aligned-readback</code></a></td><td><code>{&quot;scenario&quot;:&quot;browser-capture&quot;,&quot;mode&quot;:&quot;final&quot;}</code></td><td>incomplete</td></tr><tr><td>mechanism</td><td><a href="/demos/webgpu-validation-harness/mechanism/claim-verdicts/"><code>claim-verdicts</code></a></td><td><code>{&quot;scenario&quot;:&quot;artifact-inspector&quot;,&quot;mode&quot;:&quot;emissive&quot;}</code></td><td>incomplete</td></tr><tr><td>mechanism</td><td><a href="/demos/webgpu-validation-harness/mechanism/gpu-timestamps/"><code>gpu-timestamps</code></a></td><td><code>{&quot;scenario&quot;:&quot;timing-and-governor&quot;,&quot;mode&quot;:&quot;final&quot;}</code></td><td>incomplete</td></tr><tr><td>mechanism</td><td><a href="/demos/webgpu-validation-harness/mechanism/resource-inventory/"><code>resource-inventory</code></a></td><td><code>{&quot;scenario&quot;:&quot;resource-ledger&quot;,&quot;mode&quot;:&quot;normal&quot;}</code></td><td>incomplete</td></tr><tr><td>mechanism</td><td><a href="/demos/webgpu-validation-harness/mechanism/visual-errors/"><code>visual-errors</code></a></td><td><code>{&quot;scenario&quot;:&quot;visual-error-metrics&quot;,&quot;mode&quot;:&quot;normal&quot;}</code></td><td>incomplete</td></tr><tr><td>mechanism</td><td><a href="/demos/webgpu-validation-harness/mechanism/lifecycle-trend/"><code>lifecycle-trend</code></a></td><td><code>{&quot;scenario&quot;:&quot;lifecycle-and-leaks&quot;,&quot;mode&quot;:&quot;final&quot;}</code></td><td>incomplete</td></tr><tr><td>tier</td><td><a href="/demos/webgpu-validation-harness/tier/schema-fixture/"><code>schema-fixture</code></a></td><td><code>{&quot;tier&quot;:&quot;schema-fixture&quot;}</code></td><td>incomplete</td></tr><tr><td>tier</td><td><a href="/demos/webgpu-validation-harness/tier/webgpu-correctness/"><code>webgpu-correctness</code></a></td><td><code>{&quot;tier&quot;:&quot;webgpu-correctness&quot;}</code></td><td>incomplete</td></tr><tr><td>tier</td><td><a href="/demos/webgpu-validation-harness/tier/target-performance/"><code>target-performance</code></a></td><td><code>{&quot;tier&quot;:&quot;target-performance&quot;}</code></td><td>incomplete</td></tr><tr><td>tier</td><td><a href="/demos/webgpu-validation-harness/tier/governor-stress/"><code>governor-stress</code></a></td><td><code>{&quot;tier&quot;:&quot;governor-stress&quot;}</code></td><td>incomplete</td></tr><tr><td>tier</td><td><a href="/demos/webgpu-validation-harness/tier/release/"><code>release</code></a></td><td><code>{&quot;tier&quot;:&quot;release&quot;}</code></td><td>incomplete</td></tr></tbody></table></div></section>
+  <section class="section" aria-labelledby="routes-title"><h2 id="routes-title">Fixed routes</h2><div class="table-wrap"><table><thead><tr><th>Kind</th><th>Id</th><th>Startup state</th><th>Status</th></tr></thead><tbody><tr><td>scenario</td><td><a href="/demos/webgpu-validation-harness/scenario/browser-capture/"><code>browser-capture</code></a></td><td><code>{&quot;scenario&quot;:&quot;browser-capture&quot;}</code></td><td>accepted</td></tr><tr><td>scenario</td><td><a href="/demos/webgpu-validation-harness/scenario/pipeline-graph-inspector/"><code>pipeline-graph-inspector</code></a></td><td><code>{&quot;scenario&quot;:&quot;pipeline-graph-inspector&quot;}</code></td><td>accepted</td></tr><tr><td>scenario</td><td><a href="/demos/webgpu-validation-harness/scenario/resource-ledger/"><code>resource-ledger</code></a></td><td><code>{&quot;scenario&quot;:&quot;resource-ledger&quot;}</code></td><td>accepted</td></tr><tr><td>scenario</td><td><a href="/demos/webgpu-validation-harness/scenario/timing-and-governor/"><code>timing-and-governor</code></a></td><td><code>{&quot;scenario&quot;:&quot;timing-and-governor&quot;}</code></td><td>accepted</td></tr><tr><td>scenario</td><td><a href="/demos/webgpu-validation-harness/scenario/lifecycle-and-leaks/"><code>lifecycle-and-leaks</code></a></td><td><code>{&quot;scenario&quot;:&quot;lifecycle-and-leaks&quot;}</code></td><td>accepted</td></tr><tr><td>scenario</td><td><a href="/demos/webgpu-validation-harness/scenario/visual-error-metrics/"><code>visual-error-metrics</code></a></td><td><code>{&quot;scenario&quot;:&quot;visual-error-metrics&quot;}</code></td><td>accepted</td></tr><tr><td>scenario</td><td><a href="/demos/webgpu-validation-harness/scenario/mutation-gallery/"><code>mutation-gallery</code></a></td><td><code>{&quot;scenario&quot;:&quot;mutation-gallery&quot;}</code></td><td>accepted</td></tr><tr><td>scenario</td><td><a href="/demos/webgpu-validation-harness/scenario/artifact-inspector/"><code>artifact-inspector</code></a></td><td><code>{&quot;scenario&quot;:&quot;artifact-inspector&quot;}</code></td><td>accepted</td></tr><tr><td>mechanism</td><td><a href="/demos/webgpu-validation-harness/mechanism/aligned-readback/"><code>aligned-readback</code></a></td><td><code>{&quot;scenario&quot;:&quot;browser-capture&quot;,&quot;mode&quot;:&quot;final&quot;}</code></td><td>accepted</td></tr><tr><td>mechanism</td><td><a href="/demos/webgpu-validation-harness/mechanism/claim-verdicts/"><code>claim-verdicts</code></a></td><td><code>{&quot;scenario&quot;:&quot;artifact-inspector&quot;,&quot;mode&quot;:&quot;emissive&quot;}</code></td><td>accepted</td></tr><tr><td>mechanism</td><td><a href="/demos/webgpu-validation-harness/mechanism/gpu-timestamps/"><code>gpu-timestamps</code></a></td><td><code>{&quot;scenario&quot;:&quot;timing-and-governor&quot;,&quot;mode&quot;:&quot;final&quot;}</code></td><td>accepted</td></tr><tr><td>mechanism</td><td><a href="/demos/webgpu-validation-harness/mechanism/resource-inventory/"><code>resource-inventory</code></a></td><td><code>{&quot;scenario&quot;:&quot;resource-ledger&quot;,&quot;mode&quot;:&quot;normal&quot;}</code></td><td>accepted</td></tr><tr><td>mechanism</td><td><a href="/demos/webgpu-validation-harness/mechanism/visual-errors/"><code>visual-errors</code></a></td><td><code>{&quot;scenario&quot;:&quot;visual-error-metrics&quot;,&quot;mode&quot;:&quot;normal&quot;}</code></td><td>accepted</td></tr><tr><td>mechanism</td><td><a href="/demos/webgpu-validation-harness/mechanism/lifecycle-trend/"><code>lifecycle-trend</code></a></td><td><code>{&quot;scenario&quot;:&quot;lifecycle-and-leaks&quot;,&quot;mode&quot;:&quot;final&quot;}</code></td><td>accepted</td></tr><tr><td>tier</td><td><a href="/demos/webgpu-validation-harness/tier/schema-fixture/"><code>schema-fixture</code></a></td><td><code>{&quot;tier&quot;:&quot;schema-fixture&quot;}</code></td><td>accepted</td></tr><tr><td>tier</td><td><a href="/demos/webgpu-validation-harness/tier/webgpu-correctness/"><code>webgpu-correctness</code></a></td><td><code>{&quot;tier&quot;:&quot;webgpu-correctness&quot;}</code></td><td>accepted</td></tr><tr><td>tier</td><td><a href="/demos/webgpu-validation-harness/tier/target-performance/"><code>target-performance</code></a></td><td><code>{&quot;tier&quot;:&quot;target-performance&quot;}</code></td><td>accepted</td></tr><tr><td>tier</td><td><a href="/demos/webgpu-validation-harness/tier/governor-stress/"><code>governor-stress</code></a></td><td><code>{&quot;tier&quot;:&quot;governor-stress&quot;}</code></td><td>accepted</td></tr><tr><td>tier</td><td><a href="/demos/webgpu-validation-harness/tier/release/"><code>release</code></a></td><td><code>{&quot;tier&quot;:&quot;release&quot;}</code></td><td>accepted</td></tr></tbody></table></div></section>
 
-  <section class="section" aria-labelledby="tiers-title"><h2 id="tiers-title">Locked tier contracts</h2><details><summary>schema-fixture · incomplete</summary><pre>{
+  <section class="section" aria-labelledby="tiers-title"><h2 id="tiers-title">Locked tier contracts</h2><details><summary>schema-fixture · accepted</summary><pre>{
   &quot;targetClass&quot;: &quot;schema-transport-only&quot;,
   &quot;frameTargetMs&quot;: null,
   &quot;resolutionPolicy&quot;: {
@@ -80,7 +127,7 @@
     &quot;claim separation&quot;,
     &quot;fixture quarantine&quot;
   ]
-}</pre></details><details><summary>webgpu-correctness · incomplete</summary><pre>{
+}</pre></details><details><summary>webgpu-correctness · accepted</summary><pre>{
   &quot;targetClass&quot;: &quot;current-adapter-correctness&quot;,
   &quot;frameTargetMs&quot;: null,
   &quot;resolutionPolicy&quot;: {
@@ -101,7 +148,7 @@
     &quot;aligned readback&quot;,
     &quot;one output owner&quot;
   ]
-}</pre></details><details><summary>target-performance · incomplete</summary><pre>{
+}</pre></details><details><summary>target-performance · accepted</summary><pre>{
   &quot;targetClass&quot;: &quot;current-adapter-performance&quot;,
   &quot;frameTargetMs&quot;: {
     &quot;value&quot;: 16.67,
@@ -124,7 +171,7 @@
     &quot;native WebGPU&quot;,
     &quot;timestamp-backed GPU attribution&quot;
   ]
-}</pre></details><details><summary>governor-stress · incomplete</summary><pre>{
+}</pre></details><details><summary>governor-stress · accepted</summary><pre>{
   &quot;targetClass&quot;: &quot;current-adapter-governor-stress&quot;,
   &quot;frameTargetMs&quot;: {
     &quot;value&quot;: 16.67,
@@ -150,20 +197,17 @@
     &quot;MRT semantics&quot;,
     &quot;output ownership&quot;
   ]
-}</pre></details><details><summary>release · incomplete</summary><pre>{
-  &quot;targetClass&quot;: &quot;current-adapter-release&quot;,
-  &quot;frameTargetMs&quot;: {
-    &quot;value&quot;: 16.67,
-    &quot;unit&quot;: &quot;ms&quot;,
-    &quot;label&quot;: &quot;Gated&quot;,
-    &quot;source&quot;: &quot;60 Hz current-adapter release target&quot;
-  },
+}</pre></details><details><summary>release · accepted</summary><pre>{
+  &quot;targetClass&quot;: &quot;current-adapter-release-aggregation&quot;,
+  &quot;frameTargetMs&quot;: null,
   &quot;resolutionPolicy&quot;: {
     &quot;scenePassScale&quot;: 1,
     &quot;dprCap&quot;: 1
   },
   &quot;mechanismLimits&quot;: {
-    &quot;allClaimClassesResolved&quot;: true
+    &quot;releaseAggregation&quot;: true,
+    &quot;performanceEvidenceTier&quot;: &quot;target-performance&quot;,
+    &quot;governorEvidenceTier&quot;: &quot;governor-stress&quot;
   },
   &quot;resourceLimits&quot;: {
     &quot;lifecycleCyclesMinimum&quot;: 50,
@@ -178,8 +222,8 @@
   ]
 }</pre></details></section>
 
-  <section class="section" aria-labelledby="limitations-title"><h2 id="limitations-title">Limitations</h2><ul class="limitations"><li>No tracked accepted v2 runtime bundle is published for this source hash.</li><li>2 required capability records remain incomplete.</li><li>4 required runtime-proof records remain incomplete.</li><li>No current-hardware performance claim is published without named-adapter timestamp evidence.</li></ul></section>
-  <footer class="site-footer"><span>webgpu-validation-harness · sha256:1e1a50d6f63a</span><span><a href="/evidence/">All evidence reports</a></span></footer>
+  <section class="section" aria-labelledby="limitations-title"><h2 id="limitations-title">Limitations</h2><ul class="limitations"><li>Tracked release projection binds the approved correctness, physical-route, and performance lanes to the current source closure.</li><li>Promoted gallery images are the retained standard correctness readbacks from the accepted release bundle.</li><li>Opaque renderer-internal residency remains unclaimed beyond lab-owned resource ledgers.</li></ul></section>
+  <footer class="site-footer"><span>webgpu-validation-harness · sha256:443835b1db63</span><span><a href="/evidence/">All evidence reports</a></span></footer>
 </div></main>
 </body>
 </html>

@@ -82,6 +82,8 @@ export function extractRuntimeBackendProof(document) {
     ?? document.isWebGPUBackend
     ?? document.rendererInfo?.isWebGPUBackend
     ?? backendEvidence?.isWebGPUBackend
+    ?? (typeof backend === 'string' && /webgpu/i.test(backend))
+    ?? (typeof document.backend === 'string' && /webgpu/i.test(document.backend))
     ?? false;
   const name = typeof backend === 'string'
     ? backend

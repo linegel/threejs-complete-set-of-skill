@@ -15,12 +15,42 @@
         "Lifecycle stability remains unaccepted."
       ],
       "images": [
-        { "source": "images/final.design.png", "output": "final.design.png", "encoding": "png-copy", "meaning": "Final exposure, tone-map, LUT, and output-transform readback." },
-        { "source": "images/meter-source.png", "output": "meter-source.png", "encoding": "png-copy", "meaning": "Weighted log-luminance meter source diagnostic." },
-        { "source": "images/histogram-percentiles.png", "output": "histogram-percentiles.png", "encoding": "png-copy", "meaning": "Percentile-selection mask emitted by the histogram path; not a plotted histogram." },
-        { "source": "images/meter-mask.png", "output": "meter-mask.png", "encoding": "png-copy", "meaning": "Metering-mask diagnostic." },
-        { "source": "images/tone-map.png", "output": "tone-map.png", "encoding": "png-copy", "meaning": "Tone-map stage diagnostic before the creative LUT." },
-        { "source": "images/lut.png", "output": "lut.png", "encoding": "png-copy", "meaning": "Creative LUT stage diagnostic." }
+        {
+          "source": "images/final.design.png",
+          "output": "final.design.png",
+          "encoding": "png-copy",
+          "meaning": "Final exposure, tone-map, LUT, and output-transform readback."
+        },
+        {
+          "source": "images/meter-source.png",
+          "output": "meter-source.png",
+          "encoding": "png-copy",
+          "meaning": "Weighted log-luminance meter source diagnostic."
+        },
+        {
+          "source": "images/histogram-percentiles.png",
+          "output": "histogram-percentiles.png",
+          "encoding": "png-copy",
+          "meaning": "Percentile-selection mask emitted by the histogram path; not a plotted histogram."
+        },
+        {
+          "source": "images/meter-mask.png",
+          "output": "meter-mask.png",
+          "encoding": "png-copy",
+          "meaning": "Metering-mask diagnostic."
+        },
+        {
+          "source": "images/tone-map.png",
+          "output": "tone-map.png",
+          "encoding": "png-copy",
+          "meaning": "Tone-map stage diagnostic before the creative LUT."
+        },
+        {
+          "source": "images/lut.png",
+          "output": "lut.png",
+          "encoding": "png-copy",
+          "meaning": "Creative LUT stage diagnostic."
+        }
       ]
     },
     {
@@ -36,38 +66,205 @@
         "Current-adapter GPU timestamp and lifecycle evidence remain INSUFFICIENT_EVIDENCE."
       ],
       "images": [
-        { "source": "images/final.design.png", "output": "final.design.png", "encoding": "png-copy", "meaning": "Final composed output after the single tone map and output transform." },
-        { "source": "images/no-post.design.png", "output": "no-post.design.png", "encoding": "png-copy", "meaning": "Readable scene baseline without the post stack." },
-        { "source": "images/diagnostics.mosaic.png", "output": "diagnostics.mosaic.png", "encoding": "png-copy", "meaning": "Mosaic assembled from live diagnostic graph outputs." },
-        { "source": "images/normal.png", "output": "normal.png", "encoding": "png-copy", "meaning": "Shared normal signal readback." },
-        { "source": "images/emissive.png", "output": "emissive.png", "encoding": "png-copy", "meaning": "Shared emissive signal readback." },
-        { "source": "images/bloom.png", "output": "bloom.png", "encoding": "png-copy", "meaning": "BloomNode diagnostic readback." },
-        { "source": "images/velocity.moving-positive-x.png", "output": "velocity.moving-positive-x.png", "encoding": "png-copy", "meaning": "Moving-velocity fixture with expected positive NDC X sign." },
-        { "source": "images/temporal.history.png", "output": "temporal.history.png", "encoding": "png-copy", "meaning": "Temporal history target before camera-cut reset." }
+        {
+          "source": "images/final.design.png",
+          "output": "final.design.png",
+          "encoding": "png-copy",
+          "meaning": "Final composed output after the single tone map and output transform."
+        },
+        {
+          "source": "images/no-post.design.png",
+          "output": "no-post.design.png",
+          "encoding": "png-copy",
+          "meaning": "Readable scene baseline without the post stack."
+        },
+        {
+          "source": "images/diagnostics.mosaic.png",
+          "output": "diagnostics.mosaic.png",
+          "encoding": "png-copy",
+          "meaning": "Mosaic assembled from live diagnostic graph outputs."
+        },
+        {
+          "source": "images/normal.png",
+          "output": "normal.png",
+          "encoding": "png-copy",
+          "meaning": "Shared normal signal readback."
+        },
+        {
+          "source": "images/emissive.png",
+          "output": "emissive.png",
+          "encoding": "png-copy",
+          "meaning": "Shared emissive signal readback."
+        },
+        {
+          "source": "images/bloom.png",
+          "output": "bloom.png",
+          "encoding": "png-copy",
+          "meaning": "BloomNode diagnostic readback."
+        },
+        {
+          "source": "images/velocity.moving-positive-x.png",
+          "output": "velocity.moving-positive-x.png",
+          "encoding": "png-copy",
+          "meaning": "Moving-velocity fixture with expected positive NDC X sign."
+        },
+        {
+          "source": "images/temporal.history.png",
+          "output": "temporal.history.png",
+          "encoding": "png-copy",
+          "meaning": "Temporal history target before camera-cut reset."
+        }
       ]
     },
     {
       "labId": "webgpu-touch-history-frost",
-      "expectedAcceptanceStatus": "incomplete",
-      "artifactDirectory": "artifacts/visual-validation/webgpu-touch-history-frost/release-approved",
+      "expectedAcceptanceStatus": "accepted",
+      "artifactDirectory": "artifacts/visual-validation/webgpu-touch-history-frost/release-approved-current",
       "backendProof": "capture-session.json",
       "claimVerdicts": "evidence-manifest.json",
       "primaryImage": "final.design.png",
-      "primaryImageLabel": "Touch-history Frost native-WebGPU readback",
+      "primaryImageLabel": "Touch-history Frost native-WebGPU hardware readback",
       "limitations": [
-        "Correctness, camera, seed, temporal, full-tier 641x359 dispatch, aligned readback, and DPR extent gates pass on the current source closure.",
-        "The temporal one-step response is measured and bounded but intentionally subtle in the final frame; the raw history diagnostics provide the decisive mechanism view.",
-        "The unified-v2 raw bundle validates 14 normative JSON slots, 18 captured images, immutable raw-readback ledgers, and fifty settled lifecycle cycles.",
-        "The canonical route and locked refraction-and-fresnel mechanism route passed immutable hardware physical review and digest-bound offline release promotion.",
-        "The other declared mechanism and tier routes remain incomplete, so the lab is not yet accepted as a whole; named-hardware timing and opaque renderer-internal byte residency remain explicitly unclaimed."
+        "Correctness and hardware physical-route visual review pass on the current source closure.",
+        "Named-adapter GPU timestamp timing and opaque renderer-internal residency remain NOT_CLAIMED."
       ],
       "images": [
-        { "source": "final.design.png", "output": "final.design.png", "encoding": "png-copy", "meaning": "Final Frost composite from the complete refraction-and-Fresnel recipe." },
-        { "source": "no-post.design.png", "output": "no-post.design.png", "encoding": "png-copy", "meaning": "Same scene, camera, seed, and pointer trace with the Frost composition bypassed." },
-        { "source": "diagnostics.mosaic.png", "output": "diagnostics.mosaic.png", "encoding": "png-copy", "meaning": "Hash-bound mosaic of previous history, deposit, next history, and post-pointer Frost mask readbacks." },
-        { "source": "seed-0001.final.png", "output": "seed-0001.final.png", "encoding": "png-copy", "meaning": "Baseline uint32 seed with the fixed authored pointer trace." },
-        { "source": "seed-9e3779b9.final.png", "output": "seed-9e3779b9.final.png", "encoding": "png-copy", "meaning": "Stress uint32 seed with camera, trace, mechanism, and tier held fixed." },
-        { "source": "temporal.t001.png", "output": "temporal.t001.png", "encoding": "png-copy", "meaning": "Final output after exactly one 1/60-second pointer-history update." }
+        {
+          "source": "final.design.png",
+          "output": "final.design.png",
+          "encoding": "png-copy",
+          "meaning": "Final Frost composite from the refraction-and-Fresnel recipe."
+        },
+        {
+          "source": "no-post.design.png",
+          "output": "no-post.design.png",
+          "encoding": "png-copy",
+          "meaning": "Same scene with Frost composition bypassed."
+        },
+        {
+          "source": "diagnostics.mosaic.png",
+          "output": "diagnostics.mosaic.png",
+          "encoding": "png-copy",
+          "meaning": "History/deposit/mask diagnostic mosaic."
+        },
+        {
+          "source": "camera.near.png",
+          "output": "camera.near.png",
+          "encoding": "png-copy",
+          "meaning": "Near camera correctness capture."
+        },
+        {
+          "source": "camera.design.png",
+          "output": "camera.design.png",
+          "encoding": "png-copy",
+          "meaning": "Design camera correctness capture."
+        },
+        {
+          "source": "camera.far.png",
+          "output": "camera.far.png",
+          "encoding": "png-copy",
+          "meaning": "Far camera correctness capture."
+        },
+        {
+          "source": "seed-0001.final.png",
+          "output": "seed-0001.final.png",
+          "encoding": "png-copy",
+          "meaning": "Baseline seed final frame."
+        },
+        {
+          "source": "seed-9e3779b9.final.png",
+          "output": "seed-9e3779b9.final.png",
+          "encoding": "png-copy",
+          "meaning": "Stress seed final frame."
+        },
+        {
+          "source": "temporal.t000.png",
+          "output": "temporal.t000.png",
+          "encoding": "png-copy",
+          "meaning": "Temporal t=0 final frame."
+        },
+        {
+          "source": "temporal.t001.png",
+          "output": "temporal.t001.png",
+          "encoding": "png-copy",
+          "meaning": "Temporal t=1 final frame after one history step."
+        }
+      ]
+    },
+    {
+      "labId": "webgpu-validation-harness",
+      "expectedAcceptanceStatus": "accepted",
+      "artifactDirectory": "docs/visual-validation/webgpu-validation-harness/bundle",
+      "backendProof": "renderer-info.json",
+      "claimVerdicts": "evidence-manifest.json",
+      "primaryImage": "final.design.png",
+      "primaryImageLabel": "Native WebGPU validation harness final readback",
+      "limitations": [
+        "Tracked release projection binds the approved correctness, physical-route, and performance lanes to the current source closure.",
+        "Promoted gallery images are the retained standard correctness readbacks from the accepted release bundle.",
+        "Opaque renderer-internal residency remains unclaimed beyond lab-owned resource ledgers."
+      ],
+      "images": [
+        {
+          "source": "final.design.png",
+          "output": "final.design.png",
+          "encoding": "png-copy",
+          "meaning": "Final presentation readback from the correctness lane."
+        },
+        {
+          "source": "no-post.design.png",
+          "output": "no-post.design.png",
+          "encoding": "png-copy",
+          "meaning": "No-post baseline from the same locked route."
+        },
+        {
+          "source": "diagnostics.mosaic.png",
+          "output": "diagnostics.mosaic.png",
+          "encoding": "png-copy",
+          "meaning": "Diagnostic mosaic proving distinct mechanism outputs."
+        },
+        {
+          "source": "camera.near.png",
+          "output": "camera.near.png",
+          "encoding": "png-copy",
+          "meaning": "Near camera fixed-view readback."
+        },
+        {
+          "source": "camera.design.png",
+          "output": "camera.design.png",
+          "encoding": "png-copy",
+          "meaning": "Design camera fixed-view readback."
+        },
+        {
+          "source": "camera.far.png",
+          "output": "camera.far.png",
+          "encoding": "png-copy",
+          "meaning": "Far camera fixed-view readback."
+        },
+        {
+          "source": "seed-0001.final.png",
+          "output": "seed-0001.final.png",
+          "encoding": "png-copy",
+          "meaning": "Representative seed final frame."
+        },
+        {
+          "source": "seed-9e3779b9.final.png",
+          "output": "seed-9e3779b9.final.png",
+          "encoding": "png-copy",
+          "meaning": "Stress seed final frame."
+        },
+        {
+          "source": "temporal.t000.png",
+          "output": "temporal.t000.png",
+          "encoding": "png-copy",
+          "meaning": "Temporal sample t0."
+        },
+        {
+          "source": "temporal.t001.png",
+          "output": "temporal.t001.png",
+          "encoding": "png-copy",
+          "meaning": "Temporal sample t1."
+        }
       ]
     }
   ]
