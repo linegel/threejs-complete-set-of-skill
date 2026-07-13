@@ -72,7 +72,7 @@ assert(manifest.tiers.map((tier) => tier.id).join(",") === CANONICAL_WATER_TIER_
 const tiers = Object.fromEntries(CANONICAL_WATER_TIER_IDS.map((id) => [id, validateWaterConfig({ tier: WATER_QUALITY_TIERS[id], parameters: DEFAULT_WATER_PARAMETERS })]));
 for (const [id, validation] of Object.entries(tiers)) {
   assert(validation.courant <= WATER_CFL_LIMIT, `${id} exceeds the gated CFL margin.`);
-  assert(validation.persistentBytes === boundedWaterPersistentBytes(WATER_QUALITY_TIERS[id].resolution), `${id} persistent byte accounting drifted.`);
+  assert(validation.persistentBytes === boundedWaterPersistentBytes(WATER_QUALITY_TIERS[id].resolution, WATER_QUALITY_TIERS[id].causticResolution), `${id} persistent byte accounting drifted.`);
   assert(manifest.tiers.find((tier) => tier.id === id).resourceLimits.derivedPersistentGpuBytes === validation.persistentBytes, `${id} manifest bytes do not equal the runtime allocation formula.`);
 }
 assert(tiers.ultra.courant > 0.7 && WATER_CFL_LIMIT === 0.85, "The ultra tier must prove a real reserved CFL margin, not the exact instability boundary.");
@@ -185,7 +185,8 @@ heightfield.resetImpulseUniforms();
 assert(snapshot.drop.strength === 0.4 && snapshot.impulse.strength === 0.7, "Immutable event snapshot lost submitted values.");
 assert(Math.abs(snapshotBytes[3] - 0.4) < 1e-6 && Math.abs(snapshotBytes[11] - 0.7) < 1e-6, "GPU event snapshot layout drifted.");
 assert(snapshotBytes[15] === 0, "Default event mask must be disabled.");
-assert(heightfield.causticAccumulationBuffer.array.byteLength === WATER_QUALITY_TIERS.low.resolution ** 2 * 4, "Atomic caustic buffer allocation is wrong.");
+assert(heightfield.causticAccumulationBuffer.array.byteLength === WATER_QUALITY_TIERS.low.causticResolution ** 2 * 4, "Atomic caustic buffer allocation is wrong.");
+assert(heightfield.receiverCaustic.image.width === WATER_QUALITY_TIERS.low.causticResolution, "Receiver caustic texture ignored its independent resolution.");
 assert(heightfield.diagnosticBuffer.array.length === 8 && heightfield.probeBuffer.array.length === 16, "GPU diagnostic/probe buffer layout is wrong.");
 assertThrows(() => heightfield.setDrop({ x: 100, z: 0, radius: 1, strength: 1 }), /outside/, "Out-of-domain drop survived validation.");
 assertThrows(() => heightfield.setDrop({ x: 0, z: 0, radius: Number.NaN, strength: 1 }), /finite/, "NaN drop survived validation.");
@@ -196,6 +197,14 @@ assertThrows(() => createBoundedWaterMesh({ heightfield, width: 7, material }), 
 mesh.geometry.dispose();
 material.dispose();
 heightfield.dispose();
+
+const cadenceRenderer = { compute() {} };
+const cadenceHeightfield = new WebGPUBoundedWaterHeightfield(cadenceRenderer, { tier: "low", causticsEnabled: true });
+cadenceHeightfield.initialize();
+for (let index = 0; index < 4; index += 1) cadenceHeightfield.step(WATER_QUALITY_TIERS.low.fixedTimeStep);
+assert(cadenceHeightfield.fixedStepIndex === 4 && cadenceHeightfield.causticResolveCount === 2, "Low-tier caustics did not hold three steps and resolve on the fourth.");
+assert(cadenceHeightfield.dispatchCount === 23, "Decoupled caustic cadence dispatch accounting drifted.");
+cadenceHeightfield.dispose();
 
 assert(source.includes("causticAccumulationNode") && source.includes("atomicAdd(causticAccumulationNode.element"), "GPU caustics must use source-driven atomic receiver deposition.");
 assert(!source.includes("causticGatherRadiusCells") && !source.includes("createReceiverCausticNode"), "The unbounded-loss receiver gather must not remain reachable.");

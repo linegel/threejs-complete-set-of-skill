@@ -119,6 +119,7 @@ function createSampledDebugTexture(width, height, name) {
 function makeUniforms(parameters, tier) {
   return {
     resolution: uniform(tier.resolution, "float"),
+    causticResolution: uniform(tier.causticResolution, "float"),
     fixedTimeStep: uniform(tier.fixedTimeStep, "float"),
     worldSize: uniform(new Vector2(parameters.worldSize.x, parameters.worldSize.y)),
     dampingRatePerSecond: uniform(parameters.dampingRatePerSecond, "float"),
@@ -249,6 +250,7 @@ function exactDielectricFresnelTSL(cosIncident, incidentIor, transmittedIor) {
 function makeComputeNodes(owner) {
   const {
     resolution,
+    causticResolution,
     stateA,
     stateB,
     normalCaustic,
@@ -261,9 +263,11 @@ function makeComputeNodes(owner) {
     tier,
   } = owner;
   const cellCount = resolution * resolution;
+  const causticCellCount = causticResolution * causticResolution;
   const linearWorkgroupSize = tier.linearWorkgroupSize;
 
   const texelCoord = Fn(() => uvec2(globalId.x.mod(uint(resolution)), globalId.x.div(uint(resolution))));
+  const causticTexelCoord = Fn(() => uvec2(globalId.x.mod(uint(causticResolution)), globalId.x.div(uint(causticResolution))));
   const uvFromCoord = Fn(([coord]) => vec2(
     float(coord.x).add(0.5).div(uniforms.resolution),
     float(coord.y).add(0.5).div(uniforms.resolution),
@@ -370,17 +374,19 @@ function makeComputeNodes(owner) {
 
   const resetDiagnostics = Fn(() => {
     const index = globalId.x;
-    If(index.lessThan(uint(8)), () => atomicStore(diagnosticBufferNode.element(index), uint(0)));
+    If(index.lessThan(uint(8)), () => { atomicStore(diagnosticBufferNode.element(index), uint(0)); });
   })().compute(8, [8]).setName("bounded-water:reset-diagnostics");
   const createClearTextureNode = (target, name) => Fn(() => {
     textureStore(target, texelCoord(), vec4(0, 0, 0, 0));
   })().compute(cellCount, [linearWorkgroupSize]).setName(name);
   const clearStateA = createClearTextureNode(stateA, "bounded-water:clear-state-a");
   const clearStateB = createClearTextureNode(stateB, "bounded-water:clear-state-b");
-  const clearReceiverCaustic = createClearTextureNode(receiverCaustic, "bounded-water:clear-receiver-caustic");
+  const clearReceiverCaustic = Fn(() => {
+    textureStore(receiverCaustic, causticTexelCoord(), vec4(0, 0, 0, 0));
+  })().compute(causticCellCount, [linearWorkgroupSize]).setName("bounded-water:clear-receiver-caustic");
   const clearCausticAccumulation = Fn(() => {
     atomicStore(causticAccumulationNode.element(globalId.x), uint(0));
-  })().compute(cellCount, [linearWorkgroupSize]).setName("bounded-water:clear-caustic-accumulation");
+  })().compute(causticCellCount, [linearWorkgroupSize]).setName("bounded-water:clear-caustic-accumulation");
 
   const heightImpulseAtCoord = Fn(([coord]) => {
     const dropEvent = eventSnapshotNode.element(uint(0));
@@ -426,7 +432,7 @@ function makeComputeNodes(owner) {
     const rawHeight = centerHeight.add(rawVelocity.mul(uniforms.fixedTimeStep)).mul(boundary);
     const finite = rawVelocity.equal(rawVelocity).and(rawHeight.equal(rawHeight))
       .and(abs(rawVelocity).lessThan(1e4)).and(abs(rawHeight).lessThan(1e4));
-    If(finite.not(), () => atomicAdd(diagnosticBufferNode.element(uint(7)), uint(1)));
+    If(finite.not(), () => { atomicAdd(diagnosticBufferNode.element(uint(7)), uint(1)); });
     const velocity = select(finite, rawVelocity, float(0));
     const height = select(finite, rawHeight, float(0));
     const historyDecay = exp(float(owner.parameters.impulseHistoryDecayRatePerSecond).mul(uniforms.fixedTimeStep).negate());
@@ -449,28 +455,28 @@ function makeComputeNodes(owner) {
   const createCausticDepositNode = (stateTexture, name) => Fn(() => {
     const sourceHit = combinedSurfaceHit(stateTexture, texelCoord());
     const valid = sourceHit.z.greaterThan(0.5);
-    If(valid.not(), () => atomicAdd(diagnosticBufferNode.element(uint(0)), uint(1)));
+    If(valid.not(), () => { atomicAdd(diagnosticBufferNode.element(uint(0)), uint(1)); });
     const unclampedUnits = sourceHit.w.mul(uniforms.causticPowerUnitsPerWatt);
     const clampedUnits = min(unclampedUnits, uniforms.causticMaxUnitsPerSource);
     If(unclampedUnits.greaterThan(uniforms.causticMaxUnitsPerSource), () => {
       atomicAdd(diagnosticBufferNode.element(uint(2)), uint(1));
     });
     const sourceUnits = clampedUnits.add(0.5).toUint();
-    If(valid, () => atomicAdd(diagnosticBufferNode.element(uint(4)), sourceUnits));
-    const receiverGrid = sourceHit.xy.div(uniforms.worldSize).add(0.5).mul(uniforms.resolution.sub(1));
+    If(valid, () => { atomicAdd(diagnosticBufferNode.element(uint(4)), sourceUnits); });
+    const receiverGrid = sourceHit.xy.div(uniforms.worldSize).add(0.5).mul(uniforms.causticResolution.sub(1));
     const base = floor(receiverGrid).toVar();
     const fraction = receiverGrid.sub(base);
     for (let offsetY = 0; offsetY <= 1; offsetY += 1) {
       for (let offsetX = 0; offsetX <= 1; offsetX += 1) {
         const targetX = base.x.toInt().add(int(offsetX));
         const targetY = base.y.toInt().add(int(offsetY));
-        const inBounds = targetX.greaterThanEqual(0).and(targetX.lessThan(int(resolution)))
-          .and(targetY.greaterThanEqual(0)).and(targetY.lessThan(int(resolution)));
+        const inBounds = targetX.greaterThanEqual(0).and(targetX.lessThan(int(causticResolution)))
+          .and(targetY.greaterThanEqual(0)).and(targetY.lessThan(int(causticResolution)));
         const weightX = offsetX === 0 ? float(1).sub(fraction.x) : fraction.x;
         const weightY = offsetY === 0 ? float(1).sub(fraction.y) : fraction.y;
         const weightedUnits = float(sourceUnits).mul(weightX.mul(weightY)).add(0.5).toUint();
         If(valid.and(inBounds).and(weightedUnits.greaterThan(uint(0))), () => {
-          const linearIndex = targetY.toUint().mul(uint(resolution)).add(targetX.toUint());
+          const linearIndex = targetY.toUint().mul(uint(causticResolution)).add(targetX.toUint());
           atomicAdd(causticAccumulationNode.element(linearIndex), weightedUnits);
           atomicAdd(diagnosticBufferNode.element(uint(3)), uint(1));
           atomicAdd(diagnosticBufferNode.element(uint(5)), weightedUnits);
@@ -484,23 +490,25 @@ function makeComputeNodes(owner) {
   const causticDepositFromA = createCausticDepositNode(stateA, "bounded-water:caustic-deposit:from-a");
   const causticDepositFromB = createCausticDepositNode(stateB, "bounded-water:caustic-deposit:from-b");
   const resolveReceiverCaustic = Fn(() => {
-    const coord = texelCoord();
+    const coord = causticTexelCoord();
     const units = atomicLoad(causticAccumulationNode.element(globalId.x));
-    const cells = max(uniforms.resolution.sub(1), 1);
+    const cells = max(uniforms.causticResolution.sub(1), 1);
     const receiverCellArea = uniforms.worldSize.x.div(cells).mul(uniforms.worldSize.y.div(cells));
     const regularizedArea = max(receiverCellArea, uniforms.causticFootprintAreaEpsilonMeters2);
     const depositedPower = float(units).div(uniforms.causticPowerUnitsPerWatt);
     const irradiance = clamp(depositedPower.div(regularizedArea).mul(uniforms.causticScale), 0, uniforms.causticMaxIntensity);
-    If(units.greaterThan(uint(0)), () => atomicAdd(diagnosticBufferNode.element(uint(6)), units));
+    If(units.greaterThan(uint(0)), () => { atomicAdd(diagnosticBufferNode.element(uint(6)), units); });
     textureStore(receiverCaustic, coord, vec4(irradiance, depositedPower, regularizedArea, select(units.greaterThan(uint(0)), float(1), float(0))));
-  })().compute(cellCount, [linearWorkgroupSize]).setName("bounded-water:resolve-receiver-caustic");
+  })().compute(causticCellCount, [linearWorkgroupSize]).setName("bounded-water:resolve-receiver-caustic");
 
   const createProbeNode = (stateTexture, name) => Fn(() => {
     const probeIndex = globalId.x;
     const coordinate = probeIndex.mul(uint(resolution - 1)).div(uint(3));
     const coord = uvec2(coordinate, uint(resolution - 1).sub(coordinate));
+    const receiverCoordinate = probeIndex.mul(uint(causticResolution - 1)).div(uint(3));
+    const receiverCoord = uvec2(receiverCoordinate, uint(causticResolution - 1).sub(receiverCoordinate));
     const state = textureLoad(stateTexture, coord);
-    const receiver = textureLoad(receiverCaustic, coord);
+    const receiver = textureLoad(receiverCaustic, receiverCoord);
     probeBufferNode.element(probeIndex).assign(vec4(state.r, state.g, receiver.r, receiver.g));
   })().compute(4, [4]).setName(name);
   const probeFromA = createProbeNode(stateA, "bounded-water:probe:from-a");
@@ -536,6 +544,7 @@ export class WebGPUBoundedWaterHeightfield {
     this.renderer = renderer;
     this.tier = { ...WATER_QUALITY_TIERS[tierName] };
     this.resolution = this.tier.resolution;
+    this.causticResolution = this.tier.causticResolution;
     this.parameters = {
       ...DEFAULT_WATER_PARAMETERS,
       ...(options.parameters ?? {}),
@@ -564,15 +573,18 @@ export class WebGPUBoundedWaterHeightfield {
     this.lastStepCount = 0;
     this.droppedTimeSeconds = 0;
     this.simulationTime = 0;
+    this.fixedStepIndex = 0;
+    this.lastCausticResolveFixedStep = 0;
+    this.causticResolveCount = 0;
     this.causticsEnabled = options.causticsEnabled ?? true;
 
     this.stateA = createWaterStorageTexture(this.resolution, this.resolution, "bounded-water-state-a", { linearSampling: true });
     this.stateB = createWaterStorageTexture(this.resolution, this.resolution, "bounded-water-state-b", { linearSampling: true });
     this.normalCaustic = createSampledDebugTexture(this.resolution, this.resolution, "bounded-water-normal-caustic");
-    this.receiverCaustic = createSampledDebugTexture(this.resolution, this.resolution, "bounded-water-receiver-caustic");
-    this.causticAccumulationBuffer = new StorageBufferAttribute(this.resolution * this.resolution, 1, Uint32Array);
+    this.receiverCaustic = createSampledDebugTexture(this.causticResolution, this.causticResolution, "bounded-water-receiver-caustic");
+    this.causticAccumulationBuffer = new StorageBufferAttribute(this.causticResolution * this.causticResolution, 1, Uint32Array);
     this.causticAccumulationBuffer.name = "bounded-water-caustic-atomic-accumulation";
-    this.causticAccumulationNode = storage(this.causticAccumulationBuffer, "uint", this.resolution * this.resolution).toAtomic();
+    this.causticAccumulationNode = storage(this.causticAccumulationBuffer, "uint", this.causticResolution * this.causticResolution).toAtomic();
     this.diagnosticBuffer = new StorageBufferAttribute(8, 1, Uint32Array);
     this.diagnosticBuffer.name = "bounded-water-diagnostics";
     this.diagnosticBufferNode = storage(this.diagnosticBuffer, "uint", 8).toAtomic();
@@ -604,7 +616,10 @@ export class WebGPUBoundedWaterHeightfield {
       lastStepCount: this.lastStepCount,
       dispatchCount: this.dispatchCount,
       droppedTimeSeconds: this.droppedTimeSeconds,
-      storageBytes: boundedWaterPersistentBytes(this.resolution),
+      storageBytes: boundedWaterPersistentBytes(this.resolution, this.causticResolution),
+      causticResolution: this.causticResolution,
+      causticUpdateEverySimulationSteps: this.tier.causticUpdateEverySimulationSteps,
+      causticResolveCount: this.causticResolveCount,
       eventSnapshotBytes: this.eventSnapshotBuffer.array.byteLength,
       eventSnapshotVersion: this.eventSnapshotVersion,
       causticQuantization: boundedCausticQuantizationContract(this.resolution),
@@ -632,6 +647,7 @@ export class WebGPUBoundedWaterHeightfield {
       ...(this.causticsEnabled ? [this.computeNodes.causticDepositFromA, this.computeNodes.resolveReceiverCaustic] : []),
     ]);
     this.dispatchCount += this.causticsEnabled ? 8 : 6;
+    if (this.causticsEnabled) this.causticResolveCount += 1;
   }
 
   setDrop({ x, z, radius = this.parameters.dropRadius, strength = this.parameters.dropStrength }) {
@@ -731,6 +747,7 @@ export class WebGPUBoundedWaterHeightfield {
   runFixedStep() {
     this.snapshotPendingEvents();
     this.simulationTime += this.fixedTimeStep;
+    this.fixedStepIndex += 1;
     this.uniforms.simulationTime.value = this.simulationTime;
 
     const propagateNode = this.readIndex === 0
@@ -752,7 +769,8 @@ export class WebGPUBoundedWaterHeightfield {
       : this.computeNodes.normalCausticFromB;
     safeRendererCompute(this.renderer, normalNode);
     this.dispatchCount += 1;
-    if (!this.causticsEnabled) return;
+    if (!this.causticsEnabled) return false;
+    if (this.fixedStepIndex - this.lastCausticResolveFixedStep < this.tier.causticUpdateEverySimulationSteps) return false;
     safeRendererCompute(this.renderer, this.computeNodes.clearCausticAccumulation);
     const depositNode = this.readIndex === 0
       ? this.computeNodes.causticDepositFromA
@@ -760,14 +778,21 @@ export class WebGPUBoundedWaterHeightfield {
     safeRendererCompute(this.renderer, depositNode);
     safeRendererCompute(this.renderer, this.computeNodes.resolveReceiverCaustic);
     this.dispatchCount += 3;
+    this.lastCausticResolveFixedStep = this.fixedStepIndex;
+    this.causticResolveCount += 1;
+    return true;
   }
 
   setCausticsEnabled(enabled) {
     if (enabled !== true && enabled !== false) throw new Error("causticsEnabled must be boolean.");
+    const wasEnabled = this.causticsEnabled;
     this.causticsEnabled = enabled;
     if (!enabled) {
       safeRendererCompute(this.renderer, [this.computeNodes.clearCausticAccumulation, this.computeNodes.clearReceiverCaustic]);
       this.dispatchCount += 2;
+    }
+    if (enabled && !wasEnabled) {
+      this.lastCausticResolveFixedStep = this.fixedStepIndex - this.tier.causticUpdateEverySimulationSteps;
     }
   }
 
@@ -823,6 +848,10 @@ export class WebGPUBoundedWaterHeightfield {
           : { derivativeResolve: 1 },
       },
       lastStepCount: this.lastStepCount,
+      fixedStepIndex: this.fixedStepIndex,
+      causticResolveCount: this.causticResolveCount,
+      causticUpdateEverySimulationSteps: this.tier.causticUpdateEverySimulationSteps,
+      causticResolution: this.causticResolution,
       cumulativeDispatchCount: this.dispatchCount,
       receiverDeposition: "source-driven four-tap bilinear atomic deposition; no bounded gather",
       causticQuantization: boundedCausticQuantizationContract(this.resolution),
@@ -1181,7 +1210,7 @@ export async function createWebGPUBoundedWaterSystem(renderer, {
     material,
     mesh,
     resourceLedger: {
-      persistentGpuBytes: boundedWaterPersistentBytes(heightfield.resolution),
+      persistentGpuBytes: boundedWaterPersistentBytes(heightfield.resolution, heightfield.causticResolution),
       eventSnapshotBytes: heightfield.eventSnapshotBuffer.array.byteLength,
       causticAtomicBytes: heightfield.causticAccumulationBuffer.array.byteLength,
       gpuProbeBytes: heightfield.probeBuffer.array.byteLength,

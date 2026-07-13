@@ -9,6 +9,7 @@ export {
   WATER_MECHANISM_ROUTES,
   WATER_QUALITY_TIERS,
   WATER_CFL_LIMIT,
+  WATER_CAUSTIC_ARCHITECTURE_DECISION,
   boundedCausticQuantizationContract,
   boundedWaterPersistentBytes,
   analyticSurfaceHeightAt,

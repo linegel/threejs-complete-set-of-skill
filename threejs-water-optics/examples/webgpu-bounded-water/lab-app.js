@@ -643,11 +643,12 @@ controller.ready().then(() => {
     let busy = false;
     const frame = async (now) => {
       if (controller.disposed) return;
+      const frameNow = Number.isFinite(now) ? now : performance.now();
       if (!busy) {
         busy = true;
-        try { await controller.step(Math.min((now - previous) / 1000, 1 / 30)); } finally { busy = false; }
+        try { await controller.step(Math.max(0, Math.min((frameNow - previous) / 1000, 1 / 30))); } finally { busy = false; }
       }
-      previous = now;
+      previous = frameNow;
       requestAnimationFrame(frame);
     };
     requestAnimationFrame(frame);

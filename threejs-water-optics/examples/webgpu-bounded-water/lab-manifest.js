@@ -7,9 +7,9 @@ import {
 
 const degradation = Object.freeze( {
 	ultra: [],
-	high: [ 'simulation 512→256', 'mesh 192→128', 'max substeps 4→3', 'analytic bands 5→4', 'micro bands 4→3' ],
-	medium: [ 'simulation 256→192', 'mesh 128→96', 'analytic bands 4→3', 'micro bands 3→2' ],
-	low: [ 'simulation 192→96', 'mesh 96→48', 'max substeps 3→2', 'analytic bands 3→2', 'micro bands 2→0' ]
+	high: [ 'simulation 512→256', 'receiver caustics 512→192', 'mesh 192→128', 'max substeps 4→3', 'analytic bands 5→4', 'micro bands 4→3' ],
+	medium: [ 'simulation 256→192', 'receiver caustics 192→96', 'caustic cadence 1→2 simulation steps', 'mesh 128→96', 'analytic bands 4→3', 'micro bands 3→2' ],
+	low: [ 'simulation 192→96', 'receiver caustics 96→48', 'caustic cadence 2→4 simulation steps', 'mesh 96→48', 'max substeps 3→2', 'analytic bands 3→2', 'micro bands 2→0' ]
 } );
 
 export const BOUNDED_WATER_LAB_MANIFEST = Object.freeze( {
@@ -40,9 +40,9 @@ export const BOUNDED_WATER_LAB_MANIFEST = Object.freeze( {
 			id,
 			targetClass: 'unmeasured-current-adapter',
 			frameTargetMs: null,
-			resolutionPolicy: { simulationResolution: tier.resolution, meshSegments: tier.meshSegments, dpr: 1 },
-			mechanismLimits: { maxSubsteps: tier.maxSubsteps, analyticBands: tier.analyticBands, microBands: tier.microBands },
-			resourceLimits: { derivedPersistentGpuBytes: boundedWaterPersistentBytes( tier.resolution ), eventSnapshotBytes: 64, gpuProbeBytes: 64 },
+			resolutionPolicy: { simulationResolution: tier.resolution, causticResolution: tier.causticResolution, meshSegments: tier.meshSegments, dpr: 1 },
+			mechanismLimits: { maxSubsteps: tier.maxSubsteps, analyticBands: tier.analyticBands, microBands: tier.microBands, causticUpdateEverySimulationSteps: tier.causticUpdateEverySimulationSteps },
+			resourceLimits: { derivedPersistentGpuBytes: boundedWaterPersistentBytes( tier.resolution, tier.causticResolution ), eventSnapshotBytes: 64, gpuProbeBytes: 64 },
 			degradationFromPrevious: degradation[ id ],
 			preservedInvariants: [ 'anisotropic CFL ≤ 0.85', 'fixed-step event semantics', 'exact analytic+heightfield differential', 'side-aware exact Fresnel', 'source-driven receiver deposition' ],
 			acceptanceStatus: 'incomplete'

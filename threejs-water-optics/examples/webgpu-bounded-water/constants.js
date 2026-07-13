@@ -97,9 +97,26 @@ export const WATER_EXAMPLE_CLAIM_BOUNDARY = Object.freeze({
   ]),
 });
 
+export const WATER_CAUSTIC_ARCHITECTURE_DECISION = Object.freeze({
+  problem: "dynamic receiver caustics under sustained bandwidth and thermal constraints",
+  axes: Object.freeze(["physical-cause", "temporal-response", "receiver-detail", "bandwidth", "memory", "integration-risk", "mobile-fit", "fixed-view-marginal"]),
+  candidates: Object.freeze([
+    Object.freeze({ id: "full-rate-full-resolution", score: 62, strength: "maximum dynamic response", failure: "repeats receiver clear/deposit/resolve traffic at simulation resolution" }),
+    Object.freeze({ id: "cadence-decimated-full-resolution", score: 72, strength: "no spatial remap", failure: "retains full receiver memory and update bursts" }),
+    Object.freeze({ id: "lower-resolution-every-update", score: 76, strength: "cuts receiver memory and per-pass traffic", failure: "still pays every update and can shimmer without temporal control" }),
+    Object.freeze({ id: "decoupled-spatial-temporal-receiver", score: 88, strength: "preserves the simulation/normal cause while independently reducing receiver pixels and cadence", failure: "requires measured reprojection/hold error before a production timing claim" }),
+    Object.freeze({ id: "static-or-generated-caustic-tile", score: 55, strength: "one cheap filtered sample", failure: "cannot claim dynamic receiver energy or surface coupling" }),
+    Object.freeze({ id: "disable-caustics", score: 48, strength: "zero receiver cost", failure: "loses a major shallow-water depth cue" }),
+  ]),
+  selected: "decoupled-spatial-temporal-receiver",
+  evidenceClass: "recommendation; tier timings and temporal error remain measured obligations",
+});
+
 export const WATER_QUALITY_TIERS = Object.freeze({
   ultra: Object.freeze({
     resolution: 512,
+    causticResolution: 512,
+    causticUpdateEverySimulationSteps: 1,
     fixedTimeStep: 1 / 240,
     maxSubsteps: 4,
     linearWorkgroupSize: 64,
@@ -109,6 +126,8 @@ export const WATER_QUALITY_TIERS = Object.freeze({
   }),
   high: Object.freeze({
     resolution: 256,
+    causticResolution: 192,
+    causticUpdateEverySimulationSteps: 1,
     fixedTimeStep: 1 / 120,
     maxSubsteps: 3,
     linearWorkgroupSize: 64,
@@ -118,6 +137,8 @@ export const WATER_QUALITY_TIERS = Object.freeze({
   }),
   medium: Object.freeze({
     resolution: 192,
+    causticResolution: 96,
+    causticUpdateEverySimulationSteps: 2,
     fixedTimeStep: 1 / 120,
     maxSubsteps: 3,
     linearWorkgroupSize: 64,
@@ -127,6 +148,8 @@ export const WATER_QUALITY_TIERS = Object.freeze({
   }),
   low: Object.freeze({
     resolution: 96,
+    causticResolution: 48,
+    causticUpdateEverySimulationSteps: 4,
     fixedTimeStep: 1 / 60,
     maxSubsteps: 2,
     linearWorkgroupSize: 64,
@@ -347,11 +370,12 @@ export function waterStorageBytes(resolution, textureCount = 4, bytesPerChannel 
   return resolution * resolution * 4 * bytesPerChannel * textureCount;
 }
 
-export function boundedWaterPersistentBytes(resolution) {
-  const textures = waterStorageBytes(resolution, 4);
-  const causticAtomicBuffer = resolution * resolution * Uint32Array.BYTES_PER_ELEMENT;
+export function boundedWaterPersistentBytes(resolution, causticResolution = resolution) {
+  const simulationTextures = waterStorageBytes(resolution, 3);
+  const receiverTexture = waterStorageBytes(causticResolution, 1);
+  const causticAtomicBuffer = causticResolution * causticResolution * Uint32Array.BYTES_PER_ELEMENT;
   const fixedBuffers = 8 * Uint32Array.BYTES_PER_ELEMENT + 16 * Float32Array.BYTES_PER_ELEMENT + 16 * Float32Array.BYTES_PER_ELEMENT;
-  return textures + causticAtomicBuffer + fixedBuffers;
+  return simulationTextures + receiverTexture + causticAtomicBuffer + fixedBuffers;
 }
 
 export function waterCourantNumber({
@@ -455,7 +479,13 @@ export function validateWaterConfig({
   }
 
   const storageBytes = waterStorageBytes(resolution, textureCount);
-  const persistentBytes = boundedWaterPersistentBytes(resolution);
+  if (!Number.isInteger(tier.causticResolution) || tier.causticResolution < 16 || tier.causticResolution > resolution) {
+    throw new Error(`Water causticResolution must be an integer in [16, simulation resolution]; got ${tier.causticResolution}.`);
+  }
+  if (!Number.isInteger(tier.causticUpdateEverySimulationSteps) || tier.causticUpdateEverySimulationSteps < 1) {
+    throw new Error(`Water causticUpdateEverySimulationSteps must be a positive integer; got ${tier.causticUpdateEverySimulationSteps}.`);
+  }
+  const persistentBytes = boundedWaterPersistentBytes(resolution, tier.causticResolution);
   const causticQuantization = boundedCausticQuantizationContract(resolution);
 
   if (storageBytes > storageBudgetBytes) {
