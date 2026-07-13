@@ -7,7 +7,7 @@
   "canonicalSource": [
     "threejs-image-pipeline/examples/webgpu-image-pipeline"
   ],
-  "canonicalSourceHash": "sha256:1abae9bb29b9f64aa5cd70ae7c916d0c0371304da94e7a6190630834b311c0ec",
+  "canonicalSourceHash": "sha256:f55e0e6af55f99dffc4c5160bdecf74eb36a5d1daa196b7fa0366810565d348b",
   "threeRevision": "0.185.1",
   "runtime": {
     "renderer": "WebGPURenderer",
@@ -130,5 +130,12 @@
   "limitations": [
     "Performance and GPU attribution remain NOT_CLAIMED unless a hardware performance lane is present.",
     "Promoted media are native-WebGPU correctness readbacks bound by the accepted release-bundle ledger."
-  ]
+  ],
+  "status": "accepted",
+  "sourceHash": "sha256:f55e0e6af55f99dffc4c5160bdecf74eb36a5d1daa196b7fa0366810565d348b",
+  "sourceClosureHash": "sha256:f55e0e6af55f99dffc4c5160bdecf74eb36a5d1daa196b7fa0366810565d348b",
+  "buildRevision": "sha256:16442dce053c26e7f3b26188e7ceb546a6121dd5bca79ce434fb3c2be5b43dc7",
+  "publishable": true,
+  "promotionStatus": "APPROVED",
+  "updatedAt": "2026-07-13T14:37:34.120Z"
 }

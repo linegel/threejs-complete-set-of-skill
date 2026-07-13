@@ -8,14 +8,14 @@
   "labId": "webgpu-image-pipeline",
   "skill": "threejs-image-pipeline",
   "threeRevision": "0.185.1",
-  "sourceClosureHash": "sha256:1abae9bb29b9f64aa5cd70ae7c916d0c0371304da94e7a6190630834b311c0ec",
-  "buildRevision": "sha256:e0ccf0b3667f6fc93b583742c886d36cafd23fc75f739e01f467b3697c1f6e85",
+  "sourceClosureHash": "sha256:f55e0e6af55f99dffc4c5160bdecf74eb36a5d1daa196b7fa0366810565d348b",
+  "buildRevision": "sha256:16442dce053c26e7f3b26188e7ceb546a6121dd5bca79ce434fb3c2be5b43dc7",
   "sourceRelease": {
     "path": "evidence-manifest.json",
-    "sha256": "sha256:91ff284a06c4bc84502c8eca9f50187e4cdc8df1a8ee9b0148fcab083b353916",
-    "byteLength": 34035,
-    "promotionBindingDigest": "sha256:ca13d72bfe453c9839965a97b8f3d97c01f502500c26b8be941dea3efee0bae6",
-    "candidateBindingDigest": "sha256:2a3fb72c4ab2f4d5dc02d788b8ec2cf11fd53b1111d8e8082e729be5c70b8b82",
+    "sha256": "sha256:b877d970c7ebad65c8f8e3b734fdae43a33c9257e9858672d8acfffc5ebcebd4",
+    "byteLength": 34270,
+    "promotionBindingDigest": "sha256:5305824469cc3ad375532093a4c81ab3d15d61b43767c7205bf5d74f424cbbe0",
+    "candidateBindingDigest": "sha256:d66a7eb34d61083af9baca34a09eacd184eef5f19be0de80a04a2e09712f3a4f",
     "artifactLedgerDigest": "sha256:fb664733e3fa74fffa315f0daf16e20e556e9092c133b68952fc25abf209f3a8",
     "imageLedgerDigest": "sha256:d14bd3207d8324d03b175c32ac1774a941a563be8357ee732d79102f548afb2e"
   },
@@ -67,8 +67,8 @@
       },
       {
         "repositoryPath": "threejs-image-pipeline/examples/webgpu-image-pipeline/canonical-browser-app.js",
-        "sha256": "sha256:9a35b7b0041bcfa87b4ad34b1201d92bca5bb6a397b626726c9aa5e29d5567d6",
-        "byteLength": 7201
+        "sha256": "sha256:42c9be63576fa7aaeb718d454b4cd68615a43fbe130ee1c4bf1b2ddbf25ab9e0",
+        "byteLength": 7607
       },
       {
         "repositoryPath": "threejs-image-pipeline/examples/webgpu-image-pipeline/canonical-capture.mjs",
@@ -77,8 +77,8 @@
       },
       {
         "repositoryPath": "threejs-image-pipeline/examples/webgpu-image-pipeline/canonical-main.js",
-        "sha256": "sha256:37aa132cbeeb0b5a1b53a8eda4624f83f8512b33272126c4e1382fd4a9801565",
-        "byteLength": 17568
+        "sha256": "sha256:d636685264a3e0c481caa533a2840adfcb9c00a4b33d8fab57406bf351e35cd1",
+        "byteLength": 18011
       },
       {
         "repositoryPath": "threejs-image-pipeline/examples/webgpu-image-pipeline/capture-hook.mjs",
@@ -212,8 +212,8 @@
       }
     ],
     "threeRevision": "0.185.1",
-    "sourceHash": "sha256:1abae9bb29b9f64aa5cd70ae7c916d0c0371304da94e7a6190630834b311c0ec",
-    "buildRevision": "sha256:e0ccf0b3667f6fc93b583742c886d36cafd23fc75f739e01f467b3697c1f6e85"
+    "sourceHash": "sha256:f55e0e6af55f99dffc4c5160bdecf74eb36a5d1daa196b7fa0366810565d348b",
+    "buildRevision": "sha256:16442dce053c26e7f3b26188e7ceb546a6121dd5bca79ce434fb3c2be5b43dc7"
   },
   "retainedFiles": [
     {
@@ -439,5 +439,5 @@
       "affectedClaims": []
     }
   ],
-  "projectionDigest": "sha256:2eb6004b81009a267163357ef8a166139a559c6e950a465a14799f2d885a0bac"
+  "projectionDigest": "sha256:148d583a17a838d571aea3873ac9b6c89f4893961b67dd36566b012ee38a29aa"
 }

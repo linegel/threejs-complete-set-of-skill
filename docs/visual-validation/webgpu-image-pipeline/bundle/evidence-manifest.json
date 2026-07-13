@@ -6,8 +6,8 @@
   "publishable": true,
   "skill": "threejs-image-pipeline",
   "threeRevision": "0.185.1",
-  "sourceClosureHash": "sha256:1abae9bb29b9f64aa5cd70ae7c916d0c0371304da94e7a6190630834b311c0ec",
-  "buildRevision": "sha256:e0ccf0b3667f6fc93b583742c886d36cafd23fc75f739e01f467b3697c1f6e85",
+  "sourceClosureHash": "sha256:f55e0e6af55f99dffc4c5160bdecf74eb36a5d1daa196b7fa0366810565d348b",
+  "buildRevision": "sha256:16442dce053c26e7f3b26188e7ceb546a6121dd5bca79ce434fb3c2be5b43dc7",
   "route": {
     "path": "/demos/webgpu-image-pipeline/",
     "scenario": "pipeline-fixture",
@@ -91,8 +91,8 @@
       },
       "limitationsDigest": "sha256:1b2c9672bbf6b7d31acfd12bd2445b993a2adcc177b27d56d25003995243d4cc",
       "threeRevision": "0.185.1",
-      "sourceClosureHash": "sha256:1abae9bb29b9f64aa5cd70ae7c916d0c0371304da94e7a6190630834b311c0ec",
-      "buildRevision": "sha256:e0ccf0b3667f6fc93b583742c886d36cafd23fc75f739e01f467b3697c1f6e85",
+      "sourceClosureHash": "sha256:f55e0e6af55f99dffc4c5160bdecf74eb36a5d1daa196b7fa0366810565d348b",
+      "buildRevision": "sha256:16442dce053c26e7f3b26188e7ceb546a6121dd5bca79ce434fb3c2be5b43dc7",
       "startedAt": "2026-07-13T13:44:08.305Z",
       "finishedAt": "2026-07-13T13:47:01.395Z",
       "routePath": "/demos/webgpu-image-pipeline/",
@@ -145,8 +145,8 @@
       },
       "limitationsDigest": "sha256:d00b4f9823f4b2ab6b435bfc4e675fe91ce93d7d523d82c4eb937793758d13df",
       "threeRevision": "0.185.1",
-      "sourceClosureHash": "sha256:1abae9bb29b9f64aa5cd70ae7c916d0c0371304da94e7a6190630834b311c0ec",
-      "buildRevision": "sha256:e0ccf0b3667f6fc93b583742c886d36cafd23fc75f739e01f467b3697c1f6e85",
+      "sourceClosureHash": "sha256:f55e0e6af55f99dffc4c5160bdecf74eb36a5d1daa196b7fa0366810565d348b",
+      "buildRevision": "sha256:16442dce053c26e7f3b26188e7ceb546a6121dd5bca79ce434fb3c2be5b43dc7",
       "startedAt": "2026-07-13T14:00:12.437Z",
       "finishedAt": "2026-07-13T14:00:12.660Z",
       "routePath": "/demos/webgpu-image-pipeline/",
@@ -398,9 +398,9 @@
   "promotion": {
     "status": "APPROVED",
     "binding": {
-      "manifestCoreDigest": "sha256:344b2e7589b93100e02d5aa3f74daee51f77b808b04b318ec1271a61f2dc3b3a",
-      "sourceClosureHash": "sha256:1abae9bb29b9f64aa5cd70ae7c916d0c0371304da94e7a6190630834b311c0ec",
-      "buildRevision": "sha256:e0ccf0b3667f6fc93b583742c886d36cafd23fc75f739e01f467b3697c1f6e85",
+      "manifestCoreDigest": "sha256:4c045c1cb365cc013673a5876620d978140ce19965f3092ddff8eaac82b2cadd",
+      "sourceClosureHash": "sha256:f55e0e6af55f99dffc4c5160bdecf74eb36a5d1daa196b7fa0366810565d348b",
+      "buildRevision": "sha256:16442dce053c26e7f3b26188e7ceb546a6121dd5bca79ce434fb3c2be5b43dc7",
       "threeRevision": "0.185.1",
       "route": {
         "path": "/demos/webgpu-image-pipeline/",
@@ -488,8 +488,8 @@
           },
           "limitationsDigest": "sha256:1b2c9672bbf6b7d31acfd12bd2445b993a2adcc177b27d56d25003995243d4cc",
           "threeRevision": "0.185.1",
-          "sourceClosureHash": "sha256:1abae9bb29b9f64aa5cd70ae7c916d0c0371304da94e7a6190630834b311c0ec",
-          "buildRevision": "sha256:e0ccf0b3667f6fc93b583742c886d36cafd23fc75f739e01f467b3697c1f6e85",
+          "sourceClosureHash": "sha256:f55e0e6af55f99dffc4c5160bdecf74eb36a5d1daa196b7fa0366810565d348b",
+          "buildRevision": "sha256:16442dce053c26e7f3b26188e7ceb546a6121dd5bca79ce434fb3c2be5b43dc7",
           "startedAt": "2026-07-13T13:44:08.305Z",
           "finishedAt": "2026-07-13T13:47:01.395Z",
           "routePath": "/demos/webgpu-image-pipeline/",
@@ -542,8 +542,8 @@
           },
           "limitationsDigest": "sha256:d00b4f9823f4b2ab6b435bfc4e675fe91ce93d7d523d82c4eb937793758d13df",
           "threeRevision": "0.185.1",
-          "sourceClosureHash": "sha256:1abae9bb29b9f64aa5cd70ae7c916d0c0371304da94e7a6190630834b311c0ec",
-          "buildRevision": "sha256:e0ccf0b3667f6fc93b583742c886d36cafd23fc75f739e01f467b3697c1f6e85",
+          "sourceClosureHash": "sha256:f55e0e6af55f99dffc4c5160bdecf74eb36a5d1daa196b7fa0366810565d348b",
+          "buildRevision": "sha256:16442dce053c26e7f3b26188e7ceb546a6121dd5bca79ce434fb3c2be5b43dc7",
           "startedAt": "2026-07-13T14:00:12.437Z",
           "finishedAt": "2026-07-13T14:00:12.660Z",
           "routePath": "/demos/webgpu-image-pipeline/",
@@ -566,7 +566,7 @@
           "timestampQuerySupported": false
         }
       ],
-      "captureSessionSetDigest": "sha256:53659be4af0cde71fef810441d340e2c903f1be0775628abd2fc2cf00e1dd2d9",
+      "captureSessionSetDigest": "sha256:20251df286fb4a189689026825b81abec29b6f6d90562ae9549ed667980f202f",
       "artifactLedgerDigest": "sha256:fb664733e3fa74fffa315f0daf16e20e556e9092c133b68952fc25abf209f3a8",
       "imageLedgerDigest": "sha256:d14bd3207d8324d03b175c32ac1774a941a563be8357ee732d79102f548afb2e",
       "routeSet": [
@@ -589,13 +589,13 @@
       ],
       "routeSetDigest": "sha256:e8cad336b30203ca48284f6615f28bf414bb6e7815c17b6a07995cdbf5e538a5"
     },
-    "bindingDigest": "sha256:ca13d72bfe453c9839965a97b8f3d97c01f502500c26b8be941dea3efee0bae6",
+    "bindingDigest": "sha256:5305824469cc3ad375532093a4c81ab3d15d61b43767c7205bf5d74f424cbbe0",
     "visualSignoff": {
       "status": "APPROVED",
       "candidateBinding": {
-        "manifestCoreDigest": "sha256:8b7199d7947a019456f7e7202725740e597d5a22a438cb1d94f3b6cfa68ab8d7",
-        "sourceClosureHash": "sha256:1abae9bb29b9f64aa5cd70ae7c916d0c0371304da94e7a6190630834b311c0ec",
-        "buildRevision": "sha256:e0ccf0b3667f6fc93b583742c886d36cafd23fc75f739e01f467b3697c1f6e85",
+        "manifestCoreDigest": "sha256:9c8373dbedf6fcb55c47235d8ce506a4501a99446a672b9ecddd2a4504ba465b",
+        "sourceClosureHash": "sha256:f55e0e6af55f99dffc4c5160bdecf74eb36a5d1daa196b7fa0366810565d348b",
+        "buildRevision": "sha256:16442dce053c26e7f3b26188e7ceb546a6121dd5bca79ce434fb3c2be5b43dc7",
         "threeRevision": "0.185.1",
         "route": {
           "path": "/demos/webgpu-image-pipeline/",
@@ -683,8 +683,8 @@
             },
             "limitationsDigest": "sha256:1b2c9672bbf6b7d31acfd12bd2445b993a2adcc177b27d56d25003995243d4cc",
             "threeRevision": "0.185.1",
-            "sourceClosureHash": "sha256:1abae9bb29b9f64aa5cd70ae7c916d0c0371304da94e7a6190630834b311c0ec",
-            "buildRevision": "sha256:e0ccf0b3667f6fc93b583742c886d36cafd23fc75f739e01f467b3697c1f6e85",
+            "sourceClosureHash": "sha256:f55e0e6af55f99dffc4c5160bdecf74eb36a5d1daa196b7fa0366810565d348b",
+            "buildRevision": "sha256:16442dce053c26e7f3b26188e7ceb546a6121dd5bca79ce434fb3c2be5b43dc7",
             "startedAt": "2026-07-13T13:44:08.305Z",
             "finishedAt": "2026-07-13T13:47:01.395Z",
             "routePath": "/demos/webgpu-image-pipeline/",
@@ -737,8 +737,8 @@
             },
             "limitationsDigest": "sha256:d00b4f9823f4b2ab6b435bfc4e675fe91ce93d7d523d82c4eb937793758d13df",
             "threeRevision": "0.185.1",
-            "sourceClosureHash": "sha256:1abae9bb29b9f64aa5cd70ae7c916d0c0371304da94e7a6190630834b311c0ec",
-            "buildRevision": "sha256:e0ccf0b3667f6fc93b583742c886d36cafd23fc75f739e01f467b3697c1f6e85",
+            "sourceClosureHash": "sha256:f55e0e6af55f99dffc4c5160bdecf74eb36a5d1daa196b7fa0366810565d348b",
+            "buildRevision": "sha256:16442dce053c26e7f3b26188e7ceb546a6121dd5bca79ce434fb3c2be5b43dc7",
             "startedAt": "2026-07-13T14:00:12.437Z",
             "finishedAt": "2026-07-13T14:00:12.660Z",
             "routePath": "/demos/webgpu-image-pipeline/",
@@ -761,7 +761,7 @@
             "timestampQuerySupported": false
           }
         ],
-        "captureSessionSetDigest": "sha256:53659be4af0cde71fef810441d340e2c903f1be0775628abd2fc2cf00e1dd2d9",
+        "captureSessionSetDigest": "sha256:20251df286fb4a189689026825b81abec29b6f6d90562ae9549ed667980f202f",
         "artifactLedgerDigest": "sha256:fb664733e3fa74fffa315f0daf16e20e556e9092c133b68952fc25abf209f3a8",
         "imageLedgerDigest": "sha256:d14bd3207d8324d03b175c32ac1774a941a563be8357ee732d79102f548afb2e",
         "routeSet": [
@@ -784,10 +784,10 @@
         ],
         "routeSetDigest": "sha256:e8cad336b30203ca48284f6615f28bf414bb6e7815c17b6a07995cdbf5e538a5"
       },
-      "candidateBindingDigest": "sha256:2a3fb72c4ab2f4d5dc02d788b8ec2cf11fd53b1111d8e8082e729be5c70b8b82",
+      "candidateBindingDigest": "sha256:d66a7eb34d61083af9baca34a09eacd184eef5f19be0de80a04a2e09712f3a4f",
       "reviewer": "accept-lab-from-capture CDP hardware pipeline (webgpu-image-pipeline)",
       "reviewedAt": "2026-07-13T14:00:22.503Z",
-      "reviewDigest": "sha256:1fa72c1f0f8cc8a69f866c327d4374260433eeb05690f427e542320a86f1aebe",
+      "reviewDigest": "sha256:cbe87c257cd1051cc2a0d3d197c547996982fa565f15c6b615a954970ab47a19",
       "reviewedImages": [
         "final.design.png",
         "no-post.design.png",
@@ -803,7 +803,8 @@
       "notes": [
         "Direct file inspection of retained native-WebGPU correctness readbacks bound by the candidate.",
         "Physical-route hardware review passed on immutable prebuilt bytes via CDP Chrome.",
-        "Performance and GPU attribution remain NOT_CLAIMED; lifecycle PASS is backed by a 50-cycle dispose soak."
+        "Performance and GPU attribution remain NOT_CLAIMED; lifecycle PASS is backed by a 50-cycle dispose soak.",
+        "Source-closure rebind 2026-07-13T14:37:34.117Z: ledger refreshed to sha256:f55e0e6af55f99dffc4c5160bdecf74eb36a5d1daa196b7fa0366810565d348b (registry sha256:f55e0e6af55f99dffc4c5160bdecf74eb36a5d1daa196b7fa0366810565d348b)."
       ]
     }
   },

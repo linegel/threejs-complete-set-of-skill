@@ -139,14 +139,14 @@
   ],
   "status": "accepted",
   "sourceHash": "sha256:c099d8c03b07280a4553e1ea687d4ca092809fba4efc5c67429b954c242359c7",
-  "sourceClosureHash": "sha256:ab147dc1ba24f1bba3d62731968c9f602000622d3a338480afd8208e1c447177",
-  "buildRevision": "sha256:d0a86105ba9377cff43d80cb7d36ab40dba78558b51fd1d9fb98d16a3b7bb511",
+  "sourceClosureHash": "sha256:d7616d2b97f23ecc8e1f328f7a1815c9dd819eeb93f2ddc7eb0359a93be43f17",
+  "buildRevision": "sha256:16442dce053c26e7f3b26188e7ceb546a6121dd5bca79ce434fb3c2be5b43dc7",
   "publishable": true,
   "promotionStatus": "APPROVED",
-  "updatedAt": "2026-07-13T14:28:05.412Z",
+  "updatedAt": "2026-07-13T14:37:44.943Z",
   "dualIdentity": {
     "registrySourceHash": "sha256:c099d8c03b07280a4553e1ea687d4ca092809fba4efc5c67429b954c242359c7",
-    "captureSourceClosureHash": "sha256:ab147dc1ba24f1bba3d62731968c9f602000622d3a338480afd8208e1c447177",
+    "captureSourceClosureHash": "sha256:d7616d2b97f23ecc8e1f328f7a1815c9dd819eeb93f2ddc7eb0359a93be43f17",
     "note": "Harness package hash (registry) vs specialized capture tooling ledger (bundle). Equality is not required."
   }
 }

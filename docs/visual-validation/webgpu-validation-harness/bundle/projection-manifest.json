@@ -8,14 +8,14 @@
   "labId": "webgpu-validation-harness",
   "skill": "threejs-visual-validation",
   "threeRevision": "0.185.1",
-  "sourceClosureHash": "sha256:ab147dc1ba24f1bba3d62731968c9f602000622d3a338480afd8208e1c447177",
-  "buildRevision": "sha256:d0a86105ba9377cff43d80cb7d36ab40dba78558b51fd1d9fb98d16a3b7bb511",
+  "sourceClosureHash": "sha256:d7616d2b97f23ecc8e1f328f7a1815c9dd819eeb93f2ddc7eb0359a93be43f17",
+  "buildRevision": "sha256:16442dce053c26e7f3b26188e7ceb546a6121dd5bca79ce434fb3c2be5b43dc7",
   "sourceRelease": {
     "path": "evidence-manifest.json",
-    "sha256": "sha256:faec87889b0dcc7d34539e5e8be9925a95a2fa9ed554cd7bbc072c3f43ee9fdf",
+    "sha256": "sha256:42a9090964a5124ae45932b2af1b3a39f2bcb10c07af893044953d770e73f6c6",
     "byteLength": 90346,
-    "promotionBindingDigest": "sha256:2350b1404e7a0acab9d6ba6173655e50ddc2494bbeb01b12323079c1ee16b50a",
-    "candidateBindingDigest": "sha256:9df2cd3ccc969e39b5d8cf83ec8f309f5374b6e4b2d18871132c448f2cf2b81a",
+    "promotionBindingDigest": "sha256:1196d3564bfc51507c48b003386c7800679b35ce33c042c47b51923cce02b61a",
+    "candidateBindingDigest": "sha256:dbfd258f5052db7ab2563c90d9e2750abbcecec51e06bdce71f920f8a8b92a7c",
     "artifactLedgerDigest": "sha256:1126d41c039ac661f1eb94975934b2254ef8955a5d7e13594d93695ae06cd174",
     "imageLedgerDigest": "sha256:b3407588a0bade9830858e9e5c0347234e068ec6badbebcd6b5977ed03752ddf"
   },
@@ -51,13 +51,13 @@
       },
       {
         "repositoryPath": "package-lock.json",
-        "sha256": "sha256:ae3530769872675f9e91ecc51174d61a2d40aac97ce5a06b773b9c7cb2247487",
-        "byteLength": 48798
+        "sha256": "sha256:69a930654075f3fe4573fbf74149a7769d858854895adb6a744522e4d7fd0d87",
+        "byteLength": 48770
       },
       {
         "repositoryPath": "package.json",
-        "sha256": "sha256:db5840bd02d9a5ed1b382bb225ae563ce92b00019d1667b09ae9d583444cf540",
-        "byteLength": 3998
+        "sha256": "sha256:1465640e10fb2dd04c6c54fa7681d74fcc2cf492c959971adc13340b0df785ea",
+        "byteLength": 4604
       },
       {
         "repositoryPath": "scripts/capture-lab-browser.mjs",
@@ -641,8 +641,8 @@
       }
     ],
     "threeRevision": "0.185.1",
-    "sourceHash": "sha256:ab147dc1ba24f1bba3d62731968c9f602000622d3a338480afd8208e1c447177",
-    "buildRevision": "sha256:d0a86105ba9377cff43d80cb7d36ab40dba78558b51fd1d9fb98d16a3b7bb511"
+    "sourceHash": "sha256:d7616d2b97f23ecc8e1f328f7a1815c9dd819eeb93f2ddc7eb0359a93be43f17",
+    "buildRevision": "sha256:16442dce053c26e7f3b26188e7ceb546a6121dd5bca79ce434fb3c2be5b43dc7"
   },
   "retainedFiles": [
     {
@@ -950,5 +950,5 @@
       "affectedClaims": []
     }
   ],
-  "projectionDigest": "sha256:386a0d6131398b09c3a928b5d0a0042134406f254573ff8cd0df1236a9f427eb"
+  "projectionDigest": "sha256:344474899a704a216ff808a4e6a0a7107afd29fc6b57d0c112660c83066efedd"
 }
