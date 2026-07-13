@@ -21,6 +21,7 @@ import {
   sqrt,
   storageTexture3D,
   texture,
+  texture3D,
   textureStore,
   uvec2,
   vec2,
@@ -435,15 +436,16 @@ function sampleLayeredDensity({
       vec2(
         constants.macroWindMetersPerSecond.x,
         constants.macroWindMetersPerSecond.z,
-      ).mul(timeSeconds / 120000),
+      ).mul(timeSeconds.div(120000)),
     );
   const turbulenceVector = texture(turbulence, baseUv.mul(8)).rgb.mul(2).sub(1);
-  const shapeCoordinate = vec3(
-    baseUv.mul(4).add(turbulenceVector.xy.mul(0.012 * constants.turbulenceEnabled)),
-    heightMeters.div(max(constants.maxAltitudeMeters, 1)),
-  );
-  const baseShape = texture(shape, shapeCoordinate).r;
-  const detailShape = texture(shapeDetail, shapeCoordinate.mul(4)).r;
+  // Construct explicit xyz floats — TSL vec3(vec2, float) collapses to a 2D sample on WebGPU.
+  const warpedUv = baseUv.mul(4).add(turbulenceVector.xy.mul(0.012 * constants.turbulenceEnabled));
+  const heightFraction = heightMeters.div(max(constants.maxAltitudeMeters, 1));
+  const shapeCoordinate = vec3(warpedUv.x, warpedUv.y, heightFraction);
+  const detailCoordinate = vec3(warpedUv.x.mul(4), warpedUv.y.mul(4), heightFraction.mul(4));
+  const baseShape = texture3D(shape, shapeCoordinate).r;
+  const detailShape = texture3D(shapeDetail, detailCoordinate).r;
   const weather = texture(localWeather, baseUv);
   const total = float(0).toVar();
 
@@ -549,9 +551,9 @@ export function createCloudBeautyMarchNode({
         rayFar.sub(rayNear).div(constants.primarySteps),
         0,
       );
-      const blueNoise = texture(
+      const blueNoise = texture3D(
         stbn,
-        vec3(uv, float((stochasticSequenceIndex % 64) + 0.5).div(64)),
+        vec3(uv.x, uv.y, float((stochasticSequenceIndex % 64) + 0.5).div(64)),
       ).r;
       const distanceAlongRay = rayNear.add(stepLength.mul(blueNoise)).toVar();
       const transmittance = float(1).toVar();

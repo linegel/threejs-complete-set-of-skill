@@ -11,9 +11,11 @@ import {
   instanceIndex,
   select,
   texture,
+  texture3D,
   textureStore,
   uvec2,
   vec2,
+  vec3,
   vec4,
 } from "three/tsl";
 
@@ -175,9 +177,10 @@ export function createCloudShadowMarchNode({ shadowConfig, targets, cascadeIndex
       );
       const weatherUv = worldPosition.xz.mul(1 / 120000);
       const weather = texture(localWeather, weatherUv).rgb;
-      const shapeDensity = texture(
+      const warped = weatherUv.mul(4);
+      const shapeDensity = texture3D(
         shape,
-        vec4(weatherUv.mul(4), depthFraction, 0).xyz,
+        vec3(warped.x, warped.y, depthFraction),
       ).r;
       const dimensionlessDensity = weather.r
         .max(weather.g)
