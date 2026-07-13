@@ -42,6 +42,7 @@ function pngFromCapture( capture ) {
 const options = args( process.argv.slice( 2 ) );
 let server = null;
 let browser = null;
+let page = null;
 
 try {
 
@@ -56,17 +57,27 @@ try {
 
 	}
 	const { chromium } = await import( 'playwright' );
-	// Match capture-lab-browser: Vulkan is Linux-only; Metal is the native WebGPU path on macOS.
-	const launchArgs = [ '--enable-unsafe-webgpu', '--disable-gpu-sandbox' ];
-	if ( process.platform !== 'darwin' ) {
-		launchArgs.splice( 1, 0, '--enable-features=Vulkan,UseSkiaRenderer' );
-	}
-	browser = await chromium.launch( {
-		headless: true,
-		args: launchArgs
-	} );
+	// Prefer the already-running Google Chrome (CDP). Never spin a second
+	// Playwright Chromium when CAPTURE_CDP_ENDPOINT or channel=chrome is available.
+	const cdpEndpoint = process.env.CAPTURE_CDP_ENDPOINT;
 	const viewport = options.profile === 'performance' ? { width: 1920, height: 1080 } : { width: 1200, height: 800 };
-	const page = await browser.newPage( { viewport, deviceScaleFactor: 1 } );
+	if ( typeof cdpEndpoint === 'string' && cdpEndpoint.length > 0 ) {
+		browser = await chromium.connectOverCDP( cdpEndpoint );
+		const context = browser.contexts()[ 0 ] ?? await browser.newContext( {
+			viewport,
+			deviceScaleFactor: 1,
+		} );
+		page = await context.newPage();
+		await page.setViewportSize( viewport );
+	} else {
+		// Installed Google Chrome via Playwright channel — same default as capture-lab-browser on darwin.
+		browser = await chromium.launch( {
+			channel: process.env.CAPTURE_BROWSER_CHANNEL || ( process.platform === 'darwin' ? 'chrome' : undefined ),
+			headless: true,
+			args: [ '--enable-unsafe-webgpu', '--disable-gpu-sandbox' ],
+		} );
+		page = await browser.newPage( { viewport, deviceScaleFactor: 1 } );
+	}
 	const browserErrors = [];
 	page.on( 'pageerror', ( error ) => browserErrors.push( String( error.stack ?? error.message ) ) );
 	page.on( 'console', ( message ) => {
@@ -179,7 +190,10 @@ try {
 
 } finally {
 
-	await browser?.close();
+	// Close only the page we opened. On CDP, browser.close() disconnects
+	// Playwright without quitting the user's already-running Chrome.
+	try { await page?.close(); } catch { /* page may already be closed */ }
+	try { await browser?.close(); } catch { /* CDP disconnect or browser already gone */ }
 	await server?.close();
 
 }
