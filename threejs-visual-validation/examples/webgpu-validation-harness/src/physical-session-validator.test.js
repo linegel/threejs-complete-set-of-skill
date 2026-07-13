@@ -8,8 +8,10 @@ import { test } from 'node:test';
 import { numericDatum } from './physical-evidence-common.js';
 import { createCorrectnessCaptureSessionFixture, createCorrectnessResourceLedgerFixture } from './correctness-capture-session.fixture.js';
 import { HARDWARE_PERFORMANCE_CONTRACT, HARDWARE_PERFORMANCE_ROUTE_PLAN, PHYSICAL_ROUTE_PLAN } from './in-app-evidence-plan.js';
+import { assertLabelledNumerics } from './numeric-evidence.js';
 import { createRuntimeGovernorTrace, createRuntimePerformanceTrace } from './physical-performance-trace.js';
 import { projectValidationHarnessPerformanceEvidence } from './performance-evidence-projection.js';
+import { projectValidationHarnessPerformanceResources } from './performance-resource-projection.js';
 import { validatePhysicalEvidenceRecordFile } from './physical-validate-record.js';
 import {
 	hashPhysicalRecord,
@@ -404,6 +406,44 @@ function correctnessCaptureSession() {
 	return createCorrectnessCaptureSessionFixture();
 
 }
+
+function boundArtifact( path, document, kind = 'normative-json' ) {
+
+	const bytes = Buffer.from( `${ JSON.stringify( document, null, 2 ) }\n` );
+	return {
+		bytes,
+		ledgerEntry: {
+			path,
+			status: 'captured',
+			kind,
+			sha256: `sha256:${ createHash( 'sha256' ).update( bytes ).digest( 'hex' ) }`,
+			byteLength: bytes.byteLength
+		}
+	};
+
+}
+
+function correctnessProjectionArtifacts() {
+
+	return Object.fromEntries( [
+		[ 'renderer-info.json', { schemaVersion: 2, threeRevision: '0.185.1', captureProfile: 'correctness', adapterClass: 'software', timestampSupport: false } ],
+		[ 'render-targets.json', { schemaVersion: 2, targets: [], accountingScope: 'correctness-lane' } ],
+		[ 'resident-resources.json', { schemaVersion: 2, textures: [], accountingScope: 'correctness-lane' } ],
+		[ 'bandwidth-model.json', { schemaVersion: 2, verdict: 'INSUFFICIENT_EVIDENCE', hardwareCountersAvailable: false } ]
+	].map( ( [ path, document ] ) => [ path, boundArtifact( path, document ) ] ) );
+
+}
+
+function tierVisualResourceEvidence() {
+
+	const document = tierVisualEvidence();
+	const resourceEvidence = correctnessCaptureSession().hookResult.tierVisualEvidence;
+	document.binding.reference.resources = structuredClone( resourceEvidence.binding.reference.resources );
+	document.binding.candidate.resources = structuredClone( resourceEvidence.binding.candidate.resources );
+	document.bindingSha256 = hashPhysicalRecord( { binding: document.binding, metrics: document.metrics, gates: document.gates } );
+	return document;
+
+}
 test( 'complete 19-route physical session passes strict validation', () => {
 
 	const session = baseSession( 'physical-route', PHYSICAL_ROUTE_PLAN );
@@ -707,6 +747,92 @@ test( 'offline performance projection binds the exact hardware and tier-evidence
 		tierVisualEvidenceLedgerEntry,
 		correctnessIdentity: { ...correctnessIdentity, buildRevision: HASH_C }
 	} ), /buildRevision differ/ );
+
+} );
+
+test( 'offline resource projection preserves correctness artifacts and adds bound hardware tiers', async () => {
+
+	const imported = await importedWrapper( performanceSession() );
+	const verifiedPerformance = await loadVerifiedImportedPhysicalRecord( imported.path, { expectedProfile: 'performance' } );
+	const tierDocument = tierVisualResourceEvidence();
+	const tierInput = boundArtifact( 'tier-visual-evidence.json', tierDocument, 'supplementary-json' );
+	const correctnessIdentity = { sourceClosureHash: HASH_A, buildRevision: HASH_B, threeRevision: '0.185.1' };
+	const correctnessArtifacts = correctnessProjectionArtifacts();
+	const result = projectValidationHarnessPerformanceResources( {
+		verifiedPerformance,
+		tierVisualEvidenceBytes: tierInput.bytes,
+		tierVisualEvidenceLedgerEntry: tierInput.ledgerEntry,
+		correctnessIdentity,
+		correctnessArtifacts
+	} );
+	const renderer = result.artifacts[ 'renderer-info.json' ];
+	const targets = result.artifacts[ 'render-targets.json' ];
+	const resident = result.artifacts[ 'resident-resources.json' ];
+	const bandwidth = result.artifacts[ 'bandwidth-model.json' ];
+	assert.equal( renderer.captureProfile, 'correctness' );
+	assert.equal( renderer.performanceLane.adapterClass, 'hardware' );
+	assert.equal( renderer.performanceLane.timestampSupport, true );
+	assert.deepEqual( targets.performanceTierInventories.map( ( entry ) => entry.tier ), [ 'target-performance', 'governor-stress' ] );
+	assert.equal( targets.performanceTierInventories[ 0 ].targets.find( ( target ) => target.semantic === 'output' ).width.value, 1920 );
+	assert.equal( targets.performanceTierInventories[ 1 ].targets.find( ( target ) => target.semantic === 'output' ).width.value, 960 );
+	assert.equal( targets.performanceTransition.peakSimultaneousLiveBytes.status, 'NOT_CLAIMED' );
+	assert.equal( resident.opaqueRendererInternalResidency.status, 'NOT_CLAIMED' );
+	assert.equal( bandwidth.hardwareBandwidthVerdict, 'NOT_CLAIMED' );
+	assertLabelledNumerics( renderer.performanceLane, { allowedBarePaths: [] } );
+	assertLabelledNumerics( targets.performanceTierInventories, { allowedBarePaths: [] } );
+	for ( const artifact of Object.values( result.artifacts ) ) assertLabelledNumerics( artifact );
+	assert.equal( Object.isFrozen( result ), true );
+
+	const staleArtifacts = correctnessProjectionArtifacts();
+	staleArtifacts[ 'renderer-info.json' ].ledgerEntry.sha256 = HASH_D;
+	assert.throws( () => projectValidationHarnessPerformanceResources( {
+		verifiedPerformance,
+		tierVisualEvidenceBytes: tierInput.bytes,
+		tierVisualEvidenceLedgerEntry: tierInput.ledgerEntry,
+		correctnessIdentity,
+		correctnessArtifacts: staleArtifacts
+	} ), /bytes differ from the correctness ledger/ );
+
+	const wrongTierDocument = structuredClone( tierDocument );
+	wrongTierDocument.binding.candidate.resources.sceneMrt[ 0 ].width ++;
+	wrongTierDocument.bindingSha256 = hashPhysicalRecord( { binding: wrongTierDocument.binding, metrics: wrongTierDocument.metrics, gates: wrongTierDocument.gates } );
+	const wrongTierInput = boundArtifact( 'tier-visual-evidence.json', wrongTierDocument, 'supplementary-json' );
+	assert.throws( () => projectValidationHarnessPerformanceResources( {
+		verifiedPerformance,
+		tierVisualEvidenceBytes: wrongTierInput.bytes,
+		tierVisualEvidenceLedgerEntry: wrongTierInput.ledgerEntry,
+		correctnessIdentity,
+		correctnessArtifacts
+	} ), /resource output.width differs from the hardware route inventory/ );
+
+	const wrongRendererArtifacts = correctnessProjectionArtifacts();
+	wrongRendererArtifacts[ 'renderer-info.json' ] = boundArtifact( 'renderer-info.json', {
+		schemaVersion: 2,
+		threeRevision: '0.185.1',
+		captureProfile: 'performance'
+	} );
+	assert.throws( () => projectValidationHarnessPerformanceResources( {
+		verifiedPerformance,
+		tierVisualEvidenceBytes: tierInput.bytes,
+		tierVisualEvidenceLedgerEntry: tierInput.ledgerEntry,
+		correctnessIdentity,
+		correctnessArtifacts: wrongRendererArtifacts
+	} ), /retain captureProfile=correctness/ );
+
+	const timestampedCorrectnessArtifacts = correctnessProjectionArtifacts();
+	timestampedCorrectnessArtifacts[ 'renderer-info.json' ] = boundArtifact( 'renderer-info.json', {
+		schemaVersion: 2,
+		threeRevision: '0.185.1',
+		captureProfile: 'correctness',
+		timestampSupport: true
+	} );
+	assert.throws( () => projectValidationHarnessPerformanceResources( {
+		verifiedPerformance,
+		tierVisualEvidenceBytes: tierInput.bytes,
+		tierVisualEvidenceLedgerEntry: tierInput.ledgerEntry,
+		correctnessIdentity,
+		correctnessArtifacts: timestampedCorrectnessArtifacts
+	} ), /retain timestampSupport=false/ );
 
 } );
 
