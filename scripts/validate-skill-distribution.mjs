@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { existsSync, lstatSync, readFileSync, readdirSync } from 'node:fs';
-import { dirname, join, relative, resolve, sep } from 'node:path';
+import { dirname, extname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -51,8 +51,110 @@ const frontmatter = (text, path) => {
 const localTargets = (text) => {
   const targets = [];
   for (const match of text.matchAll(/!?\[[^\]]*\]\(([^)]+)\)/g)) targets.push(match[1]);
-  for (const match of text.matchAll(/`((?:references|scripts)\/[^`\s]+\.(?:md|py))`/g)) targets.push(match[1]);
+  for (const match of text.matchAll(/`((?:references|scripts|examples|assets|fixtures)\/[^`\s]+)`/g)) targets.push(match[1]);
   return targets;
+};
+
+const markdownProse = (text, path) => {
+  const lines = [];
+  let fence = '';
+  for (const line of text.split(/\r?\n/)) {
+    const marker = line.match(/^\s{0,3}(`{3,}|~{3,})(.*)$/);
+    if (!fence && marker) {
+      fence = marker[1];
+      continue;
+    }
+    if (fence && marker && marker[1][0] === fence[0] && marker[1].length >= fence.length && !marker[2].trim()) {
+      fence = '';
+      continue;
+    }
+    if (!fence) lines.push(line);
+  }
+  if (fence) fail(`${path} has an unclosed code fence`);
+  return lines.join('\n');
+};
+
+const textCache = new Map();
+const readText = (path) => {
+  if (textCache.has(path)) return textCache.get(path);
+  const content = readFileSync(path);
+  const text = content.includes(0) ? null : content.toString('utf8');
+  const decoded = text?.includes('\uFFFD') ? null : text;
+  textCache.set(path, decoded);
+  return decoded;
+};
+
+const anchorCache = new Map();
+const markdownAnchors = (path) => {
+  if (anchorCache.has(path)) return anchorCache.get(path);
+  const anchors = new Set();
+  const counts = new Map();
+  for (const line of markdownProse(readText(path), relative(root, path)).split(/\r?\n/)) {
+    for (const match of line.matchAll(/<(?:a\s+)?(?:id|name)=["']([^"']+)["']/gi)) anchors.add(match[1]);
+    const heading = line.match(/^#{1,6}\s+(.+?)\s*#*\s*$/)?.[1];
+    if (!heading) continue;
+    const base = heading
+      .replace(/!\[([^\]]*)\]\([^)]*\)|\[([^\]]+)\]\([^)]*\)/g, '$1$2')
+      .replace(/<[^>]*>|[`*_~]/g, '')
+      .toLowerCase()
+      .trim()
+      .replace(/[^\p{L}\p{N}\s-]/gu, '')
+      .replace(/\s+/g, '-');
+    const count = counts.get(base) ?? 0;
+    anchors.add(count ? `${base}-${count}` : base);
+    counts.set(base, count + 1);
+  }
+  anchorCache.set(path, anchors);
+  return anchors;
+};
+
+const runtimeTargets = (text, path) => {
+  const extension = extname(path).toLowerCase();
+  const targets = [];
+  const collect = (pattern, resolution = 'exact') => {
+    for (const match of text.matchAll(pattern)) targets.push({ target: match[1], resolution });
+  };
+  const collectJavaScript = () => {
+    collect(/\bimport\s*["']([^"']+)["']/g, 'module');
+    collect(/\b(?:import|export)\s+[^;]*?\sfrom\s*["']([^"']+)["']/g, 'module');
+    collect(/\b(?:import|require)\s*\(\s*["']([^"']+)["']\s*\)/g, 'module');
+    collect(/\bnew\s+URL\s*\(\s*["']([^"']+)["']\s*,\s*import\.meta\.url\s*\)/g);
+    collect(/\bfetch\s*\(\s*["']([^"']+)["']/g);
+    collect(/\b(?:readFile|readFileSync)\s*\(\s*["']([^"']+)["']/g);
+  };
+  if (['.cjs', '.js', '.jsx', '.mjs', '.ts', '.tsx'].includes(extension)) {
+    collectJavaScript();
+  } else if (['.htm', '.html', '.svg'].includes(extension)) {
+    collect(/\b(?:href|src)=["']([^"']+)["']/gi);
+    collectJavaScript();
+  } else if (extension === '.css') {
+    collect(/@import\s+(?:url\(\s*)?["']([^"']+)["']/gi);
+    collect(/\burl\(\s*["']?([^"')]+)["']?\s*\)/gi);
+  } else if (extension === '.py') {
+    for (const match of text.matchAll(/^\s*from\s+(\.+)([\w.]*)\s+import\s+([A-Za-z_]\w*)/gm)) {
+      const module = match[2] || match[3];
+      targets.push({
+        target: `${'../'.repeat(match[1].length - 1)}${module.replaceAll('.', '/')}`,
+        resolution: 'python',
+      });
+    }
+  }
+  return targets.filter(({ target, resolution }) => resolution === 'module'
+    ? target.startsWith('.') || target.startsWith('/')
+    : !target.startsWith('#') && !target.startsWith('//') && !/^[a-z][a-z0-9+.-]*:/i.test(target));
+};
+
+const moduleExtensions = ['.js', '.jsx', '.mjs', '.cjs', '.ts', '.tsx', '.json', '.css'];
+const resolvedDependency = (path, resolution, source, pointer) => {
+  if (existsSync(path) && lstatSync(path).isFile()) return path;
+  const candidates = resolution === 'module' && !moduleExtensions.includes(extname(path))
+    ? [...moduleExtensions.map((extension) => `${path}${extension}`), ...moduleExtensions.map((extension) => join(path, `index${extension}`))]
+    : resolution === 'python'
+      ? [`${path}.py`, join(path, '__init__.py')]
+      : [];
+  const files = candidates.filter((candidate) => existsSync(candidate) && lstatSync(candidate).isFile());
+  if (files.length > 1) fail(`${relative(root, source)} has an ambiguous local dependency: ${pointer}`);
+  return files[0] ?? path;
 };
 
 const interfaceMetadata = (text, path) => {
@@ -72,11 +174,12 @@ const forbiddenGuidance = [
   [/\bPhysics(?:Context|Graph|SignalDescriptor|PresentationSnapshot|CostLedger)\b/, 'retired physics ABI'],
   [/physics-domain-and-interaction-contract|physics-interchange-abi/i, 'retired physics contract'],
   [/threejs-physics-integration/i, 'experimental skill route'],
-  [/lab\.manifest\.json|labs\/schema\/evidence-bundle/i, 'repository lab contract'],
+  [/labs\/schema\/evidence-bundle/i, 'repository lab contract'],
   [/\bnpm\s+--prefix\s+threejs-|\bfrom the repository root\b/i, 'repository-only command'],
   [/\bCodex(?:'s)? in-app Browser\b|Playwright capture harness/i, 'repository QA surface'],
 ];
-const allowedRootEntries = new Set(['SKILL.md', 'LICENSE', 'agents', 'references', 'scripts']);
+const resourceRoots = ['references', 'scripts', 'examples', 'assets', 'fixtures'];
+const allowedRootEntries = new Set(['SKILL.md', 'LICENSE', 'agents', ...resourceRoots]);
 let files = 0;
 let bytes = 0;
 let lines = 0;
@@ -89,6 +192,10 @@ for (const skillName of skillNames) {
   for (const required of ['SKILL.md', 'LICENSE', 'agents/openai.yaml']) {
     const path = join(skillRoot, required);
     if (!existsSync(path) || !lstatSync(path).isFile()) fail(`${skillName}/${required} is missing`);
+  }
+  const agentEntries = readdirSync(join(skillRoot, 'agents'), { withFileTypes: true });
+  if (agentEntries.length !== 1 || agentEntries[0].name !== 'openai.yaml' || !agentEntries[0].isFile()) {
+    fail(`${skillName}/agents must contain only openai.yaml`);
   }
 
   const productFiles = [];
@@ -123,17 +230,38 @@ for (const skillName of skillNames) {
     const source = pending.pop();
     if (visited.has(source)) continue;
     visited.add(source);
-    const text = readFileSync(source, 'utf8');
-    if ((text.match(/^```/gm) ?? []).length % 2) fail(`${relative(root, source)} has an unclosed code fence`);
+    const text = readText(source);
+    if (text === null) continue;
 
-    for (let target of localTargets(text)) {
-      target = target.trim().split(/\s+["']/)[0].replace(/^<|>$/g, '').split('#')[0].split('?')[0];
-      if (!target || /^[a-z][a-z0-9+.-]*:/i.test(target) || target.startsWith('#')) continue;
-      const path = resolve(dirname(source), decodeURIComponent(target));
-      if (!within(skillRoot, path)) fail(`${relative(root, source)} links outside its installed skill: ${target}`);
-      if (!existsSync(path) || !lstatSync(path).isFile()) fail(`${relative(root, source)} links to missing file: ${target}`);
+    const markdown = extname(source).toLowerCase() === '.md';
+    const targets = markdown
+      ? localTargets(markdownProse(text, relative(root, source))).map((target) => ({ target, resolution: 'exact' }))
+      : runtimeTargets(text, source);
+    for (const { target, resolution } of targets) {
+      const pointer = (markdown
+        ? target.trim().split(/\s+["']/)[0]
+        : target.trim()).replace(/^<|>$/g, '');
+      if (!pointer || pointer.startsWith('//') || /^[a-z][a-z0-9+.-]*:/i.test(pointer)) continue;
+      const hash = pointer.indexOf('#');
+      const fragment = hash === -1 ? '' : pointer.slice(hash + 1);
+      const fileTarget = (hash === -1 ? pointer : pointer.slice(0, hash)).split('?', 1)[0];
+      let decodedTarget;
+      let decodedFragment;
+      try {
+        decodedTarget = decodeURIComponent(fileTarget);
+        decodedFragment = decodeURIComponent(fragment);
+      } catch {
+        fail(`${relative(root, source)} contains invalid percent encoding: ${pointer}`);
+      }
+      const unresolved = fileTarget ? resolve(dirname(source), decodedTarget) : source;
+      const path = resolvedDependency(unresolved, resolution, source, pointer);
+      if (!within(skillRoot, path)) fail(`${relative(root, source)} links outside its installed skill: ${pointer}`);
+      if (!existsSync(path) || !lstatSync(path).isFile()) fail(`${relative(root, source)} links to missing file: ${pointer}`);
+      if (decodedFragment && extname(path).toLowerCase() === '.md' && !markdownAnchors(path).has(decodedFragment)) {
+        fail(`${relative(root, source)} links to missing anchor: ${pointer}`);
+      }
       reachable.add(path);
-      if (path.endsWith('.md') && !visited.has(path) && !pending.includes(path)) pending.push(path);
+      if (!visited.has(path) && !pending.includes(path)) pending.push(path);
     }
   }
 
@@ -141,17 +269,19 @@ for (const skillName of skillNames) {
   const orphaned = productFiles.filter((path) => !reachable.has(path) && !standalone.has(path));
   if (orphaned.length) fail(`${skillName} contains unreachable product files: ${orphaned.map((p) => relative(skillRoot, p)).join(', ')}`);
   for (const path of productFiles) {
-    const text = readFileSync(path);
-    const decoded = text.toString('utf8');
-    for (const [pattern, label] of forbiddenGuidance) {
-      if (pattern.test(decoded)) fail(`${relative(root, path)} contains ${label}`);
-    }
-    for (const match of decoded.matchAll(/\$(threejs-[a-z0-9-]+)/g)) {
-      if (!rosterSet.has(match[1])) fail(`${relative(root, path)} invokes unknown skill ${match[1]}`);
+    const content = readFileSync(path);
+    const decoded = readText(path);
+    if (decoded !== null) {
+      for (const [pattern, label] of forbiddenGuidance) {
+        if (pattern.test(decoded)) fail(`${relative(root, path)} contains ${label}`);
+      }
+      for (const match of decoded.matchAll(/\$(threejs-[a-z0-9-]+)/g)) {
+        if (!rosterSet.has(match[1])) fail(`${relative(root, path)} invokes unknown skill ${match[1]}`);
+      }
+      lines += decoded.split(/\r?\n/).length;
     }
     files += 1;
-    bytes += text.byteLength;
-    lines += decoded.split(/\r?\n/).length;
+    bytes += content.byteLength;
   }
 }
 

@@ -59,6 +59,7 @@ const PUBLISHER = {
   },
 };
 const PUBLISHER_REF = { '@id': PUBLISHER_ID };
+const RAW_REPO = 'https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main';
 const DEMO_REGISTRY = buildDemoRegistry();
 const AUTHORITATIVE_SKILL_SLUGS = new Set(authoritativeSkillDirs());
 if (AUTHORITATIVE_SKILL_SLUGS.size !== 27) {
@@ -233,7 +234,8 @@ const previewPicture = (src, alt, attributes = '') => {
         </picture>`;
 };
 const rewriteSkillBodyLinks = (html, slug) => html
-  .replace(/href="((?:references|scripts)\/[^"?#]*)([?#][^"]*)?"/g, (_match, path, suffix = '') => {
+  .replace(/\b(href|src)="((?:references|scripts|examples|assets|fixtures)\/[^"?#]*)([?#][^"]*)?"/g, (_match, attribute, path, suffix = '') => {
+    if (attribute === 'src') return `src="${RAW_REPO}/skills/${slug}/${path}${suffix}"`;
     const view = path.endsWith('/') ? 'tree' : 'blob';
     return `href="${REPO}/${view}/main/skills/${slug}/${path}${suffix}"`;
   })
@@ -955,7 +957,7 @@ const HARNESSES = [
   { name: 'skills CLI', how: 'Use the open skills installer to list the pack, then install every skills/threejs-* directory as one coherent graphics skill pack for your selected agent.', code: `${SKILLS_ADD} --list\n${SKILLS_INSTALL_PACK}` },
   { name: 'Claude Code', how: 'Install through skills CLI, or symlink/copy the installable skill folders into a personal or project skills directory.', code: `${SKILLS_ADD} --skill '*' -a claude-code -g -y\n# manual fallback:\ngit clone ${REPO}.git\nln -s "$PWD/threejs-complete-set-of-skill"/skills/threejs-* ~/.claude/skills/` },
   { name: 'Codex CLI', how: 'Install the whole pack through skills CLI when available. For local checkouts, keep AGENTS.md pointed at the repo-local skills/threejs-*/SKILL.md files as the authoritative source.', code: `${SKILLS_ADD} --skill '*' -a codex -g -y\n# local checkout fallback: read ./skills/threejs-*/SKILL.md when a task matches` },
-  { name: 'Cursor / Gemini / generic agents', how: 'Install with copy mode, then expose the installed skill directories directly to the harness. In a repository checkout, each installable source directory is skills/<name>/. Repository examples and labs remain separate validation material.', code: `${SKILLS_ADD} --skill '*' --copy -y\n# configure the harness with the installed skill directories\ncurl -s ${SITE}skills.json | jq '.install.source, .skills[].name'\ncurl -s ${SITE}llms.txt` },
+  { name: 'Cursor / Gemini / generic agents', how: 'Install with copy mode, then expose the installed skill directories directly to the harness. In a repository checkout, each installable source directory is skills/<name>/; its reachable bundled references, scripts, examples, assets, and fixtures install with it. Top-level repository demos and labs remain separate validation material.', code: `${SKILLS_ADD} --skill '*' --copy -y\n# configure the harness with the installed skill directories\ncurl -s ${SITE}skills.json | jq '.install.source, .skills[].name'\ncurl -s ${SITE}llms.txt` },
 ];
 
 const harnessSection = HARNESSES.map((h, i) => `
@@ -1732,7 +1734,7 @@ Guides and decision support: ${SITE}guides/
 About and evidence methodology: ${aboutUrl}
 Install (Claude Code): git clone ${REPO}.git && ln -s "$PWD/threejs-complete-set-of-skill"/skills/threejs-* ~/.claude/skills/
 Install (skills CLI): ${SKILLS_ADD} --list; ${SKILLS_INSTALL_PACK}; or ${SKILLS_ADD} --skill '*' -g -a codex -y for non-interactive Codex setup.
-Install (any agent): clone the repo or use the skills CLI; each skills/<name>/ product directory contains SKILL.md (YAML frontmatter: name, description) and may include references/, scripts/, and license files. Repository examples and labs remain separate validation material.
+Install (any agent): clone the repo or use the skills CLI; each skills/<name>/ product directory contains SKILL.md (YAML frontmatter: name, description), its license and interface metadata, and any reachable bundled references, scripts, examples, assets, or fixtures. Top-level repository demos and labs remain separate validation material.
 Machine-readable index: ${SITE}skills.json
 Versioned demo registry: ${SITE}demos/registry.json
 Routing: after installing the whole pack, start broad requests with threejs-choose-skills; it selects the smallest useful in-pack skill set.

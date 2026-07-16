@@ -29,8 +29,11 @@ npx skills@latest add linegel/threejs-complete-set-of-skill --skill '*' -g -a cl
 
 The authoritative installable product is [`skills/`](skills/). Runtimes without
 the skills CLI can copy the required `skills/<name>/` directories into their local
-skills directory. Repository examples, labs, reviews, and generated media are not
-part of an installed skill.
+skills directory. A skill may include self-contained references, scripts, examples,
+assets, or fixtures when reachable from `SKILL.md`. Statically named local
+dependencies of linked scripts and examples are included through the same checked
+closure. Full demos, labs, reviews, and generated media under the top-level
+`threejs-*` directories remain repository-only.
 
 For a request spanning several rendering systems, start with
 `threejs-choose-skills`. Focused requests can invoke the owning skill directly.
@@ -102,15 +105,22 @@ skills/<name>/                 Installable product
   agents/openai.yaml           Human-facing name, summary, and default prompt
   references/                  Branch-specific technical guidance
   scripts/                     Invoked helper, only when indispensable
+  examples/                    Minimal canonical examples, when clearer than prose
+  assets/                      Inputs or templates used by the installed workflow
+  fixtures/                    Oracles that distinguish correct and incorrect output
   LICENSE                      License included with the standalone skill
 
-threejs-*/                     Repository examples, labs, and review material
+threejs-*/examples/            Full repository demos and labs
+threejs-*/assets/              Demo, evidence, and generated media
+threejs-*/                     Other repository review and validation material
 threejs-physics-integration/   Experimental notes; not an installable skill
 ```
 
 Every public skill is model-invoked. Its description names the real invocation
 branches; common decisions stay in `SKILL.md`; branch-only equations, API rules,
-caveats, and validation methods are loaded through explicit context pointers.
+caveats, validation methods, and bundled resources are loaded through explicit
+context pointers. Unlinked or unreferenced bundled files are rejected from the
+installed product.
 
 ## Validation
 
@@ -121,11 +131,32 @@ closure, standalone links, licenses, and forbidden repository leakage:
 npm run skills:check
 ```
 
-Release verification also performs a real local `skills add . --skill '*' --copy`
-smoke installation and compares the copied tree with [`skills/`](skills/).
+Before release, run this manual copy-mode smoke installation from the repository
+root; it creates and uses a fresh scratch directory:
 
-Repository examples and labs have separate validation procedures. They support
-development but do not define the installed payload.
+```bash
+repo="$(pwd -P)"
+scratch="$(mktemp -d)"
+(
+  cd "$scratch"
+  npx skills@latest add "$repo" --skill '*' --copy -a codex -y
+)
+diff -qr "$repo/skills" "$scratch/.agents/skills"
+```
+
+The smoke passes only when the CLI discovers and installs all 27 skills, every
+copied skill directory matches its source under [`skills/`](skills/), and no
+top-level repository demo or lab is installed. The scratch check is deliberately
+manual; `npm run skills:check` does not claim to run it.
+
+Top-level repository examples and labs have separate validation procedures. They
+support development but are not installed. A resource becomes part of an installed
+skill only when it is self-contained under `skills/<name>/` and is either linked
+from reachable Markdown outside fenced code or is a statically named local
+dependency of a linked script or example. The validator follows JavaScript and
+TypeScript imports, `new URL`, `fetch`, and `readFile` calls; HTML/SVG `href` and
+`src` attributes plus inline module imports; CSS imports and URLs; and relative
+Python imports. Dynamically assembled paths require an explicit Markdown pointer.
 
 ## Quality rules
 
@@ -147,6 +178,8 @@ upstream MIT license. The duplicate Codex plugin bundle is not part of this repo
 
 ## Contributing
 
-Edit the authoritative files under `skills/<name>/`. Keep examples and repository
-validation outside that directory. Run `npm run skills:check`, then run the directly
-relevant example or lab validation when implementation evidence changed.
+Edit the authoritative files under `skills/<name>/`. Bundle a reference, script,
+example, asset, or fixture only when it is self-contained and reachable from the
+installed workflow. Keep full demos, labs, and repository validation outside that
+directory. Run `npm run skills:check`, then run the directly relevant example or
+lab validation when implementation evidence changed.

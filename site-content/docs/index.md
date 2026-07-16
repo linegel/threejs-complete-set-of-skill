@@ -29,7 +29,7 @@ For the contract presented to coding agents, continue to the [agent documentatio
 
 ## Understand how the pack is intended to work
 
-The installable product is the `skills/` tree. Each published `skills/<name>/` directory contains its `SKILL.md` plus any bundled references or agent metadata it needs. Repository examples, labs, reviews, and generated media remain repository-only and are not part of the installed payload.
+The installable product is the `skills/` tree. Each published `skills/<name>/` directory contains its `SKILL.md`, license, interface metadata, and any reachable self-contained references, scripts, examples, assets, or fixtures it needs. Full examples under top-level `threejs-*/examples/`, plus repository labs, reviews, and generated media, remain repository-only and are not part of the installed payload.
 
 Install the complete pack when you want broad routing. `threejs-choose-skills` selects from the installed inventory, so it is not the recommended standalone installation target. For a focused request with a known owner, invoke that subject skill directly instead of asking the router to rediscover an obvious route.
 

@@ -31,7 +31,7 @@ Install the complete pack when broad routing is required. `threejs-choose-skills
 
 For a manual personal installation, clone the repository and symlink or copy the required `skills/<name>/` directories into `~/.claude/skills/`. For a project-specific installation, use the project's `.claude/skills/` directory.
 
-A symlink keeps one maintained source, while a copied folder becomes an independent version that needs an update policy. Preserve each complete directory from `skills/` rather than extracting only `SKILL.md`; bundled references and agent metadata may be required. Repository examples, labs, reviews, and generated media stay in the checkout and are not installed skill payload.
+A symlink keeps one maintained source, while a copied folder becomes an independent version that needs an update policy. Preserve each complete directory from `skills/` rather than extracting only `SKILL.md`; its interface metadata and reachable self-contained references, scripts, examples, assets, and fixtures are part of the installed skill. Full examples under top-level `threejs-*/examples/`, plus repository labs, reviews, and generated media, stay in the checkout and are not installed skill payload.
 
 Do not paste the full pack into `CLAUDE.md`. Project instructions should state when and where to load skills, while the skill folders retain the detailed technical contract. Existing project rules continue to own generic application architecture and repository workflow.
 

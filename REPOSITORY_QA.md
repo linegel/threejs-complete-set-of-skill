@@ -1,9 +1,12 @@
 # Repository QA and release boundaries
 
-The 27 real directories under `skills/` are the installable product. Each may
-contain `SKILL.md`, `agents/openai.yaml`, references, scripts, and a license.
-Top-level `threejs-*` examples and all labs, generated evidence, and site output
-are repository material; the skills CLI must not copy them.
+The 27 real directories under `skills/` are the installable product. Each
+contains `SKILL.md`, `agents/openai.yaml`, and a license, and may contain
+self-contained references, scripts, examples, assets, or fixtures reachable
+from `SKILL.md`. Dependencies reached by a linked script or example must remain
+inside the same skill directory. Full examples under top-level
+`threejs-*/examples/`, plus labs, generated evidence, and site output, are
+repository material; the skills CLI must not copy them.
 
 Validation guidance inside a skill describes how an agent checks Three.js work
 created with that skill. It is not a release procedure for this repository.

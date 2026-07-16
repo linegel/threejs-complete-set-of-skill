@@ -62,7 +62,7 @@ The installed `skills/threejs-choose-skills/SKILL.md` file defines the current r
 
 If the agent cannot see the files, inspect the installer-selected directory for that agent and scope. Do not assume a global install is visible to a project-scoped runtime, or the reverse.
 
-If the target runtime does not support the CLI, clone the repository and point the runtime at the required `skills/<name>/` directories. Preserve each complete directory from `skills/`; repository examples, labs, reviews, and generated media remain checkout-only. Keep one authoritative copy when possible. A copied manual installation needs an explicit update process or it will drift from the repository.
+If the target runtime does not support the CLI, clone the repository and point the runtime at the required `skills/<name>/` directories. Preserve each complete directory from `skills/`, including its reachable self-contained references, scripts, examples, assets, and fixtures. Full examples under top-level `threejs-*/examples/`, plus repository labs, reviews, and generated media, remain checkout-only. Keep one authoritative copy when possible. A copied manual installation needs an explicit update process or it will drift from the repository.
 
 If only `threejs-choose-skills` was installed, either install the complete pack or limit the request to routing across the skills that are genuinely available. The router must report owner gaps rather than fabricate coverage.
 
