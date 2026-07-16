@@ -1,0 +1,250 @@
+{
+  "schemaVersion": 1,
+  "subjects": {
+    "official-threejs-docs": {
+      "name": "Official Three.js documentation",
+      "homepage": "https://threejs.org/docs/",
+      "facts": {
+      "owner": {
+        "value": "Upstream documentation published by the Three.js project",
+        "source_url": "https://github.com/mrdoob/three.js/tree/r185/docs",
+        "reviewed": "2026-07-16",
+        "pinned_commit": "2431a09f46f34c560bc8e44b33be0e567723d5b9"
+      },
+      "scope": {
+        "value": "API reference, manuals, the TSL specification, and official examples for the Three.js library",
+        "source_url": "https://threejs.org/docs/",
+        "reviewed": "2026-07-16"
+      },
+      "webgpu_guidance": {
+        "value": "The WebGPURenderer manual covers setup, asynchronous initialization, WebGL 2 fallback, TSL, node materials, post-processing, and migration constraints",
+        "source_url": "https://threejs.org/manual/en/webgpurenderer",
+        "reviewed": "2026-07-16"
+      },
+      "revision_source": {
+        "value": "Release r185 and its migration notes are available as a pinned upstream revision",
+        "source_url": "https://github.com/mrdoob/three.js/releases/tag/r185",
+        "reviewed": "2026-07-16",
+        "pinned_commit": "2431a09f46f34c560bc8e44b33be0e567723d5b9"
+      }
+      }
+    },
+    "general-ai-prompts": {
+      "name": "General AI prompts",
+      "homepage": "https://agentskills.io/specification",
+      "facts": {
+      "comparison_scope": {
+        "value": "This comparison uses the term for one-off free-form instructions supplied outside a reusable Agent Skills package; it is a category definition, not a product claim",
+        "source_url": "https://agentskills.io/specification",
+        "reviewed": "2026-07-16"
+      }
+      }
+    },
+    "threejs-game-skills": {
+      "name": "Three.js Game Skills",
+      "homepage": "https://github.com/majidmanzarpour/threejs-game-skills",
+      "facts": {
+      "positioning": {
+        "value": "Agent skills for building playable, polished Three.js browser games",
+        "source_url": "https://github.com/majidmanzarpour/threejs-game-skills/blob/8919acca095be36ea054c866a79997fca90e8b22/README.md",
+        "reviewed": "2026-07-16",
+        "pinned_commit": "8919acca095be36ea054c866a79997fca90e8b22"
+      },
+      "routing": {
+        "value": "A threejs-game-director routes gameplay, graphics, UI, asset generation, audio, debugging, and release verification",
+        "source_url": "https://github.com/majidmanzarpour/threejs-game-skills/blob/8919acca095be36ea054c866a79997fca90e8b22/README.md",
+        "reviewed": "2026-07-16",
+        "pinned_commit": "8919acca095be36ea054c866a79997fca90e8b22"
+      },
+      "packaged_workflow": {
+        "value": "The repository documents a Vite, TypeScript, and Three.js scaffold, deterministic test hooks, Playwright templates, mobile checks, visual checks, and bot playtests",
+        "source_url": "https://github.com/majidmanzarpour/threejs-game-skills/blob/8919acca095be36ea054c866a79997fca90e8b22/README.md",
+        "reviewed": "2026-07-16",
+        "pinned_commit": "8919acca095be36ea054c866a79997fca90e8b22"
+      },
+      "optional_services": {
+        "value": "Optional Tripo, Gemini, and ElevenLabs integrations are documented for generated models, images, and audio; the core skills can run without those keys",
+        "source_url": "https://github.com/majidmanzarpour/threejs-game-skills/blob/8919acca095be36ea054c866a79997fca90e8b22/README.md",
+        "reviewed": "2026-07-16",
+        "pinned_commit": "8919acca095be36ea054c866a79997fca90e8b22"
+      },
+      "installation": {
+        "value": "The README documents installation for Codex and Claude Code through the skills CLI or its local installer",
+        "source_url": "https://github.com/majidmanzarpour/threejs-game-skills/blob/8919acca095be36ea054c866a79997fca90e8b22/README.md",
+        "reviewed": "2026-07-16",
+        "pinned_commit": "8919acca095be36ea054c866a79997fca90e8b22"
+      },
+      "license": {
+        "value": "MIT, with a standalone LICENSE file linked by the repository",
+        "source_url": "https://github.com/majidmanzarpour/threejs-game-skills/blob/8919acca095be36ea054c866a79997fca90e8b22/LICENSE",
+        "reviewed": "2026-07-16",
+        "pinned_commit": "8919acca095be36ea054c866a79997fca90e8b22"
+      }
+      }
+    },
+    "threejs-skill-plugin": {
+      "name": "Three.js Skill Plugin for Claude Code",
+      "homepage": "https://github.com/kndoshn/threejs-skill-plugin",
+      "facts": {
+      "positioning": {
+        "value": "A repo-first Claude Code plugin for building, debugging, and optimizing Three.js applications",
+        "source_url": "https://github.com/kndoshn/threejs-skill-plugin/blob/0f395b6b8cf49c27b06f3ec613676ccbf9ebbdf6/README.md",
+        "reviewed": "2026-07-16",
+        "pinned_commit": "0f395b6b8cf49c27b06f3ec613676ccbf9ebbdf6"
+      },
+      "organization": {
+        "value": "One developing-threejs-apps skill with examples, playbooks, quality gates, evaluations, FAQ, references, and diagnostic scripts",
+        "source_url": "https://github.com/kndoshn/threejs-skill-plugin/blob/0f395b6b8cf49c27b06f3ec613676ccbf9ebbdf6/README.md",
+        "reviewed": "2026-07-16",
+        "pinned_commit": "0f395b6b8cf49c27b06f3ec613676ccbf9ebbdf6"
+      },
+      "compatibility": {
+        "value": "The README declares Three.js r150+, Vanilla JS, React and R3F, Vue, Svelte, Next.js, WebGL, and WebGPU coverage",
+        "source_url": "https://github.com/kndoshn/threejs-skill-plugin/blob/0f395b6b8cf49c27b06f3ec613676ccbf9ebbdf6/README.md",
+        "reviewed": "2026-07-16",
+        "pinned_commit": "0f395b6b8cf49c27b06f3ec613676ccbf9ebbdf6"
+      },
+      "installation": {
+        "value": "The README documents Claude Code plugin, project-local, and personal Claude skill installation",
+        "source_url": "https://github.com/kndoshn/threejs-skill-plugin/blob/0f395b6b8cf49c27b06f3ec613676ccbf9ebbdf6/README.md",
+        "reviewed": "2026-07-16",
+        "pinned_commit": "0f395b6b8cf49c27b06f3ec613676ccbf9ebbdf6"
+      },
+      "license_declaration": {
+        "value": "The reviewed README declares MIT",
+        "source_url": "https://github.com/kndoshn/threejs-skill-plugin/blob/0f395b6b8cf49c27b06f3ec613676ccbf9ebbdf6/README.md",
+        "reviewed": "2026-07-16",
+        "pinned_commit": "0f395b6b8cf49c27b06f3ec613676ccbf9ebbdf6"
+      },
+      "license_file_visibility": {
+        "value": "The reviewed repository tree does not expose a standalone LICENSE file",
+        "source_url": "https://github.com/kndoshn/threejs-skill-plugin/tree/0f395b6b8cf49c27b06f3ec613676ccbf9ebbdf6",
+        "reviewed": "2026-07-16",
+        "pinned_commit": "0f395b6b8cf49c27b06f3ec613676ccbf9ebbdf6"
+      }
+      }
+    },
+    "agent-skills": {
+      "name": "Agent Skills",
+      "homepage": "https://agentskills.io/",
+      "facts": {
+      "format": {
+        "value": "A skill is a directory with a required SKILL.md file and optional scripts, references, and assets",
+        "source_url": "https://agentskills.io/specification",
+        "reviewed": "2026-07-16"
+      },
+      "loading_model": {
+        "value": "The format supports progressive disclosure through metadata, full instructions, and referenced resources",
+        "source_url": "https://agentskills.io/specification",
+        "reviewed": "2026-07-16"
+      }
+      }
+    },
+    "threejs-mcp-tools": {
+      "name": "Three.js MCP tools",
+      "homepage": "https://modelcontextprotocol.io/specification/2025-06-18/server/tools",
+      "facts": {
+      "category": {
+        "value": "Model-controlled functions exposed by an MCP server so a language model can retrieve information or perform actions",
+        "source_url": "https://modelcontextprotocol.io/specification/2025-06-18/server/tools",
+        "reviewed": "2026-07-16"
+      },
+      "safety": {
+        "value": "The MCP tools specification recommends a human in the loop with the ability to deny tool invocations",
+        "source_url": "https://modelcontextprotocol.io/specification/2025-06-18/server/tools",
+        "reviewed": "2026-07-16"
+      }
+      }
+    },
+    "threejs-devtools-mcp": {
+      "name": "threejs-devtools-mcp",
+      "homepage": "https://github.com/DmitriyGolub/threejs-devtools-mcp",
+      "facts": {
+      "documented_capability": {
+        "value": "The reviewed README documents 59 tools for real-time Three.js scene inspection and modification",
+        "source_url": "https://github.com/DmitriyGolub/threejs-devtools-mcp/blob/36b17f36ec12150af1d62a05ae879256a60867d4/README.md",
+        "reviewed": "2026-07-16",
+        "pinned_commit": "36b17f36ec12150af1d62a05ae879256a60867d4"
+      },
+      "runtime": {
+        "value": "Its documented workflow injects a browser bridge and communicates with an open scene through WebSocket",
+        "source_url": "https://github.com/DmitriyGolub/threejs-devtools-mcp/blob/36b17f36ec12150af1d62a05ae879256a60867d4/README.md",
+        "reviewed": "2026-07-16",
+        "pinned_commit": "36b17f36ec12150af1d62a05ae879256a60867d4"
+      },
+      "frameworks": {
+        "value": "The README declares support for vanilla Three.js, React Three Fiber, and other frameworks",
+        "source_url": "https://github.com/DmitriyGolub/threejs-devtools-mcp/blob/36b17f36ec12150af1d62a05ae879256a60867d4/README.md",
+        "reviewed": "2026-07-16",
+        "pinned_commit": "36b17f36ec12150af1d62a05ae879256a60867d4"
+      },
+      "license": {
+        "value": "MIT, with a standalone LICENSE file linked by the repository",
+        "source_url": "https://github.com/DmitriyGolub/threejs-devtools-mcp/blob/36b17f36ec12150af1d62a05ae879256a60867d4/LICENSE",
+        "reviewed": "2026-07-16",
+        "pinned_commit": "36b17f36ec12150af1d62a05ae879256a60867d4"
+      }
+      }
+    },
+    "threejs-awesome-graphics-agent-skills": {
+      "name": "Three.js Awesome Graphics Agent Skills",
+      "homepage": "https://github.com/scottstts/Threejs-Awesome-Graphics-Agent-Skills",
+      "facts": {
+      "positioning": {
+        "value": "A graphics-focused Three.js agent skill pack with an attached example gallery",
+        "source_url": "https://github.com/scottstts/Threejs-Awesome-Graphics-Agent-Skills/blob/e43dcb03020cae5b08983a828bc1817dd6c0c40a/README.md",
+        "reviewed": "2026-07-16",
+        "pinned_commit": "e43dcb03020cae5b08983a828bc1817dd6c0c40a"
+      },
+      "scope": {
+        "value": "The README lists specialist graphics skills covering cameras, procedural systems, TSL and WebGPU, GLSL, post-processing, color, effects, and visual validation",
+        "source_url": "https://github.com/scottstts/Threejs-Awesome-Graphics-Agent-Skills/blob/e43dcb03020cae5b08983a828bc1817dd6c0c40a/README.md",
+        "reviewed": "2026-07-16",
+        "pinned_commit": "e43dcb03020cae5b08983a828bc1817dd6c0c40a"
+      },
+      "license": {
+        "value": "MIT, with a standalone LICENSE file linked by the repository",
+        "source_url": "https://github.com/scottstts/Threejs-Awesome-Graphics-Agent-Skills/blob/e43dcb03020cae5b08983a828bc1817dd6c0c40a/LICENSE",
+        "reviewed": "2026-07-16",
+        "pinned_commit": "e43dcb03020cae5b08983a828bc1817dd6c0c40a"
+      }
+      }
+    },
+    "three-agent-skills": {
+      "name": "Three Agent Skills",
+      "homepage": "https://github.com/emalorenzo/three-agent-skills",
+      "facts": {
+      "organization": {
+        "value": "Two skills: three-best-practices for Three.js and r3f-best-practices for React Three Fiber",
+        "source_url": "https://github.com/emalorenzo/three-agent-skills/blob/f950f95ae3b13581546e6d6d8b2f88a08eb3e577/README.md",
+        "reviewed": "2026-07-16",
+        "pinned_commit": "f950f95ae3b13581546e6d6d8b2f88a08eb3e577"
+      },
+      "scope": {
+        "value": "The README documents broad Three.js and R3F best-practice rules including performance, memory, shaders, assets, physics, WebXR, mobile, and production topics",
+        "source_url": "https://github.com/emalorenzo/three-agent-skills/blob/f950f95ae3b13581546e6d6d8b2f88a08eb3e577/README.md",
+        "reviewed": "2026-07-16",
+        "pinned_commit": "f950f95ae3b13581546e6d6d8b2f88a08eb3e577"
+      },
+      "agents": {
+        "value": "The README lists Claude Code, Cursor, Codex, OpenCode, and VS Code Copilot among compatible Agent Skills clients",
+        "source_url": "https://github.com/emalorenzo/three-agent-skills/blob/f950f95ae3b13581546e6d6d8b2f88a08eb3e577/README.md",
+        "reviewed": "2026-07-16",
+        "pinned_commit": "f950f95ae3b13581546e6d6d8b2f88a08eb3e577"
+      },
+      "license_declaration": {
+        "value": "The reviewed README declares MIT",
+        "source_url": "https://github.com/emalorenzo/three-agent-skills/blob/f950f95ae3b13581546e6d6d8b2f88a08eb3e577/README.md",
+        "reviewed": "2026-07-16",
+        "pinned_commit": "f950f95ae3b13581546e6d6d8b2f88a08eb3e577"
+      },
+      "license_file_visibility": {
+        "value": "The reviewed repository tree does not expose a standalone LICENSE file",
+        "source_url": "https://github.com/emalorenzo/three-agent-skills/tree/f950f95ae3b13581546e6d6d8b2f88a08eb3e577",
+        "reviewed": "2026-07-16",
+        "pinned_commit": "f950f95ae3b13581546e6d6d8b2f88a08eb3e577"
+      }
+      }
+    }
+  }
+}

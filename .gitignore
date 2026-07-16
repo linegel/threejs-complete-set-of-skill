@@ -16,6 +16,12 @@ AGENTS.md
 plan.md
 review.md
 agents/
+!skills/*/agents/
+!skills/*/agents/openai.yaml
+!site-content/agents/
+!site-content/agents/*.md
+!docs/agents/
+!docs/agents/**
 ASSET_VARIANT_REVIEW.md
 FINAL_REPORT.md
 IMPROVEMENT_PLAN.md

@@ -16,6 +16,7 @@ import { SCIENCE } from './science-cards.mjs';
 import { PROVIDER_DEMOS } from './provider-demos.mjs';
 import { PRIMARY_DEMO_KINDS, buildDemoRegistry } from './lib/lab-registry.mjs';
 import { buildSiteRoutePresentation } from './lib/site-route-presentation.mjs';
+import { loadSiteContent } from './lib/site-content.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const siteVendorSource = join(root, 'assets', 'site', 'vendor', 'katex');
@@ -351,12 +352,12 @@ main{display:block}
 .skip-link:focus{translate:0 0}
 .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
 .site-nav{position:sticky;z-index:50;top:0;background:rgba(8,10,14,.82);border-bottom:1px solid rgba(255,255,255,.075);backdrop-filter:blur(18px) saturate(1.15)}
-nav{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
-nav .brand{white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
-nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
-nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
-nav .links a:hover{color:var(--amber)}
-nav .links a:active{scale:.96}
+.site-nav>.wrap{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+.site-nav .brand{min-height:44px;display:inline-flex;align-items:center;white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
+.site-nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
+.site-nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
+.site-nav .links a:hover{color:var(--amber)}
+.site-nav .links a:active{scale:.96}
 h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:0}
 p{text-wrap:pretty}
 h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
@@ -395,19 +396,28 @@ figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:s
 figcaption{padding:16px 18px;font-size:14.5px}
 figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
 figcaption span{display:block;margin-top:3px;color:var(--dim)}
-footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
+footer{border-top:1px solid var(--line);padding:44px 0 60px;display:grid;grid-template-columns:minmax(260px,1.4fr) minmax(0,2fr);gap:36px 64px;color:var(--dim);font-size:14.5px}
 footer a{color:var(--amber)}
 footer a:hover{text-decoration:underline}
 footer code{color:var(--cyan);font-size:11px}
+.footer-summary{max-width:55ch}.footer-summary>span{display:block;margin-top:8px;font-size:13px}.footer-groups{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}.footer-group{display:grid;align-content:start;gap:8px}.footer-group strong{font:400 10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}.footer-group a{min-height:40px;display:flex;align-items:center;color:var(--dim);font-size:13px;transition-property:color,scale;transition-duration:160ms}.footer-group a:hover{color:var(--amber);text-decoration:none}.footer-group a:active{scale:.96}
+.pathfinder{padding:clamp(52px,7vw,86px) 0;border-bottom:1px solid var(--line)}.pathfinder-head{display:grid;grid-template-columns:minmax(0,.7fr) minmax(320px,1.3fr);align-items:end;gap:28px 72px;margin-bottom:28px}.pathfinder-head h2{margin:0}.pathfinder-head p{max-width:58ch;color:var(--dim)}.pathfinder-rows{border-top:1px solid var(--line)}.pathfinder-row{display:grid;grid-template-columns:84px minmax(210px,.8fr) minmax(0,1.6fr);gap:20px 32px;align-items:center;min-height:94px;border-bottom:1px solid var(--line)}.pathfinder-stage{font:10px/1.4 var(--mono);letter-spacing:.11em;text-transform:uppercase;color:var(--cyan)}.pathfinder-row>p{color:var(--dim);font-size:14px}.pathfinder-links{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px 18px}.pathfinder-links a{min-height:44px;display:inline-flex;align-items:center;gap:8px;color:var(--amber);font:11px/1.35 var(--mono);transition-property:color,scale;transition-duration:160ms}.pathfinder-links a:after{content:"→"}.pathfinder-links a:hover{color:var(--ink)}.pathfinder-links a:active{scale:.96}
+.content-hero{padding:clamp(54px,8vw,104px) 0 42px;border-bottom:1px solid var(--line)}.breadcrumbs{min-height:44px;display:flex;align-items:center;margin-bottom:28px;font:11px/1.4 var(--mono);color:var(--dim)}.breadcrumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.breadcrumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}.breadcrumbs a{min-height:40px;display:inline-flex;align-items:center;transition-property:color,scale;transition-duration:160ms}.breadcrumbs a:hover{color:var(--amber)}.breadcrumbs a:active{scale:.96}.content-hero h1{max-width:17ch;font-size:clamp(40px,6vw,68px);font-weight:700;line-height:1.02;letter-spacing:-.02em}.content-lede{max-width:66ch;margin-top:22px;color:var(--dim);font-size:clamp(17px,2vw,20px)}.content-meta{display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:28px;font:10px/1.4 var(--mono);color:var(--cyan)}
+.content-answer{max-width:900px;margin-top:34px;padding:3px 0 3px 22px;border-left:2px solid var(--amber);font-size:clamp(19px,2.2vw,21px);line-height:1.62;color:var(--ink)}.content-shell{padding:clamp(46px,7vw,86px) 0}.content-layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(230px,1fr);align-items:start;gap:clamp(36px,6vw,76px)}.content-body{grid-column:1;grid-row:1;max-width:78ch;min-width:0}.content-body h2{margin:52px 0 16px;font-size:clamp(27px,3.5vw,39px);scroll-margin-top:112px}.content-body>h2:first-child{margin-top:0}.content-body h3{margin:34px 0 12px;font-size:21px;scroll-margin-top:112px}.content-body p,.content-body li{color:var(--dim);font-size:16px}.content-body p+p{margin-top:17px}.content-body ul,.content-body ol{margin:16px 0;padding-left:24px}.content-body li+li{margin-top:7px}.content-body a{color:var(--cyan);text-decoration:underline;text-decoration-color:rgba(127,212,193,.35);text-underline-offset:3px}.content-body a:hover{color:var(--amber);text-decoration-color:currentColor}.content-body code:not(pre code){padding:1px 5px;border:1px solid var(--line);border-radius:5px;background:#07090c;color:var(--cyan);font-size:.86em}.content-body pre{margin:20px 0;white-space:pre;tab-size:2}.content-table{max-width:100%;margin:22px 0;overflow-x:auto;border:1px solid var(--line);border-radius:12px}.content-table:focus-visible{outline:2px solid var(--amber);outline-offset:3px}.content-table table{width:100%;border-collapse:collapse;font-size:14px}.content-table th,.content-table td{min-width:150px;padding:11px 13px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);text-align:left;vertical-align:top;color:var(--dim)}.content-table th{color:var(--ink);font-weight:600;background:var(--bg2)}.content-table tr:last-child td{border-bottom:0}.content-table th:last-child,.content-table td:last-child{border-right:0}
+.content-index{grid-column:2;grid-row:1;position:sticky;top:104px;max-height:calc(100vh - 128px);overflow-y:auto;padding:18px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.content-index strong{display:block;margin-bottom:10px;font:10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}.content-index ol{list-style:none}.content-index a{min-height:40px;display:flex;align-items:center;padding:5px 0;color:var(--dim);font-size:13px;line-height:1.4;transition-property:color,translate;transition-duration:160ms}.content-index a:hover{color:var(--amber);translate:3px 0}.content-index a:active{translate:1px 0}.content-proof{margin:54px 0 0}.content-proof figure{border-radius:16px}.content-proof img{width:100%;height:auto;max-height:650px;object-fit:cover;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}.content-proof figcaption{color:var(--dim);font:11px/1.55 var(--mono)}.content-proof figcaption a{color:var(--amber)}
+.content-facts,.content-faq-list,.content-related,.content-sources,.content-skills,.content-demos,.content-discovery,.faq-provenance{margin-top:54px;padding-top:22px;border-top:1px solid var(--line)}.content-facts h2,.content-faq-list h2,.content-related h2,.content-sources h2,.content-skills h2,.content-demos h2{font-size:24px}.content-ruled-list{list-style:none;border-top:1px solid var(--line)}.content-ruled-list li{border-bottom:1px solid var(--line)}.content-ruled-list a{min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:9px 0;color:var(--dim);font-size:14px;transition-property:color,scale;transition-duration:160ms}.content-ruled-list a:after{content:"→";color:var(--amber)}.content-ruled-list a:hover{color:var(--ink)}.content-ruled-list a:active{scale:.96}.content-faq-item{padding:22px 0;border-bottom:1px solid var(--line)}.content-faq-item h3{margin:0;font-size:20px}.content-faq-item h3 a{color:var(--ink)}.content-faq-item p{margin-top:9px;color:var(--dim);font-size:15px}.faq-provenance{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);padding:0}.faq-provenance div{padding:13px;background:var(--bg2)}.faq-provenance dt{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}.faq-provenance dd{margin-top:5px;font:11px/1.45 var(--mono);color:var(--cyan);overflow-wrap:anywhere}.content-discovery{display:flex;flex-wrap:wrap;gap:10px 22px;font:11px/1.5 var(--mono);color:var(--dim)}.content-discovery a{min-height:40px;display:inline-flex;align-items:center;color:var(--amber)}
 @media (max-width:760px){
   .site-nav .wrap{padding-right:0}
-  nav{min-height:104px;display:grid;grid-template-columns:1fr;padding:14px 0 10px;gap:4px}
-  nav .brand{font-size:16px}
-  nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:none;padding-right:20px}
-  nav .links::-webkit-scrollbar{display:none}
-  nav .links a{flex:0 0 auto}
+  .site-nav>.wrap{min-height:104px;display:grid;grid-template-columns:1fr;padding-top:14px;padding-bottom:10px;gap:4px}
+  .site-nav .brand{font-size:16px}
+  .site-nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;scrollbar-color:rgba(255,180,84,.45) transparent;padding:0 20px 4px 0}
+  .site-nav .links::-webkit-scrollbar{height:3px}.site-nav .links::-webkit-scrollbar-thumb{background:rgba(255,180,84,.45);border-radius:99px}
+  .site-nav .links a{flex:0 0 auto}
   .grid,.gallery{grid-template-columns:1fr}
+  footer{grid-template-columns:1fr}.footer-groups{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+@media (max-width:900px){.pathfinder-head,.content-layout{grid-template-columns:1fr}.content-index{grid-column:1;grid-row:1;position:static;max-height:none}.content-body{grid-column:1;grid-row:2}.pathfinder-row{grid-template-columns:72px minmax(0,1fr)}.pathfinder-links{grid-column:1/-1;justify-content:flex-start;padding-bottom:18px}.faq-provenance{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.pathfinder-row{grid-template-columns:1fr;gap:6px;padding:18px 0}.pathfinder-links{grid-column:auto;padding:0}.content-hero h1{font-size:clamp(38px,12vw,54px)}.content-answer{padding-left:16px}.content-table{border-radius:8px}.content-table table{min-width:680px}.faq-provenance{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
@@ -415,16 +425,22 @@ footer code{color:var(--cyan);font-size:11px}
 }
 `;
 
-const navHtml = (depth) => `<a class="skip-link" href="#main-content">Skip to content</a><div class="site-nav"><div class="wrap"><nav aria-label="Primary navigation">
-  <a class="brand" href="${depth}">Three.js WebGPU Skill&nbsp;Pack</a>
-  <div class="links"><a href="${depth}#matrix">How it works</a><a href="${depth}#flagships">Examples</a><a href="${depth}#skills">Skills</a><a href="${depth}#labs">Labs</a><a href="${depth}evidence/">Evidence</a><a href="${depth}#install">Install</a><a href="${depth}about/">Method</a><a href="${REPO}">GitHub&nbsp;↗</a></div>
-</nav></div></div>`;
+const navHtml = () => `<a class="skip-link" href="#main-content">Skip to content</a><header class="site-nav"><div class="wrap">
+  <a class="brand" href="/">Three.js WebGPU Skill&nbsp;Pack</a>
+  <nav class="links" aria-label="Primary navigation"><a href="/#flagships">Examples</a><a href="/#skills">Skills</a><a href="/guides/">Guides</a><a href="/evidence/">Evidence</a><a href="/#install">Install</a><a href="${REPO}">GitHub</a></nav>
+</div></header>`;
 
 const footerHtml = `<div class="wrap"><footer>
-  <span>Three.js WebGPU Skill Pack: TSL, procedural graphics, and visual validation.<br/>
-  <span style="font-size:13px">Three r${DEMO_REGISTRY.threeRevision.replace(/^0\./, '')} · ${primaryDemos.length} primary targets · ${acceptedPrimaryDemos.length} accepted · build <code>${DEMO_REGISTRY.buildRevision.replace(/^sha256:/, '').slice(0, 12)}</code></span><br/>
-  <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
-  <span><a href="${SITE}about/">About &amp; methodology</a> · <a href="${REPO}">Repository</a> · <a href="${SITE}llms.txt">For coding agents</a></span>
+  <div class="footer-summary">Three.js WebGPU Skill Pack: TSL, procedural graphics, and visual validation.
+    <span>Three r${DEMO_REGISTRY.threeRevision.replace(/^0\./, '')} · ${primaryDemos.length} primary targets · ${acceptedPrimaryDemos.length} accepted · build <code>${DEMO_REGISTRY.buildRevision.replace(/^sha256:/, '').slice(0, 12)}</code></span>
+    <span>Compiling shaders? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span>
+  </div>
+  <div class="footer-groups">
+    <div class="footer-group"><strong>Build</strong><a href="/#skills">Skills</a><a href="/#flagships">Examples</a><a href="/industries/">Industries</a></div>
+    <div class="footer-group"><strong>Decide</strong><a href="/for/">Who it is for</a><a href="/compare/">Compare</a><a href="/alternatives/">Alternatives</a><a href="/pricing/">Pricing</a></div>
+    <div class="footer-group"><strong>Adopt</strong><a href="/docs/">Docs</a><a href="/migrate/">Migration</a><a href="/agents/">Agent docs</a><a href="/faq/">FAQ</a></div>
+    <div class="footer-group"><strong>Proof</strong><a href="/evidence/">Evidence</a><a href="/about/">Method</a><a href="${REPO}">Repository</a><a href="${REPO}/blob/main/LICENSE">License</a></div>
+  </div>
 </footer></div>`;
 
 const assetHead = (depth) => `<meta name="theme-color" content="${THEME_COLOR}" />
@@ -449,6 +465,238 @@ const socialImageMeta = (relativePath, alt) => {
 <meta property="og:image:alt" content="${esc(alt)}" />
 <meta name="twitter:image" content="${image}" />
 <meta name="twitter:image:alt" content="${esc(alt)}" />`;
+};
+
+const SITE_CONTENT = loadSiteContent({
+  repoRoot: root,
+  skillIds: AUTHORITATIVE_SKILL_SLUGS,
+  demos: SITE_DEMOS,
+  threeRevision: DEMO_REGISTRY.threeRevision,
+  today: '2026-07-16',
+});
+const contentPages = SITE_CONTENT.pages;
+const contentPageBySlug = SITE_CONTENT.pageBySlug;
+if (contentPages.length !== 41) {
+  throw new Error(`Release 1 decision support must contain 41 pages; received ${contentPages.length}`);
+}
+for (const warning of SITE_CONTENT.warnings) console.warn(`site-content: ${warning}`);
+
+const CONTENT_FAMILY_LABELS = {
+  guides: 'Guides',
+  for: 'Who it is for',
+  compare: 'Comparisons',
+  alternatives: 'Alternatives',
+  pricing: 'Pricing',
+  docs: 'Documentation',
+  agents: 'Agent docs',
+  migrate: 'Migration',
+  industries: 'Industries',
+  faq: 'FAQ',
+};
+const contentFamily = (page) => page.slug.split('/').filter(Boolean)[0];
+const contentUrl = (page) => new URL(page.slug, SITE).href;
+const schemaTypeForContent = (page) => {
+  if (page.slug === '/faq/') return 'FAQPage';
+  if (page.kind === 'hub') return 'CollectionPage';
+  if (['ecosystem-comparison', 'technical-comparison', 'alternatives', 'user-doc', 'agent-doc', 'migration', 'faq-answer'].includes(page.kind)) return 'TechArticle';
+  return 'WebPage';
+};
+const headingText = (value) => value
+  .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+  .replace(/[`*_~]/g, '')
+  .trim();
+const headingId = (value) => headingText(value)
+  .normalize('NFKD')
+  .toLowerCase()
+  .replace(/[^a-z0-9]+/g, '-')
+  .replace(/^-|-$/g, '') || 'section';
+const renderContentMarkdown = (body, pageTitle) => {
+  const counts = new Map();
+  const headings = body.split('\n').flatMap((line) => {
+    const match = line.match(/^(#{2,3})\s+(.+)$/);
+    if (!match) return [];
+    const base = headingId(match[2]);
+    const count = (counts.get(base) ?? 0) + 1;
+    counts.set(base, count);
+    return [{ level: match[1].length, label: headingText(match[2]), id: count === 1 ? base : `${base}-${count}` }];
+  });
+  let index = 0;
+  let tableIndex = 0;
+  const html = marked.parse(body)
+    .replace(/<h([23])>([\s\S]*?)<\/h\1>/g, (_match, level, content) => {
+      const heading = headings[index++];
+      return heading ? `<h${level} id="${heading.id}">${content}</h${level}>` : _match;
+    })
+    .replace(/<table>([\s\S]*?)<\/table>/g, (_match, table) => `<div class="content-table" role="region" aria-label="Data table ${++tableIndex} for ${esc(pageTitle)}" tabindex="0"><table>${table}</table></div>`);
+  return { html, headings };
+};
+const contentBreadcrumbs = (page) => {
+  const family = contentFamily(page);
+  const familySlug = `/${family}/`;
+  const familyPage = contentPageBySlug.get(familySlug);
+  const items = [{ name: 'Skill Pack', url: SITE }];
+  if (familyPage && familyPage.slug !== page.slug) items.push({ name: CONTENT_FAMILY_LABELS[family], url: contentUrl(familyPage) });
+  items.push({ name: page.h1, url: contentUrl(page) });
+  return items;
+};
+const contentBreadcrumbSchema = (page) => ({
+  '@type': 'BreadcrumbList',
+  '@id': `${contentUrl(page)}#breadcrumb`,
+  itemListElement: contentBreadcrumbs(page).map((item, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    name: item.name,
+    item: item.url,
+  })),
+});
+const contentFaqChildren = () => {
+  const hub = contentPageBySlug.get('/faq/');
+  const leaves = contentPages.filter((page) => page.kind === 'faq-answer');
+  const routes = [...hub.body.matchAll(/^###\s+\[[^\]]+\]\((\/faq\/[^)]+\/)\)\s*$/gm)].map((match) => match[1]);
+  const ordered = routes.map((route) => contentPageBySlug.get(route)).filter((page) => page?.kind === 'faq-answer');
+  if (ordered.length !== leaves.length || new Set(ordered).size !== leaves.length) {
+    throw new Error('FAQ hub must visibly list every FAQ answer exactly once');
+  }
+  return ordered;
+};
+const contentPageSchema = (page) => {
+  const url = contentUrl(page);
+  const type = schemaTypeForContent(page);
+  const schema = {
+    '@type': type === 'TechArticle' ? ['Article', 'TechArticle'] : type,
+    '@id': `${url}${type === 'TechArticle' ? '#article' : '#webpage'}`,
+    url,
+    name: page.title,
+    headline: page.h1,
+    description: page.description,
+    datePublished: page.published,
+    dateModified: page.last_reviewed,
+    inLanguage: 'en',
+    isAccessibleForFree: true,
+    publisher: PUBLISHER_REF,
+    breadcrumb: { '@id': `${url}#breadcrumb` },
+    image: page.hero_image ? new URL(page.hero_image, SITE).href : undefined,
+  };
+  if (type === 'TechArticle') schema.author = PUBLISHER_REF;
+  if (page.kind === 'faq-answer') {
+    schema.mainEntity = {
+      '@type': 'Question',
+      name: page.faq.question,
+      acceptedAnswer: { '@type': 'Answer', text: page.faq.answer },
+    };
+  }
+  if (page.slug === '/faq/') {
+    schema.mainEntity = contentFaqChildren().map((child) => ({
+      '@type': 'Question',
+      name: child.faq.question,
+      url: contentUrl(child),
+      acceptedAnswer: { '@type': 'Answer', text: child.faq.answer },
+    }));
+  }
+  return schema;
+};
+const renderContentFacts = (page) => {
+  if (!page.resolvedSubjects?.length) return '';
+  const rows = page.resolvedSubjects.flatMap((subject) => Object.entries(subject.facts ?? {}).map(([key, fact]) => {
+    const value = Array.isArray(fact.value) ? fact.value.join(', ') : String(fact.value);
+    return `<tr><td>${esc(subject.name)}</td><td>${esc(key.replace(/_/g, ' '))}</td><td>${esc(value)}</td><td><a href="${esc(fact.source_url)}">Source</a><br><small>Reviewed ${esc(fact.reviewed)}</small></td></tr>`;
+  }));
+  if (!rows.length) return '';
+  return `<section class="content-facts" aria-labelledby="source-facts-title"><h2 id="source-facts-title">Source-checked ecosystem facts</h2><div class="content-table" role="region" aria-label="Source-checked ecosystem facts" tabindex="0"><table><thead><tr><th>Subject</th><th>Fact</th><th>Current value</th><th>Provenance</th></tr></thead><tbody>${rows.join('')}</tbody></table></div></section>`;
+};
+const renderContentProof = (page) => {
+  if (!page.hero_image) return '';
+  const heroRelative = page.hero_image.replace(/^\//, '');
+  const demo = SITE_DEMOS.find((entry) => entry.id === page.hero_source);
+  return `<section class="content-proof" aria-labelledby="proof-title"><h2 id="proof-title">Relevant product evidence</h2><figure>
+    ${previewPicture(page.hero_image, `Evidence from ${page.hero_source} relevant to ${page.h1}`, `${imageSizeAttrs(heroRelative)} loading="lazy" decoding="async"`)}
+    <figcaption>Source lab: <code>${esc(page.hero_source)}</code>. ${demo ? `${esc(primaryKindLabel(demo.kind))}; current status ${esc(demo.status)}.` : ''} <a href="/evidence/${esc(page.hero_source)}/">Inspect the evidence report</a>.</figcaption>
+  </figure></section>`;
+};
+const renderContentList = (title, className, entries) => entries.length ? `<section class="${className}" aria-labelledby="${className}-title"><h2 id="${className}-title">${esc(title)}</h2><ul class="content-ruled-list">${entries.join('')}</ul></section>` : '';
+const renderContentRelations = (page) => {
+  const pages = page.related_pages.map((slug) => contentPageBySlug.get(slug)).filter(Boolean);
+  const relatedPages = renderContentList('Related guides', 'content-related', pages.map((related) => `<li><a data-related-route="${esc(related.slug)}" href="${esc(related.slug)}">${esc(related.title)}</a></li>`));
+  const relatedSkills = renderContentList('Relevant skills', 'content-skills', page.related_skills.map((slug) => `<li><a href="/skills/${esc(slug)}.html">${esc(skills[slug]?.title ?? slug)}</a></li>`));
+  const relatedDemos = renderContentList('Relevant demos and evidence', 'content-demos', page.related_demos.map((id) => {
+    const demo = SITE_DEMOS.find((entry) => entry.id === id);
+    const href = demo?.publishPath ?? `/evidence/${id}/`;
+    return `<li><a href="${esc(href)}">${esc(demo ? primaryTitle(demo) : id)}</a></li>`;
+  }));
+  return `${relatedPages}${relatedSkills}${relatedDemos}`;
+};
+const renderContentSources = (page) => {
+  const correctionUrl = `${REPO}/issues`;
+  return renderContentList('Sources and correction path', 'content-sources', [
+    ...page.sources.filter((source) => source !== correctionUrl).map((source) => `<li><a href="${esc(source)}">${esc(new URL(source).hostname)}${esc(new URL(source).pathname)}</a></li>`),
+    `<li><a href="${correctionUrl}">Report a correction</a></li>`,
+  ]);
+};
+const renderFaqProvenance = (page) => page.kind === 'faq-answer' ? `<dl class="faq-provenance" aria-label="Question provenance">
+  <div><dt>Question source</dt><dd>${esc(page.question_source_type)}</dd></div>
+  <div><dt>Observed</dt><dd>${esc(page.first_observed)} to ${esc(page.last_observed)}</dd></div>
+  <div><dt>Evidence status</dt><dd>${esc(page.evidence_status)}</dd></div>
+  <div><dt>Source references</dt><dd>${page.question_sources.map((source) => source.startsWith('https://') ? `<a href="${esc(source)}">${esc(new URL(source).hostname)}</a>` : esc(source)).join('<br>')}</dd></div>
+</dl>` : '';
+const renderContentPage = (page) => {
+  const url = contentUrl(page);
+  const family = contentFamily(page);
+  const familyLabel = CONTENT_FAMILY_LABELS[family];
+  const { html: bodyHtml, headings } = renderContentMarkdown(page.body, page.h1);
+  const tocHeadings = headings.filter((heading) => heading.level === 2);
+  const breadcrumbs = contentBreadcrumbs(page);
+  const schema = {
+    '@context': 'https://schema.org',
+    '@graph': [PUBLISHER, contentPageSchema(page), contentBreadcrumbSchema(page)],
+  };
+  const heroRelative = page.hero_image?.replace(/^\//, '') ?? null;
+  return `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>${esc(page.title)}</title>
+<meta name="description" content="${esc(page.description)}" />
+<link rel="canonical" href="${url}" />
+<meta name="robots" content="index, follow, max-image-preview:large" />
+${assetHead('/')}
+<meta property="og:type" content="${schemaTypeForContent(page) === 'TechArticle' ? 'article' : 'website'}" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:site_name" content="${SITE_NAME}" />
+<meta property="og:title" content="${esc(page.title)}" />
+<meta property="og:description" content="${esc(page.description)}" />
+<meta property="og:url" content="${url}" />
+${socialImageMeta(heroRelative, page.hero_image ? `Evidence from ${page.hero_source} relevant to ${page.h1}` : '')}
+${schemaTypeForContent(page) === 'TechArticle' ? `<meta property="article:published_time" content="${esc(page.published)}" />\n<meta property="article:modified_time" content="${esc(page.last_reviewed)}" />` : ''}
+<meta name="twitter:card" content="${page.hero_image ? 'summary_large_image' : 'summary'}" />
+<meta name="twitter:title" content="${esc(page.title)}" />
+<meta name="twitter:description" content="${esc(page.description)}" />
+<script type="application/ld+json">${JSON.stringify(schema, null, 1).replace(/</g, '\\u003c')}</script>
+${localFontHead}
+<style>${baseCss}</style>
+</head>
+<body data-content-kind="${esc(page.kind)}" data-content-route="${esc(page.slug)}">
+${navHtml()}
+<main id="main-content" tabindex="-1">
+  <header class="content-hero"><div class="wrap">
+    <nav class="breadcrumbs" aria-label="Breadcrumb"><ol>${breadcrumbs.map((item, index) => index === breadcrumbs.length - 1 ? `<li aria-current="page">${esc(item.name)}</li>` : `<li><a href="${esc(item.url)}">${esc(item.name)}</a></li>`).join('')}</ol></nav>
+    <p class="kicker">${esc(familyLabel)}</p>
+    <h1>${esc(page.h1)}</h1>
+    <p class="content-lede">${esc(page.description)}</p>
+    <p class="content-answer"${page.kind === 'faq-answer' ? ' data-faq-answer' : ''}>${esc(page.summary)}</p>
+    <div class="content-meta"><span>Published ${esc(page.published)}</span><span>Reviewed ${esc(page.last_reviewed)}</span>${page.supported_revision ? `<span>Three.js ${esc(page.supported_revision)}</span>` : ''}</div>
+    ${renderFaqProvenance(page)}
+  </div></header>
+  <div class="content-shell"><div class="wrap"><div class="content-layout">
+    <nav class="content-index" aria-label="On this page"><strong>On this page</strong><ol>${tocHeadings.map((heading) => `<li><a href="#${heading.id}">${esc(heading.label)}</a></li>`).join('')}</ol></nav>
+    <article class="content-body">${bodyHtml}${renderContentFacts(page)}${renderContentProof(page)}${renderContentRelations(page)}${renderContentSources(page)}
+      <nav class="content-discovery" aria-label="Machine-readable discovery"><a href="/guides/">All guides</a><a href="/llms.txt">LLM catalog</a><a href="/skills.json">Machine index</a></nav>
+    </article>
+  </div></div></div>
+</main>
+${footerHtml}
+</body>
+</html>\n`;
 };
 
 /* ---------------------------- index page ---------------------------- */
@@ -684,6 +932,21 @@ const harnessSection = HARNESSES.map((h, i) => `
       <p>${esc(h.how)}</p>
       <pre><code>${esc(h.code)}</code></pre></div>`).join('');
 
+const pathfinderGroups = [
+  { stage: 'Fit', description: 'See which roles and workloads benefit, plus the cases the pack does not own.', routes: ['/for/', '/industries/'] },
+  { stage: 'Evaluate', description: 'Compare named approaches, scan the option landscape, and calculate the real project cost.', routes: ['/compare/', '/alternatives/', '/pricing/'] },
+  { stage: 'Adopt', description: 'Install the pack, route minimal context, or move an existing workflow deliberately.', routes: ['/docs/', '/agents/', '/migrate/'] },
+  { stage: 'Solve', description: 'Open a sourced answer for a concrete version, backend, licensing, readback, or output issue.', routes: ['/faq/'] },
+];
+const pathfinderHtml = pathfinderGroups.map((group) => `<div class="pathfinder-row">
+  <span class="pathfinder-stage">${esc(group.stage)}</span><p>${esc(group.description)}</p>
+  <div class="pathfinder-links">${group.routes.map((route) => {
+    const page = contentPageBySlug.get(route);
+    if (!page) throw new Error(`Homepage pathfinder references missing content route: ${route}`);
+    return `<a href="${esc(page.slug)}">${esc(page.title)}</a>`;
+  }).join('')}</div>
+</div>`).join('');
+
 const homeTitle = 'Three.js WebGPU & TSL Skills for AI Coding Agents';
 const homeDescription = metaDescription(`Install ${total} expert Three.js WebGPU and TSL skills, explore ${showcaseDemos.length} visual demos, and inspect evidence-gated implementation guidance.`);
 const indexHtml = `<!doctype html>
@@ -856,6 +1119,10 @@ ${navHtml('')}
 </div></div>
 
 <main id="main-content" tabindex="-1">
+<section class="pathfinder" aria-labelledby="pathfinder-title"><div class="wrap">
+  <div class="pathfinder-head"><h2 id="pathfinder-title">Choose your path.</h2><p>The site now separates fit, evaluation, adoption, and troubleshooting so the next page matches the decision in front of you.</p></div>
+  <div class="pathfinder-rows">${pathfinderHtml}</div>
+</div></section>
 <section class="section" id="flagships" aria-labelledby="flagships-title"><div class="wrap">
   <h2 id="flagships-title">See what each skill lets you build.</h2>
   <p class="sub">Open a live WebGPU demo, then read the full skill for architecture, budgets, failure conditions, and validation.</p>
@@ -1074,6 +1341,14 @@ ${footerHtml}
 mkdirSync(join(root, 'docs', 'about'), { recursive: true });
 writeFileSync(join(root, 'docs', 'about', 'index.html'), aboutHtml);
 
+/* ---------------------- decision-support pages ---------------------- */
+
+for (const page of contentPages) {
+  const outputDir = join(root, 'docs', ...page.slug.split('/').filter(Boolean));
+  mkdirSync(outputDir, { recursive: true });
+  writeFileSync(join(outputDir, 'index.html'), renderContentPage(page));
+}
+
 /* ---------------------------- skill pages ---------------------------- */
 
 mkdirSync(join(root, 'docs', 'skills'), { recursive: true });
@@ -1122,6 +1397,8 @@ for (const slug of slugs) {
   const skillBodyHtml = rewriteSkillBodyLinks(marked.parse(s.body)
     .replace(/<h1([^>]*)>/g, '<h2$1>')
     .replace(/<\/h1>/g, '</h2>'), slug);
+  const skillRelatedPages = (SITE_CONTENT.relatedBySkill.get(slug) ?? []).slice(0, 4);
+  const skillRelatedGuidesHtml = skillRelatedPages.length ? `<aside class="skill-guides" aria-labelledby="related-guides-title"><h3 id="related-guides-title">Related guides</h3><ul>${skillRelatedPages.map((page) => `<li><a href="${esc(page.slug)}"><span>${esc(CONTENT_FAMILY_LABELS[contentFamily(page)])}</span>${esc(page.title)}</a></li>`).join('')}</ul></aside>` : '';
   const updateHtml = s.update ? `<span class="chip">Latest skill update <time datetime="${esc(s.update.iso)}">${esc(s.update.date)}</time></span>
     <a class="chip" href="${esc(s.update.url)}">commit ${esc(s.update.shortHash)} ↗</a>` :
     '<span class="chip">Latest skill update unavailable</span>';
@@ -1222,7 +1499,7 @@ ${evidenceDisclosureHtml}
   </div></div>` : '';
 
   const fullSkillTitle = `${s.title} | Three.js WebGPU Skill`;
-  const skillTitle = fullSkillTitle.length <= 60 ? fullSkillTitle : `${s.title} | Three.js Skill`;
+  const skillTitle = metaDescription(fullSkillTitle, 65);
   const skillDescription = metaDescription(s.desc);
   const html = `<!doctype html>
 <html lang="en">
@@ -1343,6 +1620,7 @@ a.chip:active{scale:.96}
 .runtime-evidence-disclosure dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;margin-top:16px;overflow:hidden;border-radius:10px;background:var(--line)}.runtime-evidence-disclosure dl div{padding:11px 12px;background:var(--bg2)}.runtime-evidence-disclosure dt{font:10px/1.35 var(--mono);color:var(--dim)}.runtime-evidence-disclosure dd{margin-top:4px;font:500 10px/1.35 var(--mono);color:var(--amber)}.runtime-evidence-disclosure dd[data-verdict="PASS"]{color:var(--lime)}
 .runtime-evidence-disclosure ul{margin:15px 0 0;padding-left:20px}.runtime-evidence-disclosure li{margin-top:5px;color:var(--dim);font-size:14px}
 .evidence-report-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:10px}.evidence-report-links a{display:grid;gap:6px;min-height:72px;padding:14px;border:1px solid var(--line);border-radius:11px;background:var(--bg2)}.evidence-report-links code{color:var(--cyan);font:11px/1.4 var(--mono);overflow-wrap:anywhere}.evidence-report-links span{color:var(--dim);font:10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.05em}
+.skill-guides{margin-top:52px;padding-top:22px;border-top:1px solid var(--line)}.skill-guides h3{font-size:22px}.skill-guides ul{margin-top:12px;list-style:none;border-top:1px solid var(--line)}.skill-guides li{border-bottom:1px solid var(--line)}.skill-guides a{min-height:52px;display:grid;grid-template-columns:120px minmax(0,1fr);align-items:center;gap:18px;color:var(--dim);font-size:14px;transition-property:color,scale;transition-duration:160ms}.skill-guides a span{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}.skill-guides a:hover{color:var(--amber)}.skill-guides a:active{scale:.99}
 @media (max-width:720px){
   .skill-hero{min-height:auto;padding:58px 0 52px}
   .skill-hero-bg{opacity:.3}
@@ -1388,6 +1666,7 @@ ${validationHtml}
   <h2>The full skill</h2>
   <p class="sub">The complete SKILL.md as loaded by agents, rendered verbatim.</p>
   <div class="skilltext">${skillBodyHtml}</div>
+  ${skillRelatedGuidesHtml}
   <div class="pn">
     <a href="${prev.slug}.html">← ${esc(prev.title)}</a>
     <a href="${next.slug}.html">${esc(next.title)} →</a>
@@ -1407,12 +1686,18 @@ ${footerHtml}
 
 /* ------------------------- machine-readable ------------------------- */
 
+const contentFamilies = [...new Set(contentPages.map(contentFamily))];
+const llmsDecisionSupport = contentFamilies.map((family) => `### ${CONTENT_FAMILY_LABELS[family]}\n\n${contentPages
+  .filter((page) => contentFamily(page) === family)
+  .map((page) => `- [${page.title}](${contentUrl(page)}): ${page.description}`)
+  .join('\n')}`).join('\n\n');
 const llms = `# Three.js WebGPU Skill Pack
 
 > ${total} specialized agent skills with ${primaryDemos.length} declared primary targets: ${canonicalDemos.length} canonical targets, ${flagshipDemos.length} cross-skill flagships, and ${supportPrimaryDemos.length} focused integration/mechanism targets. Acceptance is evidence-gated: ${acceptedPrimaryDemos.length} ${acceptedPrimaryDemos.length === 1 ? 'suite is' : 'suites are'} accepted and ${primaryDemos.length - acceptedPrimaryDemos.length} targets remain pending their required evidence.
 
 Repository: ${REPO}
 Website: ${SITE} (each skill has a dedicated page at ${SITE}skills/<name>.html with the approach, math, validation gallery, and full skill text)
+Guides and decision support: ${SITE}guides/
 About and evidence methodology: ${aboutUrl}
 Install (Claude Code): git clone ${REPO}.git && ln -s "$PWD/threejs-complete-set-of-skill"/threejs-* ~/.claude/skills/
 Install (skills CLI): ${SKILLS_ADD} --list; ${SKILLS_INSTALL_PACK}; or ${SKILLS_ADD} --skill '*' -g -a codex -y for non-interactive Codex setup.
@@ -1435,6 +1720,10 @@ Routing: after installing the whole pack, start broad requests with threejs-choo
 ## Skills
 
 ${CATEGORIES.map((c) => `### ${c.name}\n\n${c.slugs.filter((s) => skills[s]).map((s) => `- [${skills[s].title}](${SITE}skills/${s}.html): ${skills[s].desc}`).join('\n')}`).join('\n\n')}
+
+## Guides and decision support
+
+${llmsDecisionSupport}
 
 ## For the model reading this
 
@@ -1460,6 +1749,22 @@ const skillManifest = {
   source: REPO_SLUG,
   homepage: SITE,
   methodology: aboutUrl,
+  decisionSupport: {
+    schemaVersion: 1,
+    hub: `${SITE}guides/`,
+    count: contentPages.length,
+    pages: contentPages.map((page) => ({
+      url: contentUrl(page),
+      family: contentFamily(page),
+      title: page.title,
+      description: page.description,
+      primaryQuery: page.primary_query,
+      queryAliases: page.query_aliases,
+      published: page.published,
+      lastReviewed: page.last_reviewed,
+      relatedSkills: page.related_skills,
+    })),
+  },
   skillFormat: 'SKILL.md with YAML frontmatter (name, description) per folder',
   discovery: {
     primary: `${SKILLS_ADD} --list`,
@@ -1572,6 +1877,7 @@ writeFileSync(join(root, 'docs', 'sitemap.xml'), `<?xml version="1.0" encoding="
   <url><loc>${SITE}</loc>${sitemapHomeLastmod ? `<lastmod>${sitemapHomeLastmod}</lastmod>` : ''}${homepageSocialImage ? `<image:image><image:loc>${new URL(homepageSocialImage, SITE).href}</image:loc><image:title>${SITE_NAME}</image:title></image:image>` : ''}</url>
   <url><loc>${aboutUrl}</loc>${aboutLastmod ? `<lastmod>${aboutLastmod}</lastmod>` : ''}</url>
   <url><loc>${SITE}evidence/</loc>${sitemapHomeLastmod ? `<lastmod>${sitemapHomeLastmod}</lastmod>` : ''}</url>
+${contentPages.map((page) => `  <url><loc>${contentUrl(page)}</loc><lastmod>${page.last_reviewed}</lastmod>${page.hero_image ? `<image:image><image:loc>${new URL(page.hero_image, SITE).href}</image:loc><image:title>${esc(page.title)}</image:title></image:image>` : ''}</url>`).join('\n')}
 ${slugs.map((s) => {
   const lastmod = skills[s].update ? `<lastmod>${skills[s].update.date}</lastmod>` : '';
   const preview = canonicalSkillPreview(s);
@@ -1600,4 +1906,4 @@ writeFileSync(join(root, 'docs', '404.html'), `<!doctype html>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" /><style>html{color-scheme:dark}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#080a0e;color:#f0ede5;font:18px/1.6 system-ui,sans-serif}.wrap{width:min(680px,calc(100% - 48px))}p{color:#aaa99f}a{color:#7fd4c1}code{color:#ffb454}</style></head>
 <body><main class="wrap"><p><code>404</code></p><h1>That route does not exist.</h1><p>The skill pack, skill contracts, and published WebGPU labs are available from the catalog.</p><p><a href="/">Return to the Three.js WebGPU Skill Pack</a></p></main></body></html>\n`);
 
-console.log(`Wrote docs/index.html, docs/about/index.html, ${slugs.length} skill pages, 404.html, llm.txt, llms.txt, skills.json, robots.txt, sitemap.xml.`);
+console.log(`Wrote docs/index.html, docs/about/index.html, ${contentPages.length} decision-support pages, ${slugs.length} skill pages, 404.html, llm.txt, llms.txt, skills.json, robots.txt, sitemap.xml.`);

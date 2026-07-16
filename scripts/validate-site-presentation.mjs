@@ -7,6 +7,7 @@ import { PRIMARY_DEMO_KINDS, buildDemoRegistry } from './lib/lab-registry.mjs';
 import { remoteRuntimeAssetViolations } from './lib/site-runtime-assets.mjs';
 import { validateEvidenceReportManifest } from './lib/evidence-report-validation.mjs';
 import { buildSiteRoutePresentation } from './lib/site-route-presentation.mjs';
+import { loadSiteContent } from './lib/site-content.mjs';
 import { PROVIDER_DEMOS } from './provider-demos.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -38,6 +39,23 @@ const htmlFilesUnder = (directory) => readdirSync(directory, { withFileTypes: tr
 
 const assert = (condition, message) => {
   if (!condition) errors.push(message);
+};
+const htmlText = (value) => String(value)
+  .replace(/<[^>]+>/g, '')
+  .replace(/&nbsp;|&#160;/gi, ' ')
+  .replace(/&amp;/gi, '&')
+  .replace(/&quot;/gi, '"')
+  .replace(/&#39;|&apos;/gi, "'")
+  .replace(/\s+/g, ' ')
+  .trim();
+const primaryNavigation = (html) => {
+  const matches = [...html.matchAll(/<nav\b[^>]*\baria-label=["']Primary navigation["'][^>]*>([\s\S]*?)<\/nav>/gi)];
+  if (matches.length !== 1) return { count: matches.length, links: [] };
+  const links = [...matches[0][1].matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)].map((match) => ({
+    href: match[1].match(/\bhref=["']([^"']+)["']/i)?.[1] ?? null,
+    label: htmlText(match[2]),
+  }));
+  return { count: matches.length, links };
 };
 const relativePublishPath = (path) => path.replace(/^\/+/, '');
 const sha256 = (bytes) => `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
@@ -104,6 +122,126 @@ const expectedShowcaseIds = [
   'space-generated-starfields',
   'vegetation-generated-meadow-density',
 ];
+const expectedPrimaryNavigation = [
+  { href: '/#flagships', label: 'Examples' },
+  { href: '/#skills', label: 'Skills' },
+  { href: '/guides/', label: 'Guides' },
+  { href: '/evidence/', label: 'Evidence' },
+  { href: '/#install', label: 'Install' },
+  { href: skillManifest.repository, label: 'GitHub' },
+];
+const assertPrimaryNavigation = (html, label) => {
+  const published = primaryNavigation(html);
+  assert(published.count === 1, `${label} must contain exactly one primary navigation landmark; received ${published.count}`);
+  assert(
+    JSON.stringify(published.links) === JSON.stringify(expectedPrimaryNavigation),
+    `${label} primary navigation labels, destinations, or order drifted`,
+  );
+};
+
+let contentPages = [];
+try {
+  ({ pages: contentPages } = loadSiteContent({
+    repoRoot: root,
+    skillIds: authoritativeSkillSlugs,
+    demos: siteDemos,
+    threeRevision: registry.threeRevision,
+    today: '2026-07-16',
+  }));
+} catch (error) {
+  errors.push(`decision-support source: ${error.message}`);
+}
+assert(contentPages.length === 41, `Release 1 decision support must contain 41 source routes; received ${contentPages.length}`);
+
+const assertContentPresentation = (page, html) => {
+  const label = `decision-support route ${page.slug}`;
+  const heroIndex = html.indexOf('<header class="content-hero"');
+  const layoutIndex = html.indexOf('<div class="content-layout"');
+  const bodyIndex = html.indexOf('<article class="content-body"');
+  const indexIndex = html.indexOf('<nav class="content-index" aria-label="On this page"');
+  assert(html.includes(`<body data-content-kind="${escapedHtmlText(page.kind)}" data-content-route="${escapedHtmlText(page.slug)}">`), `${label} omits its source-bound body contract`);
+  assert(html.includes('<main id="main-content"'), `${label} has no main landmark`);
+  assert(heroIndex >= 0, `${label} has no editorial content hero`);
+  assert(layoutIndex > heroIndex, `${label} content layout does not follow its editorial hero`);
+  assert(bodyIndex > layoutIndex, `${label} has no article body inside its content layout`);
+  assert(indexIndex > bodyIndex, `${label} has no table of contents after its article body`);
+  assert(html.includes(`<h1>${escapedHtmlText(page.h1)}</h1>`), `${label} does not publish its source H1`);
+  const answerAttribute = page.kind === 'faq-answer' ? ' data-faq-answer' : '';
+  assert(
+    html.includes(`<p class="content-answer"${answerAttribute}>${escapedHtmlText(page.summary)}</p>`),
+    `${label} does not publish its source-bound direct answer`,
+  );
+  const toc = html.match(/<nav class="content-index" aria-label="On this page">[\s\S]*?<ol>([\s\S]*?)<\/ol><\/nav>/i)?.[1] ?? '';
+  const tocTargets = [...toc.matchAll(/<a\b[^>]*\bhref="#([^"']+)"/gi)].map((match) => match[1]);
+  assert(tocTargets.length > 0, `${label} table of contents has no section links`);
+  for (const id of tocTargets) assert(html.includes(`id="${id}"`), `${label} table of contents points to missing section #${id}`);
+  assert(html.includes('<section class="content-sources"'), `${label} omits its source and correction contract`);
+  if (page.hero_image) {
+    assert(html.includes('<section class="content-proof"'), `${label} omits its declared proof section`);
+    assert(html.includes(`src="${escapedHtmlText(page.hero_image)}"`), `${label} omits its declared proof image`);
+    assert(html.includes(`Source lab: <code>${escapedHtmlText(page.hero_source)}</code>`), `${label} omits proof provenance`);
+    assert(html.includes(`href="/evidence/${escapedHtmlText(page.hero_source)}/"`), `${label} does not link the proof evidence report`);
+  } else {
+    assert(!html.includes('<section class="content-proof"'), `${label} invents a proof section without a declared source image`);
+  }
+};
+
+const contentSurfaces = [];
+for (const page of contentPages) {
+  const pagePath = join(docs, relativePublishPath(page.slug), 'index.html');
+  assert(existsSync(pagePath), `generated decision-support route is missing: ${page.slug}`);
+  if (!existsSync(pagePath)) continue;
+  const html = readFileSync(pagePath, 'utf8');
+  contentSurfaces.push({ label: `decision-support route ${page.slug}`, html });
+  assertContentPresentation(page, html);
+}
+
+const representativeContent = [
+  ['guides hub', (page) => page.slug === '/guides/' && page.hero_image],
+  ['direct comparison', (page) => page.kind === 'ecosystem-comparison' && page.hero_image],
+  ['migration guide', (page) => page.kind === 'migration' && page.hero_image],
+  ['pricing page', (page) => page.kind === 'pricing'],
+  ['industry page', (page) => page.kind === 'industry' && page.hero_image],
+  ['FAQ answer', (page) => page.kind === 'faq-answer' && page.hero_image],
+];
+for (const [label, select] of representativeContent) {
+  const page = contentPages.find(select);
+  assert(Boolean(page), `decision-support source has no proof-backed representative ${label}`);
+  if (!page) continue;
+  const pagePath = join(docs, relativePublishPath(page.slug), 'index.html');
+  if (!existsSync(pagePath)) continue;
+  const html = readFileSync(pagePath, 'utf8');
+  const proofContract = page.hero_image ? 'content-proof' : 'content-sources';
+  for (const contract of ['content-hero', 'content-layout', 'content-body', 'content-index', 'content-answer', proofContract]) {
+    assert(html.includes(`class="${contract}"`), `${page.slug} representative ${label} omits ${contract}`);
+  }
+}
+
+const indexablePresentationSurfaces = [
+  { label: 'homepage', path: join(docs, 'index.html'), html: homepage },
+  { label: 'about page', path: join(docs, 'about', 'index.html') },
+  ...skillManifest.skills.map((skill) => ({
+    label: `skill page ${skill.name}`,
+    path: join(docs, 'skills', `${skill.name}.html`),
+  })),
+  { label: 'evidence index', path: join(docs, 'evidence', 'index.html') },
+  ...(evidenceReportManifest.reports ?? []).map((report) => ({
+    label: `evidence report ${report.labId}`,
+    path: join(docs, 'evidence', report.labId, 'index.html'),
+  })),
+];
+for (const surface of indexablePresentationSurfaces) {
+  assert(surface.html || existsSync(surface.path), `${surface.label} is missing`);
+  if (!surface.html && !existsSync(surface.path)) continue;
+  assertPrimaryNavigation(surface.html ?? readFileSync(surface.path, 'utf8'), surface.label);
+}
+for (const surface of contentSurfaces) assertPrimaryNavigation(surface.html, surface.label);
+
+const choosePathHeading = homepage.indexOf('<h2 id="pathfinder-title">Choose your path.</h2>');
+const flagshipSection = homepage.search(/<section\b[^>]*\bid=["']flagships["']/i);
+assert(choosePathHeading >= 0, 'homepage is missing the exact Choose your path heading');
+assert(flagshipSection >= 0, 'homepage is missing the #flagships section');
+assert(choosePathHeading >= 0 && flagshipSection >= 0 && choosePathHeading < flagshipSection, 'homepage Choose your path section must precede #flagships');
 
 for (const asset of requiredLocalAssets) {
   assert(existsSync(join(docs, asset)), `required local presentation asset is missing: ${asset}`);

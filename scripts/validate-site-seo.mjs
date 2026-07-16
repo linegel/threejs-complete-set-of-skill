@@ -10,12 +10,35 @@ import {
   responsiveDependencyHash,
   sha256,
 } from './lib/generated-asset-ledger.mjs';
+import { buildDemoRegistry } from './lib/lab-registry.mjs';
+import { loadSiteContent } from './lib/site-content.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DOCS = join(ROOT, 'docs');
 const SITE = 'https://threejs-skills.com/';
 const OLD_SITE = 'https://linegel.github.io/threejs-complete-set-of-skill/';
 const PUBLISHER_LOGO = `${SITE}icon-512.png`;
+const PRIMARY_NAV = [
+  ['Examples', '/#flagships'],
+  ['Skills', '/#skills'],
+  ['Guides', '/guides/'],
+  ['Evidence', '/evidence/'],
+  ['Install', '/#install'],
+  ['GitHub', 'https://github.com/linegel/threejs-complete-set-of-skill'],
+];
+const DEMO_REGISTRY = buildDemoRegistry();
+const skillIds = new Set(readdirSync(ROOT, { withFileTypes: true })
+  .filter((entry) => entry.isDirectory() && entry.name.startsWith('threejs-') && existsSync(join(ROOT, entry.name, 'SKILL.md')))
+  .map((entry) => entry.name));
+const SITE_CONTENT = loadSiteContent({
+  repoRoot: ROOT,
+  skillIds,
+  demos: DEMO_REGISTRY.demos.filter((demo) => skillIds.has(demo.skill)),
+  threeRevision: DEMO_REGISTRY.threeRevision,
+  today: '2026-07-16',
+});
+const contentPages = SITE_CONTENT.pages;
+const contentByUrl = new Map(contentPages.map((page) => [new URL(page.slug, SITE).href, page]));
 const ARTICLE_IMAGE_SPECS = [
   { id: '1x1', width: 1200, height: 1200 },
   { id: '4x3', width: 1200, height: 900 },
@@ -128,6 +151,49 @@ function visibleText(html) {
     .trim();
 }
 
+function decodedVisibleText(html) {
+  return staticMarkup(html)
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#(?:39|x27);/gi, "'")
+    .replace(/&#(\d+);/g, (_match, code) => String.fromCodePoint(Number(code)))
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function visibleFaqEntries(html) {
+  const article = staticMarkup(html).match(/<article\b[^>]*class=["'][^"']*\bcontent-body\b[^"']*["'][^>]*>([\s\S]*?)<\/article>/i)?.[1] ?? '';
+  return matches(article, /<h3\b[^>]*>\s*<a\b[^>]*href=["'](\/faq\/[^"']+\/)["'][^>]*>([\s\S]*?)<\/a>\s*<\/h3>\s*<p>([\s\S]*?)<\/p>/gi)
+    .map(([, route, question, answer]) => ({ route, question: decodedVisibleText(question), answer: decodedVisibleText(answer) }));
+}
+
+function validatePrimaryNavigation(html, label) {
+  const navs = matches(html, /<nav\b([^>]*)>([\s\S]*?)<\/nav>/gi)
+    .filter(([, attributes]) => attribute(`<nav ${attributes}>`, 'aria-label') === 'Primary navigation');
+  assert(navs.length === 1, `${label}: expected one Primary navigation landmark, found ${navs.length}`);
+  if (navs.length !== 1) return;
+  const anchors = matches(navs[0][2], /<a\b[^>]*href=["'][^"']+["'][^>]*>([\s\S]*?)<\/a>/gi);
+  assert(anchors.length === PRIMARY_NAV.length, `${label}: Primary navigation must contain exactly ${PRIMARY_NAV.length} links`);
+  for (const [index, [expectedLabel, expectedHref]] of PRIMARY_NAV.entries()) {
+    const anchor = anchors[index];
+    assert(visibleText(anchor?.[1] ?? '') === expectedLabel, `${label}: primary link ${index + 1} must be labeled ${expectedLabel}`);
+    assert(attribute(anchor?.[0] ?? '', 'href') === expectedHref, `${label}: ${expectedLabel} must link to ${expectedHref}`);
+  }
+  assert(!/class=["'][^"']*\bbrand\b/i.test(navs[0][0]), `${label}: brand must remain outside the Primary navigation landmark`);
+}
+
+function contentSchemaType(page) {
+  if (page.slug === '/faq/') return 'FAQPage';
+  if (page.kind === 'hub') return 'CollectionPage';
+  if (['ecosystem-comparison', 'technical-comparison', 'alternatives', 'user-doc', 'agent-doc', 'migration', 'faq-answer'].includes(page.kind)) return 'TechArticle';
+  return 'WebPage';
+}
+
+const escapedHtml = (value) => String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
 function validateIndexablePage(path, expectedUrl, {
   requireH1 = false,
   requireMain = false,
@@ -138,6 +204,8 @@ function validateIndexablePage(path, expectedUrl, {
   requireDemoShell = false,
   requireAbout = false,
   requireResponsivePreviews = false,
+  requirePrimaryNav = false,
+  contentPage = null,
 } = {}) {
   const label = relative(ROOT, path);
   const html = readFileSync(path, 'utf8');
@@ -181,7 +249,7 @@ function validateIndexablePage(path, expectedUrl, {
   const nodes = graphNodes(structuredData);
   const publisher = nodes.find((node) => hasType(node, 'Organization') && node['@id'] === `${SITE}#publisher`);
 
-  if (requireCatalog || requireArticle || requireAbout) {
+  if (requireCatalog || requireArticle || requireAbout || contentPage) {
     assert(Boolean(publisher), `${label}: missing canonical publisher Organization`);
     assert(publisher?.logo?.['@type'] === 'ImageObject', `${label}: publisher logo is not an ImageObject`);
     assert(publisher?.logo?.url === PUBLISHER_LOGO && publisher?.logo?.contentUrl === PUBLISHER_LOGO, `${label}: publisher logo URL is not canonical`);
@@ -230,6 +298,74 @@ function validateIndexablePage(path, expectedUrl, {
     assert(nodes.some((node) => hasType(node, 'Organization') && node['@id'] === `${SITE}#publisher`), `${label}: missing publisher identity`);
     assert(nodes.some((node) => hasType(node, 'BreadcrumbList')), `${label}: missing breadcrumb structured data`);
   }
+  if (contentPage) {
+    const expectedType = contentSchemaType(contentPage);
+    const expectedNodeId = `${expectedUrl}${expectedType === 'TechArticle' ? '#article' : '#webpage'}`;
+    const pageNode = nodes.find((node) => node?.['@id'] === expectedNodeId && hasType(node, expectedType));
+    assert(Boolean(pageNode), `${label}: missing ${expectedType} structured-data node`);
+    if (expectedType === 'TechArticle') {
+      assert(hasType(pageNode, 'Article'), `${label}: TechArticle must also be typed Article`);
+      assert(pageNode?.mainEntityOfPage === undefined, `${label}: TechArticle must not identify itself as its containing page`);
+    }
+    assert(pageNode?.name === contentPage.title, `${label}: schema name differs from source title`);
+    assert(pageNode?.headline === contentPage.h1, `${label}: schema headline differs from source h1`);
+    assert(pageNode?.description === contentPage.description, `${label}: schema description differs from source description`);
+    assert(pageNode?.datePublished === contentPage.published, `${label}: schema datePublished differs from source`);
+    assert(pageNode?.dateModified === contentPage.last_reviewed, `${label}: schema dateModified differs from source`);
+    assert(pageNode?.publisher?.['@id'] === `${SITE}#publisher`, `${label}: schema publisher reference is not canonical`);
+    const breadcrumb = nodes.find((node) => hasType(node, 'BreadcrumbList') && node?.['@id'] === `${expectedUrl}#breadcrumb`);
+    const breadcrumbItems = breadcrumb?.itemListElement ?? [];
+    assert(breadcrumbItems.length >= 2, `${label}: content breadcrumb is incomplete`);
+    for (const [index, item] of breadcrumbItems.entries()) assert(item.position === index + 1, `${label}: breadcrumb positions are not contiguous`);
+    assert(breadcrumbItems.at(-1)?.name === contentPage.h1 && breadcrumbItems.at(-1)?.item === expectedUrl, `${label}: breadcrumb does not terminate at the current source page`);
+    const h1 = staticMarkup(html).match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)?.[1];
+    assert(h1 === escapedHtml(contentPage.h1), `${label}: visible h1 differs from source`);
+    const answer = staticMarkup(html).match(/<p\b[^>]*class=["'][^"']*\bcontent-answer\b[^"']*["'][^>]*>([\s\S]*?)<\/p>/i)?.[1];
+    assert(answer === escapedHtml(contentPage.summary), `${label}: visible direct answer differs from source summary`);
+    const relatedRoutes = matches(html, /<a\b[^>]*data-related-route=["'][^"']+["'][^>]*>/gi).map(([tag]) => attribute(tag, 'data-related-route'));
+    assert(JSON.stringify(relatedRoutes) === JSON.stringify(contentPage.related_pages), `${label}: rendered related routes differ from source order`);
+    assert(/<nav\b[^>]*aria-label=["']On this page["']/i.test(html), `${label}: missing static on-page index`);
+    assert(/<nav\b[^>]*aria-label=["']Machine-readable discovery["']/i.test(html), `${label}: missing visible machine discovery links`);
+    const expectedImage = contentPage.hero_image ? new URL(contentPage.hero_image, SITE).href : undefined;
+    assert(pageNode?.image === expectedImage, `${label}: schema image differs from provenance-bound source image`);
+    if (contentPage.hero_image) {
+      const source = matches(html, /<img\b[^>]*>/gi).map(([tag]) => attribute(tag, 'src')).find((src) => src === contentPage.hero_image);
+      assert(Boolean(source), `${label}: declared proof image is not visible`);
+      assert(socialImages[0] === expectedImage, `${label}: social image differs from declared proof image`);
+      assert(html.includes(`/evidence/${contentPage.hero_source}/`), `${label}: proof image lacks its evidence report link`);
+    } else assert(socialImages.length === 0, `${label}: page without declared proof publishes a social image`);
+    if (expectedType === 'TechArticle') {
+      assert(headValue(html, 'property', 'article:published_time')[0] === contentPage.published, `${label}: article publication metadata differs from source`);
+      assert(headValue(html, 'property', 'article:modified_time')[0] === contentPage.last_reviewed, `${label}: article modification metadata differs from source`);
+    }
+    if (contentPage.kind === 'faq-answer') {
+      const question = pageNode?.mainEntity;
+      assert(question?.['@type'] === 'Question' && question?.name === contentPage.faq.question, `${label}: FAQ Question differs from visible/source question`);
+      assert(question?.acceptedAnswer?.['@type'] === 'Answer' && question?.acceptedAnswer?.text === contentPage.faq.answer, `${label}: FAQ acceptedAnswer differs from visible/source answer`);
+      assert(/<p\b[^>]*\bdata-faq-answer\b/i.test(html), `${label}: FAQ direct answer lacks its visible parity marker`);
+      for (const source of contentPage.question_sources) {
+        assert(source.startsWith('https://') ? html.includes(`href="${source}"`) : html.includes(escapedHtml(source)), `${label}: FAQ question provenance is not visible: ${source}`);
+      }
+    }
+    if (contentPage.slug === '/faq/') {
+      const questions = pageNode?.mainEntity ?? [];
+      const faqPages = new Map(contentPages.filter((page) => page.kind === 'faq-answer').map((page) => [page.slug, page]));
+      const visibleEntries = visibleFaqEntries(html);
+      assert(visibleEntries.length === faqPages.size, `${label}: visible FAQ count differs from source leaves`);
+      assert(new Set(visibleEntries.map((entry) => entry.route)).size === visibleEntries.length, `${label}: visible FAQ routes are duplicated`);
+      assert(questions.length === visibleEntries.length, `${label}: FAQPage schema count differs from visible questions`);
+      for (const [index, entry] of visibleEntries.entries()) {
+        const child = faqPages.get(entry.route);
+        assert(Boolean(child), `${label}: visible FAQ route has no authored answer: ${entry.route}`);
+        assert(entry.question === child?.faq.question, `${label}: visible FAQ question ${index + 1} differs from its source leaf`);
+        assert(entry.answer === child?.faq.answer, `${label}: visible FAQ answer ${index + 1} differs from its source leaf`);
+        assert(questions[index]?.name === entry.question, `${label}: FAQPage question ${index + 1} differs from visible text`);
+        assert(questions[index]?.url === new URL(entry.route, SITE).href, `${label}: FAQPage question ${index + 1} URL differs from visible route`);
+        assert(questions[index]?.acceptedAnswer?.text === entry.answer, `${label}: FAQPage answer ${index + 1} differs from visible text`);
+      }
+    }
+  }
+  if (requirePrimaryNav) validatePrimaryNavigation(html, label);
 
   if (requireH1) {
     const headings = matches(staticMarkup(html), /<h1\b[^>]*>([\s\S]*?)<\/h1>/gi);
@@ -346,6 +482,28 @@ assert(!sitemap.includes(OLD_SITE), 'sitemap.xml: contains the retired GitHub Pa
 for (const [, lastmod] of matches(sitemap, /<lastmod>([^<]+)<\/lastmod>/g)) {
   assert(/^\d{4}-\d{2}-\d{2}$/.test(lastmod), `sitemap.xml: invalid lastmod ${lastmod}`);
 }
+const sitemapEntries = new Map(matches(sitemap, /<url>([\s\S]*?)<\/url>/g).map(([, body]) => [
+  body.match(/<loc>([^<]+)<\/loc>/)?.[1],
+  {
+    lastmod: body.match(/<lastmod>([^<]+)<\/lastmod>/)?.[1],
+    images: matches(body, /<image:loc>([^<]+)<\/image:loc>/g).map((match) => match[1]),
+  },
+]));
+const contentUrls = new Set(contentByUrl.keys());
+const contentFamilies = new Set(contentPages.map((page) => page.slug.split('/').filter(Boolean)[0]));
+for (const [url, page] of contentByUrl) {
+  const entry = sitemapEntries.get(url);
+  assert(Boolean(entry), `sitemap.xml: missing authored decision page ${url}`);
+  assert(entry?.lastmod === page.last_reviewed, `sitemap.xml: ${url} lastmod differs from last_reviewed`);
+  const expectedImages = page.hero_image ? [new URL(page.hero_image, SITE).href] : [];
+  assert(JSON.stringify(entry?.images ?? []) === JSON.stringify(expectedImages), `sitemap.xml: ${url} proof image differs from source`);
+  const output = localPathForUrl(url);
+  assert(Boolean(output && existsSync(output)), `${page.sourceFile}: generated output is missing for ${url}`);
+}
+for (const url of pageUrls) {
+  const family = new URL(url).pathname.split('/').filter(Boolean)[0];
+  if (contentFamilies.has(family)) assert(contentUrls.has(url), `sitemap.xml: unknown decision-support URL ${url}`);
+}
 
 for (const url of pageUrls) {
   const path = localPathForUrl(url);
@@ -357,16 +515,19 @@ for (const url of pageUrls) {
   const isDemo = pathname.startsWith('/demos/');
   const isEvidence = pathname.startsWith('/evidence/');
   const isAbout = pathname === '/about/';
+  const contentPage = contentByUrl.get(url) ?? null;
   const record = validateIndexablePage(path, url, {
     requireH1: true,
     requireMain: true,
     validateImages: true,
-    requireDiscovery: isHome || isSkill || isAbout,
+    requireDiscovery: isHome || isSkill || isAbout || Boolean(contentPage),
     requireArticle: isSkill,
     requireCatalog: isHome,
     requireDemoShell: isDemo,
     requireAbout: isAbout,
-    requireResponsivePreviews: isHome || isSkill || isEvidence,
+    requireResponsivePreviews: isHome || isSkill || isEvidence || Boolean(contentPage?.hero_image),
+    requirePrimaryNav: !isDemo,
+    contentPage,
   });
   pageRecords.push({ url, ...record });
 }
@@ -499,12 +660,7 @@ for (const path of walk(DOCS, (file) => file.endsWith('.html'))) {
   }
 }
 
-for (const path of [
-  join(DOCS, 'index.html'),
-  join(DOCS, 'about', 'index.html'),
-  ...walk(join(DOCS, 'skills'), (file) => file.endsWith('.html')),
-  ...walk(join(DOCS, 'evidence'), (file) => file.endsWith('.html')),
-]) {
+for (const path of [...new Set(pageRecords.map((record) => localPathForUrl(record.url)).filter(Boolean))]) {
   const label = relative(ROOT, path);
   const html = readFileSync(path, 'utf8');
   assert(!/href=["'][^"']*index\.html(?:[#"'])/i.test(html), `${label}: internal navigation reinforces duplicate index.html URLs`);
@@ -531,7 +687,31 @@ for (const name of ['llm.txt', 'llms.txt', 'skills.json', 'site.webmanifest', 'r
   assert(!text.includes(OLD_SITE), `${name}: contains the retired GitHub Pages origin`);
 }
 assert(readFileSync(join(DOCS, 'llms.txt'), 'utf8').includes(`${SITE}about/`), 'llms.txt: missing methodology URL');
-assert(JSON.parse(readFileSync(join(DOCS, 'skills.json'), 'utf8')).methodology === `${SITE}about/`, 'skills.json: missing canonical methodology URL');
+const llmsText = readFileSync(join(DOCS, 'llms.txt'), 'utf8');
+assert(readFileSync(join(DOCS, 'llm.txt'), 'utf8') === llmsText, 'llm.txt: alias differs from llms.txt');
+const docsSkillsJson = readFileSync(join(DOCS, 'skills.json'), 'utf8');
+assert(readFileSync(join(ROOT, 'skills.json'), 'utf8') === docsSkillsJson, 'skills.json: root and docs copies differ');
+const skillManifest = JSON.parse(docsSkillsJson);
+assert(skillManifest.methodology === `${SITE}about/`, 'skills.json: missing canonical methodology URL');
+const expectedDecisionPages = contentPages.map((page) => ({
+  url: new URL(page.slug, SITE).href,
+  family: page.slug.split('/').filter(Boolean)[0],
+  title: page.title,
+  description: page.description,
+  primaryQuery: page.primary_query,
+  queryAliases: page.query_aliases,
+  published: page.published,
+  lastReviewed: page.last_reviewed,
+  relatedSkills: page.related_skills,
+}));
+assert(skillManifest.decisionSupport?.schemaVersion === 1, 'skills.json: decisionSupport schemaVersion must equal 1');
+assert(skillManifest.decisionSupport?.hub === `${SITE}guides/`, 'skills.json: decisionSupport hub is not canonical');
+assert(skillManifest.decisionSupport?.count === contentPages.length, 'skills.json: decisionSupport count differs from source');
+assert(JSON.stringify(skillManifest.decisionSupport?.pages) === JSON.stringify(expectedDecisionPages), 'skills.json: decisionSupport pages differ from authored source');
+for (const page of contentPages) {
+  const url = new URL(page.slug, SITE).href;
+  assert(llmsText.includes(`](${url})`), `llms.txt: missing decision-support URL ${url}`);
+}
 
 if (errors.length) {
   console.error(`Site SEO validation failed (${errors.length} errors):`);

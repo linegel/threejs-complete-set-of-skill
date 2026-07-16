@@ -1,10 +1,30 @@
 #!/usr/bin/env node
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { dirname, join, resolve, sep } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { buildDemoRegistry } from './lib/lab-registry.mjs';
+import { loadSiteContent } from './lib/site-content.mjs';
 
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
+const DOCS = join(ROOT, 'docs');
 const SITE = new URL(process.env.SITE_URL ?? 'https://threejs-skills.com/');
 const RETIRED_SITE = 'https://linegel.github.io/threejs-complete-set-of-skill/';
 const CONCURRENCY = 8;
 const PUBLISHER_LOGO = new URL('icon-512.png', SITE).href;
 const ARTICLE_IMAGE_RATIOS = ['1x1', '4x3', '16x9'];
+const DEMO_REGISTRY = buildDemoRegistry();
+const SKILL_IDS = new Set(readdirSync(ROOT, { withFileTypes: true })
+  .filter((entry) => entry.isDirectory() && entry.name.startsWith('threejs-')
+    && existsSync(join(ROOT, entry.name, 'SKILL.md')))
+  .map((entry) => entry.name));
+const SITE_DEMOS = DEMO_REGISTRY.demos.filter((demo) => SKILL_IDS.has(demo.skill));
+const DECISION_CONTENT = loadSiteContent({
+  repoRoot: ROOT,
+  skillIds: SKILL_IDS,
+  demos: SITE_DEMOS,
+  threeRevision: DEMO_REGISTRY.threeRevision,
+});
+const DECISION_PAGE_BY_PATHNAME = DECISION_CONTENT.pageBySlug;
 const NOINDEX_DEMOS = [
   ['demos/ambient-contact-shading-webgpu-node-gtao/', 'skills/threejs-ambient-contact-shading.html'],
   ['demos/bloom-node-selective/', 'skills/threejs-bloom.html'],
@@ -83,6 +103,30 @@ function schemaNodes(values) {
 function hasType(node, type) {
   const types = Array.isArray(node?.['@type']) ? node['@type'] : [node?.['@type']];
   return types.includes(type);
+}
+
+function decisionSchemaType(page) {
+  if (page.slug === '/faq/') return 'FAQPage';
+  if (page.kind === 'hub') return 'CollectionPage';
+  if (['ecosystem-comparison', 'technical-comparison', 'alternatives', 'user-doc', 'agent-doc', 'migration', 'faq-answer'].includes(page.kind)) {
+    return 'TechArticle';
+  }
+  return 'WebPage';
+}
+
+function localPng(urlString) {
+  let url;
+  try {
+    url = new URL(urlString);
+  } catch {
+    return null;
+  }
+  if (url.origin !== SITE.origin || !/\.png$/i.test(url.pathname)) return null;
+  const path = resolve(DOCS, `.${decodeURIComponent(url.pathname)}`);
+  if (!path.startsWith(`${resolve(DOCS)}${sep}`) || !existsSync(path)) return null;
+  const data = readFileSync(path);
+  if (data.length < 24 || data.subarray(0, 8).toString('hex') !== '89504e470d0a1a0a') return null;
+  return { path, width: data.readUInt32BE(16), height: data.readUInt32BE(20) };
 }
 
 function duplicateValues(records, key) {
@@ -170,11 +214,20 @@ assert(llm === llms, 'llm.txt and llms.txt differ');
 assert(llm.includes(`Website: ${SITE.href}`), 'LLM discovery file does not name the canonical website');
 
 const urls = [...sitemap.matchAll(/<url>\s*<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
+const sitemapEntries = new Map([...sitemap.matchAll(/<url>([\s\S]*?)<\/url>/g)].map(([, body]) => [
+  body.match(/<loc>([^<]+)<\/loc>/)?.[1],
+  body,
+]).filter(([url]) => Boolean(url)));
+const sitemapSet = new Set(urls);
 assert(urls.length > 0, 'sitemap.xml: no page URLs');
-assert(new Set(urls).size === urls.length, 'sitemap.xml: duplicate page URLs');
+assert(sitemapSet.size === urls.length, 'sitemap.xml: duplicate page URLs');
 assert(urls.every((url) => url.startsWith(SITE.href)), 'sitemap.xml: URL outside the canonical origin');
 assert(!sitemap.includes(RETIRED_SITE), 'sitemap.xml: contains the retired origin');
 assert(!urls.some((url) => /\/(?:scenario|mechanism|tier)\//.test(new URL(url).pathname)), 'sitemap.xml: contains state-only wrapper URLs');
+for (const page of DECISION_CONTENT.pages) {
+  const url = new URL(page.slug, SITE).href;
+  assert(sitemapSet.has(url), `${url}: authored decision page is missing from the sitemap`);
+}
 
 await mapConcurrent(NOINDEX_DEMOS, async ([demoPath, skillPath]) => {
   const demoUrl = new URL(demoPath, SITE).href;
@@ -201,17 +254,53 @@ await mapConcurrent(urls, async (url) => {
   const structuredData = jsonLd(html, url);
   const schema = schemaTypes(structuredData);
   const nodes = schemaNodes(structuredData);
+  const pathname = new URL(url).pathname;
+  const decisionPage = DECISION_PAGE_BY_PATHNAME.get(pathname) ?? null;
 
   assert(title && title.length >= 20 && title.length <= 65, `${url}: invalid title length ${title?.length ?? 0}`);
   assert(description.length === 1 && description[0].length >= 80 && description[0].length <= 165, `${url}: invalid meta description`);
   assert(robotsMeta.length === 1 && /\bindex\b/i.test(robotsMeta[0]) && !/\bnoindex\b/i.test(robotsMeta[0]), `${url}: not explicitly indexable`);
   assert(canonical.length === 1 && canonical[0] === url, `${url}: canonical mismatch (${canonical.join(', ') || 'missing'})`);
   assert(metaValues(html, 'property', 'og:url')[0] === url, `${url}: og:url mismatch`);
-  assert(/\.png$/i.test(metaValues(html, 'property', 'og:image')[0] ?? ''), `${url}: social image is not preserved as PNG`);
-  assert(metaValues(html, 'name', 'twitter:card')[0] === 'summary_large_image', `${url}: missing large Twitter card`);
+  const socialImages = metaValues(html, 'property', 'og:image');
+  const socialImage = socialImages[0] ?? null;
+  const twitterCards = metaValues(html, 'name', 'twitter:card');
+  assert(socialImages.length <= 1, `${url}: duplicate og:image metadata`);
+  assert(twitterCards.length === 1, `${url}: expected one Twitter card declaration`);
+  if (socialImage) {
+    const imageType = metaValues(html, 'property', 'og:image:type');
+    const imageWidth = metaValues(html, 'property', 'og:image:width');
+    const imageHeight = metaValues(html, 'property', 'og:image:height');
+    const imageAlt = metaValues(html, 'property', 'og:image:alt');
+    const twitterImage = metaValues(html, 'name', 'twitter:image');
+    const twitterImageAlt = metaValues(html, 'name', 'twitter:image:alt');
+    const local = localPng(socialImage);
+    assert(Boolean(local), `${url}: social image must be a local published PNG`);
+    assert(twitterCards[0] === 'summary_large_image', `${url}: social image requires a large Twitter card`);
+    assert(imageType.length === 1 && imageType[0] === 'image/png', `${url}: social image type must be image/png`);
+    assert(imageWidth.length === 1 && Number.isInteger(Number(imageWidth[0])) && Number(imageWidth[0]) > 0, `${url}: invalid social image width metadata`);
+    assert(imageHeight.length === 1 && Number.isInteger(Number(imageHeight[0])) && Number(imageHeight[0]) > 0, `${url}: invalid social image height metadata`);
+    assert(imageAlt.length === 1 && Boolean(imageAlt[0]?.trim()), `${url}: social image requires non-empty alt metadata`);
+    assert(twitterImage.length === 1 && twitterImage[0] === socialImage, `${url}: Twitter and Open Graph image URLs disagree`);
+    assert(twitterImageAlt.length === 1 && twitterImageAlt[0] === imageAlt[0], `${url}: Twitter and Open Graph image alt text disagree`);
+    if (local) {
+      assert(Number(imageWidth[0]) === local.width, `${url}: social image width metadata disagrees with the local PNG`);
+      assert(Number(imageHeight[0]) === local.height, `${url}: social image height metadata disagrees with the local PNG`);
+    }
+    structuredImageUrls.add(socialImage);
+  } else {
+    assert(twitterCards[0] === 'summary', `${url}: a page without a social image requires a summary Twitter card`);
+    for (const [attribute, name, label] of [
+      ['property', 'og:image:type', 'og:image:type'],
+      ['property', 'og:image:width', 'og:image:width'],
+      ['property', 'og:image:height', 'og:image:height'],
+      ['property', 'og:image:alt', 'og:image:alt'],
+      ['name', 'twitter:image', 'twitter:image'],
+      ['name', 'twitter:image:alt', 'twitter:image:alt'],
+    ]) assert(metaValues(html, attribute, name).length === 0, `${url}: ${label} is present without og:image`);
+  }
   assert(!html.includes(RETIRED_SITE), `${url}: contains the retired origin`);
 
-  const pathname = new URL(url).pathname;
   const rawMarkup = staticMarkup(html);
   const headings = [...rawMarkup.matchAll(/<h1\b[^>]*>([\s\S]*?)<\/h1>/gi)];
   const mainLandmarks = [...rawMarkup.matchAll(/<main\b[^>]*>/gi)];
@@ -226,7 +315,7 @@ await mapConcurrent(urls, async (url) => {
     assert(/\bdata-demo-mechanisms\b/i.test(shell?.[0] ?? ''), `${url}: demo shell lacks mechanism inventory`);
     assert(/Evidence status:/i.test(visibleText(shell?.[2] ?? '')), `${url}: demo shell lacks evidence status`);
   }
-  if (pathname === '/' || pathname.startsWith('/skills/')) {
+  if (pathname === '/' || pathname.startsWith('/skills/') || Boolean(decisionPage?.hero_image)) {
     const imageTags = [...html.matchAll(/<img\b[^>]*>/gi)].map((match) => match[0]);
     const pictures = [...html.matchAll(/<picture\b[^>]*class=["'][^"']*\bresponsive-preview\b[^"']*["'][^>]*>([\s\S]*?)<\/picture>/gi)];
     assert(pictures.length === imageTags.length, `${url}: expected ${imageTags.length} responsive picture wrappers, found ${pictures.length}`);
@@ -244,18 +333,56 @@ await mapConcurrent(urls, async (url) => {
       }
     }
   }
-  const expectedType = pathname === '/'
-    ? 'WebSite'
-    : (pathname === '/about/' ? 'AboutPage' : (pathname.startsWith('/skills/') ? 'TechArticle' : 'WebApplication'));
+  const expectedType = decisionPage
+    ? decisionSchemaType(decisionPage)
+    : (pathname === '/'
+      ? 'WebSite'
+      : (pathname === '/about/' ? 'AboutPage' : (pathname.startsWith('/skills/') ? 'TechArticle' : 'WebApplication')));
   assert(schema.has(expectedType), `${url}: missing ${expectedType} structured data`);
   assert(schema.has('BreadcrumbList') || pathname === '/', `${url}: missing breadcrumb structured data`);
-  if (pathname === '/' || pathname === '/about/' || pathname.startsWith('/skills/')) {
+  if (decisionPage) {
+    const pageNodeId = `${url}${expectedType === 'TechArticle' ? '#article' : '#webpage'}`;
+    const pageNode = nodes.find((node) => node?.['@id'] === pageNodeId);
+    const actualTypes = new Set(Array.isArray(pageNode?.['@type']) ? pageNode['@type'] : [pageNode?.['@type']].filter(Boolean));
+    const requiredTypes = expectedType === 'TechArticle' ? ['Article', 'TechArticle'] : [expectedType];
+    assert(Boolean(pageNode), `${url}: missing canonical decision-page structured-data node`);
+    assert(actualTypes.size === requiredTypes.length && requiredTypes.every((type) => actualTypes.has(type)), `${url}: decision-page type is ${[...actualTypes].join(', ') || 'missing'}, expected ${requiredTypes.join(', ')}`);
+
+    const expectedImage = decisionPage.hero_image ? new URL(decisionPage.hero_image, SITE).href : null;
+    assert(socialImage === expectedImage, `${url}: social image does not match authored decision-page provenance`);
+    if (expectedImage) assert(pageNode?.image === expectedImage, `${url}: structured-data image does not match the social image`);
+    else assert(!Object.hasOwn(pageNode ?? {}, 'image'), `${url}: structured data publishes an image for an image-free decision page`);
+
+    const sitemapImages = [...(sitemapEntries.get(url) ?? '').matchAll(/<image:loc>([^<]+)<\/image:loc>/g)].map((match) => match[1]);
+    if (expectedImage) assert(sitemapImages.length === 1 && sitemapImages[0] === expectedImage, `${url}: sitemap image does not match authored decision-page provenance`);
+    else assert(sitemapImages.length === 0, `${url}: sitemap publishes an image for an image-free decision page`);
+
+    if (expectedType === 'TechArticle') {
+      assert(hasType(pageNode, 'Article'), `${url}: TechArticle lacks dual Article typing`);
+      assert(pageNode?.mainEntityOfPage === undefined, `${url}: decision article identifies itself as its containing page`);
+      assert(pageNode?.author?.['@id'] === `${SITE.href}#publisher` && pageNode?.publisher?.['@id'] === `${SITE.href}#publisher`, `${url}: decision article author/publisher references are inconsistent`);
+      const published = Date.parse(pageNode?.datePublished ?? '');
+      const modified = Date.parse(pageNode?.dateModified ?? '');
+      assert(Number.isFinite(published), `${url}: decision article has no valid datePublished`);
+      assert(Number.isFinite(modified), `${url}: decision article has no valid dateModified`);
+      assert(!Number.isFinite(published) || !Number.isFinite(modified) || published <= modified, `${url}: decision article publication date is later than modification date`);
+      assert(metaValues(html, 'property', 'article:published_time')[0] === pageNode?.datePublished, `${url}: decision article publication timestamps disagree`);
+      assert(metaValues(html, 'property', 'article:modified_time')[0] === pageNode?.dateModified, `${url}: decision article modification timestamps disagree`);
+    }
+  }
+  const requiresPublisherAndDiscovery = Boolean(decisionPage)
+    || pathname === '/' || pathname === '/about/' || pathname.startsWith('/skills/');
+  if (requiresPublisherAndDiscovery) {
     const publisher = nodes.find((node) => hasType(node, 'Organization') && node['@id'] === `${SITE.href}#publisher`);
+    assert(Boolean(publisher), `${url}: missing canonical publisher Organization`);
     assert(publisher?.logo?.['@type'] === 'ImageObject', `${url}: publisher logo is not an ImageObject`);
     assert(publisher?.logo?.url === PUBLISHER_LOGO && publisher?.logo?.contentUrl === PUBLISHER_LOGO, `${url}: publisher logo URL is not canonical`);
     assert(publisher?.logo?.width === 512 && publisher?.logo?.height === 512, `${url}: publisher logo dimensions are not 512x512`);
-    assert(alternateValues(html, 'text/plain')[0] === new URL('llms.txt', SITE).href, `${url}: missing llms.txt discovery link`);
-    assert(alternateValues(html, 'application/json')[0] === new URL('skills.json', SITE).href, `${url}: missing skills.json discovery link`);
+    assert(publisher?.url === SITE.href && publisher?.sameAs === 'https://github.com/linegel/threejs-complete-set-of-skill', `${url}: publisher identity is incomplete`);
+    const llmsDiscovery = alternateValues(html, 'text/plain');
+    const skillsDiscovery = alternateValues(html, 'application/json');
+    assert(llmsDiscovery.length === 1 && llmsDiscovery[0] === new URL('llms.txt', SITE).href, `${url}: missing canonical llms.txt discovery link`);
+    assert(skillsDiscovery.length === 1 && skillsDiscovery[0] === new URL('skills.json', SITE).href, `${url}: missing canonical skills.json discovery link`);
   }
   if (pathname.startsWith('/skills/')) {
     const article = nodes.find((node) => hasType(node, 'Article'));
@@ -298,7 +425,6 @@ for (const [key, label] of [['title', 'title'], ['description', 'meta descriptio
   }
 }
 
-const sitemapSet = new Set(urls);
 const inboundLinks = new Map(urls.map((url) => [url, 0]));
 for (const record of pageRecords) {
   for (const target of new Set(record.links)) {

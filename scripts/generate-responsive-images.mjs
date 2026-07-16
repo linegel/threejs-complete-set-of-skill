@@ -53,12 +53,26 @@ function htmlFilesUnder(directory) {
   });
 }
 
+const EXCLUDED_INDEX_SUBTREES = new Set([
+  join(DOCS, 'demos'),
+  join(DOCS, 'labs'),
+]);
+
+function indexFilesUnder(directory) {
+  if (!existsSync(directory) || EXCLUDED_INDEX_SUBTREES.has(directory)) return [];
+  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const path = join(directory, entry.name);
+    if (entry.isDirectory()) return indexFilesUnder(path);
+    return entry.isFile() && entry.name === 'index.html' ? [path] : [];
+  });
+}
+
 function pageFiles() {
-  return [
-    join(DOCS, 'index.html'),
+  return [...new Set([
+    ...indexFilesUnder(DOCS),
     ...htmlFilesUnder(join(DOCS, 'skills')),
     ...htmlFilesUnder(join(DOCS, 'evidence')),
-  ].sort();
+  ])].sort();
 }
 
 function localSourcePath(pagePath, src) {
