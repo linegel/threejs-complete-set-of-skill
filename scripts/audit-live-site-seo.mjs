@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { buildDemoRegistry } from './lib/lab-registry.mjs';
+import { authoritativeSkillDirs, buildDemoRegistry } from './lib/lab-registry.mjs';
 import { loadSiteContent } from './lib/site-content.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -13,10 +13,8 @@ const CONCURRENCY = 8;
 const PUBLISHER_LOGO = new URL('icon-512.png', SITE).href;
 const ARTICLE_IMAGE_RATIOS = ['1x1', '4x3', '16x9'];
 const DEMO_REGISTRY = buildDemoRegistry();
-const SKILL_IDS = new Set(readdirSync(ROOT, { withFileTypes: true })
-  .filter((entry) => entry.isDirectory() && entry.name.startsWith('threejs-')
-    && existsSync(join(ROOT, entry.name, 'SKILL.md')))
-  .map((entry) => entry.name));
+const SKILL_IDS = new Set(authoritativeSkillDirs());
+if (SKILL_IDS.size !== 27) throw new Error(`live SEO audit requires exactly 27 installable skills; received ${SKILL_IDS.size}`);
 const SITE_DEMOS = DEMO_REGISTRY.demos.filter((demo) => SKILL_IDS.has(demo.skill));
 const DECISION_CONTENT = loadSiteContent({
   repoRoot: ROOT,

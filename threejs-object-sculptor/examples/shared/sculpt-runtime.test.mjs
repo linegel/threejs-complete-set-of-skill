@@ -149,8 +149,8 @@ for (const tier of SCULPT_TIERS) {
   assert.equal(bodyProxy.recordType, "ColliderConstructionInput");
   assert.equal(bodyProxy.claimStatus, "authoring-input");
   assert.equal(bodyProxy.solverAuthority, false);
-  assert.equal(bodyProxy.canonicalProxyStatus, "blocked");
-  assert.equal(bodyProxy.rigidBodyPropertiesStatus, "blocked-insufficient-evidence");
+  assert.equal(bodyProxy.solverHandoffStatus, "blocked");
+  assert.equal(bodyProxy.massPropertiesStatus, "blocked-insufficient-evidence");
   assert.equal(bodyProxy.entityId.generation, 1);
   assert.match(bodyProxy.entityId.namespace, /\.instance\/stable-preview\.entity$/);
   assert.equal(bodyProxy.targetSemanticEntityId.namespace, "shared-runtime-fixture.entity");
@@ -163,7 +163,7 @@ for (const tier of SCULPT_TIERS) {
   assert.equal(bodyProxy.validity.visualLodIndependent, true);
   assert.equal(bodyProxy.approximationError.quantity.unit, "metre");
   assert.equal(bodyProxy.approximationError.quantity.label, "Authored");
-  assert(bodyProxy.blockingRequirements.some((entry) => entry.includes("ExternalSolverAdapter")));
+  assert(bodyProxy.blockingRequirements.some((entry) => entry.includes("solver integration")));
   const materialBinding = runtime.physicsMaterials.get("body-material");
   assert.equal(materialBinding.claimStatus, "insufficient-evidence");
   assert.equal(materialBinding.canonicalRegistryStatus, "blocked");

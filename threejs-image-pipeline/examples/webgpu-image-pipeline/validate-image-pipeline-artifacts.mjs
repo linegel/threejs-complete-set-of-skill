@@ -140,7 +140,7 @@ async function validateSourceContracts() {
 	const browserSource = await readFile( resolve( here, 'browser-app.js' ), 'utf8' );
 	const captureSource = await readFile( resolve( here, 'capture.mjs' ), 'utf8' );
 	const artifactConfigSource = await readFile( resolve( here, 'artifact-config.js' ), 'utf8' );
-	const skillSource = await readFile( resolve( here, '../../SKILL.md' ), 'utf8' );
+	const skillSource = await readFile( resolve( repoRoot, 'skills/threejs-image-pipeline/SKILL.md' ), 'utf8' );
 	const readmeSource = await readFile( resolve( here, 'README.md' ), 'utf8' );
 
 	assert( mainSource.includes( 'trackTimestamp: true' ), 'Browser fixture must request timestamps before classifying GPU timing.' );

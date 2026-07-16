@@ -127,12 +127,6 @@ test('Codex in-app Browser policy requires immutable exact-byte self-serving wit
 
 test('fixture-driven non-rendering suites and fallback harness use explicit exceptional policies', () => {
   assert.deepEqual(checkCaptureImplementation({
-    id: 'router-manifest-lab',
-    nonRendering: true,
-    packageCapture: 'node router-manifest.test.mjs',
-    captureSource: 'fixture driven router-manifest test',
-  }), []);
-  assert.deepEqual(checkCaptureImplementation({
     id: 'debugging-contract-lab',
     nonRendering: true,
     packageCapture: 'node contract-lab.test.mjs',

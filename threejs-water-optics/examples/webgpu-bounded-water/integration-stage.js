@@ -3,21 +3,25 @@ import { createWebGPUBoundedWaterSystem } from './webgpu-bounded-water.js';
 
 export const WATER_PHYSICS_INTEGRATION_BOUNDARY = Object.freeze( {
 	id: 'bounded-water-render-integration-only-v1',
-	canonicalPhysicsAbi: false,
+	couplingClaim: 'presentation-only',
 	acceptedInputs: Object.freeze( [
 		'presentation-authored-weather-state',
 		'presentation-authored-drop-event',
 		'presentation-authored-moving-boundary-object-impulse'
 	] ),
-	forbiddenClaims: Object.freeze( [
-		'PhysicsContext publication',
-		'WaterSurfaceSample publication',
-		'SurfaceExchange consumption',
-		'InteractionRecord consumption',
-		'InteractionBatchLedger exact-once delivery',
-		'conservation or two-way coupling'
+	unsupportedHandoffs: Object.freeze( [
+		'versioned channel-requested surface sample batches',
+		'dimensioned forcing and reaction batches',
+		'conservative or two-way exchange',
+		'exact-once cross-system event ownership'
 	] ),
-	requiredCanonicalPath: 'physics-domain-and-interaction-contract.md plus a route-owned provider/interaction adapter'
+	requiredHostDeclarations: Object.freeze( [
+		'SI positions in one stable frame and origin',
+		'sample instant or application interval and clock',
+		'state and resource versions',
+		'channel request, validity, and error',
+		'forcing and reaction ownership'
+	] )
 } );
 
 /**
@@ -46,7 +50,7 @@ export async function createBoundedWaterStage( {
 		id: 'bounded-water-stage',
 		renderer,
 		weatherState,
-		physicsIntegrationBoundary: WATER_PHYSICS_INTEGRATION_BOUNDARY,
+		hostHandoffBoundary: WATER_PHYSICS_INTEGRATION_BOUNDARY,
 		...system,
 		ownsRenderPipeline: false,
 		ownsToneMap: false,
@@ -69,7 +73,7 @@ export async function createBoundedWaterStage( {
 					'presentation-authored-weather-precipitation',
 					'presentation-authored-weather-wind'
 				] : [],
-				forbiddenClaims: WATER_PHYSICS_INTEGRATION_BOUNDARY.forbiddenClaims
+				unsupportedHandoffs: WATER_PHYSICS_INTEGRATION_BOUNDARY.unsupportedHandoffs
 			};
 		},
 		describeResources: () => system.describeResources(),

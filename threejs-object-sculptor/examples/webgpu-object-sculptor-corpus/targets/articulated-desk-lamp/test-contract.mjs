@@ -498,7 +498,7 @@ for (const tier of TARGET_CONTRACT.tierIds) {
     assert.equal(constraint.contactAndMotionAuthority, "none");
     assert.ok(constraint.missingEvidence.some((entry) => entry.includes("compliance")));
     assert.ok(constraint.missingEvidence.some((entry) => entry.includes("damping")));
-    assert.ok(constraint.blockingRequirements.some((entry) => entry.includes("ExternalSolverAdapter")));
+    assert.ok(constraint.blockingRequirements.some((entry) => entry.includes("solver integration")));
     assert.ok(constraint.validity.invalidation.length >= 4);
     assert.equal(constraint.sourceRevision, TARGET_CONTRACT.sourceRevision);
   }

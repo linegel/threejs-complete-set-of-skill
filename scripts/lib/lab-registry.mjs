@@ -18,6 +18,7 @@ import { fileURLToPath } from 'node:url';
 import { PROVIDER_DEMOS } from '../provider-demos.mjs';
 
 export const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
+export const SKILLS_ROOT = join(REPO_ROOT, 'skills');
 export const REGISTRY_PATH = join(REPO_ROOT, 'labs', 'demo-registry.json');
 export const TARGETS_PATH = join(REPO_ROOT, 'labs', 'canonical-targets.json');
 
@@ -226,15 +227,14 @@ export function authoritativePrimaryRoster(targetData = loadCanonicalTargets()) 
   }));
 }
 
-export function authoritativeSkillDirs(targetData = loadCanonicalTargets()) {
-  void targetData;
-  const skills = readdirSync(REPO_ROOT, { withFileTypes: true })
+export function authoritativeSkillDirs() {
+  const skills = readdirSync(SKILLS_ROOT, { withFileTypes: true })
     .filter((entry) => entry.isDirectory() && /^threejs-[a-z0-9-]+$/.test(entry.name)
-      && existsSync(join(REPO_ROOT, entry.name, 'SKILL.md')))
+      && existsSync(join(SKILLS_ROOT, entry.name, 'SKILL.md')))
     .map((entry) => entry.name)
     .sort((a, b) => a.localeCompare(b));
   for (const skill of skills) {
-    if (!/^threejs-[a-z0-9-]+$/.test(skill) || !existsSync(join(REPO_ROOT, skill, 'SKILL.md'))) {
+    if (!/^threejs-[a-z0-9-]+$/.test(skill) || !existsSync(join(SKILLS_ROOT, skill, 'SKILL.md'))) {
       throw new Error(`authoritative skill directory is missing or invalid: ${skill}`);
     }
   }
@@ -666,9 +666,9 @@ export function listRawLabManifestPaths(skills = listSkillDirs()) {
 }
 
 export function listSkillDirs() {
-  return readdirSync(REPO_ROOT, { withFileTypes: true })
+  return readdirSync(SKILLS_ROOT, { withFileTypes: true })
     .filter((entry) => entry.isDirectory() && entry.name.startsWith('threejs-'))
-    .filter((entry) => existsSync(join(REPO_ROOT, entry.name, 'SKILL.md')))
+    .filter((entry) => existsSync(join(SKILLS_ROOT, entry.name, 'SKILL.md')))
     .map((entry) => entry.name)
     .sort();
 }

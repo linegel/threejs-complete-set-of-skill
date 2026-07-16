@@ -583,7 +583,7 @@ try {
     assert.equal(asset.runtime.lengthUnit, "metre");
     for (const input of asset.runtime.colliders.values()) {
       assert.equal(input.recordType, "ColliderConstructionInput");
-      assert.equal(input.canonicalProxyStatus, "blocked");
+      assert.equal(input.solverHandoffStatus, "blocked");
       assert.equal(input.solverAuthority, false);
       assert.equal(input.shape.units, "metre");
     }

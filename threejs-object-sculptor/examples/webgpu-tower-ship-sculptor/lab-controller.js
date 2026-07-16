@@ -455,7 +455,7 @@ export async function createTowerShipLabController({
           physicsMaterials: ship.runtime.physicsMaterials.size,
           destructionGroups: ship.runtime.destructionGroups.size,
           colliderContract: "world-unit construction inputs",
-          canonicalPhysicsProxyStatus: "blocked pending a route-owned PhysicsContext and pose publication",
+          physicsHandoffStatus: "blocked-authoring-inputs-only",
         },
         preservedInvariants: ["24 articulated oars", "semantic IDs", "primary silhouette", "single scene render"],
       };

@@ -17,7 +17,6 @@ import {
   buildDemoRegistry,
 } from './lib/lab-registry.mjs';
 
-export const ROUTER_CAPTURE_POLICY_ID = 'router-manifest-lab';
 export const FALLBACK_CAPTURE_POLICY_ID = 'browser-fallback-harness';
 export const FALLBACK_CAPTURE_POLICY_MARKER = 'explicit-fallback-harness';
 export const NON_RENDERING_CAPTURE_POLICY = 'non-rendering-fixture-suite';

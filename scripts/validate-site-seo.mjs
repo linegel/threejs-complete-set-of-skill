@@ -10,7 +10,7 @@ import {
   responsiveDependencyHash,
   sha256,
 } from './lib/generated-asset-ledger.mjs';
-import { buildDemoRegistry } from './lib/lab-registry.mjs';
+import { authoritativeSkillDirs, buildDemoRegistry } from './lib/lab-registry.mjs';
 import { loadSiteContent } from './lib/site-content.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -27,9 +27,8 @@ const PRIMARY_NAV = [
   ['GitHub', 'https://github.com/linegel/threejs-complete-set-of-skill'],
 ];
 const DEMO_REGISTRY = buildDemoRegistry();
-const skillIds = new Set(readdirSync(ROOT, { withFileTypes: true })
-  .filter((entry) => entry.isDirectory() && entry.name.startsWith('threejs-') && existsSync(join(ROOT, entry.name, 'SKILL.md')))
-  .map((entry) => entry.name));
+const skillIds = new Set(authoritativeSkillDirs());
+if (skillIds.size !== 27) throw new Error(`site SEO requires exactly 27 installable skills; received ${skillIds.size}`);
 const SITE_CONTENT = loadSiteContent({
   repoRoot: ROOT,
   skillIds,

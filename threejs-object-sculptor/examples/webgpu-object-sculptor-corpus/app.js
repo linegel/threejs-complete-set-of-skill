@@ -122,7 +122,6 @@ function updateModeCopy(id) {
 
 function physicsStatus(metrics, handoffCount) {
   const statusValue = metrics.physicsHandoffStatus
-    ?? metrics.canonicalPhysicsProxyStatus
     ?? metrics.physicsStatus;
   if (typeof statusValue === "string" && statusValue.length > 0) return statusValue;
   return handoffCount > 0 ? "adapter blocked" : "none";

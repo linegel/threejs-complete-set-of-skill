@@ -3828,7 +3828,7 @@ export async function createObjectSculptorCorpusController({
           members: [...members].sort(),
         })).sort((a, b) => a.id.localeCompare(b.id)),
         physicsAuthority: "authoring-input-only",
-        canonicalPhysicsProxyStatus: "blocked pending a route-owned PhysicsContext and pose publication",
+        physicsHandoffStatus: "blocked-authoring-inputs-only",
         motionOwner: currentMode === "action-ready" ? "target procedural transform timeline" : "frozen authored pose",
         motionWitness,
         cameraFraming,

@@ -210,7 +210,7 @@
       "Reject primitive substitution that removes the lathe or swept silhouettes.",
       "Reject a non-semantic or center-pivoted lid.",
       "Reject tier-dependent semantic or physics-authoring identity.",
-      "Reject canonical physics or visual acceptance claims without adapters and evidence."
+      "Reject solver or visual acceptance claims without adapters and evidence."
     ]
   },
   "runtimeContract": {
@@ -293,8 +293,8 @@
     "authority": "authoring-input-only",
     "units": "metre",
     "solverAuthority": false,
-    "canonicalProxyStatus": "blocked",
-    "rigidBodyPropertiesStatus": "blocked-insufficient-evidence",
+    "solverHandoffStatus": "blocked",
+    "massPropertiesStatus": "blocked-insufficient-evidence",
     "visualLodIndependent": true,
     "colliderMaxSurfaceDeviationMeters": {
       "body-envelope": 0.07,
@@ -316,7 +316,7 @@
     },
     "colliderEvidenceMethod": "deterministic directed visual-vertex to authored-primitive surface lower-bound regression; not symmetric Hausdorff proof",
     "requiredAdapterEvidence": [
-      "PhysicsContext",
+      "host scale and context version",
       "registered frame",
       "pose version",
       "validity interval",
@@ -1808,7 +1808,7 @@
     "Compile the body with semantic-indexed-lathe-v2, including an open mouth, inner neck wall, and recessed cavity; lathe the foot, lid, and knob from authored metre-scale profiles.",
     "Build spout and handle with parallel-transport swept tubes and embedded mounts.",
     "Keep the lid under a hinge-local pivot with detach and hinge sockets.",
-    "Publish ColliderConstructionInput records only; leave canonical physics adaptation blocked.",
+    "Publish ColliderConstructionInput records only; leave the solver handoff blocked.",
     "Reduce only visual tessellation by tier while preserving draw count and every protected identity.",
     "Render with native WebGPU NodeMaterials in one scene render and no post-processing passes."
   ],

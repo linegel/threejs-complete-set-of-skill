@@ -190,10 +190,10 @@
     "constraintRecordType": "ConstraintConstructionInput where articulated targets need it",
     "units": "SI metre and radian authoring values",
     "solverAuthority": false,
-    "canonicalProxyStatus": "blocked",
-    "rigidBodyPropertiesStatus": "blocked-insufficient-evidence",
+    "solverHandoffStatus": "blocked",
+    "massPropertiesStatus": "blocked-insufficient-evidence",
     "visualLodIndependent": true,
-    "requiredAdapterBeforePhysicalClaims": "route-selected PhysicsContext and external/native solver adapter",
+    "requiredAdapterBeforePhysicalClaims": "host scale/context version and selected external or native solver integration",
     "authoredColliderCeilingsMeters": {
       "articulated-desk-lamp": {"base-cylinder": 0.021, "lower-arm-left-capsule": 0.017, "lower-arm-right-capsule": 0.017, "upper-arm-left-capsule": 0.017, "upper-arm-right-capsule": 0.017, "shade-neck-cylinder": 0.0017, "shade-shell-rib-00-capsule": 0.062, "shade-shell-rib-01-capsule": 0.062, "shade-shell-rib-02-capsule": 0.062, "shade-shell-rib-03-capsule": 0.062, "shade-shell-rib-04-capsule": 0.062, "shade-shell-rib-05-capsule": 0.062, "shade-shell-rib-06-capsule": 0.062, "shade-shell-rib-07-capsule": 0.062, "bulb-trigger": 0.023},
       "potted-bonsai": {"pot-solid": 0.16, "trunk-capsule": 0.17, "branch-left-capsule": 0.1, "branch-right-capsule": 0.1, "branch-back-capsule": 0.1, "canopy-trigger": 0.92},

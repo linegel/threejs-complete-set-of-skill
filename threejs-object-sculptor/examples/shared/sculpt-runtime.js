@@ -19,11 +19,11 @@ const PHYSICS_MATERIAL_EVIDENCE_GAPS = Object.freeze([
 ]);
 
 const COLLIDER_ADAPTER_REQUIREMENTS = Object.freeze([
-  "PhysicsContext.metersPerWorldUnit and context version",
-  "registered physics frame, origin epoch, and transform revision",
+  "host metres-per-world-unit scale and context version",
+  "registered simulation frame, origin epoch, and transform revision",
   "committed pose signal and pose state version",
   "validity interval, update cadence, collision filter, and residency",
-  "selected collision/contact owner or ExternalSolverAdapter",
+  "selected collision/contact owner or solver integration",
 ]);
 
 const COLLISION_ROLES = new Set(["solid", "trigger", "sensor", "query-only", "boundary"]);
@@ -112,7 +112,7 @@ function normalizePhysicsMaterial(subjectId, entry, index) {
   const id = requireText(source.id ?? source.physicsMaterialId?.localId, `physicsMaterials[${index}].id`);
   const visualMaterialId = requireText(source.visualMaterialId ?? id, `physicsMaterials[${index}].visualMaterialId`);
   return deepFreeze({
-    recordType: "PhysicsMaterialBindingInput",
+    recordType: "SimulationMaterialBindingInput",
     physicsMaterialId: stableId(`${subjectId}.physics-material`, id),
     visualMaterialId,
     bindingScope: source.bindingScope ?? "semantic-asset-part",
@@ -771,8 +771,8 @@ export function addColliderConstructionInput(runtime, {
     recordType: "ColliderConstructionInput",
     claimStatus: "authoring-input",
     solverAuthority: false,
-    canonicalProxyStatus: "blocked",
-    rigidBodyPropertiesStatus: "blocked-insufficient-evidence",
+    solverHandoffStatus: "blocked",
+    massPropertiesStatus: "blocked-insufficient-evidence",
     contactAndMotionAuthority: "none",
     blockingRequirements: [...COLLIDER_ADAPTER_REQUIREMENTS],
     colliderId,
@@ -789,7 +789,7 @@ export function addColliderConstructionInput(runtime, {
       positionMeters: [0, 0, 0],
       rotationQuaternion: [0, 0, 0, 1],
       claimStatus: "authoring-local-frame",
-      canonicalFrameStatus: "blocked-until-PhysicsContext-adapter",
+      hostFrameStatus: "blocked-until-host-frame-adapter",
     },
     shape: canonical,
     shapeRepresentation: canonical.kind === "compound-boxes" ? "compound" : "analytic",

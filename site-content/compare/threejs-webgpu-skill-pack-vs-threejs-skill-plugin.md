@@ -13,7 +13,7 @@ related_pages: ["/alternatives/threejs-agent-skills/","/docs/use-in-an-existing-
 subjects: ["threejs-skill-plugin"]
 published: 2026-07-16
 last_reviewed: 2026-07-16
-sources: ["https://github.com/kndoshn/threejs-skill-plugin/blob/0f395b6b8cf49c27b06f3ec613676ccbf9ebbdf6/README.md","https://github.com/kndoshn/threejs-skill-plugin/tree/0f395b6b8cf49c27b06f3ec613676ccbf9ebbdf6","https://github.com/kndoshn/threejs-skill-plugin/tree/0f395b6b8cf49c27b06f3ec613676ccbf9ebbdf6/skills/developing-threejs-apps","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/README.md","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/LICENSE","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-object-sculptor/LICENSE","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/labs/canonical-targets.json","https://agentskills.io/specification"]
+sources: ["https://github.com/kndoshn/threejs-skill-plugin/blob/0f395b6b8cf49c27b06f3ec613676ccbf9ebbdf6/README.md","https://github.com/kndoshn/threejs-skill-plugin/tree/0f395b6b8cf49c27b06f3ec613676ccbf9ebbdf6","https://github.com/kndoshn/threejs-skill-plugin/tree/0f395b6b8cf49c27b06f3ec613676ccbf9ebbdf6/skills/developing-threejs-apps","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/README.md","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/LICENSE","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-object-sculptor/LICENSE","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills.json","https://agentskills.io/specification"]
 ---
 
 ## Short answer

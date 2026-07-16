@@ -12,7 +12,7 @@ related_demos: ["webgpu-validation-harness"]
 related_pages: ["/compare/threejs-webgpu-skill-pack-vs-official-threejs-docs/","/compare/threejs-webgpu-skill-pack-vs-general-ai-prompts/","/compare/threejs-webgpu-skill-pack-vs-threejs-game-skills/","/compare/threejs-webgpu-skill-pack-vs-threejs-skill-plugin/","/compare/agent-skills-vs-threejs-mcp-tools/","/compare/threejs-tsl-vs-glsl/","/compare/webgpurenderer-vs-webglrenderer/","/compare/renderpipeline-vs-effectcomposer/"]
 published: 2026-07-16
 last_reviewed: 2026-07-16
-sources: ["https://github.com/linegel/threejs-complete-set-of-skill/blob/main/README.md","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/labs/canonical-targets.json","https://threejs.org/manual/en/webgpurenderer","https://threejs.org/docs/TSL.html"]
+sources: ["https://github.com/linegel/threejs-complete-set-of-skill/blob/main/README.md","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills.json","https://threejs.org/manual/en/webgpurenderer","https://threejs.org/docs/TSL.html"]
 ---
 
 ## Start with the decision

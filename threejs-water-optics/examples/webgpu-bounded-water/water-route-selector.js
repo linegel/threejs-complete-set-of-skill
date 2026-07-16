@@ -146,7 +146,7 @@ export function selectWaterArchitecture(workload = {}) {
     handoff: composite ? Object.freeze({
       offshoreOwner: "spectral-offshore-ocean",
       coastalOwner: "sparse-saint-venant",
-      transfer: "dimensioned boundary elevation/discharge or action/phase adapter at a shared PhysicsInstant",
+      transfer: "dimensioned boundary elevation/discharge or action/phase adapter at a shared clocked sample instant",
       ownership: "partition of unity for presentation; exactly one reaction owner; no geometric double surface",
       requiredEvidence: Object.freeze(["phase-and-energy-transfer-error", "handoff-reflection", "provider-version-coherence", "zero-frame-readback"]),
     }) : null,

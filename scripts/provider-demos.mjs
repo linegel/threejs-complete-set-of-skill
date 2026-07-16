@@ -221,26 +221,6 @@ export const PROVIDER_DEMOS = [
     debugModes: ["final", "groups", "wire"],
   },
   {
-    id: "skill-router-manifest-demo",
-    skill: "threejs-choose-skills",
-    title: "Skill Router Manifest Bench",
-    sceneId: "skill-router-manifest-demo",
-    purpose: "live directional provider demo",
-    tier: "reduced-tier WebGPU preflight and routing manifest scene",
-    livePath: "demos/skill-router-manifest-demo/",
-    visual: { kind: "route", label: "route manifest + shared owners" },
-    sourceExample: "threejs-choose-skills/examples/router-contract.test.mjs",
-    validationCommand:
-      "node threejs-choose-skills/examples/router-contract.test.mjs",
-    providerClaim:
-      "A WebGPU preflight routes one brief into selected, omitted, deferred, and shared-owner skill contracts.",
-    limitations: [
-      "The docs page visualizes routing contracts and budget ownership, not a generated application scene.",
-      "The production skill remains the decision procedure that chooses the smallest expert skill set and records backend manifests, blockers, ownership maps, and acceptance evidence.",
-    ],
-    debugModes: ["final", "budget", "ownership"],
-  },
-  {
     id: "compatibility-fallback-planner-demo",
     skill: "threejs-compatibility-fallbacks",
     title: "Fallback Loss Ledger",
@@ -289,9 +269,9 @@ export const PROVIDER_DEMOS = [
     tier: "reduced-tier procedural rig and field-shell scene",
     livePath: "demos/procedural-creature-lab-demo/",
     visual: { kind: "creature", label: "rig + gait + candidate fields" },
-    sourceExample: "threejs-procedural-creatures/SKILL.md",
+    sourceExample: "skills/threejs-procedural-creatures/SKILL.md",
     validationCommand:
-      "node --check docs/demos/shared/provider-demo.mjs",
+      "node --check labs/provider-proxies/provider-demo.mjs",
     providerClaim:
       "A spec-driven procedural creature exposes rig, gait, candidate field shells, and planted-foot diagnostics.",
     limitations: [

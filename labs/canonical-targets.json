@@ -136,14 +136,6 @@
       ]
     },
     {
-      "id": "router-manifest-lab",
-      "kind": "canonical-lab",
-      "canonicalDir": "threejs-choose-skills/examples/router-manifest-lab",
-      "executionClass": "non-rendering",
-      "flagship": false,
-      "dependencyLabIds": []
-    },
-    {
       "id": "semantic-mesh-writer",
       "kind": "canonical-lab",
       "canonicalDir": "threejs-procedural-geometry/examples/semantic-mesh-writer",
@@ -620,41 +612,6 @@
     }
   ],
   "targets": [
-    {
-      "skill": "threejs-choose-skills",
-      "id": "router-manifest-lab",
-      "canonicalDir": "threejs-choose-skills/examples/router-manifest-lab",
-      "scenarios": [
-        "ocean-planet",
-        "rainy-city",
-        "forest",
-        "black-hole-shot",
-        "post-pipeline-dashboard",
-        "ocean-fauna",
-        "route-away-unsupported",
-        "over-budget-17.5-to-16.5",
-        "missing-webgpu",
-        "duplicate-output-owner",
-        "duplicate-velocity-owner",
-        "fabricated-tier",
-        "post-before-physical-cause",
-        "inventory-drift",
-        "unsupported-route-away",
-        "automatic-fallback"
-      ],
-      "mechanisms": [
-        "inventory-intersection",
-        "capability-gate",
-        "causal-ordering",
-        "exclusive-ownership",
-        "tier-provenance",
-        "stage-budget-aggregation",
-        "route-away",
-        "fallback-quarantine"
-      ],
-      "tiers": [],
-      "nonRenderingScenarioSuite": true
-    },
     {
       "skill": "threejs-debugging",
       "id": "debugging-contract-lab",

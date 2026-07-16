@@ -13,7 +13,7 @@ related_pages: ["/industries/browser-games/","/alternatives/threejs-agent-skills
 subjects: ["threejs-game-skills"]
 published: 2026-07-16
 last_reviewed: 2026-07-16
-sources: ["https://github.com/majidmanzarpour/threejs-game-skills/blob/8919acca095be36ea054c866a79997fca90e8b22/README.md","https://github.com/majidmanzarpour/threejs-game-skills/blob/8919acca095be36ea054c866a79997fca90e8b22/LICENSE","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/README.md","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/LICENSE","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-object-sculptor/LICENSE","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/labs/canonical-targets.json","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/docs/demos/registry.json"]
+sources: ["https://github.com/majidmanzarpour/threejs-game-skills/blob/8919acca095be36ea054c866a79997fca90e8b22/README.md","https://github.com/majidmanzarpour/threejs-game-skills/blob/8919acca095be36ea054c866a79997fca90e8b22/LICENSE","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/README.md","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/LICENSE","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-object-sculptor/LICENSE","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills.json","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/docs/demos/registry.json"]
 ---
 
 ## Short answer

@@ -22,7 +22,7 @@ function validateShape(shape, label, errors) {
     errors.push(`${label}.shape is required`);
     return;
   }
-  if (shape.units !== "world-unit") errors.push(`${label}.shape.units must remain world-unit until a PhysicsContext adapter converts it`);
+  if (shape.units !== "world-unit") errors.push(`${label}.shape.units must remain world-unit until a host scale adapter converts it`);
   if (shape.kind === "box") {
     finiteArray(shape.centerWorldUnits, 3, `${label}.shape.centerWorldUnits`, errors);
     if (finiteArray(shape.sizeWorldUnits, 3, `${label}.shape.sizeWorldUnits`, errors) && shape.sizeWorldUnits.some((value) => value <= 0)) {
@@ -155,8 +155,8 @@ export function validateTowerShipActionReady(spec, root) {
   for (const [mapId, proxy] of runtime.colliders) {
     const label = `collider ${mapId}`;
     if (proxy.recordType !== "ColliderConstructionInput") errors.push(`${label}.recordType must be ColliderConstructionInput`);
-    if (proxy.claimStatus !== "authoring-input" || proxy.solverAuthority !== false || proxy.canonicalProxyStatus !== "blocked") errors.push(`${label} must remain a blocked non-solver authoring input`);
-    if (!Array.isArray(proxy.blockingRequirements) || !proxy.blockingRequirements.includes("PhysicsContext.metersPerWorldUnit")) errors.push(`${label} must name the missing PhysicsContext scale`);
+    if (proxy.claimStatus !== "authoring-input" || proxy.solverAuthority !== false || proxy.solverHandoffStatus !== "blocked") errors.push(`${label} must remain a blocked non-solver authoring input`);
+    if (!Array.isArray(proxy.blockingRequirements) || !proxy.blockingRequirements.includes("host metres-per-world-unit scale")) errors.push(`${label} must name the missing host scale`);
     const colliderLocalId = stableId(proxy.colliderId, `${label}.colliderId`, errors);
     const entityLocalId = stableId(proxy.entityId, `${label}.entityId`, errors);
     stableId(proxy.shapeId, `${label}.shapeId`, errors);
@@ -178,7 +178,7 @@ export function validateTowerShipActionReady(spec, root) {
 
   for (const material of runtime.physicsMaterials.values()) {
     const materialId = stableId(material.physicsMaterialId, "physics material ID", errors);
-    if (materialId && (material.recordType !== "PhysicsMaterialBindingInput" || material.claimStatus !== "insufficient-evidence" || material.canonicalRegistryStatus !== "blocked")) {
+    if (materialId && (material.recordType !== "SimulationMaterialBindingInput" || material.claimStatus !== "insufficient-evidence" || material.canonicalRegistryStatus !== "blocked")) {
       errors.push(`physics material ${materialId} must remain a blocked binding input without invented constitutive evidence`);
     }
   }

@@ -510,7 +510,7 @@ function assertSourceContracts() {
 	const mainSource = readExampleSource( 'main.js' );
 	const readmeSource = readExampleSource( 'README.md' );
 	const normalizedReadmeSource = readmeSource.replace( /\s+/g, ' ' );
-	const referenceSource = readFileSync( new URL( '../../references/scene-referred-color-pipeline.md', EXAMPLE_ROOT ), 'utf8' );
+	const referenceSource = readFileSync( new URL( '../../../skills/threejs-exposure-color-grading/references/scene-referred-color-pipeline.md', EXAMPLE_ROOT ), 'utf8' );
 
 	const requiredNodeTokens = [
 		'log2( luminance )',

@@ -26,7 +26,7 @@ function record(ownerId, sourceSha256, formats) {
 
 test('responsive sources receive stable owners from their provenance path', () => {
   assert.equal(ownerIdForResponsiveSource('visual-validation/webgpu-ocean/final.design.png'), 'webgpu-ocean');
-  assert.equal(ownerIdForResponsiveSource('previews/primary/router-manifest-lab.png'), 'router-manifest-lab');
+  assert.equal(ownerIdForResponsiveSource('previews/primary/node-selective-bloom.png'), 'node-selective-bloom');
   assert.equal(ownerIdForResponsiveSource('previews/provider/legacy-water.png'), 'legacy-water');
   assert.equal(ownerIdForResponsiveSource('generated-asset-contact-sheet.png'), 'generated-asset-archive');
   assert.equal(ownerIdForResponsiveSource('misc/site.png'), 'site');
@@ -48,8 +48,8 @@ test('article owners accept primary evidence and reject secondary or generic med
     'webgpu-ocean',
   );
   assert.equal(
-    ownerIdForSiteImageUrl(`${SITE}previews/primary/router-manifest-lab.png`, SITE),
-    'router-manifest-lab',
+    ownerIdForSiteImageUrl(`${SITE}previews/primary/node-selective-bloom.png`, SITE),
+    'node-selective-bloom',
   );
   for (const url of [
     'https://cdn.example/evidence.png',

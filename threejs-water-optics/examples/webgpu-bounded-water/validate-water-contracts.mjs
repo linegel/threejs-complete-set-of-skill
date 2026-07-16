@@ -237,14 +237,16 @@ try { await createWebGPUBoundedWaterSystem(fakeNonWebGpuRenderer, { tier: "ultra
 assert(rejectedNonWebGpu, "Missing WebGPU must block without fallback.");
 
 assert(WATER_EXAMPLE_CLAIM_BOUNDARY.classification === "canonical-native-webgpu-lab-incomplete", "Claim boundary must match the canonical incomplete status.");
-assert(WATER_PHYSICS_INTEGRATION_BOUNDARY.canonicalPhysicsAbi === false, "Render integration shell must not claim the canonical physics ABI.");
+assert(WATER_PHYSICS_INTEGRATION_BOUNDARY.couplingClaim === "presentation-only", "Render integration shell must keep its presentation-only coupling claim.");
 assert(JSON.stringify(WATER_PHYSICS_INTEGRATION_BOUNDARY.acceptedInputs) === JSON.stringify([
   "presentation-authored-weather-state",
   "presentation-authored-drop-event",
   "presentation-authored-moving-boundary-object-impulse",
 ]), "Render integration shell must enumerate every accepted presentation-authored input exactly.");
-assert(WATER_PHYSICS_INTEGRATION_BOUNDARY.forbiddenClaims.includes("InteractionRecord consumption")
-  && WATER_PHYSICS_INTEGRATION_BOUNDARY.forbiddenClaims.includes("conservation or two-way coupling"), "Render integration shell must enumerate its forbidden physics claims.");
+assert(WATER_PHYSICS_INTEGRATION_BOUNDARY.unsupportedHandoffs.includes("conservative or two-way exchange")
+  && WATER_PHYSICS_INTEGRATION_BOUNDARY.unsupportedHandoffs.includes("exact-once cross-system event ownership"), "Render integration shell must enumerate unsupported coupling guarantees.");
+assert(WATER_PHYSICS_INTEGRATION_BOUNDARY.requiredHostDeclarations.includes("sample instant or application interval and clock")
+  && WATER_PHYSICS_INTEGRATION_BOUNDARY.requiredHostDeclarations.includes("channel request, validity, and error"), "Host handoff requirements must retain timing and sample-quality semantics.");
 assert(appSource.includes("presentation-authored moving-boundary ripple") || readFileSync(join(here, "README.md"), "utf8").includes("presentation-authored moving-boundary ripple"), "Ad-hoc water events must be labelled presentation-authored.");
 
 console.log(JSON.stringify({

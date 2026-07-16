@@ -573,7 +573,7 @@ function createHarness({
         ["body", { recordType: "ColliderConstructionInput", id: "body" }],
         ["detail", { recordType: "ColliderConstructionInput", id: "detail" }],
       ]),
-      physicsMaterials: new Map([["surface", { recordType: "PhysicsMaterialBindingInput", id: "surface" }]]),
+      physicsMaterials: new Map([["surface", { recordType: "SimulationMaterialBindingInput", id: "surface" }]]),
       destructionGroups: new Map([["shell", ["root"]]]),
       setTimeCalls: [],
       setModeCalls: [],

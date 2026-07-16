@@ -554,9 +554,9 @@ function addHingeConstraint(runtime, pivot, {
       "solver tolerance and iteration policy",
     ],
     blockingRequirements: [
-      "PhysicsContext and registered frames/origin/transform revisions",
+      "host scale/context version and registered frames/origin/transform revisions",
       "committed parent and child pose versions",
-      "selected constraint and motion owner or ExternalSolverAdapter",
+      "selected constraint and motion owner or solver integration",
       "validity interval and clock mapping",
       "body, inertia, compliance, damping, and material evidence",
     ],

@@ -14,6 +14,7 @@ import {
   REPO_ROOT,
   buildDemoRegistry,
 } from './lib/lab-registry.mjs';
+import { PROVIDER_DEMOS } from './provider-demos.mjs';
 
 const CONTROLLER_GLOBALS = [
   'labController',
@@ -195,8 +196,9 @@ export async function captureSitePreviews() {
     const previousManifest = existsSync(manifestPath)
       ? JSON.parse(readFileSync(manifestPath, 'utf8'))
       : { results: [] };
+    const providerIds = new Set(PROVIDER_DEMOS.map(({ id }) => id));
     const preservedResults = previousManifest.results
-      .filter((entry) => entry.image?.startsWith('previews/provider/'));
+      .filter((entry) => providerIds.has(entry.id) && entry.image?.startsWith('previews/provider/'));
     const mergedResults = [...preservedResults, ...results];
 
     const manifest = {

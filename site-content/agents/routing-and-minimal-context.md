@@ -113,4 +113,4 @@ Do not teach fallback automatically. The pack's canonical route remains native W
 
 Treat the installed `skills/threejs-choose-skills/SKILL.md` route-result shape and completion conditions as the routing contract. Validate each route against the current project's installed inventory, required backend and capabilities, ordered handoffs, resource consumers, output ownership, acceptance bounds, and project-level verification. A route is not proven by documentation prose or a catalog entry.
 
-That lab performs planning checks and does not render. Rendering claims still need the selected implementation lab or the [native WebGPU validation harness](/demos/webgpu-validation-harness/) applied to the project under test.
+Routing validation is planning-only and does not render. Rendering claims still need the selected implementation lab or the [native WebGPU validation harness](/demos/webgpu-validation-harness/) applied to the project under test.

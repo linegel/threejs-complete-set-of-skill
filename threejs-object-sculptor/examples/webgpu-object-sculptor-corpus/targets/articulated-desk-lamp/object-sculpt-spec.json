@@ -343,9 +343,9 @@
     "authority": "authoring-input-only",
     "units": "metre-and-radian",
     "solverAuthority": false,
-    "canonicalProxyStatus": "blocked",
+    "solverHandoffStatus": "blocked",
     "canonicalConstraintStatus": "blocked",
-    "rigidBodyPropertiesStatus": "blocked-insufficient-evidence",
+    "massPropertiesStatus": "blocked-insufficient-evidence",
     "visualLodIndependent": true,
     "colliderMaxSurfaceDeviationMeters": {
       "base-cylinder": 0.021,
@@ -392,7 +392,7 @@
     },
     "bulbTriggerPurpose": "proximity trigger only; no solid-contact authority",
     "requiredAdapterEvidence": [
-      "PhysicsContext",
+      "host scale and context version",
       "registered frame",
       "pose version",
       "validity interval",
@@ -439,7 +439,7 @@
       {"id": "elbow-hinge-constraint", "parentEntityId": "shoulder-hinge-pivot", "childEntityId": "elbow-hinge-pivot", "parentAnchorPositionMeters": [0.13, 0.34, 0], "childAnchorPositionMeters": [0, 0, 0], "axisLocal": [0, 0, 1], "limitRadians": [-1.45, 0.65], "restRadians": "seed-bounded ±0.018"},
       {"id": "shade-hinge-constraint", "parentEntityId": "elbow-hinge-pivot", "childEntityId": "shade-hinge-pivot", "parentAnchorPositionMeters": [0.18, 0.3, 0], "childAnchorPositionMeters": [0, 0, 0], "axisLocal": [0, 0, 1], "limitRadians": [-1.1, 0.75], "restRadians": "-0.16 plus seed-bounded ±0.025"}
     ],
-    "blockingRequirements": ["PhysicsContext and registered frames", "committed participant pose versions", "selected constraint/motion owner", "validity interval and clock mapping", "body/inertia/compliance/damping/material evidence"]
+    "blockingRequirements": ["host scale/context version and registered frames", "committed participant pose versions", "selected constraint/motion owner", "validity interval and clock mapping", "body/inertia/compliance/damping/material evidence"]
   },
   "attachmentConstructionContract": {
     "recordType": "SculptAttachmentInput",
@@ -2748,7 +2748,7 @@
     "Nest yaw, shoulder, elbow, and shade pivots at mechanical joints and attach named sockets in parent-local metres.",
     "Build tension springs as deterministic helix tubes and cables as attached low-radial tubes.",
     "Drive four authored diagnostic rotation channels with exact reset and no solver claim.",
-    "Publish ColliderConstructionInput and ConstraintConstructionInput records only; canonical physics remains blocked.",
+    "Publish ColliderConstructionInput and ConstraintConstructionInput records only; the solver handoff remains blocked.",
     "Reduce radial, spring, and fastener geometry by tier while preserving all protected identities.",
     "Render native WebGPU NodeMaterials in one scene render with no post-processing passes."
   ],

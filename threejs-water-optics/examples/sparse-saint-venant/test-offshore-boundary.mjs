@@ -6,11 +6,11 @@ import {
 	finiteDepthAngularFrequency,
 	injectIncomingCharacteristic,
 	selectIncomingBoundaryModes,
-	validateBoundaryPhysicsInstant
+	validateBoundarySampleInstant
 } from './offshore-boundary.js';
 
 const instant = ( tick, seconds ) => Object.freeze( {
-	recordType: 'PhysicsInstant', clockId: 'coastal-clock', tick,
+	clockId: 'coastal-clock', tick,
 	rationalSubstep: Object.freeze( { numerator: 0, denominator: 1 } ),
 	clockMappingRevision: 'clock-map-v1', discontinuityEpoch: 'continuous-v1',
 	timeSecondsDerived: Object.freeze( { value: seconds, unit: 's', label: 'Derived', source: 'fixture fixed-rational clock' } )
@@ -77,7 +77,7 @@ const grazingMode = Object.freeze( { ...donor.modes[ 0 ], modeId: 'grazing', wav
 const rejected = selectIncomingBoundaryModes( [ outgoingMode, grazingMode ], { outwardNormal, depthMeters, gravityMps2, reflectionAmplitudeGate: 0.08 } );
 assert.deepEqual( rejected.rejected.map( ( entry ) => entry.reason ), [ 'not-incoming', 'reflection-gate' ] );
 
-assert.throws( () => validateBoundaryPhysicsInstant( { ...phaseReferenceInstant, rationalSubstep: { numerator: 2, denominator: 2 } } ), /canonical/ );
+assert.throws( () => validateBoundarySampleInstant( { ...phaseReferenceInstant, rationalSubstep: { numerator: 2, denominator: 2 } } ), /canonical/ );
 assert.throws( () => createPhaseResolvedOffshoreDonor( { phaseReferenceInstant, depthMeters, gravityMps2, modes: [ { waveVectorRadPerMeter: [ 0, 0 ], amplitudeMeters: 1, intrinsicAngularFrequencyRadPerSecond: 1 } ] } ), /DC/ );
 assert.throws( () => createPhaseResolvedOffshoreDonor( { phaseReferenceInstant, depthMeters, gravityMps2, modes: [ { waveVectorRadPerMeter: [ k, 0 ], amplitudeMeters: 1, intrinsicAngularFrequencyRadPerSecond: omega * 1.2 } ] } ), /dispersion mismatch/ );
 assert.throws( () => injectIncomingCharacteristic( { donorSample: referenceSample, interiorElevationMeters: 0, interiorWaveDischargeM2ps: [ 0, 0 ], outwardNormal: [ 2, 0 ], characteristicDepthMeters: 1 } ), /unit length/ );

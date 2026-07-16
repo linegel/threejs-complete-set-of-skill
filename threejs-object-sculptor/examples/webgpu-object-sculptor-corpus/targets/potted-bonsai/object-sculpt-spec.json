@@ -320,11 +320,11 @@
     "authority": "authoring-input-only",
     "units": "metre",
     "solverAuthority": false,
-    "canonicalProxyStatus": "blocked",
-    "rigidBodyPropertiesStatus": "blocked-insufficient-evidence",
+    "solverHandoffStatus": "blocked",
+    "massPropertiesStatus": "blocked-insufficient-evidence",
     "visualLodIndependent": true,
     "requiredAdapterEvidence": [
-      "PhysicsContext",
+      "host scale and context version",
       "registered frame",
       "pose version",
       "validity interval",
@@ -2236,7 +2236,7 @@
     "Root every branch at a named parent-local socket and keep six foliage identities stable.",
     "Use merged opaque leaf solids at full/budgeted and six opaque canopy clusters at minimum.",
     "Drive deterministic rooted diagnostic sway through shared Object3D transforms and exact reset; consume no environmental forcing.",
-    "Publish ColliderConstructionInput records only; canonical physics remains blocked.",
+    "Publish ColliderConstructionInput records only; the solver handoff remains blocked.",
     "Render native WebGPU NodeMaterials in one scene render with no post-processing passes."
   ],
   "animationAnchors": [

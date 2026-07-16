@@ -903,7 +903,7 @@ async function makeFixtureBundle() {
       protectedColliderIds: ["collider-main"],
       protectedDestructionGroupIds: ["destruction-main"],
       colliderConstructionInputs: [{ id: "collider-main" }],
-      canonicalPhysicsProxyStatus: "blocked pending adapter",
+      physicsHandoffStatus: "blocked-authoring-inputs-only",
     }])),
   ]));
 

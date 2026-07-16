@@ -8,8 +8,8 @@ import {
 } from '../../scripts/lib/checked-json-schema.mjs';
 import { validateRawLabManifest } from '../../scripts/lib/lab-validation.mjs';
 
-const routerManifest = JSON.parse(readFileSync(
-  new URL('../../threejs-choose-skills/examples/router-manifest-lab/lab.manifest.json', import.meta.url),
+const debuggingManifest = JSON.parse(readFileSync(
+  new URL('../../threejs-debugging/examples/debugging-contract-lab/lab.manifest.json', import.meta.url),
   'utf8',
 ));
 
@@ -18,12 +18,11 @@ test('shared checked schemas validate the canonical raw manifest and runtime gra
   assert.deepEqual(Object.keys(schemas).sort(), [
     'evidenceManifest',
     'labManifest',
-    'physicsIntegration',
     'runtimeGraph',
     'tierVisualEvidence',
     'trackedReleaseProjection',
   ]);
-  assert.deepEqual(validateCheckedJsonSchema(schemas.labManifest, routerManifest), {
+  assert.deepEqual(validateCheckedJsonSchema(schemas.labManifest, debuggingManifest), {
     valid: true,
     errors: [],
   });
@@ -46,7 +45,7 @@ test('shared checked schemas validate the canonical raw manifest and runtime gra
 });
 
 test('raw manifest validation applies the checked schema before semantic checks', () => {
-  const unknown = structuredClone(routerManifest);
+  const unknown = structuredClone(debuggingManifest);
   unknown.uncheckedClaim = true;
   const unknownResult = validateRawLabManifest(unknown);
   assert.equal(unknownResult.valid, false);
@@ -54,7 +53,7 @@ test('raw manifest validation applies the checked schema before semantic checks'
     error.includes('lab-manifest.schema.json') && error.includes('unknown property uncheckedClaim')
   )));
 
-  const invalidTier = structuredClone(routerManifest);
+  const invalidTier = structuredClone(debuggingManifest);
   invalidTier.tiers = [{
     id: 'bad-tier',
     targetClass: 'fixture',

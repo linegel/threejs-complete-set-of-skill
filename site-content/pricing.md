@@ -12,7 +12,7 @@ related_demos: []
 related_pages: ["/docs/install/","/faq/is-the-threejs-skill-pack-free-for-commercial-use/","/alternatives/","/docs/use-in-an-existing-project/"]
 published: 2026-07-16
 last_reviewed: 2026-07-16
-sources: ["https://github.com/linegel/threejs-complete-set-of-skill/blob/main/LICENSE","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-object-sculptor/LICENSE","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/package.json","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/README.md","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/labs/canonical-targets.json","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/docs/demos/registry.json","https://github.com/linegel/threejs-complete-set-of-skill/issues"]
+sources: ["https://github.com/linegel/threejs-complete-set-of-skill/blob/main/LICENSE","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-object-sculptor/LICENSE","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/package.json","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/README.md","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills.json","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/docs/demos/registry.json","https://github.com/linegel/threejs-complete-set-of-skill/issues"]
 ---
 
 ## The exact price boundary
@@ -28,7 +28,7 @@ That does not make adoption or production free. The pack supplies specialist ins
 | Included in this repository | Paid or supplied elsewhere |
 | --- | --- |
 | Published `threejs-*` Agent Skills | Coding-agent subscription or API usage |
-| Checked-in skill references, assets, and scripts | Engineering, review, and technical-art time |
+| Checked-in skill references and scripts | Engineering, review, and technical-art time |
 | Checked-in examples and lab source | Workstation, GPU, mobile devices, and browser test matrix |
 | Demo registry, diagnostics, and evidence tooling | Optional generated, purchased, or commissioned assets |
 | Site guides and machine-readable skill indexes | Production hosting, storage, bandwidth, and monitoring |
@@ -56,7 +56,7 @@ For the short canonical answer, see [commercial-use FAQ](/faq/is-the-threejs-ski
 
 ## What the pack includes
 
-The package manifest and repository currently publish specialist skill instructions plus their selected references, assets, and scripts. The repository also contains examples, lab source, integration demos, generated diagnostics, evidence reports, and site indexes. Verify an artifact's current status and source hash before relying on it as evidence for a claim.
+The package manifest and repository currently publish specialist skill instructions plus their selected references and scripts. The repository also contains examples, lab source, integration demos, generated diagnostics, evidence reports, and site indexes. Verify an artifact's current status and source hash before relying on it as evidence for a claim.
 
 The primary conversion is installation, not account creation. The README documents listing and installing skills through the open skills CLI, plus file-based use by compatible coding agents. After a complete install, `threejs-choose-skills` routes broad work to a smaller specialist set.
 

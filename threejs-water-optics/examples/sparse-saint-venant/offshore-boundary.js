@@ -35,9 +35,8 @@ function gcd( a, b ) {
 
 }
 
-export function validateBoundaryPhysicsInstant( instant, label = 'phaseReferenceInstant' ) {
+export function validateBoundarySampleInstant( instant, label = 'phaseReferenceInstant' ) {
 
-	if ( instant?.recordType !== 'PhysicsInstant' ) throw new Error( `${ label } must be a PhysicsInstant` );
 	if ( typeof instant.clockId !== 'string' || instant.clockId.length === 0 ) throw new Error( `${ label }.clockId must be nonempty` );
 	if ( ! Number.isSafeInteger( instant.tick ) ) throw new Error( `${ label }.tick must be a safe integer` );
 	const numerator = instant.rationalSubstep?.numerator;
@@ -53,7 +52,7 @@ export function validateBoundaryPhysicsInstant( instant, label = 'phaseReference
 
 function instantSeconds( instant, label ) {
 
-	validateBoundaryPhysicsInstant( instant, label );
+	validateBoundarySampleInstant( instant, label );
 	return instant.timeSecondsDerived.value;
 
 }
@@ -154,7 +153,7 @@ export function createPhaseResolvedOffshoreDonor( {
 	stateVersion = 'offshore-state-v1'
 } ) {
 
-	validateBoundaryPhysicsInstant( phaseReferenceInstant );
+	validateBoundarySampleInstant( phaseReferenceInstant );
 	if ( ! Array.isArray( modes ) || modes.length === 0 ) throw new Error( 'phase-resolved donor requires at least one mode' );
 	const current = requireVector2( meanCurrentMps, 'meanCurrentMps' );
 	const environment = Object.freeze( { depthMeters, gravityMps2, surfaceTensionNpm, densityKgPerM3, dispersionRelativeErrorGate } );

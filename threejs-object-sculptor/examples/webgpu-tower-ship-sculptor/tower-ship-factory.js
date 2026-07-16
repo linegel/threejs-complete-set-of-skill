@@ -109,7 +109,7 @@ function generatedId(namespace, localId) {
 
 function physicsMaterialBinding(localId, visualMaterialId) {
   return Object.freeze({
-    recordType: "PhysicsMaterialBindingInput",
+    recordType: "SimulationMaterialBindingInput",
     physicsMaterialId: generatedId("tower-ship.physics-material", localId),
     visualMaterialId,
     claimStatus: "insufficient-evidence",
@@ -124,9 +124,9 @@ function colliderConstructionInput({ id, entityId, shape, physicsMaterialId, col
     recordType: "ColliderConstructionInput",
     claimStatus: "authoring-input",
     solverAuthority: false,
-    canonicalProxyStatus: "blocked",
+    solverHandoffStatus: "blocked",
     blockingRequirements: Object.freeze([
-      "PhysicsContext.metersPerWorldUnit",
+      "host metres-per-world-unit scale",
       "physics frame, origin epoch, and transform revision",
       "pose signal and committed pose version",
       "collision filter, cadence, residency, and validity interval",

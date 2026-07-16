@@ -7,15 +7,19 @@
 //   docs/skills.json           machine-readable manifest
 //   docs/sitemap.xml, robots.txt
 // Re-run after adding or renaming skills: node scripts/build-pages.mjs
-import { cpSync, readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync } from 'node:fs';
+import { cpSync, readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { marked } from 'marked';
 import { SCIENCE } from './science-cards.mjs';
 import { PROVIDER_DEMOS } from './provider-demos.mjs';
-import { PRIMARY_DEMO_KINDS, buildDemoRegistry } from './lib/lab-registry.mjs';
-import { buildSiteRoutePresentation } from './lib/site-route-presentation.mjs';
+import {
+  PRIMARY_DEMO_KINDS,
+  SKILLS_ROOT,
+  authoritativeSkillDirs,
+  buildDemoRegistry,
+} from './lib/lab-registry.mjs';
 import { loadSiteContent } from './lib/site-content.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -53,17 +57,10 @@ const PUBLISHER = {
 };
 const PUBLISHER_REF = { '@id': PUBLISHER_ID };
 const DEMO_REGISTRY = buildDemoRegistry();
-const ROUTER_FIXTURES = JSON.parse(readFileSync(join(
-  root,
-  'threejs-choose-skills',
-  'examples',
-  'router-manifest-lab',
-  'router-fixtures.json',
-), 'utf8'));
-const AUTHORITATIVE_SKILL_SLUGS = new Set(readdirSync(root, { withFileTypes: true })
-  .filter((entry) => entry.isDirectory() && entry.name.startsWith('threejs-')
-    && existsSync(join(root, entry.name, 'SKILL.md')))
-  .map((entry) => entry.name));
+const AUTHORITATIVE_SKILL_SLUGS = new Set(authoritativeSkillDirs());
+if (AUTHORITATIVE_SKILL_SLUGS.size !== 27) {
+  throw new Error(`site requires exactly 27 installable skills; received ${AUTHORITATIVE_SKILL_SLUGS.size}`);
+}
 const SITE_DEMOS = DEMO_REGISTRY.demos.filter((demo) => AUTHORITATIVE_SKILL_SLUGS.has(demo.skill));
 const ATTRIBUTIONS = {
   'threejs-object-sculptor': {
@@ -79,7 +76,7 @@ const ATTRIBUTIONS = {
 };
 
 const CATEGORIES = [
-  { name: 'Planning and Validation', blurb: 'Route requests to the right experts, diagnose version-dependent failures, and prove results with reproducible evidence.', slugs: ['threejs-choose-skills', 'threejs-debugging', 'threejs-visual-validation', 'threejs-physics-integration', 'threejs-compatibility-fallbacks'] },
+  { name: 'Planning and Validation', blurb: 'Route requests to the right experts, diagnose version-dependent failures, and prove results with reproducible evidence.', slugs: ['threejs-choose-skills', 'threejs-debugging', 'threejs-visual-validation', 'threejs-compatibility-fallbacks'] },
   { name: 'Cameras, Lighting, and Final Image', blurb: 'Who owns depth, tone mapping, and the last pass determines the difference between a demo and an image.', slugs: ['threejs-camera-controls-and-rigs', 'threejs-scalable-real-time-shadows', 'threejs-ambient-contact-shading', 'threejs-bloom', 'threejs-exposure-color-grading', 'threejs-image-pipeline'] },
   { name: 'Worlds and Environments', blurb: 'Skies, oceans, weather, and water that share causes instead of fighting each other.', slugs: ['threejs-sky-atmosphere-and-haze', 'threejs-volumetric-clouds', 'threejs-spectral-ocean', 'threejs-water-optics', 'threejs-rain-snow-and-wet-surfaces'] },
   { name: 'Procedural Content', blurb: 'Fields, materials, geometry, object reconstruction, buildings, planets, vegetation, and creatures as authored systems, not noise soup.', slugs: ['threejs-procedural-fields', 'threejs-procedural-materials', 'threejs-procedural-geometry', 'threejs-object-sculptor', 'threejs-procedural-buildings-and-cities', 'threejs-procedural-planets', 'threejs-procedural-vegetation', 'threejs-procedural-creatures'] },
@@ -106,9 +103,17 @@ const GALLERY = [
   { img: 'generated-asset-contact-sheet.png', title: 'Generated texture asset contact sheet', note: 'deterministic PNG variants shipped under assets/generated-variants/', link: 'threejs-procedural-materials' },
 ];
 
+const skillHistoryPaths = (slug) => [
+  join('skills', slug),
+  join(slug, 'SKILL.md'),
+  join(slug, 'references'),
+  join(slug, 'scripts'),
+  join(slug, 'LICENSE'),
+];
+
 const latestSkillUpdate = (slug) => {
   try {
-    const out = execFileSync('git', ['log', '-1', '--format=%H%x00%cI%x00%cs', '--', slug], {
+    const out = execFileSync('git', ['log', '-1', '--format=%H%x00%cI%x00%cs', '--', ...skillHistoryPaths(slug)], {
       cwd: root,
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'ignore'],
@@ -129,7 +134,7 @@ const latestSkillUpdate = (slug) => {
 
 const earliestSkillUpdate = (slug) => {
   try {
-    const out = execFileSync('git', ['log', '--reverse', '--format=%H%x00%cI%x00%cs', '--', slug], {
+    const out = execFileSync('git', ['log', '--reverse', '--format=%H%x00%cI%x00%cs', '--', ...skillHistoryPaths(slug)], {
       cwd: root,
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'ignore'],
@@ -161,9 +166,8 @@ const latestPathDate = (paths) => {
 };
 
 const skills = {};
-for (const d of readdirSync(root)) {
-  const p = join(root, d, 'SKILL.md');
-  if (!AUTHORITATIVE_SKILL_SLUGS.has(d) || !existsSync(p)) continue;
+for (const d of AUTHORITATIVE_SKILL_SLUGS) {
+  const p = join(SKILLS_ROOT, d, 'SKILL.md');
   const t = readFileSync(p, 'utf8');
   const fm = t.match(/^---\n([\s\S]*?)\n---/)[1];
   const desc = fm.match(/description:\s*([\s\S]*?)(?=\n\w|$)/)[1]
@@ -226,13 +230,13 @@ const previewPicture = (src, alt, attributes = '') => {
         </picture>`;
 };
 const rewriteSkillBodyLinks = (html, slug) => html
-  .replace(/href="((?:references|examples|assets|agents)\/[^"?#]*)([?#][^"]*)?"/g, (_match, path, suffix = '') => {
+  .replace(/href="((?:references|scripts)\/[^"?#]*)([?#][^"]*)?"/g, (_match, path, suffix = '') => {
     const view = path.endsWith('/') ? 'tree' : 'blob';
-    return `href="${REPO}/${view}/main/${slug}/${path}${suffix}"`;
+    return `href="${REPO}/${view}/main/skills/${slug}/${path}${suffix}"`;
   })
   .replace(/href="\.\.\/(threejs-[a-z0-9-]+)\/([^"?#]*)([?#][^"]*)?"/g, (_match, targetSlug, path, suffix = '') => {
     const view = path.endsWith('/') ? 'tree' : 'blob';
-    return `href="${REPO}/${view}/main/${targetSlug}/${path}${suffix}"`;
+    return `href="${REPO}/${view}/main/skills/${targetSlug}/${path}${suffix}"`;
   });
 const total = Object.keys(skills).length;
 if (total !== AUTHORITATIVE_SKILL_SLUGS.size) {
@@ -317,12 +321,6 @@ const acceptanceLabel = (demo) => demo.status === 'accepted'
   ? 'Accepted'
   : (demo.status === 'blocked' ? 'Blocked' : 'Evidence pending');
 const acceptanceClass = (demo) => demo.status === 'accepted' ? 'accepted' : 'pending';
-const oceanPlanetRoute = buildSiteRoutePresentation(
-  ROUTER_FIXTURES,
-  'ocean-planet',
-  Object.fromEntries(Object.values(skills).map((skill) => [skill.slug, skill.title])),
-);
-
 const localFontHead = `
 <link rel="preload" href="/assets/vendor/katex/fonts/KaTeX_SansSerif-Regular.woff2" as="font" type="font/woff2" crossorigin />
 <link rel="preload" href="/assets/vendor/katex/fonts/KaTeX_SansSerif-Bold.woff2" as="font" type="font/woff2" crossorigin />`;
@@ -706,16 +704,16 @@ const card = (s) => {
   const accepted = ownedPrimary.filter((demo) => demo.status === 'accepted').length;
   const mechanisms = ownedPrimary.reduce((sum, demo) => sum + demo.mechanisms.length, 0);
   const tiers = ownedPrimary.reduce((sum, demo) => sum + demo.tiers.length, 0);
-  const evidenceLabel = accepted === ownedPrimary.length && ownedPrimary.length
-    ? 'Accepted evidence'
-    : 'Native evidence pending';
+  const evidenceLabel = ownedPrimary.length === 0
+    ? 'Reference skill'
+    : (accepted === ownedPrimary.length ? 'Accepted evidence' : 'Native evidence pending');
   const evidenceClass = accepted === ownedPrimary.length && ownedPrimary.length ? 'accepted' : 'pending';
   return `
       <a class="card" href="skills/${s.slug}.html">
         <span class="card-head"><span class="status status--${evidenceClass}">${evidenceLabel}</span></span>
         <h4 style="view-transition-name:skill-${esc(s.slug)}">${esc(s.title)}</h4>
         <p>${esc(s.desc)}</p>
-        <span class="card-meta">${ownedPrimary.length} primary · ${mechanisms} mechanism${mechanisms === 1 ? '' : 's'} · ${tiers} tier${tiers === 1 ? '' : 's'}</span>
+        <span class="card-meta">${ownedPrimary.length === 0 ? 'Routing contract · no demo claim' : `${ownedPrimary.length} primary · ${mechanisms} mechanism${mechanisms === 1 ? '' : 's'} · ${tiers} tier${tiers === 1 ? '' : 's'}`}</span>
       </a>`;
 };
 
@@ -893,7 +891,7 @@ const showcaseHtml = showcaseDemos.map(({ demo, poster, copy }, index) => `
       </article>`).join('');
 
 const primaryLabGroups = [
-  { name: 'Canonical skill labs', note: 'One native implementation surface per rendering skill, plus the non-rendering router and explicit fallback harness.', demos: canonicalDemos },
+  { name: 'Canonical skill labs', note: `The registry declares ${canonicalDemos.length} canonical labs, including rendering targets and the non-rendering Debugging suite.`, demos: canonicalDemos },
   { name: 'Cross-skill flagships', note: 'The five ownership-critical scenes where independent systems must compose without duplicate render, signal, tone-map, or output owners.', demos: flagshipDemos.map(({ demo }) => demo) },
   { name: 'Focused integrations and benches', note: 'Five focused integration hosts and two mechanism benches that prove temporal, AO, vegetation, precipitation, and shadow composition.', demos: supportPrimaryDemos },
 ];
@@ -921,10 +919,10 @@ const homepageEvidencePreview = flagshipDemos
 const homepageSocialImage = homepageEvidencePreview?.path ?? null;
 
 const HARNESSES = [
-  { name: 'skills CLI', how: 'Use the open skills installer to list the pack, then install every top-level threejs-* skill folder as one coherent graphics skill pack for your selected agent.', code: `${SKILLS_ADD} --list\n${SKILLS_INSTALL_PACK}` },
-  { name: 'Claude Code', how: 'Install through skills CLI, or symlink/copy the skill folders into a personal or project skills directory.', code: `${SKILLS_ADD} --skill '*' -a claude-code -g -y\n# manual fallback:\ngit clone ${REPO}.git\nln -s "$PWD/threejs-complete-set-of-skill"/threejs-* ~/.claude/skills/` },
-  { name: 'Codex CLI', how: 'Install the whole pack through skills CLI when available. For local checkouts, keep AGENTS.md pointed at the repo-local threejs-*/SKILL.md files as the authoritative source.', code: `${SKILLS_ADD} --skill '*' -a codex -g -y\n# local checkout fallback: read ./threejs-*/SKILL.md when a task matches` },
-  { name: 'Cursor / Gemini / generic agents', how: 'Any harness that can read local files works: each skill is a self-contained folder with SKILL.md, references/, agents/, and examples/. The machine-readable index lives at skills.json; a plain-text overview at llms.txt.', code: `git submodule add ${REPO}.git skills/threejs\ncurl -s ${SITE}skills.json | jq '.install.source, .skills[].name'\ncurl -s ${SITE}llms.txt` },
+  { name: 'skills CLI', how: 'Use the open skills installer to list the pack, then install every skills/threejs-* directory as one coherent graphics skill pack for your selected agent.', code: `${SKILLS_ADD} --list\n${SKILLS_INSTALL_PACK}` },
+  { name: 'Claude Code', how: 'Install through skills CLI, or symlink/copy the installable skill folders into a personal or project skills directory.', code: `${SKILLS_ADD} --skill '*' -a claude-code -g -y\n# manual fallback:\ngit clone ${REPO}.git\nln -s "$PWD/threejs-complete-set-of-skill"/skills/threejs-* ~/.claude/skills/` },
+  { name: 'Codex CLI', how: 'Install the whole pack through skills CLI when available. For local checkouts, keep AGENTS.md pointed at the repo-local skills/threejs-*/SKILL.md files as the authoritative source.', code: `${SKILLS_ADD} --skill '*' -a codex -g -y\n# local checkout fallback: read ./skills/threejs-*/SKILL.md when a task matches` },
+  { name: 'Cursor / Gemini / generic agents', how: 'Install with copy mode, then expose the installed skill directories directly to the harness. In a repository checkout, each installable source directory is skills/<name>/. Repository examples and labs remain separate validation material.', code: `${SKILLS_ADD} --skill '*' --copy -y\n# configure the harness with the installed skill directories\ncurl -s ${SITE}skills.json | jq '.install.source, .skills[].name'\ncurl -s ${SITE}llms.txt` },
 ];
 
 const harnessSection = HARNESSES.map((h, i) => `
@@ -1041,8 +1039,8 @@ h1 em{font-style:normal;color:var(--amber)}
 .hero-showcase-inner{position:relative;min-height:460px;display:flex;flex-direction:column;justify-content:center;padding:clamp(24px,3vw,34px)}
 .hero-showcase-kicker{font:10px/1.4 var(--mono);color:var(--cyan);letter-spacing:.11em;text-transform:uppercase}
 .hero-showcase h2{max-width:13ch;margin-top:10px;font-size:clamp(30px,3.2vw,44px);line-height:1.04;text-wrap:balance}
-.skill-route{display:grid;gap:0;margin-top:22px;border-top:1px solid var(--line)}.skill-route a{display:grid;grid-template-columns:22px minmax(0,1fr);align-items:center;gap:10px;min-height:42px;border-bottom:1px solid var(--line);font:10px/1.35 var(--mono);color:var(--ink)}.skill-route a:before{content:attr(data-route-index);color:var(--dim);font-variant-numeric:tabular-nums}.skill-route a[data-primary-owner="true"]{color:var(--amber)}
-.route-owner{margin-top:16px;color:var(--dim);font:10px/1.5 var(--mono)}.route-owner strong{color:var(--cyan);font-weight:400}.hero-showcase p:last-of-type{max-width:45ch;margin-top:16px;color:rgba(237,232,221,.72);font-size:13px}.hero-showcase-link{display:inline-flex;align-self:flex-start;margin-top:20px;color:var(--amber);font:11px var(--mono)}.hero-showcase-link:hover{color:var(--ink)}
+.skill-route{display:grid;gap:0;margin-top:22px;border-top:1px solid var(--line)}.skill-route a{display:grid;grid-template-columns:22px minmax(0,1fr);align-items:center;gap:10px;min-height:42px;border-bottom:1px solid var(--line);font:10px/1.35 var(--mono);color:var(--ink)}.skill-route a:before{content:attr(data-route-index);color:var(--dim);font-variant-numeric:tabular-nums}.skill-route a:first-child{color:var(--amber)}
+.product-source{margin-top:16px;color:var(--dim);font:10px/1.5 var(--mono)}.product-source strong{color:var(--cyan);font-weight:400}.hero-showcase p:last-of-type{max-width:45ch;margin-top:16px;color:rgba(237,232,221,.72);font-size:13px}.hero-showcase-link{display:inline-flex;align-self:flex-start;margin-top:20px;color:var(--amber);font:11px var(--mono)}.hero-showcase-link:hover{color:var(--ink)}
 .stats-band{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:rgba(15,18,24,.64)}
 .stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1px;padding:0}
 .stat{padding:20px clamp(10px,2vw,24px);border-left:1px solid var(--line)}.stat:first-child{border-left:0}
@@ -1092,16 +1090,18 @@ ${navHtml('')}
           <a class="hero-action" href="#flagships">Explore visual demos</a>
         </div>
       </div>
-      <aside class="hero-showcase" aria-labelledby="hero-showcase-title" data-route-fixture="${esc(oceanPlanetRoute.id)}" data-primary-owner="${esc(oceanPlanetRoute.primaryOwner)}">
+      <aside class="hero-showcase" aria-labelledby="hero-showcase-title" data-product-skill-count="${total}" data-product-source="skills/{name}/">
         <div class="hero-showcase-inner">
-          <p class="hero-showcase-kicker">Router fixture: ${esc(oceanPlanetRoute.id)}</p>
-          <h2 id="hero-showcase-title">${esc(oceanPlanetRoute.title)}</h2>
-          <div class="skill-route" aria-label="Recommended ocean world skill sequence">
-            ${oceanPlanetRoute.selectedSkills.map((skill, index) => `<a href="skills/${esc(skill.id)}.html" data-route-skill="${esc(skill.id)}" data-route-index="${String(index + 1).padStart(2, '0')}" data-primary-owner="${skill.id === oceanPlanetRoute.primaryOwner ? 'true' : 'false'}">${esc(skill.title)}</a>`).join('\n            ')}
+          <p class="hero-showcase-kicker">Installable product</p>
+          <h2 id="hero-showcase-title">${total} specialist skills. One source of truth.</h2>
+          <div class="skill-route" aria-label="Product entry points">
+            <a href="skills/threejs-choose-skills.html" data-route-index="01">Route a request with Choose Skills</a>
+            <a href="docs/install/" data-route-index="02">Install the complete pack</a>
+            <a href="evidence/" data-route-index="03">Inspect runtime evidence</a>
           </div>
-          <p class="route-owner">Primary owner: <strong>${esc(oceanPlanetRoute.primaryOwnerTitle)}</strong></p>
-          <p>This order comes directly from the positive router contract. It names the primary owner and every required downstream system.</p>
-          <a class="hero-showcase-link" href="skills/threejs-choose-skills.html">See how skill routing works&nbsp;→</a>
+          <p class="product-source">Authoritative product source: <strong>skills/&lt;name&gt;/</strong></p>
+          <p>Installable skill files are separated from repository-only examples, labs, and generated evidence.</p>
+          <a class="hero-showcase-link" href="#skills">Browse the complete roster&nbsp;→</a>
         </div>
       </aside>
     </div>
@@ -1302,7 +1302,7 @@ ${navHtml('../')}
     <div class="identity-grid">
       <article class="about-card"><code>maintainer</code><h3>linegel</h3><p>Repository owner and current public maintainer. Review the <a href="https://github.com/linegel">GitHub profile</a>, signed-in activity, and commit history directly.</p></article>
       <article class="about-card"><code>contributors</code><h3>Repository contributors</h3><p>Every accepted change remains attributable through the public <a href="${REPO}/graphs/contributors">contributors graph</a> and per-file Git history.</p></article>
-      <article class="about-card"><code>incorporated work</code><h3>Vinh Hiển</h3><p>The <a href="${SITE}skills/threejs-object-sculptor.html">Three.js Object Sculptor skill</a> and plugin are adapted from <a href="https://github.com/vinhhien112/Three.js-Object-Sculptor-Codex-Plugin">Vinh Hiển's original MIT-licensed project</a> at pinned commit <code>4194e9ad436a</code>.</p></article>
+      <article class="about-card"><code>incorporated work</code><h3>Vinh Hiển</h3><p>The <a href="${SITE}skills/threejs-object-sculptor.html">Three.js Object Sculptor skill</a> is adapted from <a href="https://github.com/vinhhien112/Three.js-Object-Sculptor-Codex-Plugin">Vinh Hiển's original MIT-licensed project</a> at pinned commit <code>4194e9ad436a</code>.</p></article>
       <article class="about-card"><code>license</code><h3>ISC licensed</h3><p>The source and generated presentation are distributed under the repository’s <a href="${REPO}/blob/main/LICENSE">ISC License</a>. Third-party dependencies retain their own licenses.</p></article>
     </div>
   </div></section>
@@ -1403,7 +1403,9 @@ for (const slug of slugs) {
     <a class="chip" href="${esc(s.update.url)}">commit ${esc(s.update.shortHash)} ↗</a>` :
     '<span class="chip">Latest skill update unavailable</span>';
   const demoChipHtml = skillDemos.length ? `<span class="chip">${skillDemos.length} secondary surface${skillDemos.length > 1 ? 's' : ''}</span>` : '';
-  const primaryChipHtml = `<span class="chip">${ownedPrimaryDemos.length} primary target${ownedPrimaryDemos.length === 1 ? '' : 's'}</span>`;
+  const primaryChipHtml = ownedPrimaryDemos.length
+    ? `<span class="chip">${ownedPrimaryDemos.length} primary target${ownedPrimaryDemos.length === 1 ? '' : 's'}</span>`
+    : '';
   const flagshipChipHtml = participatingFlagships.length ? `<span class="chip">${participatingFlagships.length} flagship${participatingFlagships.length === 1 ? '' : 's'}</span>` : '';
   const hasRenderingPrimary = ownedPrimaryDemos.some((demo) => demo.executionClass === 'rendering');
   const attributionChipHtml = s.attribution ? `<a class="chip" href="${esc(s.attribution.authorUrl)}">Original author: ${esc(s.attribution.author)} ↗</a>` : '';
@@ -1448,12 +1450,12 @@ for (const slug of slugs) {
     </div>
   </div></section>` : '';
 
-  const evidenceReportsHtml = `
+  const evidenceReportsHtml = relatedEvidenceDemos.length ? `
   <section class="section" id="evidence-reports" aria-labelledby="evidence-reports-title"><div class="wrap">
     <h2 id="evidence-reports-title">Evidence reports</h2>
     <p class="sub">Source hashes, claim verdicts, promoted same-lab media, fixed routes, exact tier contracts, and current limitations.</p>
     <nav class="evidence-report-links" aria-label="Evidence reports for ${esc(s.title)}">${relatedEvidenceDemos.map((demo) => `<a href="../evidence/${esc(demo.id)}/"><code>${esc(demo.id)}</code><span>${demo.status === 'accepted' ? 'accepted' : 'evidence pending'}</span></a>`).join('')}</nav>
-  </div></section>`;
+  </div></section>` : '';
 
   const examplesHtml = s.examples.length ? `
   <div class="section" id="examples"><div class="wrap">
@@ -1479,7 +1481,7 @@ for (const slug of slugs) {
     </div>
   </div></div>` : '';
 
-  const validationHtml = `
+  const validationHtml = ownedPrimaryDemos.length ? `
   <div class="section" id="validation"><div class="wrap">
     <h2>Preview and evidence ledger</h2>
     <p class="sub">${hasRenderingPrimary ? 'Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; rendering acceptance still requires same-lab readback and a schema-v2 bundle.' : 'Every image identifies what it proves. This skill owns a non-rendering scenario suite, so acceptance depends on deterministic fixture verdicts, ownership and budget checks, and mutations rather than GPU pixels.'}</p>
@@ -1490,7 +1492,7 @@ ${evidenceDisclosureHtml}
         <span class="preview-media">${previewPicture(`../${path}`, `${s.title}: ${label}`, `itemprop="contentUrl" ${imageSizeAttrs(path)} loading="lazy" decoding="async"`)}</span>
         <figcaption itemprop="caption"><strong>${esc(label)}</strong><span>${esc(classification.replace(/-/g, ' '))}</span>${detail === null ? '' : `<span>${esc(detail ?? (classification.includes('evidence') ? 'Evidence classification follows the v2 registry.' : 'Presentation preview only; this image is not canonical runtime evidence.'))}</span>`}</figcaption>
       </figure>`).join('')}</div>` : `<div class="primary-evidence-panel" data-evidence-state="incomplete"><span class="primary-evidence-label">Same-lab evidence</span><strong>No runtime image promoted</strong><span>The page remains image-free until this skill's own lab supplies hash-bound pixels.</span></div>`}
-  </div></div>`;
+  </div></div>` : '';
 
   const scienceHtml = science ? `
   <div class="section" id="approach"><div class="wrap">
@@ -1646,10 +1648,10 @@ ${navHtml('../')}
       ${primaryChipHtml}
 ${flagshipChipHtml}
 ${demoChipHtml}
-${attributionChipHtml ? `      ${attributionChipHtml}\n` : ''}      ${ownedPrimaryDemos.some((demo) => demo.status === 'accepted') ? '<span class="chip">accepted runtime evidence</span>' : '<span class="chip">native evidence pending</span>'}
+${attributionChipHtml ? `      ${attributionChipHtml}\n` : ''}      ${ownedPrimaryDemos.length === 0 ? '<span class="chip">reference skill</span>' : (ownedPrimaryDemos.some((demo) => demo.status === 'accepted') ? '<span class="chip">accepted runtime evidence</span>' : '<span class="chip">native evidence pending</span>')}
       ${updateHtml}
-      <a class="chip" href="${REPO}/blob/main/${slug}/SKILL.md">SKILL.md on GitHub ↗</a>
-      <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/${slug}/SKILL.md">raw (for agents) ↗</a>
+      <a class="chip" href="${REPO}/blob/main/skills/${slug}/SKILL.md">SKILL.md on GitHub ↗</a>
+      <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/skills/${slug}/SKILL.md">raw (for agents) ↗</a>
     </div>
   </div>
 </header>
@@ -1699,9 +1701,9 @@ Repository: ${REPO}
 Website: ${SITE} (each skill has a dedicated page at ${SITE}skills/<name>.html with the approach, math, validation gallery, and full skill text)
 Guides and decision support: ${SITE}guides/
 About and evidence methodology: ${aboutUrl}
-Install (Claude Code): git clone ${REPO}.git && ln -s "$PWD/threejs-complete-set-of-skill"/threejs-* ~/.claude/skills/
+Install (Claude Code): git clone ${REPO}.git && ln -s "$PWD/threejs-complete-set-of-skill"/skills/threejs-* ~/.claude/skills/
 Install (skills CLI): ${SKILLS_ADD} --list; ${SKILLS_INSTALL_PACK}; or ${SKILLS_ADD} --skill '*' -g -a codex -y for non-interactive Codex setup.
-Install (any agent): clone the repo or use the skills CLI; each skill is a self-contained folder with SKILL.md (YAML frontmatter: name, description), references/, agents/, and examples/. Example-directory presence is not canonical runtime proof.
+Install (any agent): clone the repo or use the skills CLI; each skills/<name>/ product directory contains SKILL.md (YAML frontmatter: name, description) and may include references/, scripts/, and license files. Repository examples and labs remain separate validation material.
 Machine-readable index: ${SITE}skills.json
 Versioned demo registry: ${SITE}demos/registry.json
 Routing: after installing the whole pack, start broad requests with threejs-choose-skills; it selects the smallest useful in-pack skill set.
@@ -1770,7 +1772,7 @@ const skillManifest = {
     primary: `${SKILLS_ADD} --list`,
     installPack: SKILLS_INSTALL_PACK,
     installPackForCodex: `${SKILLS_ADD} --skill '*' -g -a codex -y`,
-    scanContract: 'Top-level threejs-*/SKILL.md folders; each SKILL.md has string frontmatter fields name and description.',
+    scanContract: 'skills/threejs-*/SKILL.md folders; each SKILL.md has string frontmatter fields name and description.',
   },
   install: {
     source: REPO_SLUG,
@@ -1846,8 +1848,8 @@ const skillManifest = {
       commitUrl: s.update.url,
     } : null,
     page: `${SITE}skills/${s.slug}.html`,
-    skillMd: `${REPO}/blob/main/${s.slug}/SKILL.md`,
-    raw: `https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/${s.slug}/SKILL.md`,
+    skillMd: `${REPO}/blob/main/skills/${s.slug}/SKILL.md`,
+    raw: `https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/skills/${s.slug}/SKILL.md`,
   })),
 };
 const skillManifestJson = JSON.stringify(skillManifest, null, 2) + '\n';
@@ -1871,7 +1873,7 @@ writeFileSync(join(root, 'docs', 'site.webmanifest'), JSON.stringify({
     { src: 'icon-512.png', sizes: '512x512', type: 'image/png' },
   ],
 }, null, 2) + '\n');
-const sitemapHomeLastmod = latestPathDate(['scripts/build-pages.mjs', ...slugs]);
+const sitemapHomeLastmod = latestPathDate(['scripts/build-pages.mjs', ...slugs.map((slug) => join('skills', slug))]);
 writeFileSync(join(root, 'docs', 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url><loc>${SITE}</loc>${sitemapHomeLastmod ? `<lastmod>${sitemapHomeLastmod}</lastmod>` : ''}${homepageSocialImage ? `<image:image><image:loc>${new URL(homepageSocialImage, SITE).href}</image:loc><image:title>${SITE_NAME}</image:title></image:image>` : ''}</url>

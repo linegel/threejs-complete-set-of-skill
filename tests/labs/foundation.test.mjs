@@ -203,22 +203,22 @@ test('empty-startup mechanism wrappers select by query without calling setMode',
   assert.equal(lockedRouteSelectionMatches({ mode: 'velocity-and-history' }, 'mechanism', 'velocity-and-history'), false);
   assert.equal(lockedRouteSelectionMatches({ mode: 'final' }, 'mechanism', 'velocity-and-history'), false);
   assert.equal(lockedRouteSelectionMatches(
-    { scenario: 'inventory-drift', mode: 'route' },
+    { scenario: 'stress', mode: 'route' },
     'mechanism',
-    'inventory-intersection',
-    { scenario: 'inventory-drift' },
+    'velocity-and-history',
+    { scenario: 'stress' },
   ), false);
   assert.equal(lockedRouteSelectionMatches(
-    { scenario: 'inventory-drift', mechanism: 'inventory-intersection', mode: 'route' },
+    { scenario: 'stress', mechanism: 'velocity-and-history', mode: 'route' },
     'mechanism',
-    'inventory-intersection',
-    { scenario: 'inventory-drift' },
+    'velocity-and-history',
+    { scenario: 'stress' },
   ), true);
   assert.equal(lockedRouteSelectionMatches(
-    { scenario: 'default', mechanism: 'inventory-intersection' },
+    { scenario: 'default', mechanism: 'velocity-and-history' },
     'mechanism',
-    'inventory-intersection',
-    { scenario: 'inventory-drift' },
+    'velocity-and-history',
+    { scenario: 'stress' },
   ), false);
   assert.equal(lockedRouteSelectionMatches({ routeSelection: { kind: 'tier', id: 'full' } }, 'tier', 'full'), true);
   assert.throws(() => lockedRouteContract({
@@ -429,15 +429,15 @@ test('Pages browser observations require readiness, lab identity, WebGPU, locks,
 
 test('Pages browser observations allow an explicitly non-rendering primary without WebGPU', () => {
   assert.doesNotThrow(() => assertPagesBrowserObservation({
-    path: '/demos/router-manifest-lab/',
+    path: '/demos/debugging-contract-lab/',
     category: 'primary-base',
-    labId: 'router-manifest-lab',
+    labId: 'debugging-contract-lab',
     nonRenderingScenarioSuite: true,
   }, {
-    url: 'http://127.0.0.1:4173/demos/router-manifest-lab/',
+    url: 'http://127.0.0.1:4173/demos/debugging-contract-lab/',
     ready: true,
-    documentLabId: 'router-manifest-lab',
-    controllerLabId: 'router-manifest-lab',
+    documentLabId: 'debugging-contract-lab',
+    controllerLabId: 'debugging-contract-lab',
     backendProof: null,
     disposed: true,
     pageErrors: [],

@@ -617,8 +617,8 @@ function validateTierContracts(tierContracts, errors) {
       if (!Array.isArray(contract.colliderConstructionInputs) || contract.colliderConstructionInputs.length !== contract.colliderIds?.length) {
         errors.push(`${subjectId}.${tier} collider construction inputs do not close over collider IDs`);
       }
-      if (!String(contract.canonicalPhysicsProxyStatus ?? "").startsWith("blocked")) {
-        errors.push(`${subjectId}.${tier} must keep canonical physics proxy authority blocked`);
+      if (!String(contract.physicsHandoffStatus ?? "").startsWith("blocked")) {
+        errors.push(`${subjectId}.${tier} must keep the solver handoff blocked`);
       }
       if (baseline === null) baseline = contract;
       else for (const field of protectedIdentityFields) {

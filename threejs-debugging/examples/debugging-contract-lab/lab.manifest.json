@@ -7,8 +7,8 @@
   "kind": "canonical-lab",
   "status": "accepted",
   "canonicalSource": [
-    "threejs-debugging/SKILL.md",
-    "threejs-debugging/references/upstream-research.md",
+    "skills/threejs-debugging/SKILL.md",
+    "skills/threejs-debugging/references/upstream-research.md",
     "threejs-debugging/examples/triage-cases.json",
     "threejs-debugging/examples/debugging-contract.test.mjs",
     "threejs-debugging/examples/debugging-contract-lab/app.mjs",

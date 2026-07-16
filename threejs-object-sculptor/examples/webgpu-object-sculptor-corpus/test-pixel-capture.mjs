@@ -391,7 +391,7 @@ const fakeSession = {
         physicsMaterialBindings: [],
         destructionGroupRecords: [],
         physicsAuthority: "authoring-input-only",
-        canonicalPhysicsProxyStatus: "blocked pending PhysicsContext",
+        physicsHandoffStatus: "blocked-authoring-inputs-only",
         motionOwner: state.mode === "action-ready" ? "target procedural transform timeline" : "frozen authored pose",
       };
     } else throw new Error(`unexpected fake controller method ${method}`);

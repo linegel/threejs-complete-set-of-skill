@@ -566,15 +566,15 @@ function validateCorpusDeepContractShape(corpus) {
     "constraintRecordType",
     "units",
     "solverAuthority",
-    "canonicalProxyStatus",
-    "rigidBodyPropertiesStatus",
+    "solverHandoffStatus",
+    "massPropertiesStatus",
     "visualLodIndependent",
     "requiredAdapterBeforePhysicalClaims",
     "authoredColliderCeilingsMeters",
     "directedColliderLowerBoundWitnesses",
     "status",
   ], "corpus.physicsBoundary");
-  for (const field of ["assetRecordType", "constraintRecordType", "units", "canonicalProxyStatus", "rigidBodyPropertiesStatus", "requiredAdapterBeforePhysicalClaims"]) {
+  for (const field of ["assetRecordType", "constraintRecordType", "units", "solverHandoffStatus", "massPropertiesStatus", "requiredAdapterBeforePhysicalClaims"]) {
     requireText(physics[field], `corpus.physicsBoundary.${field}`);
   }
   requireBoolean(physics.solverAuthority, "corpus.physicsBoundary.solverAuthority");
@@ -819,8 +819,8 @@ function validateSpec(spec, definition, { acceptancePromoted = false, artifactDi
   assert.equal(spec.physicsHandoff?.recordType, "ColliderConstructionInput", `${definition.id} physics record type drifted`);
   assert.equal(spec.physicsHandoff?.authority, "authoring-input-only", `${definition.id} physics authority drifted`);
   assert.equal(spec.physicsHandoff?.solverAuthority, false, `${definition.id} must not claim solver authority`);
-  assert.equal(spec.physicsHandoff?.canonicalProxyStatus, "blocked", `${definition.id} canonical proxy claim must remain blocked`);
-  assert.match(spec.physicsHandoff?.rigidBodyPropertiesStatus ?? "", /^blocked/, `${definition.id} rigid-body claim must remain blocked`);
+  assert.equal(spec.physicsHandoff?.solverHandoffStatus, "blocked", `${definition.id} solver handoff must remain blocked`);
+  assert.match(spec.physicsHandoff?.massPropertiesStatus ?? "", /^blocked/, `${definition.id} mass-property evidence must remain blocked`);
   assert.equal(spec.physicsHandoff?.visualLodIndependent, true, `${definition.id} visual LOD must not mutate physics authoring identity`);
   assert.equal(spec.motionContract?.enabledMode, "action-ready", `${definition.id} motion must be exposed in action-ready mode`);
   assert.equal(spec.motionContract?.exactReset, true, `${definition.id} action preview must define exact reset`);
@@ -1087,8 +1087,8 @@ function validateRuntimeContract(definition, spec, corpusTiers) {
         assert.equal(collider.recordType, "ColliderConstructionInput", `${definition.id}/${tier}/${id} record type drifted`);
         assert.equal(collider.claimStatus, "authoring-input", `${definition.id}/${tier}/${id} claim status drifted`);
         assert.equal(collider.solverAuthority, false, `${definition.id}/${tier}/${id} must not own solve`);
-        assert.equal(collider.canonicalProxyStatus, "blocked", `${definition.id}/${tier}/${id} must not claim canonical proxy status`);
-        assert.match(collider.rigidBodyPropertiesStatus, /^blocked/, `${definition.id}/${tier}/${id} rigid-body claim must remain blocked`);
+        assert.equal(collider.solverHandoffStatus, "blocked", `${definition.id}/${tier}/${id} solver handoff must remain blocked`);
+        assert.match(collider.massPropertiesStatus, /^blocked/, `${definition.id}/${tier}/${id} mass-property evidence must remain blocked`);
         assert.equal(collider.shape.units, "metre", `${definition.id}/${tier}/${id} collider units drifted`);
         assert.equal(collider.validity.visualLodIndependent, true, `${definition.id}/${tier}/${id} must be visual-LOD-independent`);
         assert.equal(
@@ -1288,8 +1288,8 @@ export function validateCorpusManifest() {
   assert.equal(corpus.renderArchitecture?.outputTransformOwners, 1);
   assert.equal(corpus.physicsBoundary?.assetRecordType, "ColliderConstructionInput");
   assert.equal(corpus.physicsBoundary?.solverAuthority, false);
-  assert.equal(corpus.physicsBoundary?.canonicalProxyStatus, "blocked");
-  assert.match(corpus.physicsBoundary?.rigidBodyPropertiesStatus ?? "", /^blocked/);
+  assert.equal(corpus.physicsBoundary?.solverHandoffStatus, "blocked");
+  assert.match(corpus.physicsBoundary?.massPropertiesStatus ?? "", /^blocked/);
   assert.equal(corpus.identityContinuity?.semanticIdsStableAcrossVisualTiers, true);
   assert.equal(corpus.identityContinuity?.continuityTokenRequiredForTierRebuild, true);
   assert.equal(corpus.identityContinuity?.changedSeedOrSourceRequiresNewGeneration, true);

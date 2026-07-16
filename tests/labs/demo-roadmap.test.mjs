@@ -1,24 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { RUNNABLE_DEMOS_BY_SKILL } from '../../threejs-choose-skills/examples/router-manifest-lab/runnable-demos.mjs';
 import { buildDemoRoadmap } from '../../scripts/lib/demo-roadmap.mjs';
 import { buildDemoRegistry } from '../../scripts/lib/lab-registry.mjs';
 
 const registry = buildDemoRegistry();
 const demosById = new Map(registry.demos.map((demo) => [demo.id, demo]));
-
-test('every mapped runnable demo has a readiness roadmap', () => {
-  const mappedIds = [...new Set(Object.values(RUNNABLE_DEMOS_BY_SKILL).map((entry) => entry.id))];
-  for (const id of mappedIds) {
-    const demo = demosById.get(id);
-    assert.ok(demo, `${id} is absent from the registry`);
-    const roadmap = buildDemoRoadmap(demo);
-    assert.equal(roadmap.status, demo.status);
-    if (demo.status === 'accepted') assert.equal(roadmap.items.length, 0, `${id} has accepted status but open roadmap items`);
-    else assert.ok(roadmap.items.length > 0, `${id} has no remaining-fixes roadmap`);
-    assert.equal(new Set(roadmap.items.map((item) => item.id)).size, roadmap.items.length, `${id} has duplicate roadmap items`);
-  }
-});
 
 test('incomplete tiered demos expose performance, evidence, and tier closure', () => {
   for (const demo of registry.demos.filter((entry) => entry.status === 'incomplete' && entry.tiers.length > 0)) {

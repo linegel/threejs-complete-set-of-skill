@@ -4,7 +4,7 @@
 
 ### [Task L1–L3 implementation status]
 - This file collects empirical doctrine deltas from the lab implementation and captures.
-- Expected rows and thresholds are sourced from `threejs-procedural-creatures/references/creature-body-systems.md` and the local plan.
+- Expected rows and thresholds are sourced from `skills/threejs-procedural-creatures/references/creature-body-systems.md` and the local plan.
 - Findings will be appended as executable proof with evidence paths when available.
 
 ### Current acceptance status — 2026-07-11

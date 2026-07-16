@@ -28,7 +28,7 @@ import { createEvidenceLaneJoin, validateEvidenceLaneJoin } from './lib/evidence
 import { assemblePendingReleaseBundle } from './lib/release-bundle-assembler.mjs';
 import { promoteReleaseBundle } from './lib/offline-release-promotion.mjs';
 import { validateEvidenceBundle, REQUIRED_EVIDENCE_IMAGES } from './lib/evidence-v2.mjs';
-import { buildDemoRegistry } from './lib/lab-registry.mjs';
+import { buildDemoRegistry, listSkillDirs } from './lib/lab-registry.mjs';
 import { canonicalSha256, routeStateDigest } from './lib/evidence-manifest-contract.mjs';
 import { numericDatum, NumericLabel } from '../labs/runtime/numeric-evidence.mjs';
 
@@ -298,7 +298,7 @@ const manifestCandidates = [
 ];
 function findManifest(id) {
   for (const candidate of manifestCandidates) if (existsSync(candidate)) return candidate;
-  const roots = readdirSync(REPO_ROOT).filter((name) => name.startsWith('threejs-'));
+  const roots = listSkillDirs();
   for (const root of roots) {
     const examples = join(REPO_ROOT, root, 'examples');
     if (!existsSync(examples)) continue;

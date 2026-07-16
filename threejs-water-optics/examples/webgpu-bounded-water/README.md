@@ -50,37 +50,34 @@ controller splits a presentation delta into bounded chunks, so equal-real-time
 produce the same f32 state hash. Direct `heightfield.step()` still reports
 dropped catch-up time rather than hiding it.
 
-## Shared physics boundary
+## Host handoff boundary
 
 The reusable `integration-stage.js` is a render-integration shell, not the
-canonical physics ABI. Its mutable `weatherState`, `setDrop(...)`, and
-`setObjectImpulse(...)` inputs are presentation-authored local events. They do
-not publish `PhysicsContext` or `WaterSurfaceSample`, do not consume
-`SurfaceExchange` or `InteractionRecord`, have no exact-once
-`InteractionBatchLedger`, and support no conservation or two-way-coupling
-claim. The runtime exports `WATER_PHYSICS_INTEGRATION_BOUNDARY` and returns it
-from the stage so downstream code cannot infer a stronger contract from the
-helper names.
+host's cross-system adapter. Its mutable `weatherState`, `setDrop(...)`, and
+`setObjectImpulse(...)` inputs are presentation-authored local events. The
+helper claims neither conservative/two-way exchange nor cross-system
+exact-once event ownership. The runtime exports
+`WATER_PHYSICS_INTEGRATION_BOUNDARY` and returns its host-handoff boundary so
+downstream code cannot infer a stronger contract from the helper names.
 
-Canonical integration uses the shared
-[physics-domain and interaction contract](../../../threejs-choose-skills/references/physics-domain-and-interaction-contract.md):
+A host adapter must declare:
 
-- query and event positions are physics-frame metres under one `PhysicsContext`;
-- the provider publishes batched, channel-requested `WaterSurfaceSample`
-  records with actual time, filter, state version, validity, and error;
+- query and event positions in metres under one stable frame and origin, with
+  frame, state, and resource versions;
+- batched, channel-requested surface samples with sample instant or application
+  interval, clock, actual time, filter, validity, and error;
 - the visible analytic-plus-heightfield surface is valid only with a measured
   or hard live-state residual bound; the analytic CPU query alone is not
   silently authoritative for the combined surface;
-- precipitation and moving bodies reach the solver through `SurfaceExchange`
-  and dimensioned `InteractionRecord` batches, with conservative scatter,
-  exact-once ledgers, and declared one-way or two-way coupling;
+- dimensioned forcing and reaction batches with conservative scatter and one
+  declared owner; replayable events additionally need one exact-once owner;
 - GPU-resident consumers use ordered bindings and graph dependencies. A
   frame-critical synchronous readback is forbidden.
 
 The analytic query now returns the exact fixed-chart surface-point velocity,
 acceleration, and gauge-invariant geometric normal velocity. These are useful
 ingredients for an adapter, but they remain distinct from material current,
-phase speed, and a complete live-surface `WaterSurfaceSample`.
+phase speed, and a versioned live-surface sample.
 
 ## One surface cause
 
