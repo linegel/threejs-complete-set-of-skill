@@ -60,13 +60,17 @@ exposed surfaces, placements, material slots, and stable identity.
    For a heterogeneous site assembly, keep domain assets delegated to their
    owning skills and register each ruin, dock, boat, rock, vegetation cluster,
    or prop with a stable placement ID, owner, transform/frame/scale, support and
-   clearance volumes, anchor, and LOD policy. Place the landmark first, then
-   solve access, support, and clearance before repeated detail.
+   clearance volumes, anchor, and LOD policy. Apply the deterministic
+   heterogeneous-site-placement rules in
+   [grammar-and-mesh-compiler.md](references/grammar-and-mesh-compiler.md).
+   Place the landmark first, then solve access, support, and clearance before
+   repeated detail.
 
    **Complete when:** every placement resolves, every surface has one owner,
    overlaps are empty or explicitly permitted, support/clearance gates pass,
-   stable IDs replay deterministically, and all emitted geometry or delegated
-   assets trace to a plan record.
+   stable IDs replay independently of chunk load order and unrelated family
+   insertion, and all emitted geometry or delegated assets trace to a plan
+   record.
 
 5. **Compile by material slot and spatial boundary.** Keep semantic material
    identities stable while choosing merge, batch, or instance emission. In

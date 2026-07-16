@@ -304,12 +304,15 @@ capability manifest, renderer.info counters, per-pass timings — so regressions
 <p>Routing is set-cover under a budget: given request features $R$ and skills with coverage
 sets $C_i$ and load costs $c_i$, choose the smallest set that covers the request:</p>
 $$\\min_{S} \\sum_{i \\in S} c_i \\quad \\text{s.t.} \\quad R \\subseteq \\bigcup_{i\\in S} C_i$$
-<p>The router also owns the composed frame-budget constraint — a tier assignment is feasible
-only if the per-skill budgets sum inside the frame:</p>
-$$\\sum_{i \\in scene} b_i(t_i) \\le B_{frame} = \\frac{1000}{f_{target}}\\;\\text{ms}$$
-<p>Preflight is a contract, not advice: it names the selected skills, the signal owners
-(depth, tone map, output transform), and the tier assignment before any code is written —
-so composition conflicts surface at plan time instead of debug time.</p>`,
+<p>The route proves composed-frame feasibility from the full target trace. CPU, GPU, and
+presentation overlap unless a measured dependency serializes them; standalone skill timings
+do not form a valid sum:</p>
+$$T_{frame}^{trace} =
+\\operatorname{criticalPath}(G_{CPU \\leftrightarrow GPU \\leftrightarrow present})
+\\le \\frac{1000}{f_{target}}\\;\\text{ms}$$
+<p>Preflight names the selected causal owners, ordered handoffs, resource consumers,
+final-output owner, and acceptance evidence before implementation, so composition conflicts
+surface at plan time.</p>`,
 
   'threejs-compatibility-fallbacks': `
 <p>Fallback planning is explicit tier design, not silent degradation. Capability detection

@@ -17,12 +17,14 @@ or perceptual radiance scale to lights, environment, atmosphere, emissive
 materials, bloom sources, and optical effects.
 
 Partition targets or views into exposure-control groups. A group may share GPU
-state only when its radiance basis, meter mask, exposure key, sample schedule,
-and reset history are identical. Assign exactly one meter/adaptation owner, one
-tone-map owner, and one output-conversion owner per group.
+state only when its radiance basis, exposure policy, and reset history are
+identical; an automatic group also requires the same meter mask, key, and
+sample schedule. Assign exactly one exposure owner, one tone-map owner, and one
+output-conversion owner per group.
 
 **Complete when:** every photographed input has one basis and scale, and every
-group names its members, three owners, and state-sharing policy.
+group names its members, exposure/tone-map/output owners, and state-sharing
+policy.
 
 ## 2. Choose the cheapest meter that meets the image requirement
 
@@ -45,16 +47,21 @@ Read [the color-pipeline reference](references/scene-referred-color-pipeline.md#
 when implementing sampled, exact, pyramid, or histogram metering; it contains
 the weighted-log equations, traffic model, and small-emitter failure tests.
 
-**Complete when:** one meter is selected, its source and mask are named, and
-each cheaper rejected option has a concrete correctness failure.
+**Complete when:** fixed EV names its value/calibration and requires zero meter
+source reads; otherwise one meter is selected, its source and mask are named,
+and each cheaper rejected option has a concrete correctness failure.
 
-## 3. Build the GPU exposure controller
+## 3. Build the selected exposure controller
 
-Keep `targetEV`, `currentEV`, validity, and frame indices in GPU state. Advance
-adaptation every rendered frame toward the last valid target, even when the
-meter runs less often. Keep CPU readback diagnostic-only.
+For fixed EV, bind the authored or calibrated value directly and allocate no
+meter, reduction, target-publication, or adaptation state.
 
-Use an explicit producer schedule:
+For automatic exposure, keep `targetEV`, `currentEV`, validity, and frame
+indices in GPU state. Advance adaptation every rendered frame toward the last
+valid target, even when the meter runs less often. Keep CPU readback
+diagnostic-only.
+
+Use this producer schedule only for automatic exposure:
 
 ```text
 adapt currentEV from the last completed target
@@ -69,9 +76,10 @@ reduction. Read [GPU exposure state](references/scene-referred-color-pipeline.md
 for reduction state, EV adaptation, invalid aggregates, and r185 compute
 semantics.
 
-**Complete when:** a frame trace proves which source produced each target,
-adaptation remains GPU-resident, and an invalid aggregate holds the prior valid
-target without a CPU substitute.
+**Complete when:** fixed EV has zero metering/adaptation work, or an automatic
+frame trace proves which source produced each target, adaptation remains
+GPU-resident, and an invalid aggregate holds the prior valid target without a
+CPU substitute.
 
 ## 4. Handle discontinuities before presentation
 
@@ -79,17 +87,19 @@ Give cuts an authored `hold`, `reseed`, or fixed-EV policy. Treat a radiance
 basis, working-primary, quantity, nonlinear-normalization, or exposure-key
 change as a new exposure epoch. For a pure positive scale change
 `L_new = k * L_old` with otherwise identical semantics, preserve the displayed
-product with:
+product by shifting the fixed EV, or both automatic states, by `-log2(k)`:
 
 ```text
 currentEV_new = currentEV_old - log2(k)
 targetEV_new  = targetEV_old  - log2(k)
 ```
 
-Every other incompatible change resets meter accumulation and reseeds adapted
-state before the new signal is presented. Resize or DPR changes rebuild
-resolution-dependent meter resources and sampling coordinates. Device loss
-recreates and reseeds GPU state under the new resource generation.
+Every other incompatible change starts a new exposure epoch. Automatic
+exposure resets meter accumulation and reseeds adapted state; fixed exposure
+rebinds its authored value before the new signal is presented. Resize or DPR
+changes rebuild only admitted resolution-dependent meter resources and sampling
+coordinates. Device loss recreates and reseeds only admitted GPU state under
+the new resource generation.
 
 **Complete when:** every cut, invalid input, basis/scale change, resize, and
 device-loss event maps to one conversion, hold, rebuild, or reseed action that
@@ -103,7 +113,7 @@ Use this domain order unless the LUT declares another complete contract:
 scene-linear HDR
   -> exposure
   -> tone map
-  -> tone-mapped-linear LUT
+  -> tone-mapped-linear LUT, when admitted
   -> alpha restoration
   -> output conversion
 ```
@@ -117,25 +127,27 @@ With explicit `renderOutput()`, set
 `RenderPipeline.outputColorTransform = false`. Mark
 `renderPipeline.needsUpdate = true` after changing the output node or output
 ownership. Read [tone mapping and LUTs](references/scene-referred-color-pipeline.md#tone-mapping-and-luts)
-when loading, authoring, or placing a cube.
+only when loading, authoring, or placing a cube.
 
 **Complete when:** the graph contains one exposure multiply, one tone map, one
-LUT placement in its declared domain, and one working-to-output conversion.
+working-to-output conversion, and—only when admitted—one LUT placement in its
+declared domain.
 
 ## 6. Prove the selected branches
 
 Capture deterministic fixtures:
 
 - a key-gray calibration card with the expected target EV;
-- a bright source entering and leaving frame, with monotone target/current EV
-  trajectories in the expected directions;
-- the selected meter's branch-specific mask, small-emitter, and cadence cases;
-- an identity LUT with ramps and saturated swatches in its declared domain;
+- for automatic exposure, a bright source entering and leaving frame with
+  monotone target/current EV trajectories, plus the selected meter's mask,
+  small-emitter, and cadence cases;
+- when a LUT is admitted, an identity LUT with ramps and saturated swatches in
+  its declared domain;
 - output isolation showing exactly one tone map and one output conversion.
 
-Measure meter and LUT cost as paired graph deltas after warmup on the target.
-GPU time is available only after post-init timestamp-query support is proven;
-otherwise report the timing as unavailable.
+Measure each admitted meter or LUT as a paired graph delta after warmup on the
+target. GPU time is available only after post-init timestamp-query support is
+proven; otherwise report the timing as unavailable.
 
 **Complete when:** all applicable fixtures pass, the final image is inspected,
 and each failed fixture identifies the meter, adaptation, LUT-domain, alpha, or

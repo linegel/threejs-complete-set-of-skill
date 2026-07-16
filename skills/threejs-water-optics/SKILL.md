@@ -24,7 +24,7 @@ transport from that state.
 | Overturning, entrained air, jets, or three-dimensional vortices | External free-surface/particle/VOF solver | A single-valued or depth-averaged model is sufficient |
 | Body motion affects water and water reaction affects the body | Selected water solver plus the two-way coupling branch | One-way visual following or a prescribed wake is sufficient |
 
-Route broad homogeneous wind sea or swell to `threejs-spectral-ocean`. Normal-
+Route broad homogeneous wind sea or swell to `$threejs-spectral-ocean`. Normal-
 only detail is a display optimization, not another physical owner.
 
 Record domain size, smallest resolved wavelength, interaction radius,

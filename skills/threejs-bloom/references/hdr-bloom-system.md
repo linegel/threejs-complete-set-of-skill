@@ -298,6 +298,7 @@ Route visible failures by cause:
 | reflected/transmitted highlights stay sharp | use full-scene or hybrid input |
 | transparent glow changes with draw order | fix MRT blend/alpha ownership |
 | halo shifts across resize | tier the scale/spread or use a custom PSF |
+| blocky stairs around small highlights | raise bloom scale or reject the tier |
 | tiny views produce invalid output | enforce the `16`-texel base gate |
 | sparse hot pixels create huge halos | repair or robustly cap fireflies upstream |
 | scene form vanishes bloom-off | repair source geometry/material/lighting |

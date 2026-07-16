@@ -108,11 +108,11 @@ HDR scene pass + depth + admitted MRT
   -> lighting/AO/atmosphere with valid temporal inputs
   -> temporal scene-radiance resolve, when admitted
   -> excluded transparent or refractive layers
-  -> meter tap from resolved pre-bloom HDR
-  -> bloom and other scene-linear optical effects
-  -> adapted exposure
-  -> tone map
-  -> LUT in its declared domain
+  -> meter tap from resolved pre-bloom HDR, when admitted
+  -> bloom and other scene-linear optical effects, when admitted
+  -> fixed or adapted exposure, when admitted
+  -> tone map, when admitted
+  -> LUT in its declared domain, when admitted
   -> one output conversion
   -> display-domain AA, dither, diagnostics, and UI
 ```
@@ -122,9 +122,9 @@ while preserving scene alpha. If `renderOutput()` owns presentation, set
 `renderPipeline.outputColorTransform = false`; after any output-node change,
 set `renderPipeline.needsUpdate = true`.
 
-This step is complete when meter, exposure, tone map, LUT, alpha, and output
-conversion each have one owner and every transparent/refractive layer has an
-explicit position.
+This step is complete when every present meter, bloom, exposure, tone map, LUT,
+alpha operation, and output conversion has one owner, and every
+transparent/refractive layer has an explicit position.
 
 When choosing a LUT/output ending or handling transparent alpha, read
 [Color, alpha, and legal endings](references/production-image-pipeline.md#color-alpha-and-legal-endings).
@@ -152,9 +152,9 @@ DPR, read
 
 ## 7. Prove the graph
 
-Capture the no-post baseline, each admitted signal, temporal rejection/reset
-views, meter source, bloom source, pre-tone and final output, and physical
-target inventory. Measure the complete warmed graph and paired marginal
+Capture the no-post baseline, each admitted signal, the diagnostics for each
+admitted temporal/meter/bloom/color branch, final output, and physical target
+inventory. Measure the complete warmed graph and paired marginal
 variants at identical scene state. Exercise negative controls: disable each
 effect, force each reset class, resize, and destroy/recreate the graph.
 
@@ -162,5 +162,6 @@ When a capture, timing scope, reset, output-isolation, or lifecycle control fail
 
 The pipeline is complete when all shipping tiers preserve the visual contract,
 the full graph and resident targets meet declared budgets, output isolation
-shows one tone map and one conversion, temporal diagnostics pass in both axes,
-and lifecycle counts plateau after disposal.
+shows one output conversion and—when admitted—one tone map, diagnostics pass
+for every admitted temporal branch and axis, and lifecycle counts plateau after
+disposal.

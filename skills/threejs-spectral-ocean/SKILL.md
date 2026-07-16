@@ -1,6 +1,6 @@
 ---
 name: threejs-spectral-ocean
-description: Synthesize broad-band offshore seas with spectral FFT cascades in Three.js WebGPU/TSL. Use for homogeneous directional wind sea or swell, or for offshore forcing of a separate coastal model.
+description: Synthesize broad-band offshore seas with spectral FFT cascades in Three.js WebGPU/TSL. Use for homogeneous directional wind sea or swell, transported foam history, bounded CPU surface queries, or offshore forcing of a separate coastal model.
 ---
 
 # Spectral Ocean
@@ -15,10 +15,10 @@ Choose from the required observable, not the desired look:
 
 | Observable | Owner |
 | --- | --- |
-| A few authored modes or exact cheap CPU queries | Parametric waves in `threejs-water-optics` |
-| Bounded disturbances or explicit walls | Bounded heightfield in `threejs-water-optics` |
+| A few authored modes or exact cheap CPU queries | Parametric waves in `$threejs-water-optics` |
+| Bounded disturbances or explicit walls | Bounded heightfield in `$threejs-water-optics` |
 | Broad stochastic directional sea | This spectral FFT skill |
-| Depth-varying refraction, diffraction, breaking, run-up, or wet/dry fronts | Coastal branch in `threejs-water-optics`; this skill may supply offshore forcing |
+| Depth-varying refraction, diffraction, breaking, run-up, or wet/dry fronts | Coastal branch in `$threejs-water-optics`; this skill may supply offshore forcing |
 | Overturning, entrained air, jets, or three-dimensional vortices | External free-surface solver |
 
 Select FFT cascades only when the visible wavelength band contains enough

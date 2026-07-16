@@ -43,7 +43,8 @@ WebGPU backend before allocating compute/storage products. Use
 host output stage.
 
 For physically dimensioned extinction, LUT radiometry, mapping equations, phase
-conventions, product dependencies, or the single unit-equivalence fixture, read
+conventions, product dependencies, imported LUT/product compatibility, or the
+single unit-equivalence fixture, read
 [references/atmosphere-transport.md](references/atmosphere-transport.md).
 
 **Complete when:** every producer and consumer uses the same frame, length

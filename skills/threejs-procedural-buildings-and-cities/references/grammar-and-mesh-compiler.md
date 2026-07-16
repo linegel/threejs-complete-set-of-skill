@@ -172,6 +172,37 @@ modules use separately declared transforms. Validate transformed winding,
 normal direction, and finite bounds. A missing builder is a hard plan error;
 an unused registered builder is diagnostic information.
 
+### Deterministic heterogeneous site placement
+
+Generate each candidate from a fixed-width identity tuple:
+
+```text
+(generatorSchemaVersion, stableSeed, familyId, sourceCellId, candidateOrdinal)
+```
+
+Namespace randomness by that full tuple, and compare the full tuple when hashes
+collide. Adding an unrelated family or loading chunks in another order must not
+change an existing family's candidates.
+
+Close placement phases in order. Within a phase, give each candidate one total
+winner key—declared priority, score, then the full candidate tuple—and accept it
+only when its key strictly wins against every conflicting candidate. Support
+and validity may read the immutable environment and completed prior phases, but
+not acceptance order within the current phase.
+
+`environmentRevision` versions terrain, parcel, support, access, and registry
+inputs for acceptance-cache invalidation; it is not part of candidate identity
+or randomness. For chunk-local solving, load a halo at least as wide as the
+largest support, validity, or conflict radius and assign boundary winners by
+stable source cell, not the requesting chunk. A rule without a finite support
+radius requires a global phase after all relevant candidates are known.
+
+Replay with reversed chunk order, an inserted unrelated family, forced hash
+collisions, and boundary candidates. Accepted placement IDs and transforms must
+remain identical while candidate and environment inputs are unchanged; an
+environment-only edit may change acceptance without renumbering or rerandomizing
+surviving candidates.
+
 ## 5. Material-Slot Compilation
 
 Select the package from actual topology and mutability:
@@ -265,6 +296,7 @@ finite positions, normals, UVs, and bounds
 complete material-slot membership
 stable physical UV density
 deterministic plan replay across seeds and chunk order
+deterministic heterogeneous placement across family insertion and hash collision
 projected-error LOD with bounded transition memory
 actual triangle, byte, and backend draw counts
 ```

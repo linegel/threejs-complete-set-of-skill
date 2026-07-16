@@ -239,7 +239,6 @@
     "reason": "No native-WebGPU visual evidence bundle or AI-vision authored-contract review is accepted."
   },
   "commands": {
-    "specs": "npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run validate:specs",
     "targets": "npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run validate:targets",
     "unit": "npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run validate:unit",
     "generateRoutes": "npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run generate:routes",

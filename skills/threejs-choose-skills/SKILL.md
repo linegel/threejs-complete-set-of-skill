@@ -66,8 +66,8 @@ Set `renderPipeline.needsUpdate = true` after changing `outputNode` or
 `outputColorTransform`. Key temporal state by semantic signal, view, encoding,
 resolution, jitter, cadence, and reset policy.
 
-**Complete when:** every cross-system edge has an ordered producer/consumer
-contract, every allocated resource has a consumer, and each target has one
+**Complete when:** every cross-system edge closes every applicable handoff row,
+every allocated resource has a consumer, and each target has one
 tone-map/output path.
 
 ### 4. Prove the composed route
@@ -161,7 +161,9 @@ route:
 ```
 
 `selected` is minimal; `deferred` names a condition that would make each skill
-necessary. Every handoff names producer, consumer, and order. Every resource
+necessary. Every handoff closes the applicable quantity/units, frame, time,
+authority/version, validity/error, ordering, lifetime, and reset rows in
+[cross-system-handoffs.md](references/cross-system-handoffs.md). Every resource
 names its format, physical extent, lifetime, and consumers. `verification`
 tests the selected cause rather than image plausibility alone.
 
@@ -171,6 +173,9 @@ tests the selected cause rather than image plausibility alone.
   presentation, memory, and latency bounds separately.
 - Accept performance from the full composed route on the target device,
   viewport, DPR, quality state, camera/input trace, and sustained thermal state.
+- Trace the measured critical path across state advance, CPU preparation,
+  uploads, GPU queues, synchronization, and presentation; the constraining path
+  must satisfy the frame interval.
 - Treat CPU and GPU work as overlapping unless a measured dependency serializes
   them. Independent percentiles and standalone totals do not form a valid sum.
 - Count each semantic pass or dispatch once. Shared signals have one producer
@@ -189,4 +194,7 @@ tests the selected cause rather than image plausibility alone.
   transition updates dependent attachments, texel uniforms, jitter, velocity,
   histories, resets, and disposal as one transaction.
 
-Routing is complete when every requested observable or constraint has exactly one owning skill or an explicit gap; every selected skill owns at least one item; every cross-skill dependency names its producer, consumer, and order; and every verification point tests the selected cause.
+Routing is complete when every requested observable or constraint has exactly
+one owning skill or an explicit gap; every selected skill owns at least one
+item; every cross-skill dependency closes every applicable handoff row; and
+every verification point tests the selected cause.

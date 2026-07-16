@@ -154,8 +154,10 @@ variance_z = sum(w_i*(s_i-z_bar)^2)/sum(w_i)
 
 Use one representative surface only for a unimodal contribution distribution.
 Use front depth plus moments or split histories for broad/multiple layers.
-Reproject an advected representative world point into the previous camera; host
-surface velocity is a different signal.
+Reproject an advected representative physical point into the previous camera.
+Record immutable current-render-to-physics and
+previous-physics-to-render transforms; map through them across an origin
+rebase. Host surface velocity is a different signal.
 
 Blend with frame-rate-independent current response:
 
@@ -166,9 +168,10 @@ resolved = alpha_current*current + (1-alpha_current)*clippedHistory
 
 Reject history outside the viewport or across depth/spread mismatch, camera
 cuts, projection changes, weather/topology discontinuities, encoding changes,
-and resolution/tier changes. Raise current response for disocclusion and low
-confidence. Variance-clip premultiplied linear HDR radiance and transmittance
-separately, then upsample with scene/cloud depth agreement.
+resolution/tier changes, or a missing/incompatible previous origin mapping.
+Raise current response for disocclusion and low confidence. Variance-clip
+premultiplied linear HDR radiance and transmittance separately, then upsample
+with scene/cloud depth agreement.
 
 Read
 [references/temporal-reconstruction.md](references/temporal-reconstruction.md)
@@ -176,7 +179,8 @@ when history, sparse phases, depth encoding, reset policy, or upsampling is in
 scope.
 
 **Complete when:** a translating-density control reprojects to the expected
-previous pixel, camera-cut/topology controls give history confidence zero,
+previous pixel, a mapped floating-origin rebase preserves that pixel,
+camera-cut/topology/incompatible-origin controls give history confidence zero,
 measured ghost decay matches the response model, and depth-edge upsampling does
 not cross the opaque surface.
 
@@ -212,7 +216,7 @@ Verify:
 - fixed-seed weather mass, erosion, octave filtering, and advection continuity;
 - ground and in-cloud shadow decoding, cadence, and stale-product rejection;
 - translating density, depth encoding, history rejection, response time, and
-  depth-aware upsample;
+  depth-aware upsample, including mapped and incompatible origin rebases;
 - fixed-view HDR radiance, transmittance, silhouette, and halo against a
   higher-quality reference;
 - create, resize/tier-switch, history reset, GPU completion, and disposal.

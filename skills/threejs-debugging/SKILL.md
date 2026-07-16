@@ -1,13 +1,13 @@
 ---
 name: threejs-debugging
-description: Diagnose unexpected Three.js runtime, rendering, API, asset, or version behavior. Use for a concrete failure, a suspected upstream regression or known issue, or a choice among an application fix, released upgrade, bounded workaround, upstream report, and blocker.
+description: Diagnose unexpected Three.js WebGPU/TSL runtime, rendering, API, asset, or version behavior. Use for a concrete failure, a suspected upstream regression or known issue, or a choice among an application fix, released upgrade, bounded workaround, upstream report, and blocker.
 ---
 
 # Three.js Debugging
 
 Reproduce first. Treat installed source and official history as evidence, not as
 background trivia. A domain skill defines the intended mechanism;
-`threejs-visual-validation` supplies formal image, timing, resource, or
+`$threejs-visual-validation` supplies formal image, timing, resource, or
 regression proof when the diagnosis needs it.
 
 Keep one case record with the symptom, expected behavior, exact environment,
@@ -22,9 +22,14 @@ resolution, import entrypoints, renderer class, initialized backend,
 browser/OS/GPU, relevant capabilities, seed, asset revisions, and exact command
 or interaction. Build the smallest deterministic reproduction that still fails.
 
-This step is complete when the recorded reproduction fails repeatedly under the
-recorded environment and another run can distinguish reproduced from not
-reproduced.
+Canonical conclusions require an initialized `WebGPURenderer` with
+`renderer.backend.isWebGPUBackend === true`. Otherwise record the canonical
+blocker; reach `$threejs-compatibility-fallbacks` only when the user explicitly
+requests that branch.
+
+This step is complete when backend truth is recorded, the reproduction fails
+repeatedly under the recorded environment, and another run can distinguish
+reproduced from not reproduced.
 
 ## 2. Name the violated contract and first failure
 

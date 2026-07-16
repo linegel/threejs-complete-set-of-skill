@@ -1,4 +1,4 @@
 interface:
   display_name: "Three.js Debugging"
-  short_description: "Diagnose Three.js runtime and rendering failures"
-  default_prompt: "Use $threejs-debugging to reproduce this Three.js failure, isolate its first violated boundary, and choose an evidence-backed fix or escalation."
+  short_description: "Diagnose Three.js WebGPU/TSL runtime and rendering failures"
+  default_prompt: "Use $threejs-debugging to reproduce this Three.js WebGPU/TSL failure, isolate its first violated boundary, and choose an evidence-backed fix or escalation."

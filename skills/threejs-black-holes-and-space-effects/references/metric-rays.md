@@ -41,8 +41,10 @@ Use the Ellis/Morris-Thorne metric with `c = 1`:
 ds^2 = -dt^2 + dl^2 + (l^2 + a^2)(dtheta^2 + sin(theta)^2 dphi^2)
 ```
 
-`a` is the throat radius and `l` is signed proper radial distance. Integrate
-the dimensionless state `L = l/a`, `B = b/a`, and `sigma = a s`:
+`a` is the throat radius and `l` is signed proper radial distance. Let `lambda`
+be an affine parameter and define the Mino-like parameter `s` by
+`d lambda = (l^2 + a^2) ds`. Integrate the dimensionless state `L = l/a`,
+`B = b/a`, and `sigma = a s`:
 
 ```text
 dL/dsigma   = (L^2 + 1) p_l
@@ -79,8 +81,9 @@ than entering this capture/turning classification. At `L*p_l = 0`, classify
 the state from the invariant and radial derivative as a turning or critical
 initial condition.
 
-Keep `escaped`, `turning`, `traversing`, `unresolved-critical`, `step-cap`, and
-`invalid` distinct. At finite escape radius reconstruct the outgoing tangent:
+Keep `escaped`, `turning`, `traversing`, `unresolved-critical`, `step-cap`,
+`attempt-cap`, and `invalid` distinct. At finite escape radius reconstruct the
+outgoing tangent:
 
 ```text
 e_r         = u*cos(phi) + v*sin(phi)
@@ -138,7 +141,8 @@ Classify an exact critical inward ray from `R > 3M` as
 ray reaches the horizon and a supercritical inward ray turns and may escape.
 Refine the first crossing of `r = 2M`. Declare escape only after the radial
 momentum has turned outward and the ray crosses `r = R`; refine that crossing
-from the pre-step state. A cap is `step-cap`, never an escape.
+from the pre-step state. The accepted-step cap is `step-cap`, the attempted-step
+cap is `attempt-cap`, and neither is an escape.
 
 At the finite boundary, use the static Schwarzschild orthonormal frame. With
 `F = 1 - 2M/R`, the outgoing spatial direction is:

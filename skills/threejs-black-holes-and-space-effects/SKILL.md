@@ -32,8 +32,8 @@ Define before authoring the march:
 - the state vector, its integration parameter, its owner, and its valid time;
 - the environment orientation and the orthonormal frame used for escaped-ray
   lookup;
-- horizon, core, disk, shell, proxy-exit, invalid-state, opacity, and step-cap
-  events that apply to the selected branch.
+- horizon, core, disk, shell, proxy-exit, invalid-state, opacity, step-cap, and
+  attempt-cap events that apply to the selected branch.
 
 For metric rays, nondimensionalize with the Ellis throat radius `a` or the
 Schwarzschild mass length `M = G M_SI / c^2`, while retaining the conversion
@@ -73,11 +73,12 @@ The canonical march is:
 5. Accumulate the accepted segment's transfer, then commit exactly one state
    advance and increment the accepted-step count once.
 6. Terminate as `escaped`, `horizon`, `core`, `opaque`, `invalid`,
-   `unresolved-critical`, `minimum-step`, or `step-cap`.
+   `unresolved-critical`, `minimum-step`, `step-cap`, or `attempt-cap`.
 
 The attempt cap bounds divergent work independently of the accepted-step cap.
-A curvature or distance heuristic may propose a step; refinement against a
-tighter solution decides whether it is accurate.
+`step-cap` bounds committed accepted steps; `attempt-cap` bounds accepted plus
+rejected attempts. A curvature or distance heuristic may propose a step;
+refinement against a tighter solution decides whether it is accurate.
 
 **Complete when:** a trace proves one committed advance per accepted step,
 rejected attempts leave physical and event state unchanged, every ray receives

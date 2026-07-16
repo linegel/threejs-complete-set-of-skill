@@ -99,11 +99,17 @@ for subpixel or discontinuous emission. Keep UI and diagnostics outside HDR
 bloom unless the visual contract includes them. After changing the active
 output graph, set `RenderPipeline.needsUpdate = true`.
 
-This step is complete when meter, bloom, exposure, tone map, alpha, and output
-conversion each have one owner and the bloom-off graph is genuinely reachable.
+This step is complete when bloom has one owner, every admitted meter, exposure,
+tone map, alpha operation, and output conversion has one owner, and the
+bloom-off graph is genuinely reachable.
 
 When coupling threshold to exposure or selecting final output ownership, read
 [Exposure, output, and lifecycle](references/hdr-bloom-system.md#exposure-output-and-lifecycle).
+
+Use `$threejs-exposure-color-grading` for exposure-coupled thresholds, tone
+mapping, grading, and output conversion. Use `$threejs-image-pipeline` when the
+scene pass, MRT signals, transparent ordering, or final graph is shared with
+other effects.
 
 ## 6. Measure, degrade, and dispose
 

@@ -77,17 +77,22 @@ reprojection rather than replacing transport.
 
 ## Reprojection
 
-Reconstruct the representative world point and reverse its cloud motion:
+Reconstruct the representative point, map it through the immutable current and
+previous origin/frame transforms, and reverse its cloud motion:
 
 ```text
-xCurrent = rayOrigin + rayDirection*zMean
-xPrevious = advectBackward(xCurrent, macroVelocity, relativeLayerVelocity, dt)
-historyUV = project(previousViewProjection, xPrevious)
+xCurrentRender   = rayOrigin + rayDirection*zMean
+xCurrentPhysics  = currentRenderToPhysics(xCurrentRender)
+xPreviousPhysics = advectBackward(xCurrentPhysics, macroVelocity, relativeLayerVelocity, dt)
+xPreviousRender  = previousPhysicsToRender(xPreviousPhysics)
+historyUV         = project(previousViewProjection, xPreviousRender)
 ```
 
 For changing velocity, integrate or use the same motion approximation that
 advanced the density. Opaque-surface velocity is valid only if it demonstrably
-represents the same advected cloud point.
+represents the same advected cloud point. Version both transforms and set
+history confidence to zero when either mapping is missing, nonfinite, or
+incompatible with the history generation.
 
 Resolve in this order:
 
@@ -122,6 +127,8 @@ confidence, or approaching the maximum accepted ghost age.
 Set history confidence to zero for:
 
 - camera cuts or incompatible view/projection changes;
+- missing or incompatible current-render-to-physics or
+  previous-physics-to-render mappings;
 - depth encoding or interval changes;
 - resolution, render-scale, or history-layout changes;
 - density recipe/seed, layer topology, or discontinuous weather changes;
@@ -130,8 +137,10 @@ Set history confidence to zero for:
   radiance;
 - nonfinite data or a resource generation mismatch.
 
-Ordinary continuous camera/cloud motion should reproject rather than reset.
-Track the reset reason and the current/history resource generations.
+Ordinary continuous camera/cloud motion and a rebase with valid
+current-render-to-physics and previous-physics-to-render mappings should
+reproject rather than reset. Track mapping versions, reset reason, and
+current/history resource generations.
 
 Define depth acceptance from all known uncertainty:
 
@@ -177,6 +186,8 @@ Use deterministic controls:
 - ordinary camera motion with low rejection;
 - camera cut, projection change, topology change, and resolution change with
   confidence exactly zero;
+- floating-origin rebase with a valid mapping, then an incompatible mapping
+  with confidence exactly zero;
 - two separated layers demonstrating the single-depth failure and split-history
   correction;
 - depth encoding round-trip at every admitted interval;
@@ -185,7 +196,8 @@ Use deterministic controls:
 - HDR impulse/topology change measuring ghost decay;
 - repeated resize/tier-switch/reset/dispose cycles.
 
-Record current/history generations, UV, depths, spread, encoding error,
-velocity, rejection reason, response weight, confidence, and upsample weights.
+Record current/history generations, origin-mapping versions, UV, depths,
+spread, encoding error, velocity, rejection reason, response weight,
+confidence, and upsample weights.
 Completion requires reprojection residual, ghost decay, edge leakage, and
 resource lifetime to fit their declared gates.

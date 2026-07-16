@@ -87,10 +87,11 @@ resource has one owner and disposal path.
 
 ## 5. Validate the changed claims
 
-Invoke `threejs-visual-validation` for every preserved or weakened claim. Use
-the canonical evidence as truth, capture final/no-post/contribution and the
-diagnostics needed by those claims, and return `PASS`, `FAIL`, or
-`INSUFFICIENT_EVIDENCE` per claim.
+Invoke `$threejs-visual-validation` for every preserved or weakened claim. Use
+the canonical evidence as truth. For visual or mechanism claims, capture the
+final/no-post/contribution views needed to isolate the cause; for temporal,
+performance, resource, or lifecycle claims, capture only their producing trace
+and diagnostics. Return `PASS`, `FAIL`, or `INSUFFICIENT_EVIDENCE` per claim.
 
 Exercise the branch-specific reset, resize/DPR, repeated transition, teardown,
 and dispose/recreate paths. Persistent resources must plateau after declared

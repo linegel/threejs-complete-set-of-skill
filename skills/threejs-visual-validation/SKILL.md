@@ -49,7 +49,7 @@ if ( renderer.backend.isWebGPUBackend !== true ) {
 ```
 
 Record the blocker when canonical WebGPU is unavailable. Reach
-`threejs-compatibility-fallbacks` only when the user explicitly asks for that
+`$threejs-compatibility-fallbacks` only when the user explicitly asks for that
 branch.
 
 This step is complete when the run can be repeated from the recorded state and
@@ -59,11 +59,13 @@ initialized backend truth is captured rather than inferred.
 
 Capture the real pipeline under the frozen state:
 
-- final output;
-- no-post output;
-- the subject or effect contribution;
+- for visual or mechanism claims, the final, no-post, and contribution views
+  required to isolate the claimed cause;
 - only the depth, normal, velocity, field, history, mask, resource, or pass
   diagnostics needed by declared claims;
+- for performance, GPU-attribution, resource, or lifecycle claims without a
+  visual/mechanism claim, only the producing trace and diagnostics required by
+  that claim;
 - the pass/dispatch ownership graph, including histories and reset edges.
 
 Keep HDR work scene-linear until one tone-map/output-transform owner. Diagnostic

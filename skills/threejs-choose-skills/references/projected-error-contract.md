@@ -7,6 +7,10 @@ resolution, or field-band selection is justified by screen error.
 
 Record all inputs with `Authored`, `Derived`, `Gated`, or `Measured` status:
 
+`Authored` is a chosen source value; `Derived` is reproducibly computed from
+named inputs; `Gated` is an acceptance bound that must pass before selection;
+`Measured` is target evidence captured from the running composition.
+
 - actual physical render-target width/height after DPR and pass scale, not CSS
   dimensions;
 - unjittered camera projection for stable selection, plus every eye/view;

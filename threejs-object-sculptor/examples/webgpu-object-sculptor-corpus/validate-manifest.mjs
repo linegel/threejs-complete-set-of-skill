@@ -27,7 +27,6 @@ const EXPECTED_TARGET_IDS = Object.freeze([
   "ceramic-teapot",
 ]);
 const EXPECTED_DEEP_COMMANDS = Object.freeze({
-  specs: "npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run validate:specs",
   targets: "npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run validate:targets",
   unit: "npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run validate:unit",
   generateRoutes: "npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run generate:routes",
@@ -631,7 +630,7 @@ function validateCorpusDeepContractShape(corpus) {
   requireStringArray(visual.acceptedScenarios, "corpus.visualAcceptance.acceptedScenarios", { unique: true });
   requireText(visual.reason, "corpus.visualAcceptance.reason");
 
-  exactKeys(corpus.commands, ["specs", "targets", "unit", "generateRoutes", "routes"], "corpus.commands");
+  exactKeys(corpus.commands, ["targets", "unit", "generateRoutes", "routes"], "corpus.commands");
   for (const [id, command] of Object.entries(corpus.commands)) {
     requireText(command, `corpus.commands.${id}`);
     assert.equal(command, EXPECTED_DEEP_COMMANDS[id], `corpus.commands.${id} drifted from the package script entry point`);
@@ -1277,7 +1276,7 @@ export function validateCorpusManifest() {
   assert.equal(corpus.defaultStartup.camera, "design");
   assert.equal(corpus.defaultStartup.seed, 1);
   assert.deepEqual(corpus.physicalRouteContract.dimensions, { scenario: 3, mechanism: 5, tier: 3, camera: 4 });
-  exact(Object.keys(corpus.commands), ["specs", "targets", "unit", "generateRoutes", "routes"], "deep command names");
+  exact(Object.keys(corpus.commands), ["targets", "unit", "generateRoutes", "routes"], "deep command names");
 
   assert.equal(corpus.renderArchitecture?.renderer, "WebGPURenderer");
   assert.equal(corpus.renderArchitecture?.requiredBackend, "native WebGPU");
