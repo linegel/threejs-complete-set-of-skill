@@ -1,1 +1,0 @@
-../../../threejs-object-sculptor/scripts/validate_sculpt_spec.py

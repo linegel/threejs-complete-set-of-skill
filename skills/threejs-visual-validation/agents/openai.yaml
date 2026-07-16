@@ -1,0 +1,4 @@
+interface:
+  display_name: "Three.js Visual Validation"
+  short_description: "Validate Three.js graphics with direct evidence"
+  default_prompt: "Use $threejs-visual-validation to define falsifiable claims, capture their producing mechanisms, and return evidence-scoped PASS, FAIL, or INSUFFICIENT_EVIDENCE verdicts."

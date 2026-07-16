@@ -1,1 +1,0 @@
-../../../threejs-object-sculptor/scripts/visual_feature_gate.py

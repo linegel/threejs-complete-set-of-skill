@@ -1,0 +1,4 @@
+interface:
+  display_name: "Three.js Procedural Planets"
+  short_description: "Build body-scale procedural planet systems"
+  default_prompt: "Use $threejs-procedural-planets to choose a cube-sphere, tangent clipmap, hybrid, or gas-deck representation and verify shared fields, LOD, and surface handoffs."

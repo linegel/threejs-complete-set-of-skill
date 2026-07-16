@@ -1,0 +1,4 @@
+interface:
+  display_name: "Three.js Ambient Contact Shading"
+  short_description: "Add grounded ambient visibility and GTAO"
+  default_prompt: "Use $threejs-ambient-contact-shading to choose between authored AO and dynamic GTAO, then verify indirect-light placement, reconstruction, stability, and cost."

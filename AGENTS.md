@@ -1,7 +1,8 @@
 # Three.js WebGPU/TSL skill repository
 
-This checkout is the authoritative local source for the `threejs-*` skills,
-their examples, validation harnesses, and generated documentation.
+This checkout is the authoritative local source for the installable skills under
+`skills/`, plus their repository examples, validation harnesses, and generated
+documentation.
 
 ## Codex state and workflow
 
@@ -26,10 +27,10 @@ their examples, validation harnesses, and generated documentation.
 ## Skill routing
 
 - When a task names or matches a `threejs-*` skill, read that repo-local
-  `<skill>/SKILL.md` before acting. The copy in this repository wins over a
+  `skills/<skill>/SKILL.md` before acting. The copy in this repository wins over a
   global copy.
 - When a task spans multiple rendering systems, start with
-  `threejs-choose-skills/SKILL.md` and load only the smallest set it selects.
+  `skills/threejs-choose-skills/SKILL.md` and load only the smallest set it selects.
 - Follow references and scripts named by the selected skill. Do not load every
   skill or demo as general context.
 - Checked-in source, examples, tests, manifests, and skill instructions are the

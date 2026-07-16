@@ -1,0 +1,4 @@
+interface:
+  display_name: "Three.js Particles, Trails, and Effects"
+  short_description: "Build particles, trails, debris, and wakes"
+  default_prompt: "Use $threejs-particles-trails-and-effects to choose analytic or recurrent particle state, stable slots or compaction, and verify identity, depth, HDR, and budget."

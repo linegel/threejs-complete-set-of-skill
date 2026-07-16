@@ -1,0 +1,4 @@
+interface:
+  display_name: "Three.js Procedural Fields"
+  short_description: "Author deterministic shared procedural fields"
+  default_prompt: "Use $threejs-procedural-fields to define one deterministic, unit-bearing causal field, choose direct or stored evaluation, and verify filtering, parity, invalidation, and ownership."

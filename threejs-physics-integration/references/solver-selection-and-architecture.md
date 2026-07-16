@@ -1,207 +1,92 @@
-# Solver Selection And Architecture
+# Solver Selection and Architecture
 
-## Contents
+Select the smallest mechanism that satisfies the observable. Freeze its units,
+frames, time interval, supported interactions, error limits, target device, and
+failure behavior before choosing an engine.
 
-- Problem record
-- Five-solution comparison
-- Query and collision representations
-- Broadphase selection
-- Narrowphase selection
-- CCD selection
-- Constraint and contact selection
-- Residency and scheduling
-- Low-end/mobile controls
-- Validation matrix
+## Solver boundaries
 
-## Problem record
+| Family | Use when | Boundary |
+| --- | --- | --- |
+| Analytic or query-only | The result is a ray, overlap, distance, sweep, or field sample. | No integrated physical state or impulse response. |
+| Authored kinematic | Motion is directed and force response is outside the observable. | Contacts are queries or explicitly bounded authored reactions. |
+| Local CPU solver | General rigid contact and constraints have host-side consumers. | GPU coupling must tolerate upload or delayed diagnostic readback. |
+| GPU specialist | A bounded equation and its consumers are GPU-resident. | The implementation owns scans, barriers, capacity, recovery, and numerical validation. |
+| External solver | Mature collision, joints, vehicles, soft bodies, or another authority is required. | One adapter owns conversion, synchronization, completion, recovery, and version compatibility. |
+| Offline recording | Live response is unnecessary. | Interpolation and compression error remain inside the observable's limits. |
 
-Freeze this record before scoring algorithms:
+Body count alone does not select a family. Use the worst relevant contact
+island, shape population, motion, coupling, memory, synchronization tail, and
+sustained target cost.
 
-```yaml
-physicsDecisionProblem:
-  problemId: stable-id
-  observable: exact user-visible or quantitative behavior
-  truthContract: metric | physically-plausible | authored-kinematic | query-only
-  unitsFrameClock: canonical SI, registered proper frame, versioned clock
-  bodyAndShapePopulation: counts, shape kinds, static/kinematic/dynamic split
-  topologyAndMotion: convexity, deformation, maximum speed/rotation, lifespan
-  queryAndContactNeeds: ray, overlap, distance, sweep, contact, constraints
-  coupling: none | one-way | two-way-explicit | two-way-iterated | external
-  target: device/browser/GPU, refresh, memory, latency, sustained protocol
-  hardGates: capability, error, conservation, stability, memory, latency
-  evidenceAvailable: source proof, numerical oracle, Browser route, timing
-```
+## Representation boundaries
 
-Every numerical gate uses `{ value, unit, label, source }`. Counts that are
-structural fixture identities may remain integers; budgets and thresholds may
-not.
+Keep each representation independent even when several derive from one source:
 
-## Five-solution comparison
+| Representation | Owns |
+| --- | --- |
+| Render surface | Appearance, shading topology, and visual LOD. |
+| Query proxy | Rays, overlaps, closest points, sweeps, or field samples. |
+| Collider | Exclusion geometry, filtering, material law, and feature identity. |
+| Support surface | Placement or locomotion height/point, normal, surface velocity, validity interval, and approximation error. |
+| Integration model | Mass, center of mass, inertia, generalized coordinates, and state equations. |
 
-Compare at least five materially different solutions. A normal dynamic-body
-decision starts with:
+Primitive and convex proxies suit moving contact when their approximation error
+is acceptable. Convex compounds preserve bounded concavity at additional pair
+cost. Triangle meshes normally serve static or chunk-stable geometry. A field
+or SDF is suitable only where distance, gradient, support, update, and filtering
+errors are declared. Visual LOD may change without changing physical identity.
 
-| Candidate | Best fit | Principal cost | Principal failure |
-| --- | --- | --- | --- |
-| Analytic/query provider | static or low-count exact queries | pair-specific code | no general dynamics |
-| Authored kinematic | directed motion with bounded contacts | authoring and query updates | no force response |
-| CPU local solver | moderate body/contact set, host consumers | traversal/contact tail | GPU coupling may require staging |
-| GPU specialist | dense bounded, GPU-coupled state | scans, barriers, hot bytes | complexity and weak small-set efficiency |
-| External solver adapter | mature general rigid/constraint feature set | boundary synchronization and lifecycle | missing channels/ownership proof |
-| Offline/recorded | high-fidelity noninteractive result | storage and interpolation | no live interaction |
+Keep collider, entity, shape, feature, and material identities stable across
+batching, compaction, sleeping, and LOD. Physical density, friction,
+restitution, compliance, and filters belong to the physical model rather than
+the render material.
 
-Score truth fidelity, target cost, integration simplicity, determinism,
-recovery, and evidence feasibility from 0 to 5. Higher simplicity means lower
-integration risk. Freeze weights first. A failed hard gate makes a candidate
-ineligible regardless of score.
+## Contact versus support
 
-## Query and collision representations
+A support query answers where a surface is, how it moves, when the sample is
+valid, and how wrong it may be. It can drive placement, foot targets, suspension
+queries, or authored locomotion without creating a collision response.
 
-Keep render and physics representations independent:
+A contact owns a body pair, signed separation or time of impact, normal,
+contact points and feature identities, material law, begin/persist/end
+lifecycle, and the reaction applied to the state equations. Broadphase overlap
+is only a contact candidate. Source geometry may be shared while each consumer
+keeps its own semantics.
 
-| Representation | Strength | Weakness | Use when |
-| --- | --- | --- | --- |
-| sphere/capsule/box/plane | exact, compact, cheap sweep | limited shape fidelity | proxy error stays inside gate |
-| convex hull | robust support mapping and inertia | loses concavity | dynamic contact is primary |
-| convex compound | preserves bounded concavity | more proxies/pairs | semantic parts justify cost |
-| static triangle BVH | exact surface topology for rays/contact | dynamic update is expensive | environment is static or chunk-stable |
-| heightfield | compact terrain support | overhangs impossible | single-valued support is valid |
-| SDF/field | distance/gradient queries and deformation | sampling/filter error, memory | field is already authoritative |
-| external/native shape | solver-specific optimized path | opaque portability | adapter exposes revision/error/lifecycle |
+## Algorithm boundaries
 
-For every proxy record position/rotation source, validity interval, swept
-bounds, one-sidedness, closedness, material, filter, feature IDs, residency,
-and approximation error. Visual LOD never silently changes collider identity.
+- **Broadphase:** use bounded all-pairs for genuinely small sets,
+  sweep-and-prune for coherent separation, trees for sparse incremental worlds,
+  grids for bounded local sizes, and LBVH/Morton rebuilds for parallel dense
+  populations. Swept bounds must retain every required pair over the interval.
+- **Narrowphase:** use analytic pairs, SAT, GJK with a separate penetration
+  method, mesh-BVH traversal, or field contact according to supported shapes.
+  Declare degeneracy, iteration, tolerance, and unsupported-pair behavior.
+- **Continuous collision:** select swept analytic tests, conservative
+  advancement, continuous SAT, speculative contact, or bounded substeps from
+  motion and feature size. Substeps alone are not general CCD.
+- **Constraints:** select sequential impulses, temporal refinement, XPBD,
+  direct small-system solves, or an external owner from graph topology, mass
+  ratios, compliance, stacking, loops, and residual limits.
 
-## Broadphase selection
+Sleeping is a state transition. Its quiet threshold, residence time, wake
+sources, island propagation, identity continuity, and deterministic ordering
+must be explicit. Base it on physical signals independent of camera visibility.
 
-Evaluate at least five choices for nontrivial populations:
+## Residency, coupling, and evidence
 
-1. bounded all-pairs: best for very small sets; exact cost is `n(n-1)/2` pair
-   tests `[Derived]`;
-2. sweep-and-prune: strong temporal coherence and axis separation; degrades
-   under rotations, clustering, or a poor sweep axis;
-3. dynamic AABB tree: general sparse worlds and incremental updates; measure
-   refit, reinsertion, traversal, and imbalance;
-4. uniform/hashed grid: bounded-size local objects and predictable domains;
-   measure large-object duplication, hash collisions, cell overflow, and empty
-   scan work;
-5. LBVH/Morton hierarchy: parallel rebuild-friendly GPU populations; measure
-   key generation, radix sort, hierarchy construction, traversal, and barriers;
-6. domain-specialized active tiles: fluids/terrain/contact regions already use
-   sparse tiles; measure activation, halo, compaction, and capacity.
+Keep authoritative state near its frame-critical consumers. A CPU/GPU or
+external boundary must name the producer, consumer, interval, ownership
+transfer, completion condition, and stale-data behavior. Keep the
+frame-critical GPU path resident and use delayed readback for diagnostics.
 
-The broadphase output is only a candidate-pair set. Prove no required pair is
-lost under swept bounds and motion over the full coordination interval.
+One-way coupling is valid only when omitted reaction is bounded. Two-way
+coupling applies source and reaction over the same interval and commits both or
+neither. Iterated coupling must have a fixed convergence and failure bound.
 
-## Narrowphase selection
-
-Compare analytic pair tests, SAT, GJK plus EPA/MPR, triangle BVH traversal,
-and field/SDF contact. Record supported shape pairs and exact fallback policy.
-
-- GJK distance/intersection needs a bounded iteration and nonconvergence
-  disposition. EPA/MPR penetration is a separate capability.
-- SAT needs stable axes and robust tolerances; box/polytope convenience does
-  not generalize to arbitrary smooth shapes.
-- Mesh contact needs feature identity, one-sidedness, adjacency policy,
-  degeneracy handling, and persistent manifold reduction.
-- Field contact needs gradient validity, conservative sampling error, and a
-  rule for flat/non-differentiable regions.
-
-Freeze scale-aware tolerances in metres/radians. Do not use one epsilon across
-world scales or derive it from the render camera.
-
-## CCD selection
-
-Compare at least:
-
-1. exact swept analytic tests for supported primitive pairs;
-2. conservative advancement from distance/support queries;
-3. continuous SAT for compatible polytopes;
-4. speculative contacts with a bounded false-positive/error model;
-5. adaptive substepping under a motion/feature-size gate;
-6. explicit unsupported pairs with visible route rejection.
-
-CCD is not `more substeps`. State the swept interval, angular-motion bound,
-time-of-impact convention, grazing/touch policy, iteration bound, starting
-overlap behavior, and transition into discrete contact. High-speed stress must
-cross the thinnest admitted feature.
-
-## Constraint and contact selection
-
-Compare sequential impulses/PGS, TGS-style temporal refinement, XPBD, a direct
-small-system solve, and an external solver. Score the actual constraint graph:
-contact/friction rows, joints, compliance, mass ratios, stacking, loops, warm
-starts, and determinism.
-
-Persistent contact owns begin/persist/end state, point/feature IDs, pair-law
-versions, tangent basis, warm starts, friction/adhesion state, and emitted
-interactions. Build islands from the declared constraint graph. Measure the
-largest island and stress topology; average island size is insufficient.
-
-Sleeping requires:
-
-- translational/angular energy or velocity gates with units;
-- minimum quiet residence;
-- wake on force, impulse, kinematic contact, support change, material-law
-  change, interaction receipt, and relevant field forcing;
-- island-wide deterministic propagation;
-- cursor and presentation continuity;
-- no camera-visibility dependency.
-
-## Residency and scheduling
-
-Choose CPU, GPU, mirrored, or external residency from consumers and update
-paths. Compare at least:
-
-1. host-authoritative with GPU upload;
-2. GPU-authoritative with GPU presentation;
-3. CPU/GPU mirrored with delayed diagnostic mirror;
-4. shared GPU resource with explicit ownership transitions;
-5. external process/device copy or message transport.
-
-Include hot-state bytes, interaction queues, broadphase/contact scratch,
-previous/current presentation handles, frames in flight, checkpoints, and
-old/new migration overlap. No frame-critical readback is allowed. A same-queue
-consumer still needs a pass/dispatch boundary and resource-generation proof.
-
-The graph owns catch-up. For every presentation opportunity record exact
-coordination advances, native substeps, loop iterations, interactions,
-dispatches, traffic, and dependency critical paths. Do not add independent
-stage percentiles.
-
-## Low-end/mobile controls
-
-Prefer controls that preserve physical identity and observables:
-
-- simpler/versioned collision proxies;
-- fewer inactive broadphase updates, not hidden active-body loss;
-- stable grids/trees and dirty-range updates;
-- bounded contact/manifold capacity with fail-visible overflow;
-- lower solver iterations only under residual/error gates;
-- lower cadence only through `QualityTransition` with interpolation/error;
-- island sleeping with complete wake semantics;
-- batched queries/interactions and persistent buffers;
-- GPU specialization only after composed evidence beats CPU/external routes;
-- minimal render attachments and no duplicate physics presentation buffers.
-
-Measure sustained Full/Budgeted/Minimum states on named targets. Mobile claims
-without a mobile-capable measurement route remain architecture models, not
-measured acceptance.
-
-## Validation matrix
-
-Require positive and rejection fixtures for:
-
-- five-candidate decision closure and stable winner;
-- SI, proper frame, polar/axial, and clock round trips;
-- broadphase pair completeness and permutation invariance;
-- narrowphase analytic oracle and degeneracies;
-- CCD thin-feature crossing and starting overlap;
-- manifold lifecycle, warm-start invalidation, and pair-law latching;
-- constraint residual, energy/dissipation, stacking, loops, and mass ratio;
-- sleep/wake sources and deterministic island propagation;
-- exact-once rate/integral interactions and rollback;
-- external synchronization, failure, recovery, and cost tail;
-- immutable presentation and resource lease retirement;
-- target-bound sustained CPU/GPU/presentation/memory evidence.
+Accept a route only after the evidence that matters to its branch is direct:
+query oracles for query providers, pair-completeness tests for broadphases,
+degenerate and analytic cases for narrowphases, thin-feature crossings for CCD,
+residual and energy checks for constraints, lifecycle checks for contacts, and
+sustained end-to-end measurements for residency decisions.

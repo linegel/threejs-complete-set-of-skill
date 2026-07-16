@@ -1,1 +1,0 @@
-../../threejs-physics-integration/SKILL.md

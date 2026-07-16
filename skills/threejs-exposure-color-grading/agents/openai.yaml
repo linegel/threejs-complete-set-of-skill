@@ -1,0 +1,4 @@
+interface:
+  display_name: "Three.js Exposure and Color Grading"
+  short_description: "Meter, adapt, tone-map, and grade HDR images"
+  default_prompt: "Use $threejs-exposure-color-grading to choose fixed or automatic exposure, implement GPU adaptation when needed, and place tone mapping, LUT grading, and output conversion exactly once."

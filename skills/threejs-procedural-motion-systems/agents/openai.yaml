@@ -1,0 +1,4 @@
+interface:
+  display_name: "Three.js Procedural Motion Systems"
+  short_description: "Build deterministic motion and frame handoffs"
+  default_prompt: "Use $threejs-procedural-motion-systems to choose analytic, fixed-step recurrent, or perceptual motion, then preserve deterministic clocks, frame-safe transforms, and reset ownership."

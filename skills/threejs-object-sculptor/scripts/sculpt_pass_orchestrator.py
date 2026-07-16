@@ -1,1 +1,0 @@
-../../../threejs-object-sculptor/scripts/sculpt_pass_orchestrator.py

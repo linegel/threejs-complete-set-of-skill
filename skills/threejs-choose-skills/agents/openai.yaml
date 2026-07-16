@@ -1,0 +1,4 @@
+interface:
+  display_name: "Three.js Skill Router"
+  short_description: "Route multi-system WebGPU/TSL work"
+  default_prompt: "Use $threejs-choose-skills to select the smallest causal skill set and assign shared resources, cross-system handoffs, and final-output ownership."

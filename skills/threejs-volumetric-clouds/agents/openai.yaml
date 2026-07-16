@@ -1,0 +1,4 @@
+interface:
+  display_name: "Three.js Volumetric Clouds"
+  short_description: "Build bounded, weather-shaped volumetric clouds"
+  default_prompt: "Use $threejs-volumetric-clouds to build weather-shaped bounded density, select marching, shadow, and temporal branches, and verify optical, lifecycle, and error bounds."

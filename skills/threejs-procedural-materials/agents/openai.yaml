@@ -1,0 +1,4 @@
+interface:
+  display_name: "Three.js Procedural Materials"
+  short_description: "Build coherent procedural PBR materials"
+  default_prompt: "Use $threejs-procedural-materials to drive coherent PBR slots from shared identities and causes, choose the cheapest valid mapping and filtering, and preserve one output conversion."

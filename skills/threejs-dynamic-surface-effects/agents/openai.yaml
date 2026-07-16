@@ -1,0 +1,4 @@
+interface:
+  display_name: "Three.js Dynamic Surface Effects"
+  short_description: "Build persistent frost, touch, and thaw effects"
+  default_prompt: "Use $threejs-dynamic-surface-effects to choose full-field, sparse, or idle screen-space history updates and verify time invariance, ping-pong ownership, composition, and lifecycle."

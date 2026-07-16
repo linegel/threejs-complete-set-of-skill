@@ -1,0 +1,4 @@
+interface:
+  display_name: "Three.js Procedural Creatures"
+  short_description: "Build procedural creatures, rigs, and populations"
+  default_prompt: "Use $threejs-procedural-creatures to choose and verify the generated body, semantic rig or locomotion, and repeated-population representations this request needs."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Three.js Procedural Vegetation"
+  short_description: "Generate deterministic terrain-aware vegetation"
+  default_prompt: "Use $threejs-procedural-vegetation to compile deterministic terrain-aware placement, tree or ground-cover geometry, projected-error LOD, and rooted dynamic response."

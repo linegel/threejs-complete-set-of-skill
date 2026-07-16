@@ -1,0 +1,4 @@
+interface:
+  display_name: "Three.js Camera Controls and Rigs"
+  short_description: "Build deterministic camera rigs and handoffs"
+  default_prompt: "Use $threejs-camera-controls-and-rigs to design a one-writer camera rig with valid framing, control handoffs, temporal resets, and large-world precision where needed."

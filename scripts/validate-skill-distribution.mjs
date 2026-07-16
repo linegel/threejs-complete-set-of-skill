@@ -1,150 +1,158 @@
 #!/usr/bin/env node
-import {
-  existsSync,
-  lstatSync,
-  readFileSync,
-  readdirSync,
-  realpathSync
-} from 'node:fs';
+import { existsSync, lstatSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const distributionRoot = join(root, 'skills');
-
+const productRoot = join(root, 'skills');
 const fail = (message) => {
-  console.error(`skill distribution validation failed: ${message}`);
+  console.error(`skill product validation failed: ${message}`);
   process.exit(1);
 };
-
 const sorted = (values) => [...values].sort();
 const same = (left, right) => JSON.stringify(sorted(left)) === JSON.stringify(sorted(right));
-const isWithin = (parent, child) => child === parent || child.startsWith(`${parent}${sep}`);
-const isProductResourcePath = (path) => {
-  if (!isWithin(root, path)) return false;
-  const segments = relative(root, path).split(sep);
-  if (!skillNames.includes(segments[0])) return false;
-  if (segments[1] === 'SKILL.md') return segments.length === 2;
-  if (!['assets', 'references', 'scripts'].includes(segments[1])) return false;
-  return !(segments[1] === 'scripts' && segments.at(-1).startsWith('test_'));
+const within = (parent, child) => child === parent || child.startsWith(`${parent}${sep}`);
+
+const manifest = JSON.parse(readFileSync(join(root, 'skills.sh.json'), 'utf8'));
+const roster = manifest.groupings.flatMap((group) => group.skills);
+const rosterSet = new Set(roster);
+if (roster.length !== 27 || rosterSet.size !== roster.length) {
+  fail(`skills.sh.json must name 27 unique public skills; found ${roster.length}`);
+}
+if (roster.includes('threejs-physics-integration')) fail('experimental physics is not a public skill');
+if (!existsSync(productRoot) || !lstatSync(productRoot).isDirectory() || lstatSync(productRoot).isSymbolicLink()) {
+  fail('skills/ must be a real directory');
+}
+if (existsSync(join(root, 'plugins', 'threejs-object-sculptor'))) {
+  fail('duplicate Object Sculptor plugin must remain retired');
+}
+
+const entries = readdirSync(productRoot, { withFileTypes: true });
+const skillNames = entries.filter((entry) => entry.isDirectory()).map((entry) => entry.name);
+const invalidEntries = entries.filter((entry) => !entry.isDirectory() || entry.isSymbolicLink());
+if (invalidEntries.length) fail(`skills/ contains non-directory entries: ${invalidEntries.map((e) => e.name).join(', ')}`);
+if (!same(skillNames, roster)) fail('skills/ directories must exactly match the skills.sh.json roster');
+
+for (const entry of readdirSync(root, { withFileTypes: true })) {
+  if (entry.isDirectory() && entry.name.startsWith('threejs-') && existsSync(join(root, entry.name, 'SKILL.md'))) {
+    fail(`${entry.name}/SKILL.md is a competing installer entrypoint`);
+  }
+}
+
+const frontmatter = (text, path) => {
+  const block = text.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n/);
+  if (!block) fail(`${path} has no YAML frontmatter`);
+  return Object.fromEntries(block[1].split(/\r?\n/).flatMap((line) => {
+    const field = line.match(/^([A-Za-z0-9_-]+):\s*(.*)$/);
+    return field ? [[field[1], field[2].replace(/^["']|["']$/g, '')]] : [];
+  }));
 };
 
-const skillNames = readdirSync(root, { withFileTypes: true })
-  .filter((entry) => entry.isDirectory() && entry.name.startsWith('threejs-'))
-  .map((entry) => entry.name);
-
-if (!existsSync(distributionRoot)) fail('skills/ product projection is missing; run npm run skills:sync');
-const distributedNames = readdirSync(distributionRoot, { withFileTypes: true })
-  .filter((entry) => entry.isDirectory())
-  .map((entry) => entry.name);
-if (!same(skillNames, distributedNames)) {
-  fail('skills/ projection does not exactly match the top-level threejs-* product set');
-}
-
-const forbiddenProductEntries = new Set([
-  '.agent', 'EXPERIMENTAL', 'examples', 'node_modules', 'plan.md', 'review.md', 'tests'
-]);
-const allowedEntries = new Set(['SKILL.md', 'assets', 'references', 'scripts']);
-
-const visitProductTree = (path, sourceRoot) => {
-  for (const entry of readdirSync(path, { withFileTypes: true })) {
-    const entryPath = join(path, entry.name);
-    if (entry.isSymbolicLink()) fail(`${relative(root, entryPath)} contains an unapproved nested symlink`);
-    if (!isWithin(sourceRoot, realpathSync(entryPath))) {
-      fail(`${relative(root, entryPath)} escapes its skill product root`);
-    }
-    if (entry.isDirectory()) visitProductTree(entryPath, sourceRoot);
-  }
+const localTargets = (text) => {
+  const targets = [];
+  for (const match of text.matchAll(/!?\[[^\]]*\]\(([^)]+)\)/g)) targets.push(match[1]);
+  for (const match of text.matchAll(/`((?:references|scripts)\/[^`\s]+\.(?:md|py))`/g)) targets.push(match[1]);
+  return targets;
 };
 
-for (const skillName of skillNames) {
-  const sourceRoot = realpathSync(join(root, skillName));
-  const projectedRoot = join(distributionRoot, skillName);
-  for (const entry of readdirSync(projectedRoot, { withFileTypes: true })) {
-    if (forbiddenProductEntries.has(entry.name) || !allowedEntries.has(entry.name)) {
-      fail(`${relative(root, join(projectedRoot, entry.name))} is not a product resource`);
-    }
-    const entryPath = join(projectedRoot, entry.name);
-    if (entry.name === 'scripts' && entry.isDirectory()) {
-      for (const script of readdirSync(entryPath, { withFileTypes: true })) {
-        if (!script.isSymbolicLink() || script.name.startsWith('test_')) {
-          fail(`${relative(root, join(entryPath, script.name))} is not an approved product helper link`);
-        }
-        const resolvedScript = realpathSync(join(entryPath, script.name));
-        if (!isWithin(sourceRoot, resolvedScript)) {
-          fail(`${relative(root, join(entryPath, script.name))} resolves outside ${skillName}`);
-        }
-      }
-      continue;
-    } else if (!entry.isSymbolicLink()) {
-      fail(`${relative(root, entryPath)} must be a generated product link`);
-    }
-    const resolved = realpathSync(entryPath);
-    if (!isWithin(sourceRoot, resolved)) {
-      fail(`${relative(root, entryPath)} resolves outside ${skillName}`);
-    }
-    if (lstatSync(resolved).isDirectory()) visitProductTree(resolved, sourceRoot);
+const interfaceMetadata = (text, path) => {
+  const lines = text.split(/\r?\n/).filter(Boolean);
+  if (lines[0] !== 'interface:') fail(`${path} must contain one interface mapping`);
+  const fields = Object.fromEntries(lines.slice(1).flatMap((line) => {
+    const field = line.match(/^  (display_name|short_description|default_prompt):\s*["'](.+)["']$/);
+    return field ? [[field[1], field[2]]] : [];
+  }));
+  if (lines.length !== 4 || Object.keys(fields).length !== 3) {
+    fail(`${path} must define only display_name, short_description, and default_prompt`);
   }
-}
-
-const packageJson = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
-if (Object.hasOwn(packageJson, 'main')) fail('package.json must not advertise a nonexistent JavaScript main');
-if (packageJson.scripts?.test !== 'npm run skills:check') {
-  fail('root npm test must be the skill-product gate only');
-}
-if (packageJson.scripts?.['skills:pack'] !== 'npm run skills:check && npm pack') {
-  fail('skills:pack must depend only on skills:check');
-}
-const packageFiles = packageJson.files ?? [];
-for (const pattern of packageFiles) {
-  if (/(?:^|\/)(?:examples|labs|integration-labs|tests|docs|evidence|artifacts)(?:\/|$)/.test(pattern)) {
-    fail(`package allowlist leaks non-product contour: ${pattern}`);
-  }
-}
-for (const requiredPattern of [
-  'skills/**',
-  'threejs-*/SKILL.md',
-  'threejs-*/references/**',
-  'threejs-*/assets/**',
-  'skills.sh.json'
-]) {
-  if (!packageFiles.includes(requiredPattern)) fail(`package allowlist omits ${requiredPattern}`);
-}
+  return fields;
+};
 
 const forbiddenGuidance = [
-  [/labs\/schema\/evidence-bundle/i, 'repo evidence schema'],
-  [/lab\.manifest\.json/i, 'lab manifest acceptance contract'],
-  [/\bnpm\s+--prefix\s+threejs-/i, 'repository example command'],
-  [/\bfrom the repository root\b/i, 'repository-root command'],
-  [/\bCodex(?:'s)? in-app Browser\b/i, 'Codex UI automation surface'],
-  [/\bPlaywright capture harness\b/i, 'repository capture harness'],
-  [/\bthis repository roster\b/i, 'repository roster'],
-  [/\brepository's `\[Gated\]/i, 'repository release label'],
-  [/\bevidence bundles? (?:the|that) [^\n]*lab emits\b/i, 'lab evidence bundle requirement'],
-  [/\b(?:candidate|signoff)\s*(?:→|->)\s*(?:signoff|promotion)\b/i, 'repository promotion pipeline']
+  [/\bPhysics(?:Context|Graph|SignalDescriptor|PresentationSnapshot|CostLedger)\b/, 'retired physics ABI'],
+  [/physics-domain-and-interaction-contract|physics-interchange-abi/i, 'retired physics contract'],
+  [/threejs-physics-integration/i, 'experimental skill route'],
+  [/lab\.manifest\.json|labs\/schema\/evidence-bundle/i, 'repository lab contract'],
+  [/\bnpm\s+--prefix\s+threejs-|\bfrom the repository root\b/i, 'repository-only command'],
+  [/\bCodex(?:'s)? in-app Browser\b|Playwright capture harness/i, 'repository QA surface'],
 ];
+const allowedRootEntries = new Set(['SKILL.md', 'LICENSE', 'agents', 'references', 'scripts']);
+let files = 0;
+let bytes = 0;
+let lines = 0;
 
 for (const skillName of skillNames) {
-  const markdownPaths = [join(root, skillName, 'SKILL.md')];
-  const referencesRoot = join(root, skillName, 'references');
-  for (const entry of readdirSync(referencesRoot, { withFileTypes: true })) {
-    if (entry.isFile() && entry.name.endsWith('.md')) markdownPaths.push(join(referencesRoot, entry.name));
+  const skillRoot = join(productRoot, skillName);
+  const rootEntries = readdirSync(skillRoot, { withFileTypes: true });
+  const unexpected = rootEntries.filter((entry) => !allowedRootEntries.has(entry.name));
+  if (unexpected.length) fail(`${skillName} contains non-product entries: ${unexpected.map((e) => e.name).join(', ')}`);
+  for (const required of ['SKILL.md', 'LICENSE', 'agents/openai.yaml']) {
+    const path = join(skillRoot, required);
+    if (!existsSync(path) || !lstatSync(path).isFile()) fail(`${skillName}/${required} is missing`);
   }
-  for (const markdownPath of markdownPaths) {
-    const text = readFileSync(markdownPath, 'utf8');
+
+  const productFiles = [];
+  const walk = (path) => {
+    for (const entry of readdirSync(path, { withFileTypes: true })) {
+      const child = join(path, entry.name);
+      if (entry.isSymbolicLink()) fail(`${relative(root, child)} is a symlink`);
+      if (entry.isDirectory()) walk(child);
+      else if (entry.isFile()) productFiles.push(child);
+      else fail(`${relative(root, child)} is not a regular product file`);
+    }
+  };
+  walk(skillRoot);
+
+  const skillPath = join(skillRoot, 'SKILL.md');
+  const skillText = readFileSync(skillPath, 'utf8');
+  const metadata = frontmatter(skillText, `${skillName}/SKILL.md`);
+  if (!same(Object.keys(metadata), ['name', 'description'])) fail(`${skillName}/SKILL.md frontmatter must contain only name and description`);
+  if (metadata.name !== skillName) fail(`${skillName}/SKILL.md declares name ${metadata.name || '(missing)'}`);
+  if (!metadata.description || metadata.description.length < 30) fail(`${skillName}/SKILL.md has no useful description`);
+  if (metadata['disable-model-invocation'] === 'true') fail(`${skillName} must remain model-invoked`);
+  const uiPath = join(skillRoot, 'agents', 'openai.yaml');
+  const uiText = readFileSync(uiPath, 'utf8');
+  const ui = interfaceMetadata(uiText, `${skillName}/agents/openai.yaml`);
+  if (ui.short_description.length < 25 || ui.short_description.length > 64) fail(`${skillName}/agents/openai.yaml has an invalid short description`);
+  if (!ui.default_prompt.startsWith(`Use $${skillName}`)) fail(`${skillName}/agents/openai.yaml does not start by invoking its skill`);
+
+  const reachable = new Set([skillPath]);
+  const visited = new Set();
+  const pending = [skillPath];
+  while (pending.length) {
+    const source = pending.pop();
+    if (visited.has(source)) continue;
+    visited.add(source);
+    const text = readFileSync(source, 'utf8');
+    if ((text.match(/^```/gm) ?? []).length % 2) fail(`${relative(root, source)} has an unclosed code fence`);
+
+    for (let target of localTargets(text)) {
+      target = target.trim().split(/\s+["']/)[0].replace(/^<|>$/g, '').split('#')[0].split('?')[0];
+      if (!target || /^[a-z][a-z0-9+.-]*:/i.test(target) || target.startsWith('#')) continue;
+      const path = resolve(dirname(source), decodeURIComponent(target));
+      if (!within(skillRoot, path)) fail(`${relative(root, source)} links outside its installed skill: ${target}`);
+      if (!existsSync(path) || !lstatSync(path).isFile()) fail(`${relative(root, source)} links to missing file: ${target}`);
+      reachable.add(path);
+      if (path.endsWith('.md') && !visited.has(path) && !pending.includes(path)) pending.push(path);
+    }
+  }
+
+  const standalone = new Set([join(skillRoot, 'LICENSE'), uiPath]);
+  const orphaned = productFiles.filter((path) => !reachable.has(path) && !standalone.has(path));
+  if (orphaned.length) fail(`${skillName} contains unreachable product files: ${orphaned.map((p) => relative(skillRoot, p)).join(', ')}`);
+  for (const path of productFiles) {
+    const text = readFileSync(path);
+    const decoded = text.toString('utf8');
     for (const [pattern, label] of forbiddenGuidance) {
-      if (pattern.test(text)) fail(`${relative(root, markdownPath)} contains ${label}`);
+      if (pattern.test(decoded)) fail(`${relative(root, path)} contains ${label}`);
     }
-    for (const match of text.matchAll(/!?!?\[[^\]]*\]\(([^)]+)\)/g)) {
-      let target = match[1].trim().split('#')[0].split('?')[0];
-      if (!target || target.startsWith('#') || /^[a-z][a-z0-9+.-]*:/i.test(target)) continue;
-      if (target.startsWith('<') && target.endsWith('>')) target = target.slice(1, -1);
-      const resolved = resolve(dirname(markdownPath), decodeURIComponent(target));
-      if (!isProductResourcePath(resolved)) {
-        fail(`${relative(root, markdownPath)} links outside the distributed product: ${target}`);
-      }
+    for (const match of decoded.matchAll(/\$(threejs-[a-z0-9-]+)/g)) {
+      if (!rosterSet.has(match[1])) fail(`${relative(root, path)} invokes unknown skill ${match[1]}`);
     }
+    files += 1;
+    bytes += text.byteLength;
+    lines += decoded.split(/\r?\n/).length;
   }
 }
 
-console.log(`Validated product boundary for ${skillNames.length} distributed skills`);
+console.log(`Validated ${skillNames.length} real installable skills: ${files} files, ${lines} lines, ${bytes} bytes`);

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Three.js Rain, Snow, and Wet Surfaces"
+  short_description: "Couple precipitation, accumulation, and wetness"
+  default_prompt: "Use $threejs-rain-snow-and-wet-surfaces to separate visual precipitation from physical deposition and couple one committed receiver state to snow, wetness, ripples, or splashes."

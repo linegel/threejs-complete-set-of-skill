@@ -1,0 +1,4 @@
+interface:
+  display_name: "Three.js Procedural Geometry"
+  short_description: "Compile semantic procedural mesh geometry"
+  default_prompt: "Use $threejs-procedural-geometry to select a representation, allocate exact mesh capacity, preserve semantic topology through LOD, and verify updates and lifecycle."

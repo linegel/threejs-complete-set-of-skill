@@ -1,12 +1,12 @@
 {
   "$schema": "https://skills.sh/schemas/skills.sh.schema.json",
-  "notGrouped": "bottom",
   "groupings": [
     {
       "title": "Planning and Validation",
       "description": "Route broad Three.js WebGPU requests and prove rendered results with reproducible evidence.",
       "skills": [
         "threejs-choose-skills",
+        "threejs-debugging",
         "threejs-visual-validation",
         "threejs-compatibility-fallbacks"
       ]
@@ -41,6 +41,7 @@
         "threejs-procedural-fields",
         "threejs-procedural-materials",
         "threejs-procedural-geometry",
+        "threejs-object-sculptor",
         "threejs-procedural-buildings-and-cities",
         "threejs-procedural-planets",
         "threejs-procedural-vegetation",

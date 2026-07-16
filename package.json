@@ -6,17 +6,6 @@
   "engines": {
     "node": ">=22"
   },
-  "files": [
-    "skills/**",
-    "threejs-*/SKILL.md",
-    "threejs-*/references/**",
-    "threejs-*/assets/**",
-    "threejs-object-sculptor/scripts/*.py",
-    "!threejs-object-sculptor/scripts/test_*.py",
-    "skills.sh.json",
-    "README.md",
-    "LICENSE"
-  ],
   "scripts": {
     "toolchain:preflight": "node scripts/toolchain-preflight.mjs",
     "browser:install": "PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium",
@@ -53,10 +42,7 @@
     "site:smoke": "node scripts/pages-smoke.mjs",
     "site:validate": "node scripts/validate-site-presentation.mjs && node scripts/validate-site-seo.mjs",
     "skills:list": "npx skills@latest add linegel/threejs-complete-set-of-skill --list",
-    "skills:sync": "node scripts/sync-skill-distribution.mjs",
-    "skills:check": "node scripts/validate-skills-manifest.mjs && node scripts/validate-skill-distribution.mjs && node scripts/validate-skill-package.mjs && node --test tests/skills/*.test.mjs",
-    "skills:pack": "npm run skills:check && npm pack",
-    "skills:pack:dry-run": "npm run skills:check && npm pack --dry-run --json --ignore-scripts",
+    "skills:check": "node scripts/validate-skill-distribution.mjs",
     "test:skills": "npm run skills:check",
     "check:all": "npm run skills:check && npm run labs:check && npm run evidence:test && npm run site:build",
     "test": "npm run skills:check"

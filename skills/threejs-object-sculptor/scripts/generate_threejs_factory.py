@@ -1,1 +1,0 @@
-../../../threejs-object-sculptor/scripts/generate_threejs_factory.py

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Three.js Procedural Buildings and Cities"
+  short_description: "Compile buildings, facades, and city geometry"
+  default_prompt: "Use $threejs-procedural-buildings-and-cities to compile a deterministic building plan into massing, facades, material-slot geometry, and projected-error spatial LOD."

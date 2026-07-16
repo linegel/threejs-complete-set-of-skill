@@ -1,0 +1,4 @@
+interface:
+  display_name: "Three.js Water Optics"
+  short_description: "Build bounded and coastal water with optics"
+  default_prompt: "Use $threejs-water-optics to choose the least complex valid parametric, bounded, coastal, shallow-water, or external-solver branch and verify shared surface state and optics."

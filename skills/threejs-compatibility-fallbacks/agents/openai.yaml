@@ -1,0 +1,4 @@
+interface:
+  display_name: "Three.js Compatibility Fallbacks"
+  short_description: "Design an explicit unavailable-WebGPU fallback"
+  default_prompt: "Use $threejs-compatibility-fallbacks only for an explicitly requested unavailable-WebGPU fallback, then classify each canonical behavior as preserved, weakened, or removed."

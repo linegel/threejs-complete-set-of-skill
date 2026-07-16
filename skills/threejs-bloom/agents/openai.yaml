@@ -1,0 +1,4 @@
+interface:
+  display_name: "Three.js Bloom"
+  short_description: "Design scene-linear HDR bloom and glare"
+  default_prompt: "Use $threejs-bloom to choose an optical or selective scene-linear HDR signal, set its threshold and footprint, and preserve one final-output owner."

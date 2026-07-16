@@ -1,0 +1,4 @@
+interface:
+  display_name: "Three.js Scalable Real-Time Shadows"
+  short_description: "Fit scalable directional shadow systems"
+  default_prompt: "Use $threejs-scalable-real-time-shadows to choose and verify the least complex directional shadow topology that satisfies coverage, stability, invalidation, and sustained-cost gates."

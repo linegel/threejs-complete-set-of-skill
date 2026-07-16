@@ -1,155 +1,129 @@
-# External Solver Boundaries
+# Frame Transport and External Solver Boundaries
 
-## Contents
+## Moving-frame transport
 
-- Boundary rule
-- Adapter inventory
-- Units, frames, and clocks
-- Directional capabilities
-- Synchronization transports
-- Atomic execution and failure
-- Recovery
-- Cost and evidence
-
-## Boundary rule
-
-An external solver is any library, WASM module, worker, process, service, or
-device whose internal state or stepping is not owned by the route coordinator.
-Keep its internal representation and timestep authoritative. Translate only at
-one versioned boundary and publish the canonical `ExternalSolverAdapter`.
-
-Do not rename it `ExternalPhysicsAdapter` in serialized records. That phrase may
-describe the capability, but the shared ABI token is `ExternalSolverAdapter`.
-
-## Adapter inventory
-
-Every route stores adapters in `physicsExternalSolverAdaptersById`, keyed by the
-exact `adapterId`. The value is the complete canonical record, not a pointer,
-partial overlay, or prose sketch.
-
-Declare exactly one owner for:
-
-- stepping;
-- constraint assembly and solve;
-- collision detection;
-- contact-manifold lifecycle;
-- force/impulse accumulation;
-- committed-state publication.
-
-Split ownership is allowed only with a typed handoff. `engine default`,
-`automatic`, `shared`, or an omitted field is invalid.
-
-## Units, frames, and clocks
-
-Convert into canonical SI at the adapter. Record dimension-checked maps for
-length, mass, time, force, torque, impulse, angular quantities, and any domain
-specific channel. Record offsets only for affine quantities that permit them.
-
-Map handedness once. Distinguish points, polar vectors, axial vectors, normals,
-tensors, coordinate rates, twists, and wrenches. Validate proper rotations and
-SE(3) adjoint/coadjoint power preservation. Negative scale or an implicit
-left/right-handed swap is invalid.
-
-Clock mapping identifies external and context clocks, mapping revision,
-discontinuity epoch, frozen evaluations/replay, maximum age, and mapping error.
-Never carry independent authoritative ticks and seconds. An adaptive or remote
-step receipt lists the actual native intervals that tile the requested route
-interval.
-
-## Directional capabilities
-
-Each boundary-crossing interaction matches exactly one
-`ExternalInteractionCapability`:
-
-- direction and source/reaction role;
-- payload tag and exact SI dimensional signature;
-- target equation for ingress;
-- frame and supported footprint kinds;
-- cadence, batch count/layout/bytes;
-- exact-once support;
-- reaction atomicity;
-- residency and dependency;
-- error descriptor.
-
-Ambiguous matches and unused capability claims fail. Required unsupported
-channels or payloads block the route; do not synthesize zeros.
-
-An `ExternalSolverStepReceipt` binds the requested coordination interval,
-actual native intervals, input state versions, committed application ledgers,
-prepared outputs, emitted sequence ranges, dependency completions, status, and
-content digest. Prepared outputs enter one atomic commit transaction.
-
-## Synchronization transports
-
-Compare at least five transports even when one seems obvious:
-
-1. same-process CPU calls;
-2. shared GPU resources;
-3. device copy plus map/staging;
-4. worker/process IPC with shared memory or messages;
-5. network/remote service;
-6. offline recorded state.
-
-Shared GPU resources require device, backend, resource and loss generations,
-layout, subresource, producer/consumer access, acquire dependency, release or
-completion token, and retirement owner. A handle string is insufficient.
-
-Copy/message paths require a versioned byte layout, endianness, precision,
-quantization, content digest, sequence/exact-once keys, byte/cadence/latency/
-staleness gates, and host-visibility proof. Dispatch promise resolution or
-submission is not completion. “Zero copy” still accounts for ownership
-transitions, fences, cache effects, queueing, and in-flight residency.
-
-## Atomic execution and failure
-
-The adapter participates in `PhysicsGraph`; it does not run independently in a
-render callback. Before a step, validate capabilities, versions, clocks,
-dependencies, and input application ledgers. After it, validate receipt digest,
-interval tiling, output closure, reactions, conservation/error gates, and one
-atomic prepared-to-committed promotion.
-
-Failure policy names detection/timeout, frozen commit groups, prior committed
-state disposition, queued interactions/events, recovery owner/transaction, and
-whether degraded publication is forbidden. A timeout cannot expose half of a
-two-way exchange.
-
-## Recovery
-
-Compare at least:
-
-1. preserve prior commit and retry;
-2. checkpoint restore;
-3. checkpoint plus exact replay;
-4. explicit discontinuous restart with loss ledger;
-5. block route and require external intervention.
-
-Checkpoint/replay includes state versions, inventories, stable IDs, RNG/event/
-application cursors, context/graph/material/frame/clock revisions, content
-digest, rollback bound, and restore validation. Restore the cursor before the
-closed replay range, apply only keys without committed receipts, then atomically
-publish the post-range cursor.
-
-Without a coherent checkpoint, publish the complete lost inventory/event/
-cursor ledger, new discontinuity epoch, reset plan, new resource generations,
-and validated restart state. Never reconstruct authority from rendered poses.
-
-## Cost and evidence
-
-`PhysicsExternalAdapterCost` covers:
+Let `R^I_F` rotate coordinates from moving frame `F` into inertial frame `I`.
+Let `o^I`, `v_o^I`, and `a_o^I` be the position, velocity, and acceleration of
+the `F` origin in `I`. Express angular velocity `omega^F` and angular
+acceleration `alpha^F` in `F`. For a point with moving-frame position `r^F`,
+relative velocity `u^F`, and relative acceleration `a_rel^F`:
 
 ```text
-enqueue -> serialize/convert -> queue wait -> transport/ownership transfer
-        -> remote wait/solve -> fence/completion -> deserialize
-        -> conservation/error validation -> atomic commit
+x^I = o^I + R^I_F r^F
+v^I = v_o^I + R^I_F (u^F + omega^F cross r^F)
+a^I = a_o^I + R^I_F (
+        a_rel^F
+        + 2 omega^F cross u^F
+        + alpha^F cross r^F
+        + omega^F cross (omega^F cross r^F))
 ```
 
-Record aligned request/response/batch counts, logical and physical bytes,
-staging/shared/in-flight memory, retries, duplicates, drops, timeouts, clock-map
-work, recovery, catch-up, migration, and dependency critical paths. Do not add
-overlapping spans or assign unavailable remote time to local CPU/GPU work.
+The four moving-frame acceleration terms are relative, Coriolis, Euler, and
+centrifugal acceleration. If physical force `f^I` is known, solve the relative
+equation as:
 
-Evidence must bind solver/build, adapter boundary revision, route/source digest,
-target/browser/device/backend generations, exact workload, quality state, and
-protocol. Browser-free conformance proves record semantics. Native WebGPU and
-performance/recovery acceptance require the frozen route in Codex's in-app
-Browser with directly inspected diagnostics.
+```text
+m a_rel^F = (R^I_F)^T (f^I - m a_o^I)
+            - m (2 omega^F cross u^F
+                 + alpha^F cross r^F
+                 + omega^F cross (omega^F cross r^F))
+```
+
+State the transform direction, origin, expression frame, and sample time for
+every term. Gravity is a physical force; the other terms above account for the
+moving coordinates and enter exactly once.
+
+## SE(3) twists and wrenches
+
+Let `T^A_B = (R, p)` map coordinates from frame `B` to frame `A`, with `p` the
+position of the `B` origin from the `A` origin, expressed in `A`. Use twist
+ordering `[angular velocity; linear velocity]` and wrench ordering
+`[torque; force]`:
+
+```text
+omega^A = R omega^B
+v^A     = p cross (R omega^B) + R v^B
+
+f^A   = R f^B
+tau^A = R tau^B + p cross (R f^B)
+```
+
+These are the SE(3) adjoint and coadjoint transforms. They preserve power:
+
+```text
+tau^A . omega^A + f^A . v^A
+  = tau^B . omega^B + f^B . v^B
+```
+
+For a force `f` applied at point `r` relative to a chosen moment origin,
+`tau = r cross f`. When shifting that origin from `P` to `Q` in one expression
+frame, use `tau_Q = tau_P + (r_P - r_Q) cross f`. Keep polar vectors, axial
+vectors, points, normals, twists, and wrenches distinct when changing
+handedness or applying scale. Distinguish force and torque rates from
+already-integrated linear and angular impulses.
+
+## External authority
+
+An external solver is a library, WASM module, worker, process, service, or
+device that owns a state equation or its advancement. Keep its native state
+authoritative and translate once at a versioned boundary.
+
+Before integration, assign exactly one owner for each of these responsibilities:
+
+- state advancement and native timestep selection;
+- collision detection and contact-manifold lifecycle;
+- constraint assembly and solve;
+- force, torque, and impulse accumulation;
+- commit visibility and failure recovery.
+
+A split responsibility needs one explicit handoff with producer, consumer,
+units, frame, interval, sample phase, version, completion condition, and error
+or staleness limit. Record the solver/build version and the adapter revision.
+Freeze numeric formats, reduction ordering, and every stochastic seed or stream
+identity; accept replay only when its declared equivalence gate passes.
+
+Map SI dimensions independently for length, mass, time, force, torque, impulse,
+and angular quantities. Map handedness once and apply the correct polar, axial,
+twist, and wrench transforms. Map a requested interval to the actual native
+steps that cover it. Adaptive stepping reports those intervals through one
+authoritative clock mapping.
+
+For each crossing channel, declare direction, physical meaning, rate versus
+integral semantics, footprint or support, validity, error, residency, and
+reaction scope. Integrate a rate over interval overlap. Apply an impulse once.
+When source and reaction are both observable, expose and commit them together
+from one accepted step.
+
+## Synchronization and lifecycle
+
+Use this lifecycle for every external authority:
+
+1. Establish the solver identity, transforms, clock map, capabilities, and
+   resource generations. The boundary is ready when each required channel has
+   one unambiguous mapping.
+2. Stage inputs for a named interval after their producer completion. Staging is
+   complete when versions and application ranges are frozen.
+3. Advance state exactly once and retain the native substep intervals.
+   Record submission and consumer-visible completion separately; advance to
+   validation only after completion.
+4. Validate finite state, constraint/error limits, reactions, and output
+   versions. The step is admissible only when every hard limit passes.
+5. Commit related state atomically. Rendering consumes immutable previous and
+   current committed states with stable entity identity and explicit reset
+   markers for spawn, death, teleport, reparent, slot reuse, and discontinuity.
+6. Retire resources only after all simulation and render consumers have
+   completed. The retired generation must be unreachable from in-flight work.
+7. Recover from the last coherent checkpoint and replay unapplied intervals, or
+   start a new discontinuity epoch with an explicit reset. Recovery is complete
+   when state, identities, event/application cursors, and resource generations
+   agree.
+
+Define failure detection and timeout so failure freezes affected commits and
+preserves the last coherent presentation until recovery commits a coherent
+replacement.
+
+Shared GPU resources still require device identity, access ownership,
+subresource layout, acquire/release completion, and loss generation. Keep the
+frame-critical path in its consuming residency; use delayed host mirrors for
+diagnostics. Measure the full dependency path—conversion, queueing, transport,
+solve, completion, validation, and commit—rather than isolated solver time.

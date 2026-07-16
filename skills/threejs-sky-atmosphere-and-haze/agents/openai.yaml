@@ -1,0 +1,4 @@
+interface:
+  display_name: "Three.js Sky, Atmosphere, and Haze"
+  short_description: "Build skies, atmosphere, haze, and sunlight"
+  default_prompt: "Use $threejs-sky-atmosphere-and-haze to choose the required transport branch and verify its units, product dependencies, aerial composition, lighting handoff, and output ownership."

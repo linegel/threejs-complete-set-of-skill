@@ -1,0 +1,4 @@
+interface:
+  display_name: "Three.js Spectral Ocean"
+  short_description: "Build directional offshore FFT ocean surfaces"
+  default_prompt: "Use $threejs-spectral-ocean to synthesize a dimensioned directional FFT sea and hand offshore forcing to a separate coastal owner when bathymetry matters."

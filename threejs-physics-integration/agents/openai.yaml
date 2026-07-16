@@ -1,4 +1,0 @@
-interface:
-  display_name: "Three.js Physics Integration"
-  short_description: "Select and integrate physics solvers safely"
-  default_prompt: "Use $threejs-physics-integration to select the smallest valid physics architecture, map an external solver into the shared SI/frame/clock ABI, and prove synchronization, exact-once interactions, recovery, and composed cost."

@@ -1,23 +1,23 @@
 # Repository QA and release boundaries
 
-The `threejs-*` directories are the product. Their `SKILL.md` files, references,
-assets, and product helpers are the only contents eligible for the published
-skill package. Validation guidance inside a skill describes how an agent should
-check Three.js work created with that skill; it is not a release procedure for
-this repository.
+The 27 real directories under `skills/` are the installable product. Each may
+contain `SKILL.md`, `agents/openai.yaml`, references, scripts, and a license.
+Top-level `threejs-*` examples and all labs, generated evidence, and site output
+are repository material; the skills CLI must not copy them.
+
+Validation guidance inside a skill describes how an agent checks Three.js work
+created with that skill. It is not a release procedure for this repository.
 
 ## Skill product gate
 
-`npm run skills:check` is the skill-product quality gate. It checks the authored
-skill corpus, router behavior, product-resource links, the install projection,
-and the exact `npm pack --dry-run` contents. A skill release must stop for a
-technical error, contradictory or irrelevant guidance, a router error, or a
-missing packaged product resource.
+`npm run skills:check` validates the exact roster, real-directory layout,
+frontmatter, invocation metadata, linked product resources, and absence of
+repository-only sediment. A release must also pass one real
+`skills add . --skill '*' --copy` smoke install and compare the installed tree
+byte-for-byte with `skills/`.
 
-`npm run skills:pack` has exactly one prerequisite: `skills:check`. The package
-uses an explicit allowlist and excludes examples, labs, repository tests,
-browser automation, raw captures, evidence machinery, generated pages, and
-other repository QA executables.
+A release stops for a technical error, contradictory or irrelevant guidance,
+an invocation error, a broken product link, or an unexpected installed file.
 
 ## Independent demo and publication contours
 
@@ -30,7 +30,7 @@ draft, stale, or featured without changing the release state of a skill.
 - `pages:*` builds and validates the website and gallery.
 
 These commands may be used for demo development and marketing publication, but
-they are not prerequisites of `skills:check` or `skills:pack`. A featured demo
+they are not prerequisites of `skills:check`. A featured demo
 should have current curated media bound to its demo build; a broken or missing
 demo, screenshot, video, evidence report, or site build does not block the skill
 package.

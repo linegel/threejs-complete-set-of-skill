@@ -1,0 +1,4 @@
+interface:
+  display_name: "Three.js Image Pipeline"
+  short_description: "Coordinate shared signals and final-image graphs"
+  default_prompt: "Use $threejs-image-pipeline to build the smallest final-image graph, admit shared attachments or history only for named consumers, and preserve one presentation owner."

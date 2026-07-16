@@ -1,1 +1,0 @@
-../../../threejs-object-sculptor/scripts/new_pre_spec_assessment.py

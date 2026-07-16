@@ -1,0 +1,4 @@
+interface:
+  display_name: "Three.js Object Sculptor"
+  short_description: "Rebuild reference objects as procedural Three.js"
+  default_prompt: "Use $threejs-object-sculptor to inspect the supplied views, identify identity anchors and assumptions, choose procedural representations, and produce a verified model or plan."

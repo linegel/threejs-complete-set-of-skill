@@ -1,0 +1,4 @@
+interface:
+  display_name: "Three.js Black Holes and Space Effects"
+  short_description: "Build black holes, wormholes, and curved rays"
+  default_prompt: "Use $threejs-black-holes-and-space-effects to classify this effect as artistic, Ellis, Schwarzschild, or an unsupported Kerr request, then bound and verify its numerical claim."
