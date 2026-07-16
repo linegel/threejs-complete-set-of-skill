@@ -672,6 +672,7 @@ const renderContentPage = (page) => {
     ? `<a class="docs-index-current" href="${esc(page.slug)}" aria-current="page">Current page · ${esc(page.h1)}</a>`
     : '';
   const breadcrumbs = contentBreadcrumbs(page);
+  const faqProvenance = renderFaqProvenance(page);
   const schema = {
     '@context': 'https://schema.org',
     '@graph': [PUBLISHER, contentPageSchema(page), contentBreadcrumbSchema(page)],
@@ -716,8 +717,7 @@ ${navHtml()}
     <p class="content-lede">${esc(page.description)}</p>
     <p class="content-answer"${page.kind === 'faq-answer' ? ' data-faq-answer' : ''}>${esc(page.summary)}</p>
     <div class="content-meta"><span>Published ${esc(page.published)}</span><span>Reviewed ${esc(page.last_reviewed)}</span>${page.supported_revision ? `<span>Three.js ${esc(page.supported_revision)}</span>` : ''}</div>
-    ${renderFaqProvenance(page)}
-  </div></header>
+${faqProvenance ? `    ${faqProvenance}\n` : ''}  </div></header>
   <div class="content-shell"><div class="wrap"><div class="content-layout${isHumanDocs ? ' content-layout--docs' : ''}">
     <nav class="content-index${isHumanDocs ? ' docs-index' : ''}" aria-label="${isHumanDocs ? 'Documentation sections' : 'On this page'}"><strong>${isHumanDocs ? 'Documentation' : 'On this page'}</strong>${currentDocsLink}<ol>${contentIndex}</ol></nav>
     <article class="content-body">${bodyHtml}${renderContentFacts(page)}${renderContentProof(page)}${renderContentRelations(page)}${renderContentSources(page)}

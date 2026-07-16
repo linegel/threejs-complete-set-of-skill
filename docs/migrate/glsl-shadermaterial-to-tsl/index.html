@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Migrate Three.js ShaderMaterial from GLSL to TSL</title>
+<meta name="description" content="Rewrite a Three.js ShaderMaterial as a TSL and NodeMaterial graph while preserving coordinates, material response, shadows, color space, and diagnostics." />
+<link rel="canonical" href="https://threejs-skills.com/migrate/glsl-shadermaterial-to-tsl/" />
+<meta name="robots" content="index, follow, max-image-preview:large" />
+<meta name="theme-color" content="#0a0c10" />
+
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="manifest" href="/site.webmanifest" />
+<link rel="alternate" type="text/plain" href="https://threejs-skills.com/llms.txt" title="LLM-readable skill catalog" />
+<link rel="alternate" type="application/json" href="https://threejs-skills.com/skills.json" title="Machine-readable skill catalog" />
+<meta property="og:type" content="article" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
+<meta property="og:title" content="Migrate Three.js ShaderMaterial from GLSL to TSL" />
+<meta property="og:description" content="Rewrite a Three.js ShaderMaterial as a TSL and NodeMaterial graph while preserving coordinates, material response, shadows, color space, and diagnostics." />
+<meta property="og:url" content="https://threejs-skills.com/migrate/glsl-shadermaterial-to-tsl/" />
+<meta property="og:image" content="https://threejs-skills.com/icon-512.png" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:width" content="512" />
+<meta property="og:image:height" content="512" />
+<meta property="og:image:alt" content="Three.js WebGPU Skill Pack mark" />
+<meta name="twitter:image" content="https://threejs-skills.com/icon-512.png" />
+<meta name="twitter:image:alt" content="Three.js WebGPU Skill Pack mark" />
+<meta property="article:published_time" content="2026-07-16" />
+<meta property="article:modified_time" content="2026-07-16" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="Migrate Three.js ShaderMaterial from GLSL to TSL" />
+<meta name="twitter:description" content="Rewrite a Three.js ShaderMaterial as a TSL and NodeMaterial graph while preserving coordinates, material response, shadows, color space, and diagnostics." />
+<script type="application/ld+json">{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "Organization",
+   "@id": "https://threejs-skills.com/#publisher",
+   "name": "Three.js WebGPU Skill Pack contributors",
+   "url": "https://threejs-skills.com/",
+   "sameAs": "https://github.com/linegel/threejs-complete-set-of-skill",
+   "logo": {
+    "@type": "ImageObject",
+    "url": "https://threejs-skills.com/icon-512.png",
+    "contentUrl": "https://threejs-skills.com/icon-512.png",
+    "width": 512,
+    "height": 512
+   }
+  },
+  {
+   "@type": [
+    "Article",
+    "TechArticle"
+   ],
+   "@id": "https://threejs-skills.com/migrate/glsl-shadermaterial-to-tsl/#article",
+   "url": "https://threejs-skills.com/migrate/glsl-shadermaterial-to-tsl/",
+   "name": "Migrate Three.js ShaderMaterial from GLSL to TSL",
+   "headline": "Migrate a Three.js ShaderMaterial to TSL",
+   "description": "Rewrite a Three.js ShaderMaterial as a TSL and NodeMaterial graph while preserving coordinates, material response, shadows, color space, and diagnostics.",
+   "datePublished": "2026-07-16",
+   "dateModified": "2026-07-16",
+   "inLanguage": "en",
+   "isAccessibleForFree": true,
+   "publisher": {
+    "@id": "https://threejs-skills.com/#publisher"
+   },
+   "breadcrumb": {
+    "@id": "https://threejs-skills.com/migrate/glsl-shadermaterial-to-tsl/#breadcrumb"
+   },
+   "image": "https://threejs-skills.com/icon-512.png",
+   "author": {
+    "@id": "https://threejs-skills.com/#publisher"
+   }
+  },
+  {
+   "@type": "BreadcrumbList",
+   "@id": "https://threejs-skills.com/migrate/glsl-shadermaterial-to-tsl/#breadcrumb",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Skill Pack",
+     "item": "https://threejs-skills.com/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Migration",
+     "item": "https://threejs-skills.com/migrate/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Migrate a Three.js ShaderMaterial to TSL",
+     "item": "https://threejs-skills.com/migrate/glsl-shadermaterial-to-tsl/"
+    }
+   ]
+  }
+ ]
+}</script>
+
+<link rel="preload" href="/assets/vendor/katex/fonts/KaTeX_SansSerif-Regular.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/assets/vendor/katex/fonts/KaTeX_SansSerif-Bold.woff2" as="font" type="font/woff2" crossorigin />
+<style>
+@view-transition{navigation:auto}
+@font-face{font-family:'Evidence Sans';src:url('/assets/vendor/katex/fonts/KaTeX_SansSerif-Regular.woff2') format('woff2');font-style:normal;font-weight:400;font-display:swap}
+@font-face{font-family:'Evidence Sans';src:url('/assets/vendor/katex/fonts/KaTeX_SansSerif-Italic.woff2') format('woff2');font-style:italic;font-weight:400;font-display:swap}
+@font-face{font-family:'Evidence Sans';src:url('/assets/vendor/katex/fonts/KaTeX_SansSerif-Bold.woff2') format('woff2');font-style:normal;font-weight:700;font-display:swap}
+@font-face{font-family:'Evidence Mono';src:url('/assets/vendor/katex/fonts/KaTeX_Typewriter-Regular.woff2') format('woff2');font-style:normal;font-weight:400;font-display:swap}
+:root{
+  --bg:#080a0e; --bg2:#0e1117; --bg3:#131821; --ink:#f0ede5; --dim:#aaa99f;
+  --amber:#ffb454; --cyan:#7fd4c1; --lime:#b6de82; --violet:#b7a2ff; --rose:#ff927a; --line:#242933;
+  --disp:'Evidence Sans',ui-sans-serif,sans-serif; --mono:'Evidence Mono',ui-monospace,monospace; --sans:'Evidence Sans',ui-sans-serif,sans-serif;
+  --shadow-card:0 0 0 1px rgba(255,255,255,.075),0 1px 2px rgba(0,0,0,.28),0 18px 55px rgba(0,0,0,.18);
+  --shadow-card-hover:0 0 0 1px rgba(255,255,255,.14),0 1px 2px rgba(0,0,0,.34),0 24px 70px rgba(0,0,0,.34);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+picture.responsive-preview{display:contents}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:var(--bg)}
+body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7}
+::selection{background:rgba(255,180,84,.26);color:var(--ink)}
+a{color:inherit;text-decoration:none}
+a:focus-visible,button:focus-visible,summary:focus-visible,pre[tabindex]:focus-visible,[role="region"]:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
+main{display:block}
+.skip-link{position:fixed;z-index:100;left:16px;top:12px;translate:0 -160%;font-family:var(--mono);font-size:12px;background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:9px;transition-property:translate;transition-duration:160ms}
+.skip-link:focus{translate:0 0}
+.wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
+.site-nav{position:sticky;z-index:50;top:0;background:rgba(8,10,14,.82);border-bottom:1px solid rgba(255,255,255,.075);backdrop-filter:blur(18px) saturate(1.15)}
+.site-nav>.wrap{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+.site-nav .brand{min-height:44px;display:inline-flex;align-items:center;white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
+.site-nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
+.site-nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
+.site-nav .links a:hover{color:var(--amber)}
+.site-nav .links a:active{scale:.96}
+h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:0}
+p{text-wrap:pretty}
+h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
+.section{padding:clamp(56px,8vw,110px) 0;border-top:1px solid var(--line)}
+.section>.wrap>p.sub{color:var(--dim);max-width:64ch;margin-bottom:44px}
+.kicker{font-family:var(--mono);color:var(--amber);font-size:13px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:26px}
+pre{font-family:var(--mono);background:#06080b;box-shadow:0 0 0 1px rgba(255,255,255,.075),inset 2px 0 var(--amber);border-radius:12px;padding:14px 16px;overflow-x:auto;
+  font-size:13px;line-height:1.65;color:#d8d2c2;white-space:pre-wrap}
+code{font-family:var(--mono)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:16px}
+.card{min-height:100%;background:linear-gradient(145deg,rgba(19,24,33,.96),rgba(12,15,21,.96));border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px;
+  box-shadow:var(--shadow-card);transition-property:translate,scale,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
+.card:hover{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
+.card:active{translate:0 -1px;scale:.96}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.card-kind{font-family:var(--mono);font-size:10px;color:var(--cyan)}
+.card h3,.card h4{font-size:19px;font-weight:600}
+.card p{color:var(--dim);font-size:14.5px;line-height:1.62;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.card-meta{font-family:var(--mono);margin-top:auto;padding-top:12px;font-size:11.5px;color:var(--cyan);border-top:1px dashed var(--line)}
+.status{display:inline-flex;align-items:center;font-family:var(--mono);font-size:10px;line-height:1.2;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.status--accepted{color:var(--lime)}
+.status--pending{color:var(--amber)}
+.status--secondary{color:var(--dim)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:22px}
+figure{height:100%;overflow:hidden;background:var(--bg2);border-radius:18px;box-shadow:var(--shadow-card);transition-property:translate,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
+a:hover>figure{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
+figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.05);outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
+.preview-media,.lab-card-media,.flagship-preview{position:relative;display:block;overflow:hidden;background:#090c11}
+.preview-media img,.lab-card-media img,.flagship-preview img,.card-preview{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
+.media-caption{display:block;padding:8px 2px 0;font-family:var(--mono);font-size:9px;line-height:1.4;color:var(--dim)}
+.secondary-preview-status{display:grid;gap:5px;padding:14px 0;color:var(--dim);font-family:var(--mono);font-size:10px;line-height:1.4}
+.secondary-preview-status strong{color:var(--ink);font-family:var(--disp);font-size:16px}.secondary-preview-status code{color:var(--dim);font-size:9px}
+.primary-evidence-panel{display:grid;gap:5px;margin-top:14px;padding-top:14px;border-top:1px solid var(--line);font-family:var(--mono);font-size:10px;line-height:1.45;color:var(--dim)}
+.primary-evidence-panel[data-evidence-state="accepted"]{border-top-color:var(--lime)}
+.primary-evidence-panel strong{color:var(--ink);font-family:var(--disp);font-size:18px;line-height:1.2}.primary-evidence-panel code{color:var(--cyan);font-size:10px}.primary-evidence-label{color:var(--amber);font-size:9px;letter-spacing:.09em;text-transform:uppercase}.primary-evidence-panel[data-evidence-state="accepted"] .primary-evidence-label{color:var(--lime)}
+figcaption{padding:16px 18px;font-size:14.5px}
+figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
+figcaption span{display:block;margin-top:3px;color:var(--dim)}
+footer{border-top:1px solid var(--line);padding:44px 0 60px;display:grid;grid-template-columns:minmax(260px,1.4fr) minmax(0,2fr);gap:36px 64px;color:var(--dim);font-size:14.5px}
+footer a{color:var(--amber)}
+footer a:hover{text-decoration:underline}
+footer code{color:var(--cyan);font-size:11px}
+.footer-summary{max-width:55ch}.footer-summary>span{display:block;margin-top:8px;font-size:13px}.footer-groups{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}.footer-group{display:grid;align-content:start;gap:8px}.footer-group strong{font:400 10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}.footer-group a{min-height:40px;display:flex;align-items:center;color:var(--dim);font-size:13px;transition-property:color,scale;transition-duration:160ms}.footer-group a:hover{color:var(--amber);text-decoration:none}.footer-group a:active{scale:.96}
+.pathfinder{padding:clamp(52px,7vw,86px) 0;border-bottom:1px solid var(--line)}.pathfinder-head{display:grid;grid-template-columns:minmax(0,.7fr) minmax(320px,1.3fr);align-items:end;gap:28px 72px;margin-bottom:28px}.pathfinder-head h2{margin:0}.pathfinder-head p{max-width:58ch;color:var(--dim)}.pathfinder-rows{border-top:1px solid var(--line)}.pathfinder-row{display:grid;grid-template-columns:minmax(160px,.55fr) minmax(210px,.8fr) minmax(0,1.6fr);gap:20px 32px;align-items:center;min-height:94px;border-bottom:1px solid var(--line)}.pathfinder-stage{font:10px/1.4 var(--mono);letter-spacing:.11em;text-transform:uppercase;color:var(--cyan)}.pathfinder-row>p{color:var(--dim);font-size:14px}.pathfinder-links{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px 18px}.pathfinder-links a{min-height:44px;display:inline-flex;align-items:center;gap:8px;color:var(--amber);font:11px/1.35 var(--mono);transition-property:color,scale;transition-duration:160ms}.pathfinder-links a:after{content:"→"}.pathfinder-links a:hover{color:var(--ink)}.pathfinder-links a:active{scale:.96}
+.content-hero{padding:clamp(54px,8vw,104px) 0 42px;border-bottom:1px solid var(--line)}.breadcrumbs{min-height:44px;display:flex;align-items:center;margin-bottom:28px;font:11px/1.4 var(--mono);color:var(--dim)}.breadcrumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.breadcrumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}.breadcrumbs a{min-height:40px;display:inline-flex;align-items:center;transition-property:color,scale;transition-duration:160ms}.breadcrumbs a:hover{color:var(--amber)}.breadcrumbs a:active{scale:.96}.content-hero h1{max-width:17ch;font-size:clamp(40px,6vw,68px);font-weight:700;line-height:1.02;letter-spacing:-.02em}.content-lede{max-width:66ch;margin-top:22px;color:var(--dim);font-size:clamp(17px,2vw,20px)}.content-meta{display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:28px;font:10px/1.4 var(--mono);color:var(--cyan)}
+.content-answer{max-width:900px;margin-top:34px;padding:3px 0 3px 22px;border-left:2px solid var(--amber);font-size:clamp(19px,2.2vw,21px);line-height:1.62;color:var(--ink)}.content-shell{padding:clamp(46px,7vw,86px) 0}.content-layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(230px,1fr);align-items:start;gap:clamp(36px,6vw,76px)}.content-body{grid-column:1;grid-row:1;max-width:78ch;min-width:0}.content-body h2{margin:52px 0 16px;font-size:clamp(27px,3.5vw,39px);scroll-margin-top:112px}.content-body>h2:first-child{margin-top:0}.content-body h3{margin:34px 0 12px;font-size:21px;scroll-margin-top:112px}.content-body p,.content-body li{color:var(--dim);font-size:16px}.content-body p+p{margin-top:17px}.content-body ul,.content-body ol{margin:16px 0;padding-left:24px}.content-body li+li{margin-top:7px}.content-body a{color:var(--cyan);text-decoration:underline;text-decoration-color:rgba(127,212,193,.35);text-underline-offset:3px}.content-body a:hover{color:var(--amber);text-decoration-color:currentColor}.content-body code:not(pre code){padding:1px 5px;border:1px solid var(--line);border-radius:5px;background:#07090c;color:var(--cyan);font-size:.86em}.content-body pre{margin:20px 0;white-space:pre;tab-size:2}.content-table{max-width:100%;margin:22px 0;overflow-x:auto;border:1px solid var(--line);border-radius:12px}.content-table:focus-visible{outline:2px solid var(--amber);outline-offset:3px}.content-table table{width:100%;border-collapse:collapse;font-size:14px}.content-table th,.content-table td{min-width:150px;padding:11px 13px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);text-align:left;vertical-align:top;color:var(--dim)}.content-table th{color:var(--ink);font-weight:600;background:var(--bg2)}.content-table tr:last-child td{border-bottom:0}.content-table th:last-child,.content-table td:last-child{border-right:0}
+.content-index{grid-column:2;grid-row:1;position:sticky;top:104px;max-height:calc(100vh - 128px);overflow-y:auto;padding:18px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.content-index strong{display:block;margin-bottom:10px;font:10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}.content-index ol{list-style:none}.content-index a{min-height:40px;display:flex;align-items:center;padding:5px 0;color:var(--dim);font-size:13px;line-height:1.4;transition-property:color,translate,scale;transition-duration:160ms}.content-index a:hover{color:var(--amber);translate:3px 0}.content-index a:active{translate:1px 0;scale:.96}.content-proof{margin:54px 0 0}.content-proof figure{border-radius:16px}.content-proof img{width:100%;height:auto;max-height:650px;object-fit:cover;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}.content-proof figcaption{color:var(--dim);font:11px/1.55 var(--mono)}.content-proof figcaption a{color:var(--amber)}
+.content-layout--docs{grid-template-columns:minmax(190px,.6fr) minmax(0,2fr)}.content-layout--docs .content-index{grid-column:1}.content-layout--docs .content-body{grid-column:2;max-width:72ch}.docs-index a{padding-inline:10px;border-left:2px solid transparent}.docs-index a[aria-current="page"]{border-left-color:var(--amber);background:rgba(255,180,84,.06);color:var(--ink);font-weight:600}.docs-index-current{display:none}
+.content-facts,.content-faq-list,.content-related,.content-sources,.content-skills,.content-demos,.content-discovery,.faq-provenance{margin-top:54px;padding-top:22px;border-top:1px solid var(--line)}.content-facts h2,.content-faq-list h2,.content-related h2,.content-sources h2,.content-skills h2,.content-demos h2{font-size:24px}.content-ruled-list{list-style:none;border-top:1px solid var(--line)}.content-ruled-list li{border-bottom:1px solid var(--line)}.content-ruled-list a{min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:9px 0;color:var(--dim);font-size:14px;transition-property:color,scale;transition-duration:160ms}.content-ruled-list a:after{content:"→";color:var(--amber)}.content-ruled-list a:hover{color:var(--ink)}.content-ruled-list a:active{scale:.96}.content-related .content-ruled-list a{display:grid;grid-template-columns:104px minmax(0,1fr) auto}.content-related-family{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}.content-faq-item{padding:22px 0;border-bottom:1px solid var(--line)}.content-faq-item h3{margin:0;font-size:20px}.content-faq-item h3 a{color:var(--ink)}.content-faq-item p{margin-top:9px;color:var(--dim);font-size:15px}.faq-provenance{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);padding:0}.faq-provenance div{padding:13px;background:var(--bg2)}.faq-provenance dt{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}.faq-provenance dd{margin-top:5px;font:11px/1.45 var(--mono);color:var(--cyan);overflow-wrap:anywhere}.content-discovery{display:flex;flex-wrap:wrap;gap:10px 22px;font:11px/1.5 var(--mono);color:var(--dim)}.content-discovery a{min-height:40px;display:inline-flex;align-items:center;color:var(--amber)}
+@media (max-width:760px){
+  .site-nav .wrap{padding-right:0}
+  .site-nav>.wrap{min-height:104px;display:grid;grid-template-columns:1fr;padding-top:14px;padding-bottom:10px;gap:4px}
+  .site-nav .brand{font-size:16px}
+  .site-nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;scrollbar-color:rgba(255,180,84,.45) transparent;padding:0 20px 4px 0}
+  .site-nav .links::-webkit-scrollbar{height:3px}.site-nav .links::-webkit-scrollbar-thumb{background:rgba(255,180,84,.45);border-radius:99px}
+  .site-nav .links a{flex:0 0 auto}
+  .grid,.gallery{grid-template-columns:1fr}
+  footer{grid-template-columns:1fr}.footer-groups{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:900px){.pathfinder-head,.content-layout{grid-template-columns:1fr}.content-index{grid-column:1;grid-row:1;position:static;max-height:none}.content-body,.content-layout--docs .content-body{grid-column:1;grid-row:2}.docs-index{overflow:hidden}.docs-index-current{display:flex;margin-bottom:8px}.docs-index ol{display:flex;gap:8px;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;padding-bottom:6px}.docs-index li{flex:0 0 min(72vw,260px)}.docs-index .docs-index-list-current{display:none}.docs-index a{min-height:44px;padding:8px 10px;border-left:0;border-bottom:2px solid transparent;background:var(--bg2)}.docs-index a[aria-current="page"]{border-bottom-color:var(--amber)}.pathfinder-row{grid-template-columns:minmax(160px,.6fr) minmax(0,1fr)}.pathfinder-links{grid-column:1/-1;justify-content:flex-start;padding-bottom:18px}.faq-provenance{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.pathfinder-row{grid-template-columns:1fr;gap:6px;padding:18px 0}.pathfinder-links{grid-column:auto;padding:0}.content-hero h1{font-size:clamp(38px,12vw,54px)}.content-answer{padding-left:16px}.content-table{border-radius:8px}.content-table table{min-width:680px}.faq-provenance{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+  ::view-transition-old(root),::view-transition-new(root){animation:none!important}
+}
+</style>
+</head>
+<body data-content-kind="migration" data-content-route="/migrate/glsl-shadermaterial-to-tsl/">
+<a class="skip-link" href="#main-content">Skip to content</a><header class="site-nav"><div class="wrap">
+  <a class="brand" href="/">Three.js WebGPU Skill&nbsp;Pack</a>
+  <nav class="links" aria-label="Primary navigation"><a href="/#flagships">Examples</a><a href="/#skills">Skills</a><a href="/guides/">Guides</a><a href="/evidence/">Evidence</a><a href="/#install">Install</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub</a></nav>
+</div></header>
+<main id="main-content" tabindex="-1">
+  <header class="content-hero"><div class="wrap">
+    <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://threejs-skills.com/">Skill Pack</a></li><li><a href="https://threejs-skills.com/migrate/">Migration</a></li><li aria-current="page">Migrate a Three.js ShaderMaterial to TSL</li></ol></nav>
+    <p class="kicker">Migration</p>
+    <h1>Migrate a Three.js ShaderMaterial to TSL</h1>
+    <p class="content-lede">Rewrite a Three.js ShaderMaterial as a TSL and NodeMaterial graph while preserving coordinates, material response, shadows, color space, and diagnostics.</p>
+    <p class="content-answer">Do not treat this as a text-level GLSL translation. Reconstruct the shader&#39;s inputs, spaces, material response, displacement, shadows, and outputs as a TSL graph attached to appropriate NodeMaterial slots, then validate that graph before restoring post-processing.</p>
+    <div class="content-meta"><span>Published 2026-07-16</span><span>Reviewed 2026-07-16</span><span>Three.js 0.185.1</span></div>
+  </div></header>
+  <div class="content-shell"><div class="wrap"><div class="content-layout">
+    <nav class="content-index" aria-label="On this page"><strong>On this page</strong><ol><li><a href="#inventory-the-glsl-contract-before-translating-it">Inventory the GLSL contract before translating it</a></li><li><a href="#map-glsl-concepts-to-explicit-node-owners">Map GLSL concepts to explicit node owners</a></li><li><a href="#choose-a-nodematerial-target-rather-than-translating-strings">Choose a NodeMaterial target rather than translating strings</a></li><li><a href="#port-vertex-coordinate-and-shadow-behavior-together">Port vertex, coordinate, and shadow behavior together</a></li><li><a href="#port-material-response-and-color-ownership">Port material response and color ownership</a></li><li><a href="#compare-the-original-and-target-with-useful-diagnostics">Compare the original and target with useful diagnostics</a></li><li><a href="#handle-limits-and-rollback-honestly">Handle limits and rollback honestly</a></li></ol></nav>
+    <article class="content-body"><h2 id="inventory-the-glsl-contract-before-translating-it">Inventory the GLSL contract before translating it</h2>
+<p>Freeze the original material with a deterministic object, lights, environment, camera, seed, texture set, and no-post output. Record every input and side effect:</p>
+<ul>
+<li>Uniforms, attributes, varyings, preprocessor defines, extensions, and shader chunks.</li>
+<li>Vertex displacement, normal changes, coordinate spaces, and shadow-caster behavior.</li>
+<li>Fragment color, alpha or discard behavior, blending, depth writes, derivatives, and texture operations.</li>
+<li>Texture color spaces, data encodings, wrapping, filtering, mip behavior, and precision.</li>
+<li>Built-in lighting or material behavior injected through <code>onBeforeCompile</code>.</li>
+<li>External consumers such as bloom, MRT outputs, picking IDs, or readback.</li>
+</ul>
+<p>Classify the shader&#39;s primary contract. A physically lit surface, screen-space effect, compute kernel, and full custom output do not have the same NodeMaterial target. This guide focuses on material graphs; route a shared final-image chain to <code>threejs-image-pipeline</code> and a concrete migration failure to <code>threejs-debugging</code>.</p>
+<h2 id="map-glsl-concepts-to-explicit-node-owners">Map GLSL concepts to explicit node owners</h2>
+<div class="content-table" role="region" aria-label="Data table 1 for Migrate a Three.js ShaderMaterial to TSL" tabindex="0"><table>
+<thead>
+<tr>
+<th>GLSL source concept</th>
+<th>TSL and NodeMaterial target</th>
+<th>Migration rule</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Uniform dictionary</td>
+<td>One <code>uniform()</code> node per mutable input</td>
+<td>Preserve type, unit, update cadence, and the application owner that changes the value.</td>
+</tr>
+<tr>
+<td>Attribute plus varying</td>
+<td>Accessor such as <code>uv()</code> or <code>attribute()</code>, followed by a named node graph</td>
+<td>Keep the value in an explicit coordinate space; do not recreate varyings merely because the source used them.</td>
+</tr>
+<tr>
+<td>Vertex transform or displacement</td>
+<td>Base NodeMaterial transform plus <code>positionNode</code></td>
+<td>Port visible and shadow position together; use <code>castShadowPositionNode</code> only for an intentionally different caster.</td>
+</tr>
+<tr>
+<td>Fragment color expression</td>
+<td><code>colorNode</code>, <code>emissiveNode</code>, opacity or other semantic material slots</td>
+<td>Choose slots from the observable being preserved, not from GLSL syntax.</td>
+</tr>
+<tr>
+<td>Shader-owned lighting model</td>
+<td>Appropriate <code>MeshStandardNodeMaterial</code> or <code>MeshPhysicalNodeMaterial</code></td>
+<td>Retain Three.js lighting and shadow behavior unless replacing that behavior is an explicit requirement.</td>
+</tr>
+<tr>
+<td>Tone mapping and color conversion code</td>
+<td>One renderer or final-pipeline output owner</td>
+<td>Keep material values scene-linear and remove duplicate presentation transforms.</td>
+</tr>
+</tbody></table></div>
+<p>Apply the migration in this order: select the target material class, bind typed inputs, port the shared coordinate and cause graph, port vertex and shadow behavior, bind semantic material slots, then compare no-post output before restoring downstream processing.</p>
+<h2 id="choose-a-nodematerial-target-rather-than-translating-strings">Choose a NodeMaterial target rather than translating strings</h2>
+<p>For a physically lit surface, start with <code>MeshStandardNodeMaterial</code> or <code>MeshPhysicalNodeMaterial</code>. Preserve Three.js lighting, environment, shadow, transmission, clearcoat, sheen, anisotropy, and output behavior, then replace only the procedural causes through node slots.</p>
+<p>For example, this source material owns one unlit, scene-linear UV gradient and delegates tone mapping and output conversion to Three.js:</p>
+<pre tabindex="0"><code class="language-js">import { ShaderMaterial } from &#39;three&#39;;
+
+const material = new ShaderMaterial({
+  name: &#39;uv-gradient&#39;,
+  vertexShader: `
+    varying vec2 vUv;
+
+    void main() {
+      vUv = uv;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `,
+  fragmentShader: `
+    varying vec2 vUv;
+
+    void main() {
+      vec3 surface = mix(
+        vec3(0.08, 0.22, 0.48),
+        vec3(0.94, 0.42, 0.10),
+        vUv.x
+      );
+      gl_FragColor = vec4(surface, 1.0);
+      #include &lt;tonemapping_fragment&gt;
+      #include &lt;colorspace_fragment&gt;
+    }
+  `
+});
+</code></pre>
+<p>The r185 target preserves the same UV input and scene-linear color expression while returning transform and presentation ownership to the renderer:</p>
+<pre tabindex="0"><code class="language-js">import { MeshBasicNodeMaterial } from &#39;three/webgpu&#39;;
+import { mix, uv, vec3 } from &#39;three/tsl&#39;;
+
+const material = new MeshBasicNodeMaterial({ name: &#39;uv-gradient&#39; });
+material.colorNode = mix(
+  vec3(0.08, 0.22, 0.48),
+  vec3(0.94, 0.42, 0.10),
+  uv().x
+);
+</code></pre>
+<p>This pair is deliberately narrow: it proves the ownership change for one unlit UV gradient, not an automatic translation recipe for lighting, displacement, alpha, or arbitrary GLSL.</p>
+<p>Build one shared TSL cause graph and derive color, roughness, metalness, normal, opacity, emissive, and masks from it. Repeating unrelated noise or texture work independently per channel can detach the material&#39;s visible identity and multiply cost.</p>
+<h2 id="port-vertex-coordinate-and-shadow-behavior-together">Port vertex, coordinate, and shadow behavior together</h2>
+<p>Label every value as object, local, world, view, clip, UV, texel, or another explicit space. Preserve the original units and transformations. A matching expression in a different space is not a successful port.</p>
+<p>Use <code>positionNode</code> for visible displacement. In r185, <code>positionNode</code> already feeds shadow projection. Set <code>castShadowPositionNode</code> only when the caster intentionally uses a different position; duplicating the same displacement there creates a second owner without changing the intended shadow contract.</p>
+<p>Fragment derivatives must execute in derivative-uniform control flow. For vertex or compute displacement, use an analytic or stored gradient rather than assuming fragment derivatives transfer across stages. Validate normal orientation and encoding with direct diagnostic output.</p>
+<p>Keep geometry-owned silhouette and topology separate from material microstructure. If the old shader changes topology or depends on an unsupported asset pipeline, name that dependency instead of forcing it into a material node.</p>
+<h2 id="port-material-response-and-color-ownership">Port material response and color ownership</h2>
+<p>Color textures use their declared sRGB encoding; normals, roughness, masks, identifiers, simulation fields, and other data remain non-color data. Generated procedural colors stay scene-linear until the unique output owner. Do not apply display conversion inside a material cause and again in the final pipeline.</p>
+<p>Use <code>emissiveNode</code> only for real material emission. Bloom is a later optical consumer and requires an HDR emission and exposure policy. Do not paint glow into base color or treat bloom as evidence that emissive energy is correct.</p>
+<p>For normals, derive the perturbation from the same height or structural field that produces the visible detail. Keep derivative work within valid control flow and preserve the base material&#39;s normal and shadow semantics. For dissolve and cutouts, drive visible and shadow masks from the same instance or field inputs.</p>
+<p>Assign one tone-map owner and one output-conversion owner. If explicit <code>renderOutput(...)</code> owns final presentation, set <code>renderPipeline.outputColorTransform = false</code>. After changing <code>renderPipeline.outputNode</code> or <code>renderPipeline.outputColorTransform</code>, set <code>renderPipeline.needsUpdate = true</code>.</p>
+<h2 id="compare-the-original-and-target-with-useful-diagnostics">Compare the original and target with useful diagnostics</h2>
+<p>Capture near, design, and far views plus deterministic seeds or inputs. Compare:</p>
+<ul>
+<li>No-post material response.</li>
+<li>Base color or material identity.</li>
+<li>Roughness, metalness, and other physical parameters.</li>
+<li>Geometric and perturbed normals.</li>
+<li>Texture footprint, filtering, and aliasing behavior.</li>
+<li>Visible displacement and shadow-caster parity.</li>
+<li>Alpha, dissolve, and shadow masks.</li>
+<li>Raw emission, final output, and output conversion.</li>
+</ul>
+<p>No source-bound evidence linked by this guide proves a general GLSL-to-TSL material migration. The demo catalog entries for the <a href="/demos/webgpu-image-pipeline/">WebGPU image-pipeline lab</a> and <a href="/demos/webgpu-validation-harness/">validation harness</a> describe output and evidence mechanisms, but the catalog is not live status authority. Confirm a matching source hash and evidence record before using either artifact; the target project must still provide its own material comparison.</p>
+<h2 id="handle-limits-and-rollback-honestly">Handle limits and rollback honestly</h2>
+<p>Do not promise that every GLSL shader has an automatic TSL equivalent. Custom chunks, unsupported renderer paths, stage-specific operations, third-party material patches, or release-dependent APIs can require redesign or a bounded blocker. Inspect installed <code>three/tsl</code> exports and source rather than relying on an API name from another release.</p>
+<p>Keep the original material available for fixed comparison until every required material, shadow, color, output, lifecycle, correctness, and named-device sustained performance or latency gate passes. If the target cannot preserve the required observable, roll back that material unit or reduce scope. Do not retain a hidden ShaderMaterial branch inside the canonical WebGPURenderer route.</p>
+<section class="content-related" aria-labelledby="content-related-title"><h2 id="content-related-title">Next steps</h2><ul class="content-ruled-list"><li><a data-related-route="/migrate/webglrenderer-to-webgpurenderer/" data-related-family="migrate" href="/migrate/webglrenderer-to-webgpurenderer/"><span class="content-related-family">Migration</span><span>Migrate Three.js WebGLRenderer to WebGPURenderer</span></a></li><li><a data-related-route="/compare/threejs-tsl-vs-glsl/" data-related-family="compare" href="/compare/threejs-tsl-vs-glsl/"><span class="content-related-family">Comparisons</span><span>Three.js TSL vs GLSL</span></a></li><li><a data-related-route="/faq/why-does-my-tsl-post-processing-look-double-tone-mapped/" data-related-family="faq" href="/faq/why-does-my-tsl-post-processing-look-double-tone-mapped/"><span class="content-related-family">FAQ</span><span>Why Does My TSL Post-Processing Look Double Tone-Mapped?</span></a></li><li><a data-related-route="/docs/use-in-an-existing-project/" data-related-family="docs" href="/docs/use-in-an-existing-project/"><span class="content-related-family">Documentation</span><span>Use Three.js Agent Skills in an Existing Project</span></a></li></ul></section><section class="content-skills" aria-labelledby="content-skills-title"><h2 id="content-skills-title">Relevant skills</h2><ul class="content-ruled-list"><li><a href="/skills/threejs-choose-skills.html">Route Three.js WebGPU/TSL Work</a></li><li><a href="/skills/threejs-debugging.html">Three.js Debugging</a></li><li><a href="/skills/threejs-procedural-materials.html">Procedural Materials</a></li><li><a href="/skills/threejs-image-pipeline.html">Image Pipeline</a></li><li><a href="/skills/threejs-visual-validation.html">Visual Validation</a></li></ul></section><section class="content-demos" aria-labelledby="content-demos-title"><h2 id="content-demos-title">Relevant demos and evidence</h2><ul class="content-ruled-list"><li><a href="/demos/webgpu-image-pipeline/">WebGPU Image Pipeline</a></li><li><a href="/demos/webgpu-validation-harness/">Native WebGPU validation harness</a></li></ul></section><section class="content-sources" aria-labelledby="content-sources-title"><h2 id="content-sources-title">Sources and correction path</h2><ul class="content-ruled-list"><li><a href="https://threejs.org/docs/TSL.html">threejs.org/docs/TSL.html</a></li><li><a href="https://threejs.org/manual/en/webgpurenderer">threejs.org/manual/en/webgpurenderer</a></li><li><a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-materials/SKILL.md">github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-materials/SKILL.md</a></li><li><a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-image-pipeline/SKILL.md">github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-image-pipeline/SKILL.md</a></li><li><a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/docs/demos/registry.json">github.com/linegel/threejs-complete-set-of-skill/blob/main/docs/demos/registry.json</a></li><li><a href="https://github.com/linegel/threejs-complete-set-of-skill/issues">Report a correction</a></li></ul></section>
+      <nav class="content-discovery" aria-label="Machine-readable discovery"><a href="/guides/">All guides</a><a href="/llms.txt">LLM catalog</a><a href="/skills.json">Machine index</a></nav>
+    </article>
+  </div></div></div>
+</main>
+<div class="wrap"><footer>
+  <div class="footer-summary">Three.js WebGPU Skill Pack: TSL, procedural graphics, and visual validation.
+    <span>Proof status and supported revision are stated on each decision page and linked evidence report.</span>
+    <span>Compiling shaders? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span>
+  </div>
+  <div class="footer-groups">
+    <div class="footer-group"><strong>Build</strong><a href="/#skills">Skills</a><a href="/#flagships">Examples</a><a href="/industries/">Industries</a></div>
+    <div class="footer-group"><strong>Decide</strong><a href="/for/">Who it is for</a><a href="/compare/">Compare</a><a href="/alternatives/">Alternatives</a><a href="/pricing/">Pricing</a></div>
+    <div class="footer-group"><strong>Adopt</strong><a href="/docs/">Docs</a><a href="/migrate/">Migration</a><a href="/agents/">Agent docs</a><a href="/faq/">FAQ</a></div>
+    <div class="footer-group"><strong>Proof</strong><a href="/evidence/">Evidence</a><a href="/about/">Method</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a><a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/LICENSE">License</a></div>
+  </div>
+</footer></div>
+</body>
+</html>

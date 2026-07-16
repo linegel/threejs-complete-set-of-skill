@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Three.js WebGPU for Product Visualization and Configurators</title>
+<meta name="description" content="Build product viewers and configurators that preserve part identity, materials, inspection behavior, and color-managed Three.js WebGPU output." />
+<link rel="canonical" href="https://threejs-skills.com/industries/product-visualization-and-configurators/" />
+<meta name="robots" content="index, follow, max-image-preview:large" />
+<meta name="theme-color" content="#0a0c10" />
+
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="manifest" href="/site.webmanifest" />
+<link rel="alternate" type="text/plain" href="https://threejs-skills.com/llms.txt" title="LLM-readable skill catalog" />
+<link rel="alternate" type="application/json" href="https://threejs-skills.com/skills.json" title="Machine-readable skill catalog" />
+<meta property="og:type" content="website" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
+<meta property="og:title" content="Three.js WebGPU for Product Visualization and Configurators" />
+<meta property="og:description" content="Build product viewers and configurators that preserve part identity, materials, inspection behavior, and color-managed Three.js WebGPU output." />
+<meta property="og:url" content="https://threejs-skills.com/industries/product-visualization-and-configurators/" />
+<meta property="og:image" content="https://threejs-skills.com/icon-512.png" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:width" content="512" />
+<meta property="og:image:height" content="512" />
+<meta property="og:image:alt" content="Three.js WebGPU Skill Pack mark" />
+<meta name="twitter:image" content="https://threejs-skills.com/icon-512.png" />
+<meta name="twitter:image:alt" content="Three.js WebGPU Skill Pack mark" />
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="Three.js WebGPU for Product Visualization and Configurators" />
+<meta name="twitter:description" content="Build product viewers and configurators that preserve part identity, materials, inspection behavior, and color-managed Three.js WebGPU output." />
+<script type="application/ld+json">{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "Organization",
+   "@id": "https://threejs-skills.com/#publisher",
+   "name": "Three.js WebGPU Skill Pack contributors",
+   "url": "https://threejs-skills.com/",
+   "sameAs": "https://github.com/linegel/threejs-complete-set-of-skill",
+   "logo": {
+    "@type": "ImageObject",
+    "url": "https://threejs-skills.com/icon-512.png",
+    "contentUrl": "https://threejs-skills.com/icon-512.png",
+    "width": 512,
+    "height": 512
+   }
+  },
+  {
+   "@type": "WebPage",
+   "@id": "https://threejs-skills.com/industries/product-visualization-and-configurators/#webpage",
+   "url": "https://threejs-skills.com/industries/product-visualization-and-configurators/",
+   "name": "Three.js WebGPU for Product Visualization and Configurators",
+   "headline": "Three.js WebGPU for product visualization and configurators",
+   "description": "Build product viewers and configurators that preserve part identity, materials, inspection behavior, and color-managed Three.js WebGPU output.",
+   "datePublished": "2026-07-16",
+   "dateModified": "2026-07-16",
+   "inLanguage": "en",
+   "isAccessibleForFree": true,
+   "publisher": {
+    "@id": "https://threejs-skills.com/#publisher"
+   },
+   "breadcrumb": {
+    "@id": "https://threejs-skills.com/industries/product-visualization-and-configurators/#breadcrumb"
+   },
+   "image": "https://threejs-skills.com/icon-512.png"
+  },
+  {
+   "@type": "BreadcrumbList",
+   "@id": "https://threejs-skills.com/industries/product-visualization-and-configurators/#breadcrumb",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Skill Pack",
+     "item": "https://threejs-skills.com/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Industries",
+     "item": "https://threejs-skills.com/industries/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Three.js WebGPU for product visualization and configurators",
+     "item": "https://threejs-skills.com/industries/product-visualization-and-configurators/"
+    }
+   ]
+  }
+ ]
+}</script>
+
+<link rel="preload" href="/assets/vendor/katex/fonts/KaTeX_SansSerif-Regular.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/assets/vendor/katex/fonts/KaTeX_SansSerif-Bold.woff2" as="font" type="font/woff2" crossorigin />
+<style>
+@view-transition{navigation:auto}
+@font-face{font-family:'Evidence Sans';src:url('/assets/vendor/katex/fonts/KaTeX_SansSerif-Regular.woff2') format('woff2');font-style:normal;font-weight:400;font-display:swap}
+@font-face{font-family:'Evidence Sans';src:url('/assets/vendor/katex/fonts/KaTeX_SansSerif-Italic.woff2') format('woff2');font-style:italic;font-weight:400;font-display:swap}
+@font-face{font-family:'Evidence Sans';src:url('/assets/vendor/katex/fonts/KaTeX_SansSerif-Bold.woff2') format('woff2');font-style:normal;font-weight:700;font-display:swap}
+@font-face{font-family:'Evidence Mono';src:url('/assets/vendor/katex/fonts/KaTeX_Typewriter-Regular.woff2') format('woff2');font-style:normal;font-weight:400;font-display:swap}
+:root{
+  --bg:#080a0e; --bg2:#0e1117; --bg3:#131821; --ink:#f0ede5; --dim:#aaa99f;
+  --amber:#ffb454; --cyan:#7fd4c1; --lime:#b6de82; --violet:#b7a2ff; --rose:#ff927a; --line:#242933;
+  --disp:'Evidence Sans',ui-sans-serif,sans-serif; --mono:'Evidence Mono',ui-monospace,monospace; --sans:'Evidence Sans',ui-sans-serif,sans-serif;
+  --shadow-card:0 0 0 1px rgba(255,255,255,.075),0 1px 2px rgba(0,0,0,.28),0 18px 55px rgba(0,0,0,.18);
+  --shadow-card-hover:0 0 0 1px rgba(255,255,255,.14),0 1px 2px rgba(0,0,0,.34),0 24px 70px rgba(0,0,0,.34);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+picture.responsive-preview{display:contents}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:var(--bg)}
+body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7}
+::selection{background:rgba(255,180,84,.26);color:var(--ink)}
+a{color:inherit;text-decoration:none}
+a:focus-visible,button:focus-visible,summary:focus-visible,pre[tabindex]:focus-visible,[role="region"]:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
+main{display:block}
+.skip-link{position:fixed;z-index:100;left:16px;top:12px;translate:0 -160%;font-family:var(--mono);font-size:12px;background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:9px;transition-property:translate;transition-duration:160ms}
+.skip-link:focus{translate:0 0}
+.wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
+.site-nav{position:sticky;z-index:50;top:0;background:rgba(8,10,14,.82);border-bottom:1px solid rgba(255,255,255,.075);backdrop-filter:blur(18px) saturate(1.15)}
+.site-nav>.wrap{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+.site-nav .brand{min-height:44px;display:inline-flex;align-items:center;white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
+.site-nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
+.site-nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
+.site-nav .links a:hover{color:var(--amber)}
+.site-nav .links a:active{scale:.96}
+h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:0}
+p{text-wrap:pretty}
+h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
+.section{padding:clamp(56px,8vw,110px) 0;border-top:1px solid var(--line)}
+.section>.wrap>p.sub{color:var(--dim);max-width:64ch;margin-bottom:44px}
+.kicker{font-family:var(--mono);color:var(--amber);font-size:13px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:26px}
+pre{font-family:var(--mono);background:#06080b;box-shadow:0 0 0 1px rgba(255,255,255,.075),inset 2px 0 var(--amber);border-radius:12px;padding:14px 16px;overflow-x:auto;
+  font-size:13px;line-height:1.65;color:#d8d2c2;white-space:pre-wrap}
+code{font-family:var(--mono)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:16px}
+.card{min-height:100%;background:linear-gradient(145deg,rgba(19,24,33,.96),rgba(12,15,21,.96));border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px;
+  box-shadow:var(--shadow-card);transition-property:translate,scale,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
+.card:hover{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
+.card:active{translate:0 -1px;scale:.96}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.card-kind{font-family:var(--mono);font-size:10px;color:var(--cyan)}
+.card h3,.card h4{font-size:19px;font-weight:600}
+.card p{color:var(--dim);font-size:14.5px;line-height:1.62;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.card-meta{font-family:var(--mono);margin-top:auto;padding-top:12px;font-size:11.5px;color:var(--cyan);border-top:1px dashed var(--line)}
+.status{display:inline-flex;align-items:center;font-family:var(--mono);font-size:10px;line-height:1.2;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.status--accepted{color:var(--lime)}
+.status--pending{color:var(--amber)}
+.status--secondary{color:var(--dim)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:22px}
+figure{height:100%;overflow:hidden;background:var(--bg2);border-radius:18px;box-shadow:var(--shadow-card);transition-property:translate,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
+a:hover>figure{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
+figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.05);outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
+.preview-media,.lab-card-media,.flagship-preview{position:relative;display:block;overflow:hidden;background:#090c11}
+.preview-media img,.lab-card-media img,.flagship-preview img,.card-preview{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
+.media-caption{display:block;padding:8px 2px 0;font-family:var(--mono);font-size:9px;line-height:1.4;color:var(--dim)}
+.secondary-preview-status{display:grid;gap:5px;padding:14px 0;color:var(--dim);font-family:var(--mono);font-size:10px;line-height:1.4}
+.secondary-preview-status strong{color:var(--ink);font-family:var(--disp);font-size:16px}.secondary-preview-status code{color:var(--dim);font-size:9px}
+.primary-evidence-panel{display:grid;gap:5px;margin-top:14px;padding-top:14px;border-top:1px solid var(--line);font-family:var(--mono);font-size:10px;line-height:1.45;color:var(--dim)}
+.primary-evidence-panel[data-evidence-state="accepted"]{border-top-color:var(--lime)}
+.primary-evidence-panel strong{color:var(--ink);font-family:var(--disp);font-size:18px;line-height:1.2}.primary-evidence-panel code{color:var(--cyan);font-size:10px}.primary-evidence-label{color:var(--amber);font-size:9px;letter-spacing:.09em;text-transform:uppercase}.primary-evidence-panel[data-evidence-state="accepted"] .primary-evidence-label{color:var(--lime)}
+figcaption{padding:16px 18px;font-size:14.5px}
+figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
+figcaption span{display:block;margin-top:3px;color:var(--dim)}
+footer{border-top:1px solid var(--line);padding:44px 0 60px;display:grid;grid-template-columns:minmax(260px,1.4fr) minmax(0,2fr);gap:36px 64px;color:var(--dim);font-size:14.5px}
+footer a{color:var(--amber)}
+footer a:hover{text-decoration:underline}
+footer code{color:var(--cyan);font-size:11px}
+.footer-summary{max-width:55ch}.footer-summary>span{display:block;margin-top:8px;font-size:13px}.footer-groups{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}.footer-group{display:grid;align-content:start;gap:8px}.footer-group strong{font:400 10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}.footer-group a{min-height:40px;display:flex;align-items:center;color:var(--dim);font-size:13px;transition-property:color,scale;transition-duration:160ms}.footer-group a:hover{color:var(--amber);text-decoration:none}.footer-group a:active{scale:.96}
+.pathfinder{padding:clamp(52px,7vw,86px) 0;border-bottom:1px solid var(--line)}.pathfinder-head{display:grid;grid-template-columns:minmax(0,.7fr) minmax(320px,1.3fr);align-items:end;gap:28px 72px;margin-bottom:28px}.pathfinder-head h2{margin:0}.pathfinder-head p{max-width:58ch;color:var(--dim)}.pathfinder-rows{border-top:1px solid var(--line)}.pathfinder-row{display:grid;grid-template-columns:minmax(160px,.55fr) minmax(210px,.8fr) minmax(0,1.6fr);gap:20px 32px;align-items:center;min-height:94px;border-bottom:1px solid var(--line)}.pathfinder-stage{font:10px/1.4 var(--mono);letter-spacing:.11em;text-transform:uppercase;color:var(--cyan)}.pathfinder-row>p{color:var(--dim);font-size:14px}.pathfinder-links{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px 18px}.pathfinder-links a{min-height:44px;display:inline-flex;align-items:center;gap:8px;color:var(--amber);font:11px/1.35 var(--mono);transition-property:color,scale;transition-duration:160ms}.pathfinder-links a:after{content:"→"}.pathfinder-links a:hover{color:var(--ink)}.pathfinder-links a:active{scale:.96}
+.content-hero{padding:clamp(54px,8vw,104px) 0 42px;border-bottom:1px solid var(--line)}.breadcrumbs{min-height:44px;display:flex;align-items:center;margin-bottom:28px;font:11px/1.4 var(--mono);color:var(--dim)}.breadcrumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.breadcrumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}.breadcrumbs a{min-height:40px;display:inline-flex;align-items:center;transition-property:color,scale;transition-duration:160ms}.breadcrumbs a:hover{color:var(--amber)}.breadcrumbs a:active{scale:.96}.content-hero h1{max-width:17ch;font-size:clamp(40px,6vw,68px);font-weight:700;line-height:1.02;letter-spacing:-.02em}.content-lede{max-width:66ch;margin-top:22px;color:var(--dim);font-size:clamp(17px,2vw,20px)}.content-meta{display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:28px;font:10px/1.4 var(--mono);color:var(--cyan)}
+.content-answer{max-width:900px;margin-top:34px;padding:3px 0 3px 22px;border-left:2px solid var(--amber);font-size:clamp(19px,2.2vw,21px);line-height:1.62;color:var(--ink)}.content-shell{padding:clamp(46px,7vw,86px) 0}.content-layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(230px,1fr);align-items:start;gap:clamp(36px,6vw,76px)}.content-body{grid-column:1;grid-row:1;max-width:78ch;min-width:0}.content-body h2{margin:52px 0 16px;font-size:clamp(27px,3.5vw,39px);scroll-margin-top:112px}.content-body>h2:first-child{margin-top:0}.content-body h3{margin:34px 0 12px;font-size:21px;scroll-margin-top:112px}.content-body p,.content-body li{color:var(--dim);font-size:16px}.content-body p+p{margin-top:17px}.content-body ul,.content-body ol{margin:16px 0;padding-left:24px}.content-body li+li{margin-top:7px}.content-body a{color:var(--cyan);text-decoration:underline;text-decoration-color:rgba(127,212,193,.35);text-underline-offset:3px}.content-body a:hover{color:var(--amber);text-decoration-color:currentColor}.content-body code:not(pre code){padding:1px 5px;border:1px solid var(--line);border-radius:5px;background:#07090c;color:var(--cyan);font-size:.86em}.content-body pre{margin:20px 0;white-space:pre;tab-size:2}.content-table{max-width:100%;margin:22px 0;overflow-x:auto;border:1px solid var(--line);border-radius:12px}.content-table:focus-visible{outline:2px solid var(--amber);outline-offset:3px}.content-table table{width:100%;border-collapse:collapse;font-size:14px}.content-table th,.content-table td{min-width:150px;padding:11px 13px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);text-align:left;vertical-align:top;color:var(--dim)}.content-table th{color:var(--ink);font-weight:600;background:var(--bg2)}.content-table tr:last-child td{border-bottom:0}.content-table th:last-child,.content-table td:last-child{border-right:0}
+.content-index{grid-column:2;grid-row:1;position:sticky;top:104px;max-height:calc(100vh - 128px);overflow-y:auto;padding:18px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.content-index strong{display:block;margin-bottom:10px;font:10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}.content-index ol{list-style:none}.content-index a{min-height:40px;display:flex;align-items:center;padding:5px 0;color:var(--dim);font-size:13px;line-height:1.4;transition-property:color,translate,scale;transition-duration:160ms}.content-index a:hover{color:var(--amber);translate:3px 0}.content-index a:active{translate:1px 0;scale:.96}.content-proof{margin:54px 0 0}.content-proof figure{border-radius:16px}.content-proof img{width:100%;height:auto;max-height:650px;object-fit:cover;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}.content-proof figcaption{color:var(--dim);font:11px/1.55 var(--mono)}.content-proof figcaption a{color:var(--amber)}
+.content-layout--docs{grid-template-columns:minmax(190px,.6fr) minmax(0,2fr)}.content-layout--docs .content-index{grid-column:1}.content-layout--docs .content-body{grid-column:2;max-width:72ch}.docs-index a{padding-inline:10px;border-left:2px solid transparent}.docs-index a[aria-current="page"]{border-left-color:var(--amber);background:rgba(255,180,84,.06);color:var(--ink);font-weight:600}.docs-index-current{display:none}
+.content-facts,.content-faq-list,.content-related,.content-sources,.content-skills,.content-demos,.content-discovery,.faq-provenance{margin-top:54px;padding-top:22px;border-top:1px solid var(--line)}.content-facts h2,.content-faq-list h2,.content-related h2,.content-sources h2,.content-skills h2,.content-demos h2{font-size:24px}.content-ruled-list{list-style:none;border-top:1px solid var(--line)}.content-ruled-list li{border-bottom:1px solid var(--line)}.content-ruled-list a{min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:9px 0;color:var(--dim);font-size:14px;transition-property:color,scale;transition-duration:160ms}.content-ruled-list a:after{content:"→";color:var(--amber)}.content-ruled-list a:hover{color:var(--ink)}.content-ruled-list a:active{scale:.96}.content-related .content-ruled-list a{display:grid;grid-template-columns:104px minmax(0,1fr) auto}.content-related-family{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}.content-faq-item{padding:22px 0;border-bottom:1px solid var(--line)}.content-faq-item h3{margin:0;font-size:20px}.content-faq-item h3 a{color:var(--ink)}.content-faq-item p{margin-top:9px;color:var(--dim);font-size:15px}.faq-provenance{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);padding:0}.faq-provenance div{padding:13px;background:var(--bg2)}.faq-provenance dt{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}.faq-provenance dd{margin-top:5px;font:11px/1.45 var(--mono);color:var(--cyan);overflow-wrap:anywhere}.content-discovery{display:flex;flex-wrap:wrap;gap:10px 22px;font:11px/1.5 var(--mono);color:var(--dim)}.content-discovery a{min-height:40px;display:inline-flex;align-items:center;color:var(--amber)}
+@media (max-width:760px){
+  .site-nav .wrap{padding-right:0}
+  .site-nav>.wrap{min-height:104px;display:grid;grid-template-columns:1fr;padding-top:14px;padding-bottom:10px;gap:4px}
+  .site-nav .brand{font-size:16px}
+  .site-nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;scrollbar-color:rgba(255,180,84,.45) transparent;padding:0 20px 4px 0}
+  .site-nav .links::-webkit-scrollbar{height:3px}.site-nav .links::-webkit-scrollbar-thumb{background:rgba(255,180,84,.45);border-radius:99px}
+  .site-nav .links a{flex:0 0 auto}
+  .grid,.gallery{grid-template-columns:1fr}
+  footer{grid-template-columns:1fr}.footer-groups{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:900px){.pathfinder-head,.content-layout{grid-template-columns:1fr}.content-index{grid-column:1;grid-row:1;position:static;max-height:none}.content-body,.content-layout--docs .content-body{grid-column:1;grid-row:2}.docs-index{overflow:hidden}.docs-index-current{display:flex;margin-bottom:8px}.docs-index ol{display:flex;gap:8px;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;padding-bottom:6px}.docs-index li{flex:0 0 min(72vw,260px)}.docs-index .docs-index-list-current{display:none}.docs-index a{min-height:44px;padding:8px 10px;border-left:0;border-bottom:2px solid transparent;background:var(--bg2)}.docs-index a[aria-current="page"]{border-bottom-color:var(--amber)}.pathfinder-row{grid-template-columns:minmax(160px,.6fr) minmax(0,1fr)}.pathfinder-links{grid-column:1/-1;justify-content:flex-start;padding-bottom:18px}.faq-provenance{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.pathfinder-row{grid-template-columns:1fr;gap:6px;padding:18px 0}.pathfinder-links{grid-column:auto;padding:0}.content-hero h1{font-size:clamp(38px,12vw,54px)}.content-answer{padding-left:16px}.content-table{border-radius:8px}.content-table table{min-width:680px}.faq-provenance{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+  ::view-transition-old(root),::view-transition-new(root){animation:none!important}
+}
+</style>
+</head>
+<body data-content-kind="industry" data-content-route="/industries/product-visualization-and-configurators/">
+<a class="skip-link" href="#main-content">Skip to content</a><header class="site-nav"><div class="wrap">
+  <a class="brand" href="/">Three.js WebGPU Skill&nbsp;Pack</a>
+  <nav class="links" aria-label="Primary navigation"><a href="/#flagships">Examples</a><a href="/#skills">Skills</a><a href="/guides/">Guides</a><a href="/evidence/">Evidence</a><a href="/#install">Install</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub</a></nav>
+</div></header>
+<main id="main-content" tabindex="-1">
+  <header class="content-hero"><div class="wrap">
+    <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://threejs-skills.com/">Skill Pack</a></li><li><a href="https://threejs-skills.com/industries/">Industries</a></li><li aria-current="page">Three.js WebGPU for product visualization and configurators</li></ol></nav>
+    <p class="kicker">Industries</p>
+    <h1>Three.js WebGPU for product visualization and configurators</h1>
+    <p class="content-lede">Build product viewers and configurators that preserve part identity, materials, inspection behavior, and color-managed Three.js WebGPU output.</p>
+    <p class="content-answer">Use the pack to preserve product truth through rendering including exact part and variant identity, stable silhouette, material response, inspection behavior, and color-managed output. Preserve the authoritative product hierarchy instead of replacing it.</p>
+    <div class="content-meta"><span>Published 2026-07-16</span><span>Reviewed 2026-07-16</span></div>
+  </div></header>
+  <div class="content-shell"><div class="wrap"><div class="content-layout">
+    <nav class="content-index" aria-label="On this page"><strong>On this page</strong><ol><li><a href="#protect-product-truth-before-adding-polish">Protect product truth before adding polish</a></li><li><a href="#use-a-concrete-reference-workload">Use a concrete reference workload</a></li><li><a href="#assign-product-and-rendering-ownership-explicitly">Assign product and rendering ownership explicitly</a></li><li><a href="#bind-variants-without-rebuilding-the-product">Bind variants without rebuilding the product</a></li><li><a href="#prove-material-response-under-neutral-output">Prove material response under neutral output</a></li><li><a href="#make-inspection-behavior-predictable">Make inspection behavior predictable</a></li><li><a href="#keep-the-presentation-graph-minimal">Keep the presentation graph minimal</a></li><li><a href="#trade-presentation-quality-against-named-resources">Trade presentation quality against named resources</a></li><li><a href="#close-deployment-lifecycle-and-accessibility-constraints">Close deployment, lifecycle, and accessibility constraints</a></li><li><a href="#validate-the-actual-buying-and-inspection-states">Validate the actual buying and inspection states</a></li><li><a href="#know-when-another-route-is-better">Know when another route is better</a></li><li><a href="#what-this-page-does-not-claim">What this page does not claim</a></li></ol></nav>
+    <article class="content-body"><h2 id="protect-product-truth-before-adding-polish">Protect product truth before adding polish</h2>
+<p>The source of truth is the imported product hierarchy, stable part IDs, variant table, material definitions, and approved product data. A rendering change must preserve silhouette, part correspondence, visibility state, material response, and color intent across every supported configuration.</p>
+<p>Start with <a href="/skills/threejs-choose-skills.html">Choose Skills</a> and classify the workload as an identity-sensitive product configurator. Reject procedural replacement geometry when the imported silhouette is authoritative. Reject bloom or AO as a repair for incorrect materials, lighting, or color management.</p>
+<h2 id="use-a-concrete-reference-workload">Use a concrete reference workload</h2>
+<p>The reference workload is one imported product assembly with stable SKU and part IDs, a finite variant catalog, material and visibility swaps, orbit/zoom inspection, click or tap selection, a deterministic reset view, neutral no-post output, and a final color-managed presentation. Treat one world unit as one metre after asset conversion, camera distance and bounds in metres, control and adaptation time in seconds, interaction latency in milliseconds, texture dimensions in pixels, and resident/upload cost in bytes.</p>
+<p>The workload contract is:</p>
+<ul>
+<li>The product-information or commerce system owns the allowed variant record. Rendering receives one immutable variant revision at a time.</li>
+<li>Every rendered node maps to a stable product part ID. Material or visibility changes may not silently change that correspondence.</li>
+<li>Approved silhouette, part presence, material assignment, neutral color reference, selection result, and camera reset pose are acceptance gates.</li>
+<li>The target matrix names browser, device/GPU class, physical canvas size, DPR, input modes, display/color assumptions, asset-cache state, and memory ceiling.</li>
+<li>The representative sequence loads the base assembly, applies each supported variant transition, selects a part, frames it, resets the camera, resizes the view, and tears the viewer down.</li>
+</ul>
+<p>This is a workload definition, not evidence that the repository contains a customer configurator.</p>
+<h2 id="assign-product-and-rendering-ownership-explicitly">Assign product and rendering ownership explicitly</h2>
+<div class="content-table" role="region" aria-label="Data table 1 for Three.js WebGPU for product visualization and configurators" tabindex="0"><table>
+<thead>
+<tr>
+<th>Cause or state</th>
+<th>Primary owner</th>
+<th>Consumes</th>
+<th>Must not own</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>SKU, option rules, compatibility, availability, price, transaction</td>
+<td>Product/commerce application</td>
+<td>Catalog and business data</td>
+<td>Render graph or scene-derived guesses</td>
+</tr>
+<tr>
+<td>Imported hierarchy, stable part mapping, asset lifecycle</td>
+<td>Product asset layer</td>
+<td>glTF/CAD conversion output</td>
+<td>Procedural replacement of authoritative shape</td>
+</tr>
+<tr>
+<td>Selection, annotations, DOM controls, analytics, accessibility</td>
+<td>Application interaction/UI layer</td>
+<td>Stable part IDs and user intent</td>
+<td>Camera or material state through hidden side effects</td>
+</tr>
+<tr>
+<td>Material coordinates, causes, PBR channels, dynamic variant state</td>
+<td><a href="/skills/threejs-procedural-materials.html">Procedural Materials</a></td>
+<td>Approved maps, material identity, world or art-unit scale</td>
+<td>Lighting design or product option rules</td>
+</tr>
+<tr>
+<td>Inspection pose, projection, framing, handoff, reset</td>
+<td><a href="/skills/threejs-camera-controls-and-rigs.html">Camera Controls and Rigs</a></td>
+<td>Product bounds, active part target, control intent</td>
+<td>Selection truth or multiple simultaneous camera writers</td>
+</tr>
+<tr>
+<td>Shared targets, optional ID/depth/normal signals, graph mutation, presentation</td>
+<td><a href="/skills/threejs-image-pipeline.html">Image Pipeline</a></td>
+<td>Scene-linear product render and named consumers</td>
+<td>Adding attachments without a consumer</td>
+</tr>
+<tr>
+<td>Exposure, tone map, grading, output conversion</td>
+<td><a href="/skills/threejs-exposure-color-grading.html">Exposure and Color Grading</a></td>
+<td>Declared scene-linear source and color contract</td>
+<td>Repairing wrong source materials or lighting</td>
+</tr>
+<tr>
+<td>Captures, variant sweeps, color diagnostics, resource and lifecycle verdicts</td>
+<td><a href="/skills/threejs-visual-validation.html">Visual Validation</a></td>
+<td>Frozen catalog revision and target matrix</td>
+<td>Declaring product approval on its own</td>
+</tr>
+<tr>
+<td>Studio lighting, IBL/PMREM, reflection probes</td>
+<td>Project lighting owner and official Three.js guidance</td>
+<td>Approved lighting references</td>
+<td>Being inferred from material or post-processing skills</td>
+</tr>
+</tbody></table></div>
+<h2 id="bind-variants-without-rebuilding-the-product">Bind variants without rebuilding the product</h2>
+<p>The application product layer should own SKU, part, option, dependency, compatibility, availability, and transaction state. The rendering layer consumes an immutable variant state and applies material or visibility changes to stable hierarchy nodes.</p>
+<p>Preserve part identity through hide, show, swap, and material changes. Avoid rebuilding geometry for an ordinary variant transaction. Keep picking and selection in the application interaction layer, with an explicit mapping between visible render objects and authoritative product IDs.</p>
+<p>A useful validation sweep enumerates supported variants from fixed cameras and checks required parts, forbidden parts, material assignments, silhouette bounds, selection correspondence, and reset behavior. This evidence must come from the actual product project; the skill repository does not contain a complete customer configurator.</p>
+<h2 id="prove-material-response-under-neutral-output">Prove material response under neutral output</h2>
+<p>Use <a href="/skills/threejs-procedural-materials.html">Three.js Procedural Materials</a> when the missing cause is material identity, filtering, normal response, roughness, emission, or another surface channel. Keep a no-post view where the product can be judged without AO, bloom, or grading.</p>
+<p>The material skill supplies implementation rules and failure conditions, but this page does not attach an unrelated material demo as product proof. A real configurator still needs neutral reference captures, approved material targets, and a variant sweep from its own assets.</p>
+<p>Imported glTF and CAD preparation remains authoritative. Do not use procedural geometry to replace a validated product mesh. Compression, mesh repair, UVs, texture baking, source-asset LOD, KTX2, Meshopt, and DRACO remain asset-pipeline concerns outside this route.</p>
+<h2 id="make-inspection-behavior-predictable">Make inspection behavior predictable</h2>
+<p>Use <a href="/skills/threejs-camera-controls-and-rigs.html">Three.js Camera Controls and Rigs</a> for orbit, inspection, scale-aware framing, projection and depth, handoff, and reset. Define product bounds, allowed views, target anchors, zoom limits, pointer behavior, collision rules, and the exact reset pose.</p>
+<p>The <a href="/demos/webgpu-camera-rig/">camera-rig demo</a> has source-matched accepted evidence for its fixed view routes and camera checks. It does not establish the usability of a product viewer that has not been tested with its users.</p>
+<h2 id="keep-the-presentation-graph-minimal">Keep the presentation graph minimal</h2>
+<p>Use <a href="/skills/threejs-image-pipeline.html">Three.js Image Pipeline</a> for scene and final-output ownership. Start with scene color and presentation. Add depth, normals, velocity, identifiers, or history only after a named consumer is accepted. A persistent identifier attachment may be unnecessary if on-demand picking satisfies the interaction contract.</p>
+<p>Tone mapping and display conversion need one owner. Exposure changes can alter perceived product color, so the project must define whether exposure is fixed, adapted, or constrained. The <a href="/demos/webgpu-exposure-color-pipeline/">exposure and color demo</a> has source-matched accepted evidence for its metering, adaptation, tone-map, LUT, and output mechanisms. Named-adapter GPU timing and lifecycle remain insufficient, and the report does not validate this product&#39;s color.</p>
+<p>General studio lighting, IBL, PMREM, reflection probes, and cube-capture design are not owned by a current expert skill. Use official Three.js and project lighting guidance. Material, shadow, and image-pipeline skills consume lighting; they do not invent a product-lighting contract.</p>
+<p>The complete scene-cause-to-image path is:</p>
+<pre tabindex="0"><code class="language-text">catalog variant revision + stable part IDs
+  -&gt; imported hierarchy visibility/material bindings
+  -&gt; approved textures, geometry, material causes, and project-owned lighting
+  -&gt; inspection camera and selection highlight with one active owner each
+  -&gt; scene-linear product color + only the depth/normal/ID signals with consumers
+  -&gt; fixed or constrained exposure
+  -&gt; one tone map and one output conversion
+  -&gt; physical canvas pixels
+</code></pre>
+<p>Selection flows back through the stable render-object-to-part mapping into the DOM UI; it is not inferred from the final image. Each arrow needs a revision, lifetime, reset condition, and failure state so an asynchronous asset or option change cannot combine two catalog revisions in one frame.</p>
+<h2 id="trade-presentation-quality-against-named-resources">Trade presentation quality against named resources</h2>
+<p>Product truth is not a quality lever. A tier may reduce pixels, reflection updates, shadows, post effects, texture residency, or geometric detail only while preserving the declared part identity, allowed configuration, silhouette tolerance, material class, selection correspondence, and output ownership.</p>
+<div class="content-table" role="region" aria-label="Data table 2 for Three.js WebGPU for product visualization and configurators" tabindex="0"><table>
+<thead>
+<tr>
+<th>Lever</th>
+<th>Named resource cost</th>
+<th>Safe decision rule</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Geometry and LOD</td>
+<td>Vertex/index bytes, upload time, vertex work, acceleration/culling structures, and simultaneous LOD residency during a transition</td>
+<td>Use source-authored LOD with a silhouette-error gate; never generate a cheaper shape that changes approved product geometry</td>
+</tr>
+<tr>
+<td>Texture resolution and format</td>
+<td>Resident texel bytes, mip residency, decode/upload work, sampler bandwidth; an uncompressed full mip chain is approximately <code>width × height × bytes per texel × 4/3</code> before API padding</td>
+<td>Preserve approved material identity and neutral-reference error; choose KTX2 or another project-owned delivery format deliberately</td>
+</tr>
+<tr>
+<td>DPR and scene scale</td>
+<td>Physical pixel count, depth/color/ID attachments, fill, and bandwidth scale with rendered width × height</td>
+<td>Lower resolution only while textural detail, edge quality, and selection feedback remain legible on the target display</td>
+</tr>
+<tr>
+<td>Shadows and reflections</td>
+<td>Shadow depth targets, caster submissions, cube or probe faces, update cadence, and residency</td>
+<td>Spend them only where they communicate form or material truth; lighting remains a project owner</td>
+</tr>
+<tr>
+<td>Picking path</td>
+<td>Persistent ID attachment and write bandwidth versus CPU raycast or an on-demand narrow pass</td>
+<td>Choose from selection frequency, hierarchy complexity, transparency, instancing, and latency requirement</td>
+</tr>
+<tr>
+<td>Exposure and post</td>
+<td>Meter reductions, temporal state, LUT/meter textures, additional passes and histories</td>
+<td>Prefer fixed exposure for stable catalog comparison unless an automatic meter has an explicit source, mask, bounds, and reset</td>
+</tr>
+<tr>
+<td>Variant readiness</td>
+<td>Peak simultaneous geometry/texture residency versus decode/upload stalls during a swap</td>
+<td>Preload only the variant set justified by the memory ceiling; present a defined loading state rather than a mixed configuration</td>
+</tr>
+</tbody></table></div>
+<p>A useful three-policy ledger is:</p>
+<div class="content-table" role="region" aria-label="Data table 3 for Three.js WebGPU for product visualization and configurators" tabindex="0"><table>
+<thead>
+<tr>
+<th>Policy</th>
+<th>Reduce</th>
+<th>Preserve</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Reference capture</td>
+<td>Nothing needed for approval; use approved assets, neutral output, fixed camera, and declared display assumptions</td>
+<td>Exact hierarchy, materials, silhouette, selection map, and color reference</td>
+</tr>
+<tr>
+<td>Interactive inspection</td>
+<td>DPR, shadow/reflection update cadence, optional post, or nonselected detail according to measured pressure</td>
+<td>Current variant truth, selected-part feedback, camera response, and final color contract</td>
+</tr>
+<tr>
+<td>Constrained device</td>
+<td>Source-authored LOD, texture mip residency, shadows/reflections, temporal branches, and preloaded variant count</td>
+<td>Stable IDs, valid option state, silhouette threshold, material class, keyboard/touch access, and correct output conversion</td>
+</tr>
+</tbody></table></div>
+<h2 id="close-deployment-lifecycle-and-accessibility-constraints">Close deployment, lifecycle, and accessibility constraints</h2>
+<ul>
+<li><strong>Browser and device:</strong> initialize <code>WebGPURenderer</code> before allocating dependent resources and prove the backend for each claimed target. Decide separately whether a WebGL route is required. Record physical pixels, DPR, texture limits, memory ceiling, color/display assumptions, touch capability, and behavior under device loss.</li>
+<li><strong>Assets:</strong> normalize source units and axes; preserve hierarchy and IDs through glTF/CAD conversion; own mesh repair, UVs, tangents, texture baking, KTX2, Meshopt, DRACO, LODs, licensing, cache keys, and integrity checks in the asset pipeline.</li>
+<li><strong>Controls:</strong> define mouse, touch, pen, and keyboard orbit/zoom/select behavior; avoid relying on hover; prevent page scroll and viewer gestures from fighting; expose a deterministic reset and visible focus; keep exactly one camera writer.</li>
+<li><strong>Lifecycle:</strong> version and cancel asynchronous loads, prevent old variants from committing after a newer choice, define cache eviction, resize/DPR transactions, route teardown, device-loss recreation, and disposal of geometry, textures, render targets, controls, listeners, and observers.</li>
+<li><strong>Accessibility:</strong> provide the full option and part-selection workflow in semantic DOM controls; use accessible names and keyboard order; never communicate availability or selection only through material color, outline, or animation; provide reduced-motion inspection and useful static product imagery or text alternatives. The pack does not supply this application layer.</li>
+</ul>
+<h2 id="validate-the-actual-buying-and-inspection-states">Validate the actual buying and inspection states</h2>
+<p>Use <a href="/skills/threejs-visual-validation.html">Three.js Visual Validation</a> to capture fixed product views, material diagnostics, variant sweeps, no-post and final output, color and output ledgers, reset behavior, and lifecycle evidence. Measure variant-change and interaction latency on the named target matrix. Preserve identity, picking, silhouette, and color gates before reducing visual cost.</p>
+<p>For integration details, read <a href="/docs/use-in-an-existing-project/">use the pack in an existing project</a>. Technical artists can continue with the <a href="/for/technical-artists/">technical-artist path</a>, while rendering ownership questions belong to the <a href="/for/graphics-engineers/">graphics-engineer path</a>.</p>
+<h2 id="know-when-another-route-is-better">Know when another route is better</h2>
+<p>Use pre-rendered stills or image spins when the catalog has fixed views and 3D interaction does not change the buying decision. Use offline or server-rendered reference imagery for color-critical approval that cannot depend on an unknown consumer display. Use a CAD/B-rep viewer when exact topology, tolerances, sectioning, measurement, or engineering metadata matters more than real-time presentation. Use a hosted commerce-viewer service when turnkey catalog ingestion, analytics, CDN operation, and support matter more than a custom render graph. Use a WebGL renderer when the required browser matrix cannot mandate WebGPU and the project accepts the different rendering path.</p>
+<h2 id="what-this-page-does-not-claim">What this page does not claim</h2>
+<p>The pack does not own product data, commerce logic, availability rules, analytics, UI, accessibility, customer research, or conversion measurement. It does not own source-asset preparation, general lighting design, or production content approval.</p>
+<p>There is no accepted real-customer configurator, complete variant-sweep case study, sales-lift result, or universal performance result in the repository. The related camera-rig evidence is current and accepted for its camera mechanisms only, so this page does not use it as a product hero. The current exposure/color report proves its own captured mechanisms, not this product&#39;s material accuracy or presentation. Product acceptance requires the real hierarchy, approved references, variant catalog, target devices, interaction states, and business-owned correctness gates.</p>
+<section class="content-related" aria-labelledby="content-related-title"><h2 id="content-related-title">Next steps</h2><ul class="content-ruled-list"><li><a data-related-route="/for/technical-artists/" data-related-family="for" href="/for/technical-artists/"><span class="content-related-family">Who it is for</span><span>Three.js WebGPU and TSL Skills for Technical Artists</span></a></li><li><a data-related-route="/for/graphics-engineers/" data-related-family="for" href="/for/graphics-engineers/"><span class="content-related-family">Who it is for</span><span>Three.js WebGPU Skills for Graphics Engineers</span></a></li><li><a data-related-route="/docs/use-in-an-existing-project/" data-related-family="docs" href="/docs/use-in-an-existing-project/"><span class="content-related-family">Documentation</span><span>Use Three.js Agent Skills in an Existing Project</span></a></li><li><a data-related-route="/compare/threejs-tsl-vs-glsl/" data-related-family="compare" href="/compare/threejs-tsl-vs-glsl/"><span class="content-related-family">Comparisons</span><span>Three.js TSL vs GLSL</span></a></li><li><a data-related-route="/faq/why-does-my-tsl-post-processing-look-double-tone-mapped/" data-related-family="faq" href="/faq/why-does-my-tsl-post-processing-look-double-tone-mapped/"><span class="content-related-family">FAQ</span><span>Why Does My TSL Post-Processing Look Double Tone-Mapped?</span></a></li></ul></section><section class="content-skills" aria-labelledby="content-skills-title"><h2 id="content-skills-title">Relevant skills</h2><ul class="content-ruled-list"><li><a href="/skills/threejs-procedural-materials.html">Procedural Materials</a></li><li><a href="/skills/threejs-camera-controls-and-rigs.html">Camera Controls And Rigs</a></li><li><a href="/skills/threejs-image-pipeline.html">Image Pipeline</a></li><li><a href="/skills/threejs-exposure-color-grading.html">Exposure And Color Grading</a></li><li><a href="/skills/threejs-visual-validation.html">Visual Validation</a></li><li><a href="/skills/threejs-choose-skills.html">Route Three.js WebGPU/TSL Work</a></li></ul></section><section class="content-demos" aria-labelledby="content-demos-title"><h2 id="content-demos-title">Relevant demos and evidence</h2><ul class="content-ruled-list"><li><a href="/demos/webgpu-camera-rig/">WebGPU Camera Rig</a></li></ul></section><section class="content-sources" aria-labelledby="content-sources-title"><h2 id="content-sources-title">Sources and correction path</h2><ul class="content-ruled-list"><li><a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-choose-skills/references/router-recipes.md">github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-choose-skills/references/router-recipes.md</a></li><li><a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-materials/SKILL.md">github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-materials/SKILL.md</a></li><li><a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-camera-controls-and-rigs/SKILL.md">github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-camera-controls-and-rigs/SKILL.md</a></li><li><a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-image-pipeline/SKILL.md">github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-image-pipeline/SKILL.md</a></li><li><a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-exposure-color-grading/SKILL.md">github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-exposure-color-grading/SKILL.md</a></li><li><a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-visual-validation/SKILL.md">github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-visual-validation/SKILL.md</a></li><li><a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/docs/visual-validation/webgpu-camera-rig/evidence-summary.json">github.com/linegel/threejs-complete-set-of-skill/blob/main/docs/visual-validation/webgpu-camera-rig/evidence-summary.json</a></li><li><a href="https://threejs.org/manual/en/webgpurenderer">threejs.org/manual/en/webgpurenderer</a></li><li><a href="https://github.com/linegel/threejs-complete-set-of-skill/issues">Report a correction</a></li></ul></section>
+      <nav class="content-discovery" aria-label="Machine-readable discovery"><a href="/guides/">All guides</a><a href="/llms.txt">LLM catalog</a><a href="/skills.json">Machine index</a></nav>
+    </article>
+  </div></div></div>
+</main>
+<div class="wrap"><footer>
+  <div class="footer-summary">Three.js WebGPU Skill Pack: TSL, procedural graphics, and visual validation.
+    <span>Proof status and supported revision are stated on each decision page and linked evidence report.</span>
+    <span>Compiling shaders? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span>
+  </div>
+  <div class="footer-groups">
+    <div class="footer-group"><strong>Build</strong><a href="/#skills">Skills</a><a href="/#flagships">Examples</a><a href="/industries/">Industries</a></div>
+    <div class="footer-group"><strong>Decide</strong><a href="/for/">Who it is for</a><a href="/compare/">Compare</a><a href="/alternatives/">Alternatives</a><a href="/pricing/">Pricing</a></div>
+    <div class="footer-group"><strong>Adopt</strong><a href="/docs/">Docs</a><a href="/migrate/">Migration</a><a href="/agents/">Agent docs</a><a href="/faq/">FAQ</a></div>
+    <div class="footer-group"><strong>Proof</strong><a href="/evidence/">Evidence</a><a href="/about/">Method</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a><a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/LICENSE">License</a></div>
+  </div>
+</footer></div>
+</body>
+</html>

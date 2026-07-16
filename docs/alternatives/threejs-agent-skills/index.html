@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Three.js Agent-Skill Alternatives</title>
+<meta name="description" content="Compare five sourced Three.js agent-skill routes by job, renderer scope, framework coverage, routing, examples, evidence, and maintenance." />
+<link rel="canonical" href="https://threejs-skills.com/alternatives/threejs-agent-skills/" />
+<meta name="robots" content="index, follow, max-image-preview:large" />
+<meta name="theme-color" content="#0a0c10" />
+
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="manifest" href="/site.webmanifest" />
+<link rel="alternate" type="text/plain" href="https://threejs-skills.com/llms.txt" title="LLM-readable skill catalog" />
+<link rel="alternate" type="application/json" href="https://threejs-skills.com/skills.json" title="Machine-readable skill catalog" />
+<meta property="og:type" content="article" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
+<meta property="og:title" content="Three.js Agent-Skill Alternatives" />
+<meta property="og:description" content="Compare five sourced Three.js agent-skill routes by job, renderer scope, framework coverage, routing, examples, evidence, and maintenance." />
+<meta property="og:url" content="https://threejs-skills.com/alternatives/threejs-agent-skills/" />
+<meta property="og:image" content="https://threejs-skills.com/icon-512.png" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:width" content="512" />
+<meta property="og:image:height" content="512" />
+<meta property="og:image:alt" content="Three.js WebGPU Skill Pack mark" />
+<meta name="twitter:image" content="https://threejs-skills.com/icon-512.png" />
+<meta name="twitter:image:alt" content="Three.js WebGPU Skill Pack mark" />
+<meta property="article:published_time" content="2026-07-16" />
+<meta property="article:modified_time" content="2026-07-16" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="Three.js Agent-Skill Alternatives" />
+<meta name="twitter:description" content="Compare five sourced Three.js agent-skill routes by job, renderer scope, framework coverage, routing, examples, evidence, and maintenance." />
+<script type="application/ld+json">{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "Organization",
+   "@id": "https://threejs-skills.com/#publisher",
+   "name": "Three.js WebGPU Skill Pack contributors",
+   "url": "https://threejs-skills.com/",
+   "sameAs": "https://github.com/linegel/threejs-complete-set-of-skill",
+   "logo": {
+    "@type": "ImageObject",
+    "url": "https://threejs-skills.com/icon-512.png",
+    "contentUrl": "https://threejs-skills.com/icon-512.png",
+    "width": 512,
+    "height": 512
+   }
+  },
+  {
+   "@type": [
+    "Article",
+    "TechArticle"
+   ],
+   "@id": "https://threejs-skills.com/alternatives/threejs-agent-skills/#article",
+   "url": "https://threejs-skills.com/alternatives/threejs-agent-skills/",
+   "name": "Three.js Agent-Skill Alternatives",
+   "headline": "Three.js agent-skill alternatives",
+   "description": "Compare five sourced Three.js agent-skill routes by job, renderer scope, framework coverage, routing, examples, evidence, and maintenance.",
+   "datePublished": "2026-07-16",
+   "dateModified": "2026-07-16",
+   "inLanguage": "en",
+   "isAccessibleForFree": true,
+   "publisher": {
+    "@id": "https://threejs-skills.com/#publisher"
+   },
+   "breadcrumb": {
+    "@id": "https://threejs-skills.com/alternatives/threejs-agent-skills/#breadcrumb"
+   },
+   "image": "https://threejs-skills.com/icon-512.png",
+   "author": {
+    "@id": "https://threejs-skills.com/#publisher"
+   }
+  },
+  {
+   "@type": "BreadcrumbList",
+   "@id": "https://threejs-skills.com/alternatives/threejs-agent-skills/#breadcrumb",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Skill Pack",
+     "item": "https://threejs-skills.com/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Alternatives",
+     "item": "https://threejs-skills.com/alternatives/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Three.js agent-skill alternatives",
+     "item": "https://threejs-skills.com/alternatives/threejs-agent-skills/"
+    }
+   ]
+  }
+ ]
+}</script>
+
+<link rel="preload" href="/assets/vendor/katex/fonts/KaTeX_SansSerif-Regular.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/assets/vendor/katex/fonts/KaTeX_SansSerif-Bold.woff2" as="font" type="font/woff2" crossorigin />
+<style>
+@view-transition{navigation:auto}
+@font-face{font-family:'Evidence Sans';src:url('/assets/vendor/katex/fonts/KaTeX_SansSerif-Regular.woff2') format('woff2');font-style:normal;font-weight:400;font-display:swap}
+@font-face{font-family:'Evidence Sans';src:url('/assets/vendor/katex/fonts/KaTeX_SansSerif-Italic.woff2') format('woff2');font-style:italic;font-weight:400;font-display:swap}
+@font-face{font-family:'Evidence Sans';src:url('/assets/vendor/katex/fonts/KaTeX_SansSerif-Bold.woff2') format('woff2');font-style:normal;font-weight:700;font-display:swap}
+@font-face{font-family:'Evidence Mono';src:url('/assets/vendor/katex/fonts/KaTeX_Typewriter-Regular.woff2') format('woff2');font-style:normal;font-weight:400;font-display:swap}
+:root{
+  --bg:#080a0e; --bg2:#0e1117; --bg3:#131821; --ink:#f0ede5; --dim:#aaa99f;
+  --amber:#ffb454; --cyan:#7fd4c1; --lime:#b6de82; --violet:#b7a2ff; --rose:#ff927a; --line:#242933;
+  --disp:'Evidence Sans',ui-sans-serif,sans-serif; --mono:'Evidence Mono',ui-monospace,monospace; --sans:'Evidence Sans',ui-sans-serif,sans-serif;
+  --shadow-card:0 0 0 1px rgba(255,255,255,.075),0 1px 2px rgba(0,0,0,.28),0 18px 55px rgba(0,0,0,.18);
+  --shadow-card-hover:0 0 0 1px rgba(255,255,255,.14),0 1px 2px rgba(0,0,0,.34),0 24px 70px rgba(0,0,0,.34);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+picture.responsive-preview{display:contents}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:var(--bg)}
+body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7}
+::selection{background:rgba(255,180,84,.26);color:var(--ink)}
+a{color:inherit;text-decoration:none}
+a:focus-visible,button:focus-visible,summary:focus-visible,pre[tabindex]:focus-visible,[role="region"]:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
+main{display:block}
+.skip-link{position:fixed;z-index:100;left:16px;top:12px;translate:0 -160%;font-family:var(--mono);font-size:12px;background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:9px;transition-property:translate;transition-duration:160ms}
+.skip-link:focus{translate:0 0}
+.wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
+.site-nav{position:sticky;z-index:50;top:0;background:rgba(8,10,14,.82);border-bottom:1px solid rgba(255,255,255,.075);backdrop-filter:blur(18px) saturate(1.15)}
+.site-nav>.wrap{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+.site-nav .brand{min-height:44px;display:inline-flex;align-items:center;white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
+.site-nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
+.site-nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
+.site-nav .links a:hover{color:var(--amber)}
+.site-nav .links a:active{scale:.96}
+h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:0}
+p{text-wrap:pretty}
+h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
+.section{padding:clamp(56px,8vw,110px) 0;border-top:1px solid var(--line)}
+.section>.wrap>p.sub{color:var(--dim);max-width:64ch;margin-bottom:44px}
+.kicker{font-family:var(--mono);color:var(--amber);font-size:13px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:26px}
+pre{font-family:var(--mono);background:#06080b;box-shadow:0 0 0 1px rgba(255,255,255,.075),inset 2px 0 var(--amber);border-radius:12px;padding:14px 16px;overflow-x:auto;
+  font-size:13px;line-height:1.65;color:#d8d2c2;white-space:pre-wrap}
+code{font-family:var(--mono)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:16px}
+.card{min-height:100%;background:linear-gradient(145deg,rgba(19,24,33,.96),rgba(12,15,21,.96));border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px;
+  box-shadow:var(--shadow-card);transition-property:translate,scale,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
+.card:hover{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
+.card:active{translate:0 -1px;scale:.96}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.card-kind{font-family:var(--mono);font-size:10px;color:var(--cyan)}
+.card h3,.card h4{font-size:19px;font-weight:600}
+.card p{color:var(--dim);font-size:14.5px;line-height:1.62;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.card-meta{font-family:var(--mono);margin-top:auto;padding-top:12px;font-size:11.5px;color:var(--cyan);border-top:1px dashed var(--line)}
+.status{display:inline-flex;align-items:center;font-family:var(--mono);font-size:10px;line-height:1.2;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.status--accepted{color:var(--lime)}
+.status--pending{color:var(--amber)}
+.status--secondary{color:var(--dim)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:22px}
+figure{height:100%;overflow:hidden;background:var(--bg2);border-radius:18px;box-shadow:var(--shadow-card);transition-property:translate,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
+a:hover>figure{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
+figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.05);outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
+.preview-media,.lab-card-media,.flagship-preview{position:relative;display:block;overflow:hidden;background:#090c11}
+.preview-media img,.lab-card-media img,.flagship-preview img,.card-preview{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
+.media-caption{display:block;padding:8px 2px 0;font-family:var(--mono);font-size:9px;line-height:1.4;color:var(--dim)}
+.secondary-preview-status{display:grid;gap:5px;padding:14px 0;color:var(--dim);font-family:var(--mono);font-size:10px;line-height:1.4}
+.secondary-preview-status strong{color:var(--ink);font-family:var(--disp);font-size:16px}.secondary-preview-status code{color:var(--dim);font-size:9px}
+.primary-evidence-panel{display:grid;gap:5px;margin-top:14px;padding-top:14px;border-top:1px solid var(--line);font-family:var(--mono);font-size:10px;line-height:1.45;color:var(--dim)}
+.primary-evidence-panel[data-evidence-state="accepted"]{border-top-color:var(--lime)}
+.primary-evidence-panel strong{color:var(--ink);font-family:var(--disp);font-size:18px;line-height:1.2}.primary-evidence-panel code{color:var(--cyan);font-size:10px}.primary-evidence-label{color:var(--amber);font-size:9px;letter-spacing:.09em;text-transform:uppercase}.primary-evidence-panel[data-evidence-state="accepted"] .primary-evidence-label{color:var(--lime)}
+figcaption{padding:16px 18px;font-size:14.5px}
+figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
+figcaption span{display:block;margin-top:3px;color:var(--dim)}
+footer{border-top:1px solid var(--line);padding:44px 0 60px;display:grid;grid-template-columns:minmax(260px,1.4fr) minmax(0,2fr);gap:36px 64px;color:var(--dim);font-size:14.5px}
+footer a{color:var(--amber)}
+footer a:hover{text-decoration:underline}
+footer code{color:var(--cyan);font-size:11px}
+.footer-summary{max-width:55ch}.footer-summary>span{display:block;margin-top:8px;font-size:13px}.footer-groups{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}.footer-group{display:grid;align-content:start;gap:8px}.footer-group strong{font:400 10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}.footer-group a{min-height:40px;display:flex;align-items:center;color:var(--dim);font-size:13px;transition-property:color,scale;transition-duration:160ms}.footer-group a:hover{color:var(--amber);text-decoration:none}.footer-group a:active{scale:.96}
+.pathfinder{padding:clamp(52px,7vw,86px) 0;border-bottom:1px solid var(--line)}.pathfinder-head{display:grid;grid-template-columns:minmax(0,.7fr) minmax(320px,1.3fr);align-items:end;gap:28px 72px;margin-bottom:28px}.pathfinder-head h2{margin:0}.pathfinder-head p{max-width:58ch;color:var(--dim)}.pathfinder-rows{border-top:1px solid var(--line)}.pathfinder-row{display:grid;grid-template-columns:minmax(160px,.55fr) minmax(210px,.8fr) minmax(0,1.6fr);gap:20px 32px;align-items:center;min-height:94px;border-bottom:1px solid var(--line)}.pathfinder-stage{font:10px/1.4 var(--mono);letter-spacing:.11em;text-transform:uppercase;color:var(--cyan)}.pathfinder-row>p{color:var(--dim);font-size:14px}.pathfinder-links{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px 18px}.pathfinder-links a{min-height:44px;display:inline-flex;align-items:center;gap:8px;color:var(--amber);font:11px/1.35 var(--mono);transition-property:color,scale;transition-duration:160ms}.pathfinder-links a:after{content:"→"}.pathfinder-links a:hover{color:var(--ink)}.pathfinder-links a:active{scale:.96}
+.content-hero{padding:clamp(54px,8vw,104px) 0 42px;border-bottom:1px solid var(--line)}.breadcrumbs{min-height:44px;display:flex;align-items:center;margin-bottom:28px;font:11px/1.4 var(--mono);color:var(--dim)}.breadcrumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.breadcrumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}.breadcrumbs a{min-height:40px;display:inline-flex;align-items:center;transition-property:color,scale;transition-duration:160ms}.breadcrumbs a:hover{color:var(--amber)}.breadcrumbs a:active{scale:.96}.content-hero h1{max-width:17ch;font-size:clamp(40px,6vw,68px);font-weight:700;line-height:1.02;letter-spacing:-.02em}.content-lede{max-width:66ch;margin-top:22px;color:var(--dim);font-size:clamp(17px,2vw,20px)}.content-meta{display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:28px;font:10px/1.4 var(--mono);color:var(--cyan)}
+.content-answer{max-width:900px;margin-top:34px;padding:3px 0 3px 22px;border-left:2px solid var(--amber);font-size:clamp(19px,2.2vw,21px);line-height:1.62;color:var(--ink)}.content-shell{padding:clamp(46px,7vw,86px) 0}.content-layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(230px,1fr);align-items:start;gap:clamp(36px,6vw,76px)}.content-body{grid-column:1;grid-row:1;max-width:78ch;min-width:0}.content-body h2{margin:52px 0 16px;font-size:clamp(27px,3.5vw,39px);scroll-margin-top:112px}.content-body>h2:first-child{margin-top:0}.content-body h3{margin:34px 0 12px;font-size:21px;scroll-margin-top:112px}.content-body p,.content-body li{color:var(--dim);font-size:16px}.content-body p+p{margin-top:17px}.content-body ul,.content-body ol{margin:16px 0;padding-left:24px}.content-body li+li{margin-top:7px}.content-body a{color:var(--cyan);text-decoration:underline;text-decoration-color:rgba(127,212,193,.35);text-underline-offset:3px}.content-body a:hover{color:var(--amber);text-decoration-color:currentColor}.content-body code:not(pre code){padding:1px 5px;border:1px solid var(--line);border-radius:5px;background:#07090c;color:var(--cyan);font-size:.86em}.content-body pre{margin:20px 0;white-space:pre;tab-size:2}.content-table{max-width:100%;margin:22px 0;overflow-x:auto;border:1px solid var(--line);border-radius:12px}.content-table:focus-visible{outline:2px solid var(--amber);outline-offset:3px}.content-table table{width:100%;border-collapse:collapse;font-size:14px}.content-table th,.content-table td{min-width:150px;padding:11px 13px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);text-align:left;vertical-align:top;color:var(--dim)}.content-table th{color:var(--ink);font-weight:600;background:var(--bg2)}.content-table tr:last-child td{border-bottom:0}.content-table th:last-child,.content-table td:last-child{border-right:0}
+.content-index{grid-column:2;grid-row:1;position:sticky;top:104px;max-height:calc(100vh - 128px);overflow-y:auto;padding:18px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.content-index strong{display:block;margin-bottom:10px;font:10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}.content-index ol{list-style:none}.content-index a{min-height:40px;display:flex;align-items:center;padding:5px 0;color:var(--dim);font-size:13px;line-height:1.4;transition-property:color,translate,scale;transition-duration:160ms}.content-index a:hover{color:var(--amber);translate:3px 0}.content-index a:active{translate:1px 0;scale:.96}.content-proof{margin:54px 0 0}.content-proof figure{border-radius:16px}.content-proof img{width:100%;height:auto;max-height:650px;object-fit:cover;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}.content-proof figcaption{color:var(--dim);font:11px/1.55 var(--mono)}.content-proof figcaption a{color:var(--amber)}
+.content-layout--docs{grid-template-columns:minmax(190px,.6fr) minmax(0,2fr)}.content-layout--docs .content-index{grid-column:1}.content-layout--docs .content-body{grid-column:2;max-width:72ch}.docs-index a{padding-inline:10px;border-left:2px solid transparent}.docs-index a[aria-current="page"]{border-left-color:var(--amber);background:rgba(255,180,84,.06);color:var(--ink);font-weight:600}.docs-index-current{display:none}
+.content-facts,.content-faq-list,.content-related,.content-sources,.content-skills,.content-demos,.content-discovery,.faq-provenance{margin-top:54px;padding-top:22px;border-top:1px solid var(--line)}.content-facts h2,.content-faq-list h2,.content-related h2,.content-sources h2,.content-skills h2,.content-demos h2{font-size:24px}.content-ruled-list{list-style:none;border-top:1px solid var(--line)}.content-ruled-list li{border-bottom:1px solid var(--line)}.content-ruled-list a{min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:9px 0;color:var(--dim);font-size:14px;transition-property:color,scale;transition-duration:160ms}.content-ruled-list a:after{content:"→";color:var(--amber)}.content-ruled-list a:hover{color:var(--ink)}.content-ruled-list a:active{scale:.96}.content-related .content-ruled-list a{display:grid;grid-template-columns:104px minmax(0,1fr) auto}.content-related-family{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}.content-faq-item{padding:22px 0;border-bottom:1px solid var(--line)}.content-faq-item h3{margin:0;font-size:20px}.content-faq-item h3 a{color:var(--ink)}.content-faq-item p{margin-top:9px;color:var(--dim);font-size:15px}.faq-provenance{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);padding:0}.faq-provenance div{padding:13px;background:var(--bg2)}.faq-provenance dt{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}.faq-provenance dd{margin-top:5px;font:11px/1.45 var(--mono);color:var(--cyan);overflow-wrap:anywhere}.content-discovery{display:flex;flex-wrap:wrap;gap:10px 22px;font:11px/1.5 var(--mono);color:var(--dim)}.content-discovery a{min-height:40px;display:inline-flex;align-items:center;color:var(--amber)}
+@media (max-width:760px){
+  .site-nav .wrap{padding-right:0}
+  .site-nav>.wrap{min-height:104px;display:grid;grid-template-columns:1fr;padding-top:14px;padding-bottom:10px;gap:4px}
+  .site-nav .brand{font-size:16px}
+  .site-nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;scrollbar-color:rgba(255,180,84,.45) transparent;padding:0 20px 4px 0}
+  .site-nav .links::-webkit-scrollbar{height:3px}.site-nav .links::-webkit-scrollbar-thumb{background:rgba(255,180,84,.45);border-radius:99px}
+  .site-nav .links a{flex:0 0 auto}
+  .grid,.gallery{grid-template-columns:1fr}
+  footer{grid-template-columns:1fr}.footer-groups{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:900px){.pathfinder-head,.content-layout{grid-template-columns:1fr}.content-index{grid-column:1;grid-row:1;position:static;max-height:none}.content-body,.content-layout--docs .content-body{grid-column:1;grid-row:2}.docs-index{overflow:hidden}.docs-index-current{display:flex;margin-bottom:8px}.docs-index ol{display:flex;gap:8px;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;padding-bottom:6px}.docs-index li{flex:0 0 min(72vw,260px)}.docs-index .docs-index-list-current{display:none}.docs-index a{min-height:44px;padding:8px 10px;border-left:0;border-bottom:2px solid transparent;background:var(--bg2)}.docs-index a[aria-current="page"]{border-bottom-color:var(--amber)}.pathfinder-row{grid-template-columns:minmax(160px,.6fr) minmax(0,1fr)}.pathfinder-links{grid-column:1/-1;justify-content:flex-start;padding-bottom:18px}.faq-provenance{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.pathfinder-row{grid-template-columns:1fr;gap:6px;padding:18px 0}.pathfinder-links{grid-column:auto;padding:0}.content-hero h1{font-size:clamp(38px,12vw,54px)}.content-answer{padding-left:16px}.content-table{border-radius:8px}.content-table table{min-width:680px}.faq-provenance{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+  ::view-transition-old(root),::view-transition-new(root){animation:none!important}
+}
+</style>
+</head>
+<body data-content-kind="alternatives" data-content-route="/alternatives/threejs-agent-skills/">
+<a class="skip-link" href="#main-content">Skip to content</a><header class="site-nav"><div class="wrap">
+  <a class="brand" href="/">Three.js WebGPU Skill&nbsp;Pack</a>
+  <nav class="links" aria-label="Primary navigation"><a href="/#flagships">Examples</a><a href="/#skills">Skills</a><a href="/guides/">Guides</a><a href="/evidence/">Evidence</a><a href="/#install">Install</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub</a></nav>
+</div></header>
+<main id="main-content" tabindex="-1">
+  <header class="content-hero"><div class="wrap">
+    <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="https://threejs-skills.com/">Skill Pack</a></li><li><a href="https://threejs-skills.com/alternatives/">Alternatives</a></li><li aria-current="page">Three.js agent-skill alternatives</li></ol></nav>
+    <p class="kicker">Alternatives</p>
+    <h1>Three.js agent-skill alternatives</h1>
+    <p class="content-lede">Compare five sourced Three.js agent-skill routes by job, renderer scope, framework coverage, routing, examples, evidence, and maintenance.</p>
+    <p class="content-answer">No pack is best for every Three.js job. Choose by the application, renderer, framework, routing, and evidence workflow your agent actually needs.</p>
+    <div class="content-meta"><span>Published 2026-07-16</span><span>Reviewed 2026-07-16</span></div>
+  </div></header>
+  <div class="content-shell"><div class="wrap"><div class="content-layout">
+    <nav class="content-index" aria-label="On this page"><strong>On this page</strong><ol><li><a href="#short-answer">Short answer</a></li><li><a href="#at-a-glance-landscape">At-a-glance landscape</a></li><li><a href="#1-this-three-js-webgpu-skill-pack">1. This Three.js WebGPU skill pack</a></li><li><a href="#2-three-js-game-skills">2. Three.js Game Skills</a></li><li><a href="#3-three-agent-skills">3. Three Agent Skills</a></li><li><a href="#4-three-js-skill-plugin">4. Three.js Skill Plugin</a></li><li><a href="#5-awesome-graphics-agent-skills">5. Awesome Graphics Agent Skills</a></li><li><a href="#decision-criteria-that-matter">Decision criteria that matter</a></li><li><a href="#safe-coexistence-and-migration">Safe coexistence and migration</a></li><li><a href="#limitations">Limitations</a></li></ol></nav>
+    <article class="content-body"><h2 id="short-answer">Short answer</h2>
+<p>There is no single best Three.js skill pack for every job. Choose this pack for advanced Three.js r185 WebGPU and TSL architecture with source-provenance and validation workflows. Choose Three.js Game Skills for end-to-end browser-game production. Choose Three Agent Skills for broad Three.js and React Three Fiber best-practice rules. Choose Three.js Skill Plugin for one repo-first Claude Code skill. Choose Awesome Graphics Agent Skills for its graphics-focused specialist set and example gallery.</p>
+<p>All descriptions below come from reviewed primary repository sources. They are fit statements, not rankings.</p>
+<h2 id="at-a-glance-landscape">At-a-glance landscape</h2>
+<div class="content-table" role="region" aria-label="Data table 1 for Three.js agent-skill alternatives" tabindex="0"><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Primary fit</th>
+<th>Organization</th>
+<th>Documented breadth</th>
+<th>License presentation at review</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>This WebGPU skill pack</td>
+<td>Advanced r185 WebGPU/TSL systems, integration, and visual validation</td>
+<td>Router plus narrow specialist skills</td>
+<td>Procedural graphics, cameras, effects, image pipeline, debugging, compatibility, evidence</td>
+<td>Repository-authored material is ISC licensed; incorporated files retain their stated licenses and notices</td>
+</tr>
+<tr>
+<td>Three.js Game Skills</td>
+<td>Complete playable browser games and game release workflow</td>
+<td>Game director plus gameplay, graphics, UI, asset, audio, debug, and QA specialists</td>
+<td>Game loop, scaffold, UI, optional generation, active-play and release checks</td>
+<td>Standalone MIT license</td>
+</tr>
+<tr>
+<td>Three Agent Skills</td>
+<td>Broad Three.js and R3F rules</td>
+<td>Two broad best-practice skills</td>
+<td>Performance, memory, shaders, assets, physics, WebXR, mobile, R3F ecosystem</td>
+<td>README declares MIT</td>
+</tr>
+<tr>
+<td>Three.js Skill Plugin</td>
+<td>Repo-first Claude Code application guidance</td>
+<td>One <code>developing-threejs-apps</code> skill with supporting files</td>
+<td>r150+, WebGL/WebGPU, lifecycle, performance, and listed JS frameworks</td>
+<td>README declares MIT; no standalone license file visible at the pinned tree</td>
+</tr>
+<tr>
+<td>Awesome Graphics Agent Skills</td>
+<td>Graphics-focused specialist workflows and examples</td>
+<td>Router plus graphics specialists and example gallery</td>
+<td>Cameras, procedural graphics, TSL/WebGPU, GLSL, post, effects, color, and validation</td>
+<td>Standalone MIT license</td>
+</tr>
+</tbody></table></div>
+<p>The table reports how each source presents itself. It does not prove equivalent implementation depth, output quality, security, or maintenance.</p>
+<p>The incorporated Three.js Object Sculptor files retain their MIT license and notice.</p>
+<h2 id="1-this-three-js-webgpu-skill-pack">1. This Three.js WebGPU skill pack</h2>
+<h3 id="best-fit">Best fit</h3>
+<p>Use it when the problem is an advanced WebGPURenderer or TSL system and the agent must choose a representation, integrate it with other systems, and produce falsifiable evidence. The installed <code>threejs-choose-skills</code> contract routes Three.js r185 work, intersects its recommendations with the skills actually installed, and reports missing owners instead of inventing coverage.</p>
+<h3 id="poor-fit">Poor fit</h3>
+<p>Do not choose it as a complete game engine, no-code 3D tool, beginner JavaScript course, broad R3F application guide, asset library, or hosted runtime. It deliberately reports missing owners for work outside its specialist scope.</p>
+<h3 id="maintenance-and-cost-boundary">Maintenance and cost boundary</h3>
+<p>The repository is available for $0 at the pack level. That price is independent of its license terms. Repository-authored material is ISC licensed; incorporated files retain their stated licenses and notices. Coding-agent usage, engineering time, assets, hardware, and hosting remain external. Use the <a href="/pricing/">pricing page</a> for the exact boundary.</p>
+<h2 id="2-three-js-game-skills">2. Three.js Game Skills</h2>
+<h3 id="best-fit-2">Best fit</h3>
+<p>Use it when the requested outcome is a playable browser game with gameplay, UI, optional generated assets and audio, debugging, bot playtests, responsive checks, and release QA. The pinned README documents a game director, a Vite and TypeScript scaffold, deterministic hooks, and provider-aware asset workflows.</p>
+<h3 id="poor-fit-2">Poor fit</h3>
+<p>It is a less direct category fit when the product is not a game and the only hard problem is one specialist WebGPU rendering system. That does not imply missing rendering capability; it means its documented top-level workflow owns a wider game-production job.</p>
+<h3 id="cost-and-maintenance-boundary">Cost and maintenance boundary</h3>
+<p>The pinned repository is publicly accessible under MIT and its reviewed README does not describe a paid plan or support SLA. Agent usage, engineering, assets, audio, hosting, and any configured generation providers remain external costs. Maintenance is broader than one rendering skill because the documented director, scaffold, gameplay, UI, asset, audio, debug, QA, and release workflows can change together; review the selected director and specialist paths as one versioned workflow.</p>
+<h3 id="adoption-note">Adoption note</h3>
+<p>It can coexist with this pack when the game director owns the product workflow and a bounded specialist owns one renderer subsystem. Read the <a href="/compare/threejs-webgpu-skill-pack-vs-threejs-game-skills/">direct comparison</a> before combining routers.</p>
+<h2 id="3-three-agent-skills">3. Three Agent Skills</h2>
+<h3 id="best-fit-3">Best fit</h3>
+<p>Use it when an agent needs broad rule-based guidance across pure Three.js and React Three Fiber. The pinned README describes <code>three-best-practices</code> and <code>r3f-best-practices</code>, with topics including memory, performance, shaders, assets, physics, mobile, WebXR, Drei, Zustand, and the broader R3F ecosystem.</p>
+<h3 id="poor-fit-3">Poor fit</h3>
+<p>It is a less direct fit when the task requires a routed set of narrow visual-system specialists plus WebGPU lab and evidence records whose current status and source hashes are verified. Do not turn that distinction into an absence claim: review the actual skill source for any topic that matters.</p>
+<h3 id="cost-and-maintenance-boundary-2">Cost and maintenance boundary</h3>
+<p>The reviewed README presents the repository as MIT-licensed and does not state a paid plan or support SLA. The user&#39;s agent, engineering, framework upgrades, and runtime validation still cost time or money. Its two broad best-practice skills cover both Three.js and R3F concerns, so maintenance means rechecking the relevant rule set when Three.js, React, R3F, Drei, physics, WebXR, or mobile assumptions change rather than treating the installed text as versionless.</p>
+<h3 id="adoption-note-2">Adoption note</h3>
+<p>Its README lists several Agent Skills-compatible clients. Use it as a broad review layer or install only the relevant best-practices skill. Avoid loading a broad rule set and a specialist pack simultaneously unless their responsibilities are clear.</p>
+<h2 id="4-three-js-skill-plugin">4. Three.js Skill Plugin</h2>
+<h3 id="best-fit-4">Best fit</h3>
+<p>Use it for a repo-first Claude Code workflow that should inspect an existing application before changing it. The pinned README documents lifecycle discipline, color and post-processing concerns, performance, r150+ version detection, several frameworks, references, playbooks, quality gates, and diagnostic scripts.</p>
+<h3 id="poor-fit-4">Poor fit</h3>
+<p>It is a less direct fit when the primary need is a large menu of individually routed r185 WebGPU specialists and their evidence pages. This pack is a poorer fit when the main task is a broad R3F, disposal, or general application audit.</p>
+<h3 id="cost-and-maintenance-boundary-3">Cost and maintenance boundary</h3>
+<p>The pinned source is publicly accessible. Its README says MIT, but the reviewed tree does not expose a standalone license file, paid plan, or support SLA; confirm those terms before redistribution or procurement. Agent usage and engineering remain external. Its single top-level skill is simpler to install than a specialist roster, but its references, playbooks, diagnostic scripts, framework notes, and r150+ compatibility guidance still form one maintenance unit that must be reviewed against the actual application revision.</p>
+<h3 id="license-note">License note</h3>
+<p>The reviewed README says MIT, while the pinned repository tree does not display a standalone license file. Preserve that distinction in procurement or redistribution review. See the <a href="/compare/threejs-webgpu-skill-pack-vs-threejs-skill-plugin/">direct comparison</a> for the full matrix.</p>
+<h2 id="5-awesome-graphics-agent-skills">5. Awesome Graphics Agent Skills</h2>
+<h3 id="best-fit-5">Best fit</h3>
+<p>Use it when the agent needs a graphics-focused specialist vocabulary plus an example gallery. Its pinned README lists camera, procedural, TSL/WebGPU, GLSL, post-processing, effects, color, and validation systems, with deterministic inputs and diagnostic outputs as part of its stated operating model.</p>
+<h3 id="poor-fit-5">Poor fit</h3>
+<p>Do not infer API-reference, framework, complete-game, or hosted-tool coverage beyond what its source documents. Inspect its exact example and skill implementation for the target task rather than selecting it from the word &quot;awesome&quot; or a repository popularity signal.</p>
+<h3 id="cost-and-maintenance-boundary-4">Cost and maintenance boundary</h3>
+<p>The pinned repository carries an MIT license and its reviewed README does not document a paid plan or support SLA. Agent usage, engineering, assets, deployment, and project verification remain external. The router, graphics specialists, and example gallery are a connected maintenance surface: pin the source used for a project, update the selected paths together, and re-resolve ownership when another installed graphics pack uses overlapping skill names or procedures.</p>
+<h3 id="adoption-note-3">Adoption note</h3>
+<p>Its domain names can overlap with this pack. If both are installed, resolve exact skill paths and choose one owner for each rendering decision to prevent conflicting procedures.</p>
+<h2 id="decision-criteria-that-matter">Decision criteria that matter</h2>
+<ol>
+<li><strong>Job:</strong> game production, broad best practices, application audit, graphics vocabulary, or advanced WebGPU architecture.</li>
+<li><strong>Renderer:</strong> WebGL, WebGPU, both, or a specific migration path.</li>
+<li><strong>Framework:</strong> vanilla Three.js, R3F, another listed framework, or framework-neutral mechanisms.</li>
+<li><strong>Routing:</strong> one broad skill, a director, or a minimal specialist router.</li>
+<li><strong>Proof:</strong> source examples, live demos, QA templates, diagnostics, or evidence artifacts with verified current status and source hashes.</li>
+<li><strong>Version:</strong> explicit revision pin, version detection, or a broader compatibility statement.</li>
+<li><strong>Installation:</strong> supported client, global versus project-local placement, and update procedure.</li>
+<li><strong>Trust:</strong> source provenance, scripts, tool permissions, license presentation, and maintenance activity.</li>
+</ol>
+<h2 id="safe-coexistence-and-migration">Safe coexistence and migration</h2>
+<p>Multiple packs can coexist when their names and owners do not collide. Choose one top-level router or director. Load only the specialists needed for the current task. Preserve project-specific constraints above shared guidance, and verify the final code and runtime independently.</p>
+<p>Do not perform a wholesale migration merely to consolidate branding. Migrate when a repeated job lacks an owner, current guidance conflicts with the installed revision, or evidence requirements are not being met. Keep useful project rules and historical evidence even when the instruction source changes.</p>
+<h2 id="limitations">Limitations</h2>
+<p>This page is based on public READMEs and linked repository files at the displayed commits. It is not an execution benchmark, security audit, popularity contest, or customer review. Repository stars, forks, skill counts, and prose length are not substitutes for testing the target task.</p>
+<p>Recheck every mutable source before adoption. Installation, compatibility, skill lists, and license presentation can change after the review date.</p>
+<section class="content-facts" aria-labelledby="source-facts-title"><h2 id="source-facts-title">Source-checked ecosystem facts</h2><div class="content-table" role="region" aria-label="Source-checked ecosystem facts" tabindex="0"><table><thead><tr><th>Subject</th><th>Fact</th><th>Current value</th><th>Provenance</th></tr></thead><tbody><tr><td>Three.js Game Skills</td><td>installation</td><td>The README documents installation for Codex and Claude Code through the skills CLI or its local installer</td><td><a href="https://github.com/majidmanzarpour/threejs-game-skills/blob/8919acca095be36ea054c866a79997fca90e8b22/README.md">Source</a><br><small>Reviewed 2026-07-16</small></td></tr><tr><td>Three.js Game Skills</td><td>license</td><td>MIT, with a standalone LICENSE file linked by the repository</td><td><a href="https://github.com/majidmanzarpour/threejs-game-skills/blob/8919acca095be36ea054c866a79997fca90e8b22/LICENSE">Source</a><br><small>Reviewed 2026-07-16</small></td></tr><tr><td>Three.js Game Skills</td><td>optional services</td><td>Optional Tripo, Gemini, and ElevenLabs integrations are documented for generated models, images, and audio; the core skills can run without those keys</td><td><a href="https://github.com/majidmanzarpour/threejs-game-skills/blob/8919acca095be36ea054c866a79997fca90e8b22/README.md">Source</a><br><small>Reviewed 2026-07-16</small></td></tr><tr><td>Three.js Game Skills</td><td>packaged workflow</td><td>The repository documents a Vite, TypeScript, and Three.js scaffold, deterministic test hooks, Playwright templates, mobile checks, visual checks, and bot playtests</td><td><a href="https://github.com/majidmanzarpour/threejs-game-skills/blob/8919acca095be36ea054c866a79997fca90e8b22/README.md">Source</a><br><small>Reviewed 2026-07-16</small></td></tr><tr><td>Three.js Game Skills</td><td>positioning</td><td>Agent skills for building playable, polished Three.js browser games</td><td><a href="https://github.com/majidmanzarpour/threejs-game-skills/blob/8919acca095be36ea054c866a79997fca90e8b22/README.md">Source</a><br><small>Reviewed 2026-07-16</small></td></tr><tr><td>Three.js Game Skills</td><td>routing</td><td>A threejs-game-director routes gameplay, graphics, UI, asset generation, audio, debugging, and release verification</td><td><a href="https://github.com/majidmanzarpour/threejs-game-skills/blob/8919acca095be36ea054c866a79997fca90e8b22/README.md">Source</a><br><small>Reviewed 2026-07-16</small></td></tr><tr><td>Three Agent Skills</td><td>agents</td><td>The README lists Claude Code, Cursor, Codex, OpenCode, and VS Code Copilot among compatible Agent Skills clients</td><td><a href="https://github.com/emalorenzo/three-agent-skills/blob/f950f95ae3b13581546e6d6d8b2f88a08eb3e577/README.md">Source</a><br><small>Reviewed 2026-07-16</small></td></tr><tr><td>Three Agent Skills</td><td>license declaration</td><td>The reviewed README declares MIT</td><td><a href="https://github.com/emalorenzo/three-agent-skills/blob/f950f95ae3b13581546e6d6d8b2f88a08eb3e577/README.md">Source</a><br><small>Reviewed 2026-07-16</small></td></tr><tr><td>Three Agent Skills</td><td>license file visibility</td><td>The reviewed repository tree does not expose a standalone LICENSE file</td><td><a href="https://github.com/emalorenzo/three-agent-skills/tree/f950f95ae3b13581546e6d6d8b2f88a08eb3e577">Source</a><br><small>Reviewed 2026-07-16</small></td></tr><tr><td>Three Agent Skills</td><td>organization</td><td>Two skills: three-best-practices for Three.js and r3f-best-practices for React Three Fiber</td><td><a href="https://github.com/emalorenzo/three-agent-skills/blob/f950f95ae3b13581546e6d6d8b2f88a08eb3e577/README.md">Source</a><br><small>Reviewed 2026-07-16</small></td></tr><tr><td>Three Agent Skills</td><td>scope</td><td>The README documents broad Three.js and R3F best-practice rules including performance, memory, shaders, assets, physics, WebXR, mobile, and production topics</td><td><a href="https://github.com/emalorenzo/three-agent-skills/blob/f950f95ae3b13581546e6d6d8b2f88a08eb3e577/README.md">Source</a><br><small>Reviewed 2026-07-16</small></td></tr><tr><td>Three.js Skill Plugin for Claude Code</td><td>compatibility</td><td>The README declares Three.js r150+, Vanilla JS, React and R3F, Vue, Svelte, Next.js, WebGL, and WebGPU coverage</td><td><a href="https://github.com/kndoshn/threejs-skill-plugin/blob/0f395b6b8cf49c27b06f3ec613676ccbf9ebbdf6/README.md">Source</a><br><small>Reviewed 2026-07-16</small></td></tr><tr><td>Three.js Skill Plugin for Claude Code</td><td>installation</td><td>The README documents Claude Code plugin, project-local, and personal Claude skill installation</td><td><a href="https://github.com/kndoshn/threejs-skill-plugin/blob/0f395b6b8cf49c27b06f3ec613676ccbf9ebbdf6/README.md">Source</a><br><small>Reviewed 2026-07-16</small></td></tr><tr><td>Three.js Skill Plugin for Claude Code</td><td>license declaration</td><td>The reviewed README declares MIT</td><td><a href="https://github.com/kndoshn/threejs-skill-plugin/blob/0f395b6b8cf49c27b06f3ec613676ccbf9ebbdf6/README.md">Source</a><br><small>Reviewed 2026-07-16</small></td></tr><tr><td>Three.js Skill Plugin for Claude Code</td><td>license file visibility</td><td>The reviewed repository tree does not expose a standalone LICENSE file</td><td><a href="https://github.com/kndoshn/threejs-skill-plugin/tree/0f395b6b8cf49c27b06f3ec613676ccbf9ebbdf6">Source</a><br><small>Reviewed 2026-07-16</small></td></tr><tr><td>Three.js Skill Plugin for Claude Code</td><td>organization</td><td>One developing-threejs-apps skill with examples, playbooks, quality gates, evaluations, FAQ, references, and diagnostic scripts</td><td><a href="https://github.com/kndoshn/threejs-skill-plugin/blob/0f395b6b8cf49c27b06f3ec613676ccbf9ebbdf6/README.md">Source</a><br><small>Reviewed 2026-07-16</small></td></tr><tr><td>Three.js Skill Plugin for Claude Code</td><td>positioning</td><td>A repo-first Claude Code plugin for building, debugging, and optimizing Three.js applications</td><td><a href="https://github.com/kndoshn/threejs-skill-plugin/blob/0f395b6b8cf49c27b06f3ec613676ccbf9ebbdf6/README.md">Source</a><br><small>Reviewed 2026-07-16</small></td></tr><tr><td>Three.js Awesome Graphics Agent Skills</td><td>license</td><td>MIT, with a standalone LICENSE file linked by the repository</td><td><a href="https://github.com/scottstts/Threejs-Awesome-Graphics-Agent-Skills/blob/e43dcb03020cae5b08983a828bc1817dd6c0c40a/LICENSE">Source</a><br><small>Reviewed 2026-07-16</small></td></tr><tr><td>Three.js Awesome Graphics Agent Skills</td><td>positioning</td><td>A graphics-focused Three.js agent skill pack with an attached example gallery</td><td><a href="https://github.com/scottstts/Threejs-Awesome-Graphics-Agent-Skills/blob/e43dcb03020cae5b08983a828bc1817dd6c0c40a/README.md">Source</a><br><small>Reviewed 2026-07-16</small></td></tr><tr><td>Three.js Awesome Graphics Agent Skills</td><td>scope</td><td>The README lists specialist graphics skills covering cameras, procedural systems, TSL and WebGPU, GLSL, post-processing, color, effects, and visual validation</td><td><a href="https://github.com/scottstts/Threejs-Awesome-Graphics-Agent-Skills/blob/e43dcb03020cae5b08983a828bc1817dd6c0c40a/README.md">Source</a><br><small>Reviewed 2026-07-16</small></td></tr></tbody></table></div></section><section class="content-related" aria-labelledby="content-related-title"><h2 id="content-related-title">Next steps</h2><ul class="content-ruled-list"><li><a data-related-route="/compare/threejs-webgpu-skill-pack-vs-threejs-game-skills/" data-related-family="compare" href="/compare/threejs-webgpu-skill-pack-vs-threejs-game-skills/"><span class="content-related-family">Comparisons</span><span>Three.js WebGPU Skill Pack vs Three.js Game Skills</span></a></li><li><a data-related-route="/compare/threejs-webgpu-skill-pack-vs-threejs-skill-plugin/" data-related-family="compare" href="/compare/threejs-webgpu-skill-pack-vs-threejs-skill-plugin/"><span class="content-related-family">Comparisons</span><span>Three.js WebGPU Skill Pack vs Three.js Skill Plugin</span></a></li><li><a data-related-route="/compare/agent-skills-vs-threejs-mcp-tools/" data-related-family="compare" href="/compare/agent-skills-vs-threejs-mcp-tools/"><span class="content-related-family">Comparisons</span><span>Three.js Agent Skills vs Three.js MCP Tools</span></a></li><li><a data-related-route="/agents/routing-and-minimal-context/" data-related-family="agents" href="/agents/routing-and-minimal-context/"><span class="content-related-family">Agent docs</span><span>Route Three.js Agent Skills with Minimal Context</span></a></li><li><a data-related-route="/pricing/" data-related-family="pricing" href="/pricing/"><span class="content-related-family">Pricing</span><span>Three.js WebGPU Skill Pack Pricing and License</span></a></li></ul></section><section class="content-skills" aria-labelledby="content-skills-title"><h2 id="content-skills-title">Relevant skills</h2><ul class="content-ruled-list"><li><a href="/skills/threejs-choose-skills.html">Route Three.js WebGPU/TSL Work</a></li><li><a href="/skills/threejs-visual-validation.html">Visual Validation</a></li></ul></section><section class="content-demos" aria-labelledby="content-demos-title"><h2 id="content-demos-title">Relevant demos and evidence</h2><ul class="content-ruled-list"><li><a href="/demos/webgpu-validation-harness/">Native WebGPU validation harness</a></li></ul></section><section class="content-sources" aria-labelledby="content-sources-title"><h2 id="content-sources-title">Sources and correction path</h2><ul class="content-ruled-list"><li><a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/README.md">github.com/linegel/threejs-complete-set-of-skill/blob/main/README.md</a></li><li><a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/LICENSE">github.com/linegel/threejs-complete-set-of-skill/blob/main/LICENSE</a></li><li><a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-object-sculptor/LICENSE">github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-object-sculptor/LICENSE</a></li><li><a href="https://github.com/majidmanzarpour/threejs-game-skills/blob/8919acca095be36ea054c866a79997fca90e8b22/README.md">github.com/majidmanzarpour/threejs-game-skills/blob/8919acca095be36ea054c866a79997fca90e8b22/README.md</a></li><li><a href="https://github.com/kndoshn/threejs-skill-plugin/blob/0f395b6b8cf49c27b06f3ec613676ccbf9ebbdf6/README.md">github.com/kndoshn/threejs-skill-plugin/blob/0f395b6b8cf49c27b06f3ec613676ccbf9ebbdf6/README.md</a></li><li><a href="https://github.com/kndoshn/threejs-skill-plugin/tree/0f395b6b8cf49c27b06f3ec613676ccbf9ebbdf6">github.com/kndoshn/threejs-skill-plugin/tree/0f395b6b8cf49c27b06f3ec613676ccbf9ebbdf6</a></li><li><a href="https://github.com/emalorenzo/three-agent-skills/blob/f950f95ae3b13581546e6d6d8b2f88a08eb3e577/README.md">github.com/emalorenzo/three-agent-skills/blob/f950f95ae3b13581546e6d6d8b2f88a08eb3e577/README.md</a></li><li><a href="https://github.com/emalorenzo/three-agent-skills/tree/f950f95ae3b13581546e6d6d8b2f88a08eb3e577">github.com/emalorenzo/three-agent-skills/tree/f950f95ae3b13581546e6d6d8b2f88a08eb3e577</a></li><li><a href="https://github.com/scottstts/Threejs-Awesome-Graphics-Agent-Skills/blob/e43dcb03020cae5b08983a828bc1817dd6c0c40a/README.md">github.com/scottstts/Threejs-Awesome-Graphics-Agent-Skills/blob/e43dcb03020cae5b08983a828bc1817dd6c0c40a/README.md</a></li><li><a href="https://agentskills.io/specification">agentskills.io/specification</a></li><li><a href="https://github.com/linegel/threejs-complete-set-of-skill/issues">Report a correction</a></li></ul></section>
+      <nav class="content-discovery" aria-label="Machine-readable discovery"><a href="/guides/">All guides</a><a href="/llms.txt">LLM catalog</a><a href="/skills.json">Machine index</a></nav>
+    </article>
+  </div></div></div>
+</main>
+<div class="wrap"><footer>
+  <div class="footer-summary">Three.js WebGPU Skill Pack: TSL, procedural graphics, and visual validation.
+    <span>Proof status and supported revision are stated on each decision page and linked evidence report.</span>
+    <span>Compiling shaders? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span>
+  </div>
+  <div class="footer-groups">
+    <div class="footer-group"><strong>Build</strong><a href="/#skills">Skills</a><a href="/#flagships">Examples</a><a href="/industries/">Industries</a></div>
+    <div class="footer-group"><strong>Decide</strong><a href="/for/">Who it is for</a><a href="/compare/">Compare</a><a href="/alternatives/">Alternatives</a><a href="/pricing/">Pricing</a></div>
+    <div class="footer-group"><strong>Adopt</strong><a href="/docs/">Docs</a><a href="/migrate/">Migration</a><a href="/agents/">Agent docs</a><a href="/faq/">FAQ</a></div>
+    <div class="footer-group"><strong>Proof</strong><a href="/evidence/">Evidence</a><a href="/about/">Method</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a><a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/LICENSE">License</a></div>
+  </div>
+</footer></div>
+</body>
+</html>
