@@ -29,23 +29,70 @@ Freeze the original material with a deterministic object, lights, environment, c
 
 Classify the shader's primary contract. A physically lit surface, screen-space effect, compute kernel, and full custom output do not have the same NodeMaterial target. This guide focuses on material graphs; route a shared final-image chain to `threejs-image-pipeline` and a concrete migration failure to `threejs-debugging`.
 
+## Map GLSL concepts to explicit node owners
+
+| GLSL source concept | TSL and NodeMaterial target | Migration rule |
+|---|---|---|
+| Uniform dictionary | One `uniform()` node per mutable input | Preserve type, unit, update cadence, and the application owner that changes the value. |
+| Attribute plus varying | Accessor such as `uv()` or `attribute()`, followed by a named node graph | Keep the value in an explicit coordinate space; do not recreate varyings merely because the source used them. |
+| Vertex transform or displacement | Base NodeMaterial transform plus `positionNode` | Port visible and shadow position together; use `castShadowPositionNode` only for an intentionally different caster. |
+| Fragment color expression | `colorNode`, `emissiveNode`, opacity or other semantic material slots | Choose slots from the observable being preserved, not from GLSL syntax. |
+| Shader-owned lighting model | Appropriate `MeshStandardNodeMaterial` or `MeshPhysicalNodeMaterial` | Retain Three.js lighting and shadow behavior unless replacing that behavior is an explicit requirement. |
+| Tone mapping and color conversion code | One renderer or final-pipeline output owner | Keep material values scene-linear and remove duplicate presentation transforms. |
+
+Apply the migration in this order: select the target material class, bind typed inputs, port the shared coordinate and cause graph, port vertex and shadow behavior, bind semantic material slots, then compare no-post output before restoring downstream processing.
+
 ## Choose a NodeMaterial target rather than translating strings
 
 For a physically lit surface, start with `MeshStandardNodeMaterial` or `MeshPhysicalNodeMaterial`. Preserve Three.js lighting, environment, shadow, transmission, clearcoat, sheen, anisotropy, and output behavior, then replace only the procedural causes through node slots.
 
-A simple material identity can begin like this in the pinned r185 surface:
+For example, this source material owns one unlit, scene-linear UV gradient and delegates tone mapping and output conversion to Three.js:
 
 ```js
-import { MeshStandardNodeMaterial } from 'three/webgpu';
-import { color, float } from 'three/tsl';
+import { ShaderMaterial } from 'three';
 
-const material = new MeshStandardNodeMaterial({ name: 'painted-metal' });
-material.colorNode = color(0x6b7480);
-material.roughnessNode = float(0.42);
-material.metalnessNode = float(0.78);
+const material = new ShaderMaterial({
+  name: 'uv-gradient',
+  vertexShader: `
+    varying vec2 vUv;
+
+    void main() {
+      vUv = uv;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `,
+  fragmentShader: `
+    varying vec2 vUv;
+
+    void main() {
+      vec3 surface = mix(
+        vec3(0.08, 0.22, 0.48),
+        vec3(0.94, 0.42, 0.10),
+        vUv.x
+      );
+      gl_FragColor = vec4(surface, 1.0);
+      #include <tonemapping_fragment>
+      #include <colorspace_fragment>
+    }
+  `
+});
 ```
 
-This is not a line-by-line replacement for an arbitrary `ShaderMaterial`. It demonstrates the target ownership model: material identity is expressed through NodeMaterial slots, while the renderer retains its lighting and output contracts.
+The r185 target preserves the same UV input and scene-linear color expression while returning transform and presentation ownership to the renderer:
+
+```js
+import { MeshBasicNodeMaterial } from 'three/webgpu';
+import { mix, uv, vec3 } from 'three/tsl';
+
+const material = new MeshBasicNodeMaterial({ name: 'uv-gradient' });
+material.colorNode = mix(
+  vec3(0.08, 0.22, 0.48),
+  vec3(0.94, 0.42, 0.10),
+  uv().x
+);
+```
+
+This pair is deliberately narrow: it proves the ownership change for one unlit UV gradient, not an automatic translation recipe for lighting, displacement, alpha, or arbitrary GLSL.
 
 Build one shared TSL cause graph and derive color, roughness, metalness, normal, opacity, emissive, and masks from it. Repeating unrelated noise or texture work independently per channel can detach the material's visible identity and multiply cost.
 

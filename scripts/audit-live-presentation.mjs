@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 import { chromium } from 'playwright';
+import {
+  DECISION_SUPPORT_PRESENTATION_ROUTES,
+  NO_SCRIPT_PRESENTATION_ROUTES,
+} from './lib/page-routes.mjs';
 
 const SITE = new URL(process.env.SITE_URL ?? 'https://threejs-skills.com/');
 const currentMobileRoutes = ['/', '/skills/threejs-choose-skills.html', '/skills/threejs-water-optics.html'];
 const decisionRoutes = [
-  '/guides/',
-  '/compare/threejs-webgpu-skill-pack-vs-threejs-game-skills/',
-  '/pricing/',
-  '/migrate/webglrenderer-to-webgpurenderer/',
-  '/industries/product-visualization-and-configurators/',
-  '/faq/why-does-my-tsl-post-processing-look-double-tone-mapped/',
+  ...DECISION_SUPPORT_PRESENTATION_ROUTES.map(({ path }) => path),
+  ...NO_SCRIPT_PRESENTATION_ROUTES.filter(({ kind }) => kind === 'faq-answer').map(({ path }) => path),
 ];
 const uniqueRoutes = (...groups) => [...new Set(groups.flat())];
 const viewAudits = [
@@ -36,16 +36,6 @@ const viewAudits = [
       reducedMotion: 'reduce',
       colorScheme: 'dark',
     },
-  },
-];
-const noScriptRoutes = [
-  { route: '/', label: 'homepage', minimumText: 3_000, minimumLinks: 50 },
-  { route: '/guides/', label: 'Guides hub', minimumText: 1_200, minimumLinks: 10 },
-  {
-    route: '/faq/why-does-my-tsl-post-processing-look-double-tone-mapped/',
-    label: 'FAQ answer',
-    minimumText: 900,
-    minimumLinks: 6,
   },
 ];
 const errors = [];
@@ -142,10 +132,10 @@ try {
     javaScriptEnabled: false,
     isMobile: true,
   });
-  for (const target of noScriptRoutes) {
+  for (const target of NO_SCRIPT_PRESENTATION_ROUTES) {
     const page = await noScript.newPage();
-    const response = await page.goto(new URL(target.route, SITE).href, { waitUntil: 'load', timeout: 30_000 });
-    const label = `no-JavaScript ${target.label}`;
+    const response = await page.goto(new URL(target.path, SITE).href, { waitUntil: 'load', timeout: 30_000 });
+    const label = `no-JavaScript ${target.family}`;
     assert(response?.status() === 200, `${label} did not return 200`);
     const staticReport = await page.evaluate(() => ({
       h1: document.querySelectorAll('h1').length,
@@ -175,5 +165,5 @@ if (errors.length) {
   for (const error of errors) console.error(`- ${error}`);
   process.exitCode = 1;
 } else {
-  console.log(`Live presentation audit passed for ${reports.length} route-view checks across mobile and desktop plus ${noScriptRoutes.length} no-JavaScript pages.`);
+  console.log(`Live presentation audit passed for ${reports.length} route-view checks across mobile and desktop plus ${NO_SCRIPT_PRESENTATION_ROUTES.length} no-JavaScript pages.`);
 }

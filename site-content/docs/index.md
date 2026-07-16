@@ -5,7 +5,7 @@ title: Three.js WebGPU Skill Pack Documentation
 description: Install, route, and verify the Three.js WebGPU Skill Pack with task-focused guides for Codex, Claude Code, and existing projects.
 h1: Three.js WebGPU Skill Pack documentation
 primary_query: threejs webgpu skill pack documentation
-query_aliases: ["three.js webgpu agent skills docs","threejs skills user guide"]
+query_aliases: ["threejs skills user guide","threejs webgpu pack usage docs"]
 summary: Use these docs to install the complete skill pack, choose the smallest relevant skill set, and integrate it without replacing your project's existing rules. Installation makes the guidance available; runtime WebGPU and evidence claims still require explicit verification.
 related_skills: ["threejs-choose-skills","threejs-debugging","threejs-visual-validation"]
 related_demos: ["webgpu-validation-harness"]

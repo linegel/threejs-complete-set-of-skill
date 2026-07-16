@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { existsSync, lstatSync, readFileSync, readdirSync } from 'node:fs';
 import { extname, join, relative, resolve, sep } from 'node:path';
 
@@ -37,9 +38,14 @@ const FAQ_GROUPS = [
 const FAQ_GROUP_IDS = new Set(FAQ_GROUPS.map(([id]) => id));
 const FAQ_SOURCE_TYPES = new Set([
   'customer', 'search-console', 'repository-issue', 'upstream-issue', 'forum', 'reddit',
-  'stack-overflow', 'verified-local-failure',
+  'stack-overflow', 'derived-upstream-issue', 'derived-stack-overflow',
+  'verified-local-failure',
 ]);
-const PUBLIC_FAQ_SOURCES = new Set(['repository-issue', 'upstream-issue', 'forum', 'reddit', 'stack-overflow']);
+const PUBLIC_FAQ_SOURCES = new Set([
+  'repository-issue', 'upstream-issue', 'forum', 'reddit', 'stack-overflow',
+  'derived-upstream-issue', 'derived-stack-overflow',
+]);
+const LOCAL_FAQ_SOURCES = new Set(['verified-local-failure']);
 const EVIDENCE_STATUSES = new Set(['observed', 'reproduced', 'verified']);
 const ROUTE = /^\/(?:[a-z0-9]+(?:-[a-z0-9]+)*\/)+$/;
 const ID = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -91,6 +97,22 @@ function bodyH1(body) {
     if (fence) continue;
     if (/^#(?:\s|$)/.test(line) || /<h1\b/i.test(line) || (priorText && /^=+\s*$/.test(line))) return index + 1;
     priorText = Boolean(line.trim());
+  }
+  return null;
+}
+
+function bodyRawSubheading(body) {
+  let fence = null;
+  let priorText = false;
+  for (const [index, line] of body.split('\n').entries()) {
+    const marker = line.match(/^\s*(`{3,}|~{3,})/)?.[1]?.[0];
+    if (marker) {
+      fence = fence === marker ? null : (fence ?? marker);
+      priorText = false;
+      continue;
+    }
+    if (!fence && (/<h[23]\b/i.test(line) || (priorText && /^\s*-+\s*$/.test(line)))) return index + 1;
+    if (!fence) priorText = Boolean(line.trim());
   }
   return null;
 }
@@ -163,6 +185,8 @@ function parse(file, repoRoot, errors) {
   if (!body.trim()) errors.push(`${label}: Markdown body is empty`);
   const h1 = bodyH1(body);
   if (h1) errors.push(`${label}: Markdown body contains an H1 at body line ${h1}`);
+  const rawSubheading = bodyRawSubheading(body);
+  if (rawSubheading) errors.push(`${label}: Markdown body contains a raw H2/H3 at body line ${rawSubheading}`);
   return { metadata, body, sourceFile: label };
 }
 
@@ -203,8 +227,23 @@ function validateFaq(page, threeRevision, today, reviewed, errors) {
     if (PUBLIC_FAQ_SOURCES.has(page.question_source_type) && !page.question_sources.some(https)) {
       errors.push(`${page.sourceFile}: ${page.question_source_type} provenance requires a public HTTPS source`);
     }
-    if (page.question_source_type === 'verified-local-failure' && !page.question_sources.some((source) => /^local:\s*\S/i.test(source))) {
-      errors.push(`${page.sourceFile}: verified-local-failure provenance requires a local: source`);
+    if (LOCAL_FAQ_SOURCES.has(page.question_source_type) && !page.question_sources.some((source) => /^local:\s*\S/i.test(source))) {
+      errors.push(`${page.sourceFile}: ${page.question_source_type} provenance requires a local: source`);
+    }
+    if (page.question_source_type === 'customer' && !page.question_sources.some((source) => /^support:\s*\S/i.test(source))) {
+      errors.push(`${page.sourceFile}: customer provenance requires a support: source`);
+    }
+    if (page.question_source_type === 'search-console' && !page.question_sources.some((source) => /^search-console:\s*\S/i.test(source))) {
+      errors.push(`${page.sourceFile}: search-console provenance requires a search-console: source`);
+    }
+    if (page.question_source_type !== 'customer' && page.question_sources.some((source) => /^support:/i.test(source))) {
+      errors.push(`${page.sourceFile}: support: provenance may only be labeled customer`);
+    }
+    if (page.question_source_type !== 'search-console' && page.question_sources.some((source) => /^search-console:/i.test(source))) {
+      errors.push(`${page.sourceFile}: search-console: provenance requires search-console source type`);
+    }
+    if (!LOCAL_FAQ_SOURCES.has(page.question_source_type) && page.question_sources.some((source) => /^local:/i.test(source))) {
+      errors.push(`${page.sourceFile}: local: provenance requires a verified local source type`);
     }
   }
   if (!EVIDENCE_STATUSES.has(page.evidence_status)) errors.push(`${page.sourceFile}: invalid evidence_status "${page.evidence_status}"`);
@@ -367,6 +406,9 @@ function proof(page, repoRoot, demoById, evidenceReports, errors) {
   else {
     if (report.status !== 'accepted') errors.push(`${page.sourceFile}: hero_source evidence is not accepted: ${demo.id}`);
     if (report.sourceHash !== demo.sourceHash) errors.push(`${page.sourceFile}: hero_source evidence is stale for current source: ${demo.id}`);
+    const mediaPath = page.hero_image.replace(/^\//, '');
+    const media = Array.isArray(report.media) ? report.media.find((entry) => entry?.file === mediaPath) : null;
+    if (!media) errors.push(`${page.sourceFile}: hero_image is not listed in accepted evidence media: ${page.hero_image}`);
   }
   const image = page.hero_image;
   if (!/^\/[A-Za-z0-9._/-]+\.png$/.test(image) || image.includes('//') || image.split('/').some((part) => part === '.' || part === '..')) {
@@ -381,7 +423,17 @@ function proof(page, repoRoot, demoById, evidenceReports, errors) {
   }
   const stat = lstatSync(path);
   if (stat.isSymbolicLink() || !stat.isFile()) errors.push(`${page.sourceFile}: hero_image must be a regular nonsymlink file`);
-  else if (readFileSync(path).subarray(0, 8).toString('hex') !== '89504e470d0a1a0a') errors.push(`${page.sourceFile}: hero_image is not PNG`);
+  else {
+    const bytes = readFileSync(path);
+    if (bytes.subarray(0, 8).toString('hex') !== '89504e470d0a1a0a') errors.push(`${page.sourceFile}: hero_image is not PNG`);
+    const media = Array.isArray(report?.media) ? report.media.find((entry) => entry?.file === image.slice(1)) : null;
+    if (!/^sha256:[a-f0-9]{64}$/.test(media?.outputSha256 ?? '')) {
+      errors.push(`${page.sourceFile}: hero_image evidence media lacks a valid SHA-256`);
+    } else {
+      const actual = `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
+      if (actual !== media.outputSha256) errors.push(`${page.sourceFile}: hero_image hash differs from accepted evidence media`);
+    }
+  }
   const poster = typeof demo.poster === 'string' ? `/${demo.poster.replace(/^\/+/, '')}` : null;
   if (image !== `/previews/primary/${demo.id}.png` && image !== `/previews/provider/${demo.id}.png`
     && !image.startsWith(`/visual-validation/${demo.id}/`) && image !== poster) {
@@ -392,6 +444,30 @@ function proof(page, repoRoot, demoById, evidenceReports, errors) {
 function localRepositorySources(page, repoRoot, errors) {
   const values = [...(page.sources ?? []), ...(page.question_sources ?? [])];
   for (const source of values) {
+    if (/^local:/i.test(source)) {
+      const match = source.match(/^local:\s*([^#]+?)(?:#(.+))?$/i);
+      if (!match) {
+        errors.push(`${page.sourceFile}: invalid local repository source: ${source}`);
+        continue;
+      }
+      const path = resolve(repoRoot, match[1]);
+      if (!path.startsWith(`${repoRoot}${sep}`) || !existsSync(path)) {
+        errors.push(`${page.sourceFile}: local repository source does not exist: ${source}`);
+        continue;
+      }
+      const stat = lstatSync(path);
+      if (stat.isSymbolicLink() || !stat.isFile()) {
+        errors.push(`${page.sourceFile}: local repository source must be a regular nonsymlink file: ${source}`);
+        continue;
+      }
+      if (match[2]) {
+        const normalizeFragment = (value) => value.toLocaleLowerCase('en-US').replace(/[-_]+/g, ' ');
+        if (!normalizeFragment(readFileSync(path, 'utf8')).includes(normalizeFragment(match[2]))) {
+          errors.push(`${page.sourceFile}: local repository source fragment was not found: ${source}`);
+        }
+      }
+      continue;
+    }
     if (!source.startsWith('https://')) continue;
     const url = new URL(source);
     const match = url.pathname.match(/^\/linegel\/threejs-complete-set-of-skill\/(blob|tree)\/main\/(.+)$/);
@@ -443,6 +519,12 @@ function relationships(pages, pageBySlug, skillSet, demoById, evidenceReports, r
       if (!ROUTE.test(route)) errors.push(`${page.sourceFile}: unsafe related page "${route}"`);
       else if (route === page.slug) errors.push(`${page.sourceFile}: related_pages contains its own slug`);
       else if (!pageBySlug.has(route)) errors.push(`${page.sourceFile}: related page does not exist: ${route}`);
+    }
+    if (page.kind === 'faq-answer') {
+      const adjacent = page.related_pages.filter((route) => route.startsWith('/faq/'));
+      const deeper = page.related_pages.filter((route) => !route.startsWith('/faq/'));
+      if (adjacent.length < 2) errors.push(`${page.sourceFile}: FAQ answer needs two adjacent FAQ links`);
+      if (deeper.length < 1) errors.push(`${page.sourceFile}: FAQ answer needs one deeper non-FAQ link`);
     }
     for (const skill of Array.isArray(page.related_skills) ? page.related_skills : []) {
       if (!skillSet.has(skill)) errors.push(`${page.sourceFile}: related skill does not exist: ${skill}`);

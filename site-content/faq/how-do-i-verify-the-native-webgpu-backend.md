@@ -10,10 +10,12 @@ summary: Initialize the renderer, then check renderer.backend.isWebGPUBackend ==
 related_skills: ["threejs-choose-skills","threejs-visual-validation"]
 related_demos: ["webgpu-validation-harness"]
 related_pages: ["/migrate/webglrenderer-to-webgpurenderer/","/faq/which-threejs-version-does-the-skill-pack-support/","/faq/why-does-my-webgpu-png-have-striped-rows/"]
+hero_image: /visual-validation/webgpu-validation-harness/diagnostics.mosaic.png
+hero_source: webgpu-validation-harness
 published: 2026-07-16
 last_reviewed: 2026-07-16
 sources: ["https://threejs.org/manual/en/webgpurenderer","https://threejs.org/docs/pages/WebGPURenderer.html","https://github.com/mrdoob/three.js/issues/28898","https://github.com/mrdoob/three.js/issues/31381","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-choose-skills/SKILL.md","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/scripts/capture-via-cdp.mjs"]
-question_source_type: upstream-issue
+question_source_type: derived-upstream-issue
 question_sources: ["https://github.com/mrdoob/three.js/issues/31381"]
 first_observed: 2025-07-07
 last_observed: 2026-07-16
@@ -22,10 +24,6 @@ evidence_status: verified
 faq_group: compatibility-and-browser-support
 supported_revision: 0.185.1
 ---
-
-## Direct answer
-
-Initialize the renderer, then check renderer.backend.isWebGPUBackend === true. renderer.isWebGPURenderer only identifies the universal renderer class; it does not prove which backend was selected, because WebGPURenderer can fall back to WebGL 2. Record THREE.REVISION, the backend flag, compatibilityMode, output buffer type, and device limits. If the backend flag is false, classify the run as fallback or blocked and do not publish native WebGPU claims.
 
 ## Verify the initialized renderer
 
@@ -74,4 +72,4 @@ If the flag is false, follow the [WebGPURenderer migration guide](/migrate/webgl
 
 ## Question provenance
 
-The public source for this question is upstream issue #31381, which explicitly discusses confusion about WebGPURenderer's multi-backend behavior. Issue #28898 is technical background, not question provenance. This is upstream engineering evidence, not customer evidence. First observed 2025-07-07; last observed and answer reviewed 2026-07-16.
+This operational question is derived from upstream issue #31381, which documents confusion about WebGPURenderer's multi-backend behavior but does not ask for this exact verification procedure. Issue #28898 is technical background only. This is upstream engineering evidence, not customer evidence. Source first observed 2025-07-07; last checked and answer reviewed 2026-07-16.

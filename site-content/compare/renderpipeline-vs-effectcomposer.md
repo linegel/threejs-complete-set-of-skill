@@ -10,6 +10,8 @@ summary: Use RenderPipeline with WebGPURenderer and EffectComposer with WebGLRen
 related_skills: ["threejs-image-pipeline","threejs-exposure-color-grading","threejs-bloom","threejs-ambient-contact-shading","threejs-visual-validation"]
 related_demos: ["webgpu-temporal-history","integration-image-pipeline-ao"]
 related_pages: ["/compare/webgpurenderer-vs-webglrenderer/","/compare/threejs-tsl-vs-glsl/","/faq/why-does-my-tsl-post-processing-look-double-tone-mapped/","/migrate/webglrenderer-to-webgpurenderer/"]
+hero_image: /visual-validation/integration-image-pipeline-ao/final.design.png
+hero_source: integration-image-pipeline-ao
 supported_revision: 0.185.1
 published: 2026-07-16
 last_reviewed: 2026-07-16

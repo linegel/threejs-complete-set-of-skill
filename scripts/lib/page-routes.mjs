@@ -186,15 +186,55 @@ export function plannedPublishedRoutes(lab) {
   return routes;
 }
 
+export const DECISION_SUPPORT_PRESENTATION_ROUTES = Object.freeze([
+  Object.freeze({ family: 'guides hub', path: '/guides/', kind: 'hub' }),
+  Object.freeze({ family: 'audience', path: '/for/graphics-engineers/', kind: 'audience' }),
+  Object.freeze({ family: 'direct comparison', path: '/compare/threejs-webgpu-skill-pack-vs-official-threejs-docs/', kind: 'ecosystem-comparison' }),
+  Object.freeze({ family: 'technical comparison', path: '/compare/renderpipeline-vs-effectcomposer/', kind: 'technical-comparison' }),
+  Object.freeze({ family: 'alternatives', path: '/alternatives/threejs-agent-skills/', kind: 'alternatives' }),
+  Object.freeze({ family: 'pricing', path: '/pricing/', kind: 'pricing' }),
+  Object.freeze({ family: 'human docs', path: '/docs/use-in-an-existing-project/', kind: 'user-doc' }),
+  Object.freeze({ family: 'agent docs', path: '/agents/routing-and-minimal-context/', kind: 'agent-doc' }),
+  Object.freeze({ family: 'migration', path: '/migrate/webglrenderer-to-webgpurenderer/', kind: 'migration' }),
+  Object.freeze({ family: 'industry', path: '/industries/product-visualization-and-configurators/', kind: 'industry' }),
+  Object.freeze({ family: 'FAQ hub', path: '/faq/', kind: 'hub' }),
+]);
+
+export const HUMAN_DOCS_NAV = Object.freeze([
+  Object.freeze({ path: '/docs/', label: 'Overview' }),
+  Object.freeze({ path: '/docs/install/', label: 'Install' }),
+  Object.freeze({ path: '/docs/install-codex/', label: 'Codex' }),
+  Object.freeze({ path: '/docs/install-claude-code/', label: 'Claude Code' }),
+  Object.freeze({ path: '/docs/choose-skills/', label: 'Choose skills' }),
+  Object.freeze({ path: '/docs/use-in-an-existing-project/', label: 'Existing project' }),
+]);
+
+export const NO_SCRIPT_PRESENTATION_ROUTES = Object.freeze([
+  Object.freeze({ family: 'homepage', path: '/', minimumText: 3_000, minimumLinks: 50 }),
+  Object.freeze({ family: 'Guides hub', path: '/guides/', kind: 'hub', minimumText: 1_200, minimumLinks: 10 }),
+  Object.freeze({
+    family: 'FAQ answer',
+    path: '/faq/why-does-my-tsl-post-processing-look-double-tone-mapped/',
+    kind: 'faq-answer',
+    minimumText: 900,
+    minimumLinks: 6,
+  }),
+]);
+
+const STATIC_SITE_HTML_PATHS = [
+  '/',
+  '/about/',
+  ...DECISION_SUPPORT_PRESENTATION_ROUTES.map(({ path }) => path),
+  ...NO_SCRIPT_PRESENTATION_ROUTES.map(({ path }) => path),
+].filter((path, index, paths) => paths.indexOf(path) === index);
+
 const STATIC_PAGES_SMOKE_ROUTES = Object.freeze([
-  Object.freeze({ path: '/', category: 'site-html', responseKind: 'html', canonicalPath: '/' }),
-  Object.freeze({ path: '/about/', category: 'site-html', responseKind: 'html', canonicalPath: '/about/' }),
-  Object.freeze({ path: '/guides/', category: 'site-html', responseKind: 'html', canonicalPath: '/guides/' }),
-  Object.freeze({ path: '/compare/threejs-webgpu-skill-pack-vs-official-threejs-docs/', category: 'site-html', responseKind: 'html', canonicalPath: '/compare/threejs-webgpu-skill-pack-vs-official-threejs-docs/' }),
-  Object.freeze({ path: '/pricing/', category: 'site-html', responseKind: 'html', canonicalPath: '/pricing/' }),
-  Object.freeze({ path: '/migrate/webglrenderer-to-webgpurenderer/', category: 'site-html', responseKind: 'html', canonicalPath: '/migrate/webglrenderer-to-webgpurenderer/' }),
-  Object.freeze({ path: '/industries/product-visualization-and-configurators/', category: 'site-html', responseKind: 'html', canonicalPath: '/industries/product-visualization-and-configurators/' }),
-  Object.freeze({ path: '/faq/why-does-my-webgpu-png-have-striped-rows/', category: 'site-html', responseKind: 'html', canonicalPath: '/faq/why-does-my-webgpu-png-have-striped-rows/' }),
+  ...STATIC_SITE_HTML_PATHS.map((path) => Object.freeze({
+    path,
+    category: 'site-html',
+    responseKind: 'html',
+    canonicalPath: path,
+  })),
   Object.freeze({ path: '/skills.json', category: 'site-json', responseKind: 'json', jsonKind: 'skills' }),
   Object.freeze({ path: '/llm.txt', category: 'site-text', responseKind: 'text', bodyMarker: '# Three.js' }),
   Object.freeze({ path: '/llms.txt', category: 'site-text', responseKind: 'text', bodyMarker: '# Three.js' }),

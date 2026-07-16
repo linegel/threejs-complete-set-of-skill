@@ -2,11 +2,11 @@
 kind: hub
 slug: /faq/
 title: Three.js WebGPU Skill Pack FAQ
-description: Sourced answers about Three.js r185 support, skill routing, native WebGPU proof, ISC licensing, readback stripes, and double tone mapping.
+description: Sourced answers about Three.js r185 support, React Three Fiber boundaries, native WebGPU proof, ISC licensing, readback stripes, and double tone mapping.
 h1: Three.js WebGPU Skill Pack FAQs
 primary_query: threejs webgpu skill pack faq
 query_aliases: ["three.js webgpu skill pack questions","threejs agent skills questions"]
-summary: These sourced answers cover version support, skill routing, native WebGPU proof, licensing, readback alignment, and final-image ownership. Each answer states where the question came from, what evidence supports the response, and what the response does not prove.
+summary: These sourced answers cover version support, React Three Fiber boundaries, native WebGPU proof, licensing, readback alignment, and final-image ownership. Each answer states where the question came from, what evidence supports the response, and what the response does not prove.
 related_skills: ["threejs-choose-skills","threejs-visual-validation"]
 related_demos: []
 related_pages: ["/guides/","/docs/","/migrate/","/pricing/"]
@@ -15,17 +15,17 @@ last_reviewed: 2026-07-16
 sources: ["https://github.com/linegel/threejs-complete-set-of-skill","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/README.md","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/docs/demos/registry.json"]
 ---
 
-## Sourced community and engineering questions, plus verified failures
+## Sourced community and engineering questions, plus verified failures and contracts
 
-These answers combine sourced community and engineering questions with verified local failures. Each answer names its provenance, supporting evidence, and limits. Community questions are not customer evidence, and verified local failures are not attributed to a user.
+These answers combine sourced community and engineering questions with verified local failures and repository contracts. Each answer names its provenance, supporting evidence, and limits. Community questions are not customer evidence, and local failures or contracts are not attributed to a user.
 
 ### [Which Three.js version does the skill pack support?](/faq/which-threejs-version-does-the-skill-pack-support/)
 
 The current pack is verified against Three.js 0.185.1, whose runtime revision is 185. Treat that as the supported target, not as a promise that every later release is compatible. Check both the installed package version and THREE.REVISION before using revision-specific API guidance. If either differs, pin or upgrade the project deliberately, then rerun the relevant examples and evidence checks.
 
-### [Which Three.js skill should I use first?](/faq/which-threejs-skill-should-i-use-first/)
+### [Does the Three.js skill pack work with React Three Fiber?](/faq/does-the-skill-pack-work-with-react-three-fiber/)
 
-Use threejs-choose-skills first only when a request spans multiple rendering systems or ownership is unclear. It selects the smallest causal set and returns the current route fields: primaryOwner, selected, deferred, gaps, handoffs, resources, passes, output, and verification. For a focused task such as bloom, camera control, or ocean simulation, load that domain skill directly. Install the pack before using the router because its selected domain skills must be available.
+Partly, but it is not a drop-in React Three Fiber pack. The rendering skills can inform Three.js, WebGPURenderer, TSL, material, image-pipeline, and validation decisions that still exist beneath R3F. R3F-specific renderer creation, React lifecycle, frame scheduling, state, events, Drei abstractions, and disposal remain outside this pack. Pin both Three.js and R3F, map each recommendation into the installed R3F API, and verify the result in the actual application.
 
 ### [How do I verify the native WebGPU backend?](/faq/how-do-i-verify-the-native-webgpu-backend/)
 

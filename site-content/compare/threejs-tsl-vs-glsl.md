@@ -11,8 +11,6 @@ related_skills: ["threejs-procedural-materials","threejs-image-pipeline","threej
 related_demos: ["webgpu-node-gtao"]
 related_pages: ["/migrate/glsl-shadermaterial-to-tsl/","/compare/webgpurenderer-vs-webglrenderer/","/compare/renderpipeline-vs-effectcomposer/","/docs/use-in-an-existing-project/"]
 supported_revision: 0.185.1
-hero_image: /visual-validation/webgpu-node-gtao/final.design.png
-hero_source: webgpu-node-gtao
 published: 2026-07-16
 last_reviewed: 2026-07-16
 sources: ["https://threejs.org/docs/TSL.html","https://threejs.org/manual/en/webgpurenderer","https://threejs.org/docs/pages/WebGLRenderer.html","https://github.com/mrdoob/three.js/releases/tag/r185","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-materials/SKILL.md","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-image-pipeline/SKILL.md"]

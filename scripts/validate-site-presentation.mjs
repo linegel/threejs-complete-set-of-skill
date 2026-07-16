@@ -6,12 +6,18 @@ import { fileURLToPath } from 'node:url';
 import { PRIMARY_DEMO_KINDS, authoritativeSkillDirs, buildDemoRegistry } from './lib/lab-registry.mjs';
 import { remoteRuntimeAssetViolations } from './lib/site-runtime-assets.mjs';
 import { validateEvidenceReportManifest } from './lib/evidence-report-validation.mjs';
+import {
+  DECISION_SUPPORT_PRESENTATION_ROUTES,
+  HUMAN_DOCS_NAV,
+  NO_SCRIPT_PRESENTATION_ROUTES,
+} from './lib/page-routes.mjs';
 import { loadSiteContent } from './lib/site-content.mjs';
 import { PROVIDER_DEMOS } from './provider-demos.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const docs = join(root, 'docs');
 const site = 'https://threejs-skills.com/';
+const today = process.env.SITE_BUILD_DATE ?? new Date().toISOString().slice(0, 10);
 const registry = buildDemoRegistry();
 const homepage = readFileSync(join(docs, 'index.html'), 'utf8');
 const sitemap = readFileSync(join(docs, 'sitemap.xml'), 'utf8');
@@ -40,6 +46,8 @@ const htmlText = (value) => String(value)
   .replace(/&#39;|&apos;/gi, "'")
   .replace(/\s+/g, ' ')
   .trim();
+const hasClass = (html, className) => [...html.matchAll(/\bclass=["']([^"']*)["']/gi)]
+  .some((match) => match[1].split(/\s+/).includes(className));
 const primaryNavigation = (html) => {
   const matches = [...html.matchAll(/<nav\b[^>]*\baria-label=["']Primary navigation["'][^>]*>([\s\S]*?)<\/nav>/gi)];
   if (matches.length !== 1) return { count: matches.length, links: [] };
@@ -143,7 +151,7 @@ try {
     skillIds: authoritativeSkillSlugs,
     demos: siteDemos,
     threeRevision: registry.threeRevision,
-    today: '2026-07-16',
+    today,
   }));
 } catch (error) {
   errors.push(`decision-support source: ${error.message}`);
@@ -152,26 +160,45 @@ assert(contentPages.length === 41, `Release 1 decision support must contain 41 s
 
 const assertContentPresentation = (page, html) => {
   const label = `decision-support route ${page.slug}`;
+  const isHumanDocs = page.slug.startsWith('/docs/');
   const heroIndex = html.indexOf('<header class="content-hero"');
-  const layoutIndex = html.indexOf('<div class="content-layout"');
-  const bodyIndex = html.indexOf('<article class="content-body"');
-  const indexIndex = html.indexOf('<nav class="content-index" aria-label="On this page"');
+  const layoutIndex = html.indexOf('<div class="content-layout');
+  const bodyIndex = html.indexOf('<article class="content-body');
+  const indexNeedle = isHumanDocs
+    ? '<nav class="content-index docs-index" aria-label="Documentation sections"'
+    : '<nav class="content-index" aria-label="On this page"';
+  const indexIndex = html.indexOf(indexNeedle);
   assert(html.includes(`<body data-content-kind="${escapedHtmlText(page.kind)}" data-content-route="${escapedHtmlText(page.slug)}">`), `${label} omits its source-bound body contract`);
   assert(html.includes('<main id="main-content"'), `${label} has no main landmark`);
   assert(heroIndex >= 0, `${label} has no editorial content hero`);
   assert(layoutIndex > heroIndex, `${label} content layout does not follow its editorial hero`);
   assert(bodyIndex > layoutIndex, `${label} has no article body inside its content layout`);
-  assert(indexIndex > bodyIndex, `${label} has no table of contents after its article body`);
+  assert(indexIndex > layoutIndex && indexIndex < bodyIndex, `${label} navigation index must precede the article body`);
+  assert(!/<pre(?![^>]*tabindex="0")/i.test(html), `${label} has an unfocusable code region`);
   assert(html.includes(`<h1>${escapedHtmlText(page.h1)}</h1>`), `${label} does not publish its source H1`);
   const answerAttribute = page.kind === 'faq-answer' ? ' data-faq-answer' : '';
   assert(
     html.includes(`<p class="content-answer"${answerAttribute}>${escapedHtmlText(page.summary)}</p>`),
     `${label} does not publish its source-bound direct answer`,
   );
-  const toc = html.match(/<nav class="content-index" aria-label="On this page">[\s\S]*?<ol>([\s\S]*?)<\/ol><\/nav>/i)?.[1] ?? '';
-  const tocTargets = [...toc.matchAll(/<a\b[^>]*\bhref="#([^"']+)"/gi)].map((match) => match[1]);
-  assert(tocTargets.length > 0, `${label} table of contents has no section links`);
-  for (const id of tocTargets) assert(html.includes(`id="${id}"`), `${label} table of contents points to missing section #${id}`);
+  const indexHtml = html.slice(indexIndex, bodyIndex);
+  if (isHumanDocs) {
+    const listHtml = indexHtml.match(/<ol>([\s\S]*?)<\/ol>/i)?.[1] ?? '';
+    const docsLinks = [...listHtml.matchAll(/<a\b[^>]*\bhref="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi)]
+      .map((match) => ({ path: match[1], label: htmlText(match[2]) }));
+    assert(
+      JSON.stringify(docsLinks) === JSON.stringify(HUMAN_DOCS_NAV),
+      `${label} documentation cluster route order or labels drifted`,
+    );
+    assert(
+      indexHtml.includes(`href="${escapedHtmlText(page.slug)}" aria-current="page"`),
+      `${label} documentation cluster does not mark the current route`,
+    );
+  } else {
+    const tocTargets = [...indexHtml.matchAll(/<a\b[^>]*\bhref="#([^"']+)"/gi)].map((match) => match[1]);
+    assert(tocTargets.length > 0, `${label} table of contents has no section links`);
+    for (const id of tocTargets) assert(html.includes(`id="${id}"`), `${label} table of contents points to missing section #${id}`);
+  }
   assert(html.includes('<section class="content-sources"'), `${label} omits its source and correction contract`);
   if (page.hero_image) {
     assert(html.includes('<section class="content-proof"'), `${label} omits its declared proof section`);
@@ -193,24 +220,25 @@ for (const page of contentPages) {
   assertContentPresentation(page, html);
 }
 
-const representativeContent = [
-  ['guides hub', (page) => page.slug === '/guides/' && page.hero_image],
-  ['direct comparison', (page) => page.kind === 'ecosystem-comparison' && page.hero_image],
-  ['migration guide', (page) => page.kind === 'migration' && page.hero_image],
-  ['pricing page', (page) => page.kind === 'pricing'],
-  ['industry page', (page) => page.kind === 'industry' && page.hero_image],
-  ['FAQ answer', (page) => page.kind === 'faq-answer' && page.hero_image],
-];
-for (const [label, select] of representativeContent) {
-  const page = contentPages.find(select);
-  assert(Boolean(page), `decision-support source has no proof-backed representative ${label}`);
+const representativeContent = [...new Map([
+  ...DECISION_SUPPORT_PRESENTATION_ROUTES,
+  ...NO_SCRIPT_PRESENTATION_ROUTES.filter(({ kind }) => kind),
+].map((representative) => [representative.path, representative])).values()];
+for (const representative of representativeContent) {
+  const page = contentPages.find((candidate) => candidate.slug === representative.path);
+  assert(Boolean(page), `decision-support source has no representative ${representative.family}`);
   if (!page) continue;
+  assert(
+    page.kind === representative.kind,
+    `${representative.path} representative ${representative.family} must use kind ${representative.kind}; received ${page.kind}`,
+  );
   const pagePath = join(docs, relativePublishPath(page.slug), 'index.html');
   if (!existsSync(pagePath)) continue;
   const html = readFileSync(pagePath, 'utf8');
-  const proofContract = page.hero_image ? 'content-proof' : 'content-sources';
-  for (const contract of ['content-hero', 'content-layout', 'content-body', 'content-index', 'content-answer', proofContract]) {
-    assert(html.includes(`class="${contract}"`), `${page.slug} representative ${label} omits ${contract}`);
+  const contracts = ['content-hero', 'content-layout', 'content-body', 'content-index', 'content-answer', 'content-sources'];
+  if (page.hero_image) contracts.push('content-proof');
+  for (const contract of contracts) {
+    assert(hasClass(html, contract), `${page.slug} representative ${representative.family} omits ${contract}`);
   }
 }
 
@@ -238,7 +266,19 @@ const choosePathHeading = homepage.indexOf('<h2 id="pathfinder-title">Choose you
 const flagshipSection = homepage.search(/<section\b[^>]*\bid=["']flagships["']/i);
 assert(choosePathHeading >= 0, 'homepage is missing the exact Choose your path heading');
 assert(flagshipSection >= 0, 'homepage is missing the #flagships section');
-assert(choosePathHeading >= 0 && flagshipSection >= 0 && choosePathHeading < flagshipSection, 'homepage Choose your path section must precede #flagships');
+assert(choosePathHeading >= 0 && flagshipSection >= 0 && choosePathHeading > flagshipSection, 'homepage Choose your path section must follow #flagships');
+const expectedPathfinderStages = [
+  'Find your fit',
+  'Compare approaches',
+  'Install or migrate',
+  'Build for an industry',
+];
+const pathfinderStagePositions = expectedPathfinderStages.map((stage) => homepage.indexOf(`<span class="pathfinder-stage">${stage}</span>`));
+assert(pathfinderStagePositions.every((position) => position >= 0), 'homepage must publish the exact four decision paths');
+assert(
+  pathfinderStagePositions.every((position, index) => index === 0 || position > pathfinderStagePositions[index - 1]),
+  'homepage decision paths must retain their declared order',
+);
 
 for (const asset of requiredLocalAssets) {
   assert(existsSync(join(docs, asset)), `required local presentation asset is missing: ${asset}`);
@@ -313,6 +353,12 @@ assert(!homepage.includes('data-preview-classification="related-'), 'homepage re
 assert(!/\brunnable examples\b/i.test(homepage), 'homepage still uses directory-derived runnable-example language');
 assert(!/transition\s*:\s*all\b/i.test(homepage), 'homepage uses transition: all');
 assert(homepage.includes('<main id="main-content"'), 'homepage has no main landmark');
+const homepageMain = homepage.indexOf('<main id="main-content"');
+const homepageHero = homepage.indexOf('<header class="hero"');
+const homepageStats = homepage.indexOf('<div class="stats-band"');
+assert((homepage.match(/<main\b/g) ?? []).length === 1, 'homepage must contain exactly one main landmark');
+assert(homepageMain >= 0 && homepageMain < homepageHero && homepageHero < homepageStats, 'homepage main must wrap hero and stats');
+assert(!/<pre(?![^>]*tabindex="0")/i.test(homepage), 'homepage has an unfocusable code region');
 assert(homepage.includes(`<meta name="skill-pack-build-revision" content="${registry.buildRevision}"`), 'homepage build-revision metadata drift');
 assert(homepage.includes('class="skip-link"'), 'homepage has no skip link');
 assert(homepage.includes(':focus-visible'), 'homepage has no authored focus-visible treatment');

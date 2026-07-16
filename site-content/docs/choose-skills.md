@@ -5,11 +5,11 @@ title: Choose the Right Three.js WebGPU Skills
 description: Choose the smallest Three.js WebGPU skill set for a task, distinguish broad routes from focused work, and handle unsupported concerns explicitly.
 h1: Choose the smallest Three.js skill set
 primary_query: how to choose threejs webgpu skills
-query_aliases: ["threejs webgpu skill selection guide","route a threejs graphics task"]
+query_aliases: ["threejs webgpu skill selection guide","threejs skill selection checklist"]
 summary: Start with threejs-choose-skills when a request spans multiple rendering systems, shared signals, final output, or performance ownership. For one bounded mechanism, invoke its owning skill directly and add validation or pipeline skills only when the task actually needs them.
 related_skills: ["threejs-choose-skills","threejs-debugging","threejs-image-pipeline","threejs-visual-validation"]
 related_demos: ["webgpu-validation-harness"]
-related_pages: ["/agents/routing-and-minimal-context/","/docs/use-in-an-existing-project/","/faq/which-threejs-skill-should-i-use-first/","/migrate/raw-threejs-prompts-to-agent-skills/"]
+related_pages: ["/agents/routing-and-minimal-context/","/docs/use-in-an-existing-project/","/faq/which-threejs-version-does-the-skill-pack-support/","/migrate/raw-threejs-prompts-to-agent-skills/"]
 published: 2026-07-16
 last_reviewed: 2026-07-16
 sources: ["https://github.com/linegel/threejs-complete-set-of-skill/blob/main/README.md","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-choose-skills/SKILL.md","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/docs/demos/registry.json"]
@@ -36,18 +36,11 @@ route. Report required product inputs rather than guessing them.
 
 The router should identify the earliest missing causal layer before it selects post-processing. A missing silhouette, field, material response, illumination, motion, camera, or image transform has a different owner. Adding bloom or grading cannot repair an unidentified physical or material cause.
 
-## Require a concrete route manifest
+## Confirm the selection before implementation
 
-A useful route result includes:
+Review the proposed set as a human decision before loading more context. Every requested visual result should have one clear owner, shared signals should have one producer, and unsupported application concerns should stay with project or framework guidance. Remove any selected skill that does not change the implementation or its verification.
 
-- Minimal `selected` owners, condition-bound `deferred` owners, and explicit `gaps` from the installed inventory.
-- A primary causal owner plus any data, render, and validation owners.
-- Required API and backend gates for the installed revision.
-- Ordered `handoffs`, allocated `resources`, executable `passes`, one `output` contract, and causal `verification`.
-- Candidate algorithms, rejected alternatives, and the evidence needed to choose between them.
-- Explicit project inputs or missing owners that block part of the request.
-
-The installed `skills/threejs-choose-skills/SKILL.md` file defines the route-result fields and completion conditions. Check the route against the current project's installed inventory, initialized backend, handoffs, resources, passes, output ownership, acceptance bounds, and project-level verification before implementation.
+The exact machine route fields, handoffs, resource declarations, and failure behavior belong to the [agent routing contract](/agents/routing-and-minimal-context/). This page owns the selection checklist: choose direct ownership for a bounded task, use the router for a composed task, and stop when a required concern has no installed owner.
 
 ## Load only the selected implementation owners
 

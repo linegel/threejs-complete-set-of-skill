@@ -9,7 +9,7 @@ query_aliases: ["load minimal threejs skill context","threejs choose skills rout
 summary: Enumerate the installed skills, identify the earliest missing causal system, and load only the owners needed to produce and verify it. A route returns minimal selected owners, condition-bound deferred owners, explicit gaps, handoffs, resources, passes, output, and verification.
 related_skills: ["threejs-choose-skills","threejs-debugging","threejs-image-pipeline","threejs-visual-validation"]
 related_demos: ["webgpu-validation-harness"]
-related_pages: ["/docs/choose-skills/","/migrate/raw-threejs-prompts-to-agent-skills/","/faq/which-threejs-skill-should-i-use-first/","/docs/use-in-an-existing-project/"]
+related_pages: ["/docs/choose-skills/","/migrate/raw-threejs-prompts-to-agent-skills/","/faq/how-do-i-verify-the-native-webgpu-backend/","/docs/use-in-an-existing-project/"]
 published: 2026-07-16
 last_reviewed: 2026-07-16
 sources: ["https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-choose-skills/SKILL.md","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/docs/demos/registry.json"]

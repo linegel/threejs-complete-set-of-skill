@@ -8,47 +8,57 @@ primary_query: three.js skills for technical artists
 query_aliases: ["three.js tsl workflow for technical artists","procedural three.js skills for technical artists"]
 summary: Use the pack to translate a visual target into inspectable causes such as silhouette, material response, motion, camera, lighting signals, and final output. Each layer can be authored and diagnosed before downstream effects are added.
 related_skills: ["threejs-choose-skills","threejs-procedural-materials","threejs-procedural-geometry","threejs-object-sculptor","threejs-procedural-motion-systems","threejs-camera-controls-and-rigs","threejs-image-pipeline","threejs-visual-validation"]
-related_demos: ["webgpu-procedural-timelines"]
+related_demos: ["webgpu-procedural-timelines","webgpu-tower-ship-sculptor"]
 related_pages: ["/docs/use-in-an-existing-project/","/compare/threejs-tsl-vs-glsl/","/industries/product-visualization-and-configurators/","/for/graphics-engineers/"]
 published: 2026-07-16
 last_reviewed: 2026-07-16
 sources: ["https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-materials/SKILL.md","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-geometry/SKILL.md","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-object-sculptor/SKILL.md","https://threejs.org/docs/TSL.html"]
 ---
 
-## Find the earliest missing visual cause
+This pack is a strong fit for technical artists who can work directly in a Three.js repository and need to translate a visual target into inspectable geometry, material, motion, camera, and final-image causes. It helps an agent preserve the reference contract instead of hiding a weak source signal under post-processing.
 
-A visual target can fail at topology, silhouette, material, illumination, motion, camera, or image transformation. Post-processing cannot repair the wrong outline, a broken BRDF, missing shadow transport, or an unstable inspection camera. Use [Choose Skills](/skills/threejs-choose-skills.html) to identify the earliest missing layer before choosing an implementation technique.
+## Strong fit
 
-This makes iteration more direct. A no-post baseline answers whether the subject already reads. A material diagnostic answers whether albedo, roughness, normal, emission, and footprint data are coherent. A fixed camera answers whether the composition changed or the mechanism changed.
+- You author or direct procedural form, TSL materials, staged motion, cameras, or final-image behavior in code.
+- You need repeatable reference views and diagnostics that distinguish silhouette, material response, motion, framing, and output changes.
+- You can define what must remain authoritative: a product silhouette, a reference image, an authored motion beat, or a perceptual final-image target.
 
-## Author material identity in TSL
+## Poor fit
 
-Use [Three.js Procedural Materials](/skills/threejs-procedural-materials.html) when the observable is surface identity. Start with the BRDF and material channels, then add filtering, specular antialiasing, atlas or triplanar behavior, wetness, emission, and dissolves only where the target needs them.
+- You need no-code tooling, beginner JavaScript lessons, generic prompt snippets, or a turnkey game engine.
+- The work is primarily DCC asset production, mesh repair, UV unwrapping, baking, compression, or source-asset LOD creation.
+- You need pixel-identical reconstruction, a general asset-import pipeline, or a complete studio-lighting/IBL/PMREM workflow; the pack does not claim those outcomes.
 
-Treat material validation as project-specific. Capture the material channels, filtering behavior, shadow parity, and no-post output from the scene being changed rather than attaching an incomplete general material lab as proof.
+## Three recurring jobs
 
-Read [TSL versus GLSL](/compare/threejs-tsl-vs-glsl/) when deciding how an existing shader concept maps into the node system. The comparison owns that query; this page owns the technical-artist workflow around it.
+1. **Author surface identity — [`threejs-procedural-materials`](/skills/threejs-procedural-materials.html).** Own the BRDF and material channels first; add filtering, specular antialiasing, triplanar or atlas behavior, wetness, emission, or dissolves only when the target requires them.
+2. **Build code-native form — [`threejs-procedural-geometry`](/skills/threejs-procedural-geometry.html) and [`threejs-object-sculptor`](/skills/threejs-object-sculptor.html).** Use the geometry skill when vertices, topology, normals, UVs, or groups own the result; use the sculptor only for quality-gated procedural reconstruction from a reference.
+3. **Stage motion and framing — [`threejs-procedural-motion-systems`](/skills/threejs-procedural-motion-systems.html) and [`threejs-camera-controls-and-rigs`](/skills/threejs-camera-controls-and-rigs.html).** Make transform phases, springs, projection, orbit, inspection views, and handoffs reproducible rather than tuning them per screenshot.
 
-## Change geometry only when geometry owns the result
+The [TSL versus GLSL comparison](/compare/threejs-tsl-vs-glsl/) owns the shader-authoring choice. This page owns the technical-artist fit and workflow.
 
-Use [Three.js Procedural Geometry](/skills/threejs-procedural-geometry.html) when vertices, indices, normals, UVs, material groups, or generated topology must change. Do not replace an authoritative product, CAD, or scanned silhouette with procedural geometry just because a generator is available.
+## Representative workflow: turn a reference into an inspectable animated object
 
-[Three.js Object Sculptor](/skills/threejs-object-sculptor.html) is appropriate for quality-gated procedural reconstruction from a reference when the requested output is an authored, action-ready procedural object. The [tower-ship sculptor demo](/demos/webgpu-tower-ship-sculptor/) documents a semantic object contract with hierarchy, materials, sockets, and interaction structure. Its checked evidence does not match the live source hash and must be regenerated before citation as proof. It is not a general mesh-repair or asset-import pipeline.
+1. State the task in visual causes: preserve the reference silhouette and material identity, add one authored motion beat, and provide fixed near, design, profile, and far views.
+2. Freeze Three.js `0.185.1`/r185, `WebGPURenderer`, initialized backend, browser/GPU, reference revision, object scale, camera matrices, seed, viewport, and DPR.
+3. Establish a no-post silhouette baseline. Change geometry only where geometry owns the mismatch; keep authoritative CAD, scanned, or supplied meshes authoritative.
+4. Author material channels and inspect albedo, roughness, normals, emission, filtering, shadow parity, and the no-post image before adding bloom, grading, or other consumers.
+5. Add deterministic motion and fixed camera routes, then capture the baseline, mechanism diagnostics, motion states, and final output. Accept only the declared reference and behavior claims; keep pixel identity and unmeasured performance outside the verdict.
 
-## Stage motion and camera as authored systems
+The [procedural timelines demo](/demos/webgpu-procedural-timelines/) exposes launch, spin, debris, quaternion, interpolation, and compute-storage mechanisms under fixed routes. Its current report passes the mechanism claim while visual correctness and lifecycle remain insufficient and GPU timing is not claimed. The [tower-ship sculptor demo](/demos/webgpu-tower-ship-sculptor/) has a source-matched accepted report for its semantic object, renderer, route, and readback contract; it does not prove a different reference reconstruction or product workflow. Local images are mechanism captures, not customer work.
 
-Use [Three.js Procedural Motion Systems](/skills/threejs-procedural-motion-systems.html) for transform phases, springs, rotating frames, launch sequences, and deterministic staging. The [procedural timelines demo](/demos/webgpu-procedural-timelines/) exposes launch, spin, debris, quaternion, interpolation, and compute-storage mechanisms under fixed routes.
+## Constraints
 
-Use [Three.js Camera Controls and Rigs](/skills/threejs-camera-controls-and-rigs.html) when framing, orbit, inspection, projection, depth, handoff, or floating origin changes the result. Near, design, profile, and far views should be reproducible rather than adjusted by hand for every screenshot.
+| Constraint | Required boundary |
+| --- | --- |
+| Renderer | Canonical WebGPU/TSL claims require `WebGPURenderer` from `three/webgpu` with a confirmed native WebGPU backend. |
+| Three.js revision | The pack targets r185; this repository resolves `three@0.185.1`. Recheck installed APIs and material/node behavior after revision changes. |
+| Agent | The coding agent must be able to inspect source, edit the real project, run the project's commands, and open captured artifacts. The skills do not replace art direction. |
+| Browser and device | Record the target browser, OS, GPU, viewport, DPR, input behavior, and required WebGPU features. Motion correctness alone does not prove target performance. |
+| Expertise | Expect working TypeScript/JavaScript, Three.js scene/material knowledge, coordinate-space awareness, and the ability to judge reference and diagnostic images. |
 
-## Add final-image work after the source signal exists
+Post-processing cannot repair the wrong outline, a broken BRDF, missing shadow transport, or an unstable camera. Bloom needs HDR emission, AO needs justified signals, and final output needs one explicit conversion owner.
 
-Bloom needs HDR emission. AO needs justified depth and normal consumers. Grading needs an explicit exposure and output policy. Use [Three.js Image Pipeline](/skills/threejs-image-pipeline.html) to keep pass and final-output ownership explicit, then use [Three.js Visual Validation](/skills/threejs-visual-validation.html) to compare no-post, diagnostics, final output, fixed views, seeds, and mutation controls.
+## Start here
 
-The goal is not to reject polish. It is to ensure that polish consumes a proven signal and that disabling it reveals a coherent underlying scene.
-
-## What this page does not claim
-
-The skill pack does not own DCC workflows, mesh repair, UV unwrapping, texture baking, compression, source-asset LOD production, or general asset preparation. It also lacks a general expert owner for studio lighting, IBL, PMREM, reflection probes, and authored prop libraries.
-
-Local images are mechanism captures, not customer work, and their provenance must still match the source under review. Object-sculptor captures do not claim pixel-identical reconstruction. Motion correctness does not establish named-device performance when GPU timestamp evidence is absent. A project still needs its own references, acceptance views, target devices, and asset-production decisions.
+Use the [installation guide](/docs/install/) to add the pack, then begin the first visual task with `threejs-choose-skills` so the earliest missing cause is selected before implementation.

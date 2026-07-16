@@ -9,7 +9,7 @@ query_aliases: ["threejs skill pack supported version","threejs webgpu skill pac
 summary: The current pack is verified against Three.js 0.185.1, whose runtime revision is 185. Treat that as the supported target, not as a promise that every later release is compatible. Check both the installed package version and THREE.REVISION before using revision-specific API guidance. If either differs, pin or upgrade the project deliberately, then rerun the relevant examples and evidence checks.
 related_skills: ["threejs-choose-skills","threejs-visual-validation"]
 related_demos: ["webgpu-validation-harness"]
-related_pages: ["/docs/install/","/faq/how-do-i-verify-the-native-webgpu-backend/","/migrate/webglrenderer-to-webgpurenderer/"]
+related_pages: ["/docs/install/","/faq/how-do-i-verify-the-native-webgpu-backend/","/faq/does-the-skill-pack-work-with-react-three-fiber/"]
 published: 2026-07-16
 last_reviewed: 2026-07-16
 sources: ["https://github.com/linegel/threejs-complete-set-of-skill/blob/main/package.json","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/scripts/toolchain-preflight.mjs","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-choose-skills/SKILL.md","https://github.com/mrdoob/three.js/wiki/Migration-Guide","https://github.com/mrdoob/three.js/issues/28898"]
@@ -22,10 +22,6 @@ evidence_status: verified
 faq_group: compatibility-and-browser-support
 supported_revision: 0.185.1
 ---
-
-## Direct answer
-
-The current pack is verified against Three.js 0.185.1, whose runtime revision is 185. Treat that as the supported target, not as a promise that every later release is compatible. Check both the installed package version and THREE.REVISION before using revision-specific API guidance. If either differs, pin or upgrade the project deliberately, then rerun the relevant examples and evidence checks.
 
 ## What supported means
 

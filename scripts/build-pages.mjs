@@ -20,6 +20,7 @@ import {
   authoritativeSkillDirs,
   buildDemoRegistry,
 } from './lib/lab-registry.mjs';
+import { HUMAN_DOCS_NAV } from './lib/page-routes.mjs';
 import { loadSiteContent } from './lib/site-content.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -35,10 +36,12 @@ const configuredRuntimeEvidencePreviews = new Set(
 const REPO = 'https://github.com/linegel/threejs-complete-set-of-skill';
 const REPO_SLUG = 'linegel/threejs-complete-set-of-skill';
 const SITE = 'https://threejs-skills.com/';
+const SITE_BUILD_DATE = process.env.SITE_BUILD_DATE ?? new Date().toISOString().slice(0, 10);
 const SKILLS_ADD = `npx skills@latest add ${REPO_SLUG}`;
 const SKILLS_INSTALL_PACK = `${SKILLS_ADD} --skill '*'`;
 const THEME_COLOR = '#0a0c10';
 const SITE_NAME = 'Three.js WebGPU Skill Pack';
+const CONTENT_SOCIAL_DEFAULT = 'icon-512.png';
 const PUBLISHER_ID = `${SITE}#publisher`;
 const PUBLISHER_LOGO = `${SITE}icon-512.png`;
 const PUBLISHER = {
@@ -344,7 +347,7 @@ html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smo
 body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7}
 ::selection{background:rgba(255,180,84,.26);color:var(--ink)}
 a{color:inherit;text-decoration:none}
-a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
+a:focus-visible,button:focus-visible,summary:focus-visible,pre[tabindex]:focus-visible,[role="region"]:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
 main{display:block}
 .skip-link{position:fixed;z-index:100;left:16px;top:12px;translate:0 -160%;font-family:var(--mono);font-size:12px;background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:9px;transition-property:translate;transition-duration:160ms}
 .skip-link:focus{translate:0 0}
@@ -369,7 +372,7 @@ code{font-family:var(--mono)}
 .card{min-height:100%;background:linear-gradient(145deg,rgba(19,24,33,.96),rgba(12,15,21,.96));border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px;
   box-shadow:var(--shadow-card);transition-property:translate,scale,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
 .card:hover{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
-.card:active{translate:0 -1px;scale:.99}
+.card:active{translate:0 -1px;scale:.96}
 .card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .card-kind{font-family:var(--mono);font-size:10px;color:var(--cyan)}
 .card h3,.card h4{font-size:19px;font-weight:600}
@@ -399,11 +402,12 @@ footer a{color:var(--amber)}
 footer a:hover{text-decoration:underline}
 footer code{color:var(--cyan);font-size:11px}
 .footer-summary{max-width:55ch}.footer-summary>span{display:block;margin-top:8px;font-size:13px}.footer-groups{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}.footer-group{display:grid;align-content:start;gap:8px}.footer-group strong{font:400 10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}.footer-group a{min-height:40px;display:flex;align-items:center;color:var(--dim);font-size:13px;transition-property:color,scale;transition-duration:160ms}.footer-group a:hover{color:var(--amber);text-decoration:none}.footer-group a:active{scale:.96}
-.pathfinder{padding:clamp(52px,7vw,86px) 0;border-bottom:1px solid var(--line)}.pathfinder-head{display:grid;grid-template-columns:minmax(0,.7fr) minmax(320px,1.3fr);align-items:end;gap:28px 72px;margin-bottom:28px}.pathfinder-head h2{margin:0}.pathfinder-head p{max-width:58ch;color:var(--dim)}.pathfinder-rows{border-top:1px solid var(--line)}.pathfinder-row{display:grid;grid-template-columns:84px minmax(210px,.8fr) minmax(0,1.6fr);gap:20px 32px;align-items:center;min-height:94px;border-bottom:1px solid var(--line)}.pathfinder-stage{font:10px/1.4 var(--mono);letter-spacing:.11em;text-transform:uppercase;color:var(--cyan)}.pathfinder-row>p{color:var(--dim);font-size:14px}.pathfinder-links{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px 18px}.pathfinder-links a{min-height:44px;display:inline-flex;align-items:center;gap:8px;color:var(--amber);font:11px/1.35 var(--mono);transition-property:color,scale;transition-duration:160ms}.pathfinder-links a:after{content:"→"}.pathfinder-links a:hover{color:var(--ink)}.pathfinder-links a:active{scale:.96}
+.pathfinder{padding:clamp(52px,7vw,86px) 0;border-bottom:1px solid var(--line)}.pathfinder-head{display:grid;grid-template-columns:minmax(0,.7fr) minmax(320px,1.3fr);align-items:end;gap:28px 72px;margin-bottom:28px}.pathfinder-head h2{margin:0}.pathfinder-head p{max-width:58ch;color:var(--dim)}.pathfinder-rows{border-top:1px solid var(--line)}.pathfinder-row{display:grid;grid-template-columns:minmax(160px,.55fr) minmax(210px,.8fr) minmax(0,1.6fr);gap:20px 32px;align-items:center;min-height:94px;border-bottom:1px solid var(--line)}.pathfinder-stage{font:10px/1.4 var(--mono);letter-spacing:.11em;text-transform:uppercase;color:var(--cyan)}.pathfinder-row>p{color:var(--dim);font-size:14px}.pathfinder-links{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px 18px}.pathfinder-links a{min-height:44px;display:inline-flex;align-items:center;gap:8px;color:var(--amber);font:11px/1.35 var(--mono);transition-property:color,scale;transition-duration:160ms}.pathfinder-links a:after{content:"→"}.pathfinder-links a:hover{color:var(--ink)}.pathfinder-links a:active{scale:.96}
 .content-hero{padding:clamp(54px,8vw,104px) 0 42px;border-bottom:1px solid var(--line)}.breadcrumbs{min-height:44px;display:flex;align-items:center;margin-bottom:28px;font:11px/1.4 var(--mono);color:var(--dim)}.breadcrumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.breadcrumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}.breadcrumbs a{min-height:40px;display:inline-flex;align-items:center;transition-property:color,scale;transition-duration:160ms}.breadcrumbs a:hover{color:var(--amber)}.breadcrumbs a:active{scale:.96}.content-hero h1{max-width:17ch;font-size:clamp(40px,6vw,68px);font-weight:700;line-height:1.02;letter-spacing:-.02em}.content-lede{max-width:66ch;margin-top:22px;color:var(--dim);font-size:clamp(17px,2vw,20px)}.content-meta{display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:28px;font:10px/1.4 var(--mono);color:var(--cyan)}
 .content-answer{max-width:900px;margin-top:34px;padding:3px 0 3px 22px;border-left:2px solid var(--amber);font-size:clamp(19px,2.2vw,21px);line-height:1.62;color:var(--ink)}.content-shell{padding:clamp(46px,7vw,86px) 0}.content-layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(230px,1fr);align-items:start;gap:clamp(36px,6vw,76px)}.content-body{grid-column:1;grid-row:1;max-width:78ch;min-width:0}.content-body h2{margin:52px 0 16px;font-size:clamp(27px,3.5vw,39px);scroll-margin-top:112px}.content-body>h2:first-child{margin-top:0}.content-body h3{margin:34px 0 12px;font-size:21px;scroll-margin-top:112px}.content-body p,.content-body li{color:var(--dim);font-size:16px}.content-body p+p{margin-top:17px}.content-body ul,.content-body ol{margin:16px 0;padding-left:24px}.content-body li+li{margin-top:7px}.content-body a{color:var(--cyan);text-decoration:underline;text-decoration-color:rgba(127,212,193,.35);text-underline-offset:3px}.content-body a:hover{color:var(--amber);text-decoration-color:currentColor}.content-body code:not(pre code){padding:1px 5px;border:1px solid var(--line);border-radius:5px;background:#07090c;color:var(--cyan);font-size:.86em}.content-body pre{margin:20px 0;white-space:pre;tab-size:2}.content-table{max-width:100%;margin:22px 0;overflow-x:auto;border:1px solid var(--line);border-radius:12px}.content-table:focus-visible{outline:2px solid var(--amber);outline-offset:3px}.content-table table{width:100%;border-collapse:collapse;font-size:14px}.content-table th,.content-table td{min-width:150px;padding:11px 13px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);text-align:left;vertical-align:top;color:var(--dim)}.content-table th{color:var(--ink);font-weight:600;background:var(--bg2)}.content-table tr:last-child td{border-bottom:0}.content-table th:last-child,.content-table td:last-child{border-right:0}
-.content-index{grid-column:2;grid-row:1;position:sticky;top:104px;max-height:calc(100vh - 128px);overflow-y:auto;padding:18px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.content-index strong{display:block;margin-bottom:10px;font:10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}.content-index ol{list-style:none}.content-index a{min-height:40px;display:flex;align-items:center;padding:5px 0;color:var(--dim);font-size:13px;line-height:1.4;transition-property:color,translate;transition-duration:160ms}.content-index a:hover{color:var(--amber);translate:3px 0}.content-index a:active{translate:1px 0}.content-proof{margin:54px 0 0}.content-proof figure{border-radius:16px}.content-proof img{width:100%;height:auto;max-height:650px;object-fit:cover;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}.content-proof figcaption{color:var(--dim);font:11px/1.55 var(--mono)}.content-proof figcaption a{color:var(--amber)}
-.content-facts,.content-faq-list,.content-related,.content-sources,.content-skills,.content-demos,.content-discovery,.faq-provenance{margin-top:54px;padding-top:22px;border-top:1px solid var(--line)}.content-facts h2,.content-faq-list h2,.content-related h2,.content-sources h2,.content-skills h2,.content-demos h2{font-size:24px}.content-ruled-list{list-style:none;border-top:1px solid var(--line)}.content-ruled-list li{border-bottom:1px solid var(--line)}.content-ruled-list a{min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:9px 0;color:var(--dim);font-size:14px;transition-property:color,scale;transition-duration:160ms}.content-ruled-list a:after{content:"→";color:var(--amber)}.content-ruled-list a:hover{color:var(--ink)}.content-ruled-list a:active{scale:.96}.content-faq-item{padding:22px 0;border-bottom:1px solid var(--line)}.content-faq-item h3{margin:0;font-size:20px}.content-faq-item h3 a{color:var(--ink)}.content-faq-item p{margin-top:9px;color:var(--dim);font-size:15px}.faq-provenance{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);padding:0}.faq-provenance div{padding:13px;background:var(--bg2)}.faq-provenance dt{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}.faq-provenance dd{margin-top:5px;font:11px/1.45 var(--mono);color:var(--cyan);overflow-wrap:anywhere}.content-discovery{display:flex;flex-wrap:wrap;gap:10px 22px;font:11px/1.5 var(--mono);color:var(--dim)}.content-discovery a{min-height:40px;display:inline-flex;align-items:center;color:var(--amber)}
+.content-index{grid-column:2;grid-row:1;position:sticky;top:104px;max-height:calc(100vh - 128px);overflow-y:auto;padding:18px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.content-index strong{display:block;margin-bottom:10px;font:10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}.content-index ol{list-style:none}.content-index a{min-height:40px;display:flex;align-items:center;padding:5px 0;color:var(--dim);font-size:13px;line-height:1.4;transition-property:color,translate,scale;transition-duration:160ms}.content-index a:hover{color:var(--amber);translate:3px 0}.content-index a:active{translate:1px 0;scale:.96}.content-proof{margin:54px 0 0}.content-proof figure{border-radius:16px}.content-proof img{width:100%;height:auto;max-height:650px;object-fit:cover;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}.content-proof figcaption{color:var(--dim);font:11px/1.55 var(--mono)}.content-proof figcaption a{color:var(--amber)}
+.content-layout--docs{grid-template-columns:minmax(190px,.6fr) minmax(0,2fr)}.content-layout--docs .content-index{grid-column:1}.content-layout--docs .content-body{grid-column:2;max-width:72ch}.docs-index a{padding-inline:10px;border-left:2px solid transparent}.docs-index a[aria-current="page"]{border-left-color:var(--amber);background:rgba(255,180,84,.06);color:var(--ink);font-weight:600}.docs-index-current{display:none}
+.content-facts,.content-faq-list,.content-related,.content-sources,.content-skills,.content-demos,.content-discovery,.faq-provenance{margin-top:54px;padding-top:22px;border-top:1px solid var(--line)}.content-facts h2,.content-faq-list h2,.content-related h2,.content-sources h2,.content-skills h2,.content-demos h2{font-size:24px}.content-ruled-list{list-style:none;border-top:1px solid var(--line)}.content-ruled-list li{border-bottom:1px solid var(--line)}.content-ruled-list a{min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:9px 0;color:var(--dim);font-size:14px;transition-property:color,scale;transition-duration:160ms}.content-ruled-list a:after{content:"→";color:var(--amber)}.content-ruled-list a:hover{color:var(--ink)}.content-ruled-list a:active{scale:.96}.content-related .content-ruled-list a{display:grid;grid-template-columns:104px minmax(0,1fr) auto}.content-related-family{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}.content-faq-item{padding:22px 0;border-bottom:1px solid var(--line)}.content-faq-item h3{margin:0;font-size:20px}.content-faq-item h3 a{color:var(--ink)}.content-faq-item p{margin-top:9px;color:var(--dim);font-size:15px}.faq-provenance{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);padding:0}.faq-provenance div{padding:13px;background:var(--bg2)}.faq-provenance dt{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}.faq-provenance dd{margin-top:5px;font:11px/1.45 var(--mono);color:var(--cyan);overflow-wrap:anywhere}.content-discovery{display:flex;flex-wrap:wrap;gap:10px 22px;font:11px/1.5 var(--mono);color:var(--dim)}.content-discovery a{min-height:40px;display:inline-flex;align-items:center;color:var(--amber)}
 @media (max-width:760px){
   .site-nav .wrap{padding-right:0}
   .site-nav>.wrap{min-height:104px;display:grid;grid-template-columns:1fr;padding-top:14px;padding-bottom:10px;gap:4px}
@@ -414,7 +418,7 @@ footer code{color:var(--cyan);font-size:11px}
   .grid,.gallery{grid-template-columns:1fr}
   footer{grid-template-columns:1fr}.footer-groups{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
-@media (max-width:900px){.pathfinder-head,.content-layout{grid-template-columns:1fr}.content-index{grid-column:1;grid-row:1;position:static;max-height:none}.content-body{grid-column:1;grid-row:2}.pathfinder-row{grid-template-columns:72px minmax(0,1fr)}.pathfinder-links{grid-column:1/-1;justify-content:flex-start;padding-bottom:18px}.faq-provenance{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:900px){.pathfinder-head,.content-layout{grid-template-columns:1fr}.content-index{grid-column:1;grid-row:1;position:static;max-height:none}.content-body,.content-layout--docs .content-body{grid-column:1;grid-row:2}.docs-index{overflow:hidden}.docs-index-current{display:flex;margin-bottom:8px}.docs-index ol{display:flex;gap:8px;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;padding-bottom:6px}.docs-index li{flex:0 0 min(72vw,260px)}.docs-index .docs-index-list-current{display:none}.docs-index a{min-height:44px;padding:8px 10px;border-left:0;border-bottom:2px solid transparent;background:var(--bg2)}.docs-index a[aria-current="page"]{border-bottom-color:var(--amber)}.pathfinder-row{grid-template-columns:minmax(160px,.6fr) minmax(0,1fr)}.pathfinder-links{grid-column:1/-1;justify-content:flex-start;padding-bottom:18px}.faq-provenance{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:560px){.pathfinder-row{grid-template-columns:1fr;gap:6px;padding:18px 0}.pathfinder-links{grid-column:auto;padding:0}.content-hero h1{font-size:clamp(38px,12vw,54px)}.content-answer{padding-left:16px}.content-table{border-radius:8px}.content-table table{min-width:680px}.faq-provenance{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
@@ -428,9 +432,9 @@ const navHtml = () => `<a class="skip-link" href="#main-content">Skip to content
   <nav class="links" aria-label="Primary navigation"><a href="/#flagships">Examples</a><a href="/#skills">Skills</a><a href="/guides/">Guides</a><a href="/evidence/">Evidence</a><a href="/#install">Install</a><a href="${REPO}">GitHub</a></nav>
 </div></header>`;
 
-const footerHtml = `<div class="wrap"><footer>
+const renderFooter = ({ includeBuildStatus = true } = {}) => `<div class="wrap"><footer>
   <div class="footer-summary">Three.js WebGPU Skill Pack: TSL, procedural graphics, and visual validation.
-    <span>Three r${DEMO_REGISTRY.threeRevision.replace(/^0\./, '')} · ${primaryDemos.length} primary targets · ${acceptedPrimaryDemos.length} accepted · build <code>${DEMO_REGISTRY.buildRevision.replace(/^sha256:/, '').slice(0, 12)}</code></span>
+    ${includeBuildStatus ? `<span>Three r${DEMO_REGISTRY.threeRevision.replace(/^0\./, '')} · ${primaryDemos.length} primary targets · ${acceptedPrimaryDemos.length} accepted · build <code>${DEMO_REGISTRY.buildRevision.replace(/^sha256:/, '').slice(0, 12)}</code></span>` : '<span>Proof status and supported revision are stated on each decision page and linked evidence report.</span>'}
     <span>Compiling shaders? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span>
   </div>
   <div class="footer-groups">
@@ -441,8 +445,8 @@ const footerHtml = `<div class="wrap"><footer>
   </div>
 </footer></div>`;
 
-const assetHead = (depth) => `<meta name="theme-color" content="${THEME_COLOR}" />
-<meta name="skill-pack-build-revision" content="${DEMO_REGISTRY.buildRevision}" />
+const assetHead = (depth, { includeBuildRevision = true } = {}) => `<meta name="theme-color" content="${THEME_COLOR}" />
+${includeBuildRevision ? `<meta name="skill-pack-build-revision" content="${DEMO_REGISTRY.buildRevision}" />` : ''}
 <link rel="icon" href="${depth}favicon.ico" sizes="any" />
 <link rel="icon" href="${depth}favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="${depth}favicon-32.png" type="image/png" sizes="32x32" />
@@ -470,7 +474,7 @@ const SITE_CONTENT = loadSiteContent({
   skillIds: AUTHORITATIVE_SKILL_SLUGS,
   demos: SITE_DEMOS,
   threeRevision: DEMO_REGISTRY.threeRevision,
-  today: '2026-07-16',
+  today: SITE_BUILD_DATE,
 });
 const contentPages = SITE_CONTENT.pages;
 const contentPageBySlug = SITE_CONTENT.pageBySlug;
@@ -492,6 +496,19 @@ const CONTENT_FAMILY_LABELS = {
   faq: 'FAQ',
 };
 const contentFamily = (page) => page.slug.split('/').filter(Boolean)[0];
+const skillGuideFamilySlots = [['compare'], ['migrate'], ['industries'], ['faq', 'docs']];
+const skillGuidePages = (slug) => {
+  const candidates = SITE_CONTENT.relatedBySkill.get(slug) ?? [];
+  return skillGuideFamilySlots.flatMap((families) => {
+    const page = candidates.find((candidate) => families.includes(contentFamily(candidate)));
+    return page ? [page] : [];
+  });
+};
+const humanDocsPages = HUMAN_DOCS_NAV.map(({ path, label }) => {
+  const page = contentPageBySlug.get(path);
+  if (!page) throw new Error(`Documentation navigation references missing content route: ${path}`);
+  return { page, label };
+});
 const contentUrl = (page) => new URL(page.slug, SITE).href;
 const schemaTypeForContent = (page) => {
   if (page.slug === '/faq/') return 'FAQPage';
@@ -525,6 +542,7 @@ const renderContentMarkdown = (body, pageTitle) => {
       const heading = headings[index++];
       return heading ? `<h${level} id="${heading.id}">${content}</h${level}>` : _match;
     })
+    .replace(/<pre>/g, '<pre tabindex="0">')
     .replace(/<table>([\s\S]*?)<\/table>/g, (_match, table) => `<div class="content-table" role="region" aria-label="Data table ${++tableIndex} for ${esc(pageTitle)}" tabindex="0"><table>${table}</table></div>`);
   return { html, headings };
 };
@@ -573,9 +591,10 @@ const contentPageSchema = (page) => {
     isAccessibleForFree: true,
     publisher: PUBLISHER_REF,
     breadcrumb: { '@id': `${url}#breadcrumb` },
-    image: page.hero_image ? new URL(page.hero_image, SITE).href : undefined,
+    image: new URL(page.hero_image ?? CONTENT_SOCIAL_DEFAULT, SITE).href,
   };
   if (type === 'TechArticle') schema.author = PUBLISHER_REF;
+  if (page.slug === '/pricing/') schema.about = { '@id': `${SITE}#software` };
   if (page.kind === 'faq-answer') {
     schema.mainEntity = {
       '@type': 'Question',
@@ -614,7 +633,10 @@ const renderContentProof = (page) => {
 const renderContentList = (title, className, entries) => entries.length ? `<section class="${className}" aria-labelledby="${className}-title"><h2 id="${className}-title">${esc(title)}</h2><ul class="content-ruled-list">${entries.join('')}</ul></section>` : '';
 const renderContentRelations = (page) => {
   const pages = page.related_pages.map((slug) => contentPageBySlug.get(slug)).filter(Boolean);
-  const relatedPages = renderContentList('Related guides', 'content-related', pages.map((related) => `<li><a data-related-route="${esc(related.slug)}" href="${esc(related.slug)}">${esc(related.title)}</a></li>`));
+  const relatedPages = renderContentList('Next steps', 'content-related', pages.map((related) => {
+    const family = contentFamily(related);
+    return `<li><a data-related-route="${esc(related.slug)}" data-related-family="${esc(family)}" href="${esc(related.slug)}"><span class="content-related-family">${esc(CONTENT_FAMILY_LABELS[family])}</span><span>${esc(related.title)}</span></a></li>`;
+  }));
   const relatedSkills = renderContentList('Relevant skills', 'content-skills', page.related_skills.map((slug) => `<li><a href="/skills/${esc(slug)}.html">${esc(skills[slug]?.title ?? slug)}</a></li>`));
   const relatedDemos = renderContentList('Relevant demos and evidence', 'content-demos', page.related_demos.map((id) => {
     const demo = SITE_DEMOS.find((entry) => entry.id === id);
@@ -631,9 +653,9 @@ const renderContentSources = (page) => {
   ]);
 };
 const renderFaqProvenance = (page) => page.kind === 'faq-answer' ? `<dl class="faq-provenance" aria-label="Question provenance">
-  <div><dt>Question source</dt><dd>${esc(page.question_source_type)}</dd></div>
+  <div><dt>Question source</dt><dd>${esc(page.question_source_type)}<br>Group: ${esc(page.faq_group.replace(/-/g, ' '))}</dd></div>
   <div><dt>Observed</dt><dd>${esc(page.first_observed)} to ${esc(page.last_observed)}</dd></div>
-  <div><dt>Evidence status</dt><dd>${esc(page.evidence_status)}</dd></div>
+  <div><dt>Answer ownership</dt><dd><a href="${esc(page.canonical_route)}">${esc(page.canonical_route)}</a><br>Status: ${esc(page.evidence_status)}</dd></div>
   <div><dt>Source references</dt><dd>${page.question_sources.map((source) => source.startsWith('https://') ? `<a href="${esc(source)}">${esc(new URL(source).hostname)}</a>` : esc(source)).join('<br>')}</dd></div>
 </dl>` : '';
 const renderContentPage = (page) => {
@@ -642,12 +664,23 @@ const renderContentPage = (page) => {
   const familyLabel = CONTENT_FAMILY_LABELS[family];
   const { html: bodyHtml, headings } = renderContentMarkdown(page.body, page.h1);
   const tocHeadings = headings.filter((heading) => heading.level === 2);
+  const isHumanDocs = family === 'docs';
+  const contentIndex = isHumanDocs
+    ? humanDocsPages.map(({ page: section, label }) => `<li${section.slug === page.slug ? ' class="docs-index-list-current"' : ''}><a href="${esc(section.slug)}"${section.slug === page.slug ? ' aria-current="page"' : ''}>${esc(label)}</a></li>`).join('')
+    : tocHeadings.map((heading) => `<li><a href="#${heading.id}">${esc(heading.label)}</a></li>`).join('');
+  const currentDocsLink = isHumanDocs
+    ? `<a class="docs-index-current" href="${esc(page.slug)}" aria-current="page">Current page · ${esc(page.h1)}</a>`
+    : '';
   const breadcrumbs = contentBreadcrumbs(page);
   const schema = {
     '@context': 'https://schema.org',
     '@graph': [PUBLISHER, contentPageSchema(page), contentBreadcrumbSchema(page)],
   };
   const heroRelative = page.hero_image?.replace(/^\//, '') ?? null;
+  const socialImage = heroRelative ?? CONTENT_SOCIAL_DEFAULT;
+  const socialImageAlt = page.hero_image
+    ? `Evidence from ${page.hero_source} relevant to ${page.h1}`
+    : `${SITE_NAME} mark`;
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -657,14 +690,14 @@ const renderContentPage = (page) => {
 <meta name="description" content="${esc(page.description)}" />
 <link rel="canonical" href="${url}" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
-${assetHead('/')}
+${assetHead('/', { includeBuildRevision: false })}
 <meta property="og:type" content="${schemaTypeForContent(page) === 'TechArticle' ? 'article' : 'website'}" />
 <meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="${SITE_NAME}" />
 <meta property="og:title" content="${esc(page.title)}" />
 <meta property="og:description" content="${esc(page.description)}" />
 <meta property="og:url" content="${url}" />
-${socialImageMeta(heroRelative, page.hero_image ? `Evidence from ${page.hero_source} relevant to ${page.h1}` : '')}
+${socialImageMeta(socialImage, socialImageAlt)}
 ${schemaTypeForContent(page) === 'TechArticle' ? `<meta property="article:published_time" content="${esc(page.published)}" />\n<meta property="article:modified_time" content="${esc(page.last_reviewed)}" />` : ''}
 <meta name="twitter:card" content="${page.hero_image ? 'summary_large_image' : 'summary'}" />
 <meta name="twitter:title" content="${esc(page.title)}" />
@@ -685,14 +718,14 @@ ${navHtml()}
     <div class="content-meta"><span>Published ${esc(page.published)}</span><span>Reviewed ${esc(page.last_reviewed)}</span>${page.supported_revision ? `<span>Three.js ${esc(page.supported_revision)}</span>` : ''}</div>
     ${renderFaqProvenance(page)}
   </div></header>
-  <div class="content-shell"><div class="wrap"><div class="content-layout">
-    <nav class="content-index" aria-label="On this page"><strong>On this page</strong><ol>${tocHeadings.map((heading) => `<li><a href="#${heading.id}">${esc(heading.label)}</a></li>`).join('')}</ol></nav>
+  <div class="content-shell"><div class="wrap"><div class="content-layout${isHumanDocs ? ' content-layout--docs' : ''}">
+    <nav class="content-index${isHumanDocs ? ' docs-index' : ''}" aria-label="${isHumanDocs ? 'Documentation sections' : 'On this page'}"><strong>${isHumanDocs ? 'Documentation' : 'On this page'}</strong>${currentDocsLink}<ol>${contentIndex}</ol></nav>
     <article class="content-body">${bodyHtml}${renderContentFacts(page)}${renderContentProof(page)}${renderContentRelations(page)}${renderContentSources(page)}
       <nav class="content-discovery" aria-label="Machine-readable discovery"><a href="/guides/">All guides</a><a href="/llms.txt">LLM catalog</a><a href="/skills.json">Machine index</a></nav>
     </article>
   </div></div></div>
 </main>
-${footerHtml}
+${renderFooter({ includeBuildStatus: false })}
 </body>
 </html>\n`;
 };
@@ -928,13 +961,13 @@ const HARNESSES = [
 const harnessSection = HARNESSES.map((h, i) => `
     <div class="step"><span class="n">${String(i + 1).padStart(2, '0')}</span><h3>${esc(h.name)}</h3>
       <p>${esc(h.how)}</p>
-      <pre><code>${esc(h.code)}</code></pre></div>`).join('');
+      <pre tabindex="0"><code>${esc(h.code)}</code></pre></div>`).join('');
 
 const pathfinderGroups = [
-  { stage: 'Fit', description: 'See which roles and workloads benefit, plus the cases the pack does not own.', routes: ['/for/', '/industries/'] },
-  { stage: 'Evaluate', description: 'Compare named approaches, scan the option landscape, and calculate the real project cost.', routes: ['/compare/', '/alternatives/', '/pricing/'] },
-  { stage: 'Adopt', description: 'Install the pack, route minimal context, or move an existing workflow deliberately.', routes: ['/docs/', '/agents/', '/migrate/'] },
-  { stage: 'Solve', description: 'Open a sourced answer for a concrete version, backend, licensing, readback, or output issue.', routes: ['/faq/'] },
+  { stage: 'Find your fit', description: 'Match the pack to your role, workflow, and the work it should not own.', routes: ['/for/'] },
+  { stage: 'Compare approaches', description: 'Evaluate named options and total cost before committing to an implementation route.', routes: ['/compare/', '/alternatives/', '/pricing/'] },
+  { stage: 'Install or migrate', description: 'Start cleanly with the pack or move an existing workflow without hiding the transition cost.', routes: ['/docs/install/', '/migrate/'] },
+  { stage: 'Build for an industry', description: 'Start from real workload, interaction, and performance constraints rather than a generic role.', routes: ['/industries/'] },
 ];
 const pathfinderHtml = pathfinderGroups.map((group) => `<div class="pathfinder-row">
   <span class="pathfinder-stage">${esc(group.stage)}</span><p>${esc(group.description)}</p>
@@ -1040,7 +1073,7 @@ h1 em{font-style:normal;color:var(--amber)}
 .hero-showcase-kicker{font:10px/1.4 var(--mono);color:var(--cyan);letter-spacing:.11em;text-transform:uppercase}
 .hero-showcase h2{max-width:13ch;margin-top:10px;font-size:clamp(30px,3.2vw,44px);line-height:1.04;text-wrap:balance}
 .skill-route{display:grid;gap:0;margin-top:22px;border-top:1px solid var(--line)}.skill-route a{display:grid;grid-template-columns:22px minmax(0,1fr);align-items:center;gap:10px;min-height:42px;border-bottom:1px solid var(--line);font:10px/1.35 var(--mono);color:var(--ink)}.skill-route a:before{content:attr(data-route-index);color:var(--dim);font-variant-numeric:tabular-nums}.skill-route a:first-child{color:var(--amber)}
-.product-source{margin-top:16px;color:var(--dim);font:10px/1.5 var(--mono)}.product-source strong{color:var(--cyan);font-weight:400}.hero-showcase p:last-of-type{max-width:45ch;margin-top:16px;color:rgba(237,232,221,.72);font-size:13px}.hero-showcase-link{display:inline-flex;align-self:flex-start;margin-top:20px;color:var(--amber);font:11px var(--mono)}.hero-showcase-link:hover{color:var(--ink)}
+.product-source{margin-top:16px;color:var(--dim);font:10px/1.5 var(--mono)}.product-source strong{color:var(--cyan);font-weight:400}.hero-showcase p:last-of-type{max-width:45ch;margin-top:16px;color:rgba(237,232,221,.72);font-size:13px}.hero-showcase-link{min-height:44px;display:inline-flex;align-items:center;align-self:flex-start;margin-top:20px;color:var(--amber);font:11px var(--mono);transition-property:color,scale;transition-duration:160ms}.hero-showcase-link:hover{color:var(--ink)}.hero-showcase-link:active{scale:.96}
 .stats-band{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:rgba(15,18,24,.64)}
 .stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1px;padding:0}
 .stat{padding:20px clamp(10px,2vw,24px);border-left:1px solid var(--line)}.stat:first-child{border-left:0}
@@ -1053,7 +1086,7 @@ h1 em{font-style:normal;color:var(--amber)}
 .matrix-facts{display:grid;margin-top:10px;border-top:1px solid var(--line)}.matrix-fact{display:grid;grid-template-columns:minmax(150px,.42fr) minmax(0,1fr);gap:24px;padding:16px 0;border-bottom:1px solid var(--line)}.matrix-fact dt{font:10px/1.45 var(--mono);color:var(--dim);text-transform:uppercase;letter-spacing:.07em}.matrix-fact dd{display:grid;gap:5px}.matrix-fact strong{font:600 clamp(20px,2.3vw,30px)/1 var(--disp);font-variant-numeric:tabular-nums}.matrix-fact span{color:var(--dim);font-size:13px}.matrix-fact[data-state="accepted"] strong{color:var(--lime)}.matrix-fact[data-state="pending"] strong{color:var(--amber)}
 .matrix-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
 .achievement-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:36px}.achievement{min-height:156px;padding:20px;border-radius:16px;background:rgba(14,17,23,.78);box-shadow:0 0 0 1px rgba(255,255,255,.075)}.achievement b{display:block;font-family:var(--disp);font-size:32px;line-height:1.1;font-variant-numeric:tabular-nums}.achievement span{display:block;margin-top:8px;color:var(--dim);font-size:14px}.achievement code{color:var(--cyan);font-size:11px}
-.showcase-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:18px}.showcase-card{grid-column:span 6;min-width:0;overflow:hidden;display:flex;flex-direction:column;border-radius:22px;background:linear-gradient(145deg,rgba(19,24,33,.96),rgba(10,13,18,.98));box-shadow:var(--shadow-card);transition-property:translate,box-shadow;transition-duration:220ms;transition-timing-function:cubic-bezier(.2,0,0,1)}.showcase-card--span-5{grid-column:span 5}.showcase-card--span-7{grid-column:span 7}.showcase-media{display:block;overflow:hidden;background:#090c11}.showcase-media img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.08) contrast(1.03);transition-property:scale,filter;transition-duration:420ms;transition-timing-function:cubic-bezier(.2,0,0,1)}.showcase-copy{flex:1;display:flex;flex-direction:column;padding:20px 22px 22px}.showcase-kind{font:10px/1.4 var(--mono);color:var(--cyan);letter-spacing:.08em;text-transform:uppercase}.showcase-copy h3{margin-top:8px;font-size:clamp(22px,2.5vw,32px);line-height:1.08}.showcase-copy p{max-width:52ch;margin-top:10px;color:var(--dim);font-size:14px;line-height:1.55}.showcase-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:auto;padding-top:22px}.showcase-actions a{min-height:42px;display:inline-flex;align-items:center;justify-content:center;padding:9px 13px;border-radius:11px;background:rgba(255,255,255,.035);box-shadow:0 0 0 1px rgba(255,255,255,.12);font:11px/1.2 var(--mono);white-space:nowrap;transition-property:scale,color,background-color,box-shadow;transition-duration:160ms}.showcase-actions a:hover{color:var(--amber);box-shadow:0 0 0 1px rgba(255,180,84,.4)}.showcase-actions a:active{scale:.97}.showcase-actions .showcase-action--primary{background:var(--amber);color:#171006;box-shadow:none}.showcase-actions .showcase-action--primary:hover{background:#ffc272;color:#171006;box-shadow:none}
+.showcase-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:18px}.showcase-card{grid-column:span 6;min-width:0;overflow:hidden;display:flex;flex-direction:column;border-radius:22px;background:linear-gradient(145deg,rgba(19,24,33,.96),rgba(10,13,18,.98));box-shadow:var(--shadow-card);transition-property:translate,box-shadow;transition-duration:220ms;transition-timing-function:cubic-bezier(.2,0,0,1)}.showcase-card--span-5{grid-column:span 5}.showcase-card--span-7{grid-column:span 7}.showcase-media{display:block;overflow:hidden;background:#090c11}.showcase-media img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:saturate(1.08) contrast(1.03);transition-property:scale,filter;transition-duration:420ms;transition-timing-function:cubic-bezier(.2,0,0,1)}.showcase-copy{flex:1;display:flex;flex-direction:column;padding:20px 22px 22px}.showcase-kind{font:10px/1.4 var(--mono);color:var(--cyan);letter-spacing:.08em;text-transform:uppercase}.showcase-copy h3{margin-top:8px;font-size:clamp(22px,2.5vw,32px);line-height:1.08}.showcase-copy p{max-width:52ch;margin-top:10px;color:var(--dim);font-size:14px;line-height:1.55}.showcase-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:auto;padding-top:22px}.showcase-actions a{min-height:42px;display:inline-flex;align-items:center;justify-content:center;padding:9px 13px;border-radius:11px;background:rgba(255,255,255,.035);box-shadow:0 0 0 1px rgba(255,255,255,.12);font:11px/1.2 var(--mono);white-space:nowrap;transition-property:scale,color,background-color,box-shadow;transition-duration:160ms}.showcase-actions a:hover{color:var(--amber);box-shadow:0 0 0 1px rgba(255,180,84,.4)}.showcase-actions a:active{scale:.96}.showcase-actions .showcase-action--primary{background:var(--amber);color:#171006;box-shadow:none}.showcase-actions .showcase-action--primary:hover{background:#ffc272;color:#171006;box-shadow:none}
 .flagship-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.flagship-card{position:relative;overflow:hidden;display:grid;grid-template-columns:190px minmax(0,1fr);gap:24px;min-height:294px;padding:24px;border-radius:22px;background:var(--bg2);box-shadow:var(--shadow-card);transition-property:translate,box-shadow;transition-duration:220ms;transition-timing-function:cubic-bezier(.2,0,0,1)}.flagship-card:last-child{grid-column:1/-1}.flagship-card--no-media{grid-template-columns:1fr;min-height:0}
 .flagship-preview{align-self:stretch;min-height:230px}.flagship-preview img{height:100%;aspect-ratio:auto;filter:saturate(1.04) contrast(1.02)}
 .flagship-copy{align-self:center}.flagship-kicker{font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--cyan)}.flagship-copy h3{margin-top:9px;font-size:clamp(24px,3vw,38px)}.flagship-copy p{margin-top:12px;color:var(--dim);font-size:15.5px}.flagship-meta{display:flex;align-items:center;flex-wrap:wrap;gap:10px 16px;margin-top:20px;font-family:var(--mono);font-size:10px;color:var(--dim)}
@@ -1078,6 +1111,7 @@ h1 em{font-style:normal;color:var(--amber)}
 <body>
 ${navHtml('')}
 
+<main id="main-content" tabindex="-1">
 <header class="hero">
   <div class="wrap">
     <div class="hero-layout">
@@ -1118,15 +1152,14 @@ ${navHtml('')}
   </dl>
 </div></div>
 
-<main id="main-content" tabindex="-1">
-<section class="pathfinder" aria-labelledby="pathfinder-title"><div class="wrap">
-  <div class="pathfinder-head"><h2 id="pathfinder-title">Choose your path.</h2><p>The site now separates fit, evaluation, adoption, and troubleshooting so the next page matches the decision in front of you.</p></div>
-  <div class="pathfinder-rows">${pathfinderHtml}</div>
-</div></section>
 <section class="section" id="flagships" aria-labelledby="flagships-title"><div class="wrap">
   <h2 id="flagships-title">See what each skill lets you build.</h2>
   <p class="sub">Open a live WebGPU demo, then read the full skill for architecture, budgets, failure conditions, and validation.</p>
   <div class="showcase-grid">${showcaseHtml}</div>
+</div></section>
+<section class="pathfinder" aria-labelledby="pathfinder-title"><div class="wrap">
+  <div class="pathfinder-head"><h2 id="pathfinder-title">Choose your path.</h2><p>Start with the decision in front of you, then move from the relevant guide cluster into skills, demos, and evidence.</p></div>
+  <div class="pathfinder-rows">${pathfinderHtml}</div>
 </div></section>
 
 <section class="section" id="matrix" aria-labelledby="matrix-title"><div class="wrap">
@@ -1210,7 +1243,7 @@ ${SKILLS_INSTALL_PACK}</code></pre></div>
 
 </main>
 
-${footerHtml}
+${renderFooter()}
 </body>
 </html>
 `;
@@ -1334,7 +1367,7 @@ ${navHtml('../')}
     <div class="about-cta"><a href="${REPO}/issues">Report a technical issue ↗</a><a href="${REPO}/pulls">Review open contributions ↗</a><a href="../#skills">Browse the skill catalog</a><a href="../llms.txt">For coding agents</a></div>
   </div></section>
 </main>
-${footerHtml}
+${renderFooter()}
 </body>
 </html>
 `;
@@ -1397,7 +1430,7 @@ for (const slug of slugs) {
   const skillBodyHtml = rewriteSkillBodyLinks(marked.parse(s.body)
     .replace(/<h1([^>]*)>/g, '<h2$1>')
     .replace(/<\/h1>/g, '</h2>'), slug);
-  const skillRelatedPages = (SITE_CONTENT.relatedBySkill.get(slug) ?? []).slice(0, 4);
+  const skillRelatedPages = skillGuidePages(slug);
   const skillRelatedGuidesHtml = skillRelatedPages.length ? `<aside class="skill-guides" aria-labelledby="related-guides-title"><h3 id="related-guides-title">Related guides</h3><ul>${skillRelatedPages.map((page) => `<li><a href="${esc(page.slug)}"><span>${esc(CONTENT_FAMILY_LABELS[contentFamily(page)])}</span>${esc(page.title)}</a></li>`).join('')}</ul></aside>` : '';
   const updateHtml = s.update ? `<span class="chip">Latest skill update <time datetime="${esc(s.update.iso)}">${esc(s.update.date)}</time></span>
     <a class="chip" href="${esc(s.update.url)}">commit ${esc(s.update.shortHash)} ↗</a>` :
@@ -1582,7 +1615,7 @@ header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
   linear-gradient(90deg,rgba(10,12,16,.96) 0%,rgba(10,12,16,.8) 36%,rgba(10,12,16,.24) 68%,rgba(10,12,16,.04) 100%),
   linear-gradient(0deg,rgba(10,12,16,.9) 0%,rgba(10,12,16,.08) 65%,rgba(10,12,16,.62) 100%);z-index:1}
 .crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}.crumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.crumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}
-.crumbs a:hover{color:var(--amber)}
+.crumbs a{min-height:40px;display:inline-flex;align-items:center}.crumbs a:hover{color:var(--amber)}
 h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:0;max-width:18ch}
 .lede{margin-top:24px;max-width:70ch;color:var(--dim)}
 .meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
@@ -1622,7 +1655,7 @@ a.chip:active{scale:.96}
 .runtime-evidence-disclosure dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;margin-top:16px;overflow:hidden;border-radius:10px;background:var(--line)}.runtime-evidence-disclosure dl div{padding:11px 12px;background:var(--bg2)}.runtime-evidence-disclosure dt{font:10px/1.35 var(--mono);color:var(--dim)}.runtime-evidence-disclosure dd{margin-top:4px;font:500 10px/1.35 var(--mono);color:var(--amber)}.runtime-evidence-disclosure dd[data-verdict="PASS"]{color:var(--lime)}
 .runtime-evidence-disclosure ul{margin:15px 0 0;padding-left:20px}.runtime-evidence-disclosure li{margin-top:5px;color:var(--dim);font-size:14px}
 .evidence-report-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:10px}.evidence-report-links a{display:grid;gap:6px;min-height:72px;padding:14px;border:1px solid var(--line);border-radius:11px;background:var(--bg2)}.evidence-report-links code{color:var(--cyan);font:11px/1.4 var(--mono);overflow-wrap:anywhere}.evidence-report-links span{color:var(--dim);font:10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.05em}
-.skill-guides{margin-top:52px;padding-top:22px;border-top:1px solid var(--line)}.skill-guides h3{font-size:22px}.skill-guides ul{margin-top:12px;list-style:none;border-top:1px solid var(--line)}.skill-guides li{border-bottom:1px solid var(--line)}.skill-guides a{min-height:52px;display:grid;grid-template-columns:120px minmax(0,1fr);align-items:center;gap:18px;color:var(--dim);font-size:14px;transition-property:color,scale;transition-duration:160ms}.skill-guides a span{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}.skill-guides a:hover{color:var(--amber)}.skill-guides a:active{scale:.99}
+.skill-guides{margin-top:52px;padding-top:22px;border-top:1px solid var(--line)}.skill-guides h3{font-size:22px}.skill-guides ul{margin-top:12px;list-style:none;border-top:1px solid var(--line)}.skill-guides li{border-bottom:1px solid var(--line)}.skill-guides a{min-height:52px;display:grid;grid-template-columns:120px minmax(0,1fr);align-items:center;gap:18px;color:var(--dim);font-size:14px;transition-property:color,scale;transition-duration:160ms}.skill-guides a span{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}.skill-guides a:hover{color:var(--amber)}.skill-guides a:active{scale:.96}
 @media (max-width:720px){
   .skill-hero{min-height:auto;padding:58px 0 52px}
   .skill-hero-bg{opacity:.3}
@@ -1679,7 +1712,7 @@ ${skillDemosHtml}
 
 </main>
 
-${footerHtml}
+${renderFooter()}
 </body>
 </html>
 `;
@@ -1764,7 +1797,25 @@ const skillManifest = {
       queryAliases: page.query_aliases,
       published: page.published,
       lastReviewed: page.last_reviewed,
+      kind: page.kind,
+      supportedRevision: page.supported_revision ?? null,
       relatedSkills: page.related_skills,
+      relatedDemos: page.related_demos,
+      relatedPages: page.related_pages,
+      sources: page.sources,
+      proof: page.hero_image ? {
+        image: new URL(page.hero_image, SITE).href,
+        demo: page.hero_source,
+      } : null,
+      questionProvenance: page.kind === 'faq-answer' ? {
+        type: page.question_source_type,
+        sources: page.question_sources,
+        firstObserved: page.first_observed,
+        lastObserved: page.last_observed,
+        canonicalRoute: page.canonical_route,
+        evidenceStatus: page.evidence_status,
+        group: page.faq_group,
+      } : null,
     })),
   },
   skillFormat: 'SKILL.md with YAML frontmatter (name, description) per folder',
@@ -1874,11 +1925,16 @@ writeFileSync(join(root, 'docs', 'site.webmanifest'), JSON.stringify({
   ],
 }, null, 2) + '\n');
 const sitemapHomeLastmod = latestPathDate(['scripts/build-pages.mjs', ...slugs.map((slug) => join('skills', slug))]);
+const sitemapEvidenceLastmod = latestPathDate([
+  'docs/evidence/index.html',
+  'docs/evidence/manifest.json',
+  'scripts/build-evidence-pages.mjs',
+]);
 writeFileSync(join(root, 'docs', 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url><loc>${SITE}</loc>${sitemapHomeLastmod ? `<lastmod>${sitemapHomeLastmod}</lastmod>` : ''}${homepageSocialImage ? `<image:image><image:loc>${new URL(homepageSocialImage, SITE).href}</image:loc><image:title>${SITE_NAME}</image:title></image:image>` : ''}</url>
   <url><loc>${aboutUrl}</loc>${aboutLastmod ? `<lastmod>${aboutLastmod}</lastmod>` : ''}</url>
-  <url><loc>${SITE}evidence/</loc>${sitemapHomeLastmod ? `<lastmod>${sitemapHomeLastmod}</lastmod>` : ''}</url>
+  <url><loc>${SITE}evidence/</loc>${sitemapEvidenceLastmod ? `<lastmod>${sitemapEvidenceLastmod}</lastmod>` : ''}</url>
 ${contentPages.map((page) => `  <url><loc>${contentUrl(page)}</loc><lastmod>${page.last_reviewed}</lastmod>${page.hero_image ? `<image:image><image:loc>${new URL(page.hero_image, SITE).href}</image:loc><image:title>${esc(page.title)}</image:title></image:image>` : ''}</url>`).join('\n')}
 ${slugs.map((s) => {
   const lastmod = skills[s].update ? `<lastmod>${skills[s].update.date}</lastmod>` : '';

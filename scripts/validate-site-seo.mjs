@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
@@ -16,6 +17,7 @@ import { loadSiteContent } from './lib/site-content.mjs';
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DOCS = join(ROOT, 'docs');
 const SITE = 'https://threejs-skills.com/';
+const SITE_BUILD_DATE = process.env.SITE_BUILD_DATE ?? new Date().toISOString().slice(0, 10);
 const OLD_SITE = 'https://linegel.github.io/threejs-complete-set-of-skill/';
 const PUBLISHER_LOGO = `${SITE}icon-512.png`;
 const PRIMARY_NAV = [
@@ -34,7 +36,7 @@ const SITE_CONTENT = loadSiteContent({
   skillIds,
   demos: DEMO_REGISTRY.demos.filter((demo) => skillIds.has(demo.skill)),
   threeRevision: DEMO_REGISTRY.threeRevision,
-  today: '2026-07-16',
+  today: SITE_BUILD_DATE,
 });
 const contentPages = SITE_CONTENT.pages;
 const contentByUrl = new Map(contentPages.map((page) => [new URL(page.slug, SITE).href, page]));
@@ -44,6 +46,17 @@ const ARTICLE_IMAGE_SPECS = [
   { id: '16x9', width: 1200, height: 675 },
 ];
 const errors = [];
+const latestPathDate = (paths) => {
+  try {
+    return execFileSync('git', ['log', '-1', '--format=%cs', '--', ...paths], {
+      cwd: ROOT,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim() || null;
+  } catch {
+    return null;
+  }
+};
 const responsiveSourcesSeen = new Set();
 let responsiveManifest = { sources: {} };
 let articleManifest = { skills: {} };
@@ -227,10 +240,10 @@ function validateIndexablePage(path, expectedUrl, {
   assert(headValue(html, 'property', 'og:url')[0] === expectedUrl, `${label}: og:url is not self-referential`);
   const socialImages = headValue(html, 'property', 'og:image');
   assert(socialImages.length <= 1, `${label}: duplicate og:image`);
-  assert(
-    headValue(html, 'name', 'twitter:card')[0] === (socialImages.length === 1 ? 'summary_large_image' : 'summary'),
-    `${label}: twitter card does not match provenance-bound image availability`,
-  );
+  const expectedTwitterCard = contentPage && !contentPage.hero_image
+    ? 'summary'
+    : (socialImages.length === 1 ? 'summary_large_image' : 'summary');
+  assert(headValue(html, 'name', 'twitter:card')[0] === expectedTwitterCard, `${label}: Twitter card does not match image role`);
   if (socialImages.length === 1) {
     const imageUrl = socialImages[0];
     const imagePath = localPathForUrl(imageUrl);
@@ -312,6 +325,9 @@ function validateIndexablePage(path, expectedUrl, {
     assert(pageNode?.datePublished === contentPage.published, `${label}: schema datePublished differs from source`);
     assert(pageNode?.dateModified === contentPage.last_reviewed, `${label}: schema dateModified differs from source`);
     assert(pageNode?.publisher?.['@id'] === `${SITE}#publisher`, `${label}: schema publisher reference is not canonical`);
+    if (contentPage.slug === '/pricing/') {
+      assert(pageNode?.about?.['@id'] === `${SITE}#software`, `${label}: pricing page does not reference the canonical SoftwareSourceCode entity`);
+    }
     const breadcrumb = nodes.find((node) => hasType(node, 'BreadcrumbList') && node?.['@id'] === `${expectedUrl}#breadcrumb`);
     const breadcrumbItems = breadcrumb?.itemListElement ?? [];
     assert(breadcrumbItems.length >= 2, `${label}: content breadcrumb is incomplete`);
@@ -323,16 +339,22 @@ function validateIndexablePage(path, expectedUrl, {
     assert(answer === escapedHtml(contentPage.summary), `${label}: visible direct answer differs from source summary`);
     const relatedRoutes = matches(html, /<a\b[^>]*data-related-route=["'][^"']+["'][^>]*>/gi).map(([tag]) => attribute(tag, 'data-related-route'));
     assert(JSON.stringify(relatedRoutes) === JSON.stringify(contentPage.related_pages), `${label}: rendered related routes differ from source order`);
-    assert(/<nav\b[^>]*aria-label=["']On this page["']/i.test(html), `${label}: missing static on-page index`);
+    const relatedFamilies = matches(html, /<a\b[^>]*data-related-route=["'][^"']+["'][^>]*>/gi).map(([tag]) => attribute(tag, 'data-related-family'));
+    const expectedRelatedFamilies = contentPage.related_pages.map((route) => route.split('/').filter(Boolean)[0]);
+    assert(JSON.stringify(relatedFamilies) === JSON.stringify(expectedRelatedFamilies), `${label}: rendered related families differ from source order`);
+    const contentIndexLabel = contentPage.slug.startsWith('/docs/') ? 'Documentation sections' : 'On this page';
+    const hasContentIndex = matches(html, /<nav\b[^>]*>/gi)
+      .some(([tag]) => attribute(tag, 'aria-label') === contentIndexLabel);
+    assert(hasContentIndex, `${label}: missing static content index`);
     assert(/<nav\b[^>]*aria-label=["']Machine-readable discovery["']/i.test(html), `${label}: missing visible machine discovery links`);
-    const expectedImage = contentPage.hero_image ? new URL(contentPage.hero_image, SITE).href : undefined;
+    const expectedImage = new URL(contentPage.hero_image ?? '/icon-512.png', SITE).href;
     assert(pageNode?.image === expectedImage, `${label}: schema image differs from provenance-bound source image`);
+    assert(socialImages[0] === expectedImage, `${label}: social image differs from the page schema image`);
     if (contentPage.hero_image) {
       const source = matches(html, /<img\b[^>]*>/gi).map(([tag]) => attribute(tag, 'src')).find((src) => src === contentPage.hero_image);
       assert(Boolean(source), `${label}: declared proof image is not visible`);
-      assert(socialImages[0] === expectedImage, `${label}: social image differs from declared proof image`);
       assert(html.includes(`/evidence/${contentPage.hero_source}/`), `${label}: proof image lacks its evidence report link`);
-    } else assert(socialImages.length === 0, `${label}: page without declared proof publishes a social image`);
+    }
     if (expectedType === 'TechArticle') {
       assert(headValue(html, 'property', 'article:published_time')[0] === contentPage.published, `${label}: article publication metadata differs from source`);
       assert(headValue(html, 'property', 'article:modified_time')[0] === contentPage.last_reviewed, `${label}: article modification metadata differs from source`);
@@ -345,6 +367,8 @@ function validateIndexablePage(path, expectedUrl, {
       for (const source of contentPage.question_sources) {
         assert(source.startsWith('https://') ? html.includes(`href="${source}"`) : html.includes(escapedHtml(source)), `${label}: FAQ question provenance is not visible: ${source}`);
       }
+      assert(html.includes(`href="${contentPage.canonical_route}"`), `${label}: FAQ canonical answer route is not visible`);
+      assert(html.includes(escapedHtml(contentPage.faq_group.replace(/-/g, ' '))), `${label}: FAQ group is not visible`);
     }
     if (contentPage.slug === '/faq/') {
       const questions = pageNode?.mainEntity ?? [];
@@ -490,6 +514,12 @@ const sitemapEntries = new Map(matches(sitemap, /<url>([\s\S]*?)<\/url>/g).map((
 ]));
 const contentUrls = new Set(contentByUrl.keys());
 const contentFamilies = new Set(contentPages.map((page) => page.slug.split('/').filter(Boolean)[0]));
+const expectedEvidenceLastmod = latestPathDate([
+  'docs/evidence/index.html',
+  'docs/evidence/manifest.json',
+  'scripts/build-evidence-pages.mjs',
+]);
+assert(sitemapEntries.get(`${SITE}evidence/`)?.lastmod === expectedEvidenceLastmod, 'sitemap.xml: evidence hub lastmod does not match evidence-owned source');
 for (const [url, page] of contentByUrl) {
   const entry = sitemapEntries.get(url);
   assert(Boolean(entry), `sitemap.xml: missing authored decision page ${url}`);
@@ -662,7 +692,6 @@ for (const path of walk(DOCS, (file) => file.endsWith('.html'))) {
 for (const path of [...new Set(pageRecords.map((record) => localPathForUrl(record.url)).filter(Boolean))]) {
   const label = relative(ROOT, path);
   const html = readFileSync(path, 'utf8');
-  assert(!/href=["'][^"']*index\.html(?:[#"'])/i.test(html), `${label}: internal navigation reinforces duplicate index.html URLs`);
   const base = canonicalValues(html)[0];
   if (!base) continue;
   for (const [tag] of matches(html, /<a\b[^>]*href=["'][^"']+["'][^>]*>/gi)) {
@@ -670,6 +699,7 @@ for (const path of [...new Set(pageRecords.map((record) => localPathForUrl(recor
     if (!href || /^(?:mailto:|tel:|javascript:)/i.test(href) || href.startsWith('#')) continue;
     const resolved = new URL(href, base);
     if (resolved.origin !== new URL(SITE).origin) continue;
+    assert(!resolved.pathname.endsWith('/index.html'), `${label}: internal navigation reinforces duplicate index.html URL ${href}`);
     const target = localPathForUrl(resolved.href);
     assert(target && existsSync(target), `${label}: broken internal link ${href}`);
   }
@@ -701,7 +731,25 @@ const expectedDecisionPages = contentPages.map((page) => ({
   queryAliases: page.query_aliases,
   published: page.published,
   lastReviewed: page.last_reviewed,
+  kind: page.kind,
+  supportedRevision: page.supported_revision ?? null,
   relatedSkills: page.related_skills,
+  relatedDemos: page.related_demos,
+  relatedPages: page.related_pages,
+  sources: page.sources,
+  proof: page.hero_image ? {
+    image: new URL(page.hero_image, SITE).href,
+    demo: page.hero_source,
+  } : null,
+  questionProvenance: page.kind === 'faq-answer' ? {
+    type: page.question_source_type,
+    sources: page.question_sources,
+    firstObserved: page.first_observed,
+    lastObserved: page.last_observed,
+    canonicalRoute: page.canonical_route,
+    evidenceStatus: page.evidence_status,
+    group: page.faq_group,
+  } : null,
 }));
 assert(skillManifest.decisionSupport?.schemaVersion === 1, 'skills.json: decisionSupport schemaVersion must equal 1');
 assert(skillManifest.decisionSupport?.hub === `${SITE}guides/`, 'skills.json: decisionSupport hub is not canonical');

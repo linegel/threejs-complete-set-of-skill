@@ -8,8 +8,10 @@ primary_query: threejs webgpu migration guides
 query_aliases: ["threejs tsl migration guide index","modernize a threejs webgl project"]
 summary: Choose a guide by the source contract you are replacing: renderer, custom shader, or agent prompt workflow. Each migration preserves a working baseline, exposes unsupported behavior, and verifies the target state against the installed Three.js revision.
 related_skills: ["threejs-choose-skills","threejs-debugging","threejs-procedural-materials","threejs-image-pipeline","threejs-visual-validation"]
-related_demos: ["webgpu-image-pipeline","webgpu-validation-harness"]
+related_demos: ["final-image-flight","webgpu-image-pipeline","webgpu-validation-harness"]
 related_pages: ["/docs/use-in-an-existing-project/","/compare/webgpurenderer-vs-webglrenderer/","/compare/threejs-tsl-vs-glsl/","/agents/routing-and-minimal-context/"]
+hero_image: /visual-validation/final-image-flight/final.design.png
+hero_source: final-image-flight
 published: 2026-07-16
 last_reviewed: 2026-07-16
 sources: ["https://threejs.org/manual/en/webgpurenderer","https://github.com/mrdoob/three.js/wiki/Migration-Guide","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/package.json","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-debugging/SKILL.md"]
@@ -51,7 +53,7 @@ Keep one tone-map owner and one output-conversion owner. Keep current source and
 
 Run the project's existing static and runtime checks, then the validation procedure owned by the selected skill or lab. Compare fixed cameras, deterministic seeds or data, no-post output, mechanism diagnostics, final output, resource inventory, lifecycle behavior, and relevant negative controls.
 
-Use the published demo catalog to locate examples, not to infer current acceptance. The current evidence summaries for the debugging decision lab and WebGPU image-pipeline lab do not match their current source hashes, so neither is migration proof until source-bound validation is rerun. Use the [validation harness](/demos/webgpu-validation-harness/) only after confirming its source hash, evidence record, and required artifacts; it still does not prove the migrated project until the project runs its own checks.
+Use the published demo catalog to locate examples, not to infer current acceptance. The published debugging-contract evidence does not match its current source hash, so it is not migration proof until source-bound validation is rerun. The [WebGPU image-pipeline report](/evidence/webgpu-image-pipeline/) is current and accepted for its captured signal and output graph, and the [validation harness](/demos/webgpu-validation-harness/) is current for its declared backend and evidence mechanics. Neither proves the migrated project until that project runs its own checks.
 
 Retain a rollback path until every required backend, API, correctness, visual, resource, lifecycle, and named-device sustained performance or latency gate passes. If the target capability is unavailable, report the exact blocker and the narrower migration work that remains valid.
 

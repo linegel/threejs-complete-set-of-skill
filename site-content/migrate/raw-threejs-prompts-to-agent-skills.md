@@ -24,6 +24,19 @@ Extract repeated Three.js guidance such as renderer imports, TSL architecture, m
 
 Flag statements such as `use the latest API`, `make it fast`, or `support all devices`. They are not actionable contracts. Replace them with the resolved package, target backend, named devices, resolution and DPR, protected observable, permissible error, and measurement method.
 
+## Map prompt content to its durable owner
+
+| Raw-prompt content | Target owner | Migration rule |
+|---|---|---|
+| Product goal, users, interaction, source data, and acceptance criteria | Current task request or checked-in project rules | Keep project intent local and explicit. |
+| Repeated Three.js architecture and validation instructions | One installed specialist skill | Maintain the reusable procedure once instead of copying it into every request. |
+| Broad cross-system graphics work | `threejs-choose-skills` route result | Require one primary owner, minimal selected owners, explicit gaps, handoffs, resources, passes, output, and verification. |
+| One already-bounded graphics task | Its owning specialist skill | Invoke the owner directly; do not add router overhead. |
+| `latest`, `fast`, or `all devices` | Resolved revision, actual backend, named devices, budgets, and measurement method | Report missing inputs as gaps rather than silently inventing them. |
+| “Looks correct” or confident prose | Named diagnostics and source-bound evidence | Separate an implementation claim from proof of that claim. |
+
+Use the sections below in order: preserve representative source prompts, separate project intent from reusable guidance, install one authoritative skill source, route broad work or invoke a narrow owner, compare outcomes, then retire the old prompt as an active instruction system.
+
 ## Install the maintained source once
 
 Use the [installation guide](/docs/install/) to install the complete pack or configure a local checkout. Keep existing project instructions in `AGENTS.md`, `CLAUDE.md`, or the runtime's equivalent. Add one sentence explaining when to load matching `threejs-*` skills instead of copying their full content into the project prompt.
@@ -39,15 +52,36 @@ Do not merge global and project-local skill copies from different revisions. Sel
 
 ## Replace a mega-prompt with one routed request
 
-A broad raw prompt often mixes desired appearance, architecture, optimization, and implementation details without assigning ownership. Replace it with a product-specific request to the router:
+A broad raw prompt often mixes desired appearance, architecture, optimization, and implementation details without assigning ownership. For example, the source request for an existing product viewer might be:
 
 ```text
-Use $threejs-choose-skills to plan this Three.js WebGPU/TSL scene. Preserve the
-project's existing application and validation rules. Record the resolved package,
-runtime revision, initialized backend, target devices, protected observable, and
-product-defined budgets. Return the primary owner plus selected, deferred, gaps,
-handoffs, resources, passes, output, and verification fields used by this route.
-Do not implement until the route is explicit.
+Build the material and image pipeline for our Three.js product viewer. Use the
+latest WebGPURenderer and TSL APIs. Add procedural brushed metal, scratches,
+reflections, shadows, GTAO, HDR bloom, and strong color grading. Make it fast,
+make it work on all devices, avoid extra renders, fix every color-space issue,
+and prove that it looks correct. Include every Three.js rule needed to implement
+the whole task without asking for more information.
+```
+
+The migrated request retains the product job, replaces volatile instructions with the resolved runtime, and asks the router to expose missing inputs:
+
+```text
+Use $threejs-choose-skills to route the material and image-pipeline work for the
+existing product viewer.
+
+Product goal: preserve the loaded model, camera, controls, and interaction while
+adding a procedural brushed-metal surface, scratches, reflections, shadows,
+ambient contact shading, and HDR bloom.
+
+Resolved runtime: the project's locked three 0.185.1 package, WebGPURenderer,
+TSL, and the initialized backend reported separately from the renderer class.
+Preserve the project's existing application rules and one final-output owner.
+Use only target devices and budgets already named by the project; report a gap
+when either is absent.
+
+Return the primary owner plus selected, deferred, gaps, handoffs, resources,
+passes, output, and verification fields. Do not implement until the route is
+explicit.
 ```
 
 The request remains specific to the project. The installed router contributes reusable preflight, routing, ownership, and evidence rules. It should not invent missing product inputs or reframe an unsupported application concern as graphics work.

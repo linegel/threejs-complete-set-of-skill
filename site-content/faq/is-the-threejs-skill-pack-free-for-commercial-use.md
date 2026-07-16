@@ -9,11 +9,11 @@ query_aliases: ["threejs skill pack commercial license","can i use threejs agent
 summary: Yes. Repository-authored work is licensed under the root ISC license, which permits use, copying, modification, and distribution for any purpose, with or without fee, when copies retain its copyright and permission notice. The repository also incorporates Object Sculptor material with its own MIT notice, which must remain with affected copies. Assets, third-party dependencies, agent runtime, hosting, and support may have separate terms or costs. This is a reading of the published files, not legal advice.
 related_skills: []
 related_demos: []
-related_pages: ["/pricing/","/docs/install/","/alternatives/threejs-agent-skills/"]
+related_pages: ["/pricing/","/faq/which-threejs-version-does-the-skill-pack-support/","/faq/does-the-skill-pack-work-with-react-three-fiber/"]
 published: 2026-07-16
 last_reviewed: 2026-07-16
 sources: ["https://github.com/linegel/threejs-complete-set-of-skill/blob/main/LICENSE","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/README.md","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-object-sculptor/LICENSE","https://stackoverflow.com/questions/5057385/lgplv3-app-with-an-included-iscl-license-library"]
-question_source_type: stack-overflow
+question_source_type: derived-stack-overflow
 question_sources: ["https://stackoverflow.com/questions/5057385/lgplv3-app-with-an-included-iscl-license-library"]
 first_observed: 2011-02-20
 last_observed: 2026-07-16
@@ -21,10 +21,6 @@ canonical_route: /faq/is-the-threejs-skill-pack-free-for-commercial-use/
 evidence_status: verified
 faq_group: pricing-and-licensing
 ---
-
-## Direct answer
-
-Yes. Repository-authored work is licensed under the root ISC license, which permits use, copying, modification, and distribution for any purpose, with or without fee, when copies retain its copyright and permission notice. The repository also incorporates Object Sculptor material with its own MIT notice, which must remain with affected copies. Assets, third-party dependencies, agent runtime, hosting, and support may have separate terms or costs. This is a reading of the published files, not legal advice.
 
 ## What the repository license permits
 
@@ -55,4 +51,4 @@ The [pricing page](/pricing/) separates the pack's $0 license price from those r
 
 ## Question provenance
 
-The source is a public Stack Overflow question about incorporating an ISC-licensed library into another application. It demonstrates recurring community licensing uncertainty, not customer evidence for this pack. First observed 2011-02-20; last observed and answer reviewed 2026-07-16.
+This pack-specific question is derived from a public Stack Overflow question about incorporating an ISC-licensed library into another application. The source demonstrates general community licensing uncertainty; it does not mention this pack and is not customer evidence. Source first observed 2011-02-20; last checked and answer reviewed 2026-07-16.

@@ -13,7 +13,7 @@ related_pages: ["/faq/how-do-i-verify-the-native-webgpu-backend/","/faq/why-does
 published: 2026-07-16
 last_reviewed: 2026-07-16
 sources: ["https://www.w3.org/TR/webgpu/#gputexelcopybufferlayout","https://github.com/mrdoob/three.js/issues/31658","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/labs/runtime/aligned-readback.mjs","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/scripts/capture-lab-browser-11-15.mjs"]
-question_source_type: upstream-issue
+question_source_type: derived-upstream-issue
 question_sources: ["https://github.com/mrdoob/three.js/issues/31658"]
 first_observed: 2025-08-15
 last_observed: 2026-07-16
@@ -22,10 +22,6 @@ evidence_status: verified
 faq_group: troubleshooting
 supported_revision: 0.185.1
 ---
-
-## Direct answer
-
-Usually, padded GPU rows are being encoded as tightly packed pixels. WebGPU texture-to-buffer copies use a bytesPerRow aligned to 256 bytes, while a PNG encoder expects width times bytesPerPixel bytes per row. Carry the actual integer stride through capture, then copy only the logical pixels from each row into a compact buffer before encoding. Do not infer stride from total buffer length divided by height.
 
 ## Why the stripes appear
 
@@ -80,4 +76,4 @@ First verify the [active backend](/faq/how-do-i-verify-the-native-webgpu-backend
 
 ## Question provenance
 
-The source is a public upstream Three.js issue with a reproducible render-target readback failure and a technical discussion of padded rows. It is upstream engineering evidence, not customer evidence. First observed 2025-08-15; last observed and answer reviewed 2026-07-16.
+This troubleshooting question is derived from upstream issue #31658. That issue reports blank or failed render-target readback and discusses padded rows; it does not report the exact striped-PNG symptom used in this page title. It is upstream engineering evidence, not customer evidence. Source first observed 2025-08-15; last checked and answer reviewed 2026-07-16.

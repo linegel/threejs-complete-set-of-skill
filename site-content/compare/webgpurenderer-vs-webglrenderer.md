@@ -11,8 +11,6 @@ related_skills: ["threejs-compatibility-fallbacks","threejs-debugging","threejs-
 related_demos: ["browser-fallback-harness","webgpu-validation-harness"]
 related_pages: ["/migrate/webglrenderer-to-webgpurenderer/","/faq/how-do-i-verify-the-native-webgpu-backend/","/compare/renderpipeline-vs-effectcomposer/","/compare/threejs-tsl-vs-glsl/"]
 supported_revision: 0.185.1
-hero_image: /previews/primary/browser-fallback-harness.png
-hero_source: browser-fallback-harness
 published: 2026-07-16
 last_reviewed: 2026-07-16
 sources: ["https://threejs.org/manual/en/webgpurenderer","https://threejs.org/docs/pages/WebGPURenderer.html","https://threejs.org/docs/pages/WebGLRenderer.html","https://github.com/mrdoob/three.js/releases/tag/r185","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-compatibility-fallbacks/SKILL.md","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/labs/runtime/canonical-webgpu.mjs"]

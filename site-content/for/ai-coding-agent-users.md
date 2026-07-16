@@ -2,57 +2,63 @@
 kind: audience
 slug: /for/ai-coding-agent-users/
 title: Three.js WebGPU Skills for AI Coding Agents
-description: Deterministic routing, minimal context, runnable examples, and explicit evidence contracts for AI agents writing Three.js WebGPU code.
+description: Explicit routing, minimal context, runnable examples, and evidence contracts for AI agents writing Three.js WebGPU code.
 h1: Three.js WebGPU skills for AI coding agents
 primary_query: three.js skills for ai coding agents
 query_aliases: ["three.js webgpu agent workflow","tsl skills for coding agents"]
 summary: The pack gives a coding agent explicit ownership rules, routing decisions, runnable examples, and evidence requirements. It helps the agent load less context, avoid unsupported substitutions, and leave inspectable artifacts.
 related_skills: ["threejs-choose-skills","threejs-debugging","threejs-visual-validation"]
-related_demos: ["debugging-contract-lab"]
+related_demos: ["debugging-contract-lab","webgpu-validation-harness"]
 related_pages: ["/agents/","/agents/routing-and-minimal-context/","/docs/install-codex/","/docs/install-claude-code/","/compare/threejs-webgpu-skill-pack-vs-general-ai-prompts/","/migrate/raw-threejs-prompts-to-agent-skills/"]
 published: 2026-07-16
 last_reviewed: 2026-07-16
 sources: ["https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-choose-skills/SKILL.md","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-debugging/SKILL.md","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-visual-validation/SKILL.md","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/docs/demos/registry.json"]
 ---
 
-## Give the agent a routing problem it can verify
+This pack is a strong fit when an AI coding agent edits a real Three.js repository and must make its routing, ownership, implementation, and evidence decisions reviewable. It supplies operating contracts; it does not make the agent infallible.
 
-A broad request such as "make a WebGPU world" can activate geometry, fields, materials, motion, water, weather, camera, shadows, image-pipeline, and validation concerns. Loading every skill immediately makes ownership less clear and consumes context before the causal problem is understood.
+## Strong fit
 
-Use [Three.js WebGPU/TSL Choose Skills](/skills/threejs-choose-skills.html) as the entry point. The router asks the agent to classify the workload, define the protected observable, identify the earliest missing causal layer, compare algorithms, and select the smallest installed skill intersection.
+- The agent can read repository instructions, installed source, and project code, then run the project's commands and inspect artifacts.
+- A broad WebGPU/TSL task needs the smallest causal skill set instead of one giant prompt or every available skill.
+- The developer expects exact changed files, evidence labels, limitations, and unresolved gaps that can be reviewed after the agent finishes.
 
-The installed [Choose Skills contract](/skills/threejs-choose-skills.html) requires the agent to record the installed revision and backend, define the observable and acceptance bounds, choose the earliest missing causal owner, close cross-system handoffs, assign one final-output path, and report unsupported owners as explicit gaps. Verification must test the selected cause in the composed route; compatibility teaching is selected only when the user explicitly requests it.
+## Poor fit
 
-## Keep active context minimal
+- You want generic prompt snippets, a chat-only answer with no repository access, no-code 3D, or beginner JavaScript instruction.
+- You expect a skill to provide an agent runtime, context manager, autonomous-work guarantee, or model-quality benchmark.
+- The requested owner is application architecture, DOM UI, accessibility, data transport, asset preparation, or business logic and the project supplies no separate contract for it.
 
-The [routing and minimal-context guide](/agents/routing-and-minimal-context/) explains the working pattern. Load the router first, then only the selected domain owners and the references they require. Record omitted skills when they are tempting but unnecessary. Defer downstream consumers until their source signal exists.
+## Three recurring jobs
 
-This protects against the failure mode where an agent adds geometry, compute, MRT, temporal history, bloom, and grading because each is individually plausible. The route should instead state which observable each system owns and why a cheaper alternative failed.
+1. **Route the smallest causal context — [`threejs-choose-skills`](/skills/threejs-choose-skills.html).** Define the protected observable, earliest missing cause, candidate mechanisms, installed skill intersection, cross-system handoffs, and one final-output owner.
+2. **Triage exact runtime or revision failures — [`threejs-debugging`](/skills/threejs-debugging.html).** Reproduce the recorded environment, inspect installed source, isolate the first failed contract, and classify upstream evidence without turning issue folklore into a fix.
+3. **Leave falsifiable evidence — [`threejs-visual-validation`](/skills/threejs-visual-validation.html).** Freeze the run, capture the producing mechanism, use native-domain metrics and mutation controls, and label each number authored, derived, measured, gated, or unknown.
 
-Use the [agent documentation hub](/agents/) for machine-facing boundaries. Installation is covered separately for [Codex](/docs/install-codex/) and [Claude Code](/docs/install-claude-code/).
+The [routing and minimal-context guide](/agents/routing-and-minimal-context/) owns the detailed context-loading procedure. The [skill pack versus general AI prompts comparison](/compare/threejs-webgpu-skill-pack-vs-general-ai-prompts/) owns that choice; this page owns fit for agent users.
 
-## Preserve project ownership
+## Representative workflow: route a broad WebGPU request to verified evidence
 
-Skills do not replace repository instructions, installed dependencies, current source, tests that encode critical behavior, or user decisions. An agent should inspect the files it will change, preserve unrelated work, and use the project's existing helpers and validation path.
+1. Receive “add a WebGPU world with water, weather, motion, and final-image polish,” then read the repository rules and inspect the installed skills before proposing systems.
+2. Record Three.js `0.185.1`/r185, renderer imports, initialized backend, agent harness, browser/GPU, scene authority, units, fixed camera path, target observable, and acceptance bounds.
+3. Use the router to select only owners required by the earliest missing cause and its handoffs. Record tempting but unnecessary skills and unsupported owners as explicit omissions.
+4. Implement the smallest composed route with project helpers. Defer bloom, histories, MRT, or grading until their source signals and consumers are named.
+5. Capture the no-post baseline, required mechanism diagnostics, aligned output or timing evidence, lifecycle state, and mutation control. Report exact changed files, commands run, artifacts inspected, and any bound that remains unproven.
 
-Application architecture, DOM UI, accessibility, data transport, asset preparation, and business logic remain outside the visual-skill pack unless the project supplies an owner. Route-away is a useful result. It prevents the agent from inventing a pseudo-skill for an unsupported system.
+The [native WebGPU validation harness](/demos/webgpu-validation-harness/) has source-matched accepted evidence for aligned readback, resource inventory, diagnostics, timing, lifecycle, and artifact-validation mechanics. It does not prove the agent's separate composition. The [debugging contract lab](/demos/debugging-contract-lab/) remains a useful diagnostic demo, but its live source and published evidence manifest currently differ, so it is not current proof.
 
-## Demand evidence with the right label
+## Constraints
 
-The pack distinguishes measured, derived, gated, authored, and unknown quantities. An agent must not turn an authored starting point into a performance result, add unrelated lab timings, or call a page screenshot a render-target diagnostic.
+| Constraint | Required boundary |
+| --- | --- |
+| Renderer | Canonical claims require `WebGPURenderer` from `three/webgpu` and a confirmed native WebGPU backend. Fallback enters the route only when the user explicitly requests it. |
+| Three.js revision | The pack targets r185 and this repository resolves `three@0.185.1`; the installed package, imports, and runtime `THREE.REVISION` remain authoritative. |
+| Agent | The harness must let the agent read files, edit the repository, run commands, and inspect artifacts. Codex and Claude Code have documented install paths; loading a skill alone proves nothing. |
+| Browser and device | Record the exact browser, OS, GPU, viewport, DPR, required WebGPU features, and timing availability for every runtime claim. |
+| Expertise | The reviewing developer should understand TypeScript/JavaScript, Three.js, repository workflows, and the relevant rendering concepts well enough to challenge the agent's causal and evidence claims. |
 
-Use [Three.js Visual Validation](/skills/threejs-visual-validation.html) for fixed routes, native WebGPU proof, aligned readback, resource ledgers, diagnostics, lifecycle evidence, and mutation controls. The [validation harness](/demos/webgpu-validation-harness/) documents those artifact types, but its checked summary must be regenerated when its source hash changes. Use [Three.js Debugging](/skills/threejs-debugging.html) and the [debugging contract lab](/demos/debugging-contract-lab/) when version or runtime behavior needs source-backed triage.
+Project instructions, dependencies, current source, and user decisions remain authoritative. A route-away result is correct when the pack does not own the requested system.
 
-The result should be inspectable by a developer who did not watch the agent work. That means exact changed files, commands actually run, artifacts actually opened, limitations, and unresolved evidence gaps.
+## Start here
 
-## Prefer agent skills to raw prompts when the contract matters
-
-The [raw prompts to agent skills migration guide](/migrate/raw-threejs-prompts-to-agent-skills/) explains how to replace repeated prose with versioned, repository-backed operating contracts. The [skill pack versus general AI prompts comparison](/compare/threejs-webgpu-skill-pack-vs-general-ai-prompts/) owns the broader decision.
-
-The advantage is not that a skill makes a model infallible. The advantage is that routing, ownership, failure conditions, and validation expectations are explicit and reviewable.
-
-## What this page does not claim
-
-The pack is not an agent runtime, context manager, autonomous-work guarantee, or benchmark of model quality. It does not prove token savings or implementation correctness merely because a skill was loaded. Generated explanations are not evidence until the relevant source, command, runtime behavior, and artifacts have been inspected.
-
-Project code remains authoritative. Every coding agent can still misunderstand the request, select the wrong owner, or implement a plausible but incorrect mechanism. The purpose of the contracts is to make those decisions falsifiable and easier to review.
+Use the [Codex installation guide](/docs/install-codex/) to add the skills to Codex, then invoke `threejs-choose-skills` for the first multi-system Three.js task.

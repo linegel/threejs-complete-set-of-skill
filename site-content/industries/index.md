@@ -27,7 +27,7 @@ Use the [browser-games workflow](/industries/browser-games/) when Three.js owns 
 
 The graphics pack does not become a game engine. Gameplay rules, ECS decisions, networking, physics-engine selection, collision authority, audio, DOM UI, save state, and asset delivery remain outside the route. The page makes that boundary explicit so an agent does not bury application responsibilities inside render callbacks.
 
-The [Creature Habitat demo](/demos/creature-habitat/) documents a composed world with subject, vegetation, water, weather, camera, shadows, and final-image ownership. Its checked summary no longer matches the live source hash and must be regenerated before citation as current evidence. It is not a shipped game, a customer case, or proof of performance on an unnamed device.
+[Creature Habitat](/demos/creature-habitat/) has source-matched accepted evidence for a composed world with subject, vegetation, water, weather, camera, shadows, and final-image ownership. It is not a shipped game, a customer case, or proof of performance on an unnamed device.
 
 ## Product visualization and configurators
 
@@ -35,7 +35,7 @@ Use the [product-visualization and configurator workflow](/industries/product-vi
 
 The route preserves the imported silhouette and changes material or visibility state without procedurally replacing the product. It covers material-channel proof, inspection cameras, minimal pass ownership, fixed variant sweeps, and color-managed output. It also identifies gaps such as source-asset preparation, compression, studio lighting, reflections, picking UI, product data, and commerce logic.
 
-The [exposure and color pipeline demo](/demos/webgpu-exposure-color-pipeline/) documents a metering and output mechanism that can inform a product workflow. Its checked summary no longer matches the live source hash and must be regenerated before citation as current evidence. It is not a complete configurator, a material-accuracy study, or evidence of commercial results.
+The [exposure and color pipeline demo](/demos/webgpu-exposure-color-pipeline/) has source-matched accepted evidence for its metering, adaptation, tone-map, LUT, and output mechanisms. Named-adapter GPU timing and lifecycle remain insufficient. It is not a complete configurator, a material-accuracy study, or evidence of commercial results.
 
 ## Choose the workload before the skills
 

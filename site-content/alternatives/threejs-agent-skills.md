@@ -60,6 +60,10 @@ Use it when the requested outcome is a playable browser game with gameplay, UI, 
 
 It is a less direct category fit when the product is not a game and the only hard problem is one specialist WebGPU rendering system. That does not imply missing rendering capability; it means its documented top-level workflow owns a wider game-production job.
 
+### Cost and maintenance boundary
+
+The pinned repository is publicly accessible under MIT and its reviewed README does not describe a paid plan or support SLA. Agent usage, engineering, assets, audio, hosting, and any configured generation providers remain external costs. Maintenance is broader than one rendering skill because the documented director, scaffold, gameplay, UI, asset, audio, debug, QA, and release workflows can change together; review the selected director and specialist paths as one versioned workflow.
+
 ### Adoption note
 
 It can coexist with this pack when the game director owns the product workflow and a bounded specialist owns one renderer subsystem. Read the [direct comparison](/compare/threejs-webgpu-skill-pack-vs-threejs-game-skills/) before combining routers.
@@ -73,6 +77,10 @@ Use it when an agent needs broad rule-based guidance across pure Three.js and Re
 ### Poor fit
 
 It is a less direct fit when the task requires a routed set of narrow visual-system specialists plus WebGPU lab and evidence records whose current status and source hashes are verified. Do not turn that distinction into an absence claim: review the actual skill source for any topic that matters.
+
+### Cost and maintenance boundary
+
+The reviewed README presents the repository as MIT-licensed and does not state a paid plan or support SLA. The user's agent, engineering, framework upgrades, and runtime validation still cost time or money. Its two broad best-practice skills cover both Three.js and R3F concerns, so maintenance means rechecking the relevant rule set when Three.js, React, R3F, Drei, physics, WebXR, or mobile assumptions change rather than treating the installed text as versionless.
 
 ### Adoption note
 
@@ -88,6 +96,10 @@ Use it for a repo-first Claude Code workflow that should inspect an existing app
 
 It is a less direct fit when the primary need is a large menu of individually routed r185 WebGPU specialists and their evidence pages. This pack is a poorer fit when the main task is a broad R3F, disposal, or general application audit.
 
+### Cost and maintenance boundary
+
+The pinned source is publicly accessible. Its README says MIT, but the reviewed tree does not expose a standalone license file, paid plan, or support SLA; confirm those terms before redistribution or procurement. Agent usage and engineering remain external. Its single top-level skill is simpler to install than a specialist roster, but its references, playbooks, diagnostic scripts, framework notes, and r150+ compatibility guidance still form one maintenance unit that must be reviewed against the actual application revision.
+
 ### License note
 
 The reviewed README says MIT, while the pinned repository tree does not display a standalone license file. Preserve that distinction in procurement or redistribution review. See the [direct comparison](/compare/threejs-webgpu-skill-pack-vs-threejs-skill-plugin/) for the full matrix.
@@ -101,6 +113,10 @@ Use it when the agent needs a graphics-focused specialist vocabulary plus an exa
 ### Poor fit
 
 Do not infer API-reference, framework, complete-game, or hosted-tool coverage beyond what its source documents. Inspect its exact example and skill implementation for the target task rather than selecting it from the word "awesome" or a repository popularity signal.
+
+### Cost and maintenance boundary
+
+The pinned repository carries an MIT license and its reviewed README does not document a paid plan or support SLA. Agent usage, engineering, assets, deployment, and project verification remain external. The router, graphics specialists, and example gallery are a connected maintenance surface: pin the source used for a project, update the selected paths together, and re-resolve ownership when another installed graphics pack uses overlapping skill names or procedures.
 
 ### Adoption note
 

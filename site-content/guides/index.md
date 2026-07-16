@@ -1,15 +1,17 @@
 ---
 kind: hub
 slug: /guides/
-title: Three.js WebGPU Guides
-description: Practical guides for choosing, installing, migrating, and verifying Three.js WebGPU and TSL agent skills with repository-backed evidence.
-h1: Three.js WebGPU guides, organized by the decision you need to make
-primary_query: three.js webgpu guides
-query_aliases: ["three.js tsl guides","three.js agent skill guides"]
+title: Three.js WebGPU Skill Pack Adoption Guides
+description: Decision and adoption guides for choosing, installing, migrating, and verifying the Three.js WebGPU skill pack with repository-backed evidence.
+h1: Three.js WebGPU skill-pack guides, organized by the decision you need to make
+primary_query: three.js webgpu skill pack adoption guides
+query_aliases: ["three.js agent skill decision guides","three.js webgpu skill pack guides"]
 summary: Start here when you know the decision you need to make but not the page you need. Choose a path for installation, skill routing, migration, implementation, agent use, or troubleshooting.
 related_skills: ["threejs-choose-skills","threejs-debugging","threejs-visual-validation"]
-related_demos: []
+related_demos: ["webgpu-validation-harness"]
 related_pages: ["/for/","/docs/","/migrate/","/compare/","/faq/","/pricing/"]
+hero_image: /visual-validation/webgpu-validation-harness/final.design.png
+hero_source: webgpu-validation-harness
 published: 2026-07-16
 last_reviewed: 2026-07-16
 sources: ["https://github.com/linegel/threejs-complete-set-of-skill","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-choose-skills/SKILL.md","https://github.com/linegel/threejs-complete-set-of-skill/blob/main/docs/demos/registry.json"]
@@ -69,7 +71,7 @@ The pack itself costs nothing to license. The [pricing page](/pricing/) separate
 The [FAQ hub](/faq/) is an index of questions observed in real documentation, repository, and community work. Each answer has its own canonical route.
 
 - [Which Three.js version does the skill pack support?](/faq/which-threejs-version-does-the-skill-pack-support/)
-- [Which Three.js skill should I use first?](/faq/which-threejs-skill-should-i-use-first/)
+- [Does the skill pack work with React Three Fiber?](/faq/does-the-skill-pack-work-with-react-three-fiber/)
 - [How do I verify the native WebGPU backend?](/faq/how-do-i-verify-the-native-webgpu-backend/)
 - [Is the skill pack free for commercial use?](/faq/is-the-threejs-skill-pack-free-for-commercial-use/)
 - [Why does a WebGPU PNG have striped rows?](/faq/why-does-my-webgpu-png-have-striped-rows/)

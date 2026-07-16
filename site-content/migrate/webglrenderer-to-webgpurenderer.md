@@ -8,8 +8,10 @@ primary_query: migrate threejs webglrenderer to webgpurenderer
 query_aliases: ["threejs webgl to webgpu migration","replace webglrenderer with webgpurenderer"]
 summary: This is an application migration, not a constructor rename. Change the renderer and import path, initialize it asynchronously, verify the actual backend, then port unsupported ShaderMaterial, onBeforeCompile, and EffectComposer paths to NodeMaterial, TSL, and RenderPipeline equivalents.
 related_skills: ["threejs-choose-skills","threejs-debugging","threejs-procedural-materials","threejs-image-pipeline","threejs-visual-validation"]
-related_demos: ["debugging-contract-lab","webgpu-image-pipeline","webgpu-validation-harness"]
+related_demos: ["debugging-contract-lab","final-image-flight","webgpu-image-pipeline","webgpu-validation-harness"]
 related_pages: ["/migrate/glsl-shadermaterial-to-tsl/","/compare/webgpurenderer-vs-webglrenderer/","/docs/use-in-an-existing-project/","/faq/how-do-i-verify-the-native-webgpu-backend/"]
+hero_image: /visual-validation/final-image-flight/final.design.png
+hero_source: final-image-flight
 published: 2026-07-16
 last_reviewed: 2026-07-16
 supported_revision: 0.185.1
@@ -23,6 +25,16 @@ The source is an existing application using `WebGLRenderer`. Inventory its impor
 The target for this guide is the repository's pinned `three` package, `0.185.1`, using imports from `three/webgpu`, TSL imports from `three/tsl`, an initialized `WebGPURenderer`, NodeMaterial where custom shading is required, and `RenderPipeline` when node post-processing owns final presentation.
 
 The target does not imply that every WebGL feature, custom shader, addon, or third-party integration has a direct equivalent. It also does not imply a performance win. The official manual states that some applications can encounter missing features or better performance with `WebGLRenderer`, so measure the complete target graph on named devices.
+
+## Map source owners to target owners
+
+| Source contract | Target contract | Migration decision |
+|---|---|---|
+| `three` plus `WebGLRenderer` | `three/webgpu` plus initialized `WebGPURenderer` | Change the import and lifecycle, then gate the actual backend rather than inferring it from the renderer class. |
+| `requestAnimationFrame()` plus direct `render()` | `setAnimationLoop()` plus direct render or one `RenderPipeline` | Preserve one frame coordinator and one presentation owner. |
+| `ShaderMaterial`, `RawShaderMaterial`, or `onBeforeCompile()` | NodeMaterial slots plus TSL | Reconstruct the material contract; do not translate strings or retain shader-chunk patches. |
+| EffectComposer pass chain | `RenderPipeline` graph | Rebuild only the required passes and assign tone mapping and output conversion once. |
+| WebGL-specific targets, formats, and readback assumptions | Revision-matched render targets and WebGPU readback contract | Reconfirm format, samples, depth convention, byte layout, and aligned row stride before consuming data. |
 
 ## Inventory compatibility before changing code
 
@@ -107,6 +119,6 @@ Use `threejs-debugging` when the installed source, current documentation, and ru
 
 Keep the WebGLRenderer baseline separately runnable while the migration is incomplete. Hold scene, assets, camera, seed or data, resolution, DPR, and visual assertion constant. Compare no-post output first, then material and signal diagnostics, final output, render-target inventory, resource lifecycle, and timing on the named target.
 
-The published [WebGPU image-pipeline lab](/demos/webgpu-image-pipeline/) catalog entry describes shared-pass, history, and final-output ownership, but its current evidence summary does not match the current source hash. Do not treat it as accepted evidence until source-bound validation is rerun. The [native WebGPU validation harness](/demos/webgpu-validation-harness/) describes backend proof, diagnostics, aligned readback, resources, timing evidence, and lifecycle records; confirm its current source-bound record before use. Apply those contracts to the migrated application rather than treating a catalog entry as application proof.
+The [WebGPU image-pipeline report](/evidence/webgpu-image-pipeline/) has source-matched accepted correctness evidence for shared-pass, history, and final-output ownership; current-adapter GPU timing and lifecycle remain insufficient. [Final Image Flight](/demos/final-image-flight/) has source-matched accepted evidence for one composed target-state graph; it is not a before-and-after migration result. The [native WebGPU validation harness](/demos/webgpu-validation-harness/) has a current source-bound record for backend proof, diagnostics, aligned readback, resources, timing evidence, and lifecycle records. Apply those contracts to the migrated application rather than treating any catalog or report as application proof.
 
 Remove the WebGL source path only after every required API, backend, correctness, visual, resource, lifecycle, and named-device sustained performance or latency gate passes. If the target is blocked, retain the narrow source route or roll back the affected migration unit. Do not disguise an unverified compatibility branch as the completed canonical migration.

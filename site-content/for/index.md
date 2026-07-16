@@ -53,6 +53,6 @@ Start with the audience page that matches the immediate decision. Then use [Choo
 
 ## What this page does not claim
 
-These audience descriptions are inferred from the checked-in contracts, examples, and route boundaries. They are not customer segmentation research, testimonials, or adoption statistics. The [Final Image Flight demo](/demos/final-image-flight/) documents a composed rendering contract, but its checked evidence must be regenerated against the live source hash before it is cited as current. It cannot establish productivity, revenue, or performance on an unnamed target.
+These audience descriptions are inferred from the checked-in contracts, examples, and route boundaries. They are not customer segmentation research, testimonials, or adoption statistics. [Final Image Flight](/demos/final-image-flight/) has source-matched accepted evidence for its composed rendering contract. It cannot establish productivity, revenue, migration success, or performance on an unnamed target.
 
 The pack also does not own generic application architecture, DOM UI, accessibility, live-data transport, asset-pipeline preparation, game logic, or commerce systems. The relevant audience page names those boundaries directly so that the coding agent does not quietly absorb unrelated responsibilities.

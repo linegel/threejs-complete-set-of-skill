@@ -23,10 +23,6 @@ faq_group: troubleshooting
 supported_revision: 0.185.1
 ---
 
-## Direct answer
-
-Your final color is probably being transformed twice. In a TSL RenderPipeline, assign exactly one tone-map owner and one output-color conversion owner. If outputNode already calls renderOutput(...), set renderPipeline.outputColorTransform = false, then set renderPipeline.needsUpdate = true. If the pipeline owns automatic output conversion, do not add explicit renderOutput(). Also verify the LUT domain: a tone-mapped-linear LUT belongs after toneMapping() and before output conversion.
-
 ## One final-image owner
 
 Tone mapping compresses scene-linear HDR values into a displayable range. Output conversion maps the working color representation to the output color space. Applying either transformation twice can darken midtones, flatten highlights, shift saturation, or make a LUT look much stronger than authored.
@@ -58,9 +54,9 @@ Keep `renderer.toneMappingExposure` neutral when dynamic exposure is already app
 
 ## Source checks and evidence status
 
-The image-pipeline source validator includes a negative control named `double-output-transform`. It deliberately combines explicit `renderOutput()` ownership with automatic output conversion, and the validator must reject it. The exposure validator independently rejects `outputTransformOwner === "renderOutput"` when `outputColorTransform` is not false. These are source-level contract checks, not current published capture proof.
+The image-pipeline source validator includes a negative control named `double-output-transform`. It deliberately combines explicit `renderOutput()` ownership with automatic output conversion, and the validator must reject it. The exposure validator independently rejects `outputTransformOwner === "renderOutput"` when `outputColorTransform` is not false.
 
-The published [image-pipeline evidence report](/evidence/webgpu-image-pipeline/) currently references an older source hash, so this page does not use its preview or demo binding and does not present that report as current proof. It must be recaptured against the current source before supporting a current artifact claim. The [exposure and grading report](/evidence/webgpu-exposure-color-pipeline/) is a separate diagnostic reference; it does not resolve the image-pipeline source-hash drift.
+The published [image-pipeline evidence report](/evidence/webgpu-image-pipeline/) and [exposure and grading report](/evidence/webgpu-exposure-color-pipeline/) are accepted and match their current source hashes. They demonstrate the output-ownership and diagnostic contracts in those captured graphs. They do not prove that an unrelated application has the same cause; inspect that application's graph, exposure state, LUT domain, and final output before assigning the failure.
 
 ## Diagnose before changing the graph
 

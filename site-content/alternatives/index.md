@@ -1,11 +1,11 @@
 ---
 kind: hub
 slug: /alternatives/
-title: Alternatives for Three.js WebGPU Work
-description: Choose among agent skills, official resources, live tools, migration routes, and custom workflows for advanced Three.js WebGPU work.
-h1: Alternatives for Three.js WebGPU work
-primary_query: threejs webgpu alternatives
-query_aliases: ["threejs webgpu development options","alternatives for advanced threejs webgpu"]
+title: Three.js WebGPU Workflow Alternatives
+description: Choose among agent skills, official resources, live tools, migration routes, and custom support workflows while continuing Three.js WebGPU work.
+h1: Three.js WebGPU workflow alternatives
+primary_query: threejs webgpu workflow alternatives
+query_aliases: ["threejs webgpu development support options","alternatives for advanced threejs webgpu workflows"]
 summary: Choose by job, not brand. Agent skills package workflows, official resources define APIs, live tools expose runtime capabilities, and project guidance carries local constraints.
 related_skills: ["threejs-choose-skills","threejs-visual-validation"]
 related_demos: ["webgpu-validation-harness"]
