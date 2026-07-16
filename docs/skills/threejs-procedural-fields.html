@@ -4,12 +4,12 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Procedural Fields | Three.js WebGPU Skill</title>
-<meta name="description" content="Build coherent WebGPU/TSL procedural scalar and vector fields for Three.js. Use for local terrain and archipelago support, metric coast distance and frames…" />
+<meta name="description" content="Procedural fields for coherent scalar and vector causes in Three.js WebGPU/TSL. Use when a task needs shared causes across materials, geometry, or compute…" />
 <meta name="author" content="Three.js WebGPU Skill Pack contributors" />
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-procedural-fields.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b" />
+<meta name="skill-pack-build-revision" content="sha256:ab7d8d17e0589a6f5c2462d645b9e0d6797cd92eade36e3615dae091c6f9df5b" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -17,20 +17,26 @@
 <link rel="manifest" href="../site.webmanifest" />
 <link rel="alternate" type="text/plain" href="https://threejs-skills.com/llms.txt" title="LLM-readable skill catalog" />
 <link rel="alternate" type="application/json" href="https://threejs-skills.com/skills.json" title="Machine-readable skill catalog" />
-
+<link rel="preload" as="image" href="../visual-validation/webgpu-field-bake/final.design.avif" type="image/avif" fetchpriority="high" />
 <meta property="og:type" content="article" />
 <meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
 <meta property="og:title" content="Procedural Fields | Three.js WebGPU Skill" />
-<meta property="og:description" content="Build coherent WebGPU/TSL procedural scalar and vector fields for Three.js. Use for local terrain and archipelago support, metric coast distance and frames…" />
+<meta property="og:description" content="Procedural fields for coherent scalar and vector causes in Three.js WebGPU/TSL. Use when a task needs shared causes across materials, geometry, or compute…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-procedural-fields.html" />
-<meta property="article:modified_time" content="2026-07-12T14:49:34+03:00" />
+<meta property="article:modified_time" content="2026-07-16T11:00:33+03:00" />
 <meta property="article:published_time" content="2026-07-04T23:30:20+03:00" />
 <meta property="article:section" content="Procedural Content" />
-
-<meta name="twitter:card" content="summary" />
+<meta property="og:image" content="https://threejs-skills.com/visual-validation/webgpu-field-bake/final.design.png" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="800" />
+<meta property="og:image:alt" content="final.design.png for Procedural Fields" />
+<meta name="twitter:image" content="https://threejs-skills.com/visual-validation/webgpu-field-bake/final.design.png" />
+<meta name="twitter:image:alt" content="final.design.png for Procedural Fields" />
+<meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Procedural Fields | Three.js WebGPU Skill" />
-<meta name="twitter:description" content="Build coherent WebGPU/TSL procedural scalar and vector fields for Three.js. Use for local terrain and archipelago support, metric coast distance and frames…" />
+<meta name="twitter:description" content="Procedural fields for coherent scalar and vector causes in Three.js WebGPU/TSL. Use when a task needs shared causes across materials, geometry, or compute…" />
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
@@ -56,14 +62,19 @@
    ],
    "@id": "https://threejs-skills.com/skills/threejs-procedural-fields.html#article",
    "headline": "Procedural Fields",
-   "description": "Build coherent WebGPU/TSL procedural scalar and vector fields for Three.js. Use for local terrain and archipelago support, metric coast distance and frames, coupled elevation and bathymetry, drainage/exposure and placement factors, NodeMaterials, compute bakes, storage textures, planets, wear, biomes, clouds, water masks, displacement, roughness, normals, domain warping, and visuals where many channels derive from shared causes.",
+   "description": "Procedural fields for coherent scalar and vector causes in Three.js WebGPU/TSL. Use when a task needs shared causes across materials, geometry, or compute; must choose direct evaluation versus a baked field; needs deterministic CPU/TSL parity and footprint filtering; or needs metric signed-distance terrain and coast analysis.",
    "url": "https://threejs-skills.com/skills/threejs-procedural-fields.html",
    "mainEntityOfPage": {
     "@type": "WebPage",
     "@id": "https://threejs-skills.com/skills/threejs-procedural-fields.html"
    },
+   "image": [
+    "https://threejs-skills.com/seo/article/threejs-procedural-fields-1x1.png",
+    "https://threejs-skills.com/seo/article/threejs-procedural-fields-4x3.png",
+    "https://threejs-skills.com/seo/article/threejs-procedural-fields-16x9.png"
+   ],
    "datePublished": "2026-07-04T23:30:20+03:00",
-   "dateModified": "2026-07-12T14:49:34+03:00",
+   "dateModified": "2026-07-16T11:00:33+03:00",
    "author": {
     "@id": "https://threejs-skills.com/#publisher"
    },
@@ -140,18 +151,18 @@ html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smo
 body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7}
 ::selection{background:rgba(255,180,84,.26);color:var(--ink)}
 a{color:inherit;text-decoration:none}
-a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
+a:focus-visible,button:focus-visible,summary:focus-visible,pre[tabindex]:focus-visible,[role="region"]:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
 main{display:block}
 .skip-link{position:fixed;z-index:100;left:16px;top:12px;translate:0 -160%;font-family:var(--mono);font-size:12px;background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:9px;transition-property:translate;transition-duration:160ms}
 .skip-link:focus{translate:0 0}
 .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
 .site-nav{position:sticky;z-index:50;top:0;background:rgba(8,10,14,.82);border-bottom:1px solid rgba(255,255,255,.075);backdrop-filter:blur(18px) saturate(1.15)}
-nav{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
-nav .brand{white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
-nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
-nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
-nav .links a:hover{color:var(--amber)}
-nav .links a:active{scale:.96}
+.site-nav>.wrap{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+.site-nav .brand{min-height:44px;display:inline-flex;align-items:center;white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
+.site-nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
+.site-nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
+.site-nav .links a:hover{color:var(--amber)}
+.site-nav .links a:active{scale:.96}
 h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:0}
 p{text-wrap:pretty}
 h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
@@ -165,7 +176,7 @@ code{font-family:var(--mono)}
 .card{min-height:100%;background:linear-gradient(145deg,rgba(19,24,33,.96),rgba(12,15,21,.96));border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px;
   box-shadow:var(--shadow-card);transition-property:translate,scale,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
 .card:hover{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
-.card:active{translate:0 -1px;scale:.99}
+.card:active{translate:0 -1px;scale:.96}
 .card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .card-kind{font-family:var(--mono);font-size:10px;color:var(--cyan)}
 .card h3,.card h4{font-size:19px;font-weight:600}
@@ -190,19 +201,29 @@ figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:s
 figcaption{padding:16px 18px;font-size:14.5px}
 figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
 figcaption span{display:block;margin-top:3px;color:var(--dim)}
-footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
+footer{border-top:1px solid var(--line);padding:44px 0 60px;display:grid;grid-template-columns:minmax(260px,1.4fr) minmax(0,2fr);gap:36px 64px;color:var(--dim);font-size:14.5px}
 footer a{color:var(--amber)}
 footer a:hover{text-decoration:underline}
 footer code{color:var(--cyan);font-size:11px}
+.footer-summary{max-width:55ch}.footer-summary>span{display:block;margin-top:8px;font-size:13px}.footer-groups{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}.footer-group{display:grid;align-content:start;gap:8px}.footer-group strong{font:400 10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}.footer-group a{min-height:40px;display:flex;align-items:center;color:var(--dim);font-size:13px;transition-property:color,scale;transition-duration:160ms}.footer-group a:hover{color:var(--amber);text-decoration:none}.footer-group a:active{scale:.96}
+.pathfinder{padding:clamp(52px,7vw,86px) 0;border-bottom:1px solid var(--line)}.pathfinder-head{display:grid;grid-template-columns:minmax(0,.7fr) minmax(320px,1.3fr);align-items:end;gap:28px 72px;margin-bottom:28px}.pathfinder-head h2{margin:0}.pathfinder-head p{max-width:58ch;color:var(--dim)}.pathfinder-rows{border-top:1px solid var(--line)}.pathfinder-row{display:grid;grid-template-columns:minmax(160px,.55fr) minmax(210px,.8fr) minmax(0,1.6fr);gap:20px 32px;align-items:center;min-height:94px;border-bottom:1px solid var(--line)}.pathfinder-stage{font:10px/1.4 var(--mono);letter-spacing:.11em;text-transform:uppercase;color:var(--cyan)}.pathfinder-row>p{color:var(--dim);font-size:14px}.pathfinder-links{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px 18px}.pathfinder-links a{min-height:44px;display:inline-flex;align-items:center;gap:8px;color:var(--amber);font:11px/1.35 var(--mono);transition-property:color,scale;transition-duration:160ms}.pathfinder-links a:after{content:"→"}.pathfinder-links a:hover{color:var(--ink)}.pathfinder-links a:active{scale:.96}
+.content-hero{padding:clamp(54px,8vw,104px) 0 42px;border-bottom:1px solid var(--line)}.breadcrumbs{min-height:44px;display:flex;align-items:center;margin-bottom:28px;font:11px/1.4 var(--mono);color:var(--dim)}.breadcrumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.breadcrumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}.breadcrumbs a{min-height:40px;display:inline-flex;align-items:center;transition-property:color,scale;transition-duration:160ms}.breadcrumbs a:hover{color:var(--amber)}.breadcrumbs a:active{scale:.96}.content-hero h1{max-width:17ch;font-size:clamp(40px,6vw,68px);font-weight:700;line-height:1.02;letter-spacing:-.02em}.content-lede{max-width:66ch;margin-top:22px;color:var(--dim);font-size:clamp(17px,2vw,20px)}.content-meta{display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:28px;font:10px/1.4 var(--mono);color:var(--cyan)}
+.content-answer{max-width:900px;margin-top:34px;padding:3px 0 3px 22px;border-left:2px solid var(--amber);font-size:clamp(19px,2.2vw,21px);line-height:1.62;color:var(--ink)}.content-shell{padding:clamp(46px,7vw,86px) 0}.content-layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(230px,1fr);align-items:start;gap:clamp(36px,6vw,76px)}.content-body{grid-column:1;grid-row:1;max-width:78ch;min-width:0}.content-body h2{margin:52px 0 16px;font-size:clamp(27px,3.5vw,39px);scroll-margin-top:112px}.content-body>h2:first-child{margin-top:0}.content-body h3{margin:34px 0 12px;font-size:21px;scroll-margin-top:112px}.content-body p,.content-body li{color:var(--dim);font-size:16px}.content-body p+p{margin-top:17px}.content-body ul,.content-body ol{margin:16px 0;padding-left:24px}.content-body li+li{margin-top:7px}.content-body a{color:var(--cyan);text-decoration:underline;text-decoration-color:rgba(127,212,193,.35);text-underline-offset:3px}.content-body a:hover{color:var(--amber);text-decoration-color:currentColor}.content-body code:not(pre code){padding:1px 5px;border:1px solid var(--line);border-radius:5px;background:#07090c;color:var(--cyan);font-size:.86em}.content-body pre{margin:20px 0;white-space:pre;tab-size:2}.content-table{max-width:100%;margin:22px 0;overflow-x:auto;border:1px solid var(--line);border-radius:12px}.content-table:focus-visible{outline:2px solid var(--amber);outline-offset:3px}.content-table table{width:100%;border-collapse:collapse;font-size:14px}.content-table th,.content-table td{min-width:150px;padding:11px 13px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);text-align:left;vertical-align:top;color:var(--dim)}.content-table th{color:var(--ink);font-weight:600;background:var(--bg2)}.content-table tr:last-child td{border-bottom:0}.content-table th:last-child,.content-table td:last-child{border-right:0}
+.content-index{grid-column:2;grid-row:1;position:sticky;top:104px;max-height:calc(100vh - 128px);overflow-y:auto;padding:18px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.content-index strong{display:block;margin-bottom:10px;font:10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}.content-index ol{list-style:none}.content-index a{min-height:40px;display:flex;align-items:center;padding:5px 0;color:var(--dim);font-size:13px;line-height:1.4;transition-property:color,translate,scale;transition-duration:160ms}.content-index a:hover{color:var(--amber);translate:3px 0}.content-index a:active{translate:1px 0;scale:.96}.content-proof{margin:54px 0 0}.content-proof figure{border-radius:16px}.content-proof img{width:100%;height:auto;max-height:650px;object-fit:cover;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}.content-proof figcaption{color:var(--dim);font:11px/1.55 var(--mono)}.content-proof figcaption a{color:var(--amber)}
+.content-layout--docs{grid-template-columns:minmax(190px,.6fr) minmax(0,2fr)}.content-layout--docs .content-index{grid-column:1}.content-layout--docs .content-body{grid-column:2;max-width:72ch}.docs-index a{padding-inline:10px;border-left:2px solid transparent}.docs-index a[aria-current="page"]{border-left-color:var(--amber);background:rgba(255,180,84,.06);color:var(--ink);font-weight:600}.docs-index-current{display:none}
+.content-facts,.content-faq-list,.content-related,.content-sources,.content-skills,.content-demos,.content-discovery,.faq-provenance{margin-top:54px;padding-top:22px;border-top:1px solid var(--line)}.content-facts h2,.content-faq-list h2,.content-related h2,.content-sources h2,.content-skills h2,.content-demos h2{font-size:24px}.content-ruled-list{list-style:none;border-top:1px solid var(--line)}.content-ruled-list li{border-bottom:1px solid var(--line)}.content-ruled-list a{min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:9px 0;color:var(--dim);font-size:14px;transition-property:color,scale;transition-duration:160ms}.content-ruled-list a:after{content:"→";color:var(--amber)}.content-ruled-list a:hover{color:var(--ink)}.content-ruled-list a:active{scale:.96}.content-related .content-ruled-list a{display:grid;grid-template-columns:104px minmax(0,1fr) auto}.content-related-family{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}.content-faq-item{padding:22px 0;border-bottom:1px solid var(--line)}.content-faq-item h3{margin:0;font-size:20px}.content-faq-item h3 a{color:var(--ink)}.content-faq-item p{margin-top:9px;color:var(--dim);font-size:15px}.faq-provenance{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);padding:0}.faq-provenance div{padding:13px;background:var(--bg2)}.faq-provenance dt{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}.faq-provenance dd{margin-top:5px;font:11px/1.45 var(--mono);color:var(--cyan);overflow-wrap:anywhere}.content-discovery{display:flex;flex-wrap:wrap;gap:10px 22px;font:11px/1.5 var(--mono);color:var(--dim)}.content-discovery a{min-height:40px;display:inline-flex;align-items:center;color:var(--amber)}
 @media (max-width:760px){
   .site-nav .wrap{padding-right:0}
-  nav{min-height:104px;display:grid;grid-template-columns:1fr;padding:14px 0 10px;gap:4px}
-  nav .brand{font-size:16px}
-  nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:none;padding-right:20px}
-  nav .links::-webkit-scrollbar{display:none}
-  nav .links a{flex:0 0 auto}
+  .site-nav>.wrap{min-height:104px;display:grid;grid-template-columns:1fr;padding-top:14px;padding-bottom:10px;gap:4px}
+  .site-nav .brand{font-size:16px}
+  .site-nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;scrollbar-color:rgba(255,180,84,.45) transparent;padding:0 20px 4px 0}
+  .site-nav .links::-webkit-scrollbar{height:3px}.site-nav .links::-webkit-scrollbar-thumb{background:rgba(255,180,84,.45);border-radius:99px}
+  .site-nav .links a{flex:0 0 auto}
   .grid,.gallery{grid-template-columns:1fr}
+  footer{grid-template-columns:1fr}.footer-groups{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+@media (max-width:900px){.pathfinder-head,.content-layout{grid-template-columns:1fr}.content-index{grid-column:1;grid-row:1;position:static;max-height:none}.content-body,.content-layout--docs .content-body{grid-column:1;grid-row:2}.docs-index{overflow:hidden}.docs-index-current{display:flex;margin-bottom:8px}.docs-index ol{display:flex;gap:8px;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;padding-bottom:6px}.docs-index li{flex:0 0 min(72vw,260px)}.docs-index .docs-index-list-current{display:none}.docs-index a{min-height:44px;padding:8px 10px;border-left:0;border-bottom:2px solid transparent;background:var(--bg2)}.docs-index a[aria-current="page"]{border-bottom-color:var(--amber)}.pathfinder-row{grid-template-columns:minmax(160px,.6fr) minmax(0,1fr)}.pathfinder-links{grid-column:1/-1;justify-content:flex-start;padding-bottom:18px}.faq-provenance{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.pathfinder-row{grid-template-columns:1fr;gap:6px;padding:18px 0}.pathfinder-links{grid-column:auto;padding:0}.content-hero h1{font-size:clamp(38px,12vw,54px)}.content-answer{padding-left:16px}.content-table{border-radius:8px}.content-table table{min-width:680px}.faq-provenance{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
@@ -217,7 +238,7 @@ header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
   linear-gradient(90deg,rgba(10,12,16,.96) 0%,rgba(10,12,16,.8) 36%,rgba(10,12,16,.24) 68%,rgba(10,12,16,.04) 100%),
   linear-gradient(0deg,rgba(10,12,16,.9) 0%,rgba(10,12,16,.08) 65%,rgba(10,12,16,.62) 100%);z-index:1}
 .crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}.crumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.crumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}
-.crumbs a:hover{color:var(--amber)}
+.crumbs a{min-height:40px;display:inline-flex;align-items:center}.crumbs a:hover{color:var(--amber)}
 h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:0;max-width:18ch}
 .lede{margin-top:24px;max-width:70ch;color:var(--dim)}
 .meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
@@ -257,6 +278,7 @@ a.chip:active{scale:.96}
 .runtime-evidence-disclosure dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;margin-top:16px;overflow:hidden;border-radius:10px;background:var(--line)}.runtime-evidence-disclosure dl div{padding:11px 12px;background:var(--bg2)}.runtime-evidence-disclosure dt{font:10px/1.35 var(--mono);color:var(--dim)}.runtime-evidence-disclosure dd{margin-top:4px;font:500 10px/1.35 var(--mono);color:var(--amber)}.runtime-evidence-disclosure dd[data-verdict="PASS"]{color:var(--lime)}
 .runtime-evidence-disclosure ul{margin:15px 0 0;padding-left:20px}.runtime-evidence-disclosure li{margin-top:5px;color:var(--dim);font-size:14px}
 .evidence-report-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:10px}.evidence-report-links a{display:grid;gap:6px;min-height:72px;padding:14px;border:1px solid var(--line);border-radius:11px;background:var(--bg2)}.evidence-report-links code{color:var(--cyan);font:11px/1.4 var(--mono);overflow-wrap:anywhere}.evidence-report-links span{color:var(--dim);font:10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.05em}
+.skill-guides{margin-top:52px;padding-top:22px;border-top:1px solid var(--line)}.skill-guides h3{font-size:22px}.skill-guides ul{margin-top:12px;list-style:none;border-top:1px solid var(--line)}.skill-guides li{border-bottom:1px solid var(--line)}.skill-guides a{min-height:52px;display:grid;grid-template-columns:120px minmax(0,1fr);align-items:center;gap:18px;color:var(--dim);font-size:14px;transition-property:color,scale;transition-duration:160ms}.skill-guides a span{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}.skill-guides a:hover{color:var(--amber)}.skill-guides a:active{scale:.96}
 @media (max-width:720px){
   .skill-hero{min-height:auto;padding:58px 0 52px}
   .skill-hero-bg{opacity:.3}
@@ -267,43 +289,48 @@ a.chip:active{scale:.96}
 </style>
 </head>
 <body>
-<a class="skip-link" href="#main-content">Skip to content</a><div class="site-nav"><div class="wrap"><nav aria-label="Primary navigation">
-  <a class="brand" href="../">Three.js WebGPU Skill&nbsp;Pack</a>
-  <div class="links"><a href="../#matrix">How it works</a><a href="../#flagships">Examples</a><a href="../#skills">Skills</a><a href="../#labs">Labs</a><a href="../evidence/">Evidence</a><a href="../#install">Install</a><a href="../about/">Method</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
-</nav></div></div>
+<a class="skip-link" href="#main-content">Skip to content</a><header class="site-nav"><div class="wrap">
+  <a class="brand" href="/">Three.js WebGPU Skill&nbsp;Pack</a>
+  <nav class="links" aria-label="Primary navigation"><a href="/#flagships">Examples</a><a href="/#skills">Skills</a><a href="/guides/">Guides</a><a href="/evidence/">Evidence</a><a href="/#install">Install</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub</a></nav>
+</div></header>
 
 <main id="main-content" tabindex="-1">
-<header class="">
+<header class="skill-hero">
+  <picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-field-bake/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-field-bake/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-field-bake/final.design.png" alt="" class="skill-hero-bg" aria-hidden="true" width="1200" height="800" fetchpriority="high" decoding="async" />
+        </picture>
   <div class="wrap">
     <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Procedural Content</a></li><li aria-current="page">Procedural Fields</li></ol></nav>
     <h1 style="view-transition-name:skill-threejs-procedural-fields">Procedural Fields</h1>
-    <p class="lede">Build coherent WebGPU/TSL procedural scalar and vector fields for Three.js. Use for local terrain and archipelago support, metric coast distance and frames, coupled elevation and bathymetry, drainage/exposure and placement factors, NodeMaterials, compute bakes, storage textures, planets, wear, biomes, clouds, water masks, displacement, roughness, normals, domain warping, and visuals where many channels derive from shared causes.</p>
+    <p class="lede">Procedural fields for coherent scalar and vector causes in Three.js WebGPU/TSL. Use when a task needs shared causes across materials, geometry, or compute; must choose direct evaluation versus a baked field; needs deterministic CPU/TSL parity and footprint filtering; or needs metric signed-distance terrain and coast analysis.</p>
+    <p class="hero-evidence-caption">Image: final.design.png. Source lab: webgpu-field-bake.</p>
     <div class="meta-row">
       <span class="chip a">$threejs-procedural-fields</span>
-      <span class="chip">1 primary implementation</span>
-<span class="chip">1 flagship</span>
-<span class="chip">1 secondary surface</span>
+      <span class="chip">1 primary target</span>
+      <span class="chip">1 flagship</span>
+      <span class="chip">1 secondary surface</span>
       <span class="chip">native evidence pending</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-12T14:49:34+03:00">2026-07-12</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/cb8f8f009e7fb195535614e81e2e5cd16e0857dd">commit cb8f8f0 ↗</a>
-      <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-fields/SKILL.md">SKILL.md on GitHub ↗</a>
-      <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-procedural-fields/SKILL.md">raw (for agents) ↗</a>
+      <span class="chip">Latest skill update <time datetime="2026-07-16T11:00:33+03:00">2026-07-16</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/2ce13bcc22695dafa808d6019452752d9a39cc71">commit 2ce13bc ↗</a>
+      <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-fields/SKILL.md">SKILL.md on GitHub ↗</a>
+      <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/skills/threejs-procedural-fields/SKILL.md">raw (for agents) ↗</a>
     </div>
   </div>
 </header>
 
 
   <section class="section" id="primary-implementations" aria-labelledby="primary-implementations-title"><div class="wrap">
-    <h2 id="primary-implementations-title">Primary implementation surface</h2>
-    <p class="sub">These routes are generated from canonical source. Their exact status remains separate from implementation availability.</p>
+    <h2 id="primary-implementations-title">Primary target surface</h2>
+    <p class="sub">These rendering routes are generated from canonical source. Native-WebGPU acceptance remains separate from entrypoint availability.</p>
     <div class="grid">
       <a class="card" href="../demos/webgpu-field-bake/">
-        <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="webgpu-field-bake">
-    <span class="primary-evidence-label">Canonical capture</span>
-    <strong>Runtime evidence pending</strong>
-    <span><code>030f7fbeb883</code> source hash</span>
-    <span>15 fixed states · 5 runtime proof requirements</span>
-  </span>
+        <span class="card-preview-wrap" data-preview-for="webgpu-field-bake" data-preview-source="webgpu-field-bake" data-preview-classification="inspected-runtime-evidence-preview"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-field-bake/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-field-bake/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-field-bake/final.design.png" alt="final.design.png for WebGPU Field Bake" class="card-preview" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><span class="media-caption">final.design.png</span></span>
         <span class="card-head"><span class="card-kind">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
         <h3>WebGPU Field Bake</h3>
         <p>6 fixed scenarios, 6 mechanism routes, and 3 locked tiers.</p>
@@ -320,7 +347,7 @@ a.chip:active{scale:.96}
         <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="procedural-district">
     <span class="primary-evidence-label">Canonical capture</span>
     <strong>Runtime evidence pending</strong>
-    <span><code>919817c6e63f</code> source hash</span>
+    <span><code>3c2448b5b07d</code> source hash</span>
     <span>10 fixed states · 4 runtime proof requirements</span>
   </span>
         <span class="card-head"><span class="card-kind">Authored procedural world</span><span class="status status--pending">Evidence pending</span></span>
@@ -356,544 +383,213 @@ $\max|F_{CPU}-F_{GPU}| &lt; \varepsilon$ — placement and shading must agree on
 
   <div class="section" id="validation"><div class="wrap">
     <h2>Preview and evidence ledger</h2>
-    <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; canonical acceptance still requires render-target readback and a schema-v2 bundle.</p>
-    <div class="evidence-ledger"><span class="status status--pending">Canonical runtime evidence pending</span><code>0 published images</code></div>
-
-    <div class="primary-evidence-panel" data-evidence-state="incomplete"><span class="primary-evidence-label">Same-lab evidence</span><strong>No runtime image promoted</strong><span>The page remains image-free until this skill's own lab supplies hash-bound pixels.</span></div>
+    <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; rendering acceptance still requires same-lab readback and a schema-v2 bundle.</p>
+    <div class="evidence-ledger"><span class="status status--pending">Canonical runtime evidence pending</span><code>9 published images</code></div>
+<div class="runtime-evidence-disclosures">
+      <article class="runtime-evidence-disclosure" data-acceptance-status="incomplete">
+        <div class="runtime-evidence-head"><div><code>Native WebGPU runtime evidence preview</code><h3>WebGPU Field Bake</h3></div><span class="status status--pending">Evidence pending</span></div>
+        <dl><div><dt>visualCorrectness</dt><dd data-verdict="PASS">PASS</dd></div><div><dt>mechanismCorrectness</dt><dd data-verdict="PASS">PASS</dd></div><div><dt>performanceCompliance</dt><dd data-verdict="INSUFFICIENT_EVIDENCE">INSUFFICIENT_EVIDENCE</dd></div><div><dt>gpuAttribution</dt><dd data-verdict="INSUFFICIENT_EVIDENCE">INSUFFICIENT_EVIDENCE</dd></div><div><dt>lifecycleStability</dt><dd data-verdict="INSUFFICIENT_EVIDENCE">INSUFFICIENT_EVIDENCE</dd></div></dl>
+        <ul><li>Native WebGPU correctness bundle with field/storage/placement/probe readbacks and mechanism diagnostics.</li><li>Current-adapter GPU timestamps remain unaccepted in the correctness profile.</li></ul>
+      </article></div>
+    <div class="gallery">
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-field-bake" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-field-bake/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-field-bake/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-field-bake/final.design.png" alt="Procedural Fields: final.design.png" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>final.design.png</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-field-bake" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-field-bake/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-field-bake/diagnostics.mosaic.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-field-bake/diagnostics.mosaic.png" alt="Procedural Fields: Gradient diagnostic mosaic readback." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Gradient diagnostic mosaic readback.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-field-bake" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-field-bake/camera.near.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-field-bake/camera.near.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-field-bake/camera.near.png" alt="Procedural Fields: Near camera field presentation." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Near camera field presentation.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-field-bake" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-field-bake/camera.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-field-bake/camera.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-field-bake/camera.design.png" alt="Procedural Fields: Design camera field presentation." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Design camera field presentation.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-field-bake" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-field-bake/camera.far.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-field-bake/camera.far.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-field-bake/camera.far.png" alt="Procedural Fields: Far camera field presentation." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Far camera field presentation.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-field-bake" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-field-bake/seed-0001.final.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-field-bake/seed-0001.final.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-field-bake/seed-0001.final.png" alt="Procedural Fields: Structured-placement seed 1 final." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Structured-placement seed 1 final.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-field-bake" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-field-bake/seed-9e3779b9.final.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-field-bake/seed-9e3779b9.final.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-field-bake/seed-9e3779b9.final.png" alt="Procedural Fields: Structured-placement stress seed final." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Structured-placement stress seed final.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-field-bake" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-field-bake/temporal.t000.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-field-bake/temporal.t000.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-field-bake/temporal.t000.png" alt="Procedural Fields: Shared-cause composition at t=0." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Shared-cause composition at t=0.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-field-bake" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-field-bake/temporal.t001.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-field-bake/temporal.t001.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-field-bake/temporal.t001.png" alt="Procedural Fields: Shared-cause composition at t=25s step." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Shared-cause composition at t=25s step.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure></div>
   </div></div>
 
 <div class="section" id="skill-text"><div class="wrap">
   <h2>The full skill</h2>
-  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
+  <p class="sub">The complete SKILL.md as loaded by agents, rendered verbatim.</p>
   <div class="skilltext"><h2>Procedural Fields</h2>
-<p>The first implementation decision is the algorithm class. Do not begin with a
-simple material expression and later optimize it. Author the field once as a
-deterministic TSL <code>Fn</code>, reuse that exact function in material, vertex, and
-compute stages, and bake only when an invocation-weighted ALU, update, and
-bandwidth model predicts a win over direct evaluation.</p>
-<p>Keep the shared field core stage-portable: coordinates, deterministic field,
-analytic derivatives, and causal outputs only. Fragment footprint derivatives,
-vertex patch-error policy, and compute tile invalidation are consumer adapters;
-do not place <code>dFdx</code>/<code>dFdy</code> inside a function also called from vertex or compute.</p>
-<p>Use <code>$threejs-choose-skills</code> before this skill when the request spans multiple
-graphics systems. Use <code>$threejs-procedural-materials</code> when the task is channel
-assembly and material response, and <code>$threejs-procedural-planets</code> when the
-deliverable is a complete planetary body.</p>
-<p>When a field participates in dynamics, collision, support, forcing, or another physics query, bind it to the route&#39;s
-<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-choose-skills/references/physics-domain-and-interaction-contract.md">physics-domain and interaction contract</a>.
-The public boundary is a typed <code>PhysicsSignalDescriptor</code>, not a TSL function,
-texture handle, or undocumented callback. It references the active
-<code>PhysicsContext</code> through canonical <code>contextId</code>, <code>physicsFrameId</code>,
-<code>physicsOriginEpoch</code>, <code>transformRevision</code>, <code>clockId</code>, channel/unit,
-represented-footprint/filter, validity, <code>perChannelError</code>, cadence/latency,
-<code>stateVersion</code>, residency, and <code>resourceGeneration</code> fields.
-<code>PhysicsSampleRequest.requestedPhysicsTime</code> and
-<code>SampledChannel.actualPhysicsTime</code> both use the canonical <code>PhysicsTime</code>
-wrapper <code>{ kind, instant, interval }</code>. Query semantics select <code>kind: instant</code>
-or <code>kind: interval</code>; exactly that arm is present and the other arm is a
-canonical <code>TypedAbsence</code> record. Do not retype either boundary as a raw
-<code>PhysicsInstant | PhysicsTimeInterval</code>, add time to the descriptor, or create a
-field-local timestamp dialect. Convert from
-Three.js world coordinates exactly once through
-<code>PhysicsContext.worldToPhysicsTransform</code> and its sole positive
-<code>metersPerWorldUnit</code>; no field serializes the reciprocal or another scale.
-Field math and storage stay domain-owned; cross-system consumers may read only
-descriptors whose context, frame, version, and error gates pass. Publish
-physics values in SI in a stable physical frame. A render rebase makes the
-camera owner publish a new <code>CameraViewPublication</code> with a changed render
-mapping and <code>renderOriginEpoch</code>; the view-independent candidate and physical
-field state do not change
-<code>physicsFrameId</code>, <code>physicsOriginEpoch</code>, values, IDs, or versions.</p>
-<p>When a field classifies substrate or another physical material, its published
-<code>PhysicsMaterialId</code> resolves to the route-owned <code>PhysicsMaterialRegistry</code> and
-the exact registry/material-state versions used for the sampling interval.
-The field supplies causal classification and uncertainty; the registry pair
-resolver supplies contact, transport, thermal, or wetting laws. Render color,
-roughness, and field masks never infer those laws or silently provide defaults.</p>
-<h2>Numerical Provenance</h2>
-<p>Every numerical claim emitted from this skill carries one label:</p>
-<ul>
-<li><strong>Derived</strong>: follows from a stated equation, format, or byte count.</li>
-<li><strong>Gated</strong>: an acceptance threshold or device/API capability that must pass.</li>
-<li><strong>Measured</strong>: captured on the named browser, GPU, resolution, and workload;
-never transfer it to another target without remeasurement.</li>
-<li><strong>Authored</strong>: a look-development or planning starting point, not a physical
-constant or performance fact.</li>
-</ul>
-<p>Unlabelled integers in API names, vector widths, channel counts, or source code
-are structural, not budget claims.</p>
-<h2>Mandatory Renderer Path</h2>
-<p>Use the repository&#39;s pinned Three.js r185 WebGPU/TSL APIs:</p>
-<ul>
-<li><code>WebGPURenderer</code> from <code>three/webgpu</code>.</li>
-<li>TSL from <code>three/tsl</code>, with reusable <code>Fn</code> field functions.</li>
-<li><code>MeshStandardNodeMaterial</code>, <code>MeshPhysicalNodeMaterial</code>, or the appropriate
-<code>NodeMaterial</code> family member for material consumers.</li>
-<li><code>RenderPipeline</code>, <code>pass()</code>, <code>mrt()</code>, <code>PassNode.setResolutionScale()</code>,
-<code>outputColorTransform</code>, and <code>renderOutput()</code> for node post pipelines.</li>
-<li><code>renderer.compute()</code> or <code>renderer.computeAsync()</code> with <code>Fn().compute(count)</code>,
-<code>StorageTexture</code>, <code>textureStore()</code>, <code>StorageBufferAttribute</code>,
-<code>StorageInstancedBufferAttribute</code>, <code>storage()</code>, barriers, and atomics when the
-field bake or placement algorithm needs them.</li>
-</ul>
-<p>After renderer initialization, prefer <code>renderer.compute()</code> for ordinary
-submission. In r185 <code>computeAsync()</code> only initializes on demand before
-enqueueing; it is not a GPU-completion fence. Await an actual readback/map or
-use GPU timestamps when completion or timing evidence is required.</p>
-<p>Runnable import baseline:</p>
-<pre><code class="language-js">import {
-  RenderPipeline,
-  StorageBufferAttribute,
-  StorageInstancedBufferAttribute,
-  StorageTexture,
-  WebGPURenderer,
-} from &#39;three/webgpu&#39;;
-
-import {
-  Fn,
-  mrt,
-  pass,
-  renderOutput,
-  storageTexture,
-  textureStore,
-} from &#39;three/tsl&#39;;
+<p>Author one deterministic field bundle, then adapt it to each shader stage and
+consumer. Coordinates, seed, causes, derivatives, and output meanings belong to
+the field; fragment footprints, vertex LOD, storage, and diagnostics are
+consumer adapters.</p>
+<p>For multi-system work, <code>$threejs-choose-skills</code> is an optional coordinator.
+Materials own PBR response, geometry owns topology, water owns free-surface
+state, and the final-image skill owns tone mapping and output conversion.
+Publish each cross-system field output with units, coordinate/frame convention,
+producer and consumer owners, revision, spatial/temporal support and filter,
+validity domain, error bound, update cadence, and staleness rule. Keep GPU
+resource layout and render LOD private to the consuming adapter.</p>
+<h2>1. Freeze the field contract</h2>
+<p>Record before implementation:</p>
+<pre><code class="language-text">coordinate domain and units
+seed owner, hash/noise family, and wrapping convention
+primary fields -&gt; derived causes -&gt; named outputs
+consumer, filter, precision, update cadence, and validity per output
+direct-versus-bake decision inputs
+debug view and invalidation key per output
 </code></pre>
-<p><code>outputColorTransform</code> is a <code>RenderPipeline</code> property, not a TSL export.</p>
-<h2>Native-WebGPU Gate And Tiers</h2>
-<p>Initialize and reject any non-WebGPU backend before selecting quality. CPU
-ports remain offline/geometry/parity tools; they are not a runtime renderer
-branch.</p>
-<pre><code class="language-js">await renderer.init();
-
-if (renderer.backend.isWebGPUBackend !== true) {
-  throw new Error(&#39;threejs-procedural-fields requires a native WebGPU backend.&#39;);
-}
-
-const { features, limits } = renderer.backend.device;
+<p>Choose coordinates from the cause: world/tile-local for terrain and weather,
+undeformed radial physical coordinates for planets, object/local coordinates
+for ornament, or a declared generated-texture domain. Large domains use an
+integer tile plus local float (or another split representation) before f32
+phase error changes the field.</p>
+<p>This step is complete when every output has one coordinate/seed owner, units,
+consumer, filter, precision, update rule, invalid state, and diagnostic.</p>
+<h2>2. Author one stage-portable core</h2>
+<p>Implement the shared causes as a deterministic TSL <code>Fn</code>. Keep the core free of
+fragment-only derivatives, vertex camera policy, storage layout, and dispatch
+state. Materialize common intermediates once with <code>.toVar()</code> or an equivalent
+local; inspect generated WGSL when separate outputs might rebuild the same
+warp, hash, or octave chain.</p>
+<pre><code class="language-js">import { WebGPURenderer, StorageTexture } from &#39;three/webgpu&#39;;
+import { Fn, storageTexture, textureStore } from &#39;three/tsl&#39;;
 </code></pre>
-<p>Quality tiers:</p>
-<table>
-<thead>
-<tr>
-<th>Tier</th>
-<th>Use when</th>
-<th>Field architecture</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>full</code></td>
-<td><strong>Measured</strong> full-resolution field plan is inside the target frame and memory budgets</td>
-<td>TSL <code>Fn</code> is source of truth; use direct evaluation or compute-baked storage according to the cost model; retain required gradients and filtered mips.</td>
-</tr>
-<tr>
-<td><code>budgeted</code></td>
-<td><strong>Measured</strong> full tier misses time or bandwidth</td>
-<td>Same WebGPU graph with fewer active spectral bands, smaller/dirty-tiled bakes, lower update cadence, and packed access-local channels.</td>
-</tr>
-<tr>
-<td><code>minimum-native</code></td>
-<td><strong>Gated</strong> WebGPU exists but the budgeted tier still misses</td>
-<td>Same WebGPU consumer contract with precomputed generated data, coarser native-WebGPU textures, and only silhouette/identity-critical fields.</td>
-</tr>
-</tbody></table>
-<p>These are presentation/storage tiers for purely visual fields. Changing the
-representation, filter, active band, cadence, or error of a physics-facing
-field requires a coordinator-admitted <code>QualityTransition</code> at a graph step
-boundary, with an explicit conservative map or reset/handoff and one
-authoritative producer throughout the transition.</p>
-<h2>Field Contract</h2>
-<p>Before code, write a field bundle:</p>
-<pre><code class="language-text">coordinates
-  -&gt; macro form
-  -&gt; meso structure
-  -&gt; derived causes
-  -&gt; packed material and placement channels
-</code></pre>
-<p>Example:</p>
-<pre><code class="language-text">sphereDirection
-  -&gt; tangentially warped direction
-  -&gt; elevation + ridges + craterDepth
-  -&gt; slope + cavity + latitude + moisture
-  -&gt; biome + color + roughness + bump + placementMask
-</code></pre>
-<p>The contract must record:</p>
-<ul>
-<li>coordinate domain and units;</li>
-<li>seed ownership and deterministic hash/noise family;</li>
-<li>primary fields and derived causes;</li>
-<li>consuming material, geometry, compute, placement, and post channels;</li>
-<li>filtering rule per frequency band;</li>
-<li>bake-vs-evaluate equation with invocation counts, operation inventory, dirty
-texels, reuse interval, bytes/texel, sampling footprint, and measured timing;</li>
-<li>CPU parity plan with per-channel conditioning, storage quantization, and
-threshold guard bands;</li>
-<li>debug output for every named field.</li>
-</ul>
-<p>For every physics-facing output, emit its <code>PhysicsSignalDescriptor</code> and batched
-adapter. Static fields publish an immutable <code>stateVersion</code> with
-<code>analytic-on-demand</code> or <code>event-driven</code> cadence as appropriate; every request
-and returned channel, including a static/analytic result, carries canonical
-<code>requestedPhysicsTime</code> or <code>actualPhysicsTime</code> as a <code>PhysicsTime</code> wrapper with
-one active semantic arm and one <code>TypedAbsence</code> arm. Edited or simulated fields
-additionally publish their cadence, latency, and invalidation state. Missing,
-stale, ambiguous, or out-of-domain samples remain explicit validity states.
-Optional channels that do not exist remain absent. Never substitute zero,
-reuse an old origin epoch, or silently sample a lower render LOD.</p>
-<p>Register every edited/simulated field owner, read/write version, cadence,
-sample phase, and CPU/GPU dependency on the route&#39;s <code>PhysicsGraph</code>; a texture
-dispatch is not an implicit scheduler edge. Emit one exact
-<code>PhysicsStageExecution</code> for every attempted field update or analytic/state-hold
-evaluation so publication versions can be traced to coordination coverage
-rather than inferred from dispatch submission. Record dropped debt in the
-graph catch-up loss ledger, not as an execution. When a physics-owned field is also
-rendered, publish a view-independent <code>PhysicsPresentationCandidate</code> containing
-one leased <code>PresentedStatePair</code> per stable binding/provider. Its previous and
-current states each carry their own <code>PresentationSampleProvenance</code>,
-<code>PhysicsInstant</code>, state handle, and field <code>PresentationSpatialBinding</code>.
-<code>CameraViewPublication</code> owns the per-view render mapping;
-<code>ViewPreparationPublication</code> owns visibility, shadows, caches, resets, and
-view-specific lease refs. The sealed snapshot references candidate binding IDs
-and leases instead of copying pairs or transforms, and the multi-target
-<code>FrameExecutionRecord</code> owns completion and lease disposition. Static analytic
-fields may use explicit hold/not-interpolated provenance with identical bracket
-versions rather than omitting lifetime ownership.</p>
-<h3>Local terrain and coast field contract</h3>
-<p>For a local island, archipelago, reservoir edge, river reach, or coastal
-architectural site, do not let an arbitrary height threshold independently
-define terrain, beach, seabed, placement, and foam inputs. One signed coastal
-field owns the shared boundary:</p>
-<pre><code class="language-text">stable world/tile-local XZ
-  -&gt; land-support implicit field
-  -&gt; metric shoreline distance + closest-feature identity
-  -&gt; coast normal/tangent/curvature
-  -&gt; cross-shore land height + bathymetry
-  -&gt; terrace, cliff, beach, wet-line, drainage, exposure, and placement fields
-</code></pre>
-<p>Here <code>wet-line</code> is static substrate/capacity or a statistical envelope derived
-from declared land causes. It is not dynamic free-surface position, foam,
-run-up, or conserved wetness. Water owns free-surface/foam/wash signals; the
-route-selected receiver-state owner alone integrates precipitation,
-inundation, infiltration, drainage, evaporation, and snow storage. This field
-skill may publish static support/eligibility and consume the resulting
-immutable receiver snapshot, but it never advances a competing wetness store.</p>
-<p>Use the sign convention <code>dCoast &gt; 0</code> on land, <code>dCoast = 0</code> at the waterline,
-and <code>dCoast &lt; 0</code> in water. If primitive union, coordinate warp, or raster
-filtering makes <code>|grad(dCoast)|</code> differ materially from one, treat that result
-as an implicit support function and re-distance it before using values as
-meters. Never normalize a near-zero gradient at a medial axis; retain a
-closest-boundary feature/vector or mark the frame invalid there.</p>
-<p>Choose the boundary algorithm from the contract:</p>
-<table>
-<thead>
-<tr>
-<th>Required property</th>
-<th>Candidate</th>
-<th>Gate</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>exact supplied outline, holes, or legal/site boundary</td>
-<td>winding classification plus closest polygon-segment distance</td>
-<td>robust predicates, loop orientation, and closest-segment distance error pass</td>
-</tr>
-<tr>
-<td>few deterministic organic supports</td>
-<td>analytic ellipse/capsule/polygon implicits, then metric re-distance when distance is consumed</td>
-<td>zero-set topology and `abs(</td>
-</tr>
-<tr>
-<td>many, painted, eroded, or edited supports</td>
-<td>signed Euclidean distance transform, or jump flooding plus exact narrow-band refinement</td>
-<td>shoreline Hausdorff and coast-frame angular errors pass</td>
-</tr>
-<tr>
-<td>height threshold only</td>
-<td>shared scalar <code>h - waterLevel</code></td>
-<td>use only when topology drift under seed, resolution, and water-level sweeps is explicitly permitted</td>
-</tr>
-</tbody></table>
-<p>Couple dry elevation and bathymetry through a cross-shore profile:</p>
-<pre><code class="language-text">zBase(p) = waterLevel + C(dCoast(p))
-         + Wland(dCoast) * rLand(p)
-         + Wsea(-dCoast) * rBed(p)
-</code></pre>
-<p><code>rLand</code> and <code>rBed</code> are signed residual reliefs; their envelopes vanish outside
-their side of the coast and at zero. Treat <code>C(0)=0</code> and matching one-sided
-derivatives as <strong>Gated</strong> when the authored shore is smooth. A vertical cliff is
-not a single-valued heightfield singularity: emit <code>cliffTop</code>, <code>cliffToe</code>, and
-the shore contour for the geometry compiler to build an explicit wall. Expose
-the unquantized relief and
-<code>terraceIndex=floor((zRaw-zRef)/terraceStep)</code> separately; hard terrace caps and
-walls are topology, not a fragment-color effect. Guard every terrace/coast
-classification by its propagated CPU/TSL/storage error.</p>
-<p>The bundle must also expose the fields actually needed downstream, not a
-generic noise atlas:</p>
-<pre><code class="language-text">dCoast, closestCoastId, coastNormal, coastTangent, coastCurvature
-zRaw, zBed, cliffTop, cliffToe, terraceIndex, terracePhase
-beachBand, wetLineBand, slope, aspect, cavity
-flowDirection, flowAccumulation, moisture
-windExposure, waveExposure, fetch
-surfaceIdentity, placementFactorBundle, hardValidityMask, exclusionMask
-</code></pre>
-<p>Fields own these causal factors and validity masks. Vegetation and semantic
-site-asset compilers own asset/species selection, candidate identity, conflict
-resolution, and final accepted placements; geometry owns topology-derived
-anchors. Do not turn a generic field bake into a second placement authority.</p>
-<p>Compute drainage from a depression policy, then an acyclic receiver graph;
-for cells <code>i</code>, accumulation is <strong>Derived</strong> as
-<code>A_i = a_i + sum_(j -&gt; i)(w_ji A_j)</code> once routing weights and source areas are
-fixed. Priority-Flood plus D8 or D-infinity is
-a compile-time candidate for static land; an erosion solver is eligible only
-when changed drainage/relief is an observable. Compute coast exposure from
-declared incident directions, coast orientation, and fetch; do not use another
-noise sample as a windward or surf proxy.</p>
-<p>Read the local-coast recipe in
-<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-fields/references/field-stack-recipes.md#local-coastal-land-field-bundle">field-stack-recipes.md</a>
-before implementing terrain, beaches, shallow seabeds, or coastal placement.</p>
-<p>For the canonical <code>examples/webgpu-field-bake/</code> contract, CPU and TSL must
-import the same <code>FIELD_ALGORITHM</code> object from <code>field-constants.mjs</code>. That object
-owns the integer lattice hash multipliers, lowbias32 mix constants, seed
-wrapping convention, octave counts, lacunarity, gain, warp seed offsets, and
-derived-channel coefficients. Do not copy those numbers into CPU or TSL code.
-The canonical hash floors the lattice coordinate, converts i32 cell bits to
-u32, mixes with <code>Math.imul</code>/TSL <code>uint</code> wrapping arithmetic, and scales the final
-u32 by <strong>Derived</strong> <code>2^-32</code>; no sin-dot hash is allowed in the parity path.
-<code>validate-field-contract.mjs</code> enforces shared-object identity and uses an
-<strong>Authored</strong> <code>1e-12</code> CPU fixture-drift gate for JavaScript double evaluation.
-Its <code>FIELD_PARITY_ERROR_MANIFEST</code> labels the direct-WGSL-f32 per-channel limits
-and threshold guard <strong>Gated</strong>; it does not claim that an operation count proves
-them. The manifest separately records the <strong>Derived</strong>, conditional
-<code>rgba16float</code> nearest-rounding term and marks interpolation/total stored error
-unvalidated. A production field contract derives or measures each channel&#39;s
-f32 conditioning, built-in allowance, interpolation/finite-difference error,
-storage quantization, and threshold guard rather than copying fixture limits.</p>
-<p>The example is a canonical validation lab, not production acceptance. It
-exercises invocation/update/bandwidth algebra, one
-<code>createFieldNodeBundle()</code> owner with named <code>.toVar()</code> intermediates, direct-f32
-parity, explicit <code>rgba16float</code> base writes, dependent box-filter mips, and
-structured-placement storage. Artifacts gate three declared texels per base
-texture, three per packed mip, and every placement record. They do not prove
-filtered consumption, full-domain stored parity, dirty-region GPU execution,
-or production performance.</p>
-<h2>Build Order</h2>
-<ol>
-<li>Choose stable coordinates from the physical cause: radial planet kilometers,
-world XZ water/wetness, branch-local growth coordinates, or authored strata.</li>
-<li>Define one deterministic stage-portable TSL <code>Fn</code> field bundle. Reuse it
-everywhere instead of duplicating math in separate materials or compute
-jobs; wrap it with stage-specific filtering/LOD adapters.</li>
-<li>Port the same math to CPU only for geometry generation, offline assets,
-parity tests, and precomputed data used by native-WebGPU quality tiers. Keep
-constants, seeds, wrapping, normalization, and remaps imported from one
-checked-in constants module.</li>
-<li>Decide bake versus direct evaluation from the cost equation below and an A/B
-GPU timing before assigning material nodes.</li>
-<li>Pack baked channels by access pattern, update cadence, filter mode, and
-precision, not by visual category.</li>
-<li>Wire <code>NodeMaterial</code> consumers from the shared function or baked texture.</li>
-<li>Add node-pass diagnostics through <code>RenderPipeline</code>, <code>pass()</code>, and <code>mrt()</code>.</li>
-<li>Validate parity and budgets before adding extra bands.</li>
-</ol>
-<h2>Bake-Vs-Evaluate Cost Gate</h2>
-<p>For one amortization interval, compare:</p>
-<pre><code class="language-text">Tinline = sum_i(Q_i * E_i)
+<p>Use <code>WebGPURenderer</code> and verify <code>renderer.backend.isWebGPUBackend === true</code>
+after <code>await renderer.init()</code>. <code>renderer.compute()</code> submits ordinary compute
+work. In r185, <code>computeAsync()</code> initializes before enqueueing but is not a GPU
+completion fence; completion evidence needs timestamps or an actual map/readback.</p>
+<p>Carry parity-critical seeds as <code>u32</code>, not f32. Gate floored lattice coordinates
+to the i32 domain before bit reinterpretation. Apply a domain warp once to the
+coordinates, propagate its Jacobian into analytic gradients, and keep spherical
+warps tangent before renormalization.</p>
+<p>This step is complete when all consumers call the same cause graph, each shared
+intermediate is evaluated once per invocation, and every stage restriction is
+isolated in an adapter.</p>
+<h2>3. Select direct evaluation or storage</h2>
+<p>Compare one amortization interval:</p>
+<pre><code class="language-text">Tdirect = sum_i(Q_i * E_i)
 
 Tbake = (D * (E_bake + Wstore) + Tdispatch + Tmips) / U
       + sum_i(Q_i * (S_i + B_i / BW_effective))
 </code></pre>
-<ul>
-<li><code>Q_i</code>: dispatch and vertex workloads are <strong>Derived</strong> from explicit counts.
-Fragment workload is a <strong>Measured</strong> target model using resolution scale,
-coverage, MSAA, helper invocations, and an overdraw proxy because WebGPU does
-not expose a portable fragment-invocation counter.</li>
-<li><code>E_i</code>, <code>E_bake</code>: <strong>Measured</strong> field-evaluation cost inferred by controlled A/B
-timing at fixed workload. Inventory dependent add/multiply/FMA, integer hash,
-transcendental, branch, register, and octave costs separately; a scalar
-operation count is not a timing model.</li>
-<li><code>D</code>: <strong>Measured</strong> dirty texels per update; <code>U</code>: <strong>Measured</strong> frames between
-updates. A static bake amortizes over its observed reuse lifetime.</li>
-<li><code>S_i</code>: <strong>Measured</strong> filtered/load sample cost. <code>B_i/BW_effective</code> is effective
-cache/DRAM traffic, not <code>formatBytes * nominal taps</code>; determine it by A/B
-timing because locality, footprints, and cache reuse dominate.</li>
-<li><code>Tdispatch</code>, <code>Tmips</code>, <code>Wstore</code>: <strong>Measured</strong> dispatch, mip generation, and
-store costs on the target.</li>
-</ul>
-<p>Choose the lower measured path subject to memory and latency gates. Within one
-shader invocation, materialize the shared field bundle once (<code>toVar()</code> or an
-equivalent explicit local) before considering a texture. Across passes, stages,
-draws, or frames, include every actual consumer in <code>sum_i</code>. A full-domain bake
-usually loses when only a small visible region is shaded; a static expensive
-field can win with a single consumer because <code>U</code> is large. Fixed read-count
-cutoffs are forbidden.</p>
-<p>Do not call two packed-output <code>Fn</code>s that each rebuild the same warp/noise core.
-Hoist shared intermediates in the caller, or return/materialize one packed
-bundle supported by the installed TSL revision, then inspect generated WGSL for
-duplicate hash/octave chains. Source-level reuse is not proof of shader CSE.</p>
-<h3>Storage format and precision gate</h3>
-<ul>
-<li><code>RGBAFormat + HalfFloatType</code> maps to <code>rgba16float</code> in installed Three.js
-<code>0.185.1</code> and is the portable writable half-float storage baseline:
-<strong>Derived</strong> <code>8 B/texel</code>, fp16 unit roundoff <code>2^-11 ~= 4.883e-4</code> for normal
-values, and maximum absolute rounding for values below one of
-<code>2^-12 ~= 2.441e-4</code>. fp16&#39;s <strong>Derived</strong> largest finite value is <code>65504</code>,
-smallest positive normal is <code>2^-14 ~= 6.104e-5</code>, and smallest subnormal is
-<code>2^-24 ~= 5.960e-8</code>; do not make a visual contract depend on subnormals.</li>
-<li><code>RGFormat + HalfFloatType</code> maps to <code>rg16float</code>, which is <strong>Gated</strong> by the
-WebGPU <code>texture-formats-tier1</code> feature. Check
-<code>renderer.backend.device.features.has(&#39;texture-formats-tier1&#39;)</code> before use;
-otherwise use <code>rgba16float</code> or another baseline format.</li>
-<li><code>RedFormat + FloatType</code> maps to baseline-storage <code>r32float</code>.
-<code>RGFormat + FloatType</code> maps to <code>rg32float</code>, whose storage use is <strong>Gated</strong> by
-non-compatibility/core WebGPU (<code>core-features-and-limits</code>); compatibility mode
-forbids <code>rg32float</code> storage. Linear filtering of either float32 format is
-separately <strong>Gated</strong> by <code>float32-filterable</code>; use exact loads/manual
-reconstruction or another format when absent.</li>
-<li><code>RGBAFormat + UnsignedByteType</code> is <code>rgba8unorm</code>, not an integer-ID texture:
-<strong>Derived</strong> normalized quantization is at most <code>1/(2*255) ~= 1.961e-3</code> before
-filtering. Use nearest/exact loads plus explicit encode/decode, an r32uint
-representation, or a storage buffer for exact categories.</li>
-<li>Never store large absolute coordinates or unscaled world heights in fp16.
-Store tile-local/normalized values plus an origin and scale; require the
-<strong>Derived</strong> decoded quantization term
-<code>(decodeMax - decodeMin) * 0.5 * ulp(encodedValue)</code> plus mip/interpolation
-error to fit the channel&#39;s propagated error budget.</li>
-</ul>
-<p>The writer uses <code>storageTexture()</code>/<code>textureStore()</code> in a compute pass; a later
-filtered consumer samples the same resource through <code>texture()</code>. Do not bind a
-subresource for storage and sampling in the same usage scope. Keep
-<code>mipmapsAutoUpdate = true</code> only when automatic generation is required and
-verified for the chosen filterable format; <code>false</code> means the application must
-write the complete required mip chain. Ping-pong when a compute update needs to
-read and write the same logical field.</p>
-<h2>Required Field Rules</h2>
-<ul>
-<li>Shared causes first: color, roughness, normal, displacement, emission, masks,
-and scattering must derive from the same named fields.</li>
-<li>Carry hash seeds/IDs through <code>u32</code> uniforms, attributes, or storage. Never
-pass a parity seed through f32: it cannot represent every 32-bit integer and
-silently changes hash identity before the cast.</li>
-<li>Before the lattice i32-to-u32 bitcast, <strong>Gate</strong> floored cell coordinates to
-the i32 domain and the f32 phase-error budget. Rebase/split coordinates when
-either condition fails.</li>
-<li>Domain-warp the coordinates, not every result.</li>
-<li>Warp spherical coordinates tangentially, then renormalize.</li>
-<li>Use separate frequency bands for silhouette, regions, surface breakup, and
-micro-normal.</li>
-<li>Do not displace geometry with frequencies above mesh Nyquist.</li>
-<li>Keep categorical masks broad enough to avoid isolated bubble regions.</li>
-<li>Parameter names must describe perception: <code>ridgeWidth</code>, <code>coastBlend</code>,
-<code>cavityDarkening</code>, not <code>noise3Amount</code>.</li>
-<li>Random placement starts with strata and semantic constraints; jitter only
-inside valid cells.</li>
-</ul>
-<h2>Filtering And Stability</h2>
-<p>Filter before the field aliases:</p>
-<ul>
-<li>For a band with effective post-remap support <code>f_support</code> and post-warp
-coordinate footprint Jacobian <code>J&#39; = (I + J_w)[dPdx dPdy]</code>, use <strong>Derived</strong>
-<code>q = f_support * sigmaMax(J&#39;)</code>. Nyquist requires <code>q &lt;= 0.5</code>; begin an
-<strong>Authored</strong> smooth energy fade below that boundary and record its interval.
-A two-pixel wavelength is only the limiting inequality, not an adequate
-reconstruction filter.</li>
-<li>Geometry displacement also requires <strong>Derived</strong> <code>f * maxProjectedEdge &lt;= 0.5</code>; use the stricter screen- or mesh-sampling bound. Vertex/compute stages
-have no fragment derivatives, so pass a patch footprint or choose bands on
-CPU/compute from projected patch error.</li>
-<li>Keep coordinates stable and attenuate band amplitude/energy. Transfer
-removed micro-normal energy into a measured roughness/cone-variance term
-rather than letting highlights sharpen with distance.</li>
-<li>Use mipmapped baked fields for repeated filtered samples.</li>
-<li>For procedural normals, prefilter height/gradient or normal mean plus
-variance; renormalizing an averaged normal without retaining its lost length
-erases the variance needed for specular filtering.</li>
-<li>For displacement, silhouette bands belong in geometry; micro bands belong in
-material normals or baked masks.</li>
-<li>World effects use world coordinates; planetary effects use radial physical
-coordinates; object-local ornament uses local coordinates.</li>
-</ul>
-<h2>Color And Output</h2>
-<ul>
-<li>Authored color textures use <code>SRGBColorSpace</code>.</li>
-<li>Scalar masks, vector fields, normal/roughness/wetness/noise/LUT/weather data,
-and baked field textures use <code>NoColorSpace</code> or explicit linear data handling.</li>
-<li>HDR working buffers stay <code>HalfFloatType</code> until tone mapping.</li>
-<li>The app has one tone-map owner and one output conversion owner. In node
-pipelines, <code>RenderPipeline.outputColorTransform</code> or <code>renderOutput()</code> owns the
-final conversion; individual fields and materials do not double-convert.</li>
-</ul>
-<h2>Budgets</h2>
-<p>There is no universal desktop/mobile band count, atlas extent, dispatch count,
-millisecond cap, or MiB cap. The product field contract supplies whole-frame
-<strong>Gated</strong> GPU p95, CPU p95, peak-live-byte, quality-error, and sustained-thermal
-limits for named workloads. A device label is not a workload.</p>
-<p>For every measured case record:</p>
-<ul>
-<li>output extent, DPR, view coverage, overdraw/MSAA/helper-invocation estimate;</li>
-<li>active bands with hash/noise/transcendental operations and longest dependent
-chains;</li>
-<li>tile dimensions, total/dirty tile count, dirty texels, dispatch geometry,
-update cadence, and reuse <code>U</code>;</li>
-<li>per-stage sampled-texture, sampler, storage-texture, and storage-buffer
-bindings from the compiled layout;</li>
-<li>executed loads/filtered samples on each hot path, bytes/texel, mip levels,
-producer writes, consumer reads, and measured cache/effective-bandwidth
-behavior;</li>
-<li>base, candidate, and interleaved paired-delta GPU p50/p95; contemporaneous
-whole-frame GPU/CPU p50/p95; peak live bytes; mobile-class thermal interval.</li>
-</ul>
-<p>Compute each resource exactly from format bytes, aligned extents, mip sum,
-layers, ping-pong/history count, and simultaneous lifetime. For example, a full
-2D mip chain approaches the <strong>Derived</strong> geometric factor <code>4/3</code> before alignment;
-this is arithmetic, not a memory allowance.</p>
-<p>For marginal evidence, interleave matched frames and form
-<code>delta_k=tGPU_k(graph+field)-tGPU_k(graph)</code> before taking p50/p95. Never
-subtract independent quantiles. Architecture still comes from the cost model;
-acceptance comes from the contemporaneous whole-frame gates. Without GPU
-timestamps, report GPU cost unmeasured rather than substituting CPU intervals.</p>
-<p>Keep draw calls unchanged when adding a field. Avoid in-frame CPU readback.
-Use readback only in explicit diagnostics or parity tests. Static fields update
-once; slow fields update on a fixed cadence; edited fields update dirty tiles.</p>
-<h2>Diagnostics</h2>
-<p>Every field stack needs a debug route for:</p>
-<ul>
-<li>source coordinates;</li>
-<li>tangential warp vector;</li>
-<li>each frequency band;</li>
-<li>macro height versus material height;</li>
-<li>humidity, temperature, slope, cavity, and identity masks;</li>
-<li>near/mid/far or footprint weights;</li>
-<li>baked channel pack visualization;</li>
-<li>water-provider normal/crest reference versus the land field, without
-regenerating either water channel;</li>
-<li>receiver-owned wetness versus land support/height, with both source
-revisions shown;</li>
-<li>seed and stratification cells;</li>
-<li>CPU versus TSL parity error.</li>
-</ul>
-<p>Parity views must separate direct-f32 error from post-store/read error and show
-the per-channel <strong>Gated</strong> bound. A single max/min image or one global tolerance
-does not establish parity.</p>
-<p>Use <code>mrt()</code> when the diagnostics share one scene pass. Use
-<code>PassNode.setResolutionScale()</code> for reduced-resolution field diagnostics and
-restore full resolution only where inspection needs it.</p>
-<h2>What This Skill Emits</h2>
-<ul>
-<li>field contract with coordinate owner, physical/perceptual units, seed owner,
-filtering rule, and bake-vs-evaluate decision;</li>
-<li>one <code>PhysicsSignalDescriptor</code> and provider adapter per physics field, using the canonical context/frame/time/channel/footprint/filter,
-validity/error, version/resource, residency/latency, and missing-channel
-envelope unchanged;</li>
-<li>TSL <code>Fn</code> field bundle and CPU parity port;</li>
-<li>packed channel schema for direct material use or <code>StorageTexture</code> bakes;</li>
-<li>debug views for every named field;</li>
-<li>validation command: <code>node examples/webgpu-field-bake/validate-field-contract.mjs --allow-missing-gpu</code>
-for CPU-only fixture diagnostics (never final acceptance) and <code>node examples/webgpu-field-bake/validate-field-contract.mjs --artifacts &lt;dir&gt;</code>
-after native-WebGPU readback; record the exact sampled storage/mip and
-full-record placement scope, and keep <code>productionReady: false</code> until
-filtered consumption, full-domain parity, dirty updates, and target timing
-are validated;</li>
-<li>sibling ownership notes for material response, planet bodies, weather,
-image-pipeline ownership, and visual validation.</li>
-</ul>
+<p><code>Q_i</code> is the actual workload of consumer <code>i</code>; fragment workload is measured or
+modeled from resolution, coverage, MSAA/helpers, and overdraw. <code>D</code> is dirty
+texels, <code>U</code> reuse frames, and the remaining terms come from controlled target
+measurements. Choose the lower path subject to latency, memory, and error gates.
+Read count or octave count alone is not a decision.</p>
+<p>For a bake, pack only channels sharing coordinates, precision, filter, cadence,
+and consumer locality. Use separate storage and sampling usage scopes; ping-pong
+when an update reads and writes the same logical field. <code>RGBAFormat + HalfFloatType</code> is the portable r185 <code>rgba16float</code> writable baseline
+(<code>8 B/texel</code>). Gate narrower/float32 formats and filtering against actual WebGPU
+features. Store local/normalized values rather than large absolute coordinates.</p>
+<p>Read
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-fields/references/field-stack-recipes.md#storage-precision-and-invalidation">storage, precision, and invalidation</a>
+before adding a <code>StorageTexture</code>, mip chain, dirty-tile updater, or category ID
+texture.</p>
+<p>This step is complete when the chosen representation has measured cost inputs,
+exact bytes and simultaneous resource lifetime, a propagated per-channel error,
+and one explicit owner for creation, update, invalidation, and disposal.</p>
+<h2>4. Filter each consumer and add CPU parity only where needed</h2>
+<p>For post-warp footprint <code>J&#39;</code> and a band&#39;s effective support frequency
+<code>f_support</code>, use</p>
+<pre><code class="language-text">q = f_support * sigmaMax(J&#39;)
+</code></pre>
+<p>and require <code>q &lt;= 0.5</code> cycles/sample. Fade or prefilter before the bound, and
+transfer removed slope/normal energy to the material&#39;s variance/roughness path.
+Geometry displacement also obeys its mesh sampling bound. Fragment derivatives
+belong only to derivative-uniform fragment adapters; vertex and compute users
+need analytic, symbolic, supplied-footprint, or stored derivatives.</p>
+<p>Create a CPU port only for geometry/offline generation, precomputed native
+tiers, or parity evidence. It imports the same constants, seed wrapping,
+normalization, and remaps as TSL. Compare direct f32, sampled/interpolated, and
+stored/quantized error separately; threshold decisions use a guard band rather
+than a global image tolerance.</p>
+<p>Read
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-fields/references/field-stack-recipes.md#filtering-derivatives-and-parity">filtering and parity</a>
+when the field drives displacement, classification, a stored sample, or a CPU
+consumer.</p>
+<p>This step is complete when every active frequency band passes the relevant
+screen/mesh footprint gate and every CPU/storage comparison states the error
+source, bound, and threshold behavior.</p>
+<h2>5. Wire consumers, invalidation, and diagnostics</h2>
+<p>Use NodeMaterial slots or geometry/compute inputs without recreating causes.
+Data fields use linear/<code>NoColorSpace</code> handling; authored color textures use
+<code>SRGBColorSpace</code>. Keep HDR buffers linear until the single output owner.</p>
+<p>A field revision changes when its seed, coordinates, algorithm, source data,
+encoding, or accepted values change. Propagate that revision to dependent mips,
+contours, anchors, caches, and diagnostics. Static fields build once, slow
+fields update on cadence, edited fields invalidate dirty regions plus every
+filter/derivative halo, and all resources have a disposal owner. Frame-critical
+consumers stay on GPU or use an explicit asynchronous mirror; diagnostics may
+read back outside the render loop.</p>
+<p>Expose source coordinates, each cause/band, derivatives or frames, packed
+channels, selected mip/footprint, validity, direct-versus-stored error, and the
+final consumer result. Use <code>mrt()</code> when views share the scene pass.</p>
+<p>For metric signed distance, shorelines, cross-shore profiles, drainage, or
+contour-driving classifications, first read
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-fields/references/field-stack-recipes.md#metric-signed-distance-and-coastal-analysis">metric signed distance and coastal analysis</a>.</p>
+<p>This step is complete when changing any field input invalidates every dependent
+consumer, diagnostics expose every named output and failure state, and rebuilds
+produce the same values and identities for the same contract.</p>
+<h2>Completion</h2>
+<p>The field system is complete when one stage-portable cause graph accounts for
+every output; direct/baked and filtering choices are evidence-backed; CPU,
+storage, and threshold errors are explicit where those branches exist; all
+cross-system consumers receive versioned valid data in declared units; and
+coordinates, identities, mips, dirty regions, and resources remain stable
+through rebuild, LOD, resize, and disposal.</p>
 </div>
   <div class="pn">
     <a href="threejs-procedural-creatures.html">← Procedural Creatures</a>
@@ -920,10 +616,16 @@ image-pipeline ownership, and visual validation.</li>
 </main>
 
 <div class="wrap"><footer>
-  <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
-  <span style="font-size:13px">Three r185.1 · 41 working implementations · build <code>6c7881ab7386</code></span><br/>
-  <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
-  <span><a href="https://threejs-skills.com/about/">About &amp; methodology</a> · <a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/llms.txt">For coding agents</a></span>
+  <div class="footer-summary">Three.js WebGPU Skill Pack: TSL, procedural graphics, and visual validation.
+    <span>Three r185.1 · 40 primary targets · 25 accepted · build <code>ab7d8d17e058</code></span>
+    <span>Compiling shaders? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span>
+  </div>
+  <div class="footer-groups">
+    <div class="footer-group"><strong>Build</strong><a href="/#skills">Skills</a><a href="/#flagships">Examples</a><a href="/industries/">Industries</a></div>
+    <div class="footer-group"><strong>Decide</strong><a href="/for/">Who it is for</a><a href="/compare/">Compare</a><a href="/alternatives/">Alternatives</a><a href="/pricing/">Pricing</a></div>
+    <div class="footer-group"><strong>Adopt</strong><a href="/docs/">Docs</a><a href="/migrate/">Migration</a><a href="/agents/">Agent docs</a><a href="/faq/">FAQ</a></div>
+    <div class="footer-group"><strong>Proof</strong><a href="/evidence/">Evidence</a><a href="/about/">Method</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a><a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/LICENSE">License</a></div>
+  </div>
 </footer></div>
 </body>
 </html>

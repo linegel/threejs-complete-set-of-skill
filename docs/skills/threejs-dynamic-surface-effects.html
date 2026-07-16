@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Dynamic Surface Effects | Three.js WebGPU Skill</title>
-<meta name="description" content="Build dynamic screen-space surface effects in Three.js r185 WebGPU/TSL. Use for StorageTexture touch-history ping-pong, dt-correct frost/thaw masks…" />
+<title>State-Transition Dynamic Surface Effects | Three.js WebGPU Skill</title>
+<meta name="description" content="State-transition screen-space surface effects for Three.js WebGPU/TSL. Use for persistent touch, frost, or thaw history; full-field or sparse accumulation…" />
 <meta name="author" content="Three.js WebGPU Skill Pack contributors" />
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-dynamic-surface-effects.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:1e6b394e627f62530067de74268edff55eabade9d23fac107528808e31614555" />
+<meta name="skill-pack-build-revision" content="sha256:ab7d8d17e0589a6f5c2462d645b9e0d6797cd92eade36e3615dae091c6f9df5b" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -21,22 +21,22 @@
 <meta property="og:type" content="article" />
 <meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
-<meta property="og:title" content="Dynamic Surface Effects | Three.js WebGPU Skill" />
-<meta property="og:description" content="Build dynamic screen-space surface effects in Three.js r185 WebGPU/TSL. Use for StorageTexture touch-history ping-pong, dt-correct frost/thaw masks…" />
+<meta property="og:title" content="State-Transition Dynamic Surface Effects | Three.js WebGPU Skill" />
+<meta property="og:description" content="State-transition screen-space surface effects for Three.js WebGPU/TSL. Use for persistent touch, frost, or thaw history; full-field or sparse accumulation…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-dynamic-surface-effects.html" />
-<meta property="article:modified_time" content="2026-07-13T15:57:55+03:00" />
+<meta property="article:modified_time" content="2026-07-16T11:00:33+03:00" />
 <meta property="article:published_time" content="2026-07-04T23:30:20+03:00" />
 <meta property="article:section" content="Motion and Effects" />
 <meta property="og:image" content="https://threejs-skills.com/visual-validation/webgpu-touch-history-frost/final.design.png" />
 <meta property="og:image:type" content="image/png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="800" />
-<meta property="og:image:alt" content="Touch-history Frost hardware WebGPU readback for Dynamic Surface Effects" />
+<meta property="og:image:alt" content="Touch-history Frost hardware WebGPU readback for State-Transition Dynamic Surface Effects" />
 <meta name="twitter:image" content="https://threejs-skills.com/visual-validation/webgpu-touch-history-frost/final.design.png" />
-<meta name="twitter:image:alt" content="Touch-history Frost hardware WebGPU readback for Dynamic Surface Effects" />
+<meta name="twitter:image:alt" content="Touch-history Frost hardware WebGPU readback for State-Transition Dynamic Surface Effects" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Dynamic Surface Effects | Three.js WebGPU Skill" />
-<meta name="twitter:description" content="Build dynamic screen-space surface effects in Three.js r185 WebGPU/TSL. Use for StorageTexture touch-history ping-pong, dt-correct frost/thaw masks…" />
+<meta name="twitter:title" content="State-Transition Dynamic Surface Effects | Three.js WebGPU Skill" />
+<meta name="twitter:description" content="State-transition screen-space surface effects for Three.js WebGPU/TSL. Use for persistent touch, frost, or thaw history; full-field or sparse accumulation…" />
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
@@ -61,8 +61,8 @@
     "TechArticle"
    ],
    "@id": "https://threejs-skills.com/skills/threejs-dynamic-surface-effects.html#article",
-   "headline": "Dynamic Surface Effects",
-   "description": "Build dynamic screen-space surface effects in Three.js r185 WebGPU/TSL. Use for StorageTexture touch-history ping-pong, dt-correct frost/thaw masks, reduced-resolution node blur, static crystalline structure targets, and two-scale TSL normal refraction.",
+   "headline": "State-Transition Dynamic Surface Effects",
+   "description": "State-transition screen-space surface effects for Three.js WebGPU/TSL. Use for persistent touch, frost, or thaw history; full-field or sparse accumulation; static crystalline fields; reduced-resolution blur; or history-gated normal refraction.",
    "url": "https://threejs-skills.com/skills/threejs-dynamic-surface-effects.html",
    "mainEntityOfPage": {
     "@type": "WebPage",
@@ -74,7 +74,7 @@
     "https://threejs-skills.com/seo/article/threejs-dynamic-surface-effects-16x9.png"
    ],
    "datePublished": "2026-07-04T23:30:20+03:00",
-   "dateModified": "2026-07-13T15:57:55+03:00",
+   "dateModified": "2026-07-16T11:00:33+03:00",
    "author": {
     "@id": "https://threejs-skills.com/#publisher"
    },
@@ -94,7 +94,7 @@
     "Three.js",
     "WebGPU",
     "TSL",
-    "Dynamic Surface Effects"
+    "State-Transition Dynamic Surface Effects"
    ],
    "articleSection": "Motion and Effects"
   },
@@ -116,7 +116,7 @@
     {
      "@type": "ListItem",
      "position": 3,
-     "name": "Dynamic Surface Effects",
+     "name": "State-Transition Dynamic Surface Effects",
      "item": "https://threejs-skills.com/skills/threejs-dynamic-surface-effects.html"
     }
    ]
@@ -151,18 +151,18 @@ html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smo
 body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7}
 ::selection{background:rgba(255,180,84,.26);color:var(--ink)}
 a{color:inherit;text-decoration:none}
-a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
+a:focus-visible,button:focus-visible,summary:focus-visible,pre[tabindex]:focus-visible,[role="region"]:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
 main{display:block}
 .skip-link{position:fixed;z-index:100;left:16px;top:12px;translate:0 -160%;font-family:var(--mono);font-size:12px;background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:9px;transition-property:translate;transition-duration:160ms}
 .skip-link:focus{translate:0 0}
 .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
 .site-nav{position:sticky;z-index:50;top:0;background:rgba(8,10,14,.82);border-bottom:1px solid rgba(255,255,255,.075);backdrop-filter:blur(18px) saturate(1.15)}
-nav{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
-nav .brand{white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
-nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
-nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
-nav .links a:hover{color:var(--amber)}
-nav .links a:active{scale:.96}
+.site-nav>.wrap{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+.site-nav .brand{min-height:44px;display:inline-flex;align-items:center;white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
+.site-nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
+.site-nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
+.site-nav .links a:hover{color:var(--amber)}
+.site-nav .links a:active{scale:.96}
 h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:0}
 p{text-wrap:pretty}
 h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
@@ -176,7 +176,7 @@ code{font-family:var(--mono)}
 .card{min-height:100%;background:linear-gradient(145deg,rgba(19,24,33,.96),rgba(12,15,21,.96));border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px;
   box-shadow:var(--shadow-card);transition-property:translate,scale,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
 .card:hover{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
-.card:active{translate:0 -1px;scale:.99}
+.card:active{translate:0 -1px;scale:.96}
 .card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .card-kind{font-family:var(--mono);font-size:10px;color:var(--cyan)}
 .card h3,.card h4{font-size:19px;font-weight:600}
@@ -201,19 +201,29 @@ figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:s
 figcaption{padding:16px 18px;font-size:14.5px}
 figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
 figcaption span{display:block;margin-top:3px;color:var(--dim)}
-footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
+footer{border-top:1px solid var(--line);padding:44px 0 60px;display:grid;grid-template-columns:minmax(260px,1.4fr) minmax(0,2fr);gap:36px 64px;color:var(--dim);font-size:14.5px}
 footer a{color:var(--amber)}
 footer a:hover{text-decoration:underline}
 footer code{color:var(--cyan);font-size:11px}
+.footer-summary{max-width:55ch}.footer-summary>span{display:block;margin-top:8px;font-size:13px}.footer-groups{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}.footer-group{display:grid;align-content:start;gap:8px}.footer-group strong{font:400 10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}.footer-group a{min-height:40px;display:flex;align-items:center;color:var(--dim);font-size:13px;transition-property:color,scale;transition-duration:160ms}.footer-group a:hover{color:var(--amber);text-decoration:none}.footer-group a:active{scale:.96}
+.pathfinder{padding:clamp(52px,7vw,86px) 0;border-bottom:1px solid var(--line)}.pathfinder-head{display:grid;grid-template-columns:minmax(0,.7fr) minmax(320px,1.3fr);align-items:end;gap:28px 72px;margin-bottom:28px}.pathfinder-head h2{margin:0}.pathfinder-head p{max-width:58ch;color:var(--dim)}.pathfinder-rows{border-top:1px solid var(--line)}.pathfinder-row{display:grid;grid-template-columns:minmax(160px,.55fr) minmax(210px,.8fr) minmax(0,1.6fr);gap:20px 32px;align-items:center;min-height:94px;border-bottom:1px solid var(--line)}.pathfinder-stage{font:10px/1.4 var(--mono);letter-spacing:.11em;text-transform:uppercase;color:var(--cyan)}.pathfinder-row>p{color:var(--dim);font-size:14px}.pathfinder-links{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px 18px}.pathfinder-links a{min-height:44px;display:inline-flex;align-items:center;gap:8px;color:var(--amber);font:11px/1.35 var(--mono);transition-property:color,scale;transition-duration:160ms}.pathfinder-links a:after{content:"→"}.pathfinder-links a:hover{color:var(--ink)}.pathfinder-links a:active{scale:.96}
+.content-hero{padding:clamp(54px,8vw,104px) 0 42px;border-bottom:1px solid var(--line)}.breadcrumbs{min-height:44px;display:flex;align-items:center;margin-bottom:28px;font:11px/1.4 var(--mono);color:var(--dim)}.breadcrumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.breadcrumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}.breadcrumbs a{min-height:40px;display:inline-flex;align-items:center;transition-property:color,scale;transition-duration:160ms}.breadcrumbs a:hover{color:var(--amber)}.breadcrumbs a:active{scale:.96}.content-hero h1{max-width:17ch;font-size:clamp(40px,6vw,68px);font-weight:700;line-height:1.02;letter-spacing:-.02em}.content-lede{max-width:66ch;margin-top:22px;color:var(--dim);font-size:clamp(17px,2vw,20px)}.content-meta{display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:28px;font:10px/1.4 var(--mono);color:var(--cyan)}
+.content-answer{max-width:900px;margin-top:34px;padding:3px 0 3px 22px;border-left:2px solid var(--amber);font-size:clamp(19px,2.2vw,21px);line-height:1.62;color:var(--ink)}.content-shell{padding:clamp(46px,7vw,86px) 0}.content-layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(230px,1fr);align-items:start;gap:clamp(36px,6vw,76px)}.content-body{grid-column:1;grid-row:1;max-width:78ch;min-width:0}.content-body h2{margin:52px 0 16px;font-size:clamp(27px,3.5vw,39px);scroll-margin-top:112px}.content-body>h2:first-child{margin-top:0}.content-body h3{margin:34px 0 12px;font-size:21px;scroll-margin-top:112px}.content-body p,.content-body li{color:var(--dim);font-size:16px}.content-body p+p{margin-top:17px}.content-body ul,.content-body ol{margin:16px 0;padding-left:24px}.content-body li+li{margin-top:7px}.content-body a{color:var(--cyan);text-decoration:underline;text-decoration-color:rgba(127,212,193,.35);text-underline-offset:3px}.content-body a:hover{color:var(--amber);text-decoration-color:currentColor}.content-body code:not(pre code){padding:1px 5px;border:1px solid var(--line);border-radius:5px;background:#07090c;color:var(--cyan);font-size:.86em}.content-body pre{margin:20px 0;white-space:pre;tab-size:2}.content-table{max-width:100%;margin:22px 0;overflow-x:auto;border:1px solid var(--line);border-radius:12px}.content-table:focus-visible{outline:2px solid var(--amber);outline-offset:3px}.content-table table{width:100%;border-collapse:collapse;font-size:14px}.content-table th,.content-table td{min-width:150px;padding:11px 13px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);text-align:left;vertical-align:top;color:var(--dim)}.content-table th{color:var(--ink);font-weight:600;background:var(--bg2)}.content-table tr:last-child td{border-bottom:0}.content-table th:last-child,.content-table td:last-child{border-right:0}
+.content-index{grid-column:2;grid-row:1;position:sticky;top:104px;max-height:calc(100vh - 128px);overflow-y:auto;padding:18px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.content-index strong{display:block;margin-bottom:10px;font:10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}.content-index ol{list-style:none}.content-index a{min-height:40px;display:flex;align-items:center;padding:5px 0;color:var(--dim);font-size:13px;line-height:1.4;transition-property:color,translate,scale;transition-duration:160ms}.content-index a:hover{color:var(--amber);translate:3px 0}.content-index a:active{translate:1px 0;scale:.96}.content-proof{margin:54px 0 0}.content-proof figure{border-radius:16px}.content-proof img{width:100%;height:auto;max-height:650px;object-fit:cover;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}.content-proof figcaption{color:var(--dim);font:11px/1.55 var(--mono)}.content-proof figcaption a{color:var(--amber)}
+.content-layout--docs{grid-template-columns:minmax(190px,.6fr) minmax(0,2fr)}.content-layout--docs .content-index{grid-column:1}.content-layout--docs .content-body{grid-column:2;max-width:72ch}.docs-index a{padding-inline:10px;border-left:2px solid transparent}.docs-index a[aria-current="page"]{border-left-color:var(--amber);background:rgba(255,180,84,.06);color:var(--ink);font-weight:600}.docs-index-current{display:none}
+.content-facts,.content-faq-list,.content-related,.content-sources,.content-skills,.content-demos,.content-discovery,.faq-provenance{margin-top:54px;padding-top:22px;border-top:1px solid var(--line)}.content-facts h2,.content-faq-list h2,.content-related h2,.content-sources h2,.content-skills h2,.content-demos h2{font-size:24px}.content-ruled-list{list-style:none;border-top:1px solid var(--line)}.content-ruled-list li{border-bottom:1px solid var(--line)}.content-ruled-list a{min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:9px 0;color:var(--dim);font-size:14px;transition-property:color,scale;transition-duration:160ms}.content-ruled-list a:after{content:"→";color:var(--amber)}.content-ruled-list a:hover{color:var(--ink)}.content-ruled-list a:active{scale:.96}.content-related .content-ruled-list a{display:grid;grid-template-columns:104px minmax(0,1fr) auto}.content-related-family{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}.content-faq-item{padding:22px 0;border-bottom:1px solid var(--line)}.content-faq-item h3{margin:0;font-size:20px}.content-faq-item h3 a{color:var(--ink)}.content-faq-item p{margin-top:9px;color:var(--dim);font-size:15px}.faq-provenance{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);padding:0}.faq-provenance div{padding:13px;background:var(--bg2)}.faq-provenance dt{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}.faq-provenance dd{margin-top:5px;font:11px/1.45 var(--mono);color:var(--cyan);overflow-wrap:anywhere}.content-discovery{display:flex;flex-wrap:wrap;gap:10px 22px;font:11px/1.5 var(--mono);color:var(--dim)}.content-discovery a{min-height:40px;display:inline-flex;align-items:center;color:var(--amber)}
 @media (max-width:760px){
   .site-nav .wrap{padding-right:0}
-  nav{min-height:104px;display:grid;grid-template-columns:1fr;padding:14px 0 10px;gap:4px}
-  nav .brand{font-size:16px}
-  nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:none;padding-right:20px}
-  nav .links::-webkit-scrollbar{display:none}
-  nav .links a{flex:0 0 auto}
+  .site-nav>.wrap{min-height:104px;display:grid;grid-template-columns:1fr;padding-top:14px;padding-bottom:10px;gap:4px}
+  .site-nav .brand{font-size:16px}
+  .site-nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;scrollbar-color:rgba(255,180,84,.45) transparent;padding:0 20px 4px 0}
+  .site-nav .links::-webkit-scrollbar{height:3px}.site-nav .links::-webkit-scrollbar-thumb{background:rgba(255,180,84,.45);border-radius:99px}
+  .site-nav .links a{flex:0 0 auto}
   .grid,.gallery{grid-template-columns:1fr}
+  footer{grid-template-columns:1fr}.footer-groups{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+@media (max-width:900px){.pathfinder-head,.content-layout{grid-template-columns:1fr}.content-index{grid-column:1;grid-row:1;position:static;max-height:none}.content-body,.content-layout--docs .content-body{grid-column:1;grid-row:2}.docs-index{overflow:hidden}.docs-index-current{display:flex;margin-bottom:8px}.docs-index ol{display:flex;gap:8px;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;padding-bottom:6px}.docs-index li{flex:0 0 min(72vw,260px)}.docs-index .docs-index-list-current{display:none}.docs-index a{min-height:44px;padding:8px 10px;border-left:0;border-bottom:2px solid transparent;background:var(--bg2)}.docs-index a[aria-current="page"]{border-bottom-color:var(--amber)}.pathfinder-row{grid-template-columns:minmax(160px,.6fr) minmax(0,1fr)}.pathfinder-links{grid-column:1/-1;justify-content:flex-start;padding-bottom:18px}.faq-provenance{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.pathfinder-row{grid-template-columns:1fr;gap:6px;padding:18px 0}.pathfinder-links{grid-column:auto;padding:0}.content-hero h1{font-size:clamp(38px,12vw,54px)}.content-answer{padding-left:16px}.content-table{border-radius:8px}.content-table table{min-width:680px}.faq-provenance{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
@@ -228,7 +238,7 @@ header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
   linear-gradient(90deg,rgba(10,12,16,.96) 0%,rgba(10,12,16,.8) 36%,rgba(10,12,16,.24) 68%,rgba(10,12,16,.04) 100%),
   linear-gradient(0deg,rgba(10,12,16,.9) 0%,rgba(10,12,16,.08) 65%,rgba(10,12,16,.62) 100%);z-index:1}
 .crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}.crumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.crumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}
-.crumbs a:hover{color:var(--amber)}
+.crumbs a{min-height:40px;display:inline-flex;align-items:center}.crumbs a:hover{color:var(--amber)}
 h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:0;max-width:18ch}
 .lede{margin-top:24px;max-width:70ch;color:var(--dim)}
 .meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
@@ -268,6 +278,7 @@ a.chip:active{scale:.96}
 .runtime-evidence-disclosure dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;margin-top:16px;overflow:hidden;border-radius:10px;background:var(--line)}.runtime-evidence-disclosure dl div{padding:11px 12px;background:var(--bg2)}.runtime-evidence-disclosure dt{font:10px/1.35 var(--mono);color:var(--dim)}.runtime-evidence-disclosure dd{margin-top:4px;font:500 10px/1.35 var(--mono);color:var(--amber)}.runtime-evidence-disclosure dd[data-verdict="PASS"]{color:var(--lime)}
 .runtime-evidence-disclosure ul{margin:15px 0 0;padding-left:20px}.runtime-evidence-disclosure li{margin-top:5px;color:var(--dim);font-size:14px}
 .evidence-report-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:10px}.evidence-report-links a{display:grid;gap:6px;min-height:72px;padding:14px;border:1px solid var(--line);border-radius:11px;background:var(--bg2)}.evidence-report-links code{color:var(--cyan);font:11px/1.4 var(--mono);overflow-wrap:anywhere}.evidence-report-links span{color:var(--dim);font:10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.05em}
+.skill-guides{margin-top:52px;padding-top:22px;border-top:1px solid var(--line)}.skill-guides h3{font-size:22px}.skill-guides ul{margin-top:12px;list-style:none;border-top:1px solid var(--line)}.skill-guides li{border-bottom:1px solid var(--line)}.skill-guides a{min-height:52px;display:grid;grid-template-columns:120px minmax(0,1fr);align-items:center;gap:18px;color:var(--dim);font-size:14px;transition-property:color,scale;transition-duration:160ms}.skill-guides a span{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}.skill-guides a:hover{color:var(--amber)}.skill-guides a:active{scale:.96}
 @media (max-width:720px){
   .skill-hero{min-height:auto;padding:58px 0 52px}
   .skill-hero-bg{opacity:.3}
@@ -278,10 +289,10 @@ a.chip:active{scale:.96}
 </style>
 </head>
 <body>
-<a class="skip-link" href="#main-content">Skip to content</a><div class="site-nav"><div class="wrap"><nav aria-label="Primary navigation">
-  <a class="brand" href="../">Three.js WebGPU Skill&nbsp;Pack</a>
-  <div class="links"><a href="../#matrix">How it works</a><a href="../#flagships">Examples</a><a href="../#skills">Skills</a><a href="../#labs">Labs</a><a href="../evidence/">Evidence</a><a href="../#install">Install</a><a href="../about/">Method</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
-</nav></div></div>
+<a class="skip-link" href="#main-content">Skip to content</a><header class="site-nav"><div class="wrap">
+  <a class="brand" href="/">Three.js WebGPU Skill&nbsp;Pack</a>
+  <nav class="links" aria-label="Primary navigation"><a href="/#flagships">Examples</a><a href="/#skills">Skills</a><a href="/guides/">Guides</a><a href="/evidence/">Evidence</a><a href="/#install">Install</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub</a></nav>
+</div></header>
 
 <main id="main-content" tabindex="-1">
 <header class="skill-hero">
@@ -291,20 +302,19 @@ a.chip:active{scale:.96}
           <img data-responsive-preview src="../visual-validation/webgpu-touch-history-frost/final.design.png" alt="" class="skill-hero-bg" aria-hidden="true" width="1200" height="800" fetchpriority="high" decoding="async" />
         </picture>
   <div class="wrap">
-    <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Motion and Effects</a></li><li aria-current="page">Dynamic Surface Effects</li></ol></nav>
-    <h1 style="view-transition-name:skill-threejs-dynamic-surface-effects">Dynamic Surface Effects</h1>
-    <p class="lede">Build dynamic screen-space surface effects in Three.js r185 WebGPU/TSL. Use for StorageTexture touch-history ping-pong, dt-correct frost/thaw masks, reduced-resolution node blur, static crystalline structure targets, and two-scale TSL normal refraction.</p>
+    <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Motion and Effects</a></li><li aria-current="page">State-Transition Dynamic Surface Effects</li></ol></nav>
+    <h1 style="view-transition-name:skill-threejs-dynamic-surface-effects">State-Transition Dynamic Surface Effects</h1>
+    <p class="lede">State-transition screen-space surface effects for Three.js WebGPU/TSL. Use for persistent touch, frost, or thaw history; full-field or sparse accumulation; static crystalline fields; reduced-resolution blur; or history-gated normal refraction.</p>
     <p class="hero-evidence-caption">Image: Touch-history Frost hardware WebGPU readback. Source lab: webgpu-touch-history-frost.</p>
     <div class="meta-row">
       <span class="chip a">$threejs-dynamic-surface-effects</span>
       <span class="chip">2 primary targets</span>
-
-<span class="chip">1 secondary surface</span>
+      <span class="chip">1 secondary surface</span>
       <span class="chip">accepted runtime evidence</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-13T15:57:55+03:00">2026-07-13</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/67e1a7bb5ceba3c9983885acfae03f597ad4b25d">commit 67e1a7b ↗</a>
-      <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-dynamic-surface-effects/SKILL.md">SKILL.md on GitHub ↗</a>
-      <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-dynamic-surface-effects/SKILL.md">raw (for agents) ↗</a>
+      <span class="chip">Latest skill update <time datetime="2026-07-16T11:00:33+03:00">2026-07-16</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/2ce13bcc22695dafa808d6019452752d9a39cc71">commit 2ce13bc ↗</a>
+      <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-dynamic-surface-effects/SKILL.md">SKILL.md on GitHub ↗</a>
+      <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/skills/threejs-dynamic-surface-effects/SKILL.md">raw (for agents) ↗</a>
     </div>
   </div>
 </header>
@@ -326,11 +336,12 @@ a.chip:active{scale:.96}
         <span class="card-meta">Open published implementation →</span>
       </a>
       <a class="card" href="../demos/integration-temporal-surface/">
-        <span class="card-preview-wrap" data-preview-for="integration-temporal-surface" data-preview-source="integration-temporal-surface" data-preview-classification="inspected-runtime-evidence-preview"><picture class="responsive-preview">
-          <source type="image/avif" srcset="../visual-validation/integration-temporal-surface/final.design.avif" />
-          <source type="image/webp" srcset="../visual-validation/integration-temporal-surface/final.design.webp" />
-          <img data-responsive-preview src="../visual-validation/integration-temporal-surface/final.design.png" alt="Temporal-surface integration presentation for Integration Temporal Surface" class="card-preview" width="1200" height="800" loading="lazy" decoding="async" />
-        </picture><span class="media-caption">Temporal-surface integration presentation</span></span>
+        <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="integration-temporal-surface">
+    <span class="primary-evidence-label">Canonical capture</span>
+    <strong>Runtime evidence pending</strong>
+    <span><code>d127b9a71d8a</code> source hash</span>
+    <span>10 fixed states · 3 runtime proof requirements</span>
+  </span>
         <span class="card-head"><span class="card-kind">Integration</span><span class="status status--pending">Evidence pending</span></span>
         <h3>Integration Temporal Surface</h3>
         <p>2 fixed scenarios, 5 mechanism routes, and 3 locked tiers.</p>
@@ -343,7 +354,7 @@ a.chip:active{scale:.96}
   <section class="section" id="evidence-reports" aria-labelledby="evidence-reports-title"><div class="wrap">
     <h2 id="evidence-reports-title">Evidence reports</h2>
     <p class="sub">Source hashes, claim verdicts, promoted same-lab media, fixed routes, exact tier contracts, and current limitations.</p>
-    <nav class="evidence-report-links" aria-label="Evidence reports for Dynamic Surface Effects"><a href="../evidence/webgpu-touch-history-frost/"><code>webgpu-touch-history-frost</code><span>accepted</span></a><a href="../evidence/integration-temporal-surface/"><code>integration-temporal-surface</code><span>evidence pending</span></a></nav>
+    <nav class="evidence-report-links" aria-label="Evidence reports for State-Transition Dynamic Surface Effects"><a href="../evidence/webgpu-touch-history-frost/"><code>webgpu-touch-history-frost</code><span>accepted</span></a><a href="../evidence/integration-temporal-surface/"><code>integration-temporal-surface</code><span>evidence pending</span></a></nav>
   </div></section>
 
   <div class="section" id="approach"><div class="wrap">
@@ -376,24 +387,19 @@ with the blur radius driven by the same mask through a reduced-resolution node b
   <div class="section" id="validation"><div class="wrap">
     <h2>Preview and evidence ledger</h2>
     <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; rendering acceptance still requires same-lab readback and a schema-v2 bundle.</p>
-    <div class="evidence-ledger"><span class="status status--accepted">Accepted runtime evidence available</span><code>20 published images</code></div>
+    <div class="evidence-ledger"><span class="status status--accepted">Accepted runtime evidence available</span><code>10 published images</code></div>
 <div class="runtime-evidence-disclosures">
       <article class="runtime-evidence-disclosure" data-acceptance-status="accepted">
         <div class="runtime-evidence-head"><div><code>Native WebGPU runtime evidence preview</code><h3>WebGPU Touch History Frost</h3></div><span class="status status--accepted">Accepted</span></div>
         <dl><div><dt>visualCorrectness</dt><dd data-verdict="PASS">PASS</dd></div><div><dt>mechanismCorrectness</dt><dd data-verdict="PASS">PASS</dd></div><div><dt>performanceCompliance</dt><dd data-verdict="NOT_CLAIMED">NOT_CLAIMED</dd></div><div><dt>gpuAttribution</dt><dd data-verdict="NOT_CLAIMED">NOT_CLAIMED</dd></div><div><dt>lifecycleStability</dt><dd data-verdict="PASS">PASS</dd></div><div><dt>visualError</dt><dd data-verdict="PASS">PASS</dd></div></dl>
         <ul><li>Correctness and hardware physical-route visual review pass on the current source closure.</li><li>Named-adapter GPU timestamp timing remains NOT_CLAIMED.</li></ul>
-      </article>
-      <article class="runtime-evidence-disclosure" data-acceptance-status="incomplete">
-        <div class="runtime-evidence-head"><div><code>Native WebGPU runtime evidence preview</code><h3>Integration Temporal Surface</h3></div><span class="status status--pending">Evidence pending</span></div>
-        <dl><div><dt>visualCorrectness</dt><dd data-verdict="INSUFFICIENT_EVIDENCE">INSUFFICIENT_EVIDENCE</dd></div><div><dt>mechanismCorrectness</dt><dd data-verdict="INSUFFICIENT_EVIDENCE">INSUFFICIENT_EVIDENCE</dd></div><div><dt>performanceCompliance</dt><dd data-verdict="NOT_CLAIMED">NOT_CLAIMED</dd></div><div><dt>gpuAttribution</dt><dd data-verdict="NOT_CLAIMED">NOT_CLAIMED</dd></div><div><dt>lifecycleStability</dt><dd data-verdict="INSUFFICIENT_EVIDENCE">INSUFFICIENT_EVIDENCE</dd></div></dl>
-        <ul><li>Host temporal integration native WebGPU capture proves backend identity and warmed surface-history temporal readbacks on the current source hash.</li><li>Primary dependencies (frost, image-pipeline, temporal-history) block formal integration acceptance.</li><li>Named-adapter GPU timestamps remain incomplete.</li></ul>
       </article></div>
     <div class="gallery">
       <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-touch-history-frost" itemscope itemtype="https://schema.org/ImageObject">
         <span class="preview-media"><picture class="responsive-preview">
           <source type="image/avif" srcset="../visual-validation/webgpu-touch-history-frost/final.design.avif" />
           <source type="image/webp" srcset="../visual-validation/webgpu-touch-history-frost/final.design.webp" />
-          <img data-responsive-preview src="../visual-validation/webgpu-touch-history-frost/final.design.png" alt="Dynamic Surface Effects: Touch-history Frost hardware WebGPU readback" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+          <img data-responsive-preview src="../visual-validation/webgpu-touch-history-frost/final.design.png" alt="State-Transition Dynamic Surface Effects: Touch-history Frost hardware WebGPU readback" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
         </picture></span>
         <figcaption itemprop="caption"><strong>Touch-history Frost hardware WebGPU readback</strong><span>inspected runtime evidence preview</span></figcaption>
       </figure>
@@ -401,7 +407,7 @@ with the blur radius driven by the same mask through a reduced-resolution node b
         <span class="preview-media"><picture class="responsive-preview">
           <source type="image/avif" srcset="../visual-validation/webgpu-touch-history-frost/no-post.design.avif" />
           <source type="image/webp" srcset="../visual-validation/webgpu-touch-history-frost/no-post.design.webp" />
-          <img data-responsive-preview src="../visual-validation/webgpu-touch-history-frost/no-post.design.png" alt="Dynamic Surface Effects: No-frost baseline" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+          <img data-responsive-preview src="../visual-validation/webgpu-touch-history-frost/no-post.design.png" alt="State-Transition Dynamic Surface Effects: No-frost baseline" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
         </picture></span>
         <figcaption itemprop="caption"><strong>No-frost baseline</strong><span>inspected runtime evidence preview</span></figcaption>
       </figure>
@@ -409,7 +415,7 @@ with the blur radius driven by the same mask through a reduced-resolution node b
         <span class="preview-media"><picture class="responsive-preview">
           <source type="image/avif" srcset="../visual-validation/webgpu-touch-history-frost/diagnostics.mosaic.avif" />
           <source type="image/webp" srcset="../visual-validation/webgpu-touch-history-frost/diagnostics.mosaic.webp" />
-          <img data-responsive-preview src="../visual-validation/webgpu-touch-history-frost/diagnostics.mosaic.png" alt="Dynamic Surface Effects: History/deposit/mask mosaic" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+          <img data-responsive-preview src="../visual-validation/webgpu-touch-history-frost/diagnostics.mosaic.png" alt="State-Transition Dynamic Surface Effects: History/deposit/mask mosaic" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
         </picture></span>
         <figcaption itemprop="caption"><strong>History/deposit/mask mosaic</strong><span>inspected runtime evidence preview</span></figcaption>
       </figure>
@@ -417,7 +423,7 @@ with the blur radius driven by the same mask through a reduced-resolution node b
         <span class="preview-media"><picture class="responsive-preview">
           <source type="image/avif" srcset="../visual-validation/webgpu-touch-history-frost/camera.near.avif" />
           <source type="image/webp" srcset="../visual-validation/webgpu-touch-history-frost/camera.near.webp" />
-          <img data-responsive-preview src="../visual-validation/webgpu-touch-history-frost/camera.near.png" alt="Dynamic Surface Effects: Near camera" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+          <img data-responsive-preview src="../visual-validation/webgpu-touch-history-frost/camera.near.png" alt="State-Transition Dynamic Surface Effects: Near camera" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
         </picture></span>
         <figcaption itemprop="caption"><strong>Near camera</strong><span>inspected runtime evidence preview</span></figcaption>
       </figure>
@@ -425,7 +431,7 @@ with the blur radius driven by the same mask through a reduced-resolution node b
         <span class="preview-media"><picture class="responsive-preview">
           <source type="image/avif" srcset="../visual-validation/webgpu-touch-history-frost/camera.design.avif" />
           <source type="image/webp" srcset="../visual-validation/webgpu-touch-history-frost/camera.design.webp" />
-          <img data-responsive-preview src="../visual-validation/webgpu-touch-history-frost/camera.design.png" alt="Dynamic Surface Effects: Design camera" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+          <img data-responsive-preview src="../visual-validation/webgpu-touch-history-frost/camera.design.png" alt="State-Transition Dynamic Surface Effects: Design camera" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
         </picture></span>
         <figcaption itemprop="caption"><strong>Design camera</strong><span>inspected runtime evidence preview</span></figcaption>
       </figure>
@@ -433,7 +439,7 @@ with the blur radius driven by the same mask through a reduced-resolution node b
         <span class="preview-media"><picture class="responsive-preview">
           <source type="image/avif" srcset="../visual-validation/webgpu-touch-history-frost/camera.far.avif" />
           <source type="image/webp" srcset="../visual-validation/webgpu-touch-history-frost/camera.far.webp" />
-          <img data-responsive-preview src="../visual-validation/webgpu-touch-history-frost/camera.far.png" alt="Dynamic Surface Effects: Far camera" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+          <img data-responsive-preview src="../visual-validation/webgpu-touch-history-frost/camera.far.png" alt="State-Transition Dynamic Surface Effects: Far camera" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
         </picture></span>
         <figcaption itemprop="caption"><strong>Far camera</strong><span>inspected runtime evidence preview</span></figcaption>
       </figure>
@@ -441,7 +447,7 @@ with the blur radius driven by the same mask through a reduced-resolution node b
         <span class="preview-media"><picture class="responsive-preview">
           <source type="image/avif" srcset="../visual-validation/webgpu-touch-history-frost/seed-0001.final.avif" />
           <source type="image/webp" srcset="../visual-validation/webgpu-touch-history-frost/seed-0001.final.webp" />
-          <img data-responsive-preview src="../visual-validation/webgpu-touch-history-frost/seed-0001.final.png" alt="Dynamic Surface Effects: Seed 1" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+          <img data-responsive-preview src="../visual-validation/webgpu-touch-history-frost/seed-0001.final.png" alt="State-Transition Dynamic Surface Effects: Seed 1" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
         </picture></span>
         <figcaption itemprop="caption"><strong>Seed 1</strong><span>inspected runtime evidence preview</span></figcaption>
       </figure>
@@ -449,7 +455,7 @@ with the blur radius driven by the same mask through a reduced-resolution node b
         <span class="preview-media"><picture class="responsive-preview">
           <source type="image/avif" srcset="../visual-validation/webgpu-touch-history-frost/seed-9e3779b9.final.avif" />
           <source type="image/webp" srcset="../visual-validation/webgpu-touch-history-frost/seed-9e3779b9.final.webp" />
-          <img data-responsive-preview src="../visual-validation/webgpu-touch-history-frost/seed-9e3779b9.final.png" alt="Dynamic Surface Effects: Seed stress" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+          <img data-responsive-preview src="../visual-validation/webgpu-touch-history-frost/seed-9e3779b9.final.png" alt="State-Transition Dynamic Surface Effects: Seed stress" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
         </picture></span>
         <figcaption itemprop="caption"><strong>Seed stress</strong><span>inspected runtime evidence preview</span></figcaption>
       </figure>
@@ -457,7 +463,7 @@ with the blur radius driven by the same mask through a reduced-resolution node b
         <span class="preview-media"><picture class="responsive-preview">
           <source type="image/avif" srcset="../visual-validation/webgpu-touch-history-frost/temporal.t000.avif" />
           <source type="image/webp" srcset="../visual-validation/webgpu-touch-history-frost/temporal.t000.webp" />
-          <img data-responsive-preview src="../visual-validation/webgpu-touch-history-frost/temporal.t000.png" alt="Dynamic Surface Effects: Temporal t0" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+          <img data-responsive-preview src="../visual-validation/webgpu-touch-history-frost/temporal.t000.png" alt="State-Transition Dynamic Surface Effects: Temporal t0" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
         </picture></span>
         <figcaption itemprop="caption"><strong>Temporal t0</strong><span>inspected runtime evidence preview</span></figcaption>
       </figure>
@@ -465,475 +471,175 @@ with the blur radius driven by the same mask through a reduced-resolution node b
         <span class="preview-media"><picture class="responsive-preview">
           <source type="image/avif" srcset="../visual-validation/webgpu-touch-history-frost/temporal.t001.avif" />
           <source type="image/webp" srcset="../visual-validation/webgpu-touch-history-frost/temporal.t001.webp" />
-          <img data-responsive-preview src="../visual-validation/webgpu-touch-history-frost/temporal.t001.png" alt="Dynamic Surface Effects: Temporal t1" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+          <img data-responsive-preview src="../visual-validation/webgpu-touch-history-frost/temporal.t001.png" alt="State-Transition Dynamic Surface Effects: Temporal t1" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
         </picture></span>
         <figcaption itemprop="caption"><strong>Temporal t1</strong><span>inspected runtime evidence preview</span></figcaption>
-      </figure>
-      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="integration-temporal-surface" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><picture class="responsive-preview">
-          <source type="image/avif" srcset="../visual-validation/integration-temporal-surface/final.design.avif" />
-          <source type="image/webp" srcset="../visual-validation/integration-temporal-surface/final.design.webp" />
-          <img data-responsive-preview src="../visual-validation/integration-temporal-surface/final.design.png" alt="Dynamic Surface Effects: Temporal-surface integration presentation" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
-        </picture></span>
-        <figcaption itemprop="caption"><strong>Temporal-surface integration presentation</strong><span>inspected runtime evidence preview</span></figcaption>
-      </figure>
-      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="integration-temporal-surface" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><picture class="responsive-preview">
-          <source type="image/avif" srcset="../visual-validation/integration-temporal-surface/no-post.design.avif" />
-          <source type="image/webp" srcset="../visual-validation/integration-temporal-surface/no-post.design.webp" />
-          <img data-responsive-preview src="../visual-validation/integration-temporal-surface/no-post.design.png" alt="Dynamic Surface Effects: Wetness / no-post diagnostic presentation (multi-color scene)." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
-        </picture></span>
-        <figcaption itemprop="caption"><strong>Wetness / no-post diagnostic presentation (multi-color scene).</strong><span>inspected runtime evidence preview</span></figcaption>
-      </figure>
-      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="integration-temporal-surface" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><picture class="responsive-preview">
-          <source type="image/avif" srcset="../visual-validation/integration-temporal-surface/diagnostics.mosaic.avif" />
-          <source type="image/webp" srcset="../visual-validation/integration-temporal-surface/diagnostics.mosaic.webp" />
-          <img data-responsive-preview src="../visual-validation/integration-temporal-surface/diagnostics.mosaic.png" alt="Dynamic Surface Effects: Particles / diagnostic presentation (multi-color scene)." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
-        </picture></span>
-        <figcaption itemprop="caption"><strong>Particles / diagnostic presentation (multi-color scene).</strong><span>inspected runtime evidence preview</span></figcaption>
-      </figure>
-      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="integration-temporal-surface" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><picture class="responsive-preview">
-          <source type="image/avif" srcset="../visual-validation/integration-temporal-surface/camera.near.avif" />
-          <source type="image/webp" srcset="../visual-validation/integration-temporal-surface/camera.near.webp" />
-          <img data-responsive-preview src="../visual-validation/integration-temporal-surface/camera.near.png" alt="Dynamic Surface Effects: Near camera presentation." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
-        </picture></span>
-        <figcaption itemprop="caption"><strong>Near camera presentation.</strong><span>inspected runtime evidence preview</span></figcaption>
-      </figure>
-      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="integration-temporal-surface" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><picture class="responsive-preview">
-          <source type="image/avif" srcset="../visual-validation/integration-temporal-surface/camera.design.avif" />
-          <source type="image/webp" srcset="../visual-validation/integration-temporal-surface/camera.design.webp" />
-          <img data-responsive-preview src="../visual-validation/integration-temporal-surface/camera.design.png" alt="Dynamic Surface Effects: Design camera presentation." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
-        </picture></span>
-        <figcaption itemprop="caption"><strong>Design camera presentation.</strong><span>inspected runtime evidence preview</span></figcaption>
-      </figure>
-      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="integration-temporal-surface" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><picture class="responsive-preview">
-          <source type="image/avif" srcset="../visual-validation/integration-temporal-surface/camera.far.avif" />
-          <source type="image/webp" srcset="../visual-validation/integration-temporal-surface/camera.far.webp" />
-          <img data-responsive-preview src="../visual-validation/integration-temporal-surface/camera.far.png" alt="Dynamic Surface Effects: Far camera presentation." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
-        </picture></span>
-        <figcaption itemprop="caption"><strong>Far camera presentation.</strong><span>inspected runtime evidence preview</span></figcaption>
-      </figure>
-      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="integration-temporal-surface" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><picture class="responsive-preview">
-          <source type="image/avif" srcset="../visual-validation/integration-temporal-surface/seed-0001.final.avif" />
-          <source type="image/webp" srcset="../visual-validation/integration-temporal-surface/seed-0001.final.webp" />
-          <img data-responsive-preview src="../visual-validation/integration-temporal-surface/seed-0001.final.png" alt="Dynamic Surface Effects: Baseline seed presentation." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
-        </picture></span>
-        <figcaption itemprop="caption"><strong>Baseline seed presentation.</strong><span>inspected runtime evidence preview</span></figcaption>
-      </figure>
-      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="integration-temporal-surface" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><picture class="responsive-preview">
-          <source type="image/avif" srcset="../visual-validation/integration-temporal-surface/seed-9e3779b9.final.avif" />
-          <source type="image/webp" srcset="../visual-validation/integration-temporal-surface/seed-9e3779b9.final.webp" />
-          <img data-responsive-preview src="../visual-validation/integration-temporal-surface/seed-9e3779b9.final.png" alt="Dynamic Surface Effects: Stress seed presentation." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
-        </picture></span>
-        <figcaption itemprop="caption"><strong>Stress seed presentation.</strong><span>inspected runtime evidence preview</span></figcaption>
-      </figure>
-      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="integration-temporal-surface" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><picture class="responsive-preview">
-          <source type="image/avif" srcset="../visual-validation/integration-temporal-surface/temporal.t000.avif" />
-          <source type="image/webp" srcset="../visual-validation/integration-temporal-surface/temporal.t000.webp" />
-          <img data-responsive-preview src="../visual-validation/integration-temporal-surface/temporal.t000.png" alt="Dynamic Surface Effects: Temporal t0 presentation." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
-        </picture></span>
-        <figcaption itemprop="caption"><strong>Temporal t0 presentation.</strong><span>inspected runtime evidence preview</span></figcaption>
-      </figure>
-      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="integration-temporal-surface" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><picture class="responsive-preview">
-          <source type="image/avif" srcset="../visual-validation/integration-temporal-surface/temporal.t001.avif" />
-          <source type="image/webp" srcset="../visual-validation/integration-temporal-surface/temporal.t001.webp" />
-          <img data-responsive-preview src="../visual-validation/integration-temporal-surface/temporal.t001.png" alt="Dynamic Surface Effects: Temporal t1 presentation." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
-        </picture></span>
-        <figcaption itemprop="caption"><strong>Temporal t1 presentation.</strong><span>inspected runtime evidence preview</span></figcaption>
       </figure></div>
   </div></div>
 
 <div class="section" id="skill-text"><div class="wrap">
   <h2>The full skill</h2>
   <p class="sub">The complete SKILL.md as loaded by agents, rendered verbatim.</p>
-  <div class="skilltext"><h2>Dynamic Surface Effects</h2>
-<p>Use this skill for screen-space surface effects whose visible mask, thaw/clear
-state, or refractive response depends on persistent history. The only taught
-implementation path is pinned Three.js r185 with <code>WebGPURenderer</code>, TSL,
-<code>NodeMaterial</code>, <code>RenderPipeline</code>, <code>pass()</code>, storage textures, and compute.</p>
-<p>Run <code>$threejs-choose-skills</code> before implementation when the request could also
-involve world-space residue, weather accumulation, object paint, water, or a
-larger post stack.</p>
-<h2>Presentation-Only Physics Boundary</h2>
-<p>Read the shared
-<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-choose-skills/references/physics-domain-and-interaction-contract.md">physics domain and interaction contract</a>
-before showing state owned by a thermal, weather, contact, or surface solver.
-This skill remains a presentation consumer: its screen-UV R/A history is not
-authoritative temperature <code>[K]</code>, phase or coverage fraction, frost/ice loading
-<code>[kg m^-2]</code>, wetness, traction, heat flux, precipitation, contact, or weather
-state. Screen UV has no physics-frame measure.</p>
-<p>Physics-driven frost may consume read-only signal channels described by
-<code>PhysicsSignalDescriptor</code>: dimensionless coverage/phase fraction, temperature
-in kelvin, and optional areal frost/ice loading, all reached through one sealed
-<code>PhysicsPresentationSnapshot</code> and its exact candidate/camera/view-preparation
-references. Resolve the referenced <code>PhysicsPresentationCandidate</code> and its
-<code>PresentedStatePair</code>; its previous and
-current states have independent <code>PresentationSampleProvenance</code>. Use that
-provenance and the associated
-<code>PhysicsSignalDescriptor</code> footprint/filter, source clock and mapped
-<code>PhysicsInstant</code>, state version, validity, and typed per-channel error. Missing
-or invalid channels are
-absent—not zero—and the effect either follows its declared decorative policy
-or does not render the physical claim.</p>
-<p>Keep physical appearance and UI history as separate inputs. A local pointer
-mask must not subtract physical frost/ice coverage or loading unless the owner
-has published the corresponding updated state. If it does, label the result a
-decorative interaction overlay rather than simulated thaw.</p>
-<p>Pointer history is UI input. If scraping, touch, deposition, or heat transfer
-must change physical state, input/interaction routing sends a typed
-<code>InteractionRecord</code> to the owning solver; this skill later consumes the
-solver-published snapshot. It emits neither <code>InteractionRecord</code> nor
-<code>SurfaceExchange</code>, and it never reads screen history back to fabricate physical
-state. <code>NodeMaterial</code> frost tint, IOR, normals, and roughness are visual state,
-not a <code>PhysicsMaterialId</code> or properties in <code>PhysicsMaterialRegistry</code>.</p>
-<p>Advance visual history from the per-view
-<code>CameraViewPublication.previousRenderSampleInstant</code> and
-<code>currentRenderSampleInstant</code>. When current is later than previous, validate and
-form their half-open <code>PhysicsTimeInterval</code> before deriving seconds through the
-versioned clock mapping. Equal instants mean no elapsed interval; never invent a
-zero-length <code>PhysicsTimeInterval</code>. Never derive <code>dt</code> from one timestamp or
-subtract unrelated clock seconds. On seek, reversal, clock discontinuity,
-invalid mapping, or missing previous instant, execute the declared scoped
-reset/freeze/catch-up policy. This presentation interval is not a solver fixed
-step. Reset, remap, or reproject only through the resolved
-<code>ViewPreparationPublication.resetDependencies</code> when
-<code>PhysicsContext.contextVersion</code>/<code>worldTransformRevision</code>, descriptor
-<code>transformRevision</code>/<code>physicsOriginEpoch</code>, the camera publication&#39;s
-render-origin/transform/projection state, candidate-pair provenance or lease
-<code>resourceGeneration</code>, a discontinuous
-<code>ReactivePublication.sourceVersion</code>, render mapping/projection, validity, or a
-declared <code>QualityTransition</code> makes the history incompatible. An ordinary
-<code>stateVersion</code> advance is sampled; it is not itself a reset.
-A render-quality change cannot alter or rewrite the source physics signal.</p>
-<h2>Choose The State Update First</h2>
-<p>The history representation follows the state transition, not the visual theme:</p>
+  <div class="skilltext"><h2>State-Transition Dynamic Surface Effects</h2>
+<p>Own viewport-locked appearance history and its composite. Route world/object
+residue to <code>$threejs-particles-trails-and-effects</code>, weather accumulation to
+<code>$threejs-rain-snow-and-wet-surfaces</code>, bounded water to
+<code>$threejs-water-optics</code>, and shared full-frame output decisions to
+<code>$threejs-image-pipeline</code>.</p>
+<p>When temperature, phase, loading, wetness, contact, or weather drives the
+appearance, close this local handoff before step 1:</p>
+<ul>
+<li>name the physical quantity and units, producer frame/origin, transform and
+origin generations, and projection into screen UV;</li>
+<li>name the source interval, cadence, sample phase, immutable producer/version,
+and renderer consumer;</li>
+<li>declare support/filter, validity, staleness, error, and missing-signal policy;</li>
+<li>bind the GPU resource generation, producing and consuming passes, and
+completion dependency;</li>
+<li>keep the physical source read-only and give screen history its own appearance
+version; reset it on incompatible clock, origin, transform, projection, or
+resource-generation changes.</li>
+</ul>
+<p>Invoke <code>$threejs-choose-skills</code> when feedback or additional system owners are
+required. The physical owner retains authority; screen-UV history remains
+renderer-owned appearance state.
+Then read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-dynamic-surface-effects/references/ping-pong-accumulation.md#external-appearance-signals">external appearance signals</a>
+for local projection and reset rules.</p>
+<h2>Process</h2>
+<h3>1. Define the state transition and ownership</h3>
+<p>Write one contract for:</p>
+<ul>
+<li>each history channel and its dimensionless meaning;</li>
+<li>the screen-space event shape, timestamp, pressure/strength, and UV origin;</li>
+<li>evolution terms such as decay, deposition, diffusion, or no change;</li>
+<li>the state clock, suspension/seek policy, and reset dependencies;</li>
+<li>the one history writer, composite consumer, and final output owner;</li>
+<li>any external physical signal and the decorative overlay kept separate from it.</li>
+</ul>
+<p>For touch/frost history, a useful split is visible coverage in <code>R</code> and a
+smoother tilt/refraction response in <code>A</code>; <code>G/B</code> remain unused or explicitly
+diagnostic. The step is complete when every channel has one equation, writer,
+unit domain, clock, and consumer.</p>
+<h3>2. Select update topology</h3>
+<p>Choose from the state transition rather than the visual theme:</p>
 <table>
 <thead>
 <tr>
-<th>Workload</th>
-<th>Required path</th>
-<th>Reject</th>
+<th>Transition</th>
+<th>Update topology</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>Global decay/diffusion changes most texels every step</td>
-<td>Full-field ping-pong compute at the lowest history resolution that passes edge tests</td>
-<td>Dirty rectangles that leave untouched texels at the wrong age</td>
+<td>Decay, diffusion, or forcing changes most texels</td>
+<td>Full-field ping-pong compute</td>
 </tr>
 <tr>
 <td>Deposits are sparse and untouched texels are invariant</td>
-<td>Event bounding boxes or dirty tiles; dispatch only covered tiles</td>
-<td>A full-screen dispatch for one small mark</td>
+<td>Event bounds or dirty tiles</td>
+</tr>
+<tr>
+<td>Sparse state also decays</td>
+<td>Timestamped tiles with analytic catch-up on every visible/filter sample, or materialize every visible tile</td>
 </tr>
 <tr>
 <td>Many events overlap</td>
-<td>Bin events into screen tiles, prefix/compact bounded tile lists, then process dirty tiles or rasterize an aggregate deposit field</td>
-<td>Claiming <code>O(pixels + events)</code> when overlap still costs <code>sum(P_t * E_t)</code></td>
+<td>Bin events to tiles; bound/compact lists or rasterize one aggregate deposit field</td>
 </tr>
 <tr>
-<td>The effect is fixed for long intervals</td>
-<td>Bake the static structure once and stop history dispatches while idle</td>
-<td>Paying a nominally disabled compute pass</td>
+<td>State and inputs are unchanged</td>
+<td>Idle: retain history and dispatch nothing</td>
 </tr>
 </tbody></table>
-<p>The full-field path is the canonical frost/thaw case when state must be
-materialized every frame. A lazy-decay tile stores <code>lastUpdateTime</code> and applies
-analytic catch-up on every visible/filter sample, not only on the next touch;
-otherwise old visible tiles remain stale. Diffusion couples neighbours and
-requires a global step or halo-expanded active domain—independent timestamped
-tiles are not equivalent.</p>
-<h2>Select Architecture From Update Topology</h2>
-<p>Build the high-throughput frame graph first. Do not start from a simple
-per-frame visual mask and later &quot;upgrade&quot; to history.</p>
-<pre><code class="language-text">sealed PhysicsPresentationSnapshot
-  -&gt; resolve PhysicsPresentationCandidate bindings/leases
-  -&gt; resolve CameraViewPublication render interval/transforms
-  -&gt; resolve ViewPreparationPublication reactive/reset actions
-  -&gt; validate/project physical appearance channels ---------------------+
-UI input events for this frame                                           |
-  -&gt; compute pointer deposit into next visual-history StorageTexture    |
-  -&gt; swap visual-history read/write ------------------------------------+
-scene pass via pass(scene, camera)                                      |
-  -&gt; reduced-resolution vertical blur pass at a scale selected by edge/error gates
-  -&gt; reduced-resolution horizontal blur pass at the same measured scale
-  -&gt; static crystalline fields, generated once or loaded from assets
-  -&gt; full-resolution frost/thaw composite node &lt;------------------------+
-  -&gt; two-scale TSL normal refraction node
-  -&gt; RenderPipeline output node with one output transform owner
+<p>Diffusion uses a full field or halo-expanded active domain. Read
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-dynamic-surface-effects/references/ping-pong-accumulation.md#update-topologies">update topologies</a>
+for overlap cost and diffusion stability. The step is complete when untouched
+texels evolve exactly as the chosen model requires and idle frames schedule no
+state work.</p>
+<h3>3. Make time and event integration invariant</h3>
+<p>Derive <code>dt</code> from two ordered samples on the same clock. Treat equal samples as
+zero elapsed time. A missing previous sample, reversal, seek, invalid mapping,
+or discontinuity follows the declared freeze, reset, analytic catch-up, or
+bounded-substep policy.</p>
+<p>Rasterize timestamped pointer motion as swept capsules with aspect from the
+history texture. Integrate decay and saturating deposition together so a held
+pointer and a swept gesture converge independently of render-frame count.
+Subdivide event intervals only when their pressure or coverage variation
+exceeds the declared error gate.</p>
+<p>Read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-dynamic-surface-effects/references/ping-pong-accumulation.md#dt-correct-history">dt-correct history</a>
+before implementing decay, deposition, or diffusion. The step is complete when
+the same timed input yields equivalent history at 30, 60, and 120 Hz and a
+suspension does not silently discard elapsed evolution.</p>
+<h3>4. Allocate the ping-pong graph</h3>
+<p>Use <code>WebGPURenderer</code> from <code>three/webgpu</code>, call <code>await renderer.init()</code>, and
+require <code>renderer.backend.isWebGPUBackend === true</code> for this canonical path.
+Route explicit WebGPU-unavailable teaching to
+<code>$threejs-compatibility-fallbacks</code>.
+Allocate two renderer-owned <code>StorageTexture</code> histories at the lowest measured
+extent/format that passes reconstruction and quantization tests. Keep history,
+scene color, blur intermediates, and static structure fields as separate
+resources.</p>
+<p>Order the graph:</p>
+<pre><code class="language-text">immutable external appearance signals + timestamped UI events
+  -&gt; write next history from previous history
+  -&gt; publish/swap the completed history generation
+single scene pass
+  -&gt; optional separable blur at its owned reduced extent
+  -&gt; static structure + current history composite
+  -&gt; optional history-gated normal refraction
+  -&gt; one RenderPipeline output transform
 </code></pre>
-<p>History update comes before the frost composite so visible response can include
-the current frame&#39;s input. If a product deliberately wants a one-frame delayed
-feel, document that as a UX choice and keep the diagnostic contract identical.</p>
-<p>When close-inspection error and target measurements require it, the top tier
-uses a full-resolution RGBA <code>StorageTexture</code> ping-pong:</p>
-<ul>
-<li><code>R</code>: accumulated visible touch/thaw mask.</li>
-<li><code>A</code>: accumulated tilt/refraction response mask.</li>
-<li><code>G/B</code>: optional duplicate or debug channels, never hidden state.</li>
-</ul>
-<p>Use a declared dispatch shape: linear
-<code>.compute(width * height, [64])</code> with <code>instanceIndex</code>, or explicit 2D
-<code>.compute([gx, gy, 1], [wx, wy, 1])</code> with <code>globalId.xy</code> and extent guards.
-In the latter, <code>[gx,gy,1]</code> is workgroup count. Enqueue through
-<code>renderer.compute()</code>; <code>computeAsync()</code> only awaits renderer initialization in
-r185 and is not a GPU-completion fence. Keep the path read-back-free. Use
-<code>PassNode.getPreviousTextureNode()</code> only for temporal pass
-feedback that is naturally owned by a node pass; use storage textures when the
-history must be written from pointer/event data or compute.</p>
-<h2>Capability Gate</h2>
-<p>Compute and storage are required for the full-quality path.</p>
-<pre><code class="language-js">import { WebGPURenderer, RenderPipeline, StorageTexture } from &#39;three/webgpu&#39;;
-import { Fn, pass, storageTexture, textureStore } from &#39;three/tsl&#39;;
-
-const renderer = new WebGPURenderer( { antialias: false } );
-await renderer.init();
-
-if (renderer.backend.isWebGPUBackend !== true) {
-  throw new Error(
-    &#39;WebGPU is required for the canonical dynamic-surface path; route an explicit request for teaching fallback to threejs-compatibility-fallbacks.&#39;
-  );
-}
-
-// Native WebGPU tiers vary history resolution, format, event binning, blur,
-// and refraction while preserving the same state transition.
-</code></pre>
-<p>Quality tiers:</p>
-<table>
-<thead>
-<tr>
-<th>Tier</th>
-<th>Required capability</th>
-<th>History</th>
-<th>Blur</th>
-<th>Refraction</th>
-<th>Intended use</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Full</td>
-<td>WebGPU backend with storage texture compute</td>
-<td>full-res RGBA16F ping-pong when close inspection proves it necessary</td>
-<td>highest measured scale required by edge/error gates</td>
-<td>two-scale normals, height weighting, Fresnel/source inset</td>
-<td>close inspection</td>
-</tr>
-<tr>
-<td>Balanced</td>
-<td>WebGPU backend with tighter budget</td>
-<td>half-res history or RG8/RG16F after measurement</td>
-<td>measured reduced scale</td>
-<td>one full normals plus reduced detail</td>
-<td>ordinary inspection distance</td>
-</tr>
-<tr>
-<td>Budgeted</td>
-<td>WebGPU backend with minimal storage budget</td>
-<td>quarter-res RG8/RG16F or sparse updates</td>
-<td>minimum scale that passes edge gates</td>
-<td>tint plus single offset</td>
-<td>small projected footprint or strict traffic budget</td>
-</tr>
-</tbody></table>
-<p>If the user explicitly asks how to apply fallback when WebGPU is unavailable,
-route that teaching to <code>../threejs-compatibility-fallbacks/</code> instead of adding
-a non-WebGPU path here.</p>
-<h2>Implementation Rules</h2>
-<ul>
-<li>Treat both ping-pong slots as renderer-owned presentation resources. They are
-never registered as authoritative physics signals and have no physics
-readback path.</li>
-<li>Keep persistent history, scene color, and static structure textures separate.</li>
-<li>Record <code>eventCount</code>, dirty-tile count, texels dispatched, and the asymptotic
-update cost. A storage dispatch over the complete drawing buffer is not
-automatically efficient merely because it runs on the GPU.</li>
-<li>Integrate decay and saturating deposition together. For channel state <code>x</code>,
-brush coverage <code>b</code>, decay rate <code>lambda=-log(survivalPerSecond)</code>, and fill rate
-<code>r=-log(1-depositPerSecond)</code>, use
-<code>a=lambda+r*b</code>, <code>xEq=r*b/a</code>,
-<code>xNext=xEq+(x-xEq)*exp(-a*dt)</code> (with the zero-rate limit handled explicitly).
-Consume timestamped pointer segments and rasterize a swept capsule; one
-endpoint stamp per render frame is not frame-rate invariant. Suspension
-policy is explicit rather than silently clamping away elapsed state.</li>
-<li>Preserve separate visible-mask and tilt-response channels. The tilt channel
-should use smoother/noise-reduced deposit than the visible channel.</li>
-<li>Update history with aspect from the history texture dimensions, not from a
-reduced blur target.</li>
-<li>Use <code>HalfFloatType</code>/RGBA16F-equivalent history when accumulated precision
-needs it. Before selecting <code>RG8</code>, <code>RGBA8</code>, or another compact storage format,
-prove that the exact format is storage-writable and filterable on the target
-adapter and that quantization/decay remain stable at 30, 60, and 120 Hz.</li>
-<li>Optional diffusion must be stable and explicit: apply a small Laplacian term
-to the R/A history after decay/deposit only when the visible signature
-improves edge cohesion without same-UV smearing. Validate disabled diffusion
-and enabled diffusion at 30, 60, and 120 FPS.</li>
-<li>Use reduced-resolution separable blur with <code>PassNode.setResolutionScale()</code> or
-an equivalent node blur whose resolution scale is owned by the pass. Normalize
-alpha separately from RGB and guard zero-weight neighborhoods with an epsilon.</li>
-<li>Generate static crystalline fields once at startup or on resize/quality
-change. Asset/data textures are <code>NoColorSpace</code>, repeat or mirrored-repeat
-wrap as authored, and only generate mipmaps when the sampling path needs them.</li>
-<li>Build the final surface as TSL nodes feeding <code>RenderPipeline.outputNode</code>.
-Node materials for any helper meshes use the <code>NodeMaterial</code> family.</li>
-<li>Screen-period uniforms must be named as periods, not texture sizes. Derive
-real texel dimensions from texture metadata when needed.</li>
-<li>Define resize policy explicitly: clear, preserve by remapping, or preserve by
-reprojection. The default safe policy is to clear history and regenerate static
-structure textures.</li>
-</ul>
-<h2>Color And Output</h2>
-<ul>
-<li>Scene color entering the surface pipeline stays linear/HDR until the final
-output transform. Working buffers use <code>HalfFloatType</code> where precision matters.</li>
-<li>LDR color assets encoded as sRGB use <code>SRGBColorSpace</code>; HDR/EXR radiance
-remains loader-declared linear. Data textures, normal maps, masks, noise, and
-LUTs use <code>NoColorSpace</code>.</li>
-<li>The app has exactly one tone-map owner and one output conversion owner.
-Prefer <code>RenderPipeline.outputColorTransform = true</code>; if disabled, end the node
-graph with <code>renderOutput()</code>. Do not output-convert inside the effect.</li>
-<li>Frost tint, brightness, saturation, blur mix, and normal-refraction math are
-all linear-light operations before final output conversion.</li>
-</ul>
-<h2>Performance Contract</h2>
-<p>Set budgets before tuning visuals:</p>
-<table>
-<thead>
-<tr>
-<th>Work item</th>
-<th>Accounted cost</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Pass graph</td>
-<td>one existing scene input, one state update when dirty/decaying, two separable blur passes only when enabled, one composite/refraction output</td>
-</tr>
-<tr>
-<td>History storage</td>
-<td>Derived: <code>2 * width * height * bytesPerTexel</code>; full-res RGBA16F is about 31.6 MiB at 1920x1080, before alignment</td>
-</tr>
-<tr>
-<td>Static storage</td>
-<td>exact sum of selected data textures; generate once and share by content hash</td>
-</tr>
-<tr>
-<td>Dispatch</td>
-<td><code>ceil(activeWidth / wx) * ceil(activeHeight / wy)</code> workgroups; record active texels and measured workgroup choice</td>
-</tr>
-<tr>
-<td>Draw calls</td>
-<td>no extra scene redraws beyond the source pass</td>
-</tr>
-<tr>
-<td>Bandwidth lower bound</td>
-<td>bytes read + written by state, blur, and composite, including both ping-pong slots and any resolve/copy</td>
-</tr>
-</tbody></table>
-<p>The subsystem ceiling is allocated by <code>$threejs-choose-skills</code> from the whole
-frame; these rows are not permission to consume the entire mobile frame.
-Start native low-power trials at reduced history scale, but select the scale
-from projected feature error, peak-live memory, tile attachment behavior, and
-sustained p50/p95 target timing—not a universal pixel count. Report
-contemporaneous full-frame timing and paired marginal cost; raise
-blur/refraction quality only after state update and reconstruction fit the
-allocation.</p>
-<h2>Diagnostics And Validation</h2>
-<p>Expose debug outputs for:</p>
-<pre><code class="language-text">scene color
-vertical blur
-horizontal blur
-each static structure field
-previous history R/A
-current deposit R/A
-next history R/A
-frost mask before pointer application
-frost mask after pointer application
-sharp/blur mix
-main refraction offset
-detail refraction offset
-final without refraction
-final
-</code></pre>
-<p>Add pause and single-step controls. Validate:</p>
-<ul>
-<li>The same pointer path produces matching accumulated masks at 30, 60, and
-120 FPS.</li>
-<li>Resize follows the documented clear/preserve policy.</li>
-<li>Repeat or mirrored-repeat normal sampling is visible at boundaries.</li>
-<li><code>RenderPipeline.render()</code> owns presentation when the node pipeline is active.</li>
-<li>Output screenshots are neither double-converted nor left in linear display
-space.</li>
-<li>Optional physical inputs reject stale, unsupported, invalid, or incompatible
-candidate-pair provenance; context, transform/origin, lease generation,
-per-view camera interval, view-preparation reactive source,
-render-mapping/projection, and quality discontinuities take the declared
-scoped reset/remap/reprojection path, and the snapshot resolves rather than
-copies those exact publications.</li>
-<li>The steady frame loop performs zero readbacks from presentation history and
-emits zero physical interaction, exchange, material, force, or contact state.</li>
-</ul>
-<p>Interface anchors:</p>
-<table>
-<thead>
-<tr>
-<th>Interface</th>
-<th>Contract</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Pointer NDC</td>
-<td>Convert <code>[-1, 1]</code> input to history UV explicitly.</td>
-</tr>
-<tr>
-<td>Texel center</td>
-<td>Compute dispatches address storage texel centers, not CSS pixels.</td>
-</tr>
-<tr>
-<td>Drawing-buffer size</td>
-<td>Storage dimensions use physical drawing-buffer pixels after DPR.</td>
-</tr>
-<tr>
-<td>CSS size / DPR</td>
-<td>CSS size and DPR are metadata for resize policy, never hidden scale factors.</td>
-</tr>
-<tr>
-<td>Screen period</td>
-<td><code>mainScreenPeriod</code> and <code>detailScreenPeriod</code> are screen periods, not texture dimensions.</td>
-</tr>
-<tr>
-<td>UV origin</td>
-<td>Name Y-up/Y-down assumptions before sampling history or normal maps.</td>
-</tr>
-</tbody></table>
-<h2>Replaced Techniques</h2>
-<ul>
-<li>Replaced time-only procedural masks with storage-backed history because
-accumulation is stateful and must survive visual noise changes.</li>
-<li>Replaced per-frame decay constants with exponential dt-correct survival so
-30/60/120 FPS behavior matches.</li>
-<li>Replaced full-resolution broad blur with reduced-resolution separable blur
-because it preserves the same broad frost feel at far lower bandwidth.</li>
-<li>Replaced single-scale offset refraction with two-scale TSL normal refraction
-using height-weighted detail, Fresnel/source inset, and mask gating because it
-gives better frozen-surface structure per sample.</li>
-</ul>
-<h2>Routing Boundary</h2>
-<p>Use <code>$threejs-particles-trails-and-effects</code> for world- or object-space residue, particles, and
-dissolves. Use <code>$threejs-rain-snow-and-wet-surfaces</code> for rain wetness, puddles,
-snow accumulation, and weather-surface coupling. Use <code>$threejs-water-optics</code>
-for physically bounded water refraction/ripples. Use <code>$threejs-image-pipeline</code>
-when the work is mostly full-frame post ownership, tone mapping, bloom, GTAO, or
-anti-aliasing.</p>
-<p>This skill owns screen-space persistent surface history and its composite.
-It does not own thermal phase, frost mass, wetness, friction, or physical
-contact even when those signals drive the composite.</p>
-<p>Legacy WebGL implementation (deprecated, do not extend): <code>examples/touch-history-frost/frost-surface-effect.js</code>.</p>
+<p>Use <code>Fn().compute(...)</code>, <code>storageTexture()</code>, and <code>textureStore()</code> for history
+updates. Enqueue with <code>renderer.compute(...)</code>; r185 <code>computeAsync()</code> is not a
+GPU-completion fence. Keep the steady path readback-free. Mark/rebuild the
+render graph when the output node, diagnostic route, resource extent/format, or
+quality branch changes.</p>
+<p>Read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-dynamic-surface-effects/references/ping-pong-accumulation.md#resources-and-r185-execution">resources and r185 execution</a>
+before allocating or swapping textures. The step is complete when every pass
+reads a committed generation, no pass samples the texture it writes, and the
+scene is rendered once.</p>
+<h3>5. Compose blur, structure, and refraction</h3>
+<p>Generate static crystalline/noise fields once at startup or when their extent
+or quality changes. Treat them as data with <code>NoColorSpace</code>. Use separable blur
+at a pass-owned reduced resolution and alpha-aware normalization when alpha
+participates. Build the composite and refraction as TSL nodes feeding
+<code>RenderPipeline.outputNode</code>.</p>
+<p>Keep scene and working buffers linear/HDR until the single output conversion.
+Use screen-period uniforms as periods; derive texel dimensions from the actual
+resource. Gate refraction by structural coverage and current history, define
+normal wrap and source-edge behavior, and apply Fresnel in linear light.</p>
+<p>Read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-dynamic-surface-effects/references/ping-pong-accumulation.md#composite-and-refraction">composite and refraction</a>
+when either branch is active. The step is complete when blur extent, texture
+domains, UV conventions, refraction bounds, and output conversion are each
+owned and visible in diagnostics.</p>
+<h3>6. Close the lifecycle</h3>
+<p>Choose one resize policy: clear both histories, remap, or depth/camera-aware
+reprojection. Reset or reproject on incompatible clock, origin, transform,
+projection, resource generation, representation, or quality changes. Ordinary
+continuous source-version advances are sampled rather than reset.</p>
+<p>On idle, retain persistent state and stop update work. On resume, apply the
+declared time policy before accepting new input. On disposal or device loss,
+invalidate the history generation and release both histories, blur/static
+resources, compute/pipeline nodes, and input/resize listeners; create a fresh
+generation before the next draw.</p>
+<p>Read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-dynamic-surface-effects/references/ping-pong-accumulation.md#resize-reset-and-disposal">resize, reset, and disposal</a>.
+The step is complete when resize, seek, quality change, idle/resume, disposal,
+and device loss each have an explicit state transition and resource result.</p>
+<h3>7. Prove state and presentation</h3>
+<p>Expose previous history, deposit, next history, dirty tiles/active texels,
+scene color, blur axes, static fields, pre/post-history mask, refraction offsets,
+final-without-refraction, and final. Add pause and single-step controls.</p>
+<p>Measure event count, tile-list occupancy, dispatched texels, history and
+intermediate bytes, traffic lower bound, dispatch/draw timing, and whole-frame
+p50/p95. Scale by stopping idle work, choosing a valid sparse path, then
+reducing history/blur extent or precision after state-equivalence tests.</p>
+<p>Read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-dynamic-surface-effects/references/ping-pong-accumulation.md#resource-accounting">resource accounting</a>
+and <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-dynamic-surface-effects/references/ping-pong-accumulation.md#diagnostics-and-failure-signatures">diagnostics and failure signatures</a>.
+The skill is complete when timed inputs match across 30/60/120 Hz; full,
+sparse, and idle transitions behave as selected; ping-pong generations never
+alias; resize/reset/disposal controls pass; physical inputs remain read-only;
+the frame loop performs zero history readbacks; the scene renders once; output
+conversion has one owner; and the complete scene meets its named memory,
+traffic, and timing budget.</p>
 </div>
   <div class="pn">
     <a href="threejs-debugging.html">← Three.js Debugging</a>
@@ -960,10 +666,16 @@ contact even when those signals drive the composite.</p>
 </main>
 
 <div class="wrap"><footer>
-  <span>Three.js WebGPU Skill Pack: TSL, procedural graphics, and visual validation.<br/>
-  <span style="font-size:13px">Three r185.1 · 41 primary targets · 6 accepted · build <code>1e6b394e627f</code></span><br/>
-  <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
-  <span><a href="https://threejs-skills.com/about/">About &amp; methodology</a> · <a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/llms.txt">For coding agents</a></span>
+  <div class="footer-summary">Three.js WebGPU Skill Pack: TSL, procedural graphics, and visual validation.
+    <span>Three r185.1 · 40 primary targets · 25 accepted · build <code>ab7d8d17e058</code></span>
+    <span>Compiling shaders? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span>
+  </div>
+  <div class="footer-groups">
+    <div class="footer-group"><strong>Build</strong><a href="/#skills">Skills</a><a href="/#flagships">Examples</a><a href="/industries/">Industries</a></div>
+    <div class="footer-group"><strong>Decide</strong><a href="/for/">Who it is for</a><a href="/compare/">Compare</a><a href="/alternatives/">Alternatives</a><a href="/pricing/">Pricing</a></div>
+    <div class="footer-group"><strong>Adopt</strong><a href="/docs/">Docs</a><a href="/migrate/">Migration</a><a href="/agents/">Agent docs</a><a href="/faq/">FAQ</a></div>
+    <div class="footer-group"><strong>Proof</strong><a href="/evidence/">Evidence</a><a href="/about/">Method</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a><a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/LICENSE">License</a></div>
+  </div>
 </footer></div>
 </body>
 </html>

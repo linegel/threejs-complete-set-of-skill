@@ -4,12 +4,12 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Image Pipeline | Three.js WebGPU Skill</title>
-<meta name="description" content="Build a minimal, workload-selected WebGPU/TSL final-image pipeline for advanced Three.js scenes. Use for RenderPipeline ownership; conditional pass()/mrt()…" />
+<meta name="description" content="Coordinate Three.js WebGPU/TSL final-image graphs. Use when effects share scene-pass signals or output ownership, when choosing MRT versus reconstruction or…" />
 <meta name="author" content="Three.js WebGPU Skill Pack contributors" />
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-image-pipeline.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b" />
+<meta name="skill-pack-build-revision" content="sha256:ab7d8d17e0589a6f5c2462d645b9e0d6797cd92eade36e3615dae091c6f9df5b" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -17,26 +17,26 @@
 <link rel="manifest" href="../site.webmanifest" />
 <link rel="alternate" type="text/plain" href="https://threejs-skills.com/llms.txt" title="LLM-readable skill catalog" />
 <link rel="alternate" type="application/json" href="https://threejs-skills.com/skills.json" title="Machine-readable skill catalog" />
-<link rel="preload" as="image" href="../visual-validation/webgpu-image-pipeline/final.design.avif" type="image/avif" fetchpriority="high" />
+<link rel="preload" as="image" href="../visual-validation/creature-habitat/final.design.avif" type="image/avif" fetchpriority="high" />
 <meta property="og:type" content="article" />
 <meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
 <meta property="og:title" content="Image Pipeline | Three.js WebGPU Skill" />
-<meta property="og:description" content="Build a minimal, workload-selected WebGPU/TSL final-image pipeline for advanced Three.js scenes. Use for RenderPipeline ownership; conditional pass()/mrt()…" />
+<meta property="og:description" content="Coordinate Three.js WebGPU/TSL final-image graphs. Use when effects share scene-pass signals or output ownership, when choosing MRT versus reconstruction or…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-image-pipeline.html" />
-<meta property="article:modified_time" content="2026-07-11T13:19:44+03:00" />
+<meta property="article:modified_time" content="2026-07-16T12:45:44+03:00" />
 <meta property="article:published_time" content="2026-07-04T23:30:20+03:00" />
 <meta property="article:section" content="Cameras, Lighting, and Final Image" />
-<meta property="og:image" content="https://threejs-skills.com/visual-validation/webgpu-image-pipeline/final.design.png" />
+<meta property="og:image" content="https://threejs-skills.com/visual-validation/creature-habitat/final.design.png" />
 <meta property="og:image:type" content="image/png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="800" />
-<meta property="og:image:alt" content="Final image-pipeline render-target readback for Image Pipeline" />
-<meta name="twitter:image" content="https://threejs-skills.com/visual-validation/webgpu-image-pipeline/final.design.png" />
-<meta name="twitter:image:alt" content="Final image-pipeline render-target readback for Image Pipeline" />
+<meta property="og:image:alt" content="Accepted demo-sourced runtime evidence for Image Pipeline" />
+<meta name="twitter:image" content="https://threejs-skills.com/visual-validation/creature-habitat/final.design.png" />
+<meta name="twitter:image:alt" content="Accepted demo-sourced runtime evidence for Image Pipeline" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Image Pipeline | Three.js WebGPU Skill" />
-<meta name="twitter:description" content="Build a minimal, workload-selected WebGPU/TSL final-image pipeline for advanced Three.js scenes. Use for RenderPipeline ownership; conditional pass()/mrt()…" />
+<meta name="twitter:description" content="Coordinate Three.js WebGPU/TSL final-image graphs. Use when effects share scene-pass signals or output ownership, when choosing MRT versus reconstruction or…" />
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
@@ -62,7 +62,7 @@
    ],
    "@id": "https://threejs-skills.com/skills/threejs-image-pipeline.html#article",
    "headline": "Image Pipeline",
-   "description": "Build a minimal, workload-selected WebGPU/TSL final-image pipeline for advanced Three.js scenes. Use for RenderPipeline ownership; conditional pass()/mrt() depth, normal, albedo, emissive, velocity, and history signals; GTAONode, BloomNode, TRAANode, exposure, tone mapping, 3D LUT grading, outputColorTransform, diagnostics, and measured quality/performance tradeoffs.",
+   "description": "Coordinate Three.js WebGPU/TSL final-image graphs. Use when effects share scene-pass signals or output ownership, when choosing MRT versus reconstruction or narrow passes, when admitting temporal history, or when whole-graph budgets and lifetimes decide the design.",
    "url": "https://threejs-skills.com/skills/threejs-image-pipeline.html",
    "mainEntityOfPage": {
     "@type": "WebPage",
@@ -74,7 +74,7 @@
     "https://threejs-skills.com/seo/article/threejs-image-pipeline-16x9.png"
    ],
    "datePublished": "2026-07-04T23:30:20+03:00",
-   "dateModified": "2026-07-11T13:19:44+03:00",
+   "dateModified": "2026-07-16T12:45:44+03:00",
    "author": {
     "@id": "https://threejs-skills.com/#publisher"
    },
@@ -151,18 +151,18 @@ html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smo
 body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7}
 ::selection{background:rgba(255,180,84,.26);color:var(--ink)}
 a{color:inherit;text-decoration:none}
-a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
+a:focus-visible,button:focus-visible,summary:focus-visible,pre[tabindex]:focus-visible,[role="region"]:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
 main{display:block}
 .skip-link{position:fixed;z-index:100;left:16px;top:12px;translate:0 -160%;font-family:var(--mono);font-size:12px;background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:9px;transition-property:translate;transition-duration:160ms}
 .skip-link:focus{translate:0 0}
 .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
 .site-nav{position:sticky;z-index:50;top:0;background:rgba(8,10,14,.82);border-bottom:1px solid rgba(255,255,255,.075);backdrop-filter:blur(18px) saturate(1.15)}
-nav{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
-nav .brand{white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
-nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
-nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
-nav .links a:hover{color:var(--amber)}
-nav .links a:active{scale:.96}
+.site-nav>.wrap{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+.site-nav .brand{min-height:44px;display:inline-flex;align-items:center;white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
+.site-nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
+.site-nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
+.site-nav .links a:hover{color:var(--amber)}
+.site-nav .links a:active{scale:.96}
 h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:0}
 p{text-wrap:pretty}
 h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
@@ -176,7 +176,7 @@ code{font-family:var(--mono)}
 .card{min-height:100%;background:linear-gradient(145deg,rgba(19,24,33,.96),rgba(12,15,21,.96));border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px;
   box-shadow:var(--shadow-card);transition-property:translate,scale,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
 .card:hover{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
-.card:active{translate:0 -1px;scale:.99}
+.card:active{translate:0 -1px;scale:.96}
 .card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .card-kind{font-family:var(--mono);font-size:10px;color:var(--cyan)}
 .card h3,.card h4{font-size:19px;font-weight:600}
@@ -201,19 +201,29 @@ figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:s
 figcaption{padding:16px 18px;font-size:14.5px}
 figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
 figcaption span{display:block;margin-top:3px;color:var(--dim)}
-footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
+footer{border-top:1px solid var(--line);padding:44px 0 60px;display:grid;grid-template-columns:minmax(260px,1.4fr) minmax(0,2fr);gap:36px 64px;color:var(--dim);font-size:14.5px}
 footer a{color:var(--amber)}
 footer a:hover{text-decoration:underline}
 footer code{color:var(--cyan);font-size:11px}
+.footer-summary{max-width:55ch}.footer-summary>span{display:block;margin-top:8px;font-size:13px}.footer-groups{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}.footer-group{display:grid;align-content:start;gap:8px}.footer-group strong{font:400 10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}.footer-group a{min-height:40px;display:flex;align-items:center;color:var(--dim);font-size:13px;transition-property:color,scale;transition-duration:160ms}.footer-group a:hover{color:var(--amber);text-decoration:none}.footer-group a:active{scale:.96}
+.pathfinder{padding:clamp(52px,7vw,86px) 0;border-bottom:1px solid var(--line)}.pathfinder-head{display:grid;grid-template-columns:minmax(0,.7fr) minmax(320px,1.3fr);align-items:end;gap:28px 72px;margin-bottom:28px}.pathfinder-head h2{margin:0}.pathfinder-head p{max-width:58ch;color:var(--dim)}.pathfinder-rows{border-top:1px solid var(--line)}.pathfinder-row{display:grid;grid-template-columns:minmax(160px,.55fr) minmax(210px,.8fr) minmax(0,1.6fr);gap:20px 32px;align-items:center;min-height:94px;border-bottom:1px solid var(--line)}.pathfinder-stage{font:10px/1.4 var(--mono);letter-spacing:.11em;text-transform:uppercase;color:var(--cyan)}.pathfinder-row>p{color:var(--dim);font-size:14px}.pathfinder-links{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px 18px}.pathfinder-links a{min-height:44px;display:inline-flex;align-items:center;gap:8px;color:var(--amber);font:11px/1.35 var(--mono);transition-property:color,scale;transition-duration:160ms}.pathfinder-links a:after{content:"→"}.pathfinder-links a:hover{color:var(--ink)}.pathfinder-links a:active{scale:.96}
+.content-hero{padding:clamp(54px,8vw,104px) 0 42px;border-bottom:1px solid var(--line)}.breadcrumbs{min-height:44px;display:flex;align-items:center;margin-bottom:28px;font:11px/1.4 var(--mono);color:var(--dim)}.breadcrumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.breadcrumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}.breadcrumbs a{min-height:40px;display:inline-flex;align-items:center;transition-property:color,scale;transition-duration:160ms}.breadcrumbs a:hover{color:var(--amber)}.breadcrumbs a:active{scale:.96}.content-hero h1{max-width:17ch;font-size:clamp(40px,6vw,68px);font-weight:700;line-height:1.02;letter-spacing:-.02em}.content-lede{max-width:66ch;margin-top:22px;color:var(--dim);font-size:clamp(17px,2vw,20px)}.content-meta{display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:28px;font:10px/1.4 var(--mono);color:var(--cyan)}
+.content-answer{max-width:900px;margin-top:34px;padding:3px 0 3px 22px;border-left:2px solid var(--amber);font-size:clamp(19px,2.2vw,21px);line-height:1.62;color:var(--ink)}.content-shell{padding:clamp(46px,7vw,86px) 0}.content-layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(230px,1fr);align-items:start;gap:clamp(36px,6vw,76px)}.content-body{grid-column:1;grid-row:1;max-width:78ch;min-width:0}.content-body h2{margin:52px 0 16px;font-size:clamp(27px,3.5vw,39px);scroll-margin-top:112px}.content-body>h2:first-child{margin-top:0}.content-body h3{margin:34px 0 12px;font-size:21px;scroll-margin-top:112px}.content-body p,.content-body li{color:var(--dim);font-size:16px}.content-body p+p{margin-top:17px}.content-body ul,.content-body ol{margin:16px 0;padding-left:24px}.content-body li+li{margin-top:7px}.content-body a{color:var(--cyan);text-decoration:underline;text-decoration-color:rgba(127,212,193,.35);text-underline-offset:3px}.content-body a:hover{color:var(--amber);text-decoration-color:currentColor}.content-body code:not(pre code){padding:1px 5px;border:1px solid var(--line);border-radius:5px;background:#07090c;color:var(--cyan);font-size:.86em}.content-body pre{margin:20px 0;white-space:pre;tab-size:2}.content-table{max-width:100%;margin:22px 0;overflow-x:auto;border:1px solid var(--line);border-radius:12px}.content-table:focus-visible{outline:2px solid var(--amber);outline-offset:3px}.content-table table{width:100%;border-collapse:collapse;font-size:14px}.content-table th,.content-table td{min-width:150px;padding:11px 13px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);text-align:left;vertical-align:top;color:var(--dim)}.content-table th{color:var(--ink);font-weight:600;background:var(--bg2)}.content-table tr:last-child td{border-bottom:0}.content-table th:last-child,.content-table td:last-child{border-right:0}
+.content-index{grid-column:2;grid-row:1;position:sticky;top:104px;max-height:calc(100vh - 128px);overflow-y:auto;padding:18px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.content-index strong{display:block;margin-bottom:10px;font:10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}.content-index ol{list-style:none}.content-index a{min-height:40px;display:flex;align-items:center;padding:5px 0;color:var(--dim);font-size:13px;line-height:1.4;transition-property:color,translate,scale;transition-duration:160ms}.content-index a:hover{color:var(--amber);translate:3px 0}.content-index a:active{translate:1px 0;scale:.96}.content-proof{margin:54px 0 0}.content-proof figure{border-radius:16px}.content-proof img{width:100%;height:auto;max-height:650px;object-fit:cover;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}.content-proof figcaption{color:var(--dim);font:11px/1.55 var(--mono)}.content-proof figcaption a{color:var(--amber)}
+.content-layout--docs{grid-template-columns:minmax(190px,.6fr) minmax(0,2fr)}.content-layout--docs .content-index{grid-column:1}.content-layout--docs .content-body{grid-column:2;max-width:72ch}.docs-index a{padding-inline:10px;border-left:2px solid transparent}.docs-index a[aria-current="page"]{border-left-color:var(--amber);background:rgba(255,180,84,.06);color:var(--ink);font-weight:600}.docs-index-current{display:none}
+.content-facts,.content-faq-list,.content-related,.content-sources,.content-skills,.content-demos,.content-discovery,.faq-provenance{margin-top:54px;padding-top:22px;border-top:1px solid var(--line)}.content-facts h2,.content-faq-list h2,.content-related h2,.content-sources h2,.content-skills h2,.content-demos h2{font-size:24px}.content-ruled-list{list-style:none;border-top:1px solid var(--line)}.content-ruled-list li{border-bottom:1px solid var(--line)}.content-ruled-list a{min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:9px 0;color:var(--dim);font-size:14px;transition-property:color,scale;transition-duration:160ms}.content-ruled-list a:after{content:"→";color:var(--amber)}.content-ruled-list a:hover{color:var(--ink)}.content-ruled-list a:active{scale:.96}.content-related .content-ruled-list a{display:grid;grid-template-columns:104px minmax(0,1fr) auto}.content-related-family{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}.content-faq-item{padding:22px 0;border-bottom:1px solid var(--line)}.content-faq-item h3{margin:0;font-size:20px}.content-faq-item h3 a{color:var(--ink)}.content-faq-item p{margin-top:9px;color:var(--dim);font-size:15px}.faq-provenance{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);padding:0}.faq-provenance div{padding:13px;background:var(--bg2)}.faq-provenance dt{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}.faq-provenance dd{margin-top:5px;font:11px/1.45 var(--mono);color:var(--cyan);overflow-wrap:anywhere}.content-discovery{display:flex;flex-wrap:wrap;gap:10px 22px;font:11px/1.5 var(--mono);color:var(--dim)}.content-discovery a{min-height:40px;display:inline-flex;align-items:center;color:var(--amber)}
 @media (max-width:760px){
   .site-nav .wrap{padding-right:0}
-  nav{min-height:104px;display:grid;grid-template-columns:1fr;padding:14px 0 10px;gap:4px}
-  nav .brand{font-size:16px}
-  nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:none;padding-right:20px}
-  nav .links::-webkit-scrollbar{display:none}
-  nav .links a{flex:0 0 auto}
+  .site-nav>.wrap{min-height:104px;display:grid;grid-template-columns:1fr;padding-top:14px;padding-bottom:10px;gap:4px}
+  .site-nav .brand{font-size:16px}
+  .site-nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;scrollbar-color:rgba(255,180,84,.45) transparent;padding:0 20px 4px 0}
+  .site-nav .links::-webkit-scrollbar{height:3px}.site-nav .links::-webkit-scrollbar-thumb{background:rgba(255,180,84,.45);border-radius:99px}
+  .site-nav .links a{flex:0 0 auto}
   .grid,.gallery{grid-template-columns:1fr}
+  footer{grid-template-columns:1fr}.footer-groups{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+@media (max-width:900px){.pathfinder-head,.content-layout{grid-template-columns:1fr}.content-index{grid-column:1;grid-row:1;position:static;max-height:none}.content-body,.content-layout--docs .content-body{grid-column:1;grid-row:2}.docs-index{overflow:hidden}.docs-index-current{display:flex;margin-bottom:8px}.docs-index ol{display:flex;gap:8px;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;padding-bottom:6px}.docs-index li{flex:0 0 min(72vw,260px)}.docs-index .docs-index-list-current{display:none}.docs-index a{min-height:44px;padding:8px 10px;border-left:0;border-bottom:2px solid transparent;background:var(--bg2)}.docs-index a[aria-current="page"]{border-bottom-color:var(--amber)}.pathfinder-row{grid-template-columns:minmax(160px,.6fr) minmax(0,1fr)}.pathfinder-links{grid-column:1/-1;justify-content:flex-start;padding-bottom:18px}.faq-provenance{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.pathfinder-row{grid-template-columns:1fr;gap:6px;padding:18px 0}.pathfinder-links{grid-column:auto;padding:0}.content-hero h1{font-size:clamp(38px,12vw,54px)}.content-answer{padding-left:16px}.content-table{border-radius:8px}.content-table table{min-width:680px}.faq-provenance{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
@@ -228,7 +238,7 @@ header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
   linear-gradient(90deg,rgba(10,12,16,.96) 0%,rgba(10,12,16,.8) 36%,rgba(10,12,16,.24) 68%,rgba(10,12,16,.04) 100%),
   linear-gradient(0deg,rgba(10,12,16,.9) 0%,rgba(10,12,16,.08) 65%,rgba(10,12,16,.62) 100%);z-index:1}
 .crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}.crumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.crumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}
-.crumbs a:hover{color:var(--amber)}
+.crumbs a{min-height:40px;display:inline-flex;align-items:center}.crumbs a:hover{color:var(--amber)}
 h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:0;max-width:18ch}
 .lede{margin-top:24px;max-width:70ch;color:var(--dim)}
 .meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
@@ -268,6 +278,7 @@ a.chip:active{scale:.96}
 .runtime-evidence-disclosure dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;margin-top:16px;overflow:hidden;border-radius:10px;background:var(--line)}.runtime-evidence-disclosure dl div{padding:11px 12px;background:var(--bg2)}.runtime-evidence-disclosure dt{font:10px/1.35 var(--mono);color:var(--dim)}.runtime-evidence-disclosure dd{margin-top:4px;font:500 10px/1.35 var(--mono);color:var(--amber)}.runtime-evidence-disclosure dd[data-verdict="PASS"]{color:var(--lime)}
 .runtime-evidence-disclosure ul{margin:15px 0 0;padding-left:20px}.runtime-evidence-disclosure li{margin-top:5px;color:var(--dim);font-size:14px}
 .evidence-report-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:10px}.evidence-report-links a{display:grid;gap:6px;min-height:72px;padding:14px;border:1px solid var(--line);border-radius:11px;background:var(--bg2)}.evidence-report-links code{color:var(--cyan);font:11px/1.4 var(--mono);overflow-wrap:anywhere}.evidence-report-links span{color:var(--dim);font:10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.05em}
+.skill-guides{margin-top:52px;padding-top:22px;border-top:1px solid var(--line)}.skill-guides h3{font-size:22px}.skill-guides ul{margin-top:12px;list-style:none;border-top:1px solid var(--line)}.skill-guides li{border-bottom:1px solid var(--line)}.skill-guides a{min-height:52px;display:grid;grid-template-columns:120px minmax(0,1fr);align-items:center;gap:18px;color:var(--dim);font-size:14px;transition-property:color,scale;transition-duration:160ms}.skill-guides a span{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}.skill-guides a:hover{color:var(--amber)}.skill-guides a:active{scale:.96}
 @media (max-width:720px){
   .skill-hero{min-height:auto;padding:58px 0 52px}
   .skill-hero-bg{opacity:.3}
@@ -278,85 +289,84 @@ a.chip:active{scale:.96}
 </style>
 </head>
 <body>
-<a class="skip-link" href="#main-content">Skip to content</a><div class="site-nav"><div class="wrap"><nav aria-label="Primary navigation">
-  <a class="brand" href="../">Three.js WebGPU Skill&nbsp;Pack</a>
-  <div class="links"><a href="../#matrix">How it works</a><a href="../#flagships">Examples</a><a href="../#skills">Skills</a><a href="../#labs">Labs</a><a href="../evidence/">Evidence</a><a href="../#install">Install</a><a href="../about/">Method</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
-</nav></div></div>
+<a class="skip-link" href="#main-content">Skip to content</a><header class="site-nav"><div class="wrap">
+  <a class="brand" href="/">Three.js WebGPU Skill&nbsp;Pack</a>
+  <nav class="links" aria-label="Primary navigation"><a href="/#flagships">Examples</a><a href="/#skills">Skills</a><a href="/guides/">Guides</a><a href="/evidence/">Evidence</a><a href="/#install">Install</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub</a></nav>
+</div></header>
 
 <main id="main-content" tabindex="-1">
 <header class="skill-hero">
   <picture class="responsive-preview">
-          <source type="image/avif" srcset="../visual-validation/webgpu-image-pipeline/final.design.avif" />
-          <source type="image/webp" srcset="../visual-validation/webgpu-image-pipeline/final.design.webp" />
-          <img data-responsive-preview src="../visual-validation/webgpu-image-pipeline/final.design.png" alt="" class="skill-hero-bg" aria-hidden="true" width="1200" height="800" fetchpriority="high" decoding="async" />
+          <source type="image/avif" srcset="../visual-validation/creature-habitat/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/creature-habitat/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/creature-habitat/final.design.png" alt="" class="skill-hero-bg" aria-hidden="true" width="1200" height="800" fetchpriority="high" decoding="async" />
         </picture>
   <div class="wrap">
     <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Cameras, Lighting, and Final Image</a></li><li aria-current="page">Image Pipeline</li></ol></nav>
     <h1 style="view-transition-name:skill-threejs-image-pipeline">Image Pipeline</h1>
-    <p class="lede">Build a minimal, workload-selected WebGPU/TSL final-image pipeline for advanced Three.js scenes. Use for RenderPipeline ownership; conditional pass()/mrt() depth, normal, albedo, emissive, velocity, and history signals; GTAONode, BloomNode, TRAANode, exposure, tone mapping, 3D LUT grading, outputColorTransform, diagnostics, and measured quality/performance tradeoffs.</p>
-    <p class="hero-evidence-caption">Image: Final image-pipeline render-target readback. Source lab: webgpu-image-pipeline.</p>
+    <p class="lede">Coordinate Three.js WebGPU/TSL final-image graphs. Use when effects share scene-pass signals or output ownership, when choosing MRT versus reconstruction or narrow passes, when admitting temporal history, or when whole-graph budgets and lifetimes decide the design.</p>
+    <p class="hero-evidence-caption">Image: Accepted demo-sourced runtime evidence. Source lab: creature-habitat.</p>
     <div class="meta-row">
       <span class="chip a">$threejs-image-pipeline</span>
-      <span class="chip">7 primary implementations</span>
-<span class="chip">5 flagships</span>
-<span class="chip">1 secondary surface</span>
-      <span class="chip">native evidence pending</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-11T13:19:44+03:00">2026-07-11</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/2b9373783139b1182dd194c2a453f95e5a4e7a80">commit 2b93737 ↗</a>
-      <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-image-pipeline/SKILL.md">SKILL.md on GitHub ↗</a>
-      <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-image-pipeline/SKILL.md">raw (for agents) ↗</a>
+      <span class="chip">7 primary targets</span>
+      <span class="chip">5 flagships</span>
+      <span class="chip">1 secondary surface</span>
+      <span class="chip">accepted runtime evidence</span>
+      <span class="chip">Latest skill update <time datetime="2026-07-16T12:45:44+03:00">2026-07-16</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/8749183dffd84731506239dd86590c92bf958969">commit 8749183 ↗</a>
+      <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-image-pipeline/SKILL.md">SKILL.md on GitHub ↗</a>
+      <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/skills/threejs-image-pipeline/SKILL.md">raw (for agents) ↗</a>
     </div>
   </div>
 </header>
 
 
   <section class="section" id="primary-implementations" aria-labelledby="primary-implementations-title"><div class="wrap">
-    <h2 id="primary-implementations-title">Primary implementation surface</h2>
-    <p class="sub">These routes are generated from canonical source. Their exact status remains separate from implementation availability.</p>
+    <h2 id="primary-implementations-title">Primary target surface</h2>
+    <p class="sub">These rendering routes are generated from canonical source. Native-WebGPU acceptance remains separate from entrypoint availability.</p>
     <div class="grid">
       <a class="card" href="../demos/webgpu-image-pipeline/">
-        <span class="card-preview-wrap" data-preview-for="webgpu-image-pipeline" data-preview-source="webgpu-image-pipeline" data-preview-classification="inspected-runtime-evidence-preview"><picture class="responsive-preview">
-          <source type="image/avif" srcset="../visual-validation/webgpu-image-pipeline/final.design.avif" />
-          <source type="image/webp" srcset="../visual-validation/webgpu-image-pipeline/final.design.webp" />
-          <img data-responsive-preview src="../visual-validation/webgpu-image-pipeline/final.design.png" alt="Final image-pipeline render-target readback for WebGPU Image Pipeline" class="card-preview" width="1200" height="800" loading="lazy" decoding="async" />
-        </picture><span class="media-caption">Final image-pipeline render-target readback</span></span>
+        <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="webgpu-image-pipeline">
+    <span class="primary-evidence-label">Canonical capture</span>
+    <strong>Runtime evidence pending</strong>
+    <span><code>367f880e1d52</code> source hash</span>
+    <span>10 fixed states · 8 runtime proof requirements</span>
+  </span>
         <span class="card-head"><span class="card-kind">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
         <h3>WebGPU Image Pipeline</h3>
         <p>1 fixed scenarios, 6 mechanism routes, and 3 locked tiers.</p>
         <span class="card-meta">Open published implementation →</span>
       </a>
       <a class="card" href="../demos/webgpu-temporal-history/">
-        <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="webgpu-temporal-history">
+        <span class="primary-evidence-panel " data-evidence-state="accepted" data-preview-for="webgpu-temporal-history">
     <span class="primary-evidence-label">Canonical capture</span>
-    <strong>Runtime evidence pending</strong>
-    <span><code>432b825e938d</code> source hash</span>
-    <span>3 fixed states · 3 runtime proof requirements</span>
+    <strong>Accepted evidence published</strong>
+    <span><code>2f41080c1ecb</code> source hash</span>
+    <span>3 fixed states · 4 runtime proof requirements</span>
   </span>
-        <span class="card-head"><span class="card-kind">Mechanism bench</span><span class="status status--pending">Evidence pending</span></span>
+        <span class="card-head"><span class="card-kind">Mechanism bench</span><span class="status status--accepted">Accepted</span></span>
         <h3>WebGPU Temporal History</h3>
         <p>1 fixed scenarios, 1 mechanism routes, and 1 locked tiers.</p>
         <span class="card-meta">Open published implementation →</span>
       </a>
       <a class="card" href="../demos/creature-habitat/">
-        <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="creature-habitat">
-    <span class="primary-evidence-label">Canonical capture</span>
-    <strong>Runtime evidence pending</strong>
-    <span><code>25111e22bb87</code> source hash</span>
-    <span>9 fixed states · 5 runtime proof requirements</span>
-  </span>
-        <span class="card-head"><span class="card-kind">Integration</span><span class="status status--pending">Evidence pending</span></span>
+        <span class="card-preview-wrap" data-preview-for="creature-habitat" data-preview-source="creature-habitat" data-preview-classification="inspected-runtime-evidence-preview"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/creature-habitat/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/creature-habitat/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/creature-habitat/final.design.png" alt="Accepted demo-sourced runtime evidence for Creature Habitat" class="card-preview" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><span class="media-caption">Accepted demo-sourced runtime evidence</span></span>
+        <span class="card-head"><span class="card-kind">Integration</span><span class="status status--accepted">Accepted</span></span>
         <h3>Creature Habitat</h3>
         <p>1 fixed scenarios, 5 mechanism routes, and 3 locked tiers.</p>
         <span class="card-meta">Open published implementation →</span>
       </a>
       <a class="card" href="../demos/final-image-flight/">
-        <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="final-image-flight">
-    <span class="primary-evidence-label">Canonical capture</span>
-    <strong>Runtime evidence pending</strong>
-    <span><code>0e56ab6926da</code> source hash</span>
-    <span>10 fixed states · 12 runtime proof requirements</span>
-  </span>
-        <span class="card-head"><span class="card-kind">Integration</span><span class="status status--pending">Evidence pending</span></span>
+        <span class="card-preview-wrap" data-preview-for="final-image-flight" data-preview-source="final-image-flight" data-preview-classification="inspected-runtime-evidence-preview"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/final-image-flight/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/final-image-flight/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/final-image-flight/final.design.png" alt="Accepted demo-sourced runtime evidence for Final Image Flight" class="card-preview" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><span class="media-caption">Accepted demo-sourced runtime evidence</span></span>
+        <span class="card-head"><span class="card-kind">Integration</span><span class="status status--accepted">Accepted</span></span>
         <h3>Final Image Flight</h3>
         <p>1 fixed scenarios, 6 mechanism routes, and 3 locked tiers.</p>
         <span class="card-meta">Open published implementation →</span>
@@ -365,7 +375,7 @@ a.chip:active{scale:.96}
         <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="procedural-district">
     <span class="primary-evidence-label">Canonical capture</span>
     <strong>Runtime evidence pending</strong>
-    <span><code>919817c6e63f</code> source hash</span>
+    <span><code>3c2448b5b07d</code> source hash</span>
     <span>10 fixed states · 4 runtime proof requirements</span>
   </span>
         <span class="card-head"><span class="card-kind">Integration</span><span class="status status--pending">Evidence pending</span></span>
@@ -377,7 +387,7 @@ a.chip:active{scale:.96}
         <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="relativistic-space-shot">
     <span class="primary-evidence-label">Canonical capture</span>
     <strong>Runtime evidence pending</strong>
-    <span><code>5fe1522e9185</code> source hash</span>
+    <span><code>e2e9d6b673af</code> source hash</span>
     <span>10 fixed states · 4 runtime proof requirements</span>
   </span>
         <span class="card-head"><span class="card-kind">Integration</span><span class="status status--pending">Evidence pending</span></span>
@@ -389,7 +399,7 @@ a.chip:active{scale:.96}
         <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="weathered-world">
     <span class="primary-evidence-label">Canonical capture</span>
     <strong>Runtime evidence pending</strong>
-    <span><code>26e74c4ec93d</code> source hash</span>
+    <span><code>76b06d2596d9</code> source hash</span>
     <span>10 fixed states · 5 runtime proof requirements</span>
   </span>
         <span class="card-head"><span class="card-kind">Integration</span><span class="status status--pending">Evidence pending</span></span>
@@ -404,7 +414,7 @@ a.chip:active{scale:.96}
   <section class="section" id="evidence-reports" aria-labelledby="evidence-reports-title"><div class="wrap">
     <h2 id="evidence-reports-title">Evidence reports</h2>
     <p class="sub">Source hashes, claim verdicts, promoted same-lab media, fixed routes, exact tier contracts, and current limitations.</p>
-    <nav class="evidence-report-links" aria-label="Evidence reports for Image Pipeline"><a href="../evidence/webgpu-image-pipeline/"><code>webgpu-image-pipeline</code><span>evidence pending</span></a><a href="../evidence/webgpu-temporal-history/"><code>webgpu-temporal-history</code><span>evidence pending</span></a><a href="../evidence/creature-habitat/"><code>creature-habitat</code><span>evidence pending</span></a><a href="../evidence/final-image-flight/"><code>final-image-flight</code><span>evidence pending</span></a><a href="../evidence/procedural-district/"><code>procedural-district</code><span>evidence pending</span></a><a href="../evidence/relativistic-space-shot/"><code>relativistic-space-shot</code><span>evidence pending</span></a><a href="../evidence/weathered-world/"><code>weathered-world</code><span>evidence pending</span></a></nav>
+    <nav class="evidence-report-links" aria-label="Evidence reports for Image Pipeline"><a href="../evidence/webgpu-image-pipeline/"><code>webgpu-image-pipeline</code><span>evidence pending</span></a><a href="../evidence/webgpu-temporal-history/"><code>webgpu-temporal-history</code><span>accepted</span></a><a href="../evidence/creature-habitat/"><code>creature-habitat</code><span>accepted</span></a><a href="../evidence/final-image-flight/"><code>final-image-flight</code><span>accepted</span></a><a href="../evidence/procedural-district/"><code>procedural-district</code><span>evidence pending</span></a><a href="../evidence/relativistic-space-shot/"><code>relativistic-space-shot</code><span>evidence pending</span></a><a href="../evidence/weathered-world/"><code>weathered-world</code><span>evidence pending</span></a></nav>
   </div></section>
 
   <div class="section" id="approach"><div class="wrap">
@@ -424,469 +434,329 @@ producer.</p></div>
   </div></div>
 
 
+  <div class="section" id="examples"><div class="wrap">
+    <h2>Accepted primary labs</h2>
+    <p class="sub">Only schema-v2 labs with accepted runtime and evidence contracts appear here. Other source directories remain visible through the demo registry without being promoted to runnable proof.</p>
+    <div class="grid">
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-image-pipeline/examples/webgpu-image-pipeline">
+        <h4>webgpu-image-pipeline</h4>
+        <span class="card-meta">threejs-image-pipeline/examples/webgpu-image-pipeline</span>
+      </a>
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-image-pipeline/examples/webgpu-temporal-history">
+        <h4>webgpu-temporal-history</h4>
+        <span class="card-meta">threejs-image-pipeline/examples/webgpu-temporal-history</span>
+      </a>
+    </div>
+  </div></div>
 
   <div class="section" id="validation"><div class="wrap">
     <h2>Preview and evidence ledger</h2>
-    <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; canonical acceptance still requires render-target readback and a schema-v2 bundle.</p>
-    <div class="evidence-ledger"><span class="status status--pending">Canonical runtime evidence pending</span><code>8 published images</code></div>
+    <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; rendering acceptance still requires same-lab readback and a schema-v2 bundle.</p>
+    <div class="evidence-ledger"><span class="status status--accepted">Accepted runtime evidence available</span><code>20 published images</code></div>
 <div class="runtime-evidence-disclosures">
-      <article class="runtime-evidence-disclosure" data-acceptance-status="incomplete">
-        <div class="runtime-evidence-head"><div><code>Native WebGPU runtime evidence preview</code><h3>WebGPU Image Pipeline</h3></div><span class="status status--pending">Acceptance pending</span></div>
-        <dl><div><dt>mechanismCorrectness</dt><dd data-verdict="INSUFFICIENT_EVIDENCE">INSUFFICIENT_EVIDENCE</dd></div><div><dt>performanceCompliance</dt><dd data-verdict="INSUFFICIENT_EVIDENCE">INSUFFICIENT_EVIDENCE</dd></div><div><dt>lifecycleStability</dt><dd data-verdict="INSUFFICIENT_EVIDENCE">INSUFFICIENT_EVIDENCE</dd></div></dl>
-        <ul><li>Signal, velocity, temporal-reset, and diagnostic readbacks passed the lab artifact validator.</li><li>Current-adapter GPU timestamp and lifecycle evidence remain INSUFFICIENT_EVIDENCE.</li></ul>
+      <article class="runtime-evidence-disclosure" data-acceptance-status="accepted">
+        <div class="runtime-evidence-head"><div><code>Native WebGPU runtime evidence preview</code><h3>Creature Habitat</h3></div><span class="status status--accepted">Accepted</span></div>
+        <dl><div><dt>visualCorrectness</dt><dd data-verdict="PASS">PASS</dd></div><div><dt>mechanismCorrectness</dt><dd data-verdict="PASS">PASS</dd></div><div><dt>performanceCompliance</dt><dd data-verdict="NOT_CLAIMED">NOT_CLAIMED</dd></div><div><dt>gpuAttribution</dt><dd data-verdict="NOT_CLAIMED">NOT_CLAIMED</dd></div><div><dt>lifecycleStability</dt><dd data-verdict="PASS">PASS</dd></div></dl>
+        <ul><li>hardwarePerformance remains NOT_CLAIMED without finite GPU timestamp windows</li></ul>
+      </article>
+      <article class="runtime-evidence-disclosure" data-acceptance-status="accepted">
+        <div class="runtime-evidence-head"><div><code>Native WebGPU runtime evidence preview</code><h3>Final Image Flight</h3></div><span class="status status--accepted">Accepted</span></div>
+        <dl><div><dt>visualCorrectness</dt><dd data-verdict="PASS">PASS</dd></div><div><dt>mechanismCorrectness</dt><dd data-verdict="PASS">PASS</dd></div><div><dt>performanceCompliance</dt><dd data-verdict="NOT_CLAIMED">NOT_CLAIMED</dd></div><div><dt>gpuAttribution</dt><dd data-verdict="NOT_CLAIMED">NOT_CLAIMED</dd></div><div><dt>lifecycleStability</dt><dd data-verdict="PASS">PASS</dd></div></dl>
+        <ul><li>hardwarePerformance remains NOT_CLAIMED without finite GPU timestamp windows</li></ul>
       </article></div>
     <div class="gallery">
-      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-image-pipeline" itemscope itemtype="https://schema.org/ImageObject">
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="creature-habitat" itemscope itemtype="https://schema.org/ImageObject">
         <span class="preview-media"><picture class="responsive-preview">
-          <source type="image/avif" srcset="../visual-validation/webgpu-image-pipeline/final.design.avif" />
-          <source type="image/webp" srcset="../visual-validation/webgpu-image-pipeline/final.design.webp" />
-          <img data-responsive-preview src="../visual-validation/webgpu-image-pipeline/final.design.png" alt="Image Pipeline: Final image-pipeline render-target readback" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+          <source type="image/avif" srcset="../visual-validation/creature-habitat/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/creature-habitat/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/creature-habitat/final.design.png" alt="Image Pipeline: Accepted demo-sourced runtime evidence" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
         </picture></span>
-        <figcaption itemprop="caption"><strong>Final image-pipeline render-target readback</strong><span>inspected runtime evidence preview</span></figcaption>
+        <figcaption itemprop="caption"><strong>Accepted demo-sourced runtime evidence</strong><span>inspected runtime evidence preview</span></figcaption>
       </figure>
-      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-image-pipeline" itemscope itemtype="https://schema.org/ImageObject">
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="creature-habitat" itemscope itemtype="https://schema.org/ImageObject">
         <span class="preview-media"><picture class="responsive-preview">
-          <source type="image/avif" srcset="../visual-validation/webgpu-image-pipeline/no-post.design.avif" />
-          <source type="image/webp" srcset="../visual-validation/webgpu-image-pipeline/no-post.design.webp" />
-          <img data-responsive-preview src="../visual-validation/webgpu-image-pipeline/no-post.design.png" alt="Image Pipeline: Readable scene baseline without the post stack." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+          <source type="image/avif" srcset="../visual-validation/creature-habitat/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="../visual-validation/creature-habitat/diagnostics.mosaic.webp" />
+          <img data-responsive-preview src="../visual-validation/creature-habitat/diagnostics.mosaic.png" alt="Image Pipeline: Accepted release-bundle: diagnostics.mosaic.png" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
         </picture></span>
-        <figcaption itemprop="caption"><strong>Readable scene baseline without the post stack.</strong><span>inspected runtime evidence preview</span></figcaption>
+        <figcaption itemprop="caption"><strong>Accepted release-bundle: diagnostics.mosaic.png</strong><span>inspected runtime evidence preview</span></figcaption>
       </figure>
-      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-image-pipeline" itemscope itemtype="https://schema.org/ImageObject">
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="creature-habitat" itemscope itemtype="https://schema.org/ImageObject">
         <span class="preview-media"><picture class="responsive-preview">
-          <source type="image/avif" srcset="../visual-validation/webgpu-image-pipeline/diagnostics.mosaic.avif" />
-          <source type="image/webp" srcset="../visual-validation/webgpu-image-pipeline/diagnostics.mosaic.webp" />
-          <img data-responsive-preview src="../visual-validation/webgpu-image-pipeline/diagnostics.mosaic.png" alt="Image Pipeline: Mosaic assembled from live diagnostic graph outputs." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+          <source type="image/avif" srcset="../visual-validation/creature-habitat/camera.near.avif" />
+          <source type="image/webp" srcset="../visual-validation/creature-habitat/camera.near.webp" />
+          <img data-responsive-preview src="../visual-validation/creature-habitat/camera.near.png" alt="Image Pipeline: Accepted release-bundle: camera.near.png" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
         </picture></span>
-        <figcaption itemprop="caption"><strong>Mosaic assembled from live diagnostic graph outputs.</strong><span>inspected runtime evidence preview</span></figcaption>
+        <figcaption itemprop="caption"><strong>Accepted release-bundle: camera.near.png</strong><span>inspected runtime evidence preview</span></figcaption>
       </figure>
-      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-image-pipeline" itemscope itemtype="https://schema.org/ImageObject">
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="creature-habitat" itemscope itemtype="https://schema.org/ImageObject">
         <span class="preview-media"><picture class="responsive-preview">
-          <source type="image/avif" srcset="../visual-validation/webgpu-image-pipeline/normal.avif" />
-          <source type="image/webp" srcset="../visual-validation/webgpu-image-pipeline/normal.webp" />
-          <img data-responsive-preview src="../visual-validation/webgpu-image-pipeline/normal.png" alt="Image Pipeline: Shared normal signal readback." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+          <source type="image/avif" srcset="../visual-validation/creature-habitat/camera.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/creature-habitat/camera.design.webp" />
+          <img data-responsive-preview src="../visual-validation/creature-habitat/camera.design.png" alt="Image Pipeline: Accepted release-bundle: camera.design.png" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
         </picture></span>
-        <figcaption itemprop="caption"><strong>Shared normal signal readback.</strong><span>inspected runtime evidence preview</span></figcaption>
+        <figcaption itemprop="caption"><strong>Accepted release-bundle: camera.design.png</strong><span>inspected runtime evidence preview</span></figcaption>
       </figure>
-      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-image-pipeline" itemscope itemtype="https://schema.org/ImageObject">
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="creature-habitat" itemscope itemtype="https://schema.org/ImageObject">
         <span class="preview-media"><picture class="responsive-preview">
-          <source type="image/avif" srcset="../visual-validation/webgpu-image-pipeline/emissive.avif" />
-          <source type="image/webp" srcset="../visual-validation/webgpu-image-pipeline/emissive.webp" />
-          <img data-responsive-preview src="../visual-validation/webgpu-image-pipeline/emissive.png" alt="Image Pipeline: Shared emissive signal readback." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+          <source type="image/avif" srcset="../visual-validation/creature-habitat/camera.far.avif" />
+          <source type="image/webp" srcset="../visual-validation/creature-habitat/camera.far.webp" />
+          <img data-responsive-preview src="../visual-validation/creature-habitat/camera.far.png" alt="Image Pipeline: Accepted release-bundle: camera.far.png" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
         </picture></span>
-        <figcaption itemprop="caption"><strong>Shared emissive signal readback.</strong><span>inspected runtime evidence preview</span></figcaption>
+        <figcaption itemprop="caption"><strong>Accepted release-bundle: camera.far.png</strong><span>inspected runtime evidence preview</span></figcaption>
       </figure>
-      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-image-pipeline" itemscope itemtype="https://schema.org/ImageObject">
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="creature-habitat" itemscope itemtype="https://schema.org/ImageObject">
         <span class="preview-media"><picture class="responsive-preview">
-          <source type="image/avif" srcset="../visual-validation/webgpu-image-pipeline/bloom.avif" />
-          <source type="image/webp" srcset="../visual-validation/webgpu-image-pipeline/bloom.webp" />
-          <img data-responsive-preview src="../visual-validation/webgpu-image-pipeline/bloom.png" alt="Image Pipeline: BloomNode diagnostic readback." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+          <source type="image/avif" srcset="../visual-validation/creature-habitat/no-post.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/creature-habitat/no-post.design.webp" />
+          <img data-responsive-preview src="../visual-validation/creature-habitat/no-post.design.png" alt="Image Pipeline: Accepted release-bundle: no-post.design.png" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
         </picture></span>
-        <figcaption itemprop="caption"><strong>BloomNode diagnostic readback.</strong><span>inspected runtime evidence preview</span></figcaption>
+        <figcaption itemprop="caption"><strong>Accepted release-bundle: no-post.design.png</strong><span>inspected runtime evidence preview</span></figcaption>
       </figure>
-      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-image-pipeline" itemscope itemtype="https://schema.org/ImageObject">
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="creature-habitat" itemscope itemtype="https://schema.org/ImageObject">
         <span class="preview-media"><picture class="responsive-preview">
-          <source type="image/avif" srcset="../visual-validation/webgpu-image-pipeline/velocity.moving-positive-x.avif" />
-          <source type="image/webp" srcset="../visual-validation/webgpu-image-pipeline/velocity.moving-positive-x.webp" />
-          <img data-responsive-preview src="../visual-validation/webgpu-image-pipeline/velocity.moving-positive-x.png" alt="Image Pipeline: Moving-velocity fixture with expected positive NDC X sign." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+          <source type="image/avif" srcset="../visual-validation/creature-habitat/seed-0001.final.avif" />
+          <source type="image/webp" srcset="../visual-validation/creature-habitat/seed-0001.final.webp" />
+          <img data-responsive-preview src="../visual-validation/creature-habitat/seed-0001.final.png" alt="Image Pipeline: Accepted release-bundle: seed-0001.final.png" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
         </picture></span>
-        <figcaption itemprop="caption"><strong>Moving-velocity fixture with expected positive NDC X sign.</strong><span>inspected runtime evidence preview</span></figcaption>
+        <figcaption itemprop="caption"><strong>Accepted release-bundle: seed-0001.final.png</strong><span>inspected runtime evidence preview</span></figcaption>
       </figure>
-      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-image-pipeline" itemscope itemtype="https://schema.org/ImageObject">
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="creature-habitat" itemscope itemtype="https://schema.org/ImageObject">
         <span class="preview-media"><picture class="responsive-preview">
-          <source type="image/avif" srcset="../visual-validation/webgpu-image-pipeline/temporal.history.avif" />
-          <source type="image/webp" srcset="../visual-validation/webgpu-image-pipeline/temporal.history.webp" />
-          <img data-responsive-preview src="../visual-validation/webgpu-image-pipeline/temporal.history.png" alt="Image Pipeline: Temporal history target before camera-cut reset." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+          <source type="image/avif" srcset="../visual-validation/creature-habitat/seed-9e3779b9.final.avif" />
+          <source type="image/webp" srcset="../visual-validation/creature-habitat/seed-9e3779b9.final.webp" />
+          <img data-responsive-preview src="../visual-validation/creature-habitat/seed-9e3779b9.final.png" alt="Image Pipeline: Accepted release-bundle: seed-9e3779b9.final.png" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
         </picture></span>
-        <figcaption itemprop="caption"><strong>Temporal history target before camera-cut reset.</strong><span>inspected runtime evidence preview</span></figcaption>
+        <figcaption itemprop="caption"><strong>Accepted release-bundle: seed-9e3779b9.final.png</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="creature-habitat" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/creature-habitat/temporal.t000.avif" />
+          <source type="image/webp" srcset="../visual-validation/creature-habitat/temporal.t000.webp" />
+          <img data-responsive-preview src="../visual-validation/creature-habitat/temporal.t000.png" alt="Image Pipeline: Accepted release-bundle: temporal.t000.png" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Accepted release-bundle: temporal.t000.png</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="creature-habitat" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/creature-habitat/temporal.t001.avif" />
+          <source type="image/webp" srcset="../visual-validation/creature-habitat/temporal.t001.webp" />
+          <img data-responsive-preview src="../visual-validation/creature-habitat/temporal.t001.png" alt="Image Pipeline: Accepted release-bundle: temporal.t001.png" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Accepted release-bundle: temporal.t001.png</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="final-image-flight" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/final-image-flight/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/final-image-flight/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/final-image-flight/final.design.png" alt="Image Pipeline: Accepted demo-sourced runtime evidence" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Accepted demo-sourced runtime evidence</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="final-image-flight" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/final-image-flight/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="../visual-validation/final-image-flight/diagnostics.mosaic.webp" />
+          <img data-responsive-preview src="../visual-validation/final-image-flight/diagnostics.mosaic.png" alt="Image Pipeline: Accepted release-bundle: diagnostics.mosaic.png" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Accepted release-bundle: diagnostics.mosaic.png</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="final-image-flight" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/final-image-flight/camera.near.avif" />
+          <source type="image/webp" srcset="../visual-validation/final-image-flight/camera.near.webp" />
+          <img data-responsive-preview src="../visual-validation/final-image-flight/camera.near.png" alt="Image Pipeline: Accepted release-bundle: camera.near.png" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Accepted release-bundle: camera.near.png</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="final-image-flight" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/final-image-flight/camera.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/final-image-flight/camera.design.webp" />
+          <img data-responsive-preview src="../visual-validation/final-image-flight/camera.design.png" alt="Image Pipeline: Accepted release-bundle: camera.design.png" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Accepted release-bundle: camera.design.png</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="final-image-flight" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/final-image-flight/camera.far.avif" />
+          <source type="image/webp" srcset="../visual-validation/final-image-flight/camera.far.webp" />
+          <img data-responsive-preview src="../visual-validation/final-image-flight/camera.far.png" alt="Image Pipeline: Accepted release-bundle: camera.far.png" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Accepted release-bundle: camera.far.png</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="final-image-flight" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/final-image-flight/no-post.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/final-image-flight/no-post.design.webp" />
+          <img data-responsive-preview src="../visual-validation/final-image-flight/no-post.design.png" alt="Image Pipeline: Accepted release-bundle: no-post.design.png" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Accepted release-bundle: no-post.design.png</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="final-image-flight" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/final-image-flight/seed-0001.final.avif" />
+          <source type="image/webp" srcset="../visual-validation/final-image-flight/seed-0001.final.webp" />
+          <img data-responsive-preview src="../visual-validation/final-image-flight/seed-0001.final.png" alt="Image Pipeline: Accepted release-bundle: seed-0001.final.png" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Accepted release-bundle: seed-0001.final.png</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="final-image-flight" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/final-image-flight/seed-9e3779b9.final.avif" />
+          <source type="image/webp" srcset="../visual-validation/final-image-flight/seed-9e3779b9.final.webp" />
+          <img data-responsive-preview src="../visual-validation/final-image-flight/seed-9e3779b9.final.png" alt="Image Pipeline: Accepted release-bundle: seed-9e3779b9.final.png" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Accepted release-bundle: seed-9e3779b9.final.png</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="final-image-flight" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/final-image-flight/temporal.t000.avif" />
+          <source type="image/webp" srcset="../visual-validation/final-image-flight/temporal.t000.webp" />
+          <img data-responsive-preview src="../visual-validation/final-image-flight/temporal.t000.png" alt="Image Pipeline: Accepted release-bundle: temporal.t000.png" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Accepted release-bundle: temporal.t000.png</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="final-image-flight" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/final-image-flight/temporal.t001.avif" />
+          <source type="image/webp" srcset="../visual-validation/final-image-flight/temporal.t001.webp" />
+          <img data-responsive-preview src="../visual-validation/final-image-flight/temporal.t001.png" alt="Image Pipeline: Accepted release-bundle: temporal.t001.png" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Accepted release-bundle: temporal.t001.png</strong><span>inspected runtime evidence preview</span></figcaption>
       </figure></div>
   </div></div>
 
 <div class="section" id="skill-text"><div class="wrap">
   <h2>The full skill</h2>
-  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
+  <p class="sub">The complete SKILL.md as loaded by agents, rendered verbatim.</p>
   <div class="skilltext"><h2>Image Pipeline</h2>
-<p>Use this coordinator when several image-space systems share a scene pass,
-depth, color attachments, history, ordering, or final output. For one isolated
-effect, load its atomic skill.</p>
-<p>Route only what the graph needs:</p>
+<p>Build one causal image graph: one HDR scene pass with depth, selected shared
+signals, and one final output conversion. Add a scene traversal or attachment
+only when its measured alternative is worse.</p>
+<p>Use the atomic owner for each admitted effect:</p>
 <ul>
-<li><code>$threejs-ambient-contact-shading</code> for <code>GTAONode</code> and indirect-light use;</li>
-<li><code>$threejs-bloom</code> for <code>BloomNode</code> and emissive policy;</li>
-<li><code>$threejs-exposure-color-grading</code> for metering, EV adaptation, tone mapping,
-LUT domains, and output conversion;</li>
+<li><code>$threejs-ambient-contact-shading</code> for GTAO and indirect-light composition;</li>
+<li><code>$threejs-bloom</code> for glare source selection and <code>BloomNode</code> controls;</li>
+<li><code>$threejs-exposure-color-grading</code> for metering, adaptation, tone mapping, and
+LUT domains;</li>
 <li><code>$threejs-dynamic-surface-effects</code> for feature-local screen history;</li>
-<li><code>$threejs-visual-validation</code> for fixed-view, timing, and leak evidence.</li>
+<li><code>$threejs-visual-validation</code> for capture, timing, and lifecycle evidence.</li>
 </ul>
-<p>Read
-<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-image-pipeline/references/production-image-pipeline.md">references/production-image-pipeline.md</a>
-before implementation.</p>
-<h2>Numeric Evidence Rule</h2>
-<p>Tag every number:</p>
+<h2>1. Fix the baseline</h2>
+<p>Declare physical canvas pixels, target browser/GPU, frame budget, primary
+visual contract, and a readable no-post view. Initialize one
+<code>WebGPURenderer</code>, confirm <code>renderer.backend.isWebGPUBackend</code>, create one
+<code>RenderPipeline</code>, and make one <code>pass(scene, camera)</code> own scene-linear HDR plus
+its depth texture. Set <code>trackTimestamp</code> before <code>renderer.init()</code> when GPU timing
+is requested.</p>
+<p>This step is complete when the baseline renders without optional post, the HDR
+and depth producers are named, and exactly one component owns presentation.</p>
+<h2>2. Inventory signals</h2>
+<p>For every candidate signal—HDR color, depth, normal, emissive, velocity,
+diffuse/base color, IDs, histories, exposure, and UI—record:</p>
+<pre><code class="language-text">writer | readers | mathematical/color domain | physical format and extent
+first write -&gt; last read | history/reset owner | disable path
+</code></pre>
+<p>Treat depth as the pass depth texture rather than an MRT color output. Request
+only signals with a real reader.</p>
+<p>This step is complete when every graph edge has one writer, all consumers agree
+on domain and extent, and every optional signal has a working disable path.</p>
+<h2>3. Admit attachments</h2>
+<p>Compare each candidate attachment with reconstruction or a narrow rerender on
+the target graph:</p>
+<pre><code class="language-text">costMRT(a) = export + store/resolve + all later reads
+costAlt(a) = reconstruction or narrow rerender + its traffic
+</code></pre>
+<p>Keep the attachment when paired evidence shows <code>costMRT(a) &lt; costAlt(a)</code> and
+the peak resident budget still passes. Inspect compiled physical formats:
+r185 named <code>PassNode</code> attachments clone the pass output by default, so compact
+normal or velocity storage exists only after explicit configuration and
+verification.</p>
+<p>This step is complete when every retained attachment has a named reader,
+verified physical format, measured winning alternative, and accounted peak
+bytes.</p>
+<p>When implementing <code>pass()</code>, MRT, compact formats, or depth branches, read
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-image-pipeline/references/production-image-pipeline.md#graph-construction-and-signal-formats">Graph construction and signal formats</a>.</p>
+<h2>4. Admit temporal history</h2>
+<p>Enable temporal output only after all rendered motion has valid previous and
+current presentation state:</p>
 <ul>
-<li><code>[Derived]</code>: formula, dimensions, format, or verified API consequence;</li>
-<li><code>[Gated]</code>: enabled only after a named capability/correctness gate;</li>
-<li><code>[Measured]</code>: captured on a named target and complete graph;</li>
-<li><code>[Authored]</code>: a deliberate quality/look/controller starting point.</li>
+<li>rigid transforms, instances, bones, and procedural deformation;</li>
+<li>stable particle/slot identity where particles enter history;</li>
+<li>unjittered previous/current camera transforms and one jitter owner;</li>
+<li>depth, velocity, neighborhood, and out-of-bounds rejection;</li>
+<li>resets for resize/DPR, cut, projection or origin change, scene load,
+spawn/despawn, teleport, reparent, LOD/topology change, and discontinuous
+deformation;</li>
+<li>current, history, rejected-history, velocity, jitter, and reset diagnostics.</li>
 </ul>
-<p>This applies to attachment counts, formats, byte costs, resolution scales,
-workgroup sizes, history lengths, timing thresholds, DPR limits, hysteresis,
-and frame budgets.</p>
-<h2>Required Architecture</h2>
-<p>Lead with one <code>WebGPURenderer</code>, one <code>RenderPipeline</code>, and one primary
-<code>pass(scene, camera)</code> <code>[Authored: baseline architecture]</code>. Add only the MRT
-outputs whose measured alternative is worse. &quot;One pass plus every possible
-gbuffer&quot; is not a performance rule, especially on a tile GPU.</p>
-<p>Depth is the pass depth texture; it is not a color output in <code>mrt()</code>.</p>
-<p>Default order:</p>
-<pre><code class="language-text">primary scene pass: HDR output + depth + selected MRT outputs
-  -&gt; effect-local lighting histories, such as temporal AO
-  -&gt; lighting-aware AO / atmosphere and layers admitted to temporal history
-  -&gt; temporal reconstruction of stable scene radiance, when complete
-  -&gt; transparent/refractive layers excluded from that history
-  -&gt; exposure meter tap from resolved pre-bloom HDR by default
-  -&gt; bloom / glare and other scene-linear optical effects
-  -&gt; adapted exposure
-  -&gt; tone map
-  -&gt; grade in its declared domain
+<p>r185 velocity is <code>currentNDC - previousNDC</code>; TRAA converts it to UV with a
+negative Y scale. Stock <code>TRAANode</code> requires matching color/depth/velocity/input
+extents and MSAA off. A composite temporal input materializes another texture
+and fullscreen draw. Stock TRAA has no public general reset or reactive-mask
+input, so cuts and discontinuities require an evidenced rebuild or
+bypass/reseed policy.</p>
+<p>This step is complete when horizontal and vertical motion reproject correctly,
+every rendered representation has a velocity policy, each discontinuity fires
+an executable reset, and every temporal allocation has an owner.</p>
+<p>When temporal reconstruction is present, read
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-image-pipeline/references/production-image-pipeline.md#temporal-admission-and-resets">Temporal admission and resets</a>
+before creating velocity or history nodes.</p>
+<h2>5. Compose once</h2>
+<p>Use this default order:</p>
+<pre><code class="language-text">HDR scene pass + depth + admitted MRT
+  -&gt; effect-local lighting histories
+  -&gt; lighting/AO/atmosphere with valid temporal inputs
+  -&gt; temporal scene-radiance resolve, when admitted
+  -&gt; excluded transparent or refractive layers
+  -&gt; meter tap from resolved pre-bloom HDR, when admitted
+  -&gt; bloom and other scene-linear optical effects, when admitted
+  -&gt; fixed or adapted exposure, when admitted
+  -&gt; tone map, when admitted
+  -&gt; LUT in its declared domain, when admitted
   -&gt; one output conversion
-  -&gt; display-domain antialiasing / dither / UI
+  -&gt; display-domain AA, dither, diagnostics, and UI
 </code></pre>
-<p>Temporal resolve precedes exposure by default so history remains in stable
-scene radiance. Bloom follows temporal resolve by default to avoid reprojecting
-broad depthless glare. Deviations require a named history/exposure contract.</p>
-<p>Use built-in nodes first. A custom pass must add a measured capability, not
-duplicate a private built-in target.</p>
-<h2>Native WebGPU Gate And r185 Surface</h2>
-<pre><code class="language-js">// Numeric/API literals: [Gated: installed three@0.185.1 source]
-import {
-  HalfFloatType,
-  RenderPipeline,
-  WebGPURenderer
-} from &#39;three/webgpu&#39;;
-
-const renderer = new WebGPURenderer( {
-  antialias: false,
-  outputBufferType: HalfFloatType,
-  trackTimestamp: true
-} );
-
-await renderer.init();
-if ( renderer.backend.isWebGPUBackend !== true ) {
-  throw new Error( &#39;Native WebGPU is required for this image pipeline.&#39; );
-}
-
-const canTimeGpu = renderer.hasFeature( &#39;timestamp-query&#39; );
-const renderPipeline = new RenderPipeline( renderer );
-</code></pre>
-<p>Verified r185 APIs used by this skill:</p>
-<ul>
-<li><code>RenderPipeline.render()</code>, <code>outputColorTransform</code>, <code>needsUpdate</code>;</li>
-<li><code>pass()</code>, <code>mrt()</code>, <code>PassNode.setResolutionScale()</code>, <code>setMRT()</code>,
-<code>getTextureNode()</code>, <code>getViewZNode()</code>, <code>getLinearDepthNode()</code>,
-<code>compileAsync(renderer)</code>;</li>
-<li><code>ao(depth, normalOrNull, camera)</code> with the public
-<code>GTAONode.resolutionScale</code> property;</li>
-<li><code>bloom(input)</code> with <code>BloomNode.setResolutionScale()</code>;</li>
-<li><code>traa(beauty, depth, velocity, camera)</code> and <code>TRAANode.setViewOffset()</code>;</li>
-<li><code>renderOutput()</code> and TSL <code>toneMapping()</code>.</li>
-</ul>
-<p><code>PostProcessing</code> is the deprecated historical name for <code>RenderPipeline</code>; do
-not teach it. Do not teach a WebGPU-unavailable route here. If the user
-explicitly asks how to apply fallback when WebGPU is unavailable, route to
-<code>$threejs-compatibility-fallbacks</code>.</p>
-<h2>Build Order</h2>
-<ul>
-<li>Declare physical canvas pixels, target frame time, target browser/GPU,
-primary visual contract, and no-post baseline.</li>
-<li>Write the signal table: producer, consumers, coordinate/color domain,
-physical format, resolution, first write, last read, history, disable path,
-and bytes.</li>
-<li>Create the primary <code>pass(scene, camera)</code> and request depth.</li>
-<li>Compare each candidate MRT output against reconstruction or a narrow rerender
-on the target device. Add only winners.</li>
-<li>Compose lighting, atmosphere, and only the layers with valid temporal signals
-before temporal color history.</li>
-<li>Add temporal reconstruction only after velocity, jitter, rejection, and reset
-contracts pass diagnostics.</li>
-<li>Composite transparent/refractive layers excluded from history after the
-temporal resolve and before the photographed meter tap.</li>
-<li>Tap exposure before bloom by default; apply exposure after temporal history.</li>
-<li>Assign tone-map, LUT-domain, and output-conversion ownership once.</li>
-<li>Compute peak live resident bytes and bandwidth separately. Do not claim
-aliasing for built-in private targets.</li>
-<li>Add adaptive DPR only after fixed-DPR graph timings exist.</li>
-</ul>
-<p>Use <code>examples/webgpu-image-pipeline/</code> as a public-API baseline and
-<code>validateImagePipelineConfig.js</code> as a graph gate before browser validation.</p>
-<h2>Conditional MRT Rule</h2>
-<p>For candidate attachment <code>a</code>, compare:</p>
-<pre><code class="language-text">costMRT(a) = fragment export + attachment store + later reads        [Measured]
-costAlt(a) = reconstruction or narrow rerender + its memory traffic  [Measured]
-</code></pre>
-<p>Keep <code>a</code> only when <code>costMRT(a) &lt; costAlt(a)</code> and peak resident memory stays
-inside the declared budget. On tile GPUs, an attachment sampled by a later pass
-must normally leave tile memory; an MRT can save scene traversal yet still lose
-to bandwidth.</p>
-<p>Practical candidates:</p>
-<ul>
-<li>normal: omit and pass <code>null</code> to <code>ao()</code> when depth reconstruction is cheaper;
-retain when several consumers need stable geometric normals;</li>
-<li>emissive: retain only for selective bloom; otherwise bloom from HDR color;</li>
-<li>velocity: retain only while temporal consumers are enabled;</li>
-<li>albedo/base color: r185 exports <code>diffuseColor</code>, not <code>albedo</code>; use a named MRT
-mapping such as <code>albedo: diffuseColor.rgb</code> only when a real composite consumes
-it;</li>
-<li>material/object IDs: add only with a concrete rejection or classification
-consumer.</li>
-</ul>
-<p>r185 <code>PassNode</code> creates additional named attachments by cloning the output
-texture. Do not budget compact <code>RG16F</code> velocity or <code>RGBA8</code> normals unless the
-physical texture format is explicitly configured, compiled, and verified; the
-default HDR pass can otherwise allocate all named attachments at its HDR output
-format.</p>
-<h2>Temporal Contract</h2>
-<p>Three.js r185 <code>VelocityNode</code> writes:</p>
-<pre><code class="language-text">velocityNDC = currentNDC.xy - previousNDC.xy            [Derived: r185 source]
-</code></pre>
-<p>Its built-in <code>TRAANode</code> converts that to texture UV with a Y flip:</p>
-<pre><code class="language-js">// Constants are [Derived: r185 TRAANode source].
-const offsetUV = velocityTexel.xy.mul( vec2( 0.5, - 0.5 ) );
-const previousUV = currentUV.sub( offsetUV );
-</code></pre>
-<p>Do not use <code>currentUV - velocity * 0.5</code> for both axes. The sign mismatch ghosts
-vertical motion.</p>
-<p>Before enabling temporal output, declare:</p>
-<ul>
-<li>velocity producer for rigid, instanced, skinned, and procedurally deformed
-geometry actually present;</li>
-<li>jitter owner and whether velocity includes jitter;</li>
-<li>depth convention and rejection domain;</li>
-<li>history color domain and exposure used to create it;</li>
-<li>reset events: resize/DPR, cut, projection change, scene load, discontinuous
-deformation, format change, and invalid velocity;</li>
-<li>current/history/rejection/velocity diagnostics.</li>
-</ul>
-<p><code>traa()</code> requires a texture input. Passing a composite node causes r185 to
-materialize an additional full-resolution <code>RTTNode</code> (color target and fullscreen
-draw, with default depth unless explicitly disabled). Account, own, and dispose
-that target. Stock TRAA also requires scene color/depth/velocity/input extents to
-match the drawing buffer; a scaled scene pass is not a silent TAAU path.</p>
-<p><code>TRAANode</code> requires MSAA disabled <code>[Gated: r185 source]</code>. r185 exposes no public
-general <code>reset()</code> method; resize is handled internally, while cuts and other
-discontinuities need a validated wrapper policy or node rebuild/disposal.</p>
-<h3>Physics presentation and reactive radiance</h3>
-<p>When the route manifest declares a physics-to-render boundary, it first
-freezes a <code>PresentationTimeCohort</code> for the exact previous/current requested
-instants, clock-map revisions, context skew, and age gates. Views requesting a
-different instant pair require another cohort and Candidate. It then publishes
-a view-independent immutable <code>PhysicsPresentationCandidate</code> that references
-that cohort, then one
-<code>CameraViewPublication</code> per target/view, then <code>ViewPreparationPublication</code> for
-visibility/shadow/cache/reset plans, and finally seals
-<code>PhysicsPresentationSnapshot</code>. Bind the scene pass to that exact publication
-chain and bind the matching
-<code>LightingTransportSnapshot</code> through a provider-wide <code>PresentedStatePair</code>
-(<code>entityId: typed-absence</code>) referenced from the candidate by the Snapshot, from the
-<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-choose-skills/references/physics-domain-and-interaction-contract.md">physics domain and interaction contract</a>.
-Resolve every record against the route&#39;s exact <code>PhysicsContext</code>; reject a
-context/version, frame/chart, clock-map, unit-scale, or origin-epoch mismatch
-instead of converting it inside the image graph.
-Validate the exact central Candidate, camera publication, preparation
-publication, Snapshot, <code>PhysicsSignalDescriptor</code>, and lighting-channel schemas
-rather than defining a post-local subset. The target/view Snapshot contains the
-unique subset of Candidate pairs used by that view and references, not copied
-pairs, transforms, or reset records. Resolve stable
-binding pairs through <code>presentedStatePairRefs</code>, previous/current render instants
-and complete transforms/matrices through <code>cameraPublicationId</code>, and reactive/
-reset records through <code>viewPreparationId</code>. A post node may not sample a different provider bracket
-or silently mix radiance and irradiance. Match the lighting pair&#39;s context,
-provider/signal IDs, descriptor/state/resource generations,
-<code>PresentationStateHandle</code>, each state&#39;s requested presentation instant, mapped
-source instant and clock-map revision/error, plus the bundle <code>sampleInstant</code>;
-validate channel <code>actualPhysicsTime</code>, filter/age, maximum staleness, validity,
-and error.</p>
-<p>The provenance <code>requestedPresentationInstant</code> and bundle <code>sampleInstant</code> are
-narrow <code>PhysicsInstant</code> values. Provider <code>requestedPhysicsTime</code> and channel
-<code>actualPhysicsTime</code> are <code>PhysicsTime</code> wrappers whose discriminant selects
-exactly one arm consistent with the signal descriptor&#39;s <code>timeSemantics</code>; a raw
-<code>PhysicsInstant</code> or <code>PhysicsTimeInterval</code> is invalid in either wrapper field.</p>
-<p>Canonical lighting-provider channels remain SI-valued. A normalized RGB working
-buffer is a separately named render-local signal derived through a versioned
-SI-to-render conversion with reference scale, provenance, and error; it is not a
-normalized <code>LightingTransportSnapshot</code> channel. A nonphysical image route keeps
-the router physics fields <code>not used</code> and declares its render-local color basis
-without instantiating this ABI.</p>
-<p>Velocity is projected from the pair&#39;s independent <code>previousPresented</code> and
-<code>currentPresented</code> state handles/global bindings, using the corresponding
-previous/current <code>RenderSimilarityTransform</code> and unjittered matrices from
-<code>CameraViewPublication</code>. Each provider&#39;s fixed-step states only bracket each
-presented sample through <code>PresentationSampleProvenance</code>; they are not the
-previous/current rendered poses. Bindings cover rigid,
-skinned, instanced, and procedural deformation and explicitly invalidate
-spawn/despawn/teleport/reparent/LOD changes. A rebase must disappear after
-origin compensation, not become a full-screen motion vector.</p>
-<p>Velocity projects unjittered previous/current view and projection matrices;
-the temporal owner applies jitter separately. Stock r185 <code>VelocityNode</code> is
-gated to one presentation history and one velocity-bearing render per object
-per presented frame, with built-in previous-state coverage sufficient for the
-rendered rigid/skinned/instanced/deformation path. It is not target/view keyed.
-Multiple views/targets, multiple velocity passes, or arbitrary snapshot-bound
-previous deformation require a custom velocity path consuming the central
-presented pairs and leased resources.</p>
-<p>The camera owner returns <code>CameraViewPublication</code>; view-preparation owners return
-<code>ViewPreparationPublication</code>; no phase mutates an earlier record. Feedback that cannot precede the seal is
-explicitly one-frame deferred; the current render continues to sample the
-prior committed version named by its snapshot.</p>
-<p>The route serializes typed view-scoped <code>reactivePublications</code> and
-<code>resetDependencies</code> in <code>ViewPreparationPublication</code>. At minimum,
-dependency edges cover solver reset/quality migration, uncompensated origin or
-projection change, shadow-content commit, and discontinuous foam, emissive, or
-optical state. Use a conservative full reset when no reliable affected-pixel
-mask exists; otherwise a custom/patched temporal node may consume a versioned
-reactive mask. Stock r185 <code>TRAANode</code> has no reactive-mask input or public
-general reset, so its executable choices are evidenced rebuild, bypass/reseed
-wrapper, or conservative full reset—not a diagnostic mask alone.</p>
-<p>Each publication uses the exact central view-scoped record: source/version/
-epoch, kind (<code>shadow-content</code>, <code>foam</code>, <code>emissive</code>, <code>optical</code>, <code>topology</code>,
-<code>deformation</code>, <code>disocclusion</code>, or <code>event</code>), full-frame or leased mask
-affected-region form, validity/error, and planned history action. A mask ID
-without descriptor, alignment, error, resource generation, and retirement
-lease is invalid.
-Do not reset exposure for every local radiance edit. Reset or analytically
-convert exposure state only when the radiance basis/calibration, working
-primaries, quantity convention, or authored exposure key changes.</p>
-<p>Execute the dependency DAG before the first consumer of the new epoch:</p>
-<pre><code class="language-text">presentation candidate
-  -&gt; CameraViewPublication with transforms/matrices/jitter/depth
-  -&gt; ViewPreparationPublication with visibility/shadows/reactive/reset plans
-  -&gt; seal snapshot references
-  -&gt; depth + velocity + scene-linear radiance
-  -&gt; AO/surface/volumetric/color history rejection or reseed
-  -&gt; resolved meter source
-  -&gt; exposure adaptation
-  -&gt; bloom, tone map, grade, output
-</code></pre>
-<p>After sealing each target/view Snapshot, author one <code>PresentationRenderPlan</code>
-that binds its cohort/Candidate/Snapshot, exact leased resource generations,
-phase/edge DAG, every reset action to one exact phase, reset generations, shadow
-factors, and output ownership. The mapped reset phase writes the expected
-history generation and precedes every reader in the plan DAG. Submit
-only after the separate cohort and frame-slot admissions close against that
-immutable plan; report observed actions and completion state in
-<code>FrameExecutionRecord</code>.</p>
-<p>Every planned edge names its writer, consumers, and action. The immutable
-snapshot does not claim completion; append actual rebuild/reseed/submission
-results only to the matching target execution in a separate
-<code>FrameExecutionRecord</code>. Each result identifies its plan and execution phase,
-resolves that phase&#39;s dependency completions, and uses a queue epoch present in
-the target execution; preparation owns no result. GPU descriptors pin resource
-generation, layout, entity map, slot/range, and a central
-<code>PresentationResourceLease</code> until all consumers submit and its
-<code>reuseProhibitedUntil</code> completion join is satisfied; retirement is recorded in
-<code>FrameExecutionRecord.leaseDispositionById</code>.
-Logical state version, submission epoch, GPU queue
-availability, and host visibility are distinct; <code>computeAsync()</code> is not a
-fence.</p>
-<p>A required camera/shadow/cache or sealing failure appends a
-<code>FrameExecutionRecord</code> with <code>overallStatus: aborted</code> (or <code>partial-failure</code> when
-other targets survive), omits that target&#39;s snapshot from <code>snapshotIds</code>, stores
-typed absence in its <code>targetExecutions.snapshotId</code>, cancels or defers actions,
-retires only failed-target-exclusive preparation leases, and retains
-Candidate/shared leases until all surviving snapshot consumers join through
-<code>leaseDispositionById</code>. Device loss gives every affected target an exact loss
-tuple and status <code>device-lost</code>, advances its <code>deviceLossGeneration</code>, cancels
-dependent actions, and invalidates only resources and leases whose device/
-backend/loss generation matches that tuple, without inventing a completion
-token. <code>overallStatus</code> is <code>device-lost</code> only when every required target is lost
-under the same transaction; mixed surviving/lost targets use
-<code>partial-failure</code>. The
-immutable Candidate/Snapshot remain audit records; their lost-generation
-resource references are no longer bindable. Rebuild histories and timing proof
-under the new backend/resource generation.</p>
-<p>Even with compensated custom velocity, stock r185 <code>TRAANode</code> cannot preserve
-history across a render-origin translation or tangent-basis rebase because its
-previous-depth reconstruction has no previous-render-to-current-render bridge.
-Rebuild/reseed it on every such rebase. Only a custom/patched temporal node
-that consumes both complete global-to-render transforms may preserve history
-after an invariance proof.</p>
-<h2>Output Ownership</h2>
-<ul>
-<li>source color textures tagged with an sRGB transfer use <code>SRGBColorSpace</code>;</li>
-<li>linear HDR sources and working render targets remain in the registered
-working space;</li>
-<li>normals, masks, velocity, depth, LUT transform data, and histories that are
-not colors use <code>NoColorSpace</code>/data semantics;</li>
-<li>choose the HDR working format from required range, precision, filtering,
-blending, target support, and measured bandwidth. <code>HalfFloatType</code> is a common
-candidate, not a universal requirement <code>[Gated]</code>;</li>
-<li>one tone-map owner, one working-to-output conversion owner;</li>
-<li>a scene-linear LUT needs a shaper for unbounded HDR;</li>
-<li>a tone-mapped-linear LUT sits after <code>toneMapping()</code> and before
-<code>renderOutput(..., NoToneMapping, outputColorSpace)</code>;</li>
-<li>a display-encoded LUT sits after <code>renderOutput()</code> and receives no second
-conversion;</li>
-<li>explicit <code>renderOutput()</code> requires
-<code>RenderPipeline.outputColorTransform = false</code>.</li>
-</ul>
-<h2>Lifetime And Adaptive Resolution</h2>
-<p>r185 has no public transient render-graph alias allocator. Built-in
-<code>BloomNode</code>, <code>GTAONode</code>, and <code>TRAANode</code> own persistent private render targets.
-Count all of those allocations. Custom target reuse is legal only for
-non-overlapping lifetimes with identical dimensions, format, sample count, and
-usage; history and diagnostic pins never alias.</p>
-<p>Adaptive DPR uses sustained GPU pressure, asymmetric hysteresis, and a cooldown.
-It must distinguish scalable pixel work from fixed work, quantize changes to an
-authored step, and reset/reseed every affected history. The complete controller
-and formulas live in the reference.</p>
-<h2>Composable Budget Contract</h2>
-<p>Never add a coordinator&#39;s full-post cost to the absolute costs of effects it
-already contains. Use:</p>
-<pre><code class="language-text">fullGraph = measured end-to-end GPU frame                            [Measured]
-marginal(effect | graph) = graphWithEffect - identicalGraphWithout  [Measured]
-</code></pre>
-<p>For planning only:</p>
-<pre><code class="language-text">estimatedGraph = measuredBase + sum(measuredMarginals) + interactionReserve
-</code></pre>
-<p><code>interactionReserve</code> is <code>[Authored]</code> until the assembled full graph is
-<code>[Measured]</code>; then the full-graph measurement wins. Every result states canvas
-physical pixels, DPR, enabled graph, warmup, statistic, browser, and GPU.</p>
-<p>r185 render/compute timestamp pools sum instrumented pass durations. They do
-not automatically include copies, barriers, submission gaps, or presentation;
-do not label their sum end-to-end <code>fullGraph</code> without an independent scope gate.</p>
-<p>For parent physical extent <code>W * H</code>, scale <code>s</code>, texel bytes <code>b</code>, sample count
-<code>m</code>, array layers <code>l</code>, and retained allocation slots <code>k</code>, the uncompressed
-payload lower bound is:</p>
-<pre><code class="language-text">Wp = floor(W * s)                                         [Derived: r185 PassNode]
-Hp = floor(H * s)                                         [Derived: r185 PassNode]
-bytes &gt;= Wp * Hp * b * m * l * k                          [Derived]
-</code></pre>
-<p>Use the dimensions actually reported by the target; backend alignment,
-compression, resolves, allocator granularity, and private targets are outside
-that payload equation. Count resident bytes and peak live bytes separately;
-sum bandwidth only for actual reads/writes.</p>
-<h2>Rules</h2>
-<ul>
-<li>the primary scene pass is the baseline; extra scene renders need a measured
-reason;</li>
-<li>depth is shared from the pass, not duplicated as an MRT color attachment;</li>
-<li>MRT is conditional, not a completeness checklist;</li>
-<li>apply AO only to the indirect-light term it models;</li>
-<li>use depth/normal-aware reconstruction for reduced effects;</li>
-<li>keep temporal history in a stable pre-exposure domain by default;</li>
-<li>exclude UI/debug from exposure and HDR bloom unless intentionally authored;</li>
-<li>call <code>scenePass.compileAsync(renderer)</code> only after MRT and texture-node
-requests are complete;</li>
-<li>set <code>renderPipeline.needsUpdate = true</code> after output-graph changes;</li>
-<li>expose disable paths, effect-only views, physical formats, peak bytes, and
-timings in production diagnostics;</li>
-<li>dispose removed node effects and their targets.</li>
-</ul>
-<h2>Routing Boundary</h2>
-<p>Use this skill for shared buffers, ordering, history, lifetimes, adaptive DPR,
-budgets, or final output. Use an atomic skill for one isolated effect and return
-here only when it joins the shared graph.</p>
+<p>Keep history in stable pre-exposure scene radiance by default. Add bloom RGB
+while preserving scene alpha. If <code>renderOutput()</code> owns presentation, set
+<code>renderPipeline.outputColorTransform = false</code>; after any output-node change,
+set <code>renderPipeline.needsUpdate = true</code>.</p>
+<p>This step is complete when every present meter, bloom, exposure, tone map, LUT,
+alpha operation, and output conversion has one owner, and every
+transparent/refractive layer has an explicit position.</p>
+<p>When choosing a LUT/output ending or handling transparent alpha, read
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-image-pipeline/references/production-image-pipeline.md#color-alpha-and-legal-endings">Color, alpha, and legal endings</a>.</p>
+<h2>6. Own toggles, size, and lifetime</h2>
+<p>Count persistent private targets owned by built-in <code>BloomNode</code>, <code>GTAONode</code>,
+<code>TRAANode</code>, and <code>PassNode</code>. Rebuild the pass to reclaim an attachment previously
+requested with <code>getTextureNode()</code>; a logical MRT toggle does not reclaim it.
+On resize or DPR change, update every explicit extent and reseed all affected
+histories. Dispose removed nodes, passes, targets, materials, and storage after
+their final GPU use.</p>
+<p>Add adaptive DPR only after the fixed-DPR graph has sustained timings. Use
+asymmetric dwell and cooldown, distinguish fixed from pixel-scaled work, and
+remeasure every quality tier after a size change.</p>
+<p>This step is complete when repeated enable/disable, resize, tier-switch, and
+dispose cycles stabilize resource counts and every graph mutation marks the
+pipeline dirty.</p>
+<p>When estimating traffic, private target residency, marginal cost, or adaptive
+DPR, read
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-image-pipeline/references/production-image-pipeline.md#memory-timing-and-adaptive-resolution">Memory, timing, and adaptive resolution</a>.</p>
+<h2>7. Prove the graph</h2>
+<p>Capture the no-post baseline, each admitted signal, the diagnostics for each
+admitted temporal/meter/bloom/color branch, final output, and physical target
+inventory. Measure the complete warmed graph and paired marginal
+variants at identical scene state. Exercise negative controls: disable each
+effect, force each reset class, resize, and destroy/recreate the graph.</p>
+<p>When a capture, timing scope, reset, output-isolation, or lifecycle control fails, read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-image-pipeline/references/production-image-pipeline.md#diagnostics-and-failure-signatures">Diagnostics and failure signatures</a>.</p>
+<p>The pipeline is complete when all shipping tiers preserve the visual contract,
+the full graph and resident targets meet declared budgets, output isolation
+shows one output conversion and—when admitted—one tone map, diagnostics pass
+for every admitted temporal branch and axis, and lifecycle counts plateau after
+disposal.</p>
 </div>
+  <aside class="skill-guides" aria-labelledby="related-guides-title"><h3 id="related-guides-title">Related guides</h3><ul><li><a href="/compare/renderpipeline-vs-effectcomposer/"><span>Comparisons</span>Three.js RenderPipeline vs EffectComposer</a></li><li><a href="/migrate/"><span>Migration</span>Three.js WebGPU and Agent-Skill Migration Guides</a></li><li><a href="/industries/"><span>Industries</span>Three.js WebGPU Workflows by Industry</a></li><li><a href="/docs/choose-skills/"><span>Documentation</span>Choose the Right Three.js WebGPU Skills</a></li></ul></aside>
   <div class="pn">
     <a href="threejs-exposure-color-grading.html">← Exposure And Color Grading</a>
     <a href="threejs-object-sculptor.html">Three.js Object Sculptor →</a>
@@ -912,10 +782,16 @@ here only when it joins the shared graph.</p>
 </main>
 
 <div class="wrap"><footer>
-  <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
-  <span style="font-size:13px">Three r185.1 · 41 working implementations · build <code>6c7881ab7386</code></span><br/>
-  <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
-  <span><a href="https://threejs-skills.com/about/">About &amp; methodology</a> · <a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/llms.txt">For coding agents</a></span>
+  <div class="footer-summary">Three.js WebGPU Skill Pack: TSL, procedural graphics, and visual validation.
+    <span>Three r185.1 · 40 primary targets · 25 accepted · build <code>ab7d8d17e058</code></span>
+    <span>Compiling shaders? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span>
+  </div>
+  <div class="footer-groups">
+    <div class="footer-group"><strong>Build</strong><a href="/#skills">Skills</a><a href="/#flagships">Examples</a><a href="/industries/">Industries</a></div>
+    <div class="footer-group"><strong>Decide</strong><a href="/for/">Who it is for</a><a href="/compare/">Compare</a><a href="/alternatives/">Alternatives</a><a href="/pricing/">Pricing</a></div>
+    <div class="footer-group"><strong>Adopt</strong><a href="/docs/">Docs</a><a href="/migrate/">Migration</a><a href="/agents/">Agent docs</a><a href="/faq/">FAQ</a></div>
+    <div class="footer-group"><strong>Proof</strong><a href="/evidence/">Evidence</a><a href="/about/">Method</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a><a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/LICENSE">License</a></div>
+  </div>
 </footer></div>
 </body>
 </html>

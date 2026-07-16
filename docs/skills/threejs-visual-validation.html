@@ -4,12 +4,12 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Visual Validation | Three.js WebGPU Skill</title>
-<meta name="description" content="Validate advanced Three.js WebGPU/TSL scenes with falsifiable visual contracts, mechanism diagnostics, sustained CPU/GPU timing, refresh-derived budgets…" />
+<meta name="description" content="Validate Three.js WebGPU/TSL implementations against falsifiable claims. Use for visual or mechanism correctness, temporal behavior, target performance or GPU…" />
 <meta name="author" content="Three.js WebGPU Skill Pack contributors" />
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-visual-validation.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b" />
+<meta name="skill-pack-build-revision" content="sha256:ab7d8d17e0589a6f5c2462d645b9e0d6797cd92eade36e3615dae091c6f9df5b" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -17,20 +17,26 @@
 <link rel="manifest" href="../site.webmanifest" />
 <link rel="alternate" type="text/plain" href="https://threejs-skills.com/llms.txt" title="LLM-readable skill catalog" />
 <link rel="alternate" type="application/json" href="https://threejs-skills.com/skills.json" title="Machine-readable skill catalog" />
-
+<link rel="preload" as="image" href="../visual-validation/webgpu-validation-harness/final.design.avif" type="image/avif" fetchpriority="high" />
 <meta property="og:type" content="article" />
 <meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
 <meta property="og:title" content="Visual Validation | Three.js WebGPU Skill" />
-<meta property="og:description" content="Validate advanced Three.js WebGPU/TSL scenes with falsifiable visual contracts, mechanism diagnostics, sustained CPU/GPU timing, refresh-derived budgets…" />
+<meta property="og:description" content="Validate Three.js WebGPU/TSL implementations against falsifiable claims. Use for visual or mechanism correctness, temporal behavior, target performance or GPU…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-visual-validation.html" />
-<meta property="article:modified_time" content="2026-07-12T22:55:47+03:00" />
+<meta property="article:modified_time" content="2026-07-16T12:45:44+03:00" />
 <meta property="article:published_time" content="2026-07-04T23:30:21+03:00" />
 <meta property="article:section" content="Planning and Validation" />
-
-<meta name="twitter:card" content="summary" />
+<meta property="og:image" content="https://threejs-skills.com/visual-validation/webgpu-validation-harness/final.design.png" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="800" />
+<meta property="og:image:alt" content="Native WebGPU validation harness final readback for Visual Validation" />
+<meta name="twitter:image" content="https://threejs-skills.com/visual-validation/webgpu-validation-harness/final.design.png" />
+<meta name="twitter:image:alt" content="Native WebGPU validation harness final readback for Visual Validation" />
+<meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Visual Validation | Three.js WebGPU Skill" />
-<meta name="twitter:description" content="Validate advanced Three.js WebGPU/TSL scenes with falsifiable visual contracts, mechanism diagnostics, sustained CPU/GPU timing, refresh-derived budgets…" />
+<meta name="twitter:description" content="Validate Three.js WebGPU/TSL implementations against falsifiable claims. Use for visual or mechanism correctness, temporal behavior, target performance or GPU…" />
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
@@ -56,14 +62,19 @@
    ],
    "@id": "https://threejs-skills.com/skills/threejs-visual-validation.html#article",
    "headline": "Visual Validation",
-   "description": "Validate advanced Three.js WebGPU/TSL scenes with falsifiable visual contracts, mechanism diagnostics, sustained CPU/GPU timing, refresh-derived budgets, quality-governor traces, tile-GPU resource models, visual-error metrics, leak loops, and stable JSON+PNG evidence.",
+   "description": "Validate Three.js WebGPU/TSL implementations against falsifiable claims. Use for visual or mechanism correctness, temporal behavior, target performance or GPU attribution, resource ownership, and lifecycle stability.",
    "url": "https://threejs-skills.com/skills/threejs-visual-validation.html",
    "mainEntityOfPage": {
     "@type": "WebPage",
     "@id": "https://threejs-skills.com/skills/threejs-visual-validation.html"
    },
+   "image": [
+    "https://threejs-skills.com/seo/article/threejs-visual-validation-1x1.png",
+    "https://threejs-skills.com/seo/article/threejs-visual-validation-4x3.png",
+    "https://threejs-skills.com/seo/article/threejs-visual-validation-16x9.png"
+   ],
    "datePublished": "2026-07-04T23:30:21+03:00",
-   "dateModified": "2026-07-12T22:55:47+03:00",
+   "dateModified": "2026-07-16T12:45:44+03:00",
    "author": {
     "@id": "https://threejs-skills.com/#publisher"
    },
@@ -140,18 +151,18 @@ html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smo
 body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7}
 ::selection{background:rgba(255,180,84,.26);color:var(--ink)}
 a{color:inherit;text-decoration:none}
-a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
+a:focus-visible,button:focus-visible,summary:focus-visible,pre[tabindex]:focus-visible,[role="region"]:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
 main{display:block}
 .skip-link{position:fixed;z-index:100;left:16px;top:12px;translate:0 -160%;font-family:var(--mono);font-size:12px;background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:9px;transition-property:translate;transition-duration:160ms}
 .skip-link:focus{translate:0 0}
 .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
 .site-nav{position:sticky;z-index:50;top:0;background:rgba(8,10,14,.82);border-bottom:1px solid rgba(255,255,255,.075);backdrop-filter:blur(18px) saturate(1.15)}
-nav{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
-nav .brand{white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
-nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
-nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
-nav .links a:hover{color:var(--amber)}
-nav .links a:active{scale:.96}
+.site-nav>.wrap{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+.site-nav .brand{min-height:44px;display:inline-flex;align-items:center;white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
+.site-nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
+.site-nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
+.site-nav .links a:hover{color:var(--amber)}
+.site-nav .links a:active{scale:.96}
 h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:0}
 p{text-wrap:pretty}
 h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
@@ -165,7 +176,7 @@ code{font-family:var(--mono)}
 .card{min-height:100%;background:linear-gradient(145deg,rgba(19,24,33,.96),rgba(12,15,21,.96));border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px;
   box-shadow:var(--shadow-card);transition-property:translate,scale,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
 .card:hover{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
-.card:active{translate:0 -1px;scale:.99}
+.card:active{translate:0 -1px;scale:.96}
 .card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .card-kind{font-family:var(--mono);font-size:10px;color:var(--cyan)}
 .card h3,.card h4{font-size:19px;font-weight:600}
@@ -190,19 +201,29 @@ figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:s
 figcaption{padding:16px 18px;font-size:14.5px}
 figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
 figcaption span{display:block;margin-top:3px;color:var(--dim)}
-footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
+footer{border-top:1px solid var(--line);padding:44px 0 60px;display:grid;grid-template-columns:minmax(260px,1.4fr) minmax(0,2fr);gap:36px 64px;color:var(--dim);font-size:14.5px}
 footer a{color:var(--amber)}
 footer a:hover{text-decoration:underline}
 footer code{color:var(--cyan);font-size:11px}
+.footer-summary{max-width:55ch}.footer-summary>span{display:block;margin-top:8px;font-size:13px}.footer-groups{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}.footer-group{display:grid;align-content:start;gap:8px}.footer-group strong{font:400 10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}.footer-group a{min-height:40px;display:flex;align-items:center;color:var(--dim);font-size:13px;transition-property:color,scale;transition-duration:160ms}.footer-group a:hover{color:var(--amber);text-decoration:none}.footer-group a:active{scale:.96}
+.pathfinder{padding:clamp(52px,7vw,86px) 0;border-bottom:1px solid var(--line)}.pathfinder-head{display:grid;grid-template-columns:minmax(0,.7fr) minmax(320px,1.3fr);align-items:end;gap:28px 72px;margin-bottom:28px}.pathfinder-head h2{margin:0}.pathfinder-head p{max-width:58ch;color:var(--dim)}.pathfinder-rows{border-top:1px solid var(--line)}.pathfinder-row{display:grid;grid-template-columns:minmax(160px,.55fr) minmax(210px,.8fr) minmax(0,1.6fr);gap:20px 32px;align-items:center;min-height:94px;border-bottom:1px solid var(--line)}.pathfinder-stage{font:10px/1.4 var(--mono);letter-spacing:.11em;text-transform:uppercase;color:var(--cyan)}.pathfinder-row>p{color:var(--dim);font-size:14px}.pathfinder-links{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px 18px}.pathfinder-links a{min-height:44px;display:inline-flex;align-items:center;gap:8px;color:var(--amber);font:11px/1.35 var(--mono);transition-property:color,scale;transition-duration:160ms}.pathfinder-links a:after{content:"→"}.pathfinder-links a:hover{color:var(--ink)}.pathfinder-links a:active{scale:.96}
+.content-hero{padding:clamp(54px,8vw,104px) 0 42px;border-bottom:1px solid var(--line)}.breadcrumbs{min-height:44px;display:flex;align-items:center;margin-bottom:28px;font:11px/1.4 var(--mono);color:var(--dim)}.breadcrumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.breadcrumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}.breadcrumbs a{min-height:40px;display:inline-flex;align-items:center;transition-property:color,scale;transition-duration:160ms}.breadcrumbs a:hover{color:var(--amber)}.breadcrumbs a:active{scale:.96}.content-hero h1{max-width:17ch;font-size:clamp(40px,6vw,68px);font-weight:700;line-height:1.02;letter-spacing:-.02em}.content-lede{max-width:66ch;margin-top:22px;color:var(--dim);font-size:clamp(17px,2vw,20px)}.content-meta{display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:28px;font:10px/1.4 var(--mono);color:var(--cyan)}
+.content-answer{max-width:900px;margin-top:34px;padding:3px 0 3px 22px;border-left:2px solid var(--amber);font-size:clamp(19px,2.2vw,21px);line-height:1.62;color:var(--ink)}.content-shell{padding:clamp(46px,7vw,86px) 0}.content-layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(230px,1fr);align-items:start;gap:clamp(36px,6vw,76px)}.content-body{grid-column:1;grid-row:1;max-width:78ch;min-width:0}.content-body h2{margin:52px 0 16px;font-size:clamp(27px,3.5vw,39px);scroll-margin-top:112px}.content-body>h2:first-child{margin-top:0}.content-body h3{margin:34px 0 12px;font-size:21px;scroll-margin-top:112px}.content-body p,.content-body li{color:var(--dim);font-size:16px}.content-body p+p{margin-top:17px}.content-body ul,.content-body ol{margin:16px 0;padding-left:24px}.content-body li+li{margin-top:7px}.content-body a{color:var(--cyan);text-decoration:underline;text-decoration-color:rgba(127,212,193,.35);text-underline-offset:3px}.content-body a:hover{color:var(--amber);text-decoration-color:currentColor}.content-body code:not(pre code){padding:1px 5px;border:1px solid var(--line);border-radius:5px;background:#07090c;color:var(--cyan);font-size:.86em}.content-body pre{margin:20px 0;white-space:pre;tab-size:2}.content-table{max-width:100%;margin:22px 0;overflow-x:auto;border:1px solid var(--line);border-radius:12px}.content-table:focus-visible{outline:2px solid var(--amber);outline-offset:3px}.content-table table{width:100%;border-collapse:collapse;font-size:14px}.content-table th,.content-table td{min-width:150px;padding:11px 13px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);text-align:left;vertical-align:top;color:var(--dim)}.content-table th{color:var(--ink);font-weight:600;background:var(--bg2)}.content-table tr:last-child td{border-bottom:0}.content-table th:last-child,.content-table td:last-child{border-right:0}
+.content-index{grid-column:2;grid-row:1;position:sticky;top:104px;max-height:calc(100vh - 128px);overflow-y:auto;padding:18px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.content-index strong{display:block;margin-bottom:10px;font:10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}.content-index ol{list-style:none}.content-index a{min-height:40px;display:flex;align-items:center;padding:5px 0;color:var(--dim);font-size:13px;line-height:1.4;transition-property:color,translate,scale;transition-duration:160ms}.content-index a:hover{color:var(--amber);translate:3px 0}.content-index a:active{translate:1px 0;scale:.96}.content-proof{margin:54px 0 0}.content-proof figure{border-radius:16px}.content-proof img{width:100%;height:auto;max-height:650px;object-fit:cover;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}.content-proof figcaption{color:var(--dim);font:11px/1.55 var(--mono)}.content-proof figcaption a{color:var(--amber)}
+.content-layout--docs{grid-template-columns:minmax(190px,.6fr) minmax(0,2fr)}.content-layout--docs .content-index{grid-column:1}.content-layout--docs .content-body{grid-column:2;max-width:72ch}.docs-index a{padding-inline:10px;border-left:2px solid transparent}.docs-index a[aria-current="page"]{border-left-color:var(--amber);background:rgba(255,180,84,.06);color:var(--ink);font-weight:600}.docs-index-current{display:none}
+.content-facts,.content-faq-list,.content-related,.content-sources,.content-skills,.content-demos,.content-discovery,.faq-provenance{margin-top:54px;padding-top:22px;border-top:1px solid var(--line)}.content-facts h2,.content-faq-list h2,.content-related h2,.content-sources h2,.content-skills h2,.content-demos h2{font-size:24px}.content-ruled-list{list-style:none;border-top:1px solid var(--line)}.content-ruled-list li{border-bottom:1px solid var(--line)}.content-ruled-list a{min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:9px 0;color:var(--dim);font-size:14px;transition-property:color,scale;transition-duration:160ms}.content-ruled-list a:after{content:"→";color:var(--amber)}.content-ruled-list a:hover{color:var(--ink)}.content-ruled-list a:active{scale:.96}.content-related .content-ruled-list a{display:grid;grid-template-columns:104px minmax(0,1fr) auto}.content-related-family{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}.content-faq-item{padding:22px 0;border-bottom:1px solid var(--line)}.content-faq-item h3{margin:0;font-size:20px}.content-faq-item h3 a{color:var(--ink)}.content-faq-item p{margin-top:9px;color:var(--dim);font-size:15px}.faq-provenance{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);padding:0}.faq-provenance div{padding:13px;background:var(--bg2)}.faq-provenance dt{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}.faq-provenance dd{margin-top:5px;font:11px/1.45 var(--mono);color:var(--cyan);overflow-wrap:anywhere}.content-discovery{display:flex;flex-wrap:wrap;gap:10px 22px;font:11px/1.5 var(--mono);color:var(--dim)}.content-discovery a{min-height:40px;display:inline-flex;align-items:center;color:var(--amber)}
 @media (max-width:760px){
   .site-nav .wrap{padding-right:0}
-  nav{min-height:104px;display:grid;grid-template-columns:1fr;padding:14px 0 10px;gap:4px}
-  nav .brand{font-size:16px}
-  nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:none;padding-right:20px}
-  nav .links::-webkit-scrollbar{display:none}
-  nav .links a{flex:0 0 auto}
+  .site-nav>.wrap{min-height:104px;display:grid;grid-template-columns:1fr;padding-top:14px;padding-bottom:10px;gap:4px}
+  .site-nav .brand{font-size:16px}
+  .site-nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;scrollbar-color:rgba(255,180,84,.45) transparent;padding:0 20px 4px 0}
+  .site-nav .links::-webkit-scrollbar{height:3px}.site-nav .links::-webkit-scrollbar-thumb{background:rgba(255,180,84,.45);border-radius:99px}
+  .site-nav .links a{flex:0 0 auto}
   .grid,.gallery{grid-template-columns:1fr}
+  footer{grid-template-columns:1fr}.footer-groups{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+@media (max-width:900px){.pathfinder-head,.content-layout{grid-template-columns:1fr}.content-index{grid-column:1;grid-row:1;position:static;max-height:none}.content-body,.content-layout--docs .content-body{grid-column:1;grid-row:2}.docs-index{overflow:hidden}.docs-index-current{display:flex;margin-bottom:8px}.docs-index ol{display:flex;gap:8px;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;padding-bottom:6px}.docs-index li{flex:0 0 min(72vw,260px)}.docs-index .docs-index-list-current{display:none}.docs-index a{min-height:44px;padding:8px 10px;border-left:0;border-bottom:2px solid transparent;background:var(--bg2)}.docs-index a[aria-current="page"]{border-bottom-color:var(--amber)}.pathfinder-row{grid-template-columns:minmax(160px,.6fr) minmax(0,1fr)}.pathfinder-links{grid-column:1/-1;justify-content:flex-start;padding-bottom:18px}.faq-provenance{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.pathfinder-row{grid-template-columns:1fr;gap:6px;padding:18px 0}.pathfinder-links{grid-column:auto;padding:0}.content-hero h1{font-size:clamp(38px,12vw,54px)}.content-answer{padding-left:16px}.content-table{border-radius:8px}.content-table table{min-width:680px}.faq-provenance{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
@@ -217,7 +238,7 @@ header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
   linear-gradient(90deg,rgba(10,12,16,.96) 0%,rgba(10,12,16,.8) 36%,rgba(10,12,16,.24) 68%,rgba(10,12,16,.04) 100%),
   linear-gradient(0deg,rgba(10,12,16,.9) 0%,rgba(10,12,16,.08) 65%,rgba(10,12,16,.62) 100%);z-index:1}
 .crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}.crumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.crumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}
-.crumbs a:hover{color:var(--amber)}
+.crumbs a{min-height:40px;display:inline-flex;align-items:center}.crumbs a:hover{color:var(--amber)}
 h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:0;max-width:18ch}
 .lede{margin-top:24px;max-width:70ch;color:var(--dim)}
 .meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
@@ -257,6 +278,7 @@ a.chip:active{scale:.96}
 .runtime-evidence-disclosure dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;margin-top:16px;overflow:hidden;border-radius:10px;background:var(--line)}.runtime-evidence-disclosure dl div{padding:11px 12px;background:var(--bg2)}.runtime-evidence-disclosure dt{font:10px/1.35 var(--mono);color:var(--dim)}.runtime-evidence-disclosure dd{margin-top:4px;font:500 10px/1.35 var(--mono);color:var(--amber)}.runtime-evidence-disclosure dd[data-verdict="PASS"]{color:var(--lime)}
 .runtime-evidence-disclosure ul{margin:15px 0 0;padding-left:20px}.runtime-evidence-disclosure li{margin-top:5px;color:var(--dim);font-size:14px}
 .evidence-report-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:10px}.evidence-report-links a{display:grid;gap:6px;min-height:72px;padding:14px;border:1px solid var(--line);border-radius:11px;background:var(--bg2)}.evidence-report-links code{color:var(--cyan);font:11px/1.4 var(--mono);overflow-wrap:anywhere}.evidence-report-links span{color:var(--dim);font:10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.05em}
+.skill-guides{margin-top:52px;padding-top:22px;border-top:1px solid var(--line)}.skill-guides h3{font-size:22px}.skill-guides ul{margin-top:12px;list-style:none;border-top:1px solid var(--line)}.skill-guides li{border-bottom:1px solid var(--line)}.skill-guides a{min-height:52px;display:grid;grid-template-columns:120px minmax(0,1fr);align-items:center;gap:18px;color:var(--dim);font-size:14px;transition-property:color,scale;transition-duration:160ms}.skill-guides a span{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}.skill-guides a:hover{color:var(--amber)}.skill-guides a:active{scale:.96}
 @media (max-width:720px){
   .skill-hero{min-height:auto;padding:58px 0 52px}
   .skill-hero-bg{opacity:.3}
@@ -267,44 +289,49 @@ a.chip:active{scale:.96}
 </style>
 </head>
 <body>
-<a class="skip-link" href="#main-content">Skip to content</a><div class="site-nav"><div class="wrap"><nav aria-label="Primary navigation">
-  <a class="brand" href="../">Three.js WebGPU Skill&nbsp;Pack</a>
-  <div class="links"><a href="../#matrix">How it works</a><a href="../#flagships">Examples</a><a href="../#skills">Skills</a><a href="../#labs">Labs</a><a href="../evidence/">Evidence</a><a href="../#install">Install</a><a href="../about/">Method</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
-</nav></div></div>
+<a class="skip-link" href="#main-content">Skip to content</a><header class="site-nav"><div class="wrap">
+  <a class="brand" href="/">Three.js WebGPU Skill&nbsp;Pack</a>
+  <nav class="links" aria-label="Primary navigation"><a href="/#flagships">Examples</a><a href="/#skills">Skills</a><a href="/guides/">Guides</a><a href="/evidence/">Evidence</a><a href="/#install">Install</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub</a></nav>
+</div></header>
 
 <main id="main-content" tabindex="-1">
-<header class="">
+<header class="skill-hero">
+  <picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-validation-harness/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-validation-harness/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-validation-harness/final.design.png" alt="" class="skill-hero-bg" aria-hidden="true" width="1200" height="800" fetchpriority="high" decoding="async" />
+        </picture>
   <div class="wrap">
     <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Planning and Validation</a></li><li aria-current="page">Visual Validation</li></ol></nav>
     <h1 style="view-transition-name:skill-threejs-visual-validation">Visual Validation</h1>
-    <p class="lede">Validate advanced Three.js WebGPU/TSL scenes with falsifiable visual contracts, mechanism diagnostics, sustained CPU/GPU timing, refresh-derived budgets, quality-governor traces, tile-GPU resource models, visual-error metrics, leak loops, and stable JSON+PNG evidence.</p>
+    <p class="lede">Validate Three.js WebGPU/TSL implementations against falsifiable claims. Use for visual or mechanism correctness, temporal behavior, target performance or GPU attribution, resource ownership, and lifecycle stability.</p>
+    <p class="hero-evidence-caption">Image: Native WebGPU validation harness final readback. Source lab: webgpu-validation-harness.</p>
     <div class="meta-row">
       <span class="chip a">$threejs-visual-validation</span>
-      <span class="chip">1 primary implementation</span>
-<span class="chip">1 flagship</span>
-<span class="chip">1 secondary surface</span>
-      <span class="chip">native evidence pending</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-12T22:55:47+03:00">2026-07-12</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/f3a34ad19305f6e4bd4c52729c05aa65130f61e4">commit f3a34ad ↗</a>
-      <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-visual-validation/SKILL.md">SKILL.md on GitHub ↗</a>
-      <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-visual-validation/SKILL.md">raw (for agents) ↗</a>
+      <span class="chip">1 primary target</span>
+      <span class="chip">1 flagship</span>
+      <span class="chip">1 secondary surface</span>
+      <span class="chip">accepted runtime evidence</span>
+      <span class="chip">Latest skill update <time datetime="2026-07-16T12:45:44+03:00">2026-07-16</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/8749183dffd84731506239dd86590c92bf958969">commit 8749183 ↗</a>
+      <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-visual-validation/SKILL.md">SKILL.md on GitHub ↗</a>
+      <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/skills/threejs-visual-validation/SKILL.md">raw (for agents) ↗</a>
     </div>
   </div>
 </header>
 
 
   <section class="section" id="primary-implementations" aria-labelledby="primary-implementations-title"><div class="wrap">
-    <h2 id="primary-implementations-title">Primary implementation surface</h2>
-    <p class="sub">These routes are generated from canonical source. Their exact status remains separate from implementation availability.</p>
+    <h2 id="primary-implementations-title">Primary target surface</h2>
+    <p class="sub">These rendering routes are generated from canonical source. Native-WebGPU acceptance remains separate from entrypoint availability.</p>
     <div class="grid">
       <a class="card" href="../demos/webgpu-validation-harness/">
-        <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="webgpu-validation-harness">
-    <span class="primary-evidence-label">Canonical capture</span>
-    <strong>Runtime evidence pending</strong>
-    <span><code>1e1a50d6f63a</code> source hash</span>
-    <span>19 fixed states · 4 runtime proof requirements</span>
-  </span>
-        <span class="card-head"><span class="card-kind">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+        <span class="card-preview-wrap" data-preview-for="webgpu-validation-harness" data-preview-source="webgpu-validation-harness" data-preview-classification="inspected-runtime-evidence-preview"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-validation-harness/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-validation-harness/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-validation-harness/final.design.png" alt="Native WebGPU validation harness final readback for Native WebGPU validation harness" class="card-preview" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><span class="media-caption">Native WebGPU validation harness final readback</span></span>
+        <span class="card-head"><span class="card-kind">Canonical lab</span><span class="status status--accepted">Accepted</span></span>
         <h3>Native WebGPU validation harness</h3>
         <p>8 fixed scenarios, 6 mechanism routes, and 5 locked tiers.</p>
         <span class="card-meta">Open published implementation →</span>
@@ -317,13 +344,12 @@ a.chip:active{scale:.96}
     <p class="sub">This skill contributes to the following cross-skill owner graphs.</p>
     <div class="grid">
       <a class="card" href="../demos/final-image-flight/">
-        <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="final-image-flight">
-    <span class="primary-evidence-label">Canonical capture</span>
-    <strong>Runtime evidence pending</strong>
-    <span><code>0e56ab6926da</code> source hash</span>
-    <span>10 fixed states · 12 runtime proof requirements</span>
-  </span>
-        <span class="card-head"><span class="card-kind">Final image systems</span><span class="status status--pending">Evidence pending</span></span>
+        <span class="card-preview-wrap" data-preview-for="final-image-flight" data-preview-source="final-image-flight" data-preview-classification="inspected-runtime-evidence-preview"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/final-image-flight/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/final-image-flight/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/final-image-flight/final.design.png" alt="Accepted demo-sourced runtime evidence for Final Image Flight" class="card-preview" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><span class="media-caption">Accepted demo-sourced runtime evidence</span></span>
+        <span class="card-head"><span class="card-kind">Final image systems</span><span class="status status--accepted">Accepted</span></span>
         <h3>Final Image Flight</h3>
         <span class="card-meta">6 mechanisms · 3 locked tiers</span>
       </a>
@@ -333,7 +359,7 @@ a.chip:active{scale:.96}
   <section class="section" id="evidence-reports" aria-labelledby="evidence-reports-title"><div class="wrap">
     <h2 id="evidence-reports-title">Evidence reports</h2>
     <p class="sub">Source hashes, claim verdicts, promoted same-lab media, fixed routes, exact tier contracts, and current limitations.</p>
-    <nav class="evidence-report-links" aria-label="Evidence reports for Visual Validation"><a href="../evidence/webgpu-validation-harness/"><code>webgpu-validation-harness</code><span>evidence pending</span></a><a href="../evidence/final-image-flight/"><code>final-image-flight</code><span>evidence pending</span></a></nav>
+    <nav class="evidence-report-links" aria-label="Evidence reports for Visual Validation"><a href="../evidence/webgpu-validation-harness/"><code>webgpu-validation-harness</code><span>accepted</span></a><a href="../evidence/final-image-flight/"><code>final-image-flight</code><span>accepted</span></a></nav>
   </div></section>
 
   <div class="section" id="approach"><div class="wrap">
@@ -353,449 +379,216 @@ capability manifest, renderer.info counters, per-pass timings — so regressions
   </div></div>
 
 
+  <div class="section" id="examples"><div class="wrap">
+    <h2>Accepted primary labs</h2>
+    <p class="sub">Only schema-v2 labs with accepted runtime and evidence contracts appear here. Other source directories remain visible through the demo registry without being promoted to runnable proof.</p>
+    <div class="grid">
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-visual-validation/examples/webgpu-validation-harness">
+        <h4>webgpu-validation-harness</h4>
+        <span class="card-meta">threejs-visual-validation/examples/webgpu-validation-harness</span>
+      </a>
+    </div>
+  </div></div>
 
   <div class="section" id="validation"><div class="wrap">
     <h2>Preview and evidence ledger</h2>
-    <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; canonical acceptance still requires render-target readback and a schema-v2 bundle.</p>
-    <div class="evidence-ledger"><span class="status status--pending">Canonical runtime evidence pending</span><code>0 published images</code></div>
-
-    <div class="primary-evidence-panel" data-evidence-state="incomplete"><span class="primary-evidence-label">Same-lab evidence</span><strong>No runtime image promoted</strong><span>The page remains image-free until this skill's own lab supplies hash-bound pixels.</span></div>
+    <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; rendering acceptance still requires same-lab readback and a schema-v2 bundle.</p>
+    <div class="evidence-ledger"><span class="status status--accepted">Accepted runtime evidence available</span><code>10 published images</code></div>
+<div class="runtime-evidence-disclosures">
+      <article class="runtime-evidence-disclosure" data-acceptance-status="accepted">
+        <div class="runtime-evidence-head"><div><code>Native WebGPU runtime evidence preview</code><h3>Native WebGPU validation harness</h3></div><span class="status status--accepted">Accepted</span></div>
+        <dl><div><dt>visualCorrectness</dt><dd data-verdict="PASS">PASS</dd></div><div><dt>mechanismCorrectness</dt><dd data-verdict="PASS">PASS</dd></div><div><dt>performanceCompliance</dt><dd data-verdict="PASS">PASS</dd></div><div><dt>gpuAttribution</dt><dd data-verdict="PASS">PASS</dd></div><div><dt>lifecycleStability</dt><dd data-verdict="PASS">PASS</dd></div><div><dt>visualError</dt><dd data-verdict="PASS">PASS</dd></div></dl>
+        <ul><li>Tracked release projection binds the approved correctness, physical-route, and performance lanes to the current source closure.</li><li>Promoted gallery images are the retained standard correctness readbacks from the accepted release bundle.</li><li>Opaque renderer-internal residency remains unclaimed beyond lab-owned resource ledgers.</li></ul>
+      </article></div>
+    <div class="gallery">
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-validation-harness" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-validation-harness/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-validation-harness/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-validation-harness/final.design.png" alt="Visual Validation: Native WebGPU validation harness final readback" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Native WebGPU validation harness final readback</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-validation-harness" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-validation-harness/no-post.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-validation-harness/no-post.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-validation-harness/no-post.design.png" alt="Visual Validation: No-post baseline from the same locked route." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>No-post baseline from the same locked route.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-validation-harness" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-validation-harness/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-validation-harness/diagnostics.mosaic.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-validation-harness/diagnostics.mosaic.png" alt="Visual Validation: Diagnostic mosaic proving distinct mechanism outputs." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Diagnostic mosaic proving distinct mechanism outputs.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-validation-harness" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-validation-harness/camera.near.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-validation-harness/camera.near.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-validation-harness/camera.near.png" alt="Visual Validation: Near camera fixed-view readback." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Near camera fixed-view readback.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-validation-harness" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-validation-harness/camera.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-validation-harness/camera.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-validation-harness/camera.design.png" alt="Visual Validation: Design camera fixed-view readback." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Design camera fixed-view readback.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-validation-harness" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-validation-harness/camera.far.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-validation-harness/camera.far.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-validation-harness/camera.far.png" alt="Visual Validation: Far camera fixed-view readback." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Far camera fixed-view readback.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-validation-harness" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-validation-harness/seed-0001.final.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-validation-harness/seed-0001.final.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-validation-harness/seed-0001.final.png" alt="Visual Validation: Representative seed final frame." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Representative seed final frame.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-validation-harness" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-validation-harness/seed-9e3779b9.final.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-validation-harness/seed-9e3779b9.final.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-validation-harness/seed-9e3779b9.final.png" alt="Visual Validation: Stress seed final frame." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Stress seed final frame.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-validation-harness" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-validation-harness/temporal.t000.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-validation-harness/temporal.t000.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-validation-harness/temporal.t000.png" alt="Visual Validation: Temporal sample t0." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Temporal sample t0.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-validation-harness" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-validation-harness/temporal.t001.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-validation-harness/temporal.t001.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-validation-harness/temporal.t001.png" alt="Visual Validation: Temporal sample t1." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Temporal sample t1.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure></div>
   </div></div>
 
 <div class="section" id="skill-text"><div class="wrap">
   <h2>The full skill</h2>
-  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
+  <p class="sub">The complete SKILL.md as loaded by agents, rendered verbatim.</p>
   <div class="skilltext"><h2>Visual Validation</h2>
-<p>Validate the mechanism that creates the image, its error, and its sustained
-cost. A polished frame is not proof. The canonical path is current Three.js
-with <code>WebGPURenderer</code>, TSL, <code>NodeMaterial</code>, <code>RenderPipeline</code>, built-in post
-nodes, and compute/storage evidence whenever the implementation uses GPU-side
-state.</p>
-<h2>Acceptance Contract</h2>
-<p>Accept only when all of these agree:</p>
-<pre><code class="language-text">authored physical and visual invariants
-  -&gt; inspectable implementation and ownership graph
-  -&gt; mechanism-isolation diagnostics
-  -&gt; invariant-specific visual-error measurements
-  -&gt; sustained performance and resource evidence on the target
-  -&gt; final image inside the declared viewing envelope
-</code></pre>
-<p>Define the contract before tuning. Each invariant names its observable,
-reference or analytic truth, diagnostic, metric domain, mask, acceptance gate,
-and blocking failure. Pixel similarity alone cannot prove geometry, radiometry,
-field evolution, temporal reconstruction, or resource ownership.</p>
-<h2>Numeric Evidence Labels</h2>
-<p>Every numeric value in a contract, manifest, table, caption, or conclusion must
-carry exactly one label and a source:</p>
+<p>Validate claims, not polished frames. Keep each verdict scoped to one declared
+claim so evidence for appearance cannot substitute for mechanism, timing, or
+lifecycle proof. The owning subject skill defines mechanism truth and failure
+signatures; this skill defines how to falsify them.</p>
+<h2>1. Predeclare every claim</h2>
+<p>For each claim, record:</p>
 <ul>
-<li><code>Authored</code>: a declared input or policy fixed before the run;</li>
-<li><code>Derived</code>: computed from labelled inputs by a recorded formula;</li>
-<li><code>Measured</code>: observed during this run, with method and sample scope;</li>
-<li><code>Gated</code>: an acceptance bound fixed before inspecting the candidate result.</li>
+<li>class: visual, mechanism, temporal, performance, GPU attribution, resource,
+or lifecycle;</li>
+<li>invariant and truth source;</li>
+<li>observable and the diagnostic that isolates it;</li>
+<li>native-domain metric, units, alignment, mask, and aggregation;</li>
+<li>acceptance gate fixed before candidate inspection;</li>
+<li>blocking failure and required evidence.</li>
 </ul>
-<p>Serialize numeric evidence as <code>{ value, unit, label, source }</code>. Do not publish
-bare budgets, sample counts, resolutions, percentiles, quality constants, or
-error thresholds. <code>p50 [Measured]</code> and <code>p95 [Measured]</code> name estimators; their
-reported values still use the numeric-evidence record. A gate derived from a
-frame envelope is stored twice: the computed envelope as <code>Derived</code> and the
-frozen acceptance limit as <code>Gated</code>, with the latter citing the former.</p>
-<h2>Required Architecture</h2>
-<p>The validation surface uses:</p>
-<ul>
-<li><code>WebGPURenderer</code> from <code>three/webgpu</code>, initialized before capability checks;</li>
-<li>TSL nodes from <code>three/tsl</code> and the matching <code>NodeMaterial</code> family;</li>
-<li>one <code>RenderPipeline</code> ownership graph using <code>pass()</code>, <code>mrt()</code>,
-<code>PassNode.setResolutionScale()</code>, and a single output-transform owner;</li>
-<li>built-in nodes first where they implement the required mechanism;</li>
-<li><code>renderer.compute()</code> or <code>renderer.computeAsync()</code> and storage-resource
-evidence when simulation, culling, compaction, histories, or generated
-instance data are GPU-owned;</li>
-<li>deterministic automation for fixed cameras, time, seed, viewport, DPR,
-quality state, and diagnostic mode.</li>
-</ul>
-<p>After initialization prefer <code>renderer.compute()</code> for submission. In r185,
-<code>computeAsync()</code> is not a GPU-completion fence; CPU-visible completion needs an
-actual readback/map, while GPU timing needs resolved timestamp evidence.</p>
-<p>Use
-<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-visual-validation/references/graphics-validation-protocol.md">references/graphics-validation-protocol.md</a>
-for the artifact schema, timing protocol, target/storage/bandwidth inventories,
-visual-error families, lifecycle tests, and rejection criteria.</p>
-<h2>Capability Gate</h2>
-<p>Set <code>trackTimestamp: true</code> when constructing <code>WebGPURenderer</code> whenever the
-predeclared contract requires GPU timing; requesting it after initialization is
-too late. Record backend truth only after initialization:</p>
-<pre><code class="language-js">await renderer.init();
+<p>Label every claim-driving number <code>Authored</code>, <code>Derived</code>, <code>Measured</code>, or <code>Gated</code>
+and record its unit and source. Keep unknown values unknown.</p>
+<p>This step is complete when every claim has a direct falsifier and no claim is
+supported only by the final image.</p>
+<h2>2. Freeze the run</h2>
+<p>Freeze the exact Three.js revision, renderer and initialized backend, target,
+browser/GPU, camera matrices, seed, time or deterministic step, viewport, DPR,
+quality state, assets, and color/output graph. Construct the renderer with
+timestamp tracking before initialization whenever a declared claim needs GPU
+timing:</p>
+<pre><code class="language-js">const renderer = new WebGPURenderer( {
+  trackTimestamp: gpuTimingRequirement === &#39;required&#39;
+} );
 
-if (renderer.backend.isWebGPUBackend !== true) {
-  throw new Error(&#39;WebGPU backend required for canonical visual validation. Report the blocker. Only when the user explicitly requested teaching how to apply fallback when WebGPU is unavailable may threejs-compatibility-fallbacks be loaded.&#39;);
+await renderer.init();
+
+if ( renderer.backend.isWebGPUBackend !== true ) {
+  throw new Error( &#39;Canonical WebGPU validation is unavailable on this target.&#39; );
 }
 </code></pre>
-<p>After the gate, record revision, renderer/backend identity, output color space,
-tone map, sample count, depth mode, output buffer type, compatibility mode,
-timestamp support, adapter features, and adapter limits. Wrap every numeric
-capability or enum in the numeric-evidence record; do not serialize raw numbers.</p>
-<p>Budgeted tiers retain the canonical WebGPU mechanism and name every visual
-loss. They are not compatibility branches. This skill never teaches or embeds
-a non-WebGPU fallback.</p>
-<h2>Required Evidence</h2>
+<p>Record the blocker when canonical WebGPU is unavailable. Reach
+<code>$threejs-compatibility-fallbacks</code> only when the user explicitly asks for that
+branch.</p>
+<p>This step is complete when the run can be repeated from the recorded state and
+initialized backend truth is captured rather than inferred.</p>
+<h2>3. Capture the producing mechanism</h2>
+<p>Capture the real pipeline under the frozen state:</p>
 <ul>
-<li><code>visual-contract.json</code>: invariant-to-artifact bindings, numeric-evidence
-policy, target refresh envelope, visual-error gates, performance claims, and
-blocking failures;</li>
-<li><code>evidence-manifest.json</code>: renderer/backend, target device, browser, display
-refresh, gated presentation rate, camera, seed, time, viewport, DPR, quality
-state, assets, color pipeline, post graph, stochastic masks, and known compromises;</li>
-<li>final, no-post, contribution, diagnostic, near/design/far, representative
-seed, stress, and temporal captures as applicable to the contract;</li>
-<li>pipeline graph: output owner, pass dependencies, MRT outputs, resolution
-scales, histories, and diagnostic routes;</li>
-<li>resource ledger: textures, geometry, uniforms, render targets, storage,
-histories, staging/readback allocations, peak transient liveness, and owner;</li>
-<li>tile-GPU traffic model: attachment load/store/resolve behavior, per-pixel
-attachment footprint, sampled/storage traffic bounds, and uncertainty;</li>
-<li>timing trace: warm-up, cold and sustained windows, <code>p50 [Measured]</code>,
-<code>p95 [Measured]</code>, deadline misses, GPU timestamps when required, browser and
-compositor reserves, presentation cadence, and capture overhead separated;</li>
-<li>quality-governor trace: decision inputs, thresholds, hysteresis, dwell time,
-tier transitions, visual error per tier, and final stable tier;</li>
-<li>lifecycle evidence: resize, DPR and tier changes, history reset, teardown,
-device errors, and dispose/recreate loops with before/after resource counts.</li>
+<li>for visual or mechanism claims, the final, no-post, and contribution views
+required to isolate the claimed cause;</li>
+<li>only the depth, normal, velocity, field, history, mask, resource, or pass
+diagnostics needed by declared claims;</li>
+<li>for performance, GPU-attribution, resource, or lifecycle claims without a
+visual/mechanism claim, only the producing trace and diagnostics required by
+that claim;</li>
+<li>the pass/dispatch ownership graph, including histories and reset edges.</li>
 </ul>
-<h2>Pack-Wide Physics Integration Gate</h2>
-<p>Use the canonical
-<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-choose-skills/references/physics-domain-and-interaction-contract.md">physics domain and interaction contract</a>
-whenever two or more physical domains or a physics-to-render boundary is
-claimed. Validate the exact <code>PhysicsGraph</code>: its stages, edges, dependencies,
-bounded loops, commit groups and transactions, execution ledger, catch-up debt,
-and loss ledger must close over one coordination advance. Validate the
-<code>PhysicsContext</code>, provider schemas, scheduler DAG,
-<code>InteractionBatchLedger</code>, <code>InteractionReactionGroup</code>, <code>ConservationGroup</code>,
-<code>PhysicsPresentationCandidate</code>, sealed
-<code>CameraViewPublication</code>, <code>ViewPreparationPublication</code>,
-<code>PhysicsPresentationSnapshot</code>, <code>LightingTransportSnapshot</code>, and append-only
-<code>FrameExecutionRecord</code>; a polished coupled animation is not interface proof.
-For every scheduler row, validate the exact <code>PhysicsStageExecution</code>: resolved
-read/write versions, execution and coordination-coverage intervals,
-iteration/subcycle identity, completion status, dependency completions, queue
-evidence, and single coordination-record membership must agree with its
-<code>StateAdvanceClaim</code>, commits, and cost ledger. Dropped intervals must resolve to
-the catch-up loss ledger rather than a fabricated execution.</p>
-<p>The sealed Snapshot is per presentation target/view and deliberately contains
-references. Validate adjacent previous/current presented states and independent
-provenance in Candidate pairs, complete render instants/transforms/matrices in
-<code>CameraViewPublication</code>, reactive/reset/resource publications in
-<code>ViewPreparationPublication</code>, and the Snapshot&#39;s exact transitive ID/lease/event
-closure. Do not define or accept a reduced validation-local schema. Motion
-bindings cover rigid,
-skinned, instanced, and procedural deformation plus spawn, despawn, teleport,
-reparent, and LOD validity. Motion vectors from solver <code>n/n+1</code> endpoints fail.</p>
-<p>Validate the acyclic lifecycle:</p>
-<pre><code class="language-text">simulation/provider commits + origin rebase
-  -&gt; immutable PhysicsPresentationCandidate
-  -&gt; per-view CameraViewPublication
-  -&gt; per-view ViewPreparationPublication
-  -&gt; sealed PhysicsPresentationSnapshot
-  -&gt; depth/velocity/radiance/history/output consumers
-  -&gt; append-only FrameExecutionRecord of completed reset/submit actions
-</code></pre>
-<p>No stage mutates an earlier immutable record. A one-frame-deferred alternative is
-legal only when declared and when the current frame continues using the exact
-prior committed resource/version named by its snapshot. GPU descriptors pin
-generation, layout, entity-map, slot, and a queue-safe lease through every
-consumer submission and until its central <code>reuseProhibitedUntil</code> condition is
-satisfied;
-retirement must appear in <code>FrameExecutionRecord.leaseDispositionById</code> with its
-completion join/evidence. Do not equate
-logical state version, submission epoch,
-GPU queue availability, or host visibility; <code>computeAsync()</code> is not a fence.
-A pre-seal failure must append a <code>FrameExecutionRecord</code> with aborted overall
-status (or <code>partial-failure</code> when another target survives), exclude the failed
-target from <code>snapshotIds</code>, store typed absence in its target execution&#39;s
-<code>snapshotId</code>, cancel/defer actions, retire only failed-target-exclusive
-preparation leases, and retain Candidate leases until every surviving consumer
-joins through <code>leaseDispositionById</code>. Device loss must append <code>overallStatus: device-lost</code>
-and affected target statuses <code>device-lost</code>, advance <code>deviceLossGeneration</code>, cancel actions, and
-invalidate lost-generation resources/leases without mutating immutable
-Candidate/Snapshot records or fabricating a completion token. Rebuild histories
-and timing proof under the new generation.</p>
-<p>Acceptance requires schema/version/unit/axis checks; DAG edge and barrier
-ordering; step/subcycle convergence for numerical solvers; provider validity,
-uncertainty, and error propagation; source/flux/conservation and equal-and-
-opposite reaction residuals for claimed conserved quantities; rebase
-invariance; deterministic reset; and conservative quality-state migration.
-Require the exact central <code>QualityTransition</code> when a migration changes
-physics-facing state or provider semantics, cadence, represented
-support/band/filter, error bounds, inventories, stable IDs/RNG streams, or event
-and exact-once application-ledger cursors. A render-only tier change may remain
-local only when those contracts and every committed physical version are
-unchanged; the trace must prove that exclusion.
-Every unsupported channel must remain explicitly unavailable rather than
-becoming zero or an invented adapter default.</p>
-<p>Validate exact ledger and publication closure, not record presence. Every
-<code>ErrorPropagationLedger</code> input, transform/filter/interpolation, local term,
-correlation rule, output error, and consumer gate must resolve. Every applied
-<code>InteractionRecord.applicationLedgerKey</code> must resolve to exactly one accepted
-row in the canonical <code>InteractionApplicationLedger</code>, matching its batch&#39;s
-sequence range, per-consumer cursor, and <code>exactOnceApplicationLedgerVersion</code>.
-Every successful commit must close its <code>PhysicsStageWrite</code> and
-<code>StateAdvanceClaim</code> through <code>PhysicsPreparedPublication</code>, <code>PhysicsCommitGroup</code>,
-<code>PhysicsCommitTransaction</code>, <code>PhysicsCommitReceipt</code>, and exact
-<code>CommitPublicationLineage</code>, including content/publication digests, dependency
-completions, gate results, and the single atomic registry swap. The Candidate,
-Camera, ViewPreparation, sealed Snapshot <code>closureManifest</code>,
-<code>plannedConsumerActions</code>, submitted pass/dispatch keys, action results,
-completion tokens, and lease dispositions are one immutable render-plan closure
-through <code>FrameExecutionRecord</code>; no orphan, duplicate, subset, or superset is
-accepted.</p>
-<p>Run one deterministic end-to-end interaction fixture:</p>
-<pre><code class="language-text">exactly one precipitation ingress per interval:
-  causal-cloud PrecipitationEmissionSnapshot
-  OR external EnvironmentForcingSnapshot precipitation channels
-  -&gt; rain ground/water flux
-  -&gt; water mass and momentum source
-  -&gt; boat buoyancy/drag/reaction
-  -&gt; wake source
-  -&gt; wave/breaking dissipation
-  -&gt; one foam source/history
-  -&gt; shoreline wetness
-  -&gt; vegetation wetness/load and boat/terrain/vegetation contact
-</code></pre>
-<p>Capture each provider input/output, event/source record, reaction owner,
-residual, reactive epoch/mask, reset action, and final visual contribution.
-Disable each link in turn; downstream state must change only through declared
-dependencies. This fixture must also cross an origin rebase, simulation-rate
-change, quality migration, resize/DPR transition, and an external pose-stream
-gap or error.</p>
-<p>The two precipitation ingress arms are mutually exclusive over one
-<code>PhysicsTimeInterval</code>. Never consume or merge both: record the selected source/version and
-make the other arm typed absence. Cloud-owned precipitation must traverse its
-<code>PrecipitationEmissionSnapshot</code> and transport delay; externally prescribed
-precipitation must use the forcing snapshot&#39;s mass-flux, phase, and velocity
-channels without fabricating a cloud emission.</p>
-<p>For every domain and target, record coordination intervals, per-owner native
-ticks/subcycles, compute dispatches, render passes, queue submissions,
-executions per presented frame, barriers,
-readbacks (steady-state physics/render readback is normally zero), hot working-
-set bytes, resident and peak/migration-overlap bytes, compulsory reads/writes
-per execution, traffic per presented frame, upload volume, timing-query resolve
-latency, CPU/GPU/presentation distributions, and settled quality. A mobile
-claim requires this evidence on the named physical low-power device.
-Separate route-shared simulation/provider/Candidate work and resources from
-per-target/view Camera/ViewPreparation, pass, attachment, history, and output
-work in the canonical <code>PhysicsCostLedger</code>. Validate each view, count shared
-costs once, apply exact multiview and
-frames-in-flight multipliers, and report both the per-view rows and composed
-mobile total; neither multiplying shared work by view count nor hiding
-view-local cost in an amortized aggregate is valid.</p>
-<h2>Refresh-Derived Performance Envelope</h2>
-<p>Do not use a universal device-class millisecond table. For each target
-device/browser/display/viewport/DPR combination, record requested presentation
-rate <code>Authored</code>, actual display refresh <code>Measured</code>, and a feasible frozen target
-rate <code>Gated</code>; derive its frame period <code>Derived</code> by dimensional inversion.
-Measure the browser main-thread reserve and compositor/GPU reserve with a
-pass-through host-shell run under the same conditions. An unmeasured reserve
-may be <code>Authored</code> as a provisional assumption, but it cannot support a claim of
-measured device headroom.</p>
-<p>Derive separate stage envelopes:</p>
-<pre><code class="language-text">CPU scene envelope [Derived]
-  = refresh period [Derived]
-  - browser/main-thread reserve [Measured or provisional Authored]
-  - CPU safety reserve [Authored]
-
-GPU scene envelope [Derived]
-  = refresh period [Derived]
-  - compositor/GPU reserve [Measured or provisional Authored]
-  - GPU safety reserve [Authored]
-</code></pre>
-<p>Use reserve quantiles consistent with the frozen tail-latency gate. If the host
-shell exposes only combined browser/compositor overhead, subtract that combined
-reserve once and mark the stage attribution unavailable; never subtract
-correlated or overlapping reserves twice.</p>
-<p>CPU and GPU stages may overlap; do not add their durations unless a measured
-dependency serializes them. Freeze <code>p95 [Gated]</code> stage limits and deadline-miss
-limits as <code>Gated</code> values sourced from these envelopes. Record presentation cadence
-and dropped/deferred frames independently. Initialization, compilation, asset
-upload, readback, PNG encoding, and automation overhead are separate measured
-phases, never silently removed from end-to-end startup or capture claims.</p>
-<h2>Sustained And Thermal Evidence</h2>
-<p>Performance acceptance requires both cold and sustained traces on each target
-class. Window durations, sampling cadence, workload path, and thermal
-stabilization rule are <code>Authored</code>; minimum sample and residence requirements
-are <code>Gated</code>. Report per-window CPU and GPU <code>p50 [Measured]</code> and
-<code>p95 [Measured]</code>, presentation intervals, deadline misses, memory trend, active
-quality state, and quality transitions.</p>
-<p>The sustained verdict uses the final stable window, not an average that hides
-late throttling. Temperature, clocks, power, and hardware counters are
-<code>Measured</code> when exposed. If they are unavailable, report only observed timing,
-cadence, memory, and quality drift; do not claim absence of thermal throttling.
-An emulator or desktop emulation is not evidence for a low-power target.</p>
-<p>An adaptive governor passes only if the settled tier meets both the performance
-gates and its visual-error gates. Oscillation, repeated emergency drops,
-unbounded recovery, or satisfying timing by crossing the visual-error gate is
-a failure. Log the exact decision metric, filtered value, threshold, hysteresis,
-dwell interval, transition cause, and resource rebuild cost.</p>
-<h2>GPU Timing Sufficiency</h2>
-<p>The contract declares <code>gpuTimingRequirement</code> before capture. GPU timestamp
-timing is required for claims about GPU headroom, per-pass or per-dispatch
-cost, GPU thermal degradation, bandwidth limitation, or compliance with a GPU
-stage envelope. When required timing is unavailable, the verdict is
-<code>INSUFFICIENT_EVIDENCE</code>; it is not <code>SKIP</code>, zero cost, or a pass. CPU frame time,
-animation-frame cadence, and presentation intervals remain useful end-to-end
-measurements but cannot identify GPU cost.</p>
-<p>Resolve and record render and compute timestamp scopes separately. Timestamp
-resolution/readback is a measured auxiliary phase and cannot contaminate the
-steady-state sample window.</p>
-<p>Visual correctness, deterministic behavior, and lifecycle checks may be signed
-off separately only when the contract explicitly excludes GPU performance
-claims. Record the unsupported claim and the device/browser needed to close it.</p>
-<h2>Tile-GPU And Memory Evidence</h2>
-<p>For low-power and tile-based GPUs, inventory more than allocated target bytes.
-Derive and gate:</p>
+<p>Keep HDR work scene-linear until one tone-map/output-transform owner. Diagnostic
+modes must switch the actual output node and invalidate the graph when required;
+a label-only toggle proves nothing.</p>
+<p>This step is complete when every required artifact is traceable to the pass,
+dispatch, resource, and output owner that produced it.</p>
+<h2>4. Measure in the native domain</h2>
+<p>Compare each observable with its declared truth using the frozen metric and
+gate. Inspect the important final and diagnostic images directly; a nonblank
+capture or scalar summary is only transport evidence. Store the error map or
+worst interval when a global statistic can hide a local failure.</p>
+<p>Read
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-visual-validation/references/graphics-validation-protocol.md">the graphics validation protocol</a>
+for metric selection, aligned WebGPU readback, target timing, resource models,
+and lifecycle checks. Load only the sections used by the declared claims.</p>
+<p>This step is complete when every measured value identifies its domain, unit,
+source, sample scope, frozen gate, and supporting artifact.</p>
+<h2>5. Exercise conditional state</h2>
+<p>Run only the branches the claims require:</p>
 <ul>
-<li>resident textures, geometry, buffers, histories, pipelines when estimable,
-and staging/readback allocations;</li>
-<li>peak simultaneously live transient bytes, not the sum of reusable aliases;</li>
-<li>render-pass attachment bytes per pixel including sample count and depth or
-stencil;</li>
-<li>attachment load, store, discard, resolve, and pass-break traffic;</li>
-<li>sampled-texture, storage-texture, and storage-buffer read/write traffic as
-lower and upper bounds with cache, compression, overdraw, and filter
-assumptions;</li>
-<li>bytes per frame and bytes per second at the measured presentation rate;</li>
-<li>allocation churn and upload volume per frame.</li>
+<li>temporal: reset, first response, steady state, invalidation/disocclusion, and
+recovery under deterministic camera/object/state changes;</li>
+<li>performance: cold and final sustained windows on the named target;</li>
+<li>GPU attribution: resolved render/compute timestamps outside the measured
+steady-state window;</li>
+<li>resource: resident, transient, attachment, upload/readback, and traffic
+evidence proportional to the claim;</li>
+<li>lifecycle: repeated resize/DPR, quality/debug transition, history reset,
+teardown, and dispose/recreate until resources plateau or trend upward.</li>
 </ul>
-<p>Do not infer tile dimensions, on-chip occupancy, cache hit rate, compression,
-or physical bandwidth from WebGPU abstractions. Such values are <code>Measured</code>
-only when hardware counters expose them. Otherwise publish a <code>Derived</code> model
-with uncertainty and reject any claim that the scene is proven
-bandwidth-bound. Avoid avoidable attachment stores, resolves, full-resolution
-histories, and pass breaks before reducing the mechanism.</p>
-<h2>Visual-Error Gates</h2>
-<p>Choose metrics per invariant and before seeing the candidate result:</p>
+<p><code>renderer.computeAsync()</code> submits work; it is not proof of GPU completion.
+CPU-visible completion requires an actual readback/map, while GPU cost requires
+timestamp evidence.</p>
+<p>This step is complete when every state transition named by a claim has a
+before/after diagnostic, reset policy, and bounded resource outcome.</p>
+<h2>6. Return claim-scoped verdicts</h2>
+<p>Assign exactly one verdict to every claim:</p>
 <ul>
-<li>silhouette overlap plus boundary-distance distribution;</li>
-<li>relative depth error and occlusion disagreement;</li>
-<li>normal angular error;</li>
-<li>scene-linear radiance or luminance error before tone mapping;</li>
-<li>perceptual color difference after the same output transform;</li>
-<li>motion/velocity error, temporally reprojected residual, ghost occupancy, and
-flicker energy;</li>
-<li>field residual, conservation error, or analytic-reference error for the
-claimed mechanism;</li>
-<li>deterministic exact mismatch only where exact identity is expected.</li>
+<li><code>PASS</code>: every required artifact exists and all frozen gates pass;</li>
+<li><code>FAIL</code>: a blocking failure occurred or a gate failed;</li>
+<li><code>INSUFFICIENT_EVIDENCE</code>: required evidence or capability is unavailable.</li>
 </ul>
-<p>Every result is <code>Measured</code>; every acceptance threshold is <code>Gated</code>. Store metric
-domain, units, reference provenance, alignment, mask, percentile statistic,
-and aggregation rule. Report spatial error maps and worst-case captures, not
-only a scene-wide scalar. A stochastic mask must be authored before capture and
-cannot hide deterministic failure.</p>
-<h2>Coastal Archipelago Validation Profile</h2>
-<p>Use this profile for procedural island, coast, reef, beach, and shallow-water
-scenes such as the supplied isometric archipelago reference family. Read the
-<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-water-optics/references/coastal-archipelago-system.md">coastal archipelago system</a>
-to identify the selected water branch and its invariants, then apply the
-<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-visual-validation/references/graphics-validation-protocol.md#coupled-coastal-archipelago">coastal evidence protocol</a>.</p>
-<p>Treat the reference as a causal feature ledger, not a color thumbnail. Record
-and independently validate:</p>
-<ul>
-<li>island outline and negative-water channels;</li>
-<li>grass cap, terrace, cliff, beach, wet-line, and seabed ordering;</li>
-<li>bathymetry-visible shallow water and deep-water transition;</li>
-<li>shore/breaker-aligned foam, local obstruction response, and any persistent
-foam history;</li>
-<li>vegetation, ruin, dock, boat, reef, and rock placement constraints;</li>
-<li>orthographic/isometric projection, overview-to-detail scale hierarchy,
-semantic-region palette/value separation, far-water minification, and
-optional cloud occlusion.</li>
-</ul>
-<p>The evidence bundle must prove one shared coast/bathymetry transform. Capture
-the coast level set, terrain elevation and semantic regions, bathymetry, coast
-frame, compiled land boundary, rendered water intersection, foam source, foam
-history, wetness, and asset support/exclusion masks. A visually close frame
-fails when those signals are independently authored and merely happen to align
-at the design camera.</p>
-<p>Freeze exact cameras for <code>archipelago-overview</code>, <code>island-design</code>, <code>coast-near</code>,
-and <code>grazing-water</code>. At each applicable view capture final, no-post, semantic
-terrain groups, land/coast field, bathymetry/depth, water state and normals,
-optical thickness, foam source/history, asset constraints, LOD/chunk seams,
-camera/framing overlay, and output ownership. Add an underwater or
-water-crossing view only when the contract claims underwater rendering or a
-camera transition.</p>
-<p>Use native-domain gates fixed before candidate inspection:</p>
-<ul>
-<li>world-space and physical-pixel boundary distance between the authored coast
-level set, compiled land edge, and rendered land-water intersection;</li>
-<li>classified land-water gap/overlap area, shoreline seam residual, and
-hard-edge normal disagreement;</li>
-<li>bathymetry continuity plus monotonic depth/optical-thickness ordering under a
-fixed lighting/output transform;</li>
-<li>camera projection/framing residual plus semantic-region scene-linear
-luminance and output-referred perceptual-color error against the declared
-reference features;</li>
-<li>foam-source precision/recall against the declared coast/breaker mask,
-on-land leakage, history reset residual, flicker energy, and detached-foam
-lifetime;</li>
-<li>solver positivity, mass/boundary residual, spectrum, or dispersion error only
-when the selected algorithm claims those invariants;</li>
-<li>asset support penetration/floating distance, slope/exclusion violations,
-spacing or distribution residual, stable-ID correspondence, and rejected-
-placement accounting.</li>
-</ul>
-<p>Run deterministic representative and stress seeds selected before inspection.
-Exercise reset, steady forcing, stronger forcing, local disturbance, camera
-motion, resize/DPR, quality transition, and long sustained evolution when the
-selected mechanism makes them relevant. A still frame cannot sign off foam
-advection, simulation boundaries, LOD registration, history decay, or
-frame-rate-independent evolution.</p>
-<p>Validate <code>Full</code>, <code>Budgeted</code>, and <code>Minimum viable</code> states as separate visual
-contracts. Every state preserves coastline identity, semantic terrain order,
-bathymetric ordering, water/normal state agreement, foam causality, landmark
-support, and the single output owner. Lower states may reduce projected-error
-detail, local-water or foam resolution/cadence, sub-pixel wave bands,
-secondary asset population, caustics, or clouds only after the corresponding
-error gate passes. Never bind a state to “desktop,” “integrated,” or “mobile”
-by label; select the stable state from sustained measurements on a named
-physical target.</p>
-<p>For each physical desktop-discrete, integrated, and low-power/mobile target,
-record simulation executions per presented frame, compute and render pass
-cadence, storage and history layouts, per-step reads/writes, uploads,
-attachment load/store/resolve behavior, logical live bytes, peak simultaneous
-transients, and <code>p50 [Measured]</code>/<code>p95 [Measured]</code> CPU, GPU, and presentation
-distributions. A device-class name or a universal millisecond table is not an
-acceptance envelope. If GPU timing required by the claim is unavailable, keep
-the visual verdict separate and return insufficient GPU-performance evidence.</p>
-<p>Reject the coastal claim on a visible land-water gap or overlap, coast or foam
-swimming, shallow/deep response that contradicts bathymetry, refracted geometry
-crossing an occluder, non-finite water state, invalid normal, solver boundary
-leak, unbounded foam history, floating/buried landmarks, forbidden vegetation
-support, unstable seed identity, or any quality transition that changes the
-primary composition or crosses a frozen error gate.</p>
-<h2>Color And Output</h2>
-<ul>
-<li>Color textures use <code>SRGBColorSpace</code>.</li>
-<li>Data maps and diagnostic/storage textures use <code>NoColorSpace</code> or explicit
-linear-data semantics.</li>
-<li>HDR working targets remain scene-linear until the single tone-map owner.</li>
-<li><code>RenderPipeline</code> or an explicit <code>renderOutput()</code> stage owns the sole output
-conversion.</li>
-<li>Captures record encoding and do not double-convert material, target, or
-presentation output.</li>
-</ul>
-<h2>Rejection Summary</h2>
-<p>Reject or narrow the claim when any required invariant lacks a direct
-diagnostic and metric; the final relies on post treatment to create missing
-form; visual-error gates fail; sustained <code>p95 [Measured]</code> or deadline gates
-fail; the governor settles outside the visual contract; required GPU timing is
-unavailable; tile/resource evidence omits a material cost; deterministic reset
-fails; or lifecycle loops leak persistent resources.</p>
-<h2>Routing Boundary</h2>
-<p>This skill evaluates an implementation; it does not supply the subject
-mechanism. Load <code>threejs-choose-skills</code> first, then only the selected subject
-and image-pipeline skills. If canonical WebGPU is unavailable, report the
-blocker. Do not load, quote, or propagate compatibility fallback teaching
-unless the user explicitly requests teaching how to apply fallback when WebGPU
-is unavailable.</p>
+<p>Missing required GPU timestamps produce <code>INSUFFICIENT_EVIDENCE</code> for GPU-cost
+claims; CPU frame time and presentation cadence do not become GPU timing.
+Report unsupported claims and the exact evidence needed to close them.</p>
+<p>Validation is complete when every declared claim has one verdict, every verdict
+resolves to direct evidence, the sole output owner is identified, deterministic
+reset is checked where state exists, and persistent resources either plateau or
+fail lifecycle acceptance.</p>
 </div>
+  <aside class="skill-guides" aria-labelledby="related-guides-title"><h3 id="related-guides-title">Related guides</h3><ul><li><a href="/compare/"><span>Comparisons</span>Three.js WebGPU Comparisons</a></li><li><a href="/migrate/"><span>Migration</span>Three.js WebGPU and Agent-Skill Migration Guides</a></li><li><a href="/industries/"><span>Industries</span>Three.js WebGPU Workflows by Industry</a></li><li><a href="/docs/"><span>Documentation</span>Three.js WebGPU Skill Pack Documentation</a></li></ul></aside>
   <div class="pn">
     <a href="threejs-spectral-ocean.html">← Spectral Ocean</a>
     <a href="threejs-volumetric-clouds.html">Volumetric Clouds →</a>
@@ -821,10 +614,16 @@ is unavailable.</p>
 </main>
 
 <div class="wrap"><footer>
-  <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
-  <span style="font-size:13px">Three r185.1 · 41 working implementations · build <code>6c7881ab7386</code></span><br/>
-  <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
-  <span><a href="https://threejs-skills.com/about/">About &amp; methodology</a> · <a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/llms.txt">For coding agents</a></span>
+  <div class="footer-summary">Three.js WebGPU Skill Pack: TSL, procedural graphics, and visual validation.
+    <span>Three r185.1 · 40 primary targets · 25 accepted · build <code>ab7d8d17e058</code></span>
+    <span>Compiling shaders? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span>
+  </div>
+  <div class="footer-groups">
+    <div class="footer-group"><strong>Build</strong><a href="/#skills">Skills</a><a href="/#flagships">Examples</a><a href="/industries/">Industries</a></div>
+    <div class="footer-group"><strong>Decide</strong><a href="/for/">Who it is for</a><a href="/compare/">Compare</a><a href="/alternatives/">Alternatives</a><a href="/pricing/">Pricing</a></div>
+    <div class="footer-group"><strong>Adopt</strong><a href="/docs/">Docs</a><a href="/migrate/">Migration</a><a href="/agents/">Agent docs</a><a href="/faq/">FAQ</a></div>
+    <div class="footer-group"><strong>Proof</strong><a href="/evidence/">Evidence</a><a href="/about/">Method</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a><a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/LICENSE">License</a></div>
+  </div>
 </footer></div>
 </body>
 </html>

@@ -1678,10 +1678,7 @@ ${navHtml('../')}
     <p class="hero-evidence-caption">Image: ${esc(resolvedSkillPreview.label)}. Source lab: ${esc(resolvedSkillPreview.sourceId)}.</p>` : ''}
     <div class="meta-row">
       <span class="chip a">$${slug}</span>
-      ${primaryChipHtml}
-${flagshipChipHtml}
-${demoChipHtml}
-${attributionChipHtml ? `      ${attributionChipHtml}\n` : ''}      ${ownedPrimaryDemos.length === 0 ? '<span class="chip">reference skill</span>' : (ownedPrimaryDemos.some((demo) => demo.status === 'accepted') ? '<span class="chip">accepted runtime evidence</span>' : '<span class="chip">native evidence pending</span>')}
+${primaryChipHtml ? `      ${primaryChipHtml}\n` : ''}${flagshipChipHtml ? `      ${flagshipChipHtml}\n` : ''}${demoChipHtml ? `      ${demoChipHtml}\n` : ''}${attributionChipHtml ? `      ${attributionChipHtml}\n` : ''}      ${ownedPrimaryDemos.length === 0 ? '<span class="chip">reference skill</span>' : (ownedPrimaryDemos.some((demo) => demo.status === 'accepted') ? '<span class="chip">accepted runtime evidence</span>' : '<span class="chip">native evidence pending</span>')}
       ${updateHtml}
       <a class="chip" href="${REPO}/blob/main/skills/${slug}/SKILL.md">SKILL.md on GitHub ↗</a>
       <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/skills/${slug}/SKILL.md">raw (for agents) ↗</a>
@@ -1701,8 +1698,7 @@ ${validationHtml}
   <h2>The full skill</h2>
   <p class="sub">The complete SKILL.md as loaded by agents, rendered verbatim.</p>
   <div class="skilltext">${skillBodyHtml}</div>
-  ${skillRelatedGuidesHtml}
-  <div class="pn">
+${skillRelatedGuidesHtml ? `  ${skillRelatedGuidesHtml}\n` : ''}  <div class="pn">
     <a href="${prev.slug}.html">← ${esc(prev.title)}</a>
     <a href="${next.slug}.html">${esc(next.title)} →</a>
   </div>

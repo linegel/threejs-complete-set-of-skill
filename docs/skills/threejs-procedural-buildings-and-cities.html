@@ -4,12 +4,12 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Procedural Buildings and Cities | Three.js WebGPU Skill</title>
-<meta name="description" content="Build authored procedural buildings, facades, cities, and semantic site-asset assemblies in Three.js r185 WebGPU/TSL. Use for massing grammars and for…" />
+<meta name="description" content="Compile procedural buildings, cities, and semantic site assemblies in Three.js r185 WebGPU/TSL. Use for building massing and facades, city-scale architectural…" />
 <meta name="author" content="Three.js WebGPU Skill Pack contributors" />
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-procedural-buildings-and-cities.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b" />
+<meta name="skill-pack-build-revision" content="sha256:ab7d8d17e0589a6f5c2462d645b9e0d6797cd92eade36e3615dae091c6f9df5b" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -17,20 +17,26 @@
 <link rel="manifest" href="../site.webmanifest" />
 <link rel="alternate" type="text/plain" href="https://threejs-skills.com/llms.txt" title="LLM-readable skill catalog" />
 <link rel="alternate" type="application/json" href="https://threejs-skills.com/skills.json" title="Machine-readable skill catalog" />
-
+<link rel="preload" as="image" href="../visual-validation/webgpu-material-slot-compiler/final.design.avif" type="image/avif" fetchpriority="high" />
 <meta property="og:type" content="article" />
 <meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
 <meta property="og:title" content="Procedural Buildings and Cities | Three.js WebGPU Skill" />
-<meta property="og:description" content="Build authored procedural buildings, facades, cities, and semantic site-asset assemblies in Three.js r185 WebGPU/TSL. Use for massing grammars and for…" />
+<meta property="og:description" content="Compile procedural buildings, cities, and semantic site assemblies in Three.js r185 WebGPU/TSL. Use for building massing and facades, city-scale architectural…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-procedural-buildings-and-cities.html" />
-<meta property="article:modified_time" content="2026-07-11T12:53:24+03:00" />
+<meta property="article:modified_time" content="2026-07-16T12:45:44+03:00" />
 <meta property="article:published_time" content="2026-07-04T23:30:20+03:00" />
 <meta property="article:section" content="Procedural Content" />
-
-<meta name="twitter:card" content="summary" />
+<meta property="og:image" content="https://threejs-skills.com/visual-validation/webgpu-material-slot-compiler/final.design.png" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="800" />
+<meta property="og:image:alt" content="Material-slot presentation readback for Procedural Buildings and Cities" />
+<meta name="twitter:image" content="https://threejs-skills.com/visual-validation/webgpu-material-slot-compiler/final.design.png" />
+<meta name="twitter:image:alt" content="Material-slot presentation readback for Procedural Buildings and Cities" />
+<meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Procedural Buildings and Cities | Three.js WebGPU Skill" />
-<meta name="twitter:description" content="Build authored procedural buildings, facades, cities, and semantic site-asset assemblies in Three.js r185 WebGPU/TSL. Use for massing grammars and for…" />
+<meta name="twitter:description" content="Compile procedural buildings, cities, and semantic site assemblies in Three.js r185 WebGPU/TSL. Use for building massing and facades, city-scale architectural…" />
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
@@ -56,14 +62,19 @@
    ],
    "@id": "https://threejs-skills.com/skills/threejs-procedural-buildings-and-cities.html#article",
    "headline": "Procedural Buildings and Cities",
-   "description": "Build authored procedural buildings, facades, cities, and semantic site-asset assemblies in Three.js r185 WebGPU/TSL. Use for massing grammars and for deterministic placement/compilation of supplied or separately generated ruin, dock, boat, rock, vegetation, and prop families; anchors, sockets, exclusions, exposed-edge analysis, profiles, ornaments, material-slot BatchedMesh or merged BufferGeometry, stable IDs, NodeMaterial identities, spatial paging, LOD, and asset-manifest validation.",
+   "description": "Compile procedural buildings, cities, and semantic site assemblies in Three.js r185 WebGPU/TSL. Use for building massing and facades, city-scale architectural batching and LOD, or deterministic placement of heterogeneous site assets around architecture.",
    "url": "https://threejs-skills.com/skills/threejs-procedural-buildings-and-cities.html",
    "mainEntityOfPage": {
     "@type": "WebPage",
     "@id": "https://threejs-skills.com/skills/threejs-procedural-buildings-and-cities.html"
    },
+   "image": [
+    "https://threejs-skills.com/seo/article/threejs-procedural-buildings-and-cities-1x1.png",
+    "https://threejs-skills.com/seo/article/threejs-procedural-buildings-and-cities-4x3.png",
+    "https://threejs-skills.com/seo/article/threejs-procedural-buildings-and-cities-16x9.png"
+   ],
    "datePublished": "2026-07-04T23:30:20+03:00",
-   "dateModified": "2026-07-11T12:53:24+03:00",
+   "dateModified": "2026-07-16T12:45:44+03:00",
    "author": {
     "@id": "https://threejs-skills.com/#publisher"
    },
@@ -140,18 +151,18 @@ html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smo
 body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7}
 ::selection{background:rgba(255,180,84,.26);color:var(--ink)}
 a{color:inherit;text-decoration:none}
-a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
+a:focus-visible,button:focus-visible,summary:focus-visible,pre[tabindex]:focus-visible,[role="region"]:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
 main{display:block}
 .skip-link{position:fixed;z-index:100;left:16px;top:12px;translate:0 -160%;font-family:var(--mono);font-size:12px;background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:9px;transition-property:translate;transition-duration:160ms}
 .skip-link:focus{translate:0 0}
 .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
 .site-nav{position:sticky;z-index:50;top:0;background:rgba(8,10,14,.82);border-bottom:1px solid rgba(255,255,255,.075);backdrop-filter:blur(18px) saturate(1.15)}
-nav{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
-nav .brand{white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
-nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
-nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
-nav .links a:hover{color:var(--amber)}
-nav .links a:active{scale:.96}
+.site-nav>.wrap{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+.site-nav .brand{min-height:44px;display:inline-flex;align-items:center;white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
+.site-nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
+.site-nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
+.site-nav .links a:hover{color:var(--amber)}
+.site-nav .links a:active{scale:.96}
 h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:0}
 p{text-wrap:pretty}
 h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
@@ -165,7 +176,7 @@ code{font-family:var(--mono)}
 .card{min-height:100%;background:linear-gradient(145deg,rgba(19,24,33,.96),rgba(12,15,21,.96));border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px;
   box-shadow:var(--shadow-card);transition-property:translate,scale,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
 .card:hover{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
-.card:active{translate:0 -1px;scale:.99}
+.card:active{translate:0 -1px;scale:.96}
 .card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .card-kind{font-family:var(--mono);font-size:10px;color:var(--cyan)}
 .card h3,.card h4{font-size:19px;font-weight:600}
@@ -190,19 +201,29 @@ figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:s
 figcaption{padding:16px 18px;font-size:14.5px}
 figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
 figcaption span{display:block;margin-top:3px;color:var(--dim)}
-footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
+footer{border-top:1px solid var(--line);padding:44px 0 60px;display:grid;grid-template-columns:minmax(260px,1.4fr) minmax(0,2fr);gap:36px 64px;color:var(--dim);font-size:14.5px}
 footer a{color:var(--amber)}
 footer a:hover{text-decoration:underline}
 footer code{color:var(--cyan);font-size:11px}
+.footer-summary{max-width:55ch}.footer-summary>span{display:block;margin-top:8px;font-size:13px}.footer-groups{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}.footer-group{display:grid;align-content:start;gap:8px}.footer-group strong{font:400 10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}.footer-group a{min-height:40px;display:flex;align-items:center;color:var(--dim);font-size:13px;transition-property:color,scale;transition-duration:160ms}.footer-group a:hover{color:var(--amber);text-decoration:none}.footer-group a:active{scale:.96}
+.pathfinder{padding:clamp(52px,7vw,86px) 0;border-bottom:1px solid var(--line)}.pathfinder-head{display:grid;grid-template-columns:minmax(0,.7fr) minmax(320px,1.3fr);align-items:end;gap:28px 72px;margin-bottom:28px}.pathfinder-head h2{margin:0}.pathfinder-head p{max-width:58ch;color:var(--dim)}.pathfinder-rows{border-top:1px solid var(--line)}.pathfinder-row{display:grid;grid-template-columns:minmax(160px,.55fr) minmax(210px,.8fr) minmax(0,1.6fr);gap:20px 32px;align-items:center;min-height:94px;border-bottom:1px solid var(--line)}.pathfinder-stage{font:10px/1.4 var(--mono);letter-spacing:.11em;text-transform:uppercase;color:var(--cyan)}.pathfinder-row>p{color:var(--dim);font-size:14px}.pathfinder-links{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px 18px}.pathfinder-links a{min-height:44px;display:inline-flex;align-items:center;gap:8px;color:var(--amber);font:11px/1.35 var(--mono);transition-property:color,scale;transition-duration:160ms}.pathfinder-links a:after{content:"→"}.pathfinder-links a:hover{color:var(--ink)}.pathfinder-links a:active{scale:.96}
+.content-hero{padding:clamp(54px,8vw,104px) 0 42px;border-bottom:1px solid var(--line)}.breadcrumbs{min-height:44px;display:flex;align-items:center;margin-bottom:28px;font:11px/1.4 var(--mono);color:var(--dim)}.breadcrumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.breadcrumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}.breadcrumbs a{min-height:40px;display:inline-flex;align-items:center;transition-property:color,scale;transition-duration:160ms}.breadcrumbs a:hover{color:var(--amber)}.breadcrumbs a:active{scale:.96}.content-hero h1{max-width:17ch;font-size:clamp(40px,6vw,68px);font-weight:700;line-height:1.02;letter-spacing:-.02em}.content-lede{max-width:66ch;margin-top:22px;color:var(--dim);font-size:clamp(17px,2vw,20px)}.content-meta{display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:28px;font:10px/1.4 var(--mono);color:var(--cyan)}
+.content-answer{max-width:900px;margin-top:34px;padding:3px 0 3px 22px;border-left:2px solid var(--amber);font-size:clamp(19px,2.2vw,21px);line-height:1.62;color:var(--ink)}.content-shell{padding:clamp(46px,7vw,86px) 0}.content-layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(230px,1fr);align-items:start;gap:clamp(36px,6vw,76px)}.content-body{grid-column:1;grid-row:1;max-width:78ch;min-width:0}.content-body h2{margin:52px 0 16px;font-size:clamp(27px,3.5vw,39px);scroll-margin-top:112px}.content-body>h2:first-child{margin-top:0}.content-body h3{margin:34px 0 12px;font-size:21px;scroll-margin-top:112px}.content-body p,.content-body li{color:var(--dim);font-size:16px}.content-body p+p{margin-top:17px}.content-body ul,.content-body ol{margin:16px 0;padding-left:24px}.content-body li+li{margin-top:7px}.content-body a{color:var(--cyan);text-decoration:underline;text-decoration-color:rgba(127,212,193,.35);text-underline-offset:3px}.content-body a:hover{color:var(--amber);text-decoration-color:currentColor}.content-body code:not(pre code){padding:1px 5px;border:1px solid var(--line);border-radius:5px;background:#07090c;color:var(--cyan);font-size:.86em}.content-body pre{margin:20px 0;white-space:pre;tab-size:2}.content-table{max-width:100%;margin:22px 0;overflow-x:auto;border:1px solid var(--line);border-radius:12px}.content-table:focus-visible{outline:2px solid var(--amber);outline-offset:3px}.content-table table{width:100%;border-collapse:collapse;font-size:14px}.content-table th,.content-table td{min-width:150px;padding:11px 13px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);text-align:left;vertical-align:top;color:var(--dim)}.content-table th{color:var(--ink);font-weight:600;background:var(--bg2)}.content-table tr:last-child td{border-bottom:0}.content-table th:last-child,.content-table td:last-child{border-right:0}
+.content-index{grid-column:2;grid-row:1;position:sticky;top:104px;max-height:calc(100vh - 128px);overflow-y:auto;padding:18px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.content-index strong{display:block;margin-bottom:10px;font:10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}.content-index ol{list-style:none}.content-index a{min-height:40px;display:flex;align-items:center;padding:5px 0;color:var(--dim);font-size:13px;line-height:1.4;transition-property:color,translate,scale;transition-duration:160ms}.content-index a:hover{color:var(--amber);translate:3px 0}.content-index a:active{translate:1px 0;scale:.96}.content-proof{margin:54px 0 0}.content-proof figure{border-radius:16px}.content-proof img{width:100%;height:auto;max-height:650px;object-fit:cover;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}.content-proof figcaption{color:var(--dim);font:11px/1.55 var(--mono)}.content-proof figcaption a{color:var(--amber)}
+.content-layout--docs{grid-template-columns:minmax(190px,.6fr) minmax(0,2fr)}.content-layout--docs .content-index{grid-column:1}.content-layout--docs .content-body{grid-column:2;max-width:72ch}.docs-index a{padding-inline:10px;border-left:2px solid transparent}.docs-index a[aria-current="page"]{border-left-color:var(--amber);background:rgba(255,180,84,.06);color:var(--ink);font-weight:600}.docs-index-current{display:none}
+.content-facts,.content-faq-list,.content-related,.content-sources,.content-skills,.content-demos,.content-discovery,.faq-provenance{margin-top:54px;padding-top:22px;border-top:1px solid var(--line)}.content-facts h2,.content-faq-list h2,.content-related h2,.content-sources h2,.content-skills h2,.content-demos h2{font-size:24px}.content-ruled-list{list-style:none;border-top:1px solid var(--line)}.content-ruled-list li{border-bottom:1px solid var(--line)}.content-ruled-list a{min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:9px 0;color:var(--dim);font-size:14px;transition-property:color,scale;transition-duration:160ms}.content-ruled-list a:after{content:"→";color:var(--amber)}.content-ruled-list a:hover{color:var(--ink)}.content-ruled-list a:active{scale:.96}.content-related .content-ruled-list a{display:grid;grid-template-columns:104px minmax(0,1fr) auto}.content-related-family{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}.content-faq-item{padding:22px 0;border-bottom:1px solid var(--line)}.content-faq-item h3{margin:0;font-size:20px}.content-faq-item h3 a{color:var(--ink)}.content-faq-item p{margin-top:9px;color:var(--dim);font-size:15px}.faq-provenance{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);padding:0}.faq-provenance div{padding:13px;background:var(--bg2)}.faq-provenance dt{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}.faq-provenance dd{margin-top:5px;font:11px/1.45 var(--mono);color:var(--cyan);overflow-wrap:anywhere}.content-discovery{display:flex;flex-wrap:wrap;gap:10px 22px;font:11px/1.5 var(--mono);color:var(--dim)}.content-discovery a{min-height:40px;display:inline-flex;align-items:center;color:var(--amber)}
 @media (max-width:760px){
   .site-nav .wrap{padding-right:0}
-  nav{min-height:104px;display:grid;grid-template-columns:1fr;padding:14px 0 10px;gap:4px}
-  nav .brand{font-size:16px}
-  nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:none;padding-right:20px}
-  nav .links::-webkit-scrollbar{display:none}
-  nav .links a{flex:0 0 auto}
+  .site-nav>.wrap{min-height:104px;display:grid;grid-template-columns:1fr;padding-top:14px;padding-bottom:10px;gap:4px}
+  .site-nav .brand{font-size:16px}
+  .site-nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;scrollbar-color:rgba(255,180,84,.45) transparent;padding:0 20px 4px 0}
+  .site-nav .links::-webkit-scrollbar{height:3px}.site-nav .links::-webkit-scrollbar-thumb{background:rgba(255,180,84,.45);border-radius:99px}
+  .site-nav .links a{flex:0 0 auto}
   .grid,.gallery{grid-template-columns:1fr}
+  footer{grid-template-columns:1fr}.footer-groups{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+@media (max-width:900px){.pathfinder-head,.content-layout{grid-template-columns:1fr}.content-index{grid-column:1;grid-row:1;position:static;max-height:none}.content-body,.content-layout--docs .content-body{grid-column:1;grid-row:2}.docs-index{overflow:hidden}.docs-index-current{display:flex;margin-bottom:8px}.docs-index ol{display:flex;gap:8px;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;padding-bottom:6px}.docs-index li{flex:0 0 min(72vw,260px)}.docs-index .docs-index-list-current{display:none}.docs-index a{min-height:44px;padding:8px 10px;border-left:0;border-bottom:2px solid transparent;background:var(--bg2)}.docs-index a[aria-current="page"]{border-bottom-color:var(--amber)}.pathfinder-row{grid-template-columns:minmax(160px,.6fr) minmax(0,1fr)}.pathfinder-links{grid-column:1/-1;justify-content:flex-start;padding-bottom:18px}.faq-provenance{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.pathfinder-row{grid-template-columns:1fr;gap:6px;padding:18px 0}.pathfinder-links{grid-column:auto;padding:0}.content-hero h1{font-size:clamp(38px,12vw,54px)}.content-answer{padding-left:16px}.content-table{border-radius:8px}.content-table table{min-width:680px}.faq-provenance{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
@@ -217,7 +238,7 @@ header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
   linear-gradient(90deg,rgba(10,12,16,.96) 0%,rgba(10,12,16,.8) 36%,rgba(10,12,16,.24) 68%,rgba(10,12,16,.04) 100%),
   linear-gradient(0deg,rgba(10,12,16,.9) 0%,rgba(10,12,16,.08) 65%,rgba(10,12,16,.62) 100%);z-index:1}
 .crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}.crumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.crumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}
-.crumbs a:hover{color:var(--amber)}
+.crumbs a{min-height:40px;display:inline-flex;align-items:center}.crumbs a:hover{color:var(--amber)}
 h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:0;max-width:18ch}
 .lede{margin-top:24px;max-width:70ch;color:var(--dim)}
 .meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
@@ -257,6 +278,7 @@ a.chip:active{scale:.96}
 .runtime-evidence-disclosure dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;margin-top:16px;overflow:hidden;border-radius:10px;background:var(--line)}.runtime-evidence-disclosure dl div{padding:11px 12px;background:var(--bg2)}.runtime-evidence-disclosure dt{font:10px/1.35 var(--mono);color:var(--dim)}.runtime-evidence-disclosure dd{margin-top:4px;font:500 10px/1.35 var(--mono);color:var(--amber)}.runtime-evidence-disclosure dd[data-verdict="PASS"]{color:var(--lime)}
 .runtime-evidence-disclosure ul{margin:15px 0 0;padding-left:20px}.runtime-evidence-disclosure li{margin-top:5px;color:var(--dim);font-size:14px}
 .evidence-report-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:10px}.evidence-report-links a{display:grid;gap:6px;min-height:72px;padding:14px;border:1px solid var(--line);border-radius:11px;background:var(--bg2)}.evidence-report-links code{color:var(--cyan);font:11px/1.4 var(--mono);overflow-wrap:anywhere}.evidence-report-links span{color:var(--dim);font:10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.05em}
+.skill-guides{margin-top:52px;padding-top:22px;border-top:1px solid var(--line)}.skill-guides h3{font-size:22px}.skill-guides ul{margin-top:12px;list-style:none;border-top:1px solid var(--line)}.skill-guides li{border-bottom:1px solid var(--line)}.skill-guides a{min-height:52px;display:grid;grid-template-columns:120px minmax(0,1fr);align-items:center;gap:18px;color:var(--dim);font-size:14px;transition-property:color,scale;transition-duration:160ms}.skill-guides a span{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}.skill-guides a:hover{color:var(--amber)}.skill-guides a:active{scale:.96}
 @media (max-width:720px){
   .skill-hero{min-height:auto;padding:58px 0 52px}
   .skill-hero-bg{opacity:.3}
@@ -267,43 +289,48 @@ a.chip:active{scale:.96}
 </style>
 </head>
 <body>
-<a class="skip-link" href="#main-content">Skip to content</a><div class="site-nav"><div class="wrap"><nav aria-label="Primary navigation">
-  <a class="brand" href="../">Three.js WebGPU Skill&nbsp;Pack</a>
-  <div class="links"><a href="../#matrix">How it works</a><a href="../#flagships">Examples</a><a href="../#skills">Skills</a><a href="../#labs">Labs</a><a href="../evidence/">Evidence</a><a href="../#install">Install</a><a href="../about/">Method</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
-</nav></div></div>
+<a class="skip-link" href="#main-content">Skip to content</a><header class="site-nav"><div class="wrap">
+  <a class="brand" href="/">Three.js WebGPU Skill&nbsp;Pack</a>
+  <nav class="links" aria-label="Primary navigation"><a href="/#flagships">Examples</a><a href="/#skills">Skills</a><a href="/guides/">Guides</a><a href="/evidence/">Evidence</a><a href="/#install">Install</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub</a></nav>
+</div></header>
 
 <main id="main-content" tabindex="-1">
-<header class="">
+<header class="skill-hero">
+  <picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-material-slot-compiler/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-material-slot-compiler/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-material-slot-compiler/final.design.png" alt="" class="skill-hero-bg" aria-hidden="true" width="1200" height="800" fetchpriority="high" decoding="async" />
+        </picture>
   <div class="wrap">
     <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Procedural Content</a></li><li aria-current="page">Procedural Buildings and Cities</li></ol></nav>
     <h1 style="view-transition-name:skill-threejs-procedural-buildings-and-cities">Procedural Buildings and Cities</h1>
-    <p class="lede">Build authored procedural buildings, facades, cities, and semantic site-asset assemblies in Three.js r185 WebGPU/TSL. Use for massing grammars and for deterministic placement/compilation of supplied or separately generated ruin, dock, boat, rock, vegetation, and prop families; anchors, sockets, exclusions, exposed-edge analysis, profiles, ornaments, material-slot BatchedMesh or merged BufferGeometry, stable IDs, NodeMaterial identities, spatial paging, LOD, and asset-manifest validation.</p>
+    <p class="lede">Compile procedural buildings, cities, and semantic site assemblies in Three.js r185 WebGPU/TSL. Use for building massing and facades, city-scale architectural batching and LOD, or deterministic placement of heterogeneous site assets around architecture.</p>
+    <p class="hero-evidence-caption">Image: Material-slot presentation readback. Source lab: webgpu-material-slot-compiler.</p>
     <div class="meta-row">
       <span class="chip a">$threejs-procedural-buildings-and-cities</span>
-      <span class="chip">1 primary implementation</span>
-<span class="chip">1 flagship</span>
-<span class="chip">1 secondary surface</span>
+      <span class="chip">1 primary target</span>
+      <span class="chip">1 flagship</span>
+      <span class="chip">1 secondary surface</span>
       <span class="chip">native evidence pending</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-11T12:53:24+03:00">2026-07-11</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/364338260dc76bccc805823f7f1b88dea79d5e00">commit 3643382 ↗</a>
-      <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-buildings-and-cities/SKILL.md">SKILL.md on GitHub ↗</a>
-      <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-procedural-buildings-and-cities/SKILL.md">raw (for agents) ↗</a>
+      <span class="chip">Latest skill update <time datetime="2026-07-16T12:45:44+03:00">2026-07-16</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/8749183dffd84731506239dd86590c92bf958969">commit 8749183 ↗</a>
+      <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-buildings-and-cities/SKILL.md">SKILL.md on GitHub ↗</a>
+      <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/skills/threejs-procedural-buildings-and-cities/SKILL.md">raw (for agents) ↗</a>
     </div>
   </div>
 </header>
 
 
   <section class="section" id="primary-implementations" aria-labelledby="primary-implementations-title"><div class="wrap">
-    <h2 id="primary-implementations-title">Primary implementation surface</h2>
-    <p class="sub">These routes are generated from canonical source. Their exact status remains separate from implementation availability.</p>
+    <h2 id="primary-implementations-title">Primary target surface</h2>
+    <p class="sub">These rendering routes are generated from canonical source. Native-WebGPU acceptance remains separate from entrypoint availability.</p>
     <div class="grid">
       <a class="card" href="../demos/webgpu-material-slot-compiler/">
-        <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="webgpu-material-slot-compiler">
-    <span class="primary-evidence-label">Canonical capture</span>
-    <strong>Runtime evidence pending</strong>
-    <span><code>7ad7958a7bf3</code> source hash</span>
-    <span>15 fixed states · 5 runtime proof requirements</span>
-  </span>
+        <span class="card-preview-wrap" data-preview-for="webgpu-material-slot-compiler" data-preview-source="webgpu-material-slot-compiler" data-preview-classification="inspected-runtime-evidence-preview"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-material-slot-compiler/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-material-slot-compiler/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-material-slot-compiler/final.design.png" alt="Material-slot presentation readback for WebGPU Material Slot Compiler" class="card-preview" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><span class="media-caption">Material-slot presentation readback</span></span>
         <span class="card-head"><span class="card-kind">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
         <h3>WebGPU Material Slot Compiler</h3>
         <p>6 fixed scenarios, 6 mechanism routes, and 3 locked tiers.</p>
@@ -320,7 +347,7 @@ a.chip:active{scale:.96}
         <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="procedural-district">
     <span class="primary-evidence-label">Canonical capture</span>
     <strong>Runtime evidence pending</strong>
-    <span><code>919817c6e63f</code> source hash</span>
+    <span><code>3c2448b5b07d</code> source hash</span>
     <span>10 fixed states · 4 runtime proof requirements</span>
   </span>
         <span class="card-head"><span class="card-kind">Authored procedural world</span><span class="status status--pending">Evidence pending</span></span>
@@ -356,391 +383,204 @@ roof — for a handful of draw calls per district.</p></div>
 
   <div class="section" id="validation"><div class="wrap">
     <h2>Preview and evidence ledger</h2>
-    <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; canonical acceptance still requires render-target readback and a schema-v2 bundle.</p>
-    <div class="evidence-ledger"><span class="status status--pending">Canonical runtime evidence pending</span><code>0 published images</code></div>
-
-    <div class="primary-evidence-panel" data-evidence-state="incomplete"><span class="primary-evidence-label">Same-lab evidence</span><strong>No runtime image promoted</strong><span>The page remains image-free until this skill's own lab supplies hash-bound pixels.</span></div>
+    <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; rendering acceptance still requires same-lab readback and a schema-v2 bundle.</p>
+    <div class="evidence-ledger"><span class="status status--pending">Canonical runtime evidence pending</span><code>7 published images</code></div>
+<div class="runtime-evidence-disclosures">
+      <article class="runtime-evidence-disclosure" data-acceptance-status="incomplete">
+        <div class="runtime-evidence-head"><div><code>Native WebGPU runtime evidence preview</code><h3>WebGPU Material Slot Compiler</h3></div><span class="status status--pending">Evidence pending</span></div>
+        <dl><div><dt>visualCorrectness</dt><dd data-verdict="PASS">PASS</dd></div><div><dt>mechanismCorrectness</dt><dd data-verdict="PASS">PASS</dd></div><div><dt>performanceCompliance</dt><dd data-verdict="INSUFFICIENT_EVIDENCE">INSUFFICIENT_EVIDENCE</dd></div><div><dt>gpuAttribution</dt><dd data-verdict="INSUFFICIENT_EVIDENCE">INSUFFICIENT_EVIDENCE</dd></div><div><dt>lifecycleStability</dt><dd data-verdict="INSUFFICIENT_EVIDENCE">INSUFFICIENT_EVIDENCE</dd></div></dl>
+        <ul><li>Native WebGPU MRT/presentation readbacks and seed/camera variants captured.</li><li>Lab remains incomplete until every mechanism/tier route is release-accepted; no GPU timing claim.</li></ul>
+      </article></div>
+    <div class="gallery">
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-material-slot-compiler" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-material-slot-compiler/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-material-slot-compiler/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-material-slot-compiler/final.design.png" alt="Procedural Buildings and Cities: Material-slot presentation readback" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Material-slot presentation readback</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-material-slot-compiler" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-material-slot-compiler/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-material-slot-compiler/diagnostics.mosaic.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-material-slot-compiler/diagnostics.mosaic.png" alt="Procedural Buildings and Cities: Module-geometry diagnostic presentation." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Module-geometry diagnostic presentation.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-material-slot-compiler" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-material-slot-compiler/camera.near.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-material-slot-compiler/camera.near.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-material-slot-compiler/camera.near.png" alt="Procedural Buildings and Cities: Near camera building presentation." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Near camera building presentation.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-material-slot-compiler" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-material-slot-compiler/camera.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-material-slot-compiler/camera.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-material-slot-compiler/camera.design.png" alt="Procedural Buildings and Cities: Design camera building presentation." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Design camera building presentation.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-material-slot-compiler" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-material-slot-compiler/camera.far.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-material-slot-compiler/camera.far.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-material-slot-compiler/camera.far.png" alt="Procedural Buildings and Cities: Far camera building presentation." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Far camera building presentation.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-material-slot-compiler" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-material-slot-compiler/seed-0001.final.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-material-slot-compiler/seed-0001.final.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-material-slot-compiler/seed-0001.final.png" alt="Procedural Buildings and Cities: Seed 1 building variant." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Seed 1 building variant.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-material-slot-compiler" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-material-slot-compiler/seed-9e3779b9.final.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-material-slot-compiler/seed-9e3779b9.final.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-material-slot-compiler/seed-9e3779b9.final.png" alt="Procedural Buildings and Cities: Stress seed building variant." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Stress seed building variant.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure></div>
   </div></div>
 
 <div class="section" id="skill-text"><div class="wrap">
   <h2>The full skill</h2>
-  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
+  <p class="sub">The complete SKILL.md as loaded by agents, rendered verbatim.</p>
   <div class="skilltext"><h2>Procedural Buildings and Cities</h2>
-<p>Choose the compiler package before emission: a deterministic grammar produces
-a validated plan, then emits material-slot <code>BatchedMesh</code> containers or merged
-indexed <code>BufferGeometry</code> per building/chunk. Do not start from per-primitive
-scene objects and try to recover semantics later.</p>
-<p>Use the pinned Three.js r185 with <code>WebGPURenderer</code> from <code>three/webgpu</code>, TSL from
-<code>three/tsl</code>, <code>MeshStandardNodeMaterial</code> / <code>MeshPhysicalNodeMaterial</code> material
-identities, node post through <code>RenderPipeline</code>, and storage/compute APIs only
-where they beat CPU chunking for city-scale state. Built-in node effects are
-the first revision-matched comparison baseline; retain them only when their
-measured quality and cost pass the workload contract.</p>
-<h2>Required Build Order</h2>
-<pre><code class="language-text">settings + seed
-  -&gt; mass grammar
-  -&gt; plan validation
-  -&gt; exposed-surface graph
-  -&gt; facade / roof / trim placements
-  -&gt; module registry validation
-  -&gt; per-material-slot mesh compilation
-  -&gt; one compiled building object or chunk batch
-  -&gt; WebGPU/TSL materials and node pipeline integration
-</code></pre>
-<p>Read
-<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-buildings-and-cities/references/grammar-and-mesh-compiler.md">references/grammar-and-mesh-compiler.md</a>
-before implementing the generator.</p>
-<p>For generated terrain, islands, coasts, ruins, docks, boats, rocks, pebbles,
-flowers, or small scene assemblies, also read
-<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-buildings-and-cities/references/semantic-site-asset-kits.md">references/semantic-site-asset-kits.md</a>.
-When any asset supplies collision, support, rigid-body, hydrostatic, structural,
-or interaction semantics, also apply the shared
-<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-choose-skills/references/physics-domain-and-interaction-contract.md">physics-domain and interaction contract</a>.</p>
-<p>Legacy implementation (deprecated, do not extend):
-<code>examples/authored-financial-tower/</code>.</p>
-<h2>Architecture Rules</h2>
-<ul>
-<li>Keep grammar, validation, placement, and mesh emission as separate phases.</li>
-<li>Resolve exposed edges before facade placement. Do not decorate hidden
-internal faces.</li>
-<li>Treat exposed-edge analysis as trim and ornament authority: cornices, corner
-joints, parapets, pilasters, plinths, and roof ownership follow surviving
-intervals, not whole-tier rectangles.</li>
-<li>Modules own semantic anchors, local frames, construction depth, UV density,
-and material slots; they do not own global side orientation.</li>
-<li>Compile by material slot. The default output is one compiled building object
-with stable slot membership, not an <code>InstancedMesh</code> soup of primitive boxes.</li>
-<li>Use <code>BatchedMesh</code> when many local module geometries share one material and
-still need per-part visibility, transforms, sorting, or replacement. Use a
-merged indexed <code>BufferGeometry</code> per slot when the building is static and
-only chunk-level culling is needed.</li>
-<li>In installed r185 WebGPU, <code>BatchedMesh</code> loops one backend draw item per
-visible multi-draw entry; it reduces scene-object/state management but does
-not prove draw-call collapse. Merge compatible static slot geometry or
-instance identical topology when fewer GPU draw items are required, and
-record actual renderer/backend counts.</li>
-<li>Use <code>InstancedMesh</code> only for large counts of identical repeated objects
-whose unique geometry count is small and whose per-instance identity is
-meaningful. It is not the default compiler architecture for authored facades.</li>
-<li>Preserve real dimensions for floor height, bay width, trim projection, tile
-scale, and texture density.</li>
-<li>Randomness may select among valid designs; it must not repair invalid
-geometry.</li>
-<li>Provide topology, exposed-edge, placement, ownership, material-slot, UV
-density, bounds, draw-call, and triangle diagnostics.</li>
-</ul>
-<h2>Semantic Site And Coastal Asset Kits</h2>
-<p>Use the same plan-before-emission architecture for small site assets. The site
-plan consumes versioned terrain/coast fields plus a registry of semantic asset
-manifests; it emits placements with stable IDs, explicit anchors, support and
-exclusion volumes, material slots, LOD representations, and diagnostics. It
-does not infer meaning from arbitrary mesh bounds after placement.</p>
-<p>Physics-facing manifests additionally publish stable <code>ColliderProxy</code> and, when
-needed, <code>DeformingSupportProxy</code> IDs; <code>PhysicsMaterialId</code> bindings; provider IDs;
-and versioned <code>RigidBodyProperties</code> or <code>HydrostaticHullProperties</code>. These proxy
-identities and body properties are independent of render LOD, batching, and
-runtime instance index. A display hull, building mesh, or bounding box is not a
-collision, structural, buoyancy, or drag model.</p>
-<p>Dynamic transforms publish <code>RigidBodyState</code> and view-independent
-<code>PresentedStatePair</code> bindings with independent previous/current provenance and
-leases. Cameras own render mapping through <code>CameraViewPublication</code>; per-view
-LOD, visibility, shadows, caches, and resets belong to
-<code>ViewPreparationPublication</code>. A sealed snapshot references candidate binding
-IDs and leases, and multi-target <code>FrameExecutionRecord</code> entries retire those
-leases only after every consumer completes.</p>
-<p>External dynamics cross one declared <code>ExternalSolverAdapter</code>: the site package
-serializes its adapter and proxy identities, while the adapter owns the exact
-unit/frame/time conversion, solver ownership split, synchronization proof, and
-step receipts. The site compiler does not synthesize physical exchange records.
-The selected domain solver publishes or accepts each dimensioned
-<code>InteractionRecord</code> with a target equation, physical footprint, application
-interval, exact-once key, and conservation membership.
-Every selected external dynamics route publishes <code>PhysicsExternalAdapterCost</code>
-through its adapter owner and binds it to the same opportunity rows as site
-state and presentation. Record request/response/batch counts, logical and
-physical bytes, serialization plus frame/unit conversion, queue/transport/
-ownership/fence dependencies, remote solve and commit tail, retries/exact-once
-results, in-flight/recovery memory, clock mapping, and process/device-loss
-witnesses. Site compile time or remote-solver time alone is not adapter cost.
-After atomic commit, each dynamic asset contributes its leased state pair to a
-camera-free <code>PhysicsPresentationCandidate</code>; render LOD never substitutes for
-that committed physical state. A physics-facing change to collider topology,
-body representation, material law, solver cadence, error bound, or stable-ID
-policy proceeds only through a coordinator-admitted <code>QualityTransition</code> with a
-conservative map or explicit reset at a safe step boundary and exactly one
-authoritative emitter throughout migration.</p>
-<p>Required reference families must resolve to a licensed compact asset kit or a
-tested procedural module/generator. A missing ruin, dock, boat, rock/reef,
-vegetation, cloud-silhouette, or other identity-bearing family is a blocker,
-not permission to fabricate boxes, billboard blobs, or unrelated noise.</p>
-<pre><code class="language-text">environment snapshot + seed + authored anchors
-  -&gt; candidate/support regions
-  -&gt; constraint and clearance validation
-  -&gt; deterministic asset/variant selection
-  -&gt; semantic placements and adjacency/attachment graph
-  -&gt; per-material/per-representation compilation
-  -&gt; serialized site plan + runtime package
-</code></pre>
-<p>Place required landmarks and their reservations first, then dependent
-supports/attachments, then ecology, then optional filler clusters or decals.
-Every streamed phase uses stable candidate sorting and a conflict/filter halo;
-generation or chunk load order must not alter owned placements.</p>
-<p>Required environment inputs declare units, sign, coordinate frame, filtering,
-revision, and missing-data behavior for terrain elevation/normal/slope,
-substrate and semantic regions, signed coast distance and coast frame,
-still-water depth or bathymetry where relevant, exposure, paths, and authored
-exclusions. Site assets consume dynamic water/motion hooks but do not solve
-them.</p>
-<table>
-<thead>
-<tr>
-<th>Asset family</th>
-<th>Required semantic contract</th>
-<th>Causal owner outside this compiler</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>ruin/wall/foundation</td>
-<td>module graph, corners/openings, support footprint, collapse state, material slots, vegetation sockets</td>
-<td>low-level profiles/mesh writers route to geometry; materials route to procedural materials</td>
-</tr>
-<tr>
-<td>dock/pier/bridge</td>
-<td>land root, coast tangent/outward normal, deck datum, pile/bed contacts, berth/mooring frames, clearance prism</td>
-<td>water surface/depth from water; optional motion from motion systems</td>
-</tr>
-<tr>
-<td>boat/floating prop</td>
-<td>hull/waterline frame, conservative swept bound, berth/free-water mode, material slots, <code>RigidBodyProperties</code>, <code>HydrostaticHullProperties</code>, stable collider/support proxy and wake/interaction emitter metadata</td>
-<td>buoyancy/wave/current state from water or domain solver; transform motion from motion systems</td>
-</tr>
-<tr>
-<td>rock/boulder/pebble/debris</td>
-<td>ground/embed anchor, support normal policy, footprint, cluster group, substrate/coast eligibility</td>
-<td>topology from procedural geometry; PBR identity from procedural materials</td>
-</tr>
-<tr>
-<td>flower/grass/shrub/tree</td>
-<td>root anchor, ecology/species response, crown/wind bounds, clearance, growth/LOD package</td>
-<td>placement/growth/wind from procedural vegetation</td>
-</tr>
-</tbody></table>
-<p>Do not promote each pebble, flower, plank, or rubble fragment to a scene
-object. Compile immutable identical topology through spatially paged instancing;
-merge compatible static unique pieces by material slot; retain <code>BatchedMesh</code>
-only when replacement, per-part visibility, or identity justifies its measured
-r185 multi-draw entries. Authored landmark assets preserve individual IDs.</p>
-<p>Choose the runtime package from mutability and visibility:</p>
+<p>Treat architecture as a compiler: decide the runtime package, produce and
+validate a serializable plan, then emit geometry. The plan owns massing,
+exposed surfaces, placements, material slots, and stable identity.</p>
+<h2>Process</h2>
+<ol>
+<li><p><strong>Select the runtime package from mutability and repetition.</strong></p>
 <table>
 <thead>
 <tr>
 <th>Workload</th>
 <th>Package</th>
-<th>Visibility policy</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>One static close-inspection building</td>
-<td>Merged indexed geometry per material slot</td>
-<td>Object/part bounds; no runtime grammar work</td>
+<td>Static building or chunk</td>
+<td>merged indexed <code>BufferGeometry</code> per material slot</td>
 </tr>
 <tr>
-<td>Editable building with varied modules</td>
-<td><code>BatchedMesh</code> per compatible material family</td>
-<td>Per-object batch visibility and targeted replacement</td>
+<td>Editable varied modules</td>
+<td><code>BatchedMesh</code> per compatible material slot</td>
 </tr>
 <tr>
-<td>Repeated identical modules</td>
-<td><code>InstancedMesh</code> or storage-instanced attributes</td>
-<td>Spatial pages; never one city-wide uncullable batch</td>
+<td>Repeated identical topology</td>
+<td>spatially paged <code>InstancedMesh</code></td>
 </tr>
 <tr>
-<td>Large district</td>
-<td>Serialized spatial chunks with projected-error LOD and optional occlusion/compute compaction</td>
-<td>Submit only visible chunks; impostor/proxy far field</td>
+<td>District-scale streaming</td>
+<td>bounded chunks with projected-error LOD</td>
 </tr>
 </tbody></table>
-<p>GPU visibility is justified only when its scan/compaction plus indirect draw
-actually removes more submission/vertex work than CPU chunk culling.
-Every LOD/packing transition uses the
-<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-choose-skills/references/projected-error-contract.md">shared physical-pixel projected-error contract</a>,
-including nearest support depth, unjittered projection, hysteresis/dwell, and
-simultaneous transition memory.</p>
-<h2>Public API Shape</h2>
-<pre><code class="language-ts">type BuildingQualityTier = &quot;hero&quot; | &quot;city&quot; | &quot;distant&quot;;
-
-function createBuildingPlan(settings: BuildingSettings): BuildingPlan;
-function validateBuildingPlan(plan: BuildingPlan): BuildingDiagnostics;
-function compileBuilding(
-  plan: BuildingPlan,
-  materials: BuildingNodeMaterials,
-  options: {
-    qualityTier: BuildingQualityTier;
-    chunkId?: string;
-    preferBatchedMesh?: boolean;
-  },
-): CompiledBuilding;
-function disposeCompiledBuilding(compiled: CompiledBuilding): void;
-</code></pre>
-<p><code>BuildingPlan</code> stays serializable. It must include tiers, footprint pieces,
-exposed intervals, placements, module usage, ownership rectangles, missing and
-unused module IDs, overlap pairs, material slot counts, UV meters per repeat,
-and per-slot triangle budgets.</p>
-<h2>WebGPU Capability Gate</h2>
-<p>Architecture generation is CPU deterministic; city-scale visibility,
-regeneration, LOD masks, and animated signs may use storage buffers or compute.
-Gate those paths once after renderer initialization:</p>
-<pre><code class="language-js">import { WebGPURenderer } from &quot;three/webgpu&quot;;
-
-const renderer = new WebGPURenderer( { antialias: false } );
-await renderer.init();
-
-if (renderer.backend.isWebGPUBackend !== true) {
-  throw new Error(
-    &#39;WebGPU is required for the canonical architecture compiler path; explicit fallback teaching belongs to threejs-compatibility-fallbacks.&#39;
-  );
-}
-</code></pre>
-<p>Quality tiers are asset and budget tiers:</p>
-<pre><code class="language-text">hero:
-  full exposed-edge diagnostics, roofs, trim, ornaments, physical UV scale,
-  glass separated, close-inspection geometry
-
-city:
-  same grammar and validation, fewer ornament rewrites, chunked material-slot
-  batches, coarser roof equipment, no tiny one-off geometry
-
-distant:
-  serialized precompiled shells, simplified cornice/roof profiles, baked
-  color variation, no dynamic per-building recompute
-</code></pre>
-<h2>Materials, Color, and Output</h2>
+<p>Initialize <code>WebGPURenderer</code> before gating WebGPU features. Architecture
+planning can remain CPU-deterministic; add storage or compute only for a
+measured city-scale visibility or update bottleneck.</p>
+<p><strong>Complete when:</strong> every architectural element has one package, and every
+package has an explicit mutability, visibility, and identity reason.</p>
+</li>
+<li><p><strong>Produce a valid building plan.</strong> Normalize units and settings, then apply
+the mass-operator rail: footprint pieces -&gt; union/court subtraction -&gt;
+extrude/stack -&gt; inset/split -&gt; optional connector. Choose only
+prevalidated alternatives; give every operator result a stable ID and
+validate it before the next operator. Read
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-buildings-and-cities/references/grammar-and-mesh-compiler.md">grammar-and-mesh-compiler.md</a> when
+implementing these operators. Serialize footprints, mass volumes, exposed
+intervals, placements, module usage, ownership, material slots, UV scale,
+and budgets.</p>
+<p><strong>Complete when:</strong> the same inputs reproduce the same operator choices and
+IDs, every operator output passes its topology/dimension/ownership gate, and
+geometry emission is unnecessary to diagnose an invalid plan.</p>
+</li>
+<li><p><strong>Resolve exposed boundaries before facade placement.</strong> Subtract shared or
+blocked side intervals, quantize each surviving interval into legal bays,
+and attach facade, roof, trim, and corner placements to those intervals.
+Read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-buildings-and-cities/references/grammar-and-mesh-compiler.md">grammar-and-mesh-compiler.md</a>
+when implementing footprint subtraction, bay quantization, placement
+ownership, or module-local frames.</p>
+<p><strong>Complete when:</strong> no facade interval lies inside the footprint, every legal
+interval has a declared placement or semantic blank, and corner ownership is
+unambiguous.</p>
+</li>
+<li><p><strong>Close and validate the plan.</strong> Add visible caps, decks, soffits, and
+closure surfaces for validated connectors; resolve every placement through
+the module registry; then test registry completeness, ownership uniqueness,
+general overlap, winding, bounds, material membership, and UV density.</p>
+<p>For a heterogeneous site assembly, keep domain assets delegated to their
+owning skills and register each ruin, dock, boat, rock, vegetation cluster,
+or prop with a stable placement ID, owner, transform/frame/scale, support and
+clearance volumes, anchor, and LOD policy. Apply the deterministic
+heterogeneous-site-placement rules in
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-buildings-and-cities/references/grammar-and-mesh-compiler.md">grammar-and-mesh-compiler.md</a>.
+Place the landmark first, then solve access, support, and clearance before
+repeated detail.</p>
+<p><strong>Complete when:</strong> every placement resolves, every surface has one owner,
+overlaps are empty or explicitly permitted, support/clearance gates pass,
+stable IDs replay independently of chunk load order and unrelated family
+insertion, and all emitted geometry or delegated assets trace to a plan
+record.</p>
+</li>
+<li><p><strong>Compile by material slot and spatial boundary.</strong> Keep semantic material
+identities stable while choosing merge, batch, or instance emission. In
+Three.js r185 WebGPU, <code>BatchedMesh</code> iterates visible multi-draw entries: it
+improves object/state management but does not prove GPU draw collapse.
+Merge compatible static geometry or instance identical topology when draw
+collapse is required. Read
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-buildings-and-cities/references/grammar-and-mesh-compiler.md">grammar-and-mesh-compiler.md</a> when
+implementing slot writers, paging, projected-error LOD, or draw accounting.</p>
+<p><strong>Complete when:</strong> slot membership is complete, indexed bounds are finite,
+pages are independently cullable, LOD error is gated in physical pixels, and
+actual backend draw items are reported.</p>
+</li>
+<li><p><strong>Bind materials and presentation.</strong> Use <code>MeshStandardNodeMaterial</code> or
+<code>MeshPhysicalNodeMaterial</code> per semantic slot. Preserve physical texture
+scale and data/color encodings. Hand final color to the scene&#39;s one
+<code>RenderPipeline</code> output transform, then dispose replaced geometries,
+batches, textures, and node resources.</p>
+<p><strong>Complete when:</strong> flat material, grazing light, and final output agree on
+geometry and normals; one component owns output conversion; replacement and
+disposal leave no stale bounds or live resources.</p>
+</li>
+<li><p><strong>Verify the compiler.</strong> Exercise simple and compound footprints, courts,
+bridges or connectors when supported, minimum legal spans, dense placement,
+repeated modules, and district paging across multiple seeds. Inspect
+silhouette, untextured geometry, corners, openings, setbacks, roofs, and LOD
+transitions.</p>
+<p><strong>Complete when:</strong> every fixture has a valid plan, no internal facade
+intervals or placement overlaps, a complete registry, deterministic replay,
+correct bounds and material slots, stable UV scale, and measured triangle and
+draw counts.</p>
+</li>
+</ol>
+<h2>Ownership Boundary</h2>
 <ul>
-<li>Use <code>MeshStandardNodeMaterial</code> for masonry, metals, roof, and ornament;
-use <code>MeshPhysicalNodeMaterial</code> for glass when transmission, IOR, thickness,
-or clearcoat matters.</li>
-<li>Do not put physical transmission on every distant pane. Hero panes may use
-transmission; mid/far facades use reflection probes/environment response,
-opaque layered-window materials, or baked interiors selected by projected
-pane size. Transparent sorting and background capture are part of the cost.</li>
-<li>Keep one material identity per semantic slot: limestone, granite,
-terra-cotta, glass, bronze, black-metal, ornament, and roof.</li>
-<li>LDR base-color/emissive textures encoded as sRGB use <code>SRGBColorSpace</code>;
-HDR/EXR radiance remains loader-declared linear. Normal, roughness,
-metalness, masks, IDs, atlas selectors, and diagnostics use
-<code>NoColorSpace</code> / linear data.</li>
-<li>Keep HDR buffers as <code>HalfFloatType</code> until tone mapping.</li>
-<li>The node pipeline owns the only tone-map and output conversion through
-<code>RenderPipeline.outputColorTransform</code> or an explicit <code>renderOutput()</code> node.
-Materials and effects must not double-convert.</li>
-<li>Use <code>pass(scene, camera)</code>, <code>mrt()</code> only when several nodes share scene data,
-and <code>PassNode.setResolutionScale()</code> for reduced-resolution post effects.</li>
-<li>For image treatment, prefer built-in nodes first: <code>GTAONode</code> for contact
-grounding, <code>BloomNode</code> for authored emissive signs or interiors, <code>TRAANode</code>
-for temporal anti-aliasing. Start shadows from an ordinary fitted directional
-map; route CSM, tiled arrays, or caching through the shadow skill only when
-coverage/error/invalidation and measured cost require them.</li>
+<li>Use <code>$threejs-procedural-geometry</code> for reusable profiles, sweeps, arches,
+frames, and low-level mesh writers.</li>
+<li>Use <code>$threejs-procedural-materials</code> for masonry, glass, metal, weathering,
+filtering, and material-field authoring.</li>
+<li>Use <code>$threejs-procedural-fields</code> for terrain and parcel fields consumed by a
+city layout.</li>
+<li>Use <code>$threejs-scalable-real-time-shadows</code>, <code>$threejs-image-pipeline</code>, and
+<code>$threejs-visual-validation</code> for scene-wide shadow, output, and evidence
+ownership.</li>
 </ul>
-<h2>Performance Contract</h2>
-<p>Record a workload ledger for every compiled representation:</p>
-<pre><code class="language-text">hero building:
-  semantic/material slots, V/T, projected facade/profile error,
-  compile p50/p95, peak transient bytes, draws after material batching
-
-city block chunk:
-  source buildings, visible chunks/instances, submitted and culled V/T,
-  metadata bytes, CPU culling/submission or compute-compaction work IDs,
-  attachment/overdraw cost
-  StorageTexture: only for generated ID/LOD/debug masks that need textureStore()
-
-site asset chunk:
-  accepted/rejected placements by constraint, stable asset/variant IDs,
-  anchor/clearance/support violations, visible/submitted instances and V/T,
-  material/representation buckets, transition overlap, metadata/asset bytes,
-  compile/upload/cull p50/p95 and composed paired-marginal evidence
-
-distant skyline:
-  sector bounds, projected silhouette error, visible V/T, draws/material slots,
-  baked texture bytes and transition hysteresis
-</code></pre>
-<p>Chunk by spatial bounds before city-scale batching. Compute bounds after
-compilation and after every regeneration. Pool reusable arrays and dispose
-generated geometries, <code>BatchedMesh</code> objects, textures, and node effects when
-replacing a district.</p>
-<p>Allocate architecture cost from the complete frame and measure contemporaneous
-whole-frame and paired-marginal p50/p95 GPU time, CPU compile/cull/submission,
-overdraw, visible/culled triangles, upload traffic, peak resident/transient
-bytes, and sustained thermal behavior. Geometry/detail levels are selected by
-projected error and semantic requirements; no building/triangle/draw count is a
-portable device-class guarantee.</p>
-<h2>Acceptance</h2>
-<p>The generated building must survive:</p>
-<ul>
-<li>silhouette-only view;</li>
-<li>flat untextured material;</li>
-<li>grazing light and contact shadowing;</li>
-<li>close inspection of corners, portals, setbacks, roofs, and exposed-edge
-trim transitions;</li>
-<li>fixed-seed fixtures for single tower, compound footprint, courtyard, twin
-towers, bridge, high ornament density, and minimum-span tiers;</li>
-<li>seed variation without broken bays, overlapping ownership, hidden-wall
-decoration, floating ornament, or sliver tiers;</li>
-<li>triangle, draw-call, material-slot, module-count, bounds, and UV-density
-reporting.</li>
-</ul>
-<p>A semantic site kit must additionally survive chunk-order permutations,
-terrain/coast revision invalidation, rotated coast-frame fixtures, missing asset
-and anchor failures, overlap/support/clearance assertions, LOD population and
-identity checks, waterline/deck/berth diagnostics, and low-end/mobile composed
-measurement. A visually plausible pile of untracked props is not an accepted
-site plan.</p>
-<h2>Replaced Techniques</h2>
-<ul>
-<li>Replaced per-primitive <code>InstancedMesh</code> placement as the default with
-material-slot <code>BatchedMesh</code> or merged indexed <code>BufferGeometry</code> compilation,
-because authored buildings need many module shapes, stable material
-identities, exposed-edge ownership, and explicit mutability/culling policy.
-Only merged static geometry or identical-topology instancing is presumed to
-collapse r185 WebGPU draw items; BatchedMesh counts are measured.</li>
-<li>Replaced whole-tier rectangle decoration with exposed-interval ownership,
-because compound footprints otherwise decorate hidden walls and break trim at
-inner and outer corners.</li>
-<li>Replaced post-compile visual debugging only with serializable plan
-diagnostics before mesh emission, because invalid massing and ownership must
-fail before geometry exists.</li>
-<li>Replaced custom renderer-era material hacks with TSL <code>NodeMaterial</code>
-identities and node post, because the modern renderer path keeps materials,
-post, color, and compute in one pipeline.</li>
-</ul>
-<h2>Routing Boundary</h2>
-<p>Use <code>$threejs-choose-skills</code> for broad graphics preflight when the work spans
-materials, shadows, post, validation, and city-scale performance.</p>
-<p>Use <code>$threejs-procedural-geometry</code> for reusable profiles, sweeps, rings,
-arches, frames, or low-level mesh writers without a building grammar.</p>
-<p>Use <code>$threejs-procedural-materials</code> for procedural masonry, atlas filtering,
-derivative normals, weathering, and per-slot material fields.</p>
-<p>Use <code>$threejs-procedural-fields</code> for terrain/coast/support/exposure fields,
-<code>$threejs-procedural-vegetation</code> for plant ecology and growth, and
-<code>$threejs-water-optics</code> or <code>$threejs-procedural-motion-systems</code> for dynamic
-water and transform state consumed by docks/boats. This compiler owns semantic
-assembly, anchors, attachments, exclusions, stable asset selection, and the
-site-plan package; it does not own water simulation, buoyancy physics, plant
-growth, or generic rock mesh generation.</p>
-<p>Structural deformation, fracture progression, collision resolution, rigid-body
-dynamics, buoyancy, and fluid/structure coupling remain owned by the selected
-external/domain solver. The site compiler serializes the canonical proxy,
-property, provider, and adapter IDs; the solver participates in the shared
-<code>PhysicsGraph</code> and exchanges canonical samples/interactions. Do not add a
-site-local timestep, force accumulator, or mesh-bound collision callback.</p>
-<p>Use <code>$threejs-scalable-real-time-shadows</code> for CSM/tiled shadow budgets and diagnostics.</p>
-<p>Use <code>$threejs-ambient-contact-shading</code>,
-<code>$threejs-exposure-color-grading</code>, and <code>$threejs-image-pipeline</code> for node
-post stack ownership beyond architecture-specific guidance.</p>
-<p>This skill owns massing, facade semantics, architectural modules, validation,
-and building-plan compilation.</p>
+<p>This skill owns building massing, facade semantics, architectural module and
+site placement, plan validation, material-slot compilation, and architectural
+spatial LOD; delegated skills still own nonarchitectural asset generation.</p>
 </div>
   <div class="pn">
-    <a href="threejs-particles-trails-and-effects.html">← Particles, Trails, and Effects</a>
+    <a href="threejs-particles-trails-and-effects.html">← Representation-First Particles, Trails, and Effects</a>
     <a href="threejs-procedural-creatures.html">Procedural Creatures →</a>
   </div>
 </div></div>
@@ -764,10 +604,16 @@ and building-plan compilation.</p>
 </main>
 
 <div class="wrap"><footer>
-  <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
-  <span style="font-size:13px">Three r185.1 · 41 working implementations · build <code>6c7881ab7386</code></span><br/>
-  <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
-  <span><a href="https://threejs-skills.com/about/">About &amp; methodology</a> · <a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/llms.txt">For coding agents</a></span>
+  <div class="footer-summary">Three.js WebGPU Skill Pack: TSL, procedural graphics, and visual validation.
+    <span>Three r185.1 · 40 primary targets · 25 accepted · build <code>ab7d8d17e058</code></span>
+    <span>Compiling shaders? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span>
+  </div>
+  <div class="footer-groups">
+    <div class="footer-group"><strong>Build</strong><a href="/#skills">Skills</a><a href="/#flagships">Examples</a><a href="/industries/">Industries</a></div>
+    <div class="footer-group"><strong>Decide</strong><a href="/for/">Who it is for</a><a href="/compare/">Compare</a><a href="/alternatives/">Alternatives</a><a href="/pricing/">Pricing</a></div>
+    <div class="footer-group"><strong>Adopt</strong><a href="/docs/">Docs</a><a href="/migrate/">Migration</a><a href="/agents/">Agent docs</a><a href="/faq/">FAQ</a></div>
+    <div class="footer-group"><strong>Proof</strong><a href="/evidence/">Evidence</a><a href="/about/">Method</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a><a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/LICENSE">License</a></div>
+  </div>
 </footer></div>
 </body>
 </html>

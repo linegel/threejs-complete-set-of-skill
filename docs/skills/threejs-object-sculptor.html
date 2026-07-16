@@ -4,12 +4,12 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Three.js Object Sculptor | Three.js WebGPU Skill</title>
-<meta name="description" content="Reconstruct an object from an attached image, screenshot, URL, or local image as a quality-gated, action-ready procedural Three.js model. Use for image…" />
+<meta name="description" content="Sculpt reference-image objects into procedural Three.js models. Use for reconstruction feasibility, procedural build planning, code-native implementation, or…" />
 <meta name="author" content="Three.js WebGPU Skill Pack contributors; original work by Vinh Hiển" />
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-object-sculptor.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b" />
+<meta name="skill-pack-build-revision" content="sha256:ab7d8d17e0589a6f5c2462d645b9e0d6797cd92eade36e3615dae091c6f9df5b" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -22,15 +22,15 @@
 <meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
 <meta property="og:title" content="Three.js Object Sculptor | Three.js WebGPU Skill" />
-<meta property="og:description" content="Reconstruct an object from an attached image, screenshot, URL, or local image as a quality-gated, action-ready procedural Three.js model. Use for image…" />
+<meta property="og:description" content="Sculpt reference-image objects into procedural Three.js models. Use for reconstruction feasibility, procedural build planning, code-native implementation, or…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-object-sculptor.html" />
-<meta property="article:modified_time" content="2026-07-12T23:04:38+03:00" />
+<meta property="article:modified_time" content="2026-07-16T11:00:33+03:00" />
 <meta property="article:published_time" content="2026-07-11T04:29:27+03:00" />
 <meta property="article:section" content="Procedural Content" />
 
 <meta name="twitter:card" content="summary" />
 <meta name="twitter:title" content="Three.js Object Sculptor | Three.js WebGPU Skill" />
-<meta name="twitter:description" content="Reconstruct an object from an attached image, screenshot, URL, or local image as a quality-gated, action-ready procedural Three.js model. Use for image…" />
+<meta name="twitter:description" content="Sculpt reference-image objects into procedural Three.js models. Use for reconstruction feasibility, procedural build planning, code-native implementation, or…" />
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
@@ -56,14 +56,14 @@
    ],
    "@id": "https://threejs-skills.com/skills/threejs-object-sculptor.html#article",
    "headline": "Three.js Object Sculptor",
-   "description": "Reconstruct an object from an attached image, screenshot, URL, or local image as a quality-gated, action-ready procedural Three.js model. Use for image suitability checks, ObjectSculptSpec extraction, geometry/material/lighting planning, code-native model implementation, staged visual comparison, animation-ready hierarchy, or destruction-ready component design. Adapted from Three.js Object Sculptor by Vinh Hiển.",
+   "description": "Sculpt reference-image objects into procedural Three.js models. Use for reconstruction feasibility, procedural build planning, code-native implementation, or animation-, collider-, and destruction-ready structure from one or more object views.",
    "url": "https://threejs-skills.com/skills/threejs-object-sculptor.html",
    "mainEntityOfPage": {
     "@type": "WebPage",
     "@id": "https://threejs-skills.com/skills/threejs-object-sculptor.html"
    },
    "datePublished": "2026-07-11T04:29:27+03:00",
-   "dateModified": "2026-07-12T23:04:38+03:00",
+   "dateModified": "2026-07-16T11:00:33+03:00",
    "author": {
     "@id": "https://threejs-skills.com/#publisher"
    },
@@ -142,18 +142,18 @@ html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smo
 body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7}
 ::selection{background:rgba(255,180,84,.26);color:var(--ink)}
 a{color:inherit;text-decoration:none}
-a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
+a:focus-visible,button:focus-visible,summary:focus-visible,pre[tabindex]:focus-visible,[role="region"]:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
 main{display:block}
 .skip-link{position:fixed;z-index:100;left:16px;top:12px;translate:0 -160%;font-family:var(--mono);font-size:12px;background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:9px;transition-property:translate;transition-duration:160ms}
 .skip-link:focus{translate:0 0}
 .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
 .site-nav{position:sticky;z-index:50;top:0;background:rgba(8,10,14,.82);border-bottom:1px solid rgba(255,255,255,.075);backdrop-filter:blur(18px) saturate(1.15)}
-nav{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
-nav .brand{white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
-nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
-nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
-nav .links a:hover{color:var(--amber)}
-nav .links a:active{scale:.96}
+.site-nav>.wrap{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+.site-nav .brand{min-height:44px;display:inline-flex;align-items:center;white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
+.site-nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
+.site-nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
+.site-nav .links a:hover{color:var(--amber)}
+.site-nav .links a:active{scale:.96}
 h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:0}
 p{text-wrap:pretty}
 h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
@@ -167,7 +167,7 @@ code{font-family:var(--mono)}
 .card{min-height:100%;background:linear-gradient(145deg,rgba(19,24,33,.96),rgba(12,15,21,.96));border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px;
   box-shadow:var(--shadow-card);transition-property:translate,scale,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
 .card:hover{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
-.card:active{translate:0 -1px;scale:.99}
+.card:active{translate:0 -1px;scale:.96}
 .card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .card-kind{font-family:var(--mono);font-size:10px;color:var(--cyan)}
 .card h3,.card h4{font-size:19px;font-weight:600}
@@ -192,19 +192,29 @@ figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:s
 figcaption{padding:16px 18px;font-size:14.5px}
 figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
 figcaption span{display:block;margin-top:3px;color:var(--dim)}
-footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
+footer{border-top:1px solid var(--line);padding:44px 0 60px;display:grid;grid-template-columns:minmax(260px,1.4fr) minmax(0,2fr);gap:36px 64px;color:var(--dim);font-size:14.5px}
 footer a{color:var(--amber)}
 footer a:hover{text-decoration:underline}
 footer code{color:var(--cyan);font-size:11px}
+.footer-summary{max-width:55ch}.footer-summary>span{display:block;margin-top:8px;font-size:13px}.footer-groups{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}.footer-group{display:grid;align-content:start;gap:8px}.footer-group strong{font:400 10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}.footer-group a{min-height:40px;display:flex;align-items:center;color:var(--dim);font-size:13px;transition-property:color,scale;transition-duration:160ms}.footer-group a:hover{color:var(--amber);text-decoration:none}.footer-group a:active{scale:.96}
+.pathfinder{padding:clamp(52px,7vw,86px) 0;border-bottom:1px solid var(--line)}.pathfinder-head{display:grid;grid-template-columns:minmax(0,.7fr) minmax(320px,1.3fr);align-items:end;gap:28px 72px;margin-bottom:28px}.pathfinder-head h2{margin:0}.pathfinder-head p{max-width:58ch;color:var(--dim)}.pathfinder-rows{border-top:1px solid var(--line)}.pathfinder-row{display:grid;grid-template-columns:minmax(160px,.55fr) minmax(210px,.8fr) minmax(0,1.6fr);gap:20px 32px;align-items:center;min-height:94px;border-bottom:1px solid var(--line)}.pathfinder-stage{font:10px/1.4 var(--mono);letter-spacing:.11em;text-transform:uppercase;color:var(--cyan)}.pathfinder-row>p{color:var(--dim);font-size:14px}.pathfinder-links{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px 18px}.pathfinder-links a{min-height:44px;display:inline-flex;align-items:center;gap:8px;color:var(--amber);font:11px/1.35 var(--mono);transition-property:color,scale;transition-duration:160ms}.pathfinder-links a:after{content:"→"}.pathfinder-links a:hover{color:var(--ink)}.pathfinder-links a:active{scale:.96}
+.content-hero{padding:clamp(54px,8vw,104px) 0 42px;border-bottom:1px solid var(--line)}.breadcrumbs{min-height:44px;display:flex;align-items:center;margin-bottom:28px;font:11px/1.4 var(--mono);color:var(--dim)}.breadcrumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.breadcrumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}.breadcrumbs a{min-height:40px;display:inline-flex;align-items:center;transition-property:color,scale;transition-duration:160ms}.breadcrumbs a:hover{color:var(--amber)}.breadcrumbs a:active{scale:.96}.content-hero h1{max-width:17ch;font-size:clamp(40px,6vw,68px);font-weight:700;line-height:1.02;letter-spacing:-.02em}.content-lede{max-width:66ch;margin-top:22px;color:var(--dim);font-size:clamp(17px,2vw,20px)}.content-meta{display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:28px;font:10px/1.4 var(--mono);color:var(--cyan)}
+.content-answer{max-width:900px;margin-top:34px;padding:3px 0 3px 22px;border-left:2px solid var(--amber);font-size:clamp(19px,2.2vw,21px);line-height:1.62;color:var(--ink)}.content-shell{padding:clamp(46px,7vw,86px) 0}.content-layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(230px,1fr);align-items:start;gap:clamp(36px,6vw,76px)}.content-body{grid-column:1;grid-row:1;max-width:78ch;min-width:0}.content-body h2{margin:52px 0 16px;font-size:clamp(27px,3.5vw,39px);scroll-margin-top:112px}.content-body>h2:first-child{margin-top:0}.content-body h3{margin:34px 0 12px;font-size:21px;scroll-margin-top:112px}.content-body p,.content-body li{color:var(--dim);font-size:16px}.content-body p+p{margin-top:17px}.content-body ul,.content-body ol{margin:16px 0;padding-left:24px}.content-body li+li{margin-top:7px}.content-body a{color:var(--cyan);text-decoration:underline;text-decoration-color:rgba(127,212,193,.35);text-underline-offset:3px}.content-body a:hover{color:var(--amber);text-decoration-color:currentColor}.content-body code:not(pre code){padding:1px 5px;border:1px solid var(--line);border-radius:5px;background:#07090c;color:var(--cyan);font-size:.86em}.content-body pre{margin:20px 0;white-space:pre;tab-size:2}.content-table{max-width:100%;margin:22px 0;overflow-x:auto;border:1px solid var(--line);border-radius:12px}.content-table:focus-visible{outline:2px solid var(--amber);outline-offset:3px}.content-table table{width:100%;border-collapse:collapse;font-size:14px}.content-table th,.content-table td{min-width:150px;padding:11px 13px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);text-align:left;vertical-align:top;color:var(--dim)}.content-table th{color:var(--ink);font-weight:600;background:var(--bg2)}.content-table tr:last-child td{border-bottom:0}.content-table th:last-child,.content-table td:last-child{border-right:0}
+.content-index{grid-column:2;grid-row:1;position:sticky;top:104px;max-height:calc(100vh - 128px);overflow-y:auto;padding:18px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.content-index strong{display:block;margin-bottom:10px;font:10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}.content-index ol{list-style:none}.content-index a{min-height:40px;display:flex;align-items:center;padding:5px 0;color:var(--dim);font-size:13px;line-height:1.4;transition-property:color,translate,scale;transition-duration:160ms}.content-index a:hover{color:var(--amber);translate:3px 0}.content-index a:active{translate:1px 0;scale:.96}.content-proof{margin:54px 0 0}.content-proof figure{border-radius:16px}.content-proof img{width:100%;height:auto;max-height:650px;object-fit:cover;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}.content-proof figcaption{color:var(--dim);font:11px/1.55 var(--mono)}.content-proof figcaption a{color:var(--amber)}
+.content-layout--docs{grid-template-columns:minmax(190px,.6fr) minmax(0,2fr)}.content-layout--docs .content-index{grid-column:1}.content-layout--docs .content-body{grid-column:2;max-width:72ch}.docs-index a{padding-inline:10px;border-left:2px solid transparent}.docs-index a[aria-current="page"]{border-left-color:var(--amber);background:rgba(255,180,84,.06);color:var(--ink);font-weight:600}.docs-index-current{display:none}
+.content-facts,.content-faq-list,.content-related,.content-sources,.content-skills,.content-demos,.content-discovery,.faq-provenance{margin-top:54px;padding-top:22px;border-top:1px solid var(--line)}.content-facts h2,.content-faq-list h2,.content-related h2,.content-sources h2,.content-skills h2,.content-demos h2{font-size:24px}.content-ruled-list{list-style:none;border-top:1px solid var(--line)}.content-ruled-list li{border-bottom:1px solid var(--line)}.content-ruled-list a{min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:9px 0;color:var(--dim);font-size:14px;transition-property:color,scale;transition-duration:160ms}.content-ruled-list a:after{content:"→";color:var(--amber)}.content-ruled-list a:hover{color:var(--ink)}.content-ruled-list a:active{scale:.96}.content-related .content-ruled-list a{display:grid;grid-template-columns:104px minmax(0,1fr) auto}.content-related-family{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}.content-faq-item{padding:22px 0;border-bottom:1px solid var(--line)}.content-faq-item h3{margin:0;font-size:20px}.content-faq-item h3 a{color:var(--ink)}.content-faq-item p{margin-top:9px;color:var(--dim);font-size:15px}.faq-provenance{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);padding:0}.faq-provenance div{padding:13px;background:var(--bg2)}.faq-provenance dt{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}.faq-provenance dd{margin-top:5px;font:11px/1.45 var(--mono);color:var(--cyan);overflow-wrap:anywhere}.content-discovery{display:flex;flex-wrap:wrap;gap:10px 22px;font:11px/1.5 var(--mono);color:var(--dim)}.content-discovery a{min-height:40px;display:inline-flex;align-items:center;color:var(--amber)}
 @media (max-width:760px){
   .site-nav .wrap{padding-right:0}
-  nav{min-height:104px;display:grid;grid-template-columns:1fr;padding:14px 0 10px;gap:4px}
-  nav .brand{font-size:16px}
-  nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:none;padding-right:20px}
-  nav .links::-webkit-scrollbar{display:none}
-  nav .links a{flex:0 0 auto}
+  .site-nav>.wrap{min-height:104px;display:grid;grid-template-columns:1fr;padding-top:14px;padding-bottom:10px;gap:4px}
+  .site-nav .brand{font-size:16px}
+  .site-nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;scrollbar-color:rgba(255,180,84,.45) transparent;padding:0 20px 4px 0}
+  .site-nav .links::-webkit-scrollbar{height:3px}.site-nav .links::-webkit-scrollbar-thumb{background:rgba(255,180,84,.45);border-radius:99px}
+  .site-nav .links a{flex:0 0 auto}
   .grid,.gallery{grid-template-columns:1fr}
+  footer{grid-template-columns:1fr}.footer-groups{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+@media (max-width:900px){.pathfinder-head,.content-layout{grid-template-columns:1fr}.content-index{grid-column:1;grid-row:1;position:static;max-height:none}.content-body,.content-layout--docs .content-body{grid-column:1;grid-row:2}.docs-index{overflow:hidden}.docs-index-current{display:flex;margin-bottom:8px}.docs-index ol{display:flex;gap:8px;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;padding-bottom:6px}.docs-index li{flex:0 0 min(72vw,260px)}.docs-index .docs-index-list-current{display:none}.docs-index a{min-height:44px;padding:8px 10px;border-left:0;border-bottom:2px solid transparent;background:var(--bg2)}.docs-index a[aria-current="page"]{border-bottom-color:var(--amber)}.pathfinder-row{grid-template-columns:minmax(160px,.6fr) minmax(0,1fr)}.pathfinder-links{grid-column:1/-1;justify-content:flex-start;padding-bottom:18px}.faq-provenance{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.pathfinder-row{grid-template-columns:1fr;gap:6px;padding:18px 0}.pathfinder-links{grid-column:auto;padding:0}.content-hero h1{font-size:clamp(38px,12vw,54px)}.content-answer{padding-left:16px}.content-table{border-radius:8px}.content-table table{min-width:680px}.faq-provenance{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
@@ -219,7 +229,7 @@ header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
   linear-gradient(90deg,rgba(10,12,16,.96) 0%,rgba(10,12,16,.8) 36%,rgba(10,12,16,.24) 68%,rgba(10,12,16,.04) 100%),
   linear-gradient(0deg,rgba(10,12,16,.9) 0%,rgba(10,12,16,.08) 65%,rgba(10,12,16,.62) 100%);z-index:1}
 .crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}.crumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.crumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}
-.crumbs a:hover{color:var(--amber)}
+.crumbs a{min-height:40px;display:inline-flex;align-items:center}.crumbs a:hover{color:var(--amber)}
 h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:0;max-width:18ch}
 .lede{margin-top:24px;max-width:70ch;color:var(--dim)}
 .meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
@@ -259,6 +269,7 @@ a.chip:active{scale:.96}
 .runtime-evidence-disclosure dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;margin-top:16px;overflow:hidden;border-radius:10px;background:var(--line)}.runtime-evidence-disclosure dl div{padding:11px 12px;background:var(--bg2)}.runtime-evidence-disclosure dt{font:10px/1.35 var(--mono);color:var(--dim)}.runtime-evidence-disclosure dd{margin-top:4px;font:500 10px/1.35 var(--mono);color:var(--amber)}.runtime-evidence-disclosure dd[data-verdict="PASS"]{color:var(--lime)}
 .runtime-evidence-disclosure ul{margin:15px 0 0;padding-left:20px}.runtime-evidence-disclosure li{margin-top:5px;color:var(--dim);font-size:14px}
 .evidence-report-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:10px}.evidence-report-links a{display:grid;gap:6px;min-height:72px;padding:14px;border:1px solid var(--line);border-radius:11px;background:var(--bg2)}.evidence-report-links code{color:var(--cyan);font:11px/1.4 var(--mono);overflow-wrap:anywhere}.evidence-report-links span{color:var(--dim);font:10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.05em}
+.skill-guides{margin-top:52px;padding-top:22px;border-top:1px solid var(--line)}.skill-guides h3{font-size:22px}.skill-guides ul{margin-top:12px;list-style:none;border-top:1px solid var(--line)}.skill-guides li{border-bottom:1px solid var(--line)}.skill-guides a{min-height:52px;display:grid;grid-template-columns:120px minmax(0,1fr);align-items:center;gap:18px;color:var(--dim);font-size:14px;transition-property:color,scale;transition-duration:160ms}.skill-guides a span{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}.skill-guides a:hover{color:var(--amber)}.skill-guides a:active{scale:.96}
 @media (max-width:720px){
   .skill-hero{min-height:auto;padding:58px 0 52px}
   .skill-hero-bg{opacity:.3}
@@ -269,42 +280,40 @@ a.chip:active{scale:.96}
 </style>
 </head>
 <body>
-<a class="skip-link" href="#main-content">Skip to content</a><div class="site-nav"><div class="wrap"><nav aria-label="Primary navigation">
-  <a class="brand" href="../">Three.js WebGPU Skill&nbsp;Pack</a>
-  <div class="links"><a href="../#matrix">How it works</a><a href="../#flagships">Examples</a><a href="../#skills">Skills</a><a href="../#labs">Labs</a><a href="../evidence/">Evidence</a><a href="../#install">Install</a><a href="../about/">Method</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
-</nav></div></div>
+<a class="skip-link" href="#main-content">Skip to content</a><header class="site-nav"><div class="wrap">
+  <a class="brand" href="/">Three.js WebGPU Skill&nbsp;Pack</a>
+  <nav class="links" aria-label="Primary navigation"><a href="/#flagships">Examples</a><a href="/#skills">Skills</a><a href="/guides/">Guides</a><a href="/evidence/">Evidence</a><a href="/#install">Install</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub</a></nav>
+</div></header>
 
 <main id="main-content" tabindex="-1">
 <header class="">
   <div class="wrap">
     <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Procedural Content</a></li><li aria-current="page">Three.js Object Sculptor</li></ol></nav>
     <h1 style="view-transition-name:skill-threejs-object-sculptor">Three.js Object Sculptor</h1>
-    <p class="lede">Reconstruct an object from an attached image, screenshot, URL, or local image as a quality-gated, action-ready procedural Three.js model. Use for image suitability checks, ObjectSculptSpec extraction, geometry/material/lighting planning, code-native model implementation, staged visual comparison, animation-ready hierarchy, or destruction-ready component design. Adapted from Three.js Object Sculptor by Vinh Hiển.</p>
+    <p class="lede">Sculpt reference-image objects into procedural Three.js models. Use for reconstruction feasibility, procedural build planning, code-native implementation, or animation-, collider-, and destruction-ready structure from one or more object views.</p>
     <div class="meta-row">
       <span class="chip a">$threejs-object-sculptor</span>
-      <span class="chip">2 primary implementations</span>
-
-
+      <span class="chip">2 primary targets</span>
       <a class="chip" href="https://github.com/vinhhien112">Original author: Vinh Hiển ↗</a>
-      <span class="chip">native evidence pending</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-12T23:04:38+03:00">2026-07-12</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/542abece85f1e2b7d01f1546cc9c9af975049de1">commit 542abec ↗</a>
-      <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-object-sculptor/SKILL.md">SKILL.md on GitHub ↗</a>
-      <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-object-sculptor/SKILL.md">raw (for agents) ↗</a>
+      <span class="chip">accepted runtime evidence</span>
+      <span class="chip">Latest skill update <time datetime="2026-07-16T11:00:33+03:00">2026-07-16</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/2ce13bcc22695dafa808d6019452752d9a39cc71">commit 2ce13bc ↗</a>
+      <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-object-sculptor/SKILL.md">SKILL.md on GitHub ↗</a>
+      <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/skills/threejs-object-sculptor/SKILL.md">raw (for agents) ↗</a>
     </div>
   </div>
 </header>
 
 
   <section class="section" id="primary-implementations" aria-labelledby="primary-implementations-title"><div class="wrap">
-    <h2 id="primary-implementations-title">Primary implementation surface</h2>
-    <p class="sub">These routes are generated from canonical source. Their exact status remains separate from implementation availability.</p>
+    <h2 id="primary-implementations-title">Primary target surface</h2>
+    <p class="sub">These rendering routes are generated from canonical source. Native-WebGPU acceptance remains separate from entrypoint availability.</p>
     <div class="grid">
       <a class="card" href="../demos/webgpu-object-sculptor-corpus/">
         <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="webgpu-object-sculptor-corpus">
     <span class="primary-evidence-label">Canonical capture</span>
     <strong>Runtime evidence pending</strong>
-    <span><code>e6ea9dcc3067</code> source hash</span>
+    <span><code>a619e33bbaac</code> source hash</span>
     <span>11 fixed states · 9 runtime proof requirements</span>
   </span>
         <span class="card-head"><span class="card-kind">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
@@ -313,13 +322,13 @@ a.chip:active{scale:.96}
         <span class="card-meta">Open published implementation →</span>
       </a>
       <a class="card" href="../demos/webgpu-tower-ship-sculptor/">
-        <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="webgpu-tower-ship-sculptor">
+        <span class="primary-evidence-panel " data-evidence-state="accepted" data-preview-for="webgpu-tower-ship-sculptor">
     <span class="primary-evidence-label">Canonical capture</span>
-    <strong>Runtime evidence pending</strong>
-    <span><code>092f816d582d</code> source hash</span>
-    <span>11 fixed states · 5 runtime proof requirements</span>
+    <strong>Accepted evidence published</strong>
+    <span><code>23543812e0d4</code> source hash</span>
+    <span>11 fixed states · 6 runtime proof requirements</span>
   </span>
-        <span class="card-head"><span class="card-kind">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+        <span class="card-head"><span class="card-kind">Canonical lab</span><span class="status status--accepted">Accepted</span></span>
         <h3>WebGPU Tower Ship Sculptor</h3>
         <p>3 fixed scenarios, 5 mechanism routes, and 3 locked tiers.</p>
         <span class="card-meta">Open published implementation →</span>
@@ -331,7 +340,7 @@ a.chip:active{scale:.96}
   <section class="section" id="evidence-reports" aria-labelledby="evidence-reports-title"><div class="wrap">
     <h2 id="evidence-reports-title">Evidence reports</h2>
     <p class="sub">Source hashes, claim verdicts, promoted same-lab media, fixed routes, exact tier contracts, and current limitations.</p>
-    <nav class="evidence-report-links" aria-label="Evidence reports for Three.js Object Sculptor"><a href="../evidence/webgpu-object-sculptor-corpus/"><code>webgpu-object-sculptor-corpus</code><span>evidence pending</span></a><a href="../evidence/webgpu-tower-ship-sculptor/"><code>webgpu-tower-ship-sculptor</code><span>evidence pending</span></a></nav>
+    <nav class="evidence-report-links" aria-label="Evidence reports for Three.js Object Sculptor"><a href="../evidence/webgpu-object-sculptor-corpus/"><code>webgpu-object-sculptor-corpus</code><span>evidence pending</span></a><a href="../evidence/webgpu-tower-ship-sculptor/"><code>webgpu-tower-ship-sculptor</code><span>accepted</span></a></nav>
   </div></section>
 
 
@@ -340,466 +349,115 @@ a.chip:active{scale:.96}
     <p class="sub">Adapted from <a href="https://github.com/vinhhien112/Three.js-Object-Sculptor-Codex-Plugin">Three.js Object Sculptor Codex Plugin</a> by <a href="https://github.com/vinhhien112">Vinh Hiển</a>, imported from upstream commit <code>4194e9ad436a0dff4e1ec982fac1ac64dfded241</code> under the MIT license.</p>
   </div></section>
 
+  <div class="section" id="examples"><div class="wrap">
+    <h2>Accepted primary labs</h2>
+    <p class="sub">Only schema-v2 labs with accepted runtime and evidence contracts appear here. Other source directories remain visible through the demo registry without being promoted to runnable proof.</p>
+    <div class="grid">
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-object-sculptor/examples/webgpu-tower-ship-sculptor">
+        <h4>webgpu-tower-ship-sculptor</h4>
+        <span class="card-meta">threejs-object-sculptor/examples/webgpu-tower-ship-sculptor</span>
+      </a>
+    </div>
+  </div></div>
 
   <div class="section" id="validation"><div class="wrap">
     <h2>Preview and evidence ledger</h2>
-    <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; canonical acceptance still requires render-target readback and a schema-v2 bundle.</p>
-    <div class="evidence-ledger"><span class="status status--pending">Canonical runtime evidence pending</span><code>0 published images</code></div>
+    <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; rendering acceptance still requires same-lab readback and a schema-v2 bundle.</p>
+    <div class="evidence-ledger"><span class="status status--accepted">Accepted runtime evidence available</span><code>0 published images</code></div>
 
     <div class="primary-evidence-panel" data-evidence-state="incomplete"><span class="primary-evidence-label">Same-lab evidence</span><strong>No runtime image promoted</strong><span>The page remains image-free until this skill's own lab supplies hash-bound pixels.</span></div>
   </div></div>
 
 <div class="section" id="skill-text"><div class="wrap">
   <h2>The full skill</h2>
-  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
+  <p class="sub">The complete SKILL.md as loaded by agents, rendered verbatim.</p>
   <div class="skilltext"><h2>Three.js Object Sculptor</h2>
-<h2>Origin And Attribution</h2>
-<p>This standalone skill adapts <a href="https://github.com/vinhhien112/Three.js-Object-Sculptor-Codex-Plugin">Three.js Object Sculptor</a> by <a href="https://github.com/vinhhien112">Vinh Hiển</a>, imported from upstream commit <code>4194e9ad436a0dff4e1ec982fac1ac64dfded241</code>. The original and this adaptation retain the upstream MIT license in <code>LICENSE</code>.</p>
-<p>Use this skill when the user wants to turn a reference image of an object into a procedural Three.js model, visual spec, reconstruction plan, animation plan, destruction plan, or code implementation. This skill is for code-native reconstruction, not photogrammetry or exact mesh extraction.</p>
-<h2>Core Promise</h2>
-<p>Treat the task like sculpting from a photo:</p>
+<p>Turn object images into an evidence-bound procedural reconstruction. The output may be a feasibility verdict, a build plan, or working code; every branch follows the same six stages.</p>
+<h2>Inputs and limits</h2>
+<p>Use every supplied view. If the target or intended use is ambiguous, resolve that ambiguity before committing to a representation. Otherwise, assume an interactive browser prop whose authored scale can be revised.</p>
+<p>A single view determines only visible evidence. Hidden surfaces, thickness, absolute dimensions, material parameters, and articulation remain assumptions unless symmetry, known construction, extra views, or measurements constrain them. Label each assumption. Exact likeness, manufacturing dimensions, or an unseen mechanism requires the missing view or measurement; a stated stylized approximation is a valid alternative.</p>
+<p>For a local image, set <code>&lt;skill-dir&gt;</code> to the directory containing this <code>SKILL.md</code>,
+then run <code>python3 &quot;&lt;skill-dir&gt;/scripts/probe_reference_image.py&quot; &quot;&lt;image&gt;&quot;</code> using
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-object-sculptor/scripts/probe_reference_image.py">probe_reference_image.py</a>. It reports format,
+dimensions, aspect ratio, and technical warnings; it does not judge the pictured
+object.</p>
+<h2>Six-stage sculpt</h2>
+<h3>1. Inspect</h3>
+<p>Inspect every view before planning geometry. Record:</p>
+<ul>
+<li>the target boundary, crop, resolution, blur, occlusion, transparency, and conflicting subjects;</li>
+<li>visible front/up cues, camera projection clues, a scale anchor when one exists, and view-to-view consistency;</li>
+<li>which contours, negative spaces, contacts, material regions, and repeated features are directly observed;</li>
+<li>which hidden forms or physical properties remain assumptions.</li>
+</ul>
+<p>Assign a <strong>technical readability</strong> verdict:</p>
+<ul>
+<li><code>readable</code>: the target and its dominant silhouette are clear enough to choose a reconstruction;</li>
+<li><code>conditional</code>: a useful approximation is possible with named assumptions, reduced scope, or another view;</li>
+<li><code>unreadable</code>: target identity or defining form is too ambiguous for a defensible reconstruction.</li>
+</ul>
+<p>When conditional or unreadable evidence affects an identity-defining feature, request the smallest missing input or state the reduced claim. Inspection is complete when every supplied view is accounted for, the verdict has evidence, and every consequential uncertainty is explicit.</p>
+<h3>2. Decompose</h3>
+<p>Freeze one object coordinate frame and one authored unit. Partition the object coarse to fine:</p>
 <ol>
-<li>Validate whether the image contains a suitable 3D object target.</li>
-<li>Extract the object as a structured visual and physical description.</li>
-<li>Decompose it from coarse forms to small features.</li>
-<li>Rebuild it with procedural Three.js geometry, generated materials, lighting, and optional animation/destruction.</li>
-<li>Verify visually and technically before calling it done.</li>
+<li>macro masses and the outer silhouette;</li>
+<li>meso parts, openings, contacts, joints, and repeated systems;</li>
+<li>micro features that remain visible at the closest required view;</li>
+<li>material regions and their observable response.</li>
 </ol>
-<p>Do not pretend a single image can produce an exact production mesh. Be explicit when the output will be an approximate, stylized, low-poly, or physically simplified reconstruction.</p>
-<h2>Required Inputs</h2>
-<p>At minimum:</p>
+<p>Mark <strong>identity anchors</strong>: silhouette breaks, negative spaces, signature proportions, distinctive joints, repeated rhythms, and local material or geometric features whose loss would change what the object is. Keep each anchor as an explicit component, boundary, field, or verification target; a later average that erases one fails the reconstruction.</p>
+<p>Decomposition is complete when every visible identity anchor has one owner, every child part names its parent/contact, and every inferred part is labeled as an assumption rather than image evidence.</p>
+<h3>3. Select representation</h3>
+<p>Choose a representation per semantic part, using the cheapest form that preserves its identity anchors and future ownership:</p>
 <ul>
-<li>one image path, screenshot, URL, or attached image</li>
-<li>the intended use: standalone model, game prop, scene dressing, hero render, playable object, destructible object, or animation rig</li>
+<li>analytic primitive or beveled primitive;</li>
+<li>lathe profile;</li>
+<li>parallel-transport sweep;</li>
+<li>shape extrusion or justified CSG;</li>
+<li>instanced, batched, or card-based repeated detail;</li>
+<li>a separately routed generated/deforming surface when these supports cannot express the target.</li>
 </ul>
-<p>If the image is missing or unreadable, ask for it. If the intended use is missing, assume a browser-real-time Three.js prop with performance suitable for interactive use.</p>
-<h2>Helper Scripts</h2>
-<p>Use the bundled scripts when they make the loop faster or more reliable:</p>
-<p>These scripts live inside this standalone skill folder. Resolve each command from the skill root as <code>scripts/...</code>.</p>
-<ul>
-<li><code>scripts/probe_reference_image.py &lt;image&gt;</code> checks image type, dimensions, aspect ratio, and obvious technical issues. It does not replace visual inspection.</li>
-<li><code>scripts/extract_reference_pbr.py &lt;image&gt; --out-dir &lt;dir&gt; --material-id &lt;id&gt; --target-threshold 0.7</code> extracts reference-derived albedo, roughness, height, normal, and AO maps from image pixels. It exits non-zero when confidence is below the target threshold.</li>
-<li><code>scripts/extract_reference_pbr.py &lt;image&gt; --out-dir &lt;dir&gt; --material-id &lt;id&gt; --spec object-sculpt-spec.json --in-place</code> patches a material with usable <code>referencePbr</code> maps only when the confidence gate passes, unless <code>--allow-low-confidence</code> is explicitly used.</li>
-<li><code>scripts/new_pre_spec_assessment.py &quot;Object Name&quot; --image &lt;path&gt; --complexity &lt;simple|moderate|complex|ultra-complex&gt; --out assessment.json</code> creates a pre-spec complexity assessment and quality contract skeleton.</li>
-<li><code>scripts/new_sculpt_spec.py &quot;Object Name&quot; --image &lt;path&gt; --out object-sculpt-spec.json</code> creates a starter spec.</li>
-<li><code>scripts/new_sculpt_spec.py &quot;Object Name&quot; --image &lt;path&gt; --assessment assessment.json --out object-sculpt-spec.json</code> creates a starter spec from a completed pre-spec assessment.</li>
-<li><code>scripts/validate_sculpt_spec.py object-sculpt-spec.json</code> validates required fields, score ranges, material references, component IDs, parent links, transforms, and primitive names.</li>
-<li><code>scripts/validate_sculpt_spec.py object-sculpt-spec.json --strict-quality</code> fails when the spec is structurally valid but too shallow for its quality contract.</li>
-<li><code>scripts/sculpt_pass_orchestrator.py status object-sculpt-spec.json</code> reports the current locked build pass and required evidence.</li>
-<li><code>scripts/sculpt_pass_orchestrator.py check object-sculpt-spec.json --pass-id blockout</code> fails unless that pass is currently unlocked or already completed.</li>
-<li><code>scripts/sculpt_pass_orchestrator.py sync object-sculpt-spec.json --in-place</code> refreshes <code>sculptPipeline</code> from <code>reviewHistory</code>.</li>
-<li><code>scripts/generate_threejs_factory.py object-sculpt-spec.json --out src/createObjectModel.ts</code> creates a TypeScript Three.js factory for the current unlocked build pass only.</li>
-<li><code>scripts/generate_threejs_factory.py object-sculpt-spec.json --pass-id structural-pass --out src/createObjectModel.ts</code> creates a deeper pass only after earlier passes were reviewed with <code>action=continue</code>.</li>
-<li><code>scripts/make_visual_comparison_sheet.py --reference &lt;image&gt; --render &lt;screenshot&gt; --out &lt;comparison.png&gt; --json</code> creates one full reference/render comparison pair. AI vision scores the global result and every selected semantic feature from this same pair.</li>
-<li><code>scripts/append_sculpt_review.py object-sculpt-spec.json --pass-id &lt;pass&gt; --fidelity &lt;0-1&gt; --action &lt;continue|refine-spec|refine-code|request-input|stop&gt; --summary &quot;...&quot; --render-screenshot &lt;path&gt; --comparison-image &lt;path&gt; --ai-vision-score &lt;0-1&gt; --layer-scores-json &#39;{&quot;silhouetteProportion&quot;:0.8}&#39; --feature-reviews-json &lt;reviews.json&gt; --ai-vision-notes &quot;...&quot; --camera-view &lt;view&gt; --in-place</code> records each self-correction review plus global and feature-level AI vision evidence.</li>
-</ul>
-<p>Prefer this loop for implementation tasks:</p>
+<p>After choosing one or more of these branches and before implementation, read the matching sections of <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-object-sculptor/references/procedural-patterns.md">procedural object patterns</a> and apply their construction and verification rules.</p>
+<p>Keep separate nodes for parts that move, detach, change material independently, need picking/collision identity, or own an attachment. When a child part touches, enters, hinges from, or follows a parent, read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-object-sculptor/references/attachment-joint-correctness.md">attachment and joint correctness</a> before blockout.</p>
+<p>Selection is complete when every decomposed part has exactly one representation and owner, every rejected alternative has a concrete failure condition, and every conditional reference required by the selected branches has been applied.</p>
+<h3>4. Block out</h3>
+<p>Build only macro masses, dominant openings, coordinate frame, and identity-critical negative space. For feasibility or planning, the blockout is a dimensioned primitive/profile sketch; for implementation, it is renderable coarse geometry in the target repository.</p>
+<p>Use the intended comparison camera before adding detail. Match framing and projection separately from object proportions so camera error does not become geometry. Preserve semantic node boundaries needed by later attachments or motion.</p>
+<p>Blockout is complete when the target reads from silhouette alone in every required view, dominant proportions and negative spaces are within the declared tolerance, and geometry and layout carry the match without relying on material or micro detail.</p>
+<h3>5. Refine applicable branches</h3>
+<p>Open only branches supported by the request and evidence, in this order:</p>
 <ol>
-<li>Probe the image if it is local.</li>
-<li>Run the Pre-Spec Assessment Gate: classify the object softly, score complexity, and write the quality contract before authoring the full spec.</li>
-<li>Create or revise <code>ObjectSculptSpec</code> from the completed assessment and quality contract.
-Replace generic starter <code>featureReviewTargets</code> with the object&#39;s actual identity-defining semantic systems before strict validation. Keep at most five critical and three important targets per pass.</li>
-<li>When material fidelity matters and a source image is available, run <code>extract_reference_pbr.py</code> for each important material crop/region before material-pass. Treat confidence below <code>0.7</code> as a stop/refine-input signal, not as a pass.</li>
-<li>Validate the spec with normal validation, then run <code>--strict-quality</code> before code generation.</li>
-<li>Generate a factory skeleton only after the strict quality gate passes or after explicitly documenting accepted fidelity limits.</li>
-<li>Hand-refine geometry, materials, animation anchors, and destruction anchors one pass at a time. Do not generate or implement a deeper pass until <code>sculpt_pass_orchestrator.py check</code> passes for that pass.</li>
-<li>After each visual pass, capture a browser screenshot, create one full reference/render comparison pair, inspect it once with AI vision, then update <code>reviewHistory</code> with overall, layer, and semantic feature scores.</li>
-<li>Run project typecheck/build and browser visual review; use the Codex in-app Browser screenshot tool first. Do not install or download Playwright/Chromium just for this skill unless the user explicitly requests that route.</li>
+<li><strong>Structure:</strong> add meso parts, holes, seams, repeated systems, and attachment roots. Apply the attachment reference to every applicable child and verify contact before continuing.</li>
+<li><strong>Form:</strong> add bevels, tapers, bends, profile changes, caps, asymmetry, and silhouette-affecting relief. Apply the chosen representation&#39;s pole, seam, winding, and frame rules.</li>
+<li><strong>Material:</strong> separate base color from lighting; implement observable roughness, metalness, clearcoat, transmission, normal/bump/displacement, wear, or local masks. Band-limit detail to its screen footprint.</li>
+<li><strong>Action:</strong> add stable pivots, sockets, independent nodes, or detachable groups only when the requested use needs them. For collider intent, name each semantic part&#39;s collider representation, units/frame, fit tolerance, and collision LOD independently of render LOD. For destruction intent, author stable breakable groups, seams and cut faces, fragment IDs/mass/pivots, and effect sockets. Keep authored metadata distinct from a physics solver claim.</li>
+<li><strong>Performance:</strong> simplify by measured projected error; instance or batch only where semantic identity and update ownership survive.</li>
 </ol>
-<h3>Executable WebGPU References</h3>
-<p>Use <code>examples/webgpu-tower-ship-sculptor/</code> as the reference-reconstruction exemplar. It includes the strict <code>ObjectSculptSpec</code>, a station-built Tower Ship factory, 24 hinge-rooted oars, named sockets/collider-construction inputs/destruction groups, <code>final</code>/<code>blockout</code>/<code>hierarchy</code>/<code>materials</code>/<code>interaction</code> modes, geometry tiers, deterministic browser routes, native WebGPU render-target capture, and visual-evidence validation. The example and its Tower Ship reference preserve attribution to the original author, Vinh Hiển.</p>
-<p>Use <code>examples/webgpu-object-sculptor-corpus/</code> as the cross-subject representation and architecture benchmark. It deliberately spans an articulated hard-surface lamp, an organic potted bonsai, and a rotational ceramic teapot. Its shared runtime separates semantic and live-instance identity, visual LOD from collider construction, authored action preview from solver motion, and runtime-owned from registered external resources. Its gates target failure classes that a single ship cannot: hinge reset and constraint frames, shade apertures, botanical ring/crown winding, nondegenerate lathe poles, sweep boundaries, open vessel interiors, seed envelopes, directed collider-error lower-bound regressions, tier invariants, route locks, lifecycle, and aligned-readback layout/normalization. These self-authored benchmarks have no external reference image; they exercise transfer and runtime contracts, while native browser, visual, bidirectional collider-error, timing, and performance evidence remain separate gates.</p>
-<p>From the repository root, run <code>npm --prefix threejs-object-sculptor/examples/webgpu-tower-ship-sculptor run validate:quick</code> before browser capture. Treat the lab&#39;s <code>incomplete</code> evidence status literally until comparison review, sustained timing, and lifecycle gates have their required artifacts.</p>
-<p>From the repository root, run <code>npm --prefix threejs-object-sculptor/examples/webgpu-object-sculptor-corpus run validate:quick</code> before corpus browser review. Its artifact validator must remain <code>INSUFFICIENT_EVIDENCE</code> until the declared visual, resource, lifecycle, GPU-timing, and target-performance evidence exists.</p>
-<h2>3D Terminology Discipline</h2>
-<p>Descriptions must be clear, concrete, and compatible with real-time 3D graphics language. When describing the object, prefer terms from <code>references/3d-graphics-terminology.md</code>.</p>
-<p>Do not rely on vague descriptions such as &quot;nice&quot;, &quot;realistic&quot;, &quot;smooth&quot;, &quot;rough&quot;, &quot;bumpy&quot;, &quot;shiny&quot;, &quot;dark&quot;, or &quot;dirty&quot; unless they are translated into technical terms:</p>
-<ul>
-<li>geometry: silhouette, topology intent, primitive family, bevel radius, chamfer, taper, bend, twist, boolean cut, edge loop, local deformation, displacement amplitude</li>
-<li>material/PBR: albedo/baseColor, roughness, metalness, normal map, bump map, displacement map, ambient occlusion, cavity dirt, edge wear, clearcoat, transmission, alpha</li>
-<li>surface locality: local mask, procedural noise scale, scratch cluster, chip, dent, seam, recessed groove, raised ridge, stain, dirt accumulation, contact wear</li>
-<li>lighting/rendering: key/fill/rim light, environment reflection, contact shadow, shadow softness, color temperature, exposure, tone mapping</li>
-<li>animation/destruction: pivot, hinge, joint, socket, collider, rigid body, fracture seam, detachable fragment, impulse direction</li>
-</ul>
-<p>Every important visual claim should name the layer it belongs to: geometry, topology, material, texture, shader parameter, lighting, animation, collision, or destruction. For complex objects, include <code>terminologyProfile</code> in the spec and keep local details attached to <code>viewEvidence</code>.</p>
-<h2>Image Validation Gate</h2>
-<p>Before planning or coding, inspect the image and return a suitability verdict:</p>
-<ul>
-<li><code>pass</code>: clear object, readable silhouette, reconstructable with procedural primitives</li>
-<li><code>conditional</code>: possible, but needs assumptions, stylization, extra angles, or reduced fidelity</li>
-<li><code>reject</code>: not enough object information for a useful procedural reconstruction</li>
-</ul>
-<p>Score these 0-3:</p>
-<ul>
-<li><code>object_isolation</code>: one main object, not a crowded scene</li>
-<li><code>silhouette_readability</code>: outer shape and proportions are clear</li>
-<li><code>depth_inference</code>: enough cues to infer front/back/side thickness</li>
-<li><code>primitive_decomposition</code>: can be built from spheres, boxes, cylinders, tubes, lathe/extrude shapes, curves, instancing, or deformed surfaces</li>
-<li><code>material_procedurality</code>: material can be approximated with colors, roughness, metalness, normals, procedural noise, decals, or vertex colors</li>
-<li><code>occlusion_risk</code>: hidden parts are limited or can be inferred</li>
-<li><code>interaction_fit</code>: object can support requested animation, physics, or destruction</li>
-</ul>
-<p>Reject or ask for another image when:</p>
-<ul>
-<li>the target object is not identifiable</li>
-<li>multiple objects compete and the target is ambiguous</li>
-<li>the object is heavily cropped or hidden</li>
-<li>the goal requires exact likeness from a single image</li>
-<li>the subject is mostly text, transparent glass, fur, smoke, liquids, or fine fabric where procedural approximation would dominate the result</li>
-<li>the requested output is a rigged organic character but only one flat view is available</li>
-</ul>
-<h2>Extraction Pass</h2>
-<p>Before writing the full spec, create a pre-spec assessment. Do not use hardcoded domain profiles. Use observed traits and complexity to decide how deep the spec must be.</p>
-<h3>Pre-Spec Assessment Gate</h3>
-<p>This gate exists to prevent shallow specs. It must happen before <code>componentTree</code> and materials are finalized.</p>
-<p>Use <code>references/pre-spec-assessment.md</code> for the complexity scoring and quality-contract checklist.</p>
-<p>Assess:</p>
-<ul>
-<li>object class, using soft descriptors such as organic, hard-surface, mechanical, architectural, botanical-like, character-like, amorphous, repeated-structure, static prop, articulated, deformable, or destructible</li>
-<li>complexity tier: <code>simple</code>, <code>moderate</code>, <code>complex</code>, or <code>ultra-complex</code></li>
-<li>silhouette complexity</li>
-<li>expected component count</li>
-<li>hierarchy depth</li>
-<li>repetition density</li>
-<li>material layer count</li>
-<li>local detail density</li>
-<li>occlusion/hidden-structure risk</li>
-<li>animation/destruction readiness need</li>
-</ul>
-<p>Then write a <code>qualityContract</code> that states what &quot;good enough&quot; means for this exact object. The contract must include:</p>
-<ul>
-<li>definition of done</li>
-<li>minimum spec depth: macro components, meso components, micro feature groups, material layers, repetition systems, review viewpoints</li>
-<li>required feature groups with quality criteria, evidence refs, and failure modes</li>
-<li>visual delta checks for screenshot review</li>
-<li>anti-shallow rules that block code generation if the spec is too vague</li>
-</ul>
-<p>For a simple object, this can stay compact. For a complex object, the contract must force a deep component hierarchy, repeated systems, material local overrides, and multiple screenshot viewpoints. If the quality contract is still generic enough that it could apply to any object, refine it before generating code.</p>
-<p>After passing the pre-spec gate, produce an <code>ObjectSculptSpec</code> in prose or JSON-like form. Use schema v2 for complex objects:</p>
-<pre><code class="language-ts">type ObjectSculptSpec = {
-  targetName: string;
-  schemaVersion: &quot;2.0&quot;;
-  terminologyProfile: TerminologyProfile;
-  suitability: &quot;pass&quot; | &quot;conditional&quot; | &quot;reject&quot;;
-  assumptions: string[];
-  preSpecAssessment: PreSpecAssessment;
-  qualityContract: QualityContract;
-  coordinateFrame: {
-    front: string;
-    up: string;
-    scaleReference: string;
-  };
-  silhouette: {
-    boundingShape: string;
-    aspectRatios: string[];
-    symmetry: string;
-    dominantCurves: string[];
-  };
-  viewEvidence: ViewEvidence[];
-  componentTree: SculptComponent[];
-  materials: SculptMaterial[];
-  qualityTargets: QualityTargets;
-  selfCorrectLoop: SelfCorrectLoop;
-  sculptPipeline: SculptPipeline;
-  actionReadiness: ActionReadiness;
-  repetitionSystems: RepetitionSystem[];
-  buildPasses: BuildPass[];
-  visualEvidence: VisualEvidence[];
-  reviewHistory: SculptReview[];
-  lodPlan: LodPlan[];
-  performanceBudget: PerformanceBudget;
-  lightingFromPhoto: string[];
-  proceduralStrategy: string[];
-  animationAnchors: string[];
-  destructionAnchors: string[];
-  risks: string[];
-};
-</code></pre>
-<p>For every major component, capture:</p>
-<ul>
-<li>role: body, base, limb, handle, cap, shell, ornament, connector, surface detail</li>
-<li>level: macro, meso, or micro</li>
-<li>importance and confidence from 0 to 1</li>
-<li>primitive base: box, sphere, cylinder, cone, torus, capsule, tube, lathe, extrude, curve sweep, plane cards, instanced cluster</li>
-<li>geometry descriptor: topology intent, edge treatment, bevel radius, deformation stack, UV strategy, normal strategy</li>
-<li>dimensions: width, height, depth, radius, length, taper ratios, and confidence</li>
-<li>transforms: position, rotation, scale, taper, bend, twist, bevel, boolean cut, noise displacement</li>
-<li>joints: parent component, overlap, seam, hinge, socket, embedded, glued, floating</li>
-<li>action profile: animation role, pivot mode/local position/axis, transform channels, sockets, collider construction intent/input, constraints, destruction behavior</li>
-<li>material layers: base color, palette variation, roughness, metalness, normal, bump, displacement, transparency, edge wear, dirt, moss, scratches, chips, wetness, grain</li>
-<li>local features: per-region marks, dents, holes, seams, stains, ridges, raised details, carved lines, decals, chips, and wear patches</li>
-<li>evidence refs: which image region supports this component or local feature</li>
-<li>fidelity tier: blockout, mid detail, close-up detail</li>
-</ul>
-<p>For complex objects, do not flatten everything into one <code>details</code> string. Use:</p>
-<ul>
-<li><code>viewEvidence</code> to record image regions and observed local traits.</li>
-<li><code>terminologyProfile</code> to keep descriptions aligned with 3D graphics vocabulary.</li>
-<li><code>material.localOverrides</code> to describe local color/roughness/bump differences.</li>
-<li><code>component.localFeatures</code> for geometry-visible details.</li>
-<li><code>component.surfaceDetail</code> for macro roughness, micro roughness, bump amplitude, normal pattern, and displacement pattern.</li>
-<li><code>repetitionSystems</code> for repeated screws, leaves, scales, teeth, beads, panels, rivets, holes, or stitches.</li>
-<li><code>buildPasses</code> to state the sculpt order and acceptance criteria from coarse to fine.</li>
-</ul>
-<p>Anti-shallow rule: a complex object with only one root component, no repetition systems, no material local overrides, and no micro feature groups is not implementation-ready even if the JSON schema validates.</p>
-<p>Before selecting geometry, repetition, hierarchy, motion, physics handoff, material, or mobile representations, read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-object-sculptor/references/multi-subject-algorithm-and-architecture.md">multi-subject algorithm and architecture selection</a>. It contains the falsifiable selection matrices and exact topology, normal, frame, bounds, collider-error, seed, motion, diagnostic, and lifecycle tests. Do not choose an algorithm from object category alone; choose per semantic component from the frozen view, action, tier-invariant, and target contracts.</p>
-<h2>Action-Ready Model Contract</h2>
-<p>Build every generated model as if the user may later ask for animation, transformation, physics, or destruction. Do not generate a beautiful but inert lump of meshes.</p>
-<p>Use <code>references/action-ready-models.md</code> for pivot, socket, collider, and destruction hierarchy rules.</p>
-<h3>Shared physics boundary</h3>
-<p>For any physics-facing action-ready route, first read the shared
-<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-choose-skills/references/physics-domain-and-interaction-contract.md">physics-domain and interaction contract</a>.
-The sculpt specification and <code>root.userData.sculptRuntime</code> maps are authoring
-inputs, not an independent solver ABI. Convert source dimensions once through
-the route&#39;s SI <code>PhysicsContext</code>, preserve stable component/entity generations,
-and keep visual geometry LOD separate from physical representation.</p>
-<p>The object factory publishes a <code>ColliderConstructionInput</code> for every
-physics-relevant solid, trigger, sensor, boundary, or query shape. It contains
-stable semantic and live-instance identity, explicit authoring units, a local
-authored frame, analytic or compound shape intent, physics-material binding
-request, source revision, and a conservative authored approximation envelope.
-It has no contact, rigid-body, frame-registration, or solver authority.</p>
-<p>An articulated factory may also publish a <code>ConstraintConstructionInput</code> with
-stable parent/child identities, parent- and child-local anchor frames, authored
-axis/limits/compliance intent, source units, and revision. It is not an active
-constraint, state equation, or solve claim until the selected route owner
-adapts and commits it.</p>
-<p>Only the selected route adapter may publish a canonical <code>ColliderProxy</code>, after
-it supplies the versioned <code>PhysicsContext</code>, performs the one explicit unit
-conversion, registers frame/origin/transform revisions, binds committed pose,
-cadence, validity, filters, and residency, and validates the approximation
-error. It publishes a canonical <code>RigidBodyProperties</code> record only when mass,
-center of mass, inertia, and material evidence are sufficient. A decorative
-mesh or collider-shaped <code>userData</code> object is not collision authority. Missing
-scale, density, inertia, material, or approximation evidence blocks the
-corresponding dynamic claim instead of inventing defaults.</p>
-<p>When a route-native engine or domain solver owns motion, contact, constraints,
-or fracture, register it directly as the relevant <code>PhysicsGraph</code> state owner
-with the route&#39;s ordinary versioned cost, state, and commit records. When an
-external library, process, or device owns that work, bind it through the
-canonical <code>ExternalSolverAdapter</code>, which maps exact context/frame/unit/clock/
-state versions. Contact lifecycle publishes <code>ContactManifoldRecord</code>; closed
-dimensional payloads such as impulse or <code>constraintTarget</code> publish the matching
-<code>InteractionRecord</code>. Fracture remains a named state equation or transition owned
-by the selected solver; only its supported dimensional exchanges use an
-<code>InteractionRecord</code> arm. The object-sculptor owns semantic pivots, sockets,
-collider and constraint construction inputs, fracture groups, and visual
-component identity; it does not become a contact or rigid-body solver merely
-because a model is action-ready.</p>
-<p>The adapter owner publishes <code>PhysicsExternalAdapterCost</code> in the same route
-opportunity rows as solver-driven state and presentation. Evidence includes
-request/response/batch counts, logical and physical bytes, serialization plus
-frame/unit conversion, queue/transport/ownership/fence dependencies, remote
-solve and commit tail, retries/exact-once results, in-flight/recovery memory,
-clock mapping, and process/device-loss witnesses. Geometry build time or the
-external solver&#39;s compute time alone is not the end-to-end adapter cost.</p>
-<p>Solver-driven transforms and fracture visibility contribute stable bindings as
-<code>PresentedStatePair</code> entries in a view-independent
-<code>PhysicsPresentationCandidate</code>. Rendering consumes the sealed per-target/view
-<code>PhysicsPresentationSnapshot</code>; <code>FrameExecutionRecord</code> closes actual target
-execution and resource-lease disposition. Visual meshes, shadows, bounds,
-motion vectors, picking IDs, and detachable fragments resolve the same
-presented entity/component generation instead of sampling live solver state.</p>
-<p>A physics-facing collider/body/fracture/ID or presentation-representation tier
-change uses the canonical <code>QualityTransition</code> and commits at a safe route
-boundary. A render-only tessellation or material change stays local only when
-it preserves every collider, body property, interaction identity, committed
-state, presented binding, physical error bound, and stable component ID.</p>
-<p>The spec should include <code>actionReadiness</code>, and every macro/meso component should include <code>actionProfile</code>:</p>
-<ul>
-<li><code>animationRole</code>: root, static, articulated, deformable, detachable, breakable, effect-emitter, or socket-only.</li>
-<li><code>pivot</code>: mode, local position, axis, and confidence. Use a semantic pivot such as base, hinge, joint, center of mass, branch root, handle socket, or custom.</li>
-<li><code>transformChannels</code>: whether translate, rotate, scale, bend, twist, detach, visibility, or material-state changes are expected.</li>
-<li><code>sockets</code>: named attachment points for hands, tools, branches, wheels, lids, projectiles, effects, or later child objects.</li>
-<li><code>colliderConstructionInput</code>: authoring shape intent such as box, sphere, capsule, cylinder, convex hull, compound, trigger, query, boundary, or none; include source units, local authored frame, stable identities, material-binding request, source revision, and conservative authored error envelope.</li>
-<li><code>constraints</code>: a <code>ConstraintConstructionInput</code> for authored hinge, slide, bend, spring, or parent-lock intent with stable participants, local anchor frames, axis/limits, units, and revision; it is not a solver constraint until the selected route owner adapts and commits it.</li>
-<li><code>destruction</code>: breakable flag, fracture group, seam refs, detachable fragments, break impulse, debris material, and effect anchors.</li>
-</ul>
-<p>Generation rules:</p>
-<ul>
-<li>Put each independently transformable part under a stable <code>THREE.Group</code> pivot node; put the visual mesh as its child.</li>
-<li>Store runtime maps in <code>root.userData.sculptRuntime</code>: <code>nodes</code>, <code>meshes</code>, <code>sockets</code>, <code>colliders</code>, and <code>destructionGroups</code>. Values in the <code>colliders</code> map are <code>ColliderConstructionInput</code> records, not canonical <code>ColliderProxy</code> records.</li>
-<li>Avoid merging parts that may move, detach, bend, break, swap materials, or receive independent collision later.</li>
-<li>Use procedural seams and component boundaries as future break lines; do not rely on random explosions.</li>
-<li>If the object truly has no moving parts, still include a root pivot, whole-object collider construction input, and destruction policy so later whole-object actions remain easy.</li>
-</ul>
-<h2>Self-Correction Loop</h2>
-<p>Construction must be a feedback loop, not a blind one-way generation.</p>
-<p>After every build pass, pause and review against the source image, user requirements, <code>qualityTargets.mustMatch</code>, and the current <code>ObjectSculptSpec</code>.</p>
-<p>Use this review shape:</p>
-<pre><code class="language-text">passId:
-estimatedFidelity: 0..1
-matched:
-mismatches:
-rootCause: spec gap | code gap | rendering/lighting gap | reference ambiguity | performance tradeoff
-decision: continue | refine-spec | refine-code | request-input | stop
-specFixes:
-codeFixes:
-evidence:
-visualEvidence:
-  referenceScreenshot:
-  renderScreenshot:
-  comparisonImage:
-  cameraView:
-  notes:
-  aiVisionNotes:
-aiVisionScore: 0..1
-visualAcceptanceThreshold: 0..1
-layerScores:
-  silhouetteProportion: 0..1
-  componentStructure: 0..1
-  formDetail: 0..1
-  materialSurface: 0..1
-  lightingCamera: 0..1
-featureReviews:
-  - id:
-    score: 0..1
-    visible: true
-    notes:
-</code></pre>
-<p>Decision rules:</p>
-<ul>
-<li><code>continue</code>: current pass meets its acceptance criteria and does not threaten later quality.</li>
-<li><code>refine-spec</code>: the implementation revealed the spec is wrong, incomplete, ambiguous, or missing component/material/local feature detail.</li>
-<li><code>refine-code</code>: the spec is adequate, but the generated geometry/material/lighting does not match it.</li>
-<li><code>request-input</code>: required information is hidden in the image or user expectations conflict with the available evidence.</li>
-<li><code>stop</code>: target fidelity is reached, user accepted the approximation, or remaining gaps require new references/manual art.</li>
-</ul>
-<p>When the decision is <code>refine-spec</code>, revise the spec first, re-run <code>scripts/validate_sculpt_spec.py</code>, then continue implementation. Do not patch code around a bad spec. When the decision is <code>refine-code</code>, keep the spec stable and fix the factory/material/render code.</p>
-<p>Record review entries with <code>scripts/append_sculpt_review.py</code> whenever there is a spec file. If there is no spec file yet, write the same review summary in the response before continuing.</p>
-<h3>Screenshot Feedback Gate</h3>
-<p>For browser-renderable construction, screenshots are mandatory feedback, not optional decoration. Codex should not decide that a visual pass is good enough from code inspection alone. Code must not be the final image-comparison authority: the final pass decision comes from AI vision inspecting a side-by-side reference/render sheet.</p>
-<p>Use <code>references/browser-screenshot-feedback.md</code> for the detailed screenshot comparison checklist.
-Use <code>references/material-lighting-realism.md</code> when the shape is acceptable but material, color, texture, or lighting fidelity is still weak.
-Use <code>references/attachment-joint-correctness.md</code> when parts attach to parents: branches, limbs, handles, legs, horns, wings, cables, tubes, sockets, hinged parts, or decorative appendages.</p>
-<p>Use this order:</p>
+<p>After each opened branch, compare against its identity anchors before opening the next. Refinement is complete when every applicable branch meets its local criterion, every omitted branch is inapplicable rather than forgotten, and every identity anchor remains visible or structurally represented.</p>
+<h3>6. Verify</h3>
+<p>For code, run the target repository&#39;s syntax/type/build checks and its existing capture path. Inspect the final render directly. Keep comparison camera, projection, framing, viewport, exposure, and review lighting fixed across iterations.</p>
+<p>Compare in this order:</p>
 <ol>
-<li>Render the current model in the browser or project preview.</li>
-<li>Capture a screenshot at the relevant review viewpoint from <code>qualityTargets.reviewViewpoints</code>.</li>
-<li>Select semantic review targets for this pass:<ul>
-<li><code>critical</code>: at most five identity-defining or high-risk systems; every one must pass independently.</li>
-<li><code>important</code>: review adaptively, at most three suspicious systems; their reviewed average must pass.</li>
-<li><code>detail</code>: note mismatches without blocking the pass.
-Group repeated parts into one semantic system. Do not create a target for every mesh.</li>
-</ul>
-</li>
-<li>Create one comparison artifact with <code>scripts/make_visual_comparison_sheet.py --reference &lt;image&gt; --render &lt;screenshot&gt; --out &lt;comparison.png&gt;</code>.</li>
-<li>Inspect the comparison image with Codex AI vision and score it by layer:<ul>
-<li>silhouette/proportion</li>
-<li>component placement and hierarchy</li>
-<li>local geometry features</li>
-<li>material albedo, roughness, metalness, normal/bump/displacement</li>
-<li>lighting, shadows, exposure, and camera angle</li>
-</ul>
-</li>
-<li>From that same full image pair, score every critical semantic feature independently. A failed critical feature fails the pass even when the global score is high.</li>
-<li>Classify each mismatch as a spec gap, code gap, rendering/lighting gap, reference ambiguity, or performance tradeoff.</li>
-<li>Record the screenshot pair, comparison image, overall AI vision score, layer scores, feature scores, and critique in <code>reviewHistory.visualEvidence</code> and <code>visualEvidence</code>.</li>
+<li>silhouette, proportions, and negative space;</li>
+<li>component placement, hierarchy, contacts, repeated rhythm, and any requested collider or fracture structure;</li>
+<li>form transitions and identity anchors;</li>
+<li>material response under neutral and grazing light;</li>
+<li>camera and reference-lighting match.</li>
 </ol>
-<p>Default to the Codex in-app Browser screenshot tool when available. Playwright/Chromium is not the default validation path for this skill; do not install or download a browser runtime merely to get screenshots unless the user explicitly asks for that route. If no screenshot can be captured, no comparison sheet exists, AI vision has not reviewed it, the global score is below threshold, or any critical semantic feature is below its threshold, do not choose <code>continue</code>; choose <code>refine-spec</code>, <code>refine-code</code>, <code>request-input</code>, or explain the blocker.</p>
-<p>Minimum gates:</p>
-<ol>
-<li><code>blockout</code>: screenshot proves silhouette, proportions, primitive family, and coordinate frame.</li>
-<li><code>structural-pass</code>: screenshot proves component hierarchy, parent/child placement, joints, seams, repeated systems, and stable action-ready node boundaries.</li>
-<li><code>form-refinement</code>: screenshot proves bevel/chamfer/taper/bend/deformation, local geometry features, and no floating child joints.</li>
-<li><code>material-pass</code>: screenshot proves albedo, roughness, metalness, normal/bump/displacement, AO, dirt, wear, local overrides.</li>
-<li><code>lighting-pass</code>: screenshot proves reference-independent material readability plus optional reference lighting match.</li>
-<li><code>interaction-pass</code>: screenshot or short render capture demonstrates authored preview motion, pivots, sockets, construction-input overlays, fracture seams, and detachable fragments. Structural tests—not pixels—validate IDs, local frames, exact reset, records, and tier invariants; physical validity remains blocked until the canonical route gates pass.</li>
-<li><code>optimization-pass</code>: visual-error-qualified geometry/material tiers plus sustained CPU, GPU, presentation, memory, traffic, binding, and lifecycle gates on each named device/browser/backend target.</li>
-</ol>
-<h3>Locked Build Pass Gate</h3>
-<p>The construction loop is sequential. Codex must not jump from a completed spec directly to a polished model.</p>
-<p>Before each implementation pass:</p>
-<ol>
-<li>Run <code>scripts/sculpt_pass_orchestrator.py status object-sculpt-spec.json</code>.</li>
-<li>Run <code>scripts/sculpt_pass_orchestrator.py check object-sculpt-spec.json --pass-id &lt;pass&gt;</code>.</li>
-<li>Generate or edit only the unlocked pass.</li>
-<li>Render in the Codex in-app Browser and capture screenshot evidence.</li>
-<li>Build one full reference/render comparison sheet with <code>scripts/make_visual_comparison_sheet.py</code>.</li>
-<li>Inspect it once with AI vision and record overall, layer, and critical semantic feature scores plus concrete mismatch notes.</li>
-<li>Append review with <code>scripts/append_sculpt_review.py ... --pass-id &lt;pass&gt; --action continue --render-screenshot &lt;path&gt; --comparison-image &lt;path&gt; --ai-vision-score &lt;0-1&gt; --layer-scores-json &#39;&lt;json&gt;&#39; --feature-reviews-json &lt;reviews.json&gt; --ai-vision-notes &quot;...&quot; --camera-view &lt;view&gt; --in-place</code>.</li>
-<li>Run <code>scripts/sculpt_pass_orchestrator.py sync object-sculpt-spec.json --in-place</code> when review history was edited manually.</li>
-</ol>
-<p>The default generator is pass-gated. Calling <code>generate_threejs_factory.py</code> without <code>--pass-id</code> uses <code>sculptPipeline.currentPass</code>. Calling it with a future <code>--pass-id</code> must fail until prior passes are completed. This is intentional: first sculpt the blockout, then structure, then form, then material and surface detail.</p>
-<p>Material and lighting passes have extra look-dev gates. <code>material-pass</code> must not proceed with only flat base colors; it needs palette, roughness variation, normal/bump/displacement intent, and local masks. <code>lighting-pass</code> must not proceed with ambient-only lighting; it needs key/fill/rim or environment light, exposure, tone mapping, background, shadow softness, and contact shadow behavior.</p>
-<p>When <code>lookDevTargets.qualityPriority</code> is <code>reference-fidelity</code>, apply the quality-first gate:</p>
+<p>Route each mismatch to one cause:</p>
 <ul>
-<li>important close-up materials use independent albedo, roughness, height/normal, and AO channels</li>
-<li>surface response is decomposed into macro, meso, and micro frequency bands</li>
-<li>important procedural maps are at least 1024px, preferably 2048px</li>
-<li>if a source image exists, important close-up materials have usable <code>referencePbr</code> pixel extraction with confidence &gt;= the configured target threshold, default <code>0.7</code></li>
-<li>UV/projection and texel-density intent are explicit</li>
-<li>silhouette-affecting relief uses geometry or displacement-capable topology</li>
-<li>material review includes neutral, grazing-light close-up, and reference-matched screenshots</li>
-<li>optimization happens after fidelity is accepted; do not remove reference-critical geometry merely to hit an arbitrary polygon floor</li>
+<li><code>ambiguity</code>: evidence cannot determine the answer; request a view/measurement or reduce the claim;</li>
+<li><code>decomposition</code>: a part, boundary, or identity anchor is missing or owned incorrectly; revise stage 2;</li>
+<li><code>implementation</code>: the chosen representation is correct but its geometry, material, hierarchy, or filtering is wrong; revise stages 4-5;</li>
+<li><code>camera-lighting</code>: framing, projection, exposure, or illumination prevents a fair comparison; fix the review setup before judging the model.</li>
 </ul>
-<p>Reference PBR extraction is an inference gate, not a magic guarantee. From one photo, Codex cannot uniquely recover true physical albedo, roughness, height, normal, and AO. If the extractor confidence is below the target threshold or the rendered material still fails screenshot review, choose <code>request-input</code>, <code>refine-spec</code>, or <code>refine-code</code> instead of pretending the material reached the requested fidelity.</p>
-<p>Structural and form passes have an attachment gate. Child appendages such as branches, limbs, handles, legs, horns, wings, tubes, cables, connectors, and hinged parts must include <code>attachment.parentSocket</code>, <code>localStart</code>, <code>localEnd</code>, <code>contactType</code>, <code>embedDepth</code> or <code>overlap</code>, and <code>gapTolerance</code>. The generator should build these parts from root endpoint to tip endpoint instead of centering them at an arbitrary transform.</p>
-<p>The agent should be willing to say: &quot;This cannot reach the requested fidelity from the current image.&quot; That is a valid self-correction result.</p>
-<h2>Reconstruction Strategy</h2>
-<p>Use a layered sculpting workflow:</p>
-<ol>
-<li><code>blockout</code>: build the silhouette with simple primitives and correct proportions.</li>
-<li><code>structural pass</code>: add child components, sockets, supports, hinges, handles, legs, branches, fins, or ribs.</li>
-<li><code>form refinement</code>: bevel hard edges, taper cylinders, bend tubes, add curve sweeps, add organic noise, and break perfect symmetry where the image demands it.</li>
-<li><code>surface pass</code>: add generated normal maps, procedural noise, vertex colors, bark/stone/metal/plastic/cloth patterns, scratches, wetness, dirt, edge highlights, and small repeated geometry only where it matters.</li>
-<li><code>material pass</code>: tune roughness/metalness/clearcoat/transmission/alpha so surfaces do not look like plastic unless they should.</li>
-<li><code>lighting pass</code>: separate actual object material from photo lighting; create a neutral turntable light plus optional reference-matching light.</li>
-<li><code>interaction pass</code>: add pivots, bones, collider construction inputs, animation handles, break points, and detachable fragments only when the user needs motion or destruction.</li>
-<li><code>optimization pass</code>: instance repeated details, merge static pieces where safe, and derive candidates from projected visual error before measuring the complete sustained workload on each named target.</li>
-</ol>
-<h2>Three.js Implementation Rules</h2>
-<ul>
-<li>Prefer TypeScript and plain Three.js unless the existing project uses another Three wrapper.</li>
-<li>Use <code>Group</code> factories such as <code>createObjectNameModel(spec, options)</code> rather than scattered mesh creation.</li>
-<li>Keep reconstruction data separate from renderer objects so the spec can be revised without rewriting the scene.</li>
-<li>Use deterministic seeds for procedural noise, surface variation, and repeated details.</li>
-<li>Generate unrelated PBR channels from independent deterministic fields. Never alias the albedo texture into roughness, height, normal, or AO.</li>
-<li>Use macro/meso/micro frequency bands for tactile materials; single-frequency random marks usually read as synthetic.</li>
-<li>For quality-first targets, spend polygons on silhouette-affecting relief and use 1024-2048px maps for close-up materials before reducing quality for performance.</li>
-<li>Preserve local material traits in code metadata (<code>userData</code>) even when the first generated geometry is only a blockout.</li>
-<li>For real-time scenes, prioritize silhouette and material believability over hidden micro-geometry.</li>
-<li>Use geometry primitives, <code>Shape</code> extrusions, curve/tube geometry, instancing, displacement/noise, and generated canvas textures before importing external art.</li>
-<li>Use mesh hierarchy for future animation: body root, movable limbs, hinged parts, detachable pieces, and effect emitters.</li>
-<li>For attached children, place the pivot at the attachment root/socket and orient geometry from <code>attachment.localStart</code> to <code>attachment.localEnd</code>.</li>
-<li>For destruction, define fracture groups and seams explicitly instead of randomly exploding the entire object.</li>
-<li>Add a simple reference camera/turntable or screenshot angle for visual comparison.</li>
-</ul>
-<h2>Lessons From The Pine Forest Prototype</h2>
-<p>Apply these hard-won patterns:</p>
-<ul>
-<li>Vague &quot;make it better&quot; feedback is weak. Convert visual critique into named resets: <code>Material Realism Reset</code>, <code>Silhouette Reset</code>, <code>Water Surface Reset</code>, <code>Vegetation Structure Reset</code>, etc.</li>
-<li>A believable model needs geometry, material, lighting, and scale to agree. Fixing only one layer usually makes the result look artificial.</li>
-<li>Avoid perfect procedural smoothness. Add controlled unevenness: bevel variation, color mottling, roughness variation, micro normals, dirt at seams, edge wear, and asymmetry.</li>
-<li>Keep visual progress visible in the browser. Small loops beat large invisible rewrites.</li>
-<li>Protect performance: instance repeated details, keep collision simplified, and avoid geometry that only exists to hide a bad material.</li>
-<li>When the user compares against a reference image, explicitly name the mismatch before changing code.</li>
-</ul>
-<h2>Output Format</h2>
-<p>For analysis-only requests, return:</p>
-<ol>
-<li>Suitability verdict and scores.</li>
-<li>Target object extraction.</li>
-<li>Component hierarchy from macro to micro.</li>
-<li>Geometry strategy.</li>
-<li>Material and lighting recipe.</li>
-<li>Animation/destruction feasibility.</li>
-<li>Implementation plan and risks.</li>
-</ol>
-<p>For implementation requests, do the same briefly, then edit code. Verify with typecheck/build and, when a browser scene exists, inspect screenshots or render output.</p>
-<h2>Failure Handling</h2>
-<p>If reconstruction is not feasible from the provided image, do not fake confidence. Explain the blocker and ask for one of:</p>
-<ul>
-<li>front/side/back reference images</li>
-<li>cleaner image with isolated object</li>
-<li>acceptance of a stylized approximation</li>
-<li>permission to use generated placeholder interpretation</li>
-<li>a narrower target such as only silhouette, only material study, or only animation/destruction design</li>
-</ul>
+<p>Verification is complete when the artifact passes the checks appropriate to its branch, every required view has been inspected in the stated order, every remaining mismatch has a routed correction or explicit limitation, and the final report distinguishes observed fidelity from remaining assumptions.</p>
+<h2>Result</h2>
+<p>Return the technical-readability verdict, evidence and assumptions, decomposition and identity anchors, representation decisions, branch results, verification evidence, and remaining limits. For implementation requests, edit the target code and report only checks and images actually inspected.</p>
 </div>
   <div class="pn">
     <a href="threejs-image-pipeline.html">← Image Pipeline</a>
-    <a href="threejs-particles-trails-and-effects.html">Particles, Trails, and Effects →</a>
+    <a href="threejs-particles-trails-and-effects.html">Representation-First Particles, Trails, and Effects →</a>
   </div>
 </div></div>
 
@@ -808,10 +466,16 @@ Group repeated parts into one semantic system. Do not create a target for every 
 </main>
 
 <div class="wrap"><footer>
-  <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
-  <span style="font-size:13px">Three r185.1 · 41 working implementations · build <code>6c7881ab7386</code></span><br/>
-  <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
-  <span><a href="https://threejs-skills.com/about/">About &amp; methodology</a> · <a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/llms.txt">For coding agents</a></span>
+  <div class="footer-summary">Three.js WebGPU Skill Pack: TSL, procedural graphics, and visual validation.
+    <span>Three r185.1 · 40 primary targets · 25 accepted · build <code>ab7d8d17e058</code></span>
+    <span>Compiling shaders? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span>
+  </div>
+  <div class="footer-groups">
+    <div class="footer-group"><strong>Build</strong><a href="/#skills">Skills</a><a href="/#flagships">Examples</a><a href="/industries/">Industries</a></div>
+    <div class="footer-group"><strong>Decide</strong><a href="/for/">Who it is for</a><a href="/compare/">Compare</a><a href="/alternatives/">Alternatives</a><a href="/pricing/">Pricing</a></div>
+    <div class="footer-group"><strong>Adopt</strong><a href="/docs/">Docs</a><a href="/migrate/">Migration</a><a href="/agents/">Agent docs</a><a href="/faq/">FAQ</a></div>
+    <div class="footer-group"><strong>Proof</strong><a href="/evidence/">Evidence</a><a href="/about/">Method</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a><a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/LICENSE">License</a></div>
+  </div>
 </footer></div>
 </body>
 </html>

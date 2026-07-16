@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Particles, Trails, and Effects | Three.js WebGPU Skill</title>
-<meta name="description" content="Author workload-selected WebGPU/TSL particles, trails, and real-time effects in Three.js. Use for flow-conforming shells and wakes, reentry plasma, instanced…" />
+<title>Representation-First Particles, Trails, and Effects | Three.js…</title>
+<meta name="description" content="Representation-first Three.js WebGPU/TSL particles, trails, and effects. Use for analytic or recurrent particle motion, stable-slot or scan-compacted GPU…" />
 <meta name="author" content="Three.js WebGPU Skill Pack contributors" />
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-particles-trails-and-effects.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b" />
+<meta name="skill-pack-build-revision" content="sha256:ab7d8d17e0589a6f5c2462d645b9e0d6797cd92eade36e3615dae091c6f9df5b" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -17,20 +17,26 @@
 <link rel="manifest" href="../site.webmanifest" />
 <link rel="alternate" type="text/plain" href="https://threejs-skills.com/llms.txt" title="LLM-readable skill catalog" />
 <link rel="alternate" type="application/json" href="https://threejs-skills.com/skills.json" title="Machine-readable skill catalog" />
-
+<link rel="preload" as="image" href="../visual-validation/webgpu-pooled-effects/final.design.avif" type="image/avif" fetchpriority="high" />
 <meta property="og:type" content="article" />
 <meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
-<meta property="og:title" content="Particles, Trails, and Effects | Three.js WebGPU Skill" />
-<meta property="og:description" content="Author workload-selected WebGPU/TSL particles, trails, and real-time effects in Three.js. Use for flow-conforming shells and wakes, reentry plasma, instanced…" />
+<meta property="og:title" content="Representation-First Particles, Trails, and Effects | Three.js…" />
+<meta property="og:description" content="Representation-first Three.js WebGPU/TSL particles, trails, and effects. Use for analytic or recurrent particle motion, stable-slot or scan-compacted GPU…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-particles-trails-and-effects.html" />
-<meta property="article:modified_time" content="2026-07-11T12:53:24+03:00" />
+<meta property="article:modified_time" content="2026-07-16T11:00:33+03:00" />
 <meta property="article:published_time" content="2026-07-04T23:30:20+03:00" />
 <meta property="article:section" content="Motion and Effects" />
-
-<meta name="twitter:card" content="summary" />
-<meta name="twitter:title" content="Particles, Trails, and Effects | Three.js WebGPU Skill" />
-<meta name="twitter:description" content="Author workload-selected WebGPU/TSL particles, trails, and real-time effects in Three.js. Use for flow-conforming shells and wakes, reentry plasma, instanced…" />
+<meta property="og:image" content="https://threejs-skills.com/visual-validation/webgpu-pooled-effects/final.design.png" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="800" />
+<meta property="og:image:alt" content="Pooled effects correctness presentation for Representation-First Particles, Trails, and Effects" />
+<meta name="twitter:image" content="https://threejs-skills.com/visual-validation/webgpu-pooled-effects/final.design.png" />
+<meta name="twitter:image:alt" content="Pooled effects correctness presentation for Representation-First Particles, Trails, and Effects" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Representation-First Particles, Trails, and Effects | Three.js…" />
+<meta name="twitter:description" content="Representation-first Three.js WebGPU/TSL particles, trails, and effects. Use for analytic or recurrent particle motion, stable-slot or scan-compacted GPU…" />
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
@@ -55,15 +61,20 @@
     "TechArticle"
    ],
    "@id": "https://threejs-skills.com/skills/threejs-particles-trails-and-effects.html#article",
-   "headline": "Particles, Trails, and Effects",
-   "description": "Author workload-selected WebGPU/TSL particles, trails, and real-time effects in Three.js. Use for flow-conforming shells and wakes, reentry plasma, instanced sparks, timed dissolves, GPU particle pools, deterministic compaction, and conditional scene-relative HDR emission signals.",
+   "headline": "Representation-First Particles, Trails, and Effects",
+   "description": "Representation-first Three.js WebGPU/TSL particles, trails, and effects. Use for analytic or recurrent particle motion, stable-slot or scan-compacted GPU pools, flow-conforming shells and wakes, dissolving debris, or effect-specific HDR and depth integration.",
    "url": "https://threejs-skills.com/skills/threejs-particles-trails-and-effects.html",
    "mainEntityOfPage": {
     "@type": "WebPage",
     "@id": "https://threejs-skills.com/skills/threejs-particles-trails-and-effects.html"
    },
+   "image": [
+    "https://threejs-skills.com/seo/article/threejs-particles-trails-and-effects-1x1.png",
+    "https://threejs-skills.com/seo/article/threejs-particles-trails-and-effects-4x3.png",
+    "https://threejs-skills.com/seo/article/threejs-particles-trails-and-effects-16x9.png"
+   ],
    "datePublished": "2026-07-04T23:30:20+03:00",
-   "dateModified": "2026-07-11T12:53:24+03:00",
+   "dateModified": "2026-07-16T11:00:33+03:00",
    "author": {
     "@id": "https://threejs-skills.com/#publisher"
    },
@@ -83,7 +94,7 @@
     "Three.js",
     "WebGPU",
     "TSL",
-    "Particles, Trails, and Effects"
+    "Representation-First Particles, Trails, and Effects"
    ],
    "articleSection": "Motion and Effects"
   },
@@ -105,7 +116,7 @@
     {
      "@type": "ListItem",
      "position": 3,
-     "name": "Particles, Trails, and Effects",
+     "name": "Representation-First Particles, Trails, and Effects",
      "item": "https://threejs-skills.com/skills/threejs-particles-trails-and-effects.html"
     }
    ]
@@ -140,18 +151,18 @@ html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smo
 body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7}
 ::selection{background:rgba(255,180,84,.26);color:var(--ink)}
 a{color:inherit;text-decoration:none}
-a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
+a:focus-visible,button:focus-visible,summary:focus-visible,pre[tabindex]:focus-visible,[role="region"]:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
 main{display:block}
 .skip-link{position:fixed;z-index:100;left:16px;top:12px;translate:0 -160%;font-family:var(--mono);font-size:12px;background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:9px;transition-property:translate;transition-duration:160ms}
 .skip-link:focus{translate:0 0}
 .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
 .site-nav{position:sticky;z-index:50;top:0;background:rgba(8,10,14,.82);border-bottom:1px solid rgba(255,255,255,.075);backdrop-filter:blur(18px) saturate(1.15)}
-nav{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
-nav .brand{white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
-nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
-nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
-nav .links a:hover{color:var(--amber)}
-nav .links a:active{scale:.96}
+.site-nav>.wrap{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+.site-nav .brand{min-height:44px;display:inline-flex;align-items:center;white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
+.site-nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
+.site-nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
+.site-nav .links a:hover{color:var(--amber)}
+.site-nav .links a:active{scale:.96}
 h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:0}
 p{text-wrap:pretty}
 h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
@@ -165,7 +176,7 @@ code{font-family:var(--mono)}
 .card{min-height:100%;background:linear-gradient(145deg,rgba(19,24,33,.96),rgba(12,15,21,.96));border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px;
   box-shadow:var(--shadow-card);transition-property:translate,scale,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
 .card:hover{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
-.card:active{translate:0 -1px;scale:.99}
+.card:active{translate:0 -1px;scale:.96}
 .card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .card-kind{font-family:var(--mono);font-size:10px;color:var(--cyan)}
 .card h3,.card h4{font-size:19px;font-weight:600}
@@ -190,19 +201,29 @@ figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:s
 figcaption{padding:16px 18px;font-size:14.5px}
 figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
 figcaption span{display:block;margin-top:3px;color:var(--dim)}
-footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
+footer{border-top:1px solid var(--line);padding:44px 0 60px;display:grid;grid-template-columns:minmax(260px,1.4fr) minmax(0,2fr);gap:36px 64px;color:var(--dim);font-size:14.5px}
 footer a{color:var(--amber)}
 footer a:hover{text-decoration:underline}
 footer code{color:var(--cyan);font-size:11px}
+.footer-summary{max-width:55ch}.footer-summary>span{display:block;margin-top:8px;font-size:13px}.footer-groups{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}.footer-group{display:grid;align-content:start;gap:8px}.footer-group strong{font:400 10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}.footer-group a{min-height:40px;display:flex;align-items:center;color:var(--dim);font-size:13px;transition-property:color,scale;transition-duration:160ms}.footer-group a:hover{color:var(--amber);text-decoration:none}.footer-group a:active{scale:.96}
+.pathfinder{padding:clamp(52px,7vw,86px) 0;border-bottom:1px solid var(--line)}.pathfinder-head{display:grid;grid-template-columns:minmax(0,.7fr) minmax(320px,1.3fr);align-items:end;gap:28px 72px;margin-bottom:28px}.pathfinder-head h2{margin:0}.pathfinder-head p{max-width:58ch;color:var(--dim)}.pathfinder-rows{border-top:1px solid var(--line)}.pathfinder-row{display:grid;grid-template-columns:minmax(160px,.55fr) minmax(210px,.8fr) minmax(0,1.6fr);gap:20px 32px;align-items:center;min-height:94px;border-bottom:1px solid var(--line)}.pathfinder-stage{font:10px/1.4 var(--mono);letter-spacing:.11em;text-transform:uppercase;color:var(--cyan)}.pathfinder-row>p{color:var(--dim);font-size:14px}.pathfinder-links{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px 18px}.pathfinder-links a{min-height:44px;display:inline-flex;align-items:center;gap:8px;color:var(--amber);font:11px/1.35 var(--mono);transition-property:color,scale;transition-duration:160ms}.pathfinder-links a:after{content:"→"}.pathfinder-links a:hover{color:var(--ink)}.pathfinder-links a:active{scale:.96}
+.content-hero{padding:clamp(54px,8vw,104px) 0 42px;border-bottom:1px solid var(--line)}.breadcrumbs{min-height:44px;display:flex;align-items:center;margin-bottom:28px;font:11px/1.4 var(--mono);color:var(--dim)}.breadcrumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.breadcrumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}.breadcrumbs a{min-height:40px;display:inline-flex;align-items:center;transition-property:color,scale;transition-duration:160ms}.breadcrumbs a:hover{color:var(--amber)}.breadcrumbs a:active{scale:.96}.content-hero h1{max-width:17ch;font-size:clamp(40px,6vw,68px);font-weight:700;line-height:1.02;letter-spacing:-.02em}.content-lede{max-width:66ch;margin-top:22px;color:var(--dim);font-size:clamp(17px,2vw,20px)}.content-meta{display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:28px;font:10px/1.4 var(--mono);color:var(--cyan)}
+.content-answer{max-width:900px;margin-top:34px;padding:3px 0 3px 22px;border-left:2px solid var(--amber);font-size:clamp(19px,2.2vw,21px);line-height:1.62;color:var(--ink)}.content-shell{padding:clamp(46px,7vw,86px) 0}.content-layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(230px,1fr);align-items:start;gap:clamp(36px,6vw,76px)}.content-body{grid-column:1;grid-row:1;max-width:78ch;min-width:0}.content-body h2{margin:52px 0 16px;font-size:clamp(27px,3.5vw,39px);scroll-margin-top:112px}.content-body>h2:first-child{margin-top:0}.content-body h3{margin:34px 0 12px;font-size:21px;scroll-margin-top:112px}.content-body p,.content-body li{color:var(--dim);font-size:16px}.content-body p+p{margin-top:17px}.content-body ul,.content-body ol{margin:16px 0;padding-left:24px}.content-body li+li{margin-top:7px}.content-body a{color:var(--cyan);text-decoration:underline;text-decoration-color:rgba(127,212,193,.35);text-underline-offset:3px}.content-body a:hover{color:var(--amber);text-decoration-color:currentColor}.content-body code:not(pre code){padding:1px 5px;border:1px solid var(--line);border-radius:5px;background:#07090c;color:var(--cyan);font-size:.86em}.content-body pre{margin:20px 0;white-space:pre;tab-size:2}.content-table{max-width:100%;margin:22px 0;overflow-x:auto;border:1px solid var(--line);border-radius:12px}.content-table:focus-visible{outline:2px solid var(--amber);outline-offset:3px}.content-table table{width:100%;border-collapse:collapse;font-size:14px}.content-table th,.content-table td{min-width:150px;padding:11px 13px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);text-align:left;vertical-align:top;color:var(--dim)}.content-table th{color:var(--ink);font-weight:600;background:var(--bg2)}.content-table tr:last-child td{border-bottom:0}.content-table th:last-child,.content-table td:last-child{border-right:0}
+.content-index{grid-column:2;grid-row:1;position:sticky;top:104px;max-height:calc(100vh - 128px);overflow-y:auto;padding:18px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.content-index strong{display:block;margin-bottom:10px;font:10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}.content-index ol{list-style:none}.content-index a{min-height:40px;display:flex;align-items:center;padding:5px 0;color:var(--dim);font-size:13px;line-height:1.4;transition-property:color,translate,scale;transition-duration:160ms}.content-index a:hover{color:var(--amber);translate:3px 0}.content-index a:active{translate:1px 0;scale:.96}.content-proof{margin:54px 0 0}.content-proof figure{border-radius:16px}.content-proof img{width:100%;height:auto;max-height:650px;object-fit:cover;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}.content-proof figcaption{color:var(--dim);font:11px/1.55 var(--mono)}.content-proof figcaption a{color:var(--amber)}
+.content-layout--docs{grid-template-columns:minmax(190px,.6fr) minmax(0,2fr)}.content-layout--docs .content-index{grid-column:1}.content-layout--docs .content-body{grid-column:2;max-width:72ch}.docs-index a{padding-inline:10px;border-left:2px solid transparent}.docs-index a[aria-current="page"]{border-left-color:var(--amber);background:rgba(255,180,84,.06);color:var(--ink);font-weight:600}.docs-index-current{display:none}
+.content-facts,.content-faq-list,.content-related,.content-sources,.content-skills,.content-demos,.content-discovery,.faq-provenance{margin-top:54px;padding-top:22px;border-top:1px solid var(--line)}.content-facts h2,.content-faq-list h2,.content-related h2,.content-sources h2,.content-skills h2,.content-demos h2{font-size:24px}.content-ruled-list{list-style:none;border-top:1px solid var(--line)}.content-ruled-list li{border-bottom:1px solid var(--line)}.content-ruled-list a{min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:9px 0;color:var(--dim);font-size:14px;transition-property:color,scale;transition-duration:160ms}.content-ruled-list a:after{content:"→";color:var(--amber)}.content-ruled-list a:hover{color:var(--ink)}.content-ruled-list a:active{scale:.96}.content-related .content-ruled-list a{display:grid;grid-template-columns:104px minmax(0,1fr) auto}.content-related-family{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}.content-faq-item{padding:22px 0;border-bottom:1px solid var(--line)}.content-faq-item h3{margin:0;font-size:20px}.content-faq-item h3 a{color:var(--ink)}.content-faq-item p{margin-top:9px;color:var(--dim);font-size:15px}.faq-provenance{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);padding:0}.faq-provenance div{padding:13px;background:var(--bg2)}.faq-provenance dt{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}.faq-provenance dd{margin-top:5px;font:11px/1.45 var(--mono);color:var(--cyan);overflow-wrap:anywhere}.content-discovery{display:flex;flex-wrap:wrap;gap:10px 22px;font:11px/1.5 var(--mono);color:var(--dim)}.content-discovery a{min-height:40px;display:inline-flex;align-items:center;color:var(--amber)}
 @media (max-width:760px){
   .site-nav .wrap{padding-right:0}
-  nav{min-height:104px;display:grid;grid-template-columns:1fr;padding:14px 0 10px;gap:4px}
-  nav .brand{font-size:16px}
-  nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:none;padding-right:20px}
-  nav .links::-webkit-scrollbar{display:none}
-  nav .links a{flex:0 0 auto}
+  .site-nav>.wrap{min-height:104px;display:grid;grid-template-columns:1fr;padding-top:14px;padding-bottom:10px;gap:4px}
+  .site-nav .brand{font-size:16px}
+  .site-nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;scrollbar-color:rgba(255,180,84,.45) transparent;padding:0 20px 4px 0}
+  .site-nav .links::-webkit-scrollbar{height:3px}.site-nav .links::-webkit-scrollbar-thumb{background:rgba(255,180,84,.45);border-radius:99px}
+  .site-nav .links a{flex:0 0 auto}
   .grid,.gallery{grid-template-columns:1fr}
+  footer{grid-template-columns:1fr}.footer-groups{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+@media (max-width:900px){.pathfinder-head,.content-layout{grid-template-columns:1fr}.content-index{grid-column:1;grid-row:1;position:static;max-height:none}.content-body,.content-layout--docs .content-body{grid-column:1;grid-row:2}.docs-index{overflow:hidden}.docs-index-current{display:flex;margin-bottom:8px}.docs-index ol{display:flex;gap:8px;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;padding-bottom:6px}.docs-index li{flex:0 0 min(72vw,260px)}.docs-index .docs-index-list-current{display:none}.docs-index a{min-height:44px;padding:8px 10px;border-left:0;border-bottom:2px solid transparent;background:var(--bg2)}.docs-index a[aria-current="page"]{border-bottom-color:var(--amber)}.pathfinder-row{grid-template-columns:minmax(160px,.6fr) minmax(0,1fr)}.pathfinder-links{grid-column:1/-1;justify-content:flex-start;padding-bottom:18px}.faq-provenance{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.pathfinder-row{grid-template-columns:1fr;gap:6px;padding:18px 0}.pathfinder-links{grid-column:auto;padding:0}.content-hero h1{font-size:clamp(38px,12vw,54px)}.content-answer{padding-left:16px}.content-table{border-radius:8px}.content-table table{min-width:680px}.faq-provenance{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
@@ -217,7 +238,7 @@ header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
   linear-gradient(90deg,rgba(10,12,16,.96) 0%,rgba(10,12,16,.8) 36%,rgba(10,12,16,.24) 68%,rgba(10,12,16,.04) 100%),
   linear-gradient(0deg,rgba(10,12,16,.9) 0%,rgba(10,12,16,.08) 65%,rgba(10,12,16,.62) 100%);z-index:1}
 .crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}.crumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.crumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}
-.crumbs a:hover{color:var(--amber)}
+.crumbs a{min-height:40px;display:inline-flex;align-items:center}.crumbs a:hover{color:var(--amber)}
 h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:0;max-width:18ch}
 .lede{margin-top:24px;max-width:70ch;color:var(--dim)}
 .meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
@@ -257,6 +278,7 @@ a.chip:active{scale:.96}
 .runtime-evidence-disclosure dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;margin-top:16px;overflow:hidden;border-radius:10px;background:var(--line)}.runtime-evidence-disclosure dl div{padding:11px 12px;background:var(--bg2)}.runtime-evidence-disclosure dt{font:10px/1.35 var(--mono);color:var(--dim)}.runtime-evidence-disclosure dd{margin-top:4px;font:500 10px/1.35 var(--mono);color:var(--amber)}.runtime-evidence-disclosure dd[data-verdict="PASS"]{color:var(--lime)}
 .runtime-evidence-disclosure ul{margin:15px 0 0;padding-left:20px}.runtime-evidence-disclosure li{margin-top:5px;color:var(--dim);font-size:14px}
 .evidence-report-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:10px}.evidence-report-links a{display:grid;gap:6px;min-height:72px;padding:14px;border:1px solid var(--line);border-radius:11px;background:var(--bg2)}.evidence-report-links code{color:var(--cyan);font:11px/1.4 var(--mono);overflow-wrap:anywhere}.evidence-report-links span{color:var(--dim);font:10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.05em}
+.skill-guides{margin-top:52px;padding-top:22px;border-top:1px solid var(--line)}.skill-guides h3{font-size:22px}.skill-guides ul{margin-top:12px;list-style:none;border-top:1px solid var(--line)}.skill-guides li{border-bottom:1px solid var(--line)}.skill-guides a{min-height:52px;display:grid;grid-template-columns:120px minmax(0,1fr);align-items:center;gap:18px;color:var(--dim);font-size:14px;transition-property:color,scale;transition-duration:160ms}.skill-guides a span{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}.skill-guides a:hover{color:var(--amber)}.skill-guides a:active{scale:.96}
 @media (max-width:720px){
   .skill-hero{min-height:auto;padding:58px 0 52px}
   .skill-hero-bg{opacity:.3}
@@ -267,43 +289,48 @@ a.chip:active{scale:.96}
 </style>
 </head>
 <body>
-<a class="skip-link" href="#main-content">Skip to content</a><div class="site-nav"><div class="wrap"><nav aria-label="Primary navigation">
-  <a class="brand" href="../">Three.js WebGPU Skill&nbsp;Pack</a>
-  <div class="links"><a href="../#matrix">How it works</a><a href="../#flagships">Examples</a><a href="../#skills">Skills</a><a href="../#labs">Labs</a><a href="../evidence/">Evidence</a><a href="../#install">Install</a><a href="../about/">Method</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
-</nav></div></div>
+<a class="skip-link" href="#main-content">Skip to content</a><header class="site-nav"><div class="wrap">
+  <a class="brand" href="/">Three.js WebGPU Skill&nbsp;Pack</a>
+  <nav class="links" aria-label="Primary navigation"><a href="/#flagships">Examples</a><a href="/#skills">Skills</a><a href="/guides/">Guides</a><a href="/evidence/">Evidence</a><a href="/#install">Install</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub</a></nav>
+</div></header>
 
 <main id="main-content" tabindex="-1">
-<header class="">
+<header class="skill-hero">
+  <picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-pooled-effects/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-pooled-effects/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-pooled-effects/final.design.png" alt="" class="skill-hero-bg" aria-hidden="true" width="1200" height="800" fetchpriority="high" decoding="async" />
+        </picture>
   <div class="wrap">
-    <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Motion and Effects</a></li><li aria-current="page">Particles, Trails, and Effects</li></ol></nav>
-    <h1 style="view-transition-name:skill-threejs-particles-trails-and-effects">Particles, Trails, and Effects</h1>
-    <p class="lede">Author workload-selected WebGPU/TSL particles, trails, and real-time effects in Three.js. Use for flow-conforming shells and wakes, reentry plasma, instanced sparks, timed dissolves, GPU particle pools, deterministic compaction, and conditional scene-relative HDR emission signals.</p>
+    <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Motion and Effects</a></li><li aria-current="page">Representation-First Particles, Trails, and Effects</li></ol></nav>
+    <h1 style="view-transition-name:skill-threejs-particles-trails-and-effects">Representation-First Particles, Trails, and Effects</h1>
+    <p class="lede">Representation-first Three.js WebGPU/TSL particles, trails, and effects. Use for analytic or recurrent particle motion, stable-slot or scan-compacted GPU pools, flow-conforming shells and wakes, dissolving debris, or effect-specific HDR and depth integration.</p>
+    <p class="hero-evidence-caption">Image: Pooled effects correctness presentation. Source lab: webgpu-pooled-effects.</p>
     <div class="meta-row">
       <span class="chip a">$threejs-particles-trails-and-effects</span>
-      <span class="chip">1 primary implementation</span>
-<span class="chip">1 flagship</span>
-<span class="chip">1 secondary surface</span>
+      <span class="chip">1 primary target</span>
+      <span class="chip">1 flagship</span>
+      <span class="chip">1 secondary surface</span>
       <span class="chip">native evidence pending</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-11T12:53:24+03:00">2026-07-11</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/328ff089eb9d3044c570c171e5657b29ddc35ea7">commit 328ff08 ↗</a>
-      <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-particles-trails-and-effects/SKILL.md">SKILL.md on GitHub ↗</a>
-      <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-particles-trails-and-effects/SKILL.md">raw (for agents) ↗</a>
+      <span class="chip">Latest skill update <time datetime="2026-07-16T11:00:33+03:00">2026-07-16</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/2ce13bcc22695dafa808d6019452752d9a39cc71">commit 2ce13bc ↗</a>
+      <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-particles-trails-and-effects/SKILL.md">SKILL.md on GitHub ↗</a>
+      <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/skills/threejs-particles-trails-and-effects/SKILL.md">raw (for agents) ↗</a>
     </div>
   </div>
 </header>
 
 
   <section class="section" id="primary-implementations" aria-labelledby="primary-implementations-title"><div class="wrap">
-    <h2 id="primary-implementations-title">Primary implementation surface</h2>
-    <p class="sub">These routes are generated from canonical source. Their exact status remains separate from implementation availability.</p>
+    <h2 id="primary-implementations-title">Primary target surface</h2>
+    <p class="sub">These rendering routes are generated from canonical source. Native-WebGPU acceptance remains separate from entrypoint availability.</p>
     <div class="grid">
       <a class="card" href="../demos/webgpu-pooled-effects/">
-        <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="webgpu-pooled-effects">
-    <span class="primary-evidence-label">Canonical capture</span>
-    <strong>Runtime evidence pending</strong>
-    <span><code>acc472f7c027</code> source hash</span>
-    <span>17 fixed states · 7 runtime proof requirements</span>
-  </span>
+        <span class="card-preview-wrap" data-preview-for="webgpu-pooled-effects" data-preview-source="webgpu-pooled-effects" data-preview-classification="inspected-runtime-evidence-preview"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-pooled-effects/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-pooled-effects/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-pooled-effects/final.design.png" alt="Pooled effects correctness presentation for WebGPU Pooled Effects" class="card-preview" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><span class="media-caption">Pooled effects correctness presentation</span></span>
         <span class="card-head"><span class="card-kind">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
         <h3>WebGPU Pooled Effects</h3>
         <p>7 fixed scenarios, 7 mechanism routes, and 3 locked tiers.</p>
@@ -320,7 +347,7 @@ a.chip:active{scale:.96}
         <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="relativistic-space-shot">
     <span class="primary-evidence-label">Canonical capture</span>
     <strong>Runtime evidence pending</strong>
-    <span><code>5fe1522e9185</code> source hash</span>
+    <span><code>e2e9d6b673af</code> source hash</span>
     <span>10 fixed states · 4 runtime proof requirements</span>
   </span>
         <span class="card-head"><span class="card-kind">Relativistic cinematic</span><span class="status status--pending">Evidence pending</span></span>
@@ -333,7 +360,7 @@ a.chip:active{scale:.96}
   <section class="section" id="evidence-reports" aria-labelledby="evidence-reports-title"><div class="wrap">
     <h2 id="evidence-reports-title">Evidence reports</h2>
     <p class="sub">Source hashes, claim verdicts, promoted same-lab media, fixed routes, exact tier contracts, and current limitations.</p>
-    <nav class="evidence-report-links" aria-label="Evidence reports for Particles, Trails, and Effects"><a href="../evidence/webgpu-pooled-effects/"><code>webgpu-pooled-effects</code><span>evidence pending</span></a><a href="../evidence/relativistic-space-shot/"><code>relativistic-space-shot</code><span>evidence pending</span></a></nav>
+    <nav class="evidence-report-links" aria-label="Evidence reports for Representation-First Particles, Trails, and Effects"><a href="../evidence/webgpu-pooled-effects/"><code>webgpu-pooled-effects</code><span>evidence pending</span></a><a href="../evidence/relativistic-space-shot/"><code>relativistic-space-shot</code><span>evidence pending</span></a></nav>
   </div></section>
 
   <div class="section" id="approach"><div class="wrap">
@@ -356,349 +383,249 @@ bloom reveals that hierarchy rather than inventing one.</p></div>
 
   <div class="section" id="validation"><div class="wrap">
     <h2>Preview and evidence ledger</h2>
-    <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; canonical acceptance still requires render-target readback and a schema-v2 bundle.</p>
-    <div class="evidence-ledger"><span class="status status--pending">Canonical runtime evidence pending</span><code>0 published images</code></div>
-
-    <div class="primary-evidence-panel" data-evidence-state="incomplete"><span class="primary-evidence-label">Same-lab evidence</span><strong>No runtime image promoted</strong><span>The page remains image-free until this skill's own lab supplies hash-bound pixels.</span></div>
+    <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; rendering acceptance still requires same-lab readback and a schema-v2 bundle.</p>
+    <div class="evidence-ledger"><span class="status status--pending">Canonical runtime evidence pending</span><code>8 published images</code></div>
+<div class="runtime-evidence-disclosures">
+      <article class="runtime-evidence-disclosure" data-acceptance-status="incomplete">
+        <div class="runtime-evidence-head"><div><code>Native WebGPU runtime evidence preview</code><h3>WebGPU Pooled Effects</h3></div><span class="status status--pending">Evidence pending</span></div>
+        <dl><div><dt>visualCorrectness</dt><dd data-verdict="INSUFFICIENT_EVIDENCE">INSUFFICIENT_EVIDENCE</dd></div><div><dt>mechanismCorrectness</dt><dd data-verdict="INSUFFICIENT_EVIDENCE">INSUFFICIENT_EVIDENCE</dd></div><div><dt>performanceCompliance</dt><dd data-verdict="NOT_CLAIMED">NOT_CLAIMED</dd></div><div><dt>gpuAttribution</dt><dd data-verdict="NOT_CLAIMED">NOT_CLAIMED</dd></div><div><dt>lifecycleStability</dt><dd data-verdict="INSUFFICIENT_EVIDENCE">INSUFFICIENT_EVIDENCE</dd></div></dl>
+        <ul><li>Current-source correctness capture validates under lab validate:artifacts with legacy-v2 evidence-manifest bound to canonical sourceHash.</li><li>Mechanism/visual claims remain INSUFFICIENT_EVIDENCE; GPU timestamps NOT_CLAIMED.</li><li>Not a publishable release-bundle.</li></ul>
+      </article></div>
+    <div class="gallery">
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-pooled-effects" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-pooled-effects/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-pooled-effects/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-pooled-effects/final.design.png" alt="Representation-First Particles, Trails, and Effects: Pooled effects correctness presentation" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Pooled effects correctness presentation</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-pooled-effects" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-pooled-effects/no-post.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-pooled-effects/no-post.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-pooled-effects/no-post.design.png" alt="Representation-First Particles, Trails, and Effects: No-post baseline." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>No-post baseline.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-pooled-effects" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-pooled-effects/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-pooled-effects/diagnostics.mosaic.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-pooled-effects/diagnostics.mosaic.png" alt="Representation-First Particles, Trails, and Effects: Diagnostic mosaic." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Diagnostic mosaic.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-pooled-effects" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-pooled-effects/mechanism.impact-sparks.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-pooled-effects/mechanism.impact-sparks.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-pooled-effects/mechanism.impact-sparks.png" alt="Representation-First Particles, Trails, and Effects: Impact-sparks mechanism." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Impact-sparks mechanism.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-pooled-effects" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-pooled-effects/mechanism.debris-dissolve.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-pooled-effects/mechanism.debris-dissolve.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-pooled-effects/mechanism.debris-dissolve.png" alt="Representation-First Particles, Trails, and Effects: Debris-dissolve mechanism." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Debris-dissolve mechanism.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-pooled-effects" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-pooled-effects/mechanism.gpu-pool-and-compaction.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-pooled-effects/mechanism.gpu-pool-and-compaction.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-pooled-effects/mechanism.gpu-pool-and-compaction.png" alt="Representation-First Particles, Trails, and Effects: GPU pool compaction mechanism." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>GPU pool compaction mechanism.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-pooled-effects" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-pooled-effects/tier.ultra.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-pooled-effects/tier.ultra.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-pooled-effects/tier.ultra.png" alt="Representation-First Particles, Trails, and Effects: Ultra tier frame." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Ultra tier frame.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-pooled-effects" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-pooled-effects/tier.medium.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-pooled-effects/tier.medium.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-pooled-effects/tier.medium.png" alt="Representation-First Particles, Trails, and Effects: Medium tier frame." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Medium tier frame.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure></div>
   </div></div>
 
 <div class="section" id="skill-text"><div class="wrap">
   <h2>The full skill</h2>
-  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
-  <div class="skilltext"><h2>Particles, Trails, and Effects</h2>
-<p>Use <code>$threejs-choose-skills</code> preflight when an effect also needs custom
-atmosphere, shadows, camera staging, temporal surfaces, precipitation, or
-post-stack architecture. This skill owns object-space plasma, generated wakes,
-analytic sparks, pooled debris, lifetime compaction, and scene-relative HDR
-emission for effects.</p>
-<p>When particles collide with world geometry or exchange physical sources, read
-the shared
-<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-choose-skills/references/physics-domain-and-interaction-contract.md">physics domain and interaction contract</a>.
-Consume a registered <code>ColliderProxy</code> with its canonical frame/origin,
-topology/pose versions, swept bounds, physics material, residency, and error;
-query <code>SupportSurfaceSample</code> separately with its descriptor,
-<code>sampleInstant: PhysicsInstant</code>, footprint, validity, and per-channel error.
-Weather-coupled dynamics consume the route&#39;s immutable
-<code>EnvironmentForcingSnapshot</code>; aerodynamic force uses same-frame relative air
-velocity plus density, while direction-only visuals make no force claim.
-Emit typed <code>InteractionRecord</code>
-values only to the owning domain. A depth hit, visual spark, or wake ribbon is
-not an impulse, mass source, or equal-and-opposite reaction unless that record
-and schedule exist.</p>
-<p>On a contact-capable route, the declared collision owner publishes each
-<code>ContactManifoldRecord</code> with its manifold generation, lifecycle interval,
-collider features, material-state versions, solver-law revision, and emitted
-interaction IDs; an effect consumer does not own its warm start or impulses.
-Both contact sides resolve their <code>PhysicsMaterialId</code> and state versions through
-the route-owned <code>PhysicsMaterialRegistry</code>, whose pair resolver latches the
-constitutive laws for the application interval instead of inferring them from
-PBR appearance. The coordinator places collision, effect, and exchange work in
-the <code>PhysicsGraph</code> with typed version edges and dependency completions, so only
-committed outputs can feed later interaction or presentation stages.</p>
-<h2>Conditional Shared-Physics Contract</h2>
-<p>Apply this section only when particle/effect state participates in physical
-coupling; a purely visual analytic effect remains local.</p>
+  <p class="sub">The complete SKILL.md as loaded by agents, rendered verbatim.</p>
+  <div class="skilltext"><h2>Representation-First Particles, Trails, and Effects</h2>
+<p>Own GPU-resident object- and world-space effects: spawn, motion, lifetime,
+compaction, draw representation, depth/blend behavior, and scene-linear HDR
+emission. Route viewport history to <code>$threejs-dynamic-surface-effects</code>, weather
+accumulation to <code>$threejs-rain-snow-and-wet-surfaces</code>, authored event motion to
+<code>$threejs-procedural-motion-systems</code>, and shared post ownership to
+<code>$threejs-image-pipeline</code> or <code>$threejs-bloom</code>.</p>
+<p>When an effect consumes collision, forcing, or exchange owned by another
+system, close this local handoff before step 1:</p>
 <ul>
-<li>Register coupled ingest, forcing, solve, exchange, commit, and publication
-work as explicit <code>PhysicsGraphStage</code> entries. Each <code>PhysicsStageExecution</code>
-carries exact native and coordination-coverage intervals inside one
-<code>PhysicsCoordinationAdvanceRecord</code>; the render loop consumes
-publications and must not double-dispatch a stage, discard catch-up debt, or
-derive solver progress from rendered-frame delta.</li>
-<li>Treat forcing and provider inputs as immutable graph reads with exact signal,
-version, frame, origin epoch, interval, validity, and error. A draw callback,
-material node, or pool kernel does not ad hoc sample or mutate the provider.</li>
-<li>Cross-owner transfer uses one <code>SurfaceExchange</code> containing typed
-<code>InteractionRecord</code> values. Source and reaction directions are explicit;
-required reactions are atomic through <code>InteractionReactionGroup</code>. The batch
-publisher owns sequence allocation and <code>InteractionBatchLedger</code>; the target
-state-equation owner records exact-once acceptance in
-<code>InteractionApplicationLedger</code>. Repeated render frames cannot replay a batch,
-and skipped frames cannot drop it.</li>
-<li>Publish coupled pool state through <code>PresentationTimeCohort</code>,
-<code>PhysicsPresentationCandidate</code>, <code>PresentedStatePair</code>, and
-<code>PresentationResourceLease</code>; publish Camera/ViewPreparation records, seal the
-target/view <code>PhysicsPresentationSnapshot</code>, admit its
-<code>PresentationRenderPlan</code> and frame slot, then append <code>FrameExecutionRecord</code>.
-Never render from mutable authoritative pool state
-or reuse a leased generation before its completion join.</li>
-<li>A physics-facing change to pool capacity, cadence, filter, stable-ID policy,
-error bound, event delivery, or presentation representation requires an
-admitted <code>QualityTransition</code>. Render-only density, shading, or post quality
-remains local only when physical observables, provider contracts, IDs, event
-cursors, and error bounds are unchanged.</li>
+<li>name the quantity and units, producer frame/origin, transform revision, and
+origin generation;</li>
+<li>name the half-open source interval, cadence, sample phase, immutable producer
+version, and permitted pool consumer;</li>
+<li>declare support/filter, validity, staleness, error, and missing/overflow
+policy;</li>
+<li>mark one-way reads or name the two-way source/reaction owners, application
+order, and applied state version;</li>
+<li>bind the GPU resource generation, producing and consuming passes, completion
+dependency, and reset on discontinuity, rebase, or generation change while
+keeping the steady frame readback-free.</li>
 </ul>
-<h2>Choose Simulation And Compaction Classes First</h2>
+<p>The source owner retains authority; the pool consumes immutable publications.
+Invoke <code>$threejs-choose-skills</code> when the route needs additional system owners.
+Then read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-particles-trails-and-effects/references/particles-trails-and-effects-system.md#coupled-inputs">coupled inputs</a>
+for effect-specific ownership and degradation rules.</p>
+<h2>Process</h2>
+<h3>1. Define the observable and its owners</h3>
+<p>Write one effect contract containing:</p>
+<ul>
+<li>the event interval, deterministic seed, effect class, transform, and
+flow/impact direction;</li>
+<li>the coordinate frame, distance/time units, lifetime clock, and seek/reset
+behavior;</li>
+<li>the visible roles: silhouette, motion, illumination, residue, or occlusion;</li>
+<li>the depth-test, depth-write, blend/order, HDR signal, and final-output owner;</li>
+<li>any external producer and whether the pool is presentation-only or backed by
+a separately owned physical body.</li>
+</ul>
+<p>The step is complete when every visible or physical claim has one owner and
+every input has a frame, time, validity policy, and consumer.</p>
+<h3>2. Select motion and neighborhood representation</h3>
+<p>Choose the least writable state that represents the mechanism:</p>
 <table>
 <thead>
 <tr>
-<th>State or coupling</th>
-<th>Fastest correct representation</th>
-<th>Reject</th>
+<th>Mechanism</th>
+<th>Representation</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>Motion is a pure function of spawn data and time</td>
-<td>Immutable spawn buffer; evaluate position, age, and size analytically in vertex TSL</td>
-<td>A compute write of every particle every frame</td>
+<td>Pose and appearance are pure functions of spawn data and time</td>
+<td>Immutable spawn records; evaluate analytically in vertex TSL</td>
 </tr>
 <tr>
-<td>State evolves independently per particle</td>
-<td>One compute integration dispatch over a structure-of-arrays hot set</td>
-<td><code>Object3D</code> updates or matrix uploads</td>
+<td>State recurs independently per particle</td>
+<td>Structure-of-arrays hot state; one named compute integration stage</td>
 </tr>
 <tr>
-<td>Particles collide with a field or surface</td>
-<td>Compute state plus the field/depth representation that owns the collision</td>
-<td>CPU readback of positions</td>
+<td>Collision or field feedback changes state</td>
+<td>Recurrent state plus the owning GPU field/proxy at the same frame and sample time</td>
 </tr>
 <tr>
 <td>Neighbor interactions matter</td>
-<td>Spatial hash/grid or sort-and-scan before local interaction</td>
-<td>An all-pairs <code>O(N^2)</code> shader loop</td>
+<td>Spatial grid/hash or sort-and-scan before bounded local interaction</td>
 </tr>
 </tbody></table>
-<p>Choose compaction independently. Stable slots plus an alive bit win when dead
-vertex/overdraw cost is below a scan/scatter. When a dense output materially
-saves work, use mark -&gt; exclusive scan -&gt; scatter into a second buffer and
-write the resulting live/indirect count. Dense-swap is valid only for a
-serialized removal queue or a proven atomic protocol with unique source and
-destination ownership; naively decrementing a shared tail from many
-invocations is a race.</p>
-<h2>Architecture First</h2>
-<p>Start with the architecture selected above, then scale quality inside it:</p>
-<pre><code class="language-text">event envelope + seed
-  -&gt; analytic evaluation or compute spawn/update into storage
-  -&gt; stable alive slots or mark/scan/scatter compaction when it earns its cost
-  -&gt; visible range rendered by SpriteNodeMaterial or instanced NodeMaterial
-  -&gt; hull-conforming shell/wake displacement in TSL
-  -&gt; scene-linear HDR output; optional selective emissive signal only when required
-  -&gt; RenderPipeline bloom/other consumers and final output transform
-</code></pre>
-<p>Do not teach CPU-per-object effects at scale. The recurrent high-count path uses
-fixed-capacity spatial pages with seeded spawn packets and one draw per visible
-compatible representation page.
-Static parameters are generated once; analytic motion stays read-only, while
-compute updates only state that genuinely recurs. Compaction is optional and
-must remove more draw work than its scan/scatter costs.</p>
-<p>Use <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-particles-trails-and-effects/references/particles-trails-and-effects-system.md">references/particles-trails-and-effects-system.md</a>
-for the full implementation contract: reentry shell/wake representation,
-compute pool layout, stable-slot/scan-compaction invariants, depth policy, budgets, diagnostics,
-and the replaced techniques from the historical implementation.</p>
-<p>Canonical WebGPU lab: <code>examples/webgpu-pooled-effects/</code>. It contains prebound
-SoA A/B state, ordered mark/two-level exclusive-scan/scatter kernels,
-stable entity IDs backed by an atomic GPU free stack, deterministic event
-expansion, indirect spark/debris render objects, and the hull-shell/wake stage.
-Motion, appearance, and identity scatter are split so every kernel stays at or
-below seven storage-buffer bindings. Its CPU oracles prove invariants only; canonical
-acceptance still requires the native-browser readback/timing evidence named by
-<code>lab.manifest.json</code>. Indirect meshes retain frustum culling through conservative
-event-envelope bounds, and evidence keeps pool, draw-consumption, hull,
-dissolve/shadow, depth, and emissive claims separate.</p>
-<p>Legacy WebGL implementation (deprecated, do not extend): <code>examples/reentry-plasma/reentry-plasma.js</code></p>
-<p>Historical rename only: <code>PostProcessing</code> was renamed to <code>RenderPipeline</code>; new
-systems use <code>RenderPipeline</code>.</p>
-<h2>Mandatory Baseline</h2>
-<ul>
-<li>Renderer: <code>WebGPURenderer</code> from <code>three/webgpu</code>; call <code>await renderer.init()</code>.</li>
-<li>Materials: TSL from <code>three/tsl</code> with <code>SpriteNodeMaterial</code>,
-<code>MeshBasicNodeMaterial</code>, <code>MeshStandardNodeMaterial</code>, or
-<code>MeshPhysicalNodeMaterial</code>.</li>
-<li>Compute: TSL <code>Fn().compute(count)</code>, queued <code>renderer.compute()</code>, <code>storage()</code>
-nodes, <code>StorageInstancedBufferAttribute</code>
-for instance-visible state, and <code>StorageTexture</code> only when the effect is a
-texture field.</li>
-<li>Rendering: <code>InstancedMesh</code> or sprite batches backed by storage attributes.
-Stable slots draw a capacity/last-occupied range and reject inactive records;
-dense GPU compaction publishes an indirect instance count through
-<code>IndirectStorageBufferAttribute</code> + <code>geometry.setIndirect()</code>. Do not read back
-a GPU count to set <code>mesh.count</code> in the frame loop.</li>
-<li>Post: <code>RenderPipeline</code>, <code>pass()</code>, conditional <code>mrt()</code>,
-<code>outputColorTransform</code> or <code>renderOutput()</code>. Full-scene HDR bloom needs no
-emissive MRT; selective bloom allocates it only with a proven consumer,
-transparent blend contract, and tile-traffic A/B.</li>
-<li>Built-ins first: use <code>BloomNode</code> for bloom, <code>TRAANode</code> when the post stack
-needs temporal reprojection, <code>GTAONode</code> for shared scene grounding, and
-<code>$threejs-scalable-real-time-shadows</code> for <code>CSMShadowNode</code> / <code>TileShadowNode</code> decisions.</li>
-</ul>
-<h2>Capability Gate</h2>
-<p>Every compute/storage/MRT particle-and-effect system includes this gate:</p>
-<pre><code class="language-js">await renderer.init();
-
-if (renderer.backend.isWebGPUBackend !== true) {
-  throw new Error(
-    &#39;WebGPU is required for the canonical particle/effect path; route explicit fallback teaching to threejs-compatibility-fallbacks.&#39;
-  );
-}
-</code></pre>
-<p>Quality tiers preserve the effect mechanism and change representation:</p>
+<p>Select allocation independently:</p>
 <table>
 <thead>
 <tr>
-<th>Tier</th>
-<th>State</th>
-<th>Shell/wake</th>
-<th>Field/post policy</th>
+<th>Occupancy behavior</th>
+<th>Allocation/compaction</th>
 </tr>
 </thead>
 <tbody><tr>
-<td><code>full</code></td>
-<td>analytic or recurrent as required</td>
-<td>all mechanism layers that pass isolation tests</td>
-<td>keep only sampled field bands; post follows authored HDR signal</td>
+<td>Holes cost less than scan/scatter traffic</td>
+<td>Stable slots, generation-bearing identity, alive flag, and bounded visible range</td>
 </tr>
 <tr>
-<td><code>balanced</code></td>
-<td>same dynamics with bounded active windows/cadence</td>
-<td>merge layers below the image-error gate</td>
-<td>lower field/history extent after temporal tests</td>
+<td>Dense output materially reduces later work</td>
+<td><code>mark -&gt; exclusive scan -&gt; scatter -&gt; publish indirect count</code> into a second state set</td>
 </tr>
 <tr>
-<td><code>budgeted</code></td>
-<td>prefer analytic state and stable slots</td>
-<td>one primary representation plus necessary transients</td>
-<td>omit optional recurrent fields/post</td>
-</tr>
-<tr>
-<td><code>minimum</code></td>
-<td>immutable/analytic where possible</td>
-<td>primary silhouette/emission cue</td>
-<td>no optional per-frame field update</td>
+<td>Removal is serialized with unique source/destination ownership</td>
+<td>Dense tail swap may be used; move every state and identity lane atomically</td>
 </tr>
 </tbody></table>
-<p>Pool cap, layers, bands, and post scale are workload outputs. They remain
-Authored trials until target-context measurement and the visual contract admit
-them; no count maps universally to a device class.</p>
-<h2>Build Order</h2>
-<ol>
-<li>Checkpoint: event envelope and seed.
-Expected: spawn window, normalized lifetime, transform, flow direction,
-luminance scale, and effect class are logged in the validation report.
-If you see nondeterministic captures, remove <code>Math.random</code> from spawn paths.</li>
-<li>Checkpoint: storage-backed pools per visual class.
-Expected: sparks, debris, wake cards, and shock flecks allocate
-structure-of-arrays storage once.
-If you see per-frame object churn, the system has fallen back to emitters.</li>
-<li>Checkpoint: static attributes.
-Expected: random phase, local anchor, base radius, color family, mesh
-variant, and material flags are generated once.
-If you see upload spikes, cold fields are being rewritten in the frame loop.</li>
-<li>Checkpoint: update and visibility policy.
-Expected: analytic particles change without hot writes; simulated particles
-update once; stable-slot or mark/scan/scatter invariants are explicit.
-If parallel dense-swap can claim one tail record twice, the compaction
-policy is invalid even when a short capture looks correct.</li>
-<li>Checkpoint: dense live rendering.
-Expected: <code>SpriteNodeMaterial</code> handles camera-facing sparks and instanced
-NodeMaterial meshes handle debris and hull-conforming shells.
-If you see WebGPU point-size artifacts, replace point primitives with sprites
-or instanced quads.</li>
-<li>Checkpoint: hull shell and wake fields.
-Expected: flow-facing masks, support-point wake origin, capsule wake/lobe
-meshes, and analytic filament fields share one event frame.
-If you see a detached aura, rebuild the shell from local hull samples.</li>
-<li>Checkpoint: HDR signal and bloom-off proof.
-Expected: full-scene bloom reads the HDR scene color with no contribution
-attachment. If selective bloom was explicitly selected, HDR contribution
-writes to the proven MRT <code>emissive</code> contract and bloom reads that texture.
-In either route the beauty path stays legible when bloom is disabled.
-If you see bloom-only shape, fix material emission before post tuning.</li>
-<li>Checkpoint: diagnostics and budgets.
-Expected: pool occupancy, spawn count, compact count, overdraw heat, layer
-masks, raw HDR, bloom contribution, depth policy, and per-tier GPU time are
-visible.
-If you see a missed budget, lower live cap, layer count, field octaves, or
-bloom scale before changing the architecture.</li>
-</ol>
-<h2>Performance Contract</h2>
-<table>
-<thead>
-<tr>
-<th>Work</th>
-<th>Cost model and required counter</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>analytic instances</td>
-<td>immutable seed/parameter bytes; zero simulation dispatch and hot writes</td>
-</tr>
-<tr>
-<td>independent recurrent state</td>
-<td><code>N_live * dynamicStrideBytes</code> hot state and <code>ceil(N_active/workgroupSize)</code> invocations per solver stage</td>
-</tr>
-<tr>
-<td>deterministic compaction</td>
-<td>mark + exclusive scan + scatter traffic, or stable inactive slots; record holes, moved records, and scan bytes</td>
-</tr>
-<tr>
-<td>rendering</td>
-<td>one draw per geometry/material/depth/blend class after actual batching; record submitted and visible instances</td>
-</tr>
-<tr>
-<td>transparent effects</td>
-<td>covered pixels times mean/p95 layers per pixel; triangle or instance count alone is insufficient</td>
-</tr>
-<tr>
-<td>post</td>
-<td>exact bloom/history extent, mip chain, format, reads/writes, and peak live slots</td>
-</tr>
-</tbody></table>
-<p>Use chunked bounds and per-patch visibility for large fields. Avoid a single
-unculled monolith unless the effect is camera-attached and its bounds are
-explicitly validated.</p>
-<p>Record the workload tuple <code>{N_active, strideBytes, solverStages, compactionMode, coveredPixels, layersPerPixel, drawClasses, postExtent}</code> and
-measure contemporaneous whole-frame p50/p95 plus paired marginal A/B cost on
-the named target. Include scan/scatter, transparent fragments, attachment
-traffic, peak live memory, and sustained thermal behavior. Choose the largest
-workload whose visual-error gates and complete scene allocation both pass.</p>
-<p>When a physical particle route discovers or compacts an active subset from a
-larger eligible pool/domain, publish <code>PhysicsSparseActiveDomainCost</code> in the
-route&#39;s exact opportunity rows. Include probe candidates, active core,
-halo/neighbors, capacity/high-water, detection, scan/sort/compaction,
-allocation/indirect arguments, solve traffic, hysteresis, inactive-model error,
-and overflow; <code>N_active</code> alone is not the sparse cost. A collision-owning route
-also publishes <code>PhysicsContactCost</code> for body/proxy population, broadphase pairs,
-shape-pair tests, manifolds, islands/constraint rows, iterations, warm-start
-cache, deterministic reduction, lifecycle applications, and stress tails. If
-another solver owns contact, reference that owner&#39;s cost row from the same
-opportunity rather than duplicating attribution.</p>
-<h2>Color And Output</h2>
-<ul>
-<li>LDR color textures encoded as sRGB use <code>SRGBColorSpace</code>; HDR/EXR radiance
-remains loader-declared linear. Data textures, masks, noise, LUTs, and
-storage-generated fields use <code>NoColorSpace</code>/linear.</li>
-<li>Keep HDR in <code>HalfFloatType</code> working buffers until the final transform.</li>
-<li>There is one tone-map owner and one output conversion owner: the node
-pipeline via <code>outputColorTransform</code>, or explicit <code>renderOutput()</code> when a
-late post node needs transformed input.</li>
-<li>Material emission is scene-relative. Preserve hierarchy, then calibrate:
-short transient flash &gt; powered emitter core &gt; persistent emitter &gt; ordinary surface.</li>
-<li>Bloom is a response to authored HDR emission, not the primary shape. Always
-verify a bloom-disabled baseline.</li>
-</ul>
-<h2>Rules</h2>
-<ul>
-<li>Every layer must earn its cost through silhouette, motion, illumination, or
-residue.</li>
-<li>Use normalized lifetime curves and seeded randomness.</li>
-<li>Derive secondary motion from the same event direction, flow field, or impact
-frame.</li>
-<li>Keep spawn, analytic evaluation or simulation, compaction, draw, overdraw,
-and post costs measurable per tier.</li>
-<li>Expose raw debug views for masks, age, velocity, live indices, overdraw,
-luminance, optional selective MRT contribution, and bloom.</li>
-<li>Treat old constants as scene-relative evidence, not portable defaults.</li>
-</ul>
-<h2>Routing Boundary</h2>
-<p>Use <code>$threejs-dynamic-surface-effects</code> only for screen-space frost, thaw, and
-touch-history masks. Use <code>$threejs-rain-snow-and-wet-surfaces</code> for falling rain or
-snow, splash flipbooks, and weather events that alter ground materials. Use
-<code>$threejs-procedural-motion-systems</code> for authored motion timelines, staging debris,
-and event kinematics. Use <code>$threejs-camera-controls-and-rigs</code> for camera-relative
-readability and velocity framing. Use <code>$threejs-bloom</code> and
-<code>$threejs-image-pipeline</code> when the shared post stack or exposure path is the
-primary task.</p>
+<p>For recurrent or compacted pools, read
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-particles-trails-and-effects/references/particles-trails-and-effects-system.md#state-and-compaction">state and compaction</a>
+before implementation. The step is complete when every writable lane and every
+compaction phase is justified by a downstream consumer or measured saving.</p>
+<h3>3. Specify the state transition and identity lifecycle</h3>
+<p>Keep the order explicit:</p>
+<pre><code class="language-text">ordered event packets
+  -&gt; deterministic spawn/range allocation
+  -&gt; analytic evaluation or one recurrent update
+  -&gt; optional ordered compaction
+  -&gt; draw from the committed state/count
+  -&gt; post consumers
+</code></pre>
+<p>Generate cold parameters once and update only recurrent lanes. Preserve stable
+entity identity across slot movement. Birth, death, slot reuse, teleport,
+representation change, and unavailable prior state invalidate motion vectors,
+trails, interpolation, and temporal history before presentation. Analytic
+particles evaluate both previous and current presentation times; recurrent
+pools retain adjacent immutable presentation states.</p>
+<p>Read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-particles-trails-and-effects/references/particles-trails-and-effects-system.md#temporal-identity">temporal identity</a>
+when the effect feeds TAA, motion vectors, trails, or multi-frame post. The step
+is complete when each state version has one writer, draw consumes a committed
+version, and a reused slot cannot inherit prior entity history.</p>
+<h3>4. Build the r185 GPU path</h3>
+<p>Use <code>WebGPURenderer</code> from <code>three/webgpu</code>, call <code>await renderer.init()</code>, and
+require <code>renderer.backend.isWebGPUBackend === true</code> for this canonical path.
+Route explicit WebGPU-unavailable teaching to
+<code>$threejs-compatibility-fallbacks</code>.
+Use <code>Fn().compute(...)</code>, <code>renderer.compute(...)</code>, storage nodes and
+<code>StorageInstancedBufferAttribute</code> for recurrent state. Render sprites with
+<code>SpriteNodeMaterial</code>; render shaped particles with <code>InstancedMesh</code> and a
+<code>NodeMaterial</code> family material. Dense compaction publishes an indirect command
+through <code>IndirectStorageBufferAttribute</code> and <code>geometry.setIndirect()</code>.</p>
+<p><code>computeAsync()</code> in r185 waits for renderer initialization, not GPU completion.
+Express global phase dependencies as ordered dispatches and keep frame-critical
+counts and state GPU-resident.</p>
+<p>Read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-particles-trails-and-effects/references/particles-trails-and-effects-system.md#r185-execution-facts">r185 execution facts</a>
+when implementing compute, indirect draw, bounds, or completion. The step is
+complete when spawn, update, compaction, and draw have explicit GPU ordering and
+the steady frame path performs no readback or per-particle object update.</p>
+<h3>5. Bind representation, depth, and output</h3>
+<p>Use sprites or instanced quads for camera-facing sparks, instanced lit meshes
+for shaped debris, hull-derived geometry for conforming plasma, and generated
+capsule/profile geometry for wakes. For flow-conforming work, read
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-particles-trails-and-effects/references/particles-trails-and-effects-system.md#flow-conforming-shells-and-wakes">shells and wakes</a>.
+For spark or debris work, read
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-particles-trails-and-effects/references/particles-trails-and-effects-system.md#analytic-sparks-and-dissolving-debris">analytic sparks and dissolving debris</a>.</p>
+<p>Give each draw class an explicit depth and transparency contract. Use chunked
+analytic bounds or a GPU reduction for storage-driven motion. Keep beauty in
+scene-linear HDR through one tone-map/output conversion owner. Full-scene bloom
+reads HDR beauty; allocate a selective emissive MRT only for an authored
+inclusion/exclusion requirement with a valid transparent blend and measured
+attachment cost.</p>
+<p>Read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-particles-trails-and-effects/references/particles-trails-and-effects-system.md#depth-hdr-and-output">depth, HDR, and output</a>
+before accepting transparent or emissive effects. The step is complete when
+occlusion, ordering, bounds, HDR contribution, and final conversion each have
+one tested owner.</p>
+<h3>6. Prove the mechanism and budget</h3>
+<p>Capture seeded fixed-time states and expose event/spawn count, live/slot count,
+overflow, identity mapping, age/velocity, compaction count, bounds, depth mode,
+raw HDR, optional selective signal, bloom contribution, overdraw, and GPU time
+per compute/draw class. Compare analytic versus recurrent cost, and stable slots
+versus compaction, at the same occupancy.</p>
+<p>Verify the beauty path with bloom disabled. Preserve readable silhouette,
+layer roles, depth, and motion without halo support. Scale by stopping idle
+work, removing unnecessary writable state or compaction, then reducing active
+count, field bandwidth, transparent layers, and post extent while preserving
+the selected motion class and owners.</p>
+<p>Read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-particles-trails-and-effects/references/particles-trails-and-effects-system.md#resource-accounting">resource accounting</a>
+and <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-particles-trails-and-effects/references/particles-trails-and-effects-system.md#diagnostics-and-failure-signatures">diagnostics and failure signatures</a>
+for the applicable branches. The skill is complete when the seeded result is
+repeatable; event, update, compaction, and draw order is evidenced; stable
+identity and reset controls pass; the frame path has zero required readbacks;
+depth and output ownership are singular; the bloom-off image remains legible;
+and the complete scene meets its named resource and timing budget.</p>
 </div>
+  <aside class="skill-guides" aria-labelledby="related-guides-title"><h3 id="related-guides-title">Related guides</h3><ul><li><a href="/industries/browser-games/"><span>Industries</span>Three.js WebGPU Skills for Browser Games</a></li></ul></aside>
   <div class="pn">
     <a href="threejs-object-sculptor.html">← Three.js Object Sculptor</a>
     <a href="threejs-procedural-buildings-and-cities.html">Procedural Buildings and Cities →</a>
@@ -724,10 +651,16 @@ primary task.</p>
 </main>
 
 <div class="wrap"><footer>
-  <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
-  <span style="font-size:13px">Three r185.1 · 41 working implementations · build <code>6c7881ab7386</code></span><br/>
-  <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
-  <span><a href="https://threejs-skills.com/about/">About &amp; methodology</a> · <a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/llms.txt">For coding agents</a></span>
+  <div class="footer-summary">Three.js WebGPU Skill Pack: TSL, procedural graphics, and visual validation.
+    <span>Three r185.1 · 40 primary targets · 25 accepted · build <code>ab7d8d17e058</code></span>
+    <span>Compiling shaders? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span>
+  </div>
+  <div class="footer-groups">
+    <div class="footer-group"><strong>Build</strong><a href="/#skills">Skills</a><a href="/#flagships">Examples</a><a href="/industries/">Industries</a></div>
+    <div class="footer-group"><strong>Decide</strong><a href="/for/">Who it is for</a><a href="/compare/">Compare</a><a href="/alternatives/">Alternatives</a><a href="/pricing/">Pricing</a></div>
+    <div class="footer-group"><strong>Adopt</strong><a href="/docs/">Docs</a><a href="/migrate/">Migration</a><a href="/agents/">Agent docs</a><a href="/faq/">FAQ</a></div>
+    <div class="footer-group"><strong>Proof</strong><a href="/evidence/">Evidence</a><a href="/about/">Method</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a><a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/LICENSE">License</a></div>
+  </div>
 </footer></div>
 </body>
 </html>

@@ -4,12 +4,12 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Sky, Atmosphere, and Haze | Three.js WebGPU Skill</title>
-<meta name="description" content="Implement physically coherent sky, atmosphere, and haze in Three.js r185 native WebGPU/TSL using unit-consistent scattering LUTs, depth-aware aerial…" />
+<meta name="description" content="Build sky, atmosphere, and haze in Three.js WebGPU/TSL. Use for authored sky/fog, planetary scattering, depth-aware aerial perspective, or atmosphere-derived…" />
 <meta name="author" content="Three.js WebGPU Skill Pack contributors" />
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-sky-atmosphere-and-haze.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b" />
+<meta name="skill-pack-build-revision" content="sha256:ab7d8d17e0589a6f5c2462d645b9e0d6797cd92eade36e3615dae091c6f9df5b" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -17,20 +17,26 @@
 <link rel="manifest" href="../site.webmanifest" />
 <link rel="alternate" type="text/plain" href="https://threejs-skills.com/llms.txt" title="LLM-readable skill catalog" />
 <link rel="alternate" type="application/json" href="https://threejs-skills.com/skills.json" title="Machine-readable skill catalog" />
-
+<link rel="preload" as="image" href="../visual-validation/webgpu-lut-atmosphere/final.design.avif" type="image/avif" fetchpriority="high" />
 <meta property="og:type" content="article" />
 <meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
 <meta property="og:title" content="Sky, Atmosphere, and Haze | Three.js WebGPU Skill" />
-<meta property="og:description" content="Implement physically coherent sky, atmosphere, and haze in Three.js r185 native WebGPU/TSL using unit-consistent scattering LUTs, depth-aware aerial…" />
+<meta property="og:description" content="Build sky, atmosphere, and haze in Three.js WebGPU/TSL. Use for authored sky/fog, planetary scattering, depth-aware aerial perspective, or atmosphere-derived…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-sky-atmosphere-and-haze.html" />
-<meta property="article:modified_time" content="2026-07-11T14:16:57+03:00" />
+<meta property="article:modified_time" content="2026-07-16T12:45:44+03:00" />
 <meta property="article:published_time" content="2026-07-04T23:30:21+03:00" />
 <meta property="article:section" content="Worlds and Environments" />
-
-<meta name="twitter:card" content="summary" />
+<meta property="og:image" content="https://threejs-skills.com/visual-validation/webgpu-lut-atmosphere/final.design.png" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="800" />
+<meta property="og:image:alt" content="Atmosphere final composite readback for Sky, Atmosphere, and Haze" />
+<meta name="twitter:image" content="https://threejs-skills.com/visual-validation/webgpu-lut-atmosphere/final.design.png" />
+<meta name="twitter:image:alt" content="Atmosphere final composite readback for Sky, Atmosphere, and Haze" />
+<meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Sky, Atmosphere, and Haze | Three.js WebGPU Skill" />
-<meta name="twitter:description" content="Implement physically coherent sky, atmosphere, and haze in Three.js r185 native WebGPU/TSL using unit-consistent scattering LUTs, depth-aware aerial…" />
+<meta name="twitter:description" content="Build sky, atmosphere, and haze in Three.js WebGPU/TSL. Use for authored sky/fog, planetary scattering, depth-aware aerial perspective, or atmosphere-derived…" />
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
@@ -56,14 +62,19 @@
    ],
    "@id": "https://threejs-skills.com/skills/threejs-sky-atmosphere-and-haze.html#article",
    "headline": "Sky, Atmosphere, and Haze",
-   "description": "Implement physically coherent sky, atmosphere, and haze in Three.js r185 native WebGPU/TSL using unit-consistent scattering LUTs, depth-aware aerial perspective, ellipsoid-aware geometry, explicit invalidation, and measured pipeline evidence.",
+   "description": "Build sky, atmosphere, and haze in Three.js WebGPU/TSL. Use for authored sky/fog, planetary scattering, depth-aware aerial perspective, or atmosphere-derived sun/sky lighting.",
    "url": "https://threejs-skills.com/skills/threejs-sky-atmosphere-and-haze.html",
    "mainEntityOfPage": {
     "@type": "WebPage",
     "@id": "https://threejs-skills.com/skills/threejs-sky-atmosphere-and-haze.html"
    },
+   "image": [
+    "https://threejs-skills.com/seo/article/threejs-sky-atmosphere-and-haze-1x1.png",
+    "https://threejs-skills.com/seo/article/threejs-sky-atmosphere-and-haze-4x3.png",
+    "https://threejs-skills.com/seo/article/threejs-sky-atmosphere-and-haze-16x9.png"
+   ],
    "datePublished": "2026-07-04T23:30:21+03:00",
-   "dateModified": "2026-07-11T14:16:57+03:00",
+   "dateModified": "2026-07-16T12:45:44+03:00",
    "author": {
     "@id": "https://threejs-skills.com/#publisher"
    },
@@ -140,18 +151,18 @@ html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smo
 body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7}
 ::selection{background:rgba(255,180,84,.26);color:var(--ink)}
 a{color:inherit;text-decoration:none}
-a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
+a:focus-visible,button:focus-visible,summary:focus-visible,pre[tabindex]:focus-visible,[role="region"]:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
 main{display:block}
 .skip-link{position:fixed;z-index:100;left:16px;top:12px;translate:0 -160%;font-family:var(--mono);font-size:12px;background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:9px;transition-property:translate;transition-duration:160ms}
 .skip-link:focus{translate:0 0}
 .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
 .site-nav{position:sticky;z-index:50;top:0;background:rgba(8,10,14,.82);border-bottom:1px solid rgba(255,255,255,.075);backdrop-filter:blur(18px) saturate(1.15)}
-nav{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
-nav .brand{white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
-nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
-nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
-nav .links a:hover{color:var(--amber)}
-nav .links a:active{scale:.96}
+.site-nav>.wrap{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+.site-nav .brand{min-height:44px;display:inline-flex;align-items:center;white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
+.site-nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
+.site-nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
+.site-nav .links a:hover{color:var(--amber)}
+.site-nav .links a:active{scale:.96}
 h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:0}
 p{text-wrap:pretty}
 h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
@@ -165,7 +176,7 @@ code{font-family:var(--mono)}
 .card{min-height:100%;background:linear-gradient(145deg,rgba(19,24,33,.96),rgba(12,15,21,.96));border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px;
   box-shadow:var(--shadow-card);transition-property:translate,scale,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
 .card:hover{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
-.card:active{translate:0 -1px;scale:.99}
+.card:active{translate:0 -1px;scale:.96}
 .card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .card-kind{font-family:var(--mono);font-size:10px;color:var(--cyan)}
 .card h3,.card h4{font-size:19px;font-weight:600}
@@ -190,19 +201,29 @@ figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:s
 figcaption{padding:16px 18px;font-size:14.5px}
 figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
 figcaption span{display:block;margin-top:3px;color:var(--dim)}
-footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
+footer{border-top:1px solid var(--line);padding:44px 0 60px;display:grid;grid-template-columns:minmax(260px,1.4fr) minmax(0,2fr);gap:36px 64px;color:var(--dim);font-size:14.5px}
 footer a{color:var(--amber)}
 footer a:hover{text-decoration:underline}
 footer code{color:var(--cyan);font-size:11px}
+.footer-summary{max-width:55ch}.footer-summary>span{display:block;margin-top:8px;font-size:13px}.footer-groups{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}.footer-group{display:grid;align-content:start;gap:8px}.footer-group strong{font:400 10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}.footer-group a{min-height:40px;display:flex;align-items:center;color:var(--dim);font-size:13px;transition-property:color,scale;transition-duration:160ms}.footer-group a:hover{color:var(--amber);text-decoration:none}.footer-group a:active{scale:.96}
+.pathfinder{padding:clamp(52px,7vw,86px) 0;border-bottom:1px solid var(--line)}.pathfinder-head{display:grid;grid-template-columns:minmax(0,.7fr) minmax(320px,1.3fr);align-items:end;gap:28px 72px;margin-bottom:28px}.pathfinder-head h2{margin:0}.pathfinder-head p{max-width:58ch;color:var(--dim)}.pathfinder-rows{border-top:1px solid var(--line)}.pathfinder-row{display:grid;grid-template-columns:minmax(160px,.55fr) minmax(210px,.8fr) minmax(0,1.6fr);gap:20px 32px;align-items:center;min-height:94px;border-bottom:1px solid var(--line)}.pathfinder-stage{font:10px/1.4 var(--mono);letter-spacing:.11em;text-transform:uppercase;color:var(--cyan)}.pathfinder-row>p{color:var(--dim);font-size:14px}.pathfinder-links{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px 18px}.pathfinder-links a{min-height:44px;display:inline-flex;align-items:center;gap:8px;color:var(--amber);font:11px/1.35 var(--mono);transition-property:color,scale;transition-duration:160ms}.pathfinder-links a:after{content:"→"}.pathfinder-links a:hover{color:var(--ink)}.pathfinder-links a:active{scale:.96}
+.content-hero{padding:clamp(54px,8vw,104px) 0 42px;border-bottom:1px solid var(--line)}.breadcrumbs{min-height:44px;display:flex;align-items:center;margin-bottom:28px;font:11px/1.4 var(--mono);color:var(--dim)}.breadcrumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.breadcrumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}.breadcrumbs a{min-height:40px;display:inline-flex;align-items:center;transition-property:color,scale;transition-duration:160ms}.breadcrumbs a:hover{color:var(--amber)}.breadcrumbs a:active{scale:.96}.content-hero h1{max-width:17ch;font-size:clamp(40px,6vw,68px);font-weight:700;line-height:1.02;letter-spacing:-.02em}.content-lede{max-width:66ch;margin-top:22px;color:var(--dim);font-size:clamp(17px,2vw,20px)}.content-meta{display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:28px;font:10px/1.4 var(--mono);color:var(--cyan)}
+.content-answer{max-width:900px;margin-top:34px;padding:3px 0 3px 22px;border-left:2px solid var(--amber);font-size:clamp(19px,2.2vw,21px);line-height:1.62;color:var(--ink)}.content-shell{padding:clamp(46px,7vw,86px) 0}.content-layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(230px,1fr);align-items:start;gap:clamp(36px,6vw,76px)}.content-body{grid-column:1;grid-row:1;max-width:78ch;min-width:0}.content-body h2{margin:52px 0 16px;font-size:clamp(27px,3.5vw,39px);scroll-margin-top:112px}.content-body>h2:first-child{margin-top:0}.content-body h3{margin:34px 0 12px;font-size:21px;scroll-margin-top:112px}.content-body p,.content-body li{color:var(--dim);font-size:16px}.content-body p+p{margin-top:17px}.content-body ul,.content-body ol{margin:16px 0;padding-left:24px}.content-body li+li{margin-top:7px}.content-body a{color:var(--cyan);text-decoration:underline;text-decoration-color:rgba(127,212,193,.35);text-underline-offset:3px}.content-body a:hover{color:var(--amber);text-decoration-color:currentColor}.content-body code:not(pre code){padding:1px 5px;border:1px solid var(--line);border-radius:5px;background:#07090c;color:var(--cyan);font-size:.86em}.content-body pre{margin:20px 0;white-space:pre;tab-size:2}.content-table{max-width:100%;margin:22px 0;overflow-x:auto;border:1px solid var(--line);border-radius:12px}.content-table:focus-visible{outline:2px solid var(--amber);outline-offset:3px}.content-table table{width:100%;border-collapse:collapse;font-size:14px}.content-table th,.content-table td{min-width:150px;padding:11px 13px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);text-align:left;vertical-align:top;color:var(--dim)}.content-table th{color:var(--ink);font-weight:600;background:var(--bg2)}.content-table tr:last-child td{border-bottom:0}.content-table th:last-child,.content-table td:last-child{border-right:0}
+.content-index{grid-column:2;grid-row:1;position:sticky;top:104px;max-height:calc(100vh - 128px);overflow-y:auto;padding:18px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.content-index strong{display:block;margin-bottom:10px;font:10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}.content-index ol{list-style:none}.content-index a{min-height:40px;display:flex;align-items:center;padding:5px 0;color:var(--dim);font-size:13px;line-height:1.4;transition-property:color,translate,scale;transition-duration:160ms}.content-index a:hover{color:var(--amber);translate:3px 0}.content-index a:active{translate:1px 0;scale:.96}.content-proof{margin:54px 0 0}.content-proof figure{border-radius:16px}.content-proof img{width:100%;height:auto;max-height:650px;object-fit:cover;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}.content-proof figcaption{color:var(--dim);font:11px/1.55 var(--mono)}.content-proof figcaption a{color:var(--amber)}
+.content-layout--docs{grid-template-columns:minmax(190px,.6fr) minmax(0,2fr)}.content-layout--docs .content-index{grid-column:1}.content-layout--docs .content-body{grid-column:2;max-width:72ch}.docs-index a{padding-inline:10px;border-left:2px solid transparent}.docs-index a[aria-current="page"]{border-left-color:var(--amber);background:rgba(255,180,84,.06);color:var(--ink);font-weight:600}.docs-index-current{display:none}
+.content-facts,.content-faq-list,.content-related,.content-sources,.content-skills,.content-demos,.content-discovery,.faq-provenance{margin-top:54px;padding-top:22px;border-top:1px solid var(--line)}.content-facts h2,.content-faq-list h2,.content-related h2,.content-sources h2,.content-skills h2,.content-demos h2{font-size:24px}.content-ruled-list{list-style:none;border-top:1px solid var(--line)}.content-ruled-list li{border-bottom:1px solid var(--line)}.content-ruled-list a{min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:9px 0;color:var(--dim);font-size:14px;transition-property:color,scale;transition-duration:160ms}.content-ruled-list a:after{content:"→";color:var(--amber)}.content-ruled-list a:hover{color:var(--ink)}.content-ruled-list a:active{scale:.96}.content-related .content-ruled-list a{display:grid;grid-template-columns:104px minmax(0,1fr) auto}.content-related-family{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}.content-faq-item{padding:22px 0;border-bottom:1px solid var(--line)}.content-faq-item h3{margin:0;font-size:20px}.content-faq-item h3 a{color:var(--ink)}.content-faq-item p{margin-top:9px;color:var(--dim);font-size:15px}.faq-provenance{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);padding:0}.faq-provenance div{padding:13px;background:var(--bg2)}.faq-provenance dt{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}.faq-provenance dd{margin-top:5px;font:11px/1.45 var(--mono);color:var(--cyan);overflow-wrap:anywhere}.content-discovery{display:flex;flex-wrap:wrap;gap:10px 22px;font:11px/1.5 var(--mono);color:var(--dim)}.content-discovery a{min-height:40px;display:inline-flex;align-items:center;color:var(--amber)}
 @media (max-width:760px){
   .site-nav .wrap{padding-right:0}
-  nav{min-height:104px;display:grid;grid-template-columns:1fr;padding:14px 0 10px;gap:4px}
-  nav .brand{font-size:16px}
-  nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:none;padding-right:20px}
-  nav .links::-webkit-scrollbar{display:none}
-  nav .links a{flex:0 0 auto}
+  .site-nav>.wrap{min-height:104px;display:grid;grid-template-columns:1fr;padding-top:14px;padding-bottom:10px;gap:4px}
+  .site-nav .brand{font-size:16px}
+  .site-nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;scrollbar-color:rgba(255,180,84,.45) transparent;padding:0 20px 4px 0}
+  .site-nav .links::-webkit-scrollbar{height:3px}.site-nav .links::-webkit-scrollbar-thumb{background:rgba(255,180,84,.45);border-radius:99px}
+  .site-nav .links a{flex:0 0 auto}
   .grid,.gallery{grid-template-columns:1fr}
+  footer{grid-template-columns:1fr}.footer-groups{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+@media (max-width:900px){.pathfinder-head,.content-layout{grid-template-columns:1fr}.content-index{grid-column:1;grid-row:1;position:static;max-height:none}.content-body,.content-layout--docs .content-body{grid-column:1;grid-row:2}.docs-index{overflow:hidden}.docs-index-current{display:flex;margin-bottom:8px}.docs-index ol{display:flex;gap:8px;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;padding-bottom:6px}.docs-index li{flex:0 0 min(72vw,260px)}.docs-index .docs-index-list-current{display:none}.docs-index a{min-height:44px;padding:8px 10px;border-left:0;border-bottom:2px solid transparent;background:var(--bg2)}.docs-index a[aria-current="page"]{border-bottom-color:var(--amber)}.pathfinder-row{grid-template-columns:minmax(160px,.6fr) minmax(0,1fr)}.pathfinder-links{grid-column:1/-1;justify-content:flex-start;padding-bottom:18px}.faq-provenance{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.pathfinder-row{grid-template-columns:1fr;gap:6px;padding:18px 0}.pathfinder-links{grid-column:auto;padding:0}.content-hero h1{font-size:clamp(38px,12vw,54px)}.content-answer{padding-left:16px}.content-table{border-radius:8px}.content-table table{min-width:680px}.faq-provenance{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
@@ -217,7 +238,7 @@ header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
   linear-gradient(90deg,rgba(10,12,16,.96) 0%,rgba(10,12,16,.8) 36%,rgba(10,12,16,.24) 68%,rgba(10,12,16,.04) 100%),
   linear-gradient(0deg,rgba(10,12,16,.9) 0%,rgba(10,12,16,.08) 65%,rgba(10,12,16,.62) 100%);z-index:1}
 .crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}.crumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.crumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}
-.crumbs a:hover{color:var(--amber)}
+.crumbs a{min-height:40px;display:inline-flex;align-items:center}.crumbs a:hover{color:var(--amber)}
 h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:0;max-width:18ch}
 .lede{margin-top:24px;max-width:70ch;color:var(--dim)}
 .meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
@@ -257,6 +278,7 @@ a.chip:active{scale:.96}
 .runtime-evidence-disclosure dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;margin-top:16px;overflow:hidden;border-radius:10px;background:var(--line)}.runtime-evidence-disclosure dl div{padding:11px 12px;background:var(--bg2)}.runtime-evidence-disclosure dt{font:10px/1.35 var(--mono);color:var(--dim)}.runtime-evidence-disclosure dd{margin-top:4px;font:500 10px/1.35 var(--mono);color:var(--amber)}.runtime-evidence-disclosure dd[data-verdict="PASS"]{color:var(--lime)}
 .runtime-evidence-disclosure ul{margin:15px 0 0;padding-left:20px}.runtime-evidence-disclosure li{margin-top:5px;color:var(--dim);font-size:14px}
 .evidence-report-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:10px}.evidence-report-links a{display:grid;gap:6px;min-height:72px;padding:14px;border:1px solid var(--line);border-radius:11px;background:var(--bg2)}.evidence-report-links code{color:var(--cyan);font:11px/1.4 var(--mono);overflow-wrap:anywhere}.evidence-report-links span{color:var(--dim);font:10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.05em}
+.skill-guides{margin-top:52px;padding-top:22px;border-top:1px solid var(--line)}.skill-guides h3{font-size:22px}.skill-guides ul{margin-top:12px;list-style:none;border-top:1px solid var(--line)}.skill-guides li{border-bottom:1px solid var(--line)}.skill-guides a{min-height:52px;display:grid;grid-template-columns:120px minmax(0,1fr);align-items:center;gap:18px;color:var(--dim);font-size:14px;transition-property:color,scale;transition-duration:160ms}.skill-guides a span{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}.skill-guides a:hover{color:var(--amber)}.skill-guides a:active{scale:.96}
 @media (max-width:720px){
   .skill-hero{min-height:auto;padding:58px 0 52px}
   .skill-hero-bg{opacity:.3}
@@ -267,43 +289,48 @@ a.chip:active{scale:.96}
 </style>
 </head>
 <body>
-<a class="skip-link" href="#main-content">Skip to content</a><div class="site-nav"><div class="wrap"><nav aria-label="Primary navigation">
-  <a class="brand" href="../">Three.js WebGPU Skill&nbsp;Pack</a>
-  <div class="links"><a href="../#matrix">How it works</a><a href="../#flagships">Examples</a><a href="../#skills">Skills</a><a href="../#labs">Labs</a><a href="../evidence/">Evidence</a><a href="../#install">Install</a><a href="../about/">Method</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
-</nav></div></div>
+<a class="skip-link" href="#main-content">Skip to content</a><header class="site-nav"><div class="wrap">
+  <a class="brand" href="/">Three.js WebGPU Skill&nbsp;Pack</a>
+  <nav class="links" aria-label="Primary navigation"><a href="/#flagships">Examples</a><a href="/#skills">Skills</a><a href="/guides/">Guides</a><a href="/evidence/">Evidence</a><a href="/#install">Install</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub</a></nav>
+</div></header>
 
 <main id="main-content" tabindex="-1">
-<header class="">
+<header class="skill-hero">
+  <picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-lut-atmosphere/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-lut-atmosphere/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-lut-atmosphere/final.design.png" alt="" class="skill-hero-bg" aria-hidden="true" width="1200" height="800" fetchpriority="high" decoding="async" />
+        </picture>
   <div class="wrap">
     <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Worlds and Environments</a></li><li aria-current="page">Sky, Atmosphere, and Haze</li></ol></nav>
     <h1 style="view-transition-name:skill-threejs-sky-atmosphere-and-haze">Sky, Atmosphere, and Haze</h1>
-    <p class="lede">Implement physically coherent sky, atmosphere, and haze in Three.js r185 native WebGPU/TSL using unit-consistent scattering LUTs, depth-aware aerial perspective, ellipsoid-aware geometry, explicit invalidation, and measured pipeline evidence.</p>
+    <p class="lede">Build sky, atmosphere, and haze in Three.js WebGPU/TSL. Use for authored sky/fog, planetary scattering, depth-aware aerial perspective, or atmosphere-derived sun/sky lighting.</p>
+    <p class="hero-evidence-caption">Image: Atmosphere final composite readback. Source lab: webgpu-lut-atmosphere.</p>
     <div class="meta-row">
       <span class="chip a">$threejs-sky-atmosphere-and-haze</span>
-      <span class="chip">1 primary implementation</span>
-<span class="chip">1 flagship</span>
-<span class="chip">1 secondary surface</span>
+      <span class="chip">1 primary target</span>
+      <span class="chip">1 flagship</span>
+      <span class="chip">1 secondary surface</span>
       <span class="chip">native evidence pending</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-11T14:16:57+03:00">2026-07-11</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/86f36b9b7ea1209d7dc3e4bb68b0a6c4de9abf8d">commit 86f36b9 ↗</a>
-      <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-sky-atmosphere-and-haze/SKILL.md">SKILL.md on GitHub ↗</a>
-      <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-sky-atmosphere-and-haze/SKILL.md">raw (for agents) ↗</a>
+      <span class="chip">Latest skill update <time datetime="2026-07-16T12:45:44+03:00">2026-07-16</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/8749183dffd84731506239dd86590c92bf958969">commit 8749183 ↗</a>
+      <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-sky-atmosphere-and-haze/SKILL.md">SKILL.md on GitHub ↗</a>
+      <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/skills/threejs-sky-atmosphere-and-haze/SKILL.md">raw (for agents) ↗</a>
     </div>
   </div>
 </header>
 
 
   <section class="section" id="primary-implementations" aria-labelledby="primary-implementations-title"><div class="wrap">
-    <h2 id="primary-implementations-title">Primary implementation surface</h2>
-    <p class="sub">These routes are generated from canonical source. Their exact status remains separate from implementation availability.</p>
+    <h2 id="primary-implementations-title">Primary target surface</h2>
+    <p class="sub">These rendering routes are generated from canonical source. Native-WebGPU acceptance remains separate from entrypoint availability.</p>
     <div class="grid">
       <a class="card" href="../demos/webgpu-lut-atmosphere/">
-        <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="webgpu-lut-atmosphere">
-    <span class="primary-evidence-label">Canonical capture</span>
-    <strong>Runtime evidence pending</strong>
-    <span><code>3fa15f99b8c7</code> source hash</span>
-    <span>15 fixed states · 6 runtime proof requirements</span>
-  </span>
+        <span class="card-preview-wrap" data-preview-for="webgpu-lut-atmosphere" data-preview-source="webgpu-lut-atmosphere" data-preview-classification="inspected-runtime-evidence-preview"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-lut-atmosphere/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-lut-atmosphere/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-lut-atmosphere/final.design.png" alt="Atmosphere final composite readback for Native WebGPU LUT Atmosphere" class="card-preview" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><span class="media-caption">Atmosphere final composite readback</span></span>
         <span class="card-head"><span class="card-kind">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
         <h3>Native WebGPU LUT Atmosphere</h3>
         <p>6 fixed scenarios, 6 mechanism routes, and 3 locked tiers.</p>
@@ -320,7 +347,7 @@ a.chip:active{scale:.96}
         <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="weathered-world">
     <span class="primary-evidence-label">Canonical capture</span>
     <strong>Runtime evidence pending</strong>
-    <span><code>26e74c4ec93d</code> source hash</span>
+    <span><code>76b06d2596d9</code> source hash</span>
     <span>10 fixed states · 5 runtime proof requirements</span>
   </span>
         <span class="card-head"><span class="card-kind">Planetary environment</span><span class="status status--pending">Evidence pending</span></span>
@@ -354,309 +381,240 @@ $L' = L\,T(d) + L_{air}(d)$.</p></div>
 
   <div class="section" id="validation"><div class="wrap">
     <h2>Preview and evidence ledger</h2>
-    <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; canonical acceptance still requires render-target readback and a schema-v2 bundle.</p>
-    <div class="evidence-ledger"><span class="status status--pending">Canonical runtime evidence pending</span><code>0 published images</code></div>
-
-    <div class="primary-evidence-panel" data-evidence-state="incomplete"><span class="primary-evidence-label">Same-lab evidence</span><strong>No runtime image promoted</strong><span>The page remains image-free until this skill's own lab supplies hash-bound pixels.</span></div>
+    <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; rendering acceptance still requires same-lab readback and a schema-v2 bundle.</p>
+    <div class="evidence-ledger"><span class="status status--pending">Canonical runtime evidence pending</span><code>6 published images</code></div>
+<div class="runtime-evidence-disclosures">
+      <article class="runtime-evidence-disclosure" data-acceptance-status="incomplete">
+        <div class="runtime-evidence-head"><div><code>Native WebGPU runtime evidence preview</code><h3>Native WebGPU LUT Atmosphere</h3></div><span class="status status--pending">Evidence pending</span></div>
+        <dl><div><dt>visualCorrectness</dt><dd data-verdict="PASS">PASS</dd></div><div><dt>mechanismCorrectness</dt><dd data-verdict="PASS">PASS</dd></div><div><dt>performanceCompliance</dt><dd data-verdict="INSUFFICIENT_EVIDENCE">INSUFFICIENT_EVIDENCE</dd></div><div><dt>gpuAttribution</dt><dd data-verdict="INSUFFICIENT_EVIDENCE">INSUFFICIENT_EVIDENCE</dd></div><div><dt>lifecycleStability</dt><dd data-verdict="INSUFFICIENT_EVIDENCE">INSUFFICIENT_EVIDENCE</dd></div></dl>
+        <ul><li>Five-stage LUT chain, live depth/body composition, and cumulative aerial XY topology proved from the correctness bundle.</li><li>Named-adapter GPU timestamps, reference radiance/energy, and lifecycle stability remain residual.</li></ul>
+      </article></div>
+    <div class="gallery">
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-lut-atmosphere" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-lut-atmosphere/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-lut-atmosphere/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-lut-atmosphere/final.design.png" alt="Sky, Atmosphere, and Haze: Atmosphere final composite readback" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Atmosphere final composite readback</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-lut-atmosphere" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-lut-atmosphere/no-post.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-lut-atmosphere/no-post.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-lut-atmosphere/no-post.design.png" alt="Sky, Atmosphere, and Haze: Scene color without atmosphere composite." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Scene color without atmosphere composite.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-lut-atmosphere" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-lut-atmosphere/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-lut-atmosphere/diagnostics.mosaic.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-lut-atmosphere/diagnostics.mosaic.png" alt="Sky, Atmosphere, and Haze: Transmittance diagnostic frame used as mosaic proxy." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Transmittance diagnostic frame used as mosaic proxy.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-lut-atmosphere" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-lut-atmosphere/camera.near.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-lut-atmosphere/camera.near.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-lut-atmosphere/camera.near.png" alt="Sky, Atmosphere, and Haze: Sea-level camera composite." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Sea-level camera composite.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-lut-atmosphere" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-lut-atmosphere/camera.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-lut-atmosphere/camera.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-lut-atmosphere/camera.design.png" alt="Sky, Atmosphere, and Haze: Mountain camera composite." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Mountain camera composite.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-lut-atmosphere" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-lut-atmosphere/camera.far.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-lut-atmosphere/camera.far.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-lut-atmosphere/camera.far.png" alt="Sky, Atmosphere, and Haze: High-orbit camera composite." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>High-orbit camera composite.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure></div>
   </div></div>
 
 <div class="section" id="skill-text"><div class="wrap">
   <h2>The full skill</h2>
-  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
+  <p class="sub">The complete SKILL.md as loaded by agents, rendered verbatim.</p>
   <div class="skilltext"><h2>Sky, Atmosphere, and Haze</h2>
-<p>Throughput is won by architecture before code. The taught path is native
-WebGPU on Three.js r185, <code>WebGPURenderer</code> from <code>three/webgpu</code>, TSL from
-<code>three/tsl</code>, node materials, one <code>RenderPipeline</code>, and compute-generated
-Hillaire/Bruneton-family scattering products sampled by bounded nodes per
-pixel. A WebGL backend is a hard blocker for this skill; there is no alternate
-renderer branch here.</p>
-<p>Read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-sky-atmosphere-and-haze/references/atmosphere-system-contract.md">references/atmosphere-system-contract.md</a>
-before implementation. It defines the LUT contracts, capability gate, authored
-workload trials, measurement obligations, color/output ownership, depth contract, diagnostics, and the
-techniques replaced by the WebGPU/TSL architecture.</p>
-<h2>Shared Lighting Transport Boundary</h2>
-<p>For any material, cloud, water, vegetation, or weather consumer, first read the
-router&#39;s
-<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-choose-skills/references/physics-domain-and-interaction-contract.md">physics-domain and interaction contract</a>.
-One immutable <code>PhysicsContext</code> resolves every snapshot descriptor, frame,
-chart, clock, origin epoch, material ID, and world/physics transform revision
-used by the atmosphere stage.
-Publish one versioned <code>LightingTransportSnapshot</code> from this atmosphere model.
-The snapshot declares:</p>
-<ul>
-<li>physics-context/origin epoch, <code>sampleInstant: PhysicsInstant</code>, descriptor
-<code>validity</code> whose temporal domain is a <code>PhysicsTimeInterval</code>, producer and
-parameter revisions, spatial support, update cadence, and interpolation/error
-policy;</li>
-<li>sample-to-sun unit direction in <code>physicsFrameId</code> and disc angular radius;</li>
-<li>whether the calibrated solar source is normal irradiance or finite-disc
-radiance, including its per-channel SI unit and solid-angle conversion; an
-authored dimensionless relative scale is an internal nonphysical model input
-only and leaves snapshot radiance/irradiance channels absent;</li>
-<li>each returned <code>SampledChannel</code>&#39;s quantity kind, SI unit, filter/error,
-<code>actualPhysicsTime: PhysicsTime</code> selecting the <code>instant</code> arm while its
-<code>interval</code> arm is a canonical <code>TypedAbsence</code> record, and, where applicable,
-spectral/angular basis and conversion revision; a provider-level transform
-registry never overrides channel metadata;</li>
-<li>atmospheric direct-sun transmittance/irradiance, sky radiance/irradiance, and
-segment transmittance/inscattering providers with their domain and error;</li>
-<li>typed provider request signatures with position, direction/normal or segment
-endpoints, footprint/solid-angle support, frame, and
-<code>requestedPhysicsTime: PhysicsTime</code> selecting the <code>instant</code> arm while its
-<code>interval</code> arm is a canonical <code>TypedAbsence</code> record;</li>
-<li>applied versioned <code>attenuationFactorIds</code> for every output and explicit
-<code>skyIncludesDirectSolarDisc</code> state for sky irradiance. A boolean
-&quot;attenuated&quot; flag is insufficient.</li>
-</ul>
-<p>Consumers must choose either a pre-attenuated direct-light value or an
-unattenuated source plus the atmosphere transmittance provider. They may not
-use both. Cloud optical-depth shadows, opaque-geometry visibility, and water
-extinction are separate factors and each is applied exactly once. Do not bake
-cloud attenuation into this atmosphere snapshot or let a material reapply
-aerial perspective already owned by the image path.</p>
-<p><code>EnvironmentForcingSnapshot</code> is a separate thermodynamic/mechanical interface
-sampled at <code>sampleInstant: PhysicsInstant</code>. Requests for its instantaneous
-lighting/forcing channels use <code>requestedPhysicsTime: PhysicsTime</code> with the
-<code>instant</code> arm selected and the <code>interval</code> arm a canonical <code>TypedAbsence</code> record;
-returned channels use the same discrimination in <code>actualPhysicsTime</code>. Use raw
-<code>PhysicsTimeInterval</code> only for an actual validity or graph-stage interval. If
-temperature, humidity, pressure, aerosol loading, or wind drive atmosphere
-parameters, record that forcing revision and the transfer model; do not treat
-RGB extinction coefficients as a wind or humidity provider.</p>
-<p>Schedule every physics-facing LUT/provider update on the shared graph and emit
-an exact <code>PhysicsStageExecution</code> for each attempted recompute or analytic/state-
-hold evaluation. A queued compute dispatch alone proves neither stage coverage
-nor a publishable provider revision; dropped debt remains in the graph catch-up
-loss ledger.</p>
-<p>After every physical owner commits, publish one view-independent
-<code>PhysicsPresentationCandidate</code> with
-<code>requestedPresentationInstant: PhysicsInstant</code>, containing the atmosphere&#39;s
-base-provider <code>presentedStatePairs</code>, <code>resourceLeases</code>, and
-<code>eventSequenceRanges</code>. Each
-pair gives <code>previousPresented.provenance</code> and <code>currentPresented.provenance</code>
-their own full <code>PresentationSampleProvenance</code>; never share one bracket, clock
-map, or interpolation alpha across the two states. Each arm also carries its
-own <code>presentedInstant: PhysicsInstant</code>. Static or low-rate products still
-declare explicit <code>hold</code> or <code>not-interpolated</code> provenance.</p>
-<p>For each target/view, the camera owner publishes <code>CameraViewPublication</code> with
-<code>previousRenderSampleInstant: PhysicsInstant</code>,
-<code>currentRenderSampleInstant: PhysicsInstant</code>, and
-<code>globalToRenderPrevious</code>/<code>globalToRenderCurrent</code> plus view/projection matrices,
-jitter, viewport, and depth state. Sky, aerial, shadow, cache, visibility, and
-reset preparation then publishes a <code>ViewPreparationPublication</code>
-against that camera record and the immutable candidate, owning
-<code>visibilityPublicationRefs</code>, <code>accelerationPublicationRefs</code>,
-<code>shadowViewPublicationRefs</code>, <code>cachePublicationRefs</code>, <code>reactiveEpochs</code>,
-<code>reactivePublications</code>, <code>resetDependencies</code>, full <code>resourceLeases</code> for newly
-created camera-dependent generations, and <code>resourceLeaseRefs</code>. Beyond
-identity, target/view scope, seal metadata, and scoped <code>eventSequenceRanges</code>, the sealed
-<code>PhysicsPresentationSnapshot</code> carries <code>candidateId</code>, <code>cameraPublicationId</code>,
-<code>viewPreparationId</code>, <code>presentedStatePairRefs</code>, and <code>resourceLeaseRefs</code>; it never
-copies <code>PresentedStatePair</code> records or <code>globalToRender</code> transforms. Leases
-remain live through every consumer.</p>
-<p>Any tier transition that changes physics-facing state or providers, update
-cadence, represented support or spectral/spatial/temporal filter, error bounds,
-inventories, stable IDs/RNG streams, or event and exact-once
-application-ledger cursors requires the contract&#39;s shared <code>QualityTransition</code>.
-Commit its conservative map atomically at a safe graph-step boundary and retain
-old resources through the completion join. A strictly render-only LUT,
-resolution, sampling, or composition change may remain local only when all
-physics-provider semantics, <code>PhysicsGraph</code> ownership, committed physical
-versions, IDs, cursors, and physical error bounds remain unchanged.</p>
-<p>Canonical implementation contract: <code>examples/webgpu-lut-atmosphere/</code>.
-Run <code>node examples/webgpu-lut-atmosphere/validation.js</code> after edits.</p>
-<p>Legacy WebGL implementation (deprecated, do not extend): <code>examples/lut-aerial-perspective/atmosphere-effect.js</code>.</p>
-<h2>Required Architecture</h2>
-<p>Lead with precomputed scattering, not per-pixel full scattering integration:</p>
-<pre><code class="language-text">atmosphere parameters + planet/ellipsoid transform
-  -&gt; compute transmittance LUT
-  -&gt; compute multiscatter / irradiance LUTs
-  -&gt; compute sky-view LUT for the active camera/sun frame
-  -&gt; compute aerial inscattering plus RGB optical-depth froxels, or prove an
-     endpoint-transmittance reconstruction
-  -&gt; scene pass() with shared color/depth ownership
-  -&gt; TSL sky and aerial-perspective nodes sample LUTs
-  -&gt; one HDR RenderPipeline output path
-</code></pre>
-<p>This architecture amortizes expensive optical-depth integration into compute
-dispatches and replaces nested view/light marches in every visible pixel with
-texture lookups, segment transmittance, and depth-aware composition.</p>
-<h2>Build Order</h2>
-<ol>
-<li>Run <code>$threejs-choose-skills</code> preflight when atmosphere touches terrain,
-clouds, shadows, exposure, or post ownership.</li>
-<li>Define one atmosphere model shared by sky, aerial perspective, sun/moon
-discs, material irradiance, and lighting. Declare the integration length
-unit and coefficient unit together: <code>beta [length^-1] * ds [length]</code> must be
-dimensionless. Never combine meter radii with per-kilometer coefficients.</li>
-<li>Initialize <code>WebGPURenderer</code>, call <code>await renderer.init()</code>, and require
-<code>renderer.backend.isWebGPUBackend === true</code> before allocating resources.</li>
-<li>Generate 2D LUTs with TSL <code>Fn().compute(count)</code> dispatches through
-<code>renderer.compute()</code> or <code>renderer.computeAsync()</code>. Write 2D products with
-<code>StorageTexture</code> plus <code>textureStore()</code>; write volume products with r185
-<code>Storage3DTexture</code> plus <code>storageTexture3D()</code>. Treat all products as
-<code>NoColorSpace</code> data. Set r185 2D <code>StorageTexture.generateMipmaps = false</code>
-and <code>mipmapsAutoUpdate = false</code> unless a measured path consumes authored
-mips. Set <code>Storage3DTexture.generateMipmaps = false</code> as well when only its
-base level is written; it has no <code>mipmapsAutoUpdate</code> property.
-After initialization use <code>renderer.compute()</code> for normal submission. In
-r185 <code>computeAsync()</code> only initializes on demand before enqueueing; it is
-not a GPU-completion fence. Later GPU submissions are queue-ordered, but CPU
-readback, timestamp resolution, resource reuse, and lifetime decisions need
-an explicit completion/readback mechanism.</li>
-<li>Use <code>RenderPipeline</code>, <code>pass()</code>, and <code>mrt()</code> when the image chain needs
-shared signals. In r185, <code>PassNode.getViewZNode()</code> is the standard/reversed
-<strong>perspective</strong> helper and <code>getLinearDepthNode()</code> returns normalized depth,
-not metric ray distance. Orthographic and logarithmic depth require their
-explicit TSL conversions and fixed projection tests.</li>
-<li>Compose sky radiance and surface-segment transmittance/inscattering with
-TSL nodes. Keep output scene-linear HDR until the single tone-map and output
-color transform owner.</li>
-<li>Validate inverse LUT mappings at texel centers, quadrature convergence,
-invalidation hashes, units, payload byte counts, energy bounds, depth mode,
-planet intersections, camera altitude, and fixed sun/camera cases before
-tuning color.</li>
-</ol>
-<p>Use the canonical validation module for Phase 1 structural/equation gates:</p>
-<pre><code class="language-sh">node examples/webgpu-lut-atmosphere/validation.js
-</code></pre>
-<p>It verifies the LUT manifest, RGBA16F upload policy, unit conversion fixtures,
-manifest/live-model equality, CPU segment/intersection math, transmittance
-mapping, HG normalization through the accepted <code>|g| &lt;= 0.99</code> interval, and
-projection-specific depth reconstruction including nearest-covered-sample MSAA
-resolve. It also builds the TSL graphs. It does not initialize a GPU, submit
-compute, render a scene, or measure full-frame performance; those remain
-browser-harness obligations.</p>
-<h2>Capability Gate</h2>
-<p>Any path using compute/storage/MRT must gate after renderer initialization:</p>
-<pre><code class="language-js">await renderer.init();
-
-if ( renderer.backend.isWebGPUBackend !== true ) {
-  throw new Error(
-    &#39;threejs-sky-atmosphere-and-haze requires a native WebGPU backend.&#39;
-  );
-}
-
-// Full tier: compute-generated LUTs, storage textures, MRT/depth sharing.
-</code></pre>
-<p>Quality tiers:</p>
-<p>Numeric labels used here and in the reference: <strong>[Derived]</strong> follows from an
-equation or representation; <strong>[Gated]</strong> is an acceptance ceiling/floor;
-<strong>[Measured]</strong> must come from a named device capture; <strong>[Authored]</strong> is a
-starting quality or appearance choice, never a hardware fact.</p>
+<p>Build every branch around one atmosphere model, one scene-linear HDR path, and
+one final-output owner.</p>
+<h2>Process</h2>
+<h3>1. Select the transport claim</h3>
+<p>Choose the least expensive branch that supports the requested observable:</p>
 <table>
 <thead>
 <tr>
-<th>Tier</th>
-<th>Requirements</th>
-<th>Authored starting dimensions</th>
+<th>Need</th>
+<th>Branch</th>
+<th>Valid claim</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>Full-detail trial</td>
-<td>Native WebGPU; two RGB aerial payloads or proven endpoint reconstruction</td>
-<td><strong>[Authored]</strong> 256x64 transmittance, 64x32 multiscatter/irradiance, 192x108 sky-view, 192x108x32-48 aerial</td>
+<td>Regional authored sky, distance haze, or height haze</td>
+<td><code>SkyMesh</code> plus TSL fog/haze</td>
+<td>Authored appearance in a bounded local frame</td>
 </tr>
 <tr>
-<td>Budgeted trial</td>
-<td>Native WebGPU; cached static LUTs and staggered view products</td>
-<td><strong>[Authored]</strong> 192x48 transmittance, 128x64 sky-view, 160x90x24-32 aerial</td>
+<td>Real-time planetary sky and aerial perspective</td>
+<td>Compact Hillaire-style LUTs</td>
+<td>Approximate higher-order transport within measured error</td>
 </tr>
 <tr>
-<td>Minimum-resident trial</td>
-<td>Native WebGPU; one scene pass, compact view products, no hidden full refresh</td>
-<td><strong>[Authored]</strong> 128x32 transmittance, 96x48 sky-view, 96x54x16-24 aerial</td>
+<td>Fixed atmosphere with stricter spectral/angular accuracy</td>
+<td>Bruneton-style scattering orders or an offline solve</td>
+<td>Accuracy demonstrated against the chosen reference</td>
 </tr>
 </tbody></table>
-<h2>Required Outputs</h2>
-<ul>
-<li>sky radiance and sun/moon disc transmittance/color;</li>
-<li>camera-to-surface segment transmittance;</li>
-<li>camera-to-surface segment inscattering;</li>
-<li>optional sky irradiance for <code>MeshStandardNodeMaterial</code> or
-<code>MeshPhysicalNodeMaterial</code> lighting integration;</li>
-<li>explicit conversion between render units and atmosphere meters/kilometers;</li>
-<li>diagnostics for LUT coordinates, slices, intersections, depth class, and
-shell/post blend;</li>
-<li>a dependency hash and last-update reason for every LUT;</li>
-<li>reference-integrator errors for optical depth, radiance, horizon, and energy;</li>
-<li>a declared aerial payload: RGB inscattering plus RGB optical depth, or a
-validated method that reconstructs chromatic segment transmittance. Packing
-RGB scattering and only scalar opacity into one RGBA volume is not silently
-equivalent.</li>
-</ul>
-<h2>Workload And Performance Evidence</h2>
-<p>Do not inherit a device-class millisecond or memory table. Derive the workload:</p>
-<pre><code class="language-text">payloadBytes = sum(width * height * depth * bytesPerTexel * residentCopies)
-invocations = width * height * depth
-workgroupInvocations = wgX * wgY * wgZ
-r185FlattenedGroups = ceil(invocations / workgroupInvocations)
-integratorSamples = updatedTexels * samplesPerTexel
+<p>Use the compact branch for changing cameras and suns. Use the higher-order
+branch when its regeneration cost and higher-dimensional products fit the
+actual workload. Keep an offline integrator as reference evidence rather than
+visible-pixel runtime work.</p>
+<p><strong>Complete when:</strong> the implementation names one branch, its supported spatial
+domain, its physical-versus-authored claim, and the error or visual criterion
+that admits it.</p>
+<h3>2. Establish one model</h3>
+<p>Declare one length unit for radii, positions, and integration steps; store
+extinction/scattering coefficients in its reciprocal unit so
+<code>beta * ds</code> is dimensionless. Define the body or local frame, origin policy,
+altitude model, sun direction convention, spectral/working basis, and whether
+the solar source is normal irradiance or finite-disc radiance.</p>
+<p>Initialize <code>WebGPURenderer</code>, await <code>renderer.init()</code>, and confirm the native
+WebGPU backend before allocating compute/storage products. Use
+<code>NoColorSpace</code> for transport data and keep radiance scene-linear until the
+host output stage.</p>
+<p>For physically dimensioned extinction, LUT radiometry, mapping equations, phase
+conventions, product dependencies, imported LUT/product compatibility, or the
+single unit-equivalence fixture, read
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-sky-atmosphere-and-haze/references/atmosphere-transport.md">references/atmosphere-transport.md</a>.</p>
+<p><strong>Complete when:</strong> every producer and consumer uses the same frame, length
+conversion, sun convention, and radiometric basis; physically dimensioned
+extinction also gives the same fixture optical depth on CPU and GPU.</p>
+<h3>3. Build products in dependency order</h3>
+<p>The authored local branch samples its sky and distance/height haze directly
+from the shared model and host depth. The compact LUT branch generates:</p>
+<pre><code class="language-text">transmittance
+  -&gt; multiscatter and optional irradiance
+  -&gt; camera/sun sky-view
+  -&gt; aerial RGB inscattering plus RGB optical depth
+  -&gt; scene composition
 </code></pre>
-<p>This formula matches a numeric r185 <code>Fn().compute(count, [wgX,wgY,wgZ])</code>:
-the backend dispatches <code>[r185FlattenedGroups,1,1]</code>, wrapping into Y only when
-the adapter&#39;s <code>maxComputeWorkgroupsPerDimension</code> is exceeded. Count unique
-kernels, not output textures; one aerial kernel may write both RGB
-inscattering and RGB optical depth.</p>
-<p>The product supplies its own full-frame GPU p95, CPU-submit p95, presented-frame
-p95, and peak-live-byte budgets. Acceptance uses contemporaneous full-frame
-captures on the named adapter/browser/viewport/DPR/pass graph. Quality-table
-dimensions are <strong>[Authored] trials</strong>, not memory gates or timing evidence.</p>
-<p>Do not spend full-resolution nested optical-depth marches per pixel. Every
-enabled tier must state texture dimensions, storage formats, dispatch counts,
-render resolution, update cadence, draw calls, peak live bytes, full-frame
-p50/p95, and resize/disposal behavior.</p>
-<h2>Color And Output</h2>
+<p>Give each product its own dependency key and last-update reason. Atmosphere
+profile and body changes dirty base products. Camera body-relative pose,
+projection, viewport, and depth mapping dirty aerial products. Camera yaw,
+projection jitter, and a pure floating-origin translation leave unchanged
+body-frame LUTs valid.</p>
+<p>Write 2D products with <code>StorageTexture</code> and <code>textureStore()</code>; write 3D
+products with <code>Storage3DTexture</code> and <code>storageTexture3D()</code>. Set formats,
+filters, wrapping, and mip ownership explicitly. Treat
+<code>renderer.computeAsync()</code> as submission, not GPU completion; synchronize
+readback, reuse, and retirement with an actual completion mechanism.</p>
+<p><strong>Complete when:</strong> every sampled product names all of its physical and view
+dependencies, no consumer can observe a newer dependency with an older
+dependent product, and unchanged base LUTs survive camera-only changes.</p>
+<h3>4. Compose sky and aerial perspective</h3>
+<p>Reuse the host scene color and depth. Reconstruct the active perspective,
+reversed, logarithmic, or orthographic depth convention into a metric segment,
+then intersect that segment with the atmosphere. Classify sky through explicit
+coverage or the declared clear-depth encoding.</p>
+<p>For a visible surface, apply exactly:</p>
+<pre><code class="language-text">C_out = C_scene * T_segment + S_segment
+</code></pre>
+<p>For a sky pixel, sample sky radiance and the calibrated sun/moon disc. Keep
+direct lighting, diffuse sky lighting, cloud shadows, opaque visibility, and
+camera-segment transport as separate factors. Let either <code>renderOutput()</code> or
+<code>RenderPipeline.outputColorTransform</code> own presentation.</p>
+<p>For planetary bodies, exterior cameras, ellipsoids, non-perspective depth, or a
+shell/post handoff, read
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-sky-atmosphere-and-haze/references/body-depth-and-composition.md">references/body-depth-and-composition.md</a>.</p>
+<p><strong>Complete when:</strong> standard and enabled alternate depth modes reconstruct known
+positions within the declared tolerance, sky/surface coverage is stable, the
+zero-atmosphere control returns <code>C_scene</code>, and tone mapping/output conversion
+runs once.</p>
+<h3>5. Expose the lighting handoff</h3>
+<p>Expose only the quantities another system needs:</p>
 <ul>
-<li>LUTs, density masks, depth, normals, weather inputs, and optical-depth data
-are <code>NoColorSpace</code> linear data. Albedo/color art textures use
-<code>SRGBColorSpace</code>.</li>
-<li>Atmosphere radiance enters the image chain as scene-linear HDR. Use
-<code>HalfFloatType</code> working buffers until tone mapping.</li>
-<li>Exactly one system owns tone mapping and one system owns output color
-conversion. If <code>renderOutput()</code> owns final presentation, set
-<code>RenderPipeline.outputColorTransform = false</code>; otherwise let the host
-<code>RenderPipeline.outputColorTransform</code> own conversion.</li>
-<li>Exposure can scale physically authored radiance, but it must not hide wrong
-units, coefficients, or transmittance.</li>
+<li>sample time, model revision, physics frame/origin, support, filter, age, and
+error;</li>
+<li>sample-to-sun unit direction and disc angular radius;</li>
+<li>calibrated solar quantity, unit, and basis;</li>
+<li>either direct sun already attenuated by the atmosphere, or the unattenuated
+source plus atmosphere transmittance;</li>
+<li>directional sky radiance, normal-dependent sky irradiance, and whether each
+includes the direct disc;</li>
+<li>camera-segment RGB transmittance and RGB inscattering.</li>
 </ul>
-<h2>Failure Conditions</h2>
+<p>Clouds add cloud-only optical depth; geometry adds visibility; water adds its
+own path extinction. A consumer chooses one atmosphere direct-light form and
+applies each factor once.</p>
+<p><strong>Complete when:</strong> every lighting consumer can identify quantity, unit, frame,
+sample age, and included attenuation, and a factor trace proves that atmosphere,
+cloud, geometry, water, and aerial transport each appear at most once.</p>
+<h3>6. Verify the selected branch</h3>
+<p>Verify the mechanisms that branch actually uses:</p>
 <ul>
-<li>sky and terrain haze use different sun directions, coefficients, radii, or
-unit conversions;</li>
-<li>per-pixel nested view/light marching is used as the primary production path;</li>
-<li>aerial perspective is a uniform fog color or transparent sphere;</li>
-<li>camera altitude is measured in a local flat frame during orbital/geospatial
-motion;</li>
-<li>depth reconstruction ignores standard, reversed, logarithmic, orthographic,
-MSAA-resolved, or sky-pixel cases used by the host renderer;</li>
-<li>reversed depth is manually flipped before an r185 conversion that already
-handles <code>renderer.reversedDepthBuffer</code>, or <code>getLinearDepthNode()</code> is treated
-as a metric distance;</li>
-<li>direct sun, sky irradiance, segment transmittance, and inscattering are
-collapsed into one color;</li>
-<li>a single scalar alpha is presented as chromatic RGB transmittance without an
-error gate;</li>
-<li>an imported LUT is sampled without proving that radii, coefficients, density
-layers, phase convention, and solar/spectral basis equal the live model;</li>
-<li>HG <code>g</code> approaches its singular <code>|g|=1</code> limit without a declared accepted
-interval, stable denominator, and normalization/extreme-direction tests;</li>
-<li>camera rotation, temporal projection jitter, or a floating-origin shift
-invalidates body-frame LUTs that are unchanged;</li>
-<li>tone mapping or output color conversion happens more than once;</li>
-<li>atmosphere fades abruptly at shell entry or switches ownership without a
-validated transition.</li>
+<li>LUT forward/inverse maps at texel centers, boundaries, horizon split, and
+azimuth seam;</li>
+<li>phase normalization and forward-lobe sign;</li>
+<li>optical-depth, radiance, and energy convergence against a higher-accuracy
+reference;</li>
+<li>body intersections and every enabled depth encoding;</li>
+<li>product invalidation under parameter, camera, jitter, viewport, and origin
+changes;</li>
+<li>fixed-view linear-HDR sky, horizon, night, surface-haze, and exterior-camera
+diagnostics;</li>
+<li>create, resize/tier-switch, completion, and disposal ownership.</li>
 </ul>
-<h2>Routing Boundary</h2>
-<p>This skill owns molecular/aerosol sky scattering, sun/moon transmittance,
-material sky irradiance, and depth-based surface-segment aerial perspective.
-Use <code>$threejs-image-pipeline</code> for whole-frame HDR/depth/MRT ownership,
-<code>$threejs-exposure-color-grading</code> for metering and tone mapping,
-<code>$threejs-volumetric-clouds</code> for weather-shaped cloud density and cloud
-shadows, <code>$threejs-procedural-planets</code> for planet terrain/material fields, and
-<code>$threejs-visual-validation</code> for fixed-view diagnostics and GPU timing evidence.
-This skill is the unique producer of the atmosphere-derived
-<code>LightingTransportSnapshot</code> for a routed scene.</p>
+<p><strong>Complete when:</strong> every enabled branch passes its numeric and visual gates,
+every diagnostic names the product revision it displays, and repeated
+resize/tier-switch cycles leave one live generation per retained product.</p>
+<h2>Failure signatures</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Inspect</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Halo appears opposite the sun</td>
+<td>phase direction sign</td>
+</tr>
+<tr>
+<td>Haze changes with world scale</td>
+<td>length/coefficient conversion</td>
+</tr>
+<tr>
+<td>Horizon seam or limb pop</td>
+<td>LUT seam, body interval, or owner transition</td>
+</tr>
+<tr>
+<td>Terrain is darkened twice</td>
+<td>direct-light or aerial factor ownership</td>
+</tr>
+<tr>
+<td>Camera jitter regenerates base LUTs</td>
+<td>dependency keys are too broad</td>
+</tr>
+<tr>
+<td>Off-axis haze is too short</td>
+<td>normalized depth was mistaken for ray distance</td>
+</tr>
+</tbody></table>
+<h2>Routing boundary</h2>
+<p>This skill owns molecular/aerosol sky transport, atmosphere-derived sun/sky
+lighting, and camera-segment aerial perspective. Use
+<code>$threejs-volumetric-clouds</code> for weather-shaped cloud density and cloud-only
+shadows, <code>$threejs-image-pipeline</code> for shared scene signals and final-output
+ownership, <code>$threejs-exposure-color-grading</code> for metering/tone mapping, and
+<code>$threejs-procedural-planets</code> for terrain/body detail.</p>
 </div>
   <div class="pn">
     <a href="threejs-scalable-real-time-shadows.html">← Scalable Real-Time Shadows</a>
@@ -683,10 +641,16 @@ This skill is the unique producer of the atmosphere-derived
 </main>
 
 <div class="wrap"><footer>
-  <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
-  <span style="font-size:13px">Three r185.1 · 41 working implementations · build <code>6c7881ab7386</code></span><br/>
-  <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
-  <span><a href="https://threejs-skills.com/about/">About &amp; methodology</a> · <a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/llms.txt">For coding agents</a></span>
+  <div class="footer-summary">Three.js WebGPU Skill Pack: TSL, procedural graphics, and visual validation.
+    <span>Three r185.1 · 40 primary targets · 25 accepted · build <code>ab7d8d17e058</code></span>
+    <span>Compiling shaders? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span>
+  </div>
+  <div class="footer-groups">
+    <div class="footer-group"><strong>Build</strong><a href="/#skills">Skills</a><a href="/#flagships">Examples</a><a href="/industries/">Industries</a></div>
+    <div class="footer-group"><strong>Decide</strong><a href="/for/">Who it is for</a><a href="/compare/">Compare</a><a href="/alternatives/">Alternatives</a><a href="/pricing/">Pricing</a></div>
+    <div class="footer-group"><strong>Adopt</strong><a href="/docs/">Docs</a><a href="/migrate/">Migration</a><a href="/agents/">Agent docs</a><a href="/faq/">FAQ</a></div>
+    <div class="footer-group"><strong>Proof</strong><a href="/evidence/">Evidence</a><a href="/about/">Method</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a><a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/LICENSE">License</a></div>
+  </div>
 </footer></div>
 </body>
 </html>

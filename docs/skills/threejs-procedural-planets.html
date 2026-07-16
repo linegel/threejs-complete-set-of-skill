@@ -4,12 +4,12 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Procedural Planets | Three.js WebGPU Skill</title>
-<meta name="description" content="Author scalable procedural planetary bodies in Three.js r185 native WebGPU/TSL with explicit cube-sphere/clipmap selection, conservative error-driven LOD…" />
+<meta name="description" content="Scale procedural planetary bodies in Three.js r185 WebGPU/TSL. Use when global curvature needs a cube-sphere quadtree, a sustained ground view needs a tangent…" />
 <meta name="author" content="Three.js WebGPU Skill Pack contributors" />
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-procedural-planets.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b" />
+<meta name="skill-pack-build-revision" content="sha256:ab7d8d17e0589a6f5c2462d645b9e0d6797cd92eade36e3615dae091c6f9df5b" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -17,20 +17,26 @@
 <link rel="manifest" href="../site.webmanifest" />
 <link rel="alternate" type="text/plain" href="https://threejs-skills.com/llms.txt" title="LLM-readable skill catalog" />
 <link rel="alternate" type="application/json" href="https://threejs-skills.com/skills.json" title="Machine-readable skill catalog" />
-
+<link rel="preload" as="image" href="../visual-validation/webgpu-quadtree-planet/final.design.avif" type="image/avif" fetchpriority="high" />
 <meta property="og:type" content="article" />
 <meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
 <meta property="og:title" content="Procedural Planets | Three.js WebGPU Skill" />
-<meta property="og:description" content="Author scalable procedural planetary bodies in Three.js r185 native WebGPU/TSL with explicit cube-sphere/clipmap selection, conservative error-driven LOD…" />
+<meta property="og:description" content="Scale procedural planetary bodies in Three.js r185 WebGPU/TSL. Use when global curvature needs a cube-sphere quadtree, a sustained ground view needs a tangent…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-procedural-planets.html" />
-<meta property="article:modified_time" content="2026-07-11T12:53:41+03:00" />
+<meta property="article:modified_time" content="2026-07-16T11:00:33+03:00" />
 <meta property="article:published_time" content="2026-07-04T23:30:20+03:00" />
 <meta property="article:section" content="Procedural Content" />
-
-<meta name="twitter:card" content="summary" />
+<meta property="og:image" content="https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/final.design.png" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="800" />
+<meta property="og:image:alt" content="Quadtree planet correctness presentation for Procedural Planets" />
+<meta name="twitter:image" content="https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/final.design.png" />
+<meta name="twitter:image:alt" content="Quadtree planet correctness presentation for Procedural Planets" />
+<meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Procedural Planets | Three.js WebGPU Skill" />
-<meta name="twitter:description" content="Author scalable procedural planetary bodies in Three.js r185 native WebGPU/TSL with explicit cube-sphere/clipmap selection, conservative error-driven LOD…" />
+<meta name="twitter:description" content="Scale procedural planetary bodies in Three.js r185 WebGPU/TSL. Use when global curvature needs a cube-sphere quadtree, a sustained ground view needs a tangent…" />
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
@@ -56,14 +62,19 @@
    ],
    "@id": "https://threejs-skills.com/skills/threejs-procedural-planets.html#article",
    "headline": "Procedural Planets",
-   "description": "Author scalable procedural planetary bodies in Three.js r185 native WebGPU/TSL with explicit cube-sphere/clipmap selection, conservative error-driven LOD, balanced transitions, shared causal fields, validated normals, instanced/indirect submission, and explicit atmosphere handoff.",
+   "description": "Scale procedural planetary bodies in Three.js r185 WebGPU/TSL. Use when global curvature needs a cube-sphere quadtree, a sustained ground view needs a tangent clipmap, an orbit-to-ground transition needs both, or a gas-giant cloud deck needs body-scale band fields.",
    "url": "https://threejs-skills.com/skills/threejs-procedural-planets.html",
    "mainEntityOfPage": {
     "@type": "WebPage",
     "@id": "https://threejs-skills.com/skills/threejs-procedural-planets.html"
    },
+   "image": [
+    "https://threejs-skills.com/seo/article/threejs-procedural-planets-1x1.png",
+    "https://threejs-skills.com/seo/article/threejs-procedural-planets-4x3.png",
+    "https://threejs-skills.com/seo/article/threejs-procedural-planets-16x9.png"
+   ],
    "datePublished": "2026-07-04T23:30:20+03:00",
-   "dateModified": "2026-07-11T12:53:41+03:00",
+   "dateModified": "2026-07-16T11:00:33+03:00",
    "author": {
     "@id": "https://threejs-skills.com/#publisher"
    },
@@ -140,18 +151,18 @@ html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smo
 body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7}
 ::selection{background:rgba(255,180,84,.26);color:var(--ink)}
 a{color:inherit;text-decoration:none}
-a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
+a:focus-visible,button:focus-visible,summary:focus-visible,pre[tabindex]:focus-visible,[role="region"]:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
 main{display:block}
 .skip-link{position:fixed;z-index:100;left:16px;top:12px;translate:0 -160%;font-family:var(--mono);font-size:12px;background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:9px;transition-property:translate;transition-duration:160ms}
 .skip-link:focus{translate:0 0}
 .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
 .site-nav{position:sticky;z-index:50;top:0;background:rgba(8,10,14,.82);border-bottom:1px solid rgba(255,255,255,.075);backdrop-filter:blur(18px) saturate(1.15)}
-nav{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
-nav .brand{white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
-nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
-nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
-nav .links a:hover{color:var(--amber)}
-nav .links a:active{scale:.96}
+.site-nav>.wrap{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+.site-nav .brand{min-height:44px;display:inline-flex;align-items:center;white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
+.site-nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
+.site-nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
+.site-nav .links a:hover{color:var(--amber)}
+.site-nav .links a:active{scale:.96}
 h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:0}
 p{text-wrap:pretty}
 h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
@@ -165,7 +176,7 @@ code{font-family:var(--mono)}
 .card{min-height:100%;background:linear-gradient(145deg,rgba(19,24,33,.96),rgba(12,15,21,.96));border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px;
   box-shadow:var(--shadow-card);transition-property:translate,scale,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
 .card:hover{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
-.card:active{translate:0 -1px;scale:.99}
+.card:active{translate:0 -1px;scale:.96}
 .card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .card-kind{font-family:var(--mono);font-size:10px;color:var(--cyan)}
 .card h3,.card h4{font-size:19px;font-weight:600}
@@ -190,19 +201,29 @@ figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:s
 figcaption{padding:16px 18px;font-size:14.5px}
 figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
 figcaption span{display:block;margin-top:3px;color:var(--dim)}
-footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
+footer{border-top:1px solid var(--line);padding:44px 0 60px;display:grid;grid-template-columns:minmax(260px,1.4fr) minmax(0,2fr);gap:36px 64px;color:var(--dim);font-size:14.5px}
 footer a{color:var(--amber)}
 footer a:hover{text-decoration:underline}
 footer code{color:var(--cyan);font-size:11px}
+.footer-summary{max-width:55ch}.footer-summary>span{display:block;margin-top:8px;font-size:13px}.footer-groups{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}.footer-group{display:grid;align-content:start;gap:8px}.footer-group strong{font:400 10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}.footer-group a{min-height:40px;display:flex;align-items:center;color:var(--dim);font-size:13px;transition-property:color,scale;transition-duration:160ms}.footer-group a:hover{color:var(--amber);text-decoration:none}.footer-group a:active{scale:.96}
+.pathfinder{padding:clamp(52px,7vw,86px) 0;border-bottom:1px solid var(--line)}.pathfinder-head{display:grid;grid-template-columns:minmax(0,.7fr) minmax(320px,1.3fr);align-items:end;gap:28px 72px;margin-bottom:28px}.pathfinder-head h2{margin:0}.pathfinder-head p{max-width:58ch;color:var(--dim)}.pathfinder-rows{border-top:1px solid var(--line)}.pathfinder-row{display:grid;grid-template-columns:minmax(160px,.55fr) minmax(210px,.8fr) minmax(0,1.6fr);gap:20px 32px;align-items:center;min-height:94px;border-bottom:1px solid var(--line)}.pathfinder-stage{font:10px/1.4 var(--mono);letter-spacing:.11em;text-transform:uppercase;color:var(--cyan)}.pathfinder-row>p{color:var(--dim);font-size:14px}.pathfinder-links{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px 18px}.pathfinder-links a{min-height:44px;display:inline-flex;align-items:center;gap:8px;color:var(--amber);font:11px/1.35 var(--mono);transition-property:color,scale;transition-duration:160ms}.pathfinder-links a:after{content:"→"}.pathfinder-links a:hover{color:var(--ink)}.pathfinder-links a:active{scale:.96}
+.content-hero{padding:clamp(54px,8vw,104px) 0 42px;border-bottom:1px solid var(--line)}.breadcrumbs{min-height:44px;display:flex;align-items:center;margin-bottom:28px;font:11px/1.4 var(--mono);color:var(--dim)}.breadcrumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.breadcrumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}.breadcrumbs a{min-height:40px;display:inline-flex;align-items:center;transition-property:color,scale;transition-duration:160ms}.breadcrumbs a:hover{color:var(--amber)}.breadcrumbs a:active{scale:.96}.content-hero h1{max-width:17ch;font-size:clamp(40px,6vw,68px);font-weight:700;line-height:1.02;letter-spacing:-.02em}.content-lede{max-width:66ch;margin-top:22px;color:var(--dim);font-size:clamp(17px,2vw,20px)}.content-meta{display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:28px;font:10px/1.4 var(--mono);color:var(--cyan)}
+.content-answer{max-width:900px;margin-top:34px;padding:3px 0 3px 22px;border-left:2px solid var(--amber);font-size:clamp(19px,2.2vw,21px);line-height:1.62;color:var(--ink)}.content-shell{padding:clamp(46px,7vw,86px) 0}.content-layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(230px,1fr);align-items:start;gap:clamp(36px,6vw,76px)}.content-body{grid-column:1;grid-row:1;max-width:78ch;min-width:0}.content-body h2{margin:52px 0 16px;font-size:clamp(27px,3.5vw,39px);scroll-margin-top:112px}.content-body>h2:first-child{margin-top:0}.content-body h3{margin:34px 0 12px;font-size:21px;scroll-margin-top:112px}.content-body p,.content-body li{color:var(--dim);font-size:16px}.content-body p+p{margin-top:17px}.content-body ul,.content-body ol{margin:16px 0;padding-left:24px}.content-body li+li{margin-top:7px}.content-body a{color:var(--cyan);text-decoration:underline;text-decoration-color:rgba(127,212,193,.35);text-underline-offset:3px}.content-body a:hover{color:var(--amber);text-decoration-color:currentColor}.content-body code:not(pre code){padding:1px 5px;border:1px solid var(--line);border-radius:5px;background:#07090c;color:var(--cyan);font-size:.86em}.content-body pre{margin:20px 0;white-space:pre;tab-size:2}.content-table{max-width:100%;margin:22px 0;overflow-x:auto;border:1px solid var(--line);border-radius:12px}.content-table:focus-visible{outline:2px solid var(--amber);outline-offset:3px}.content-table table{width:100%;border-collapse:collapse;font-size:14px}.content-table th,.content-table td{min-width:150px;padding:11px 13px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);text-align:left;vertical-align:top;color:var(--dim)}.content-table th{color:var(--ink);font-weight:600;background:var(--bg2)}.content-table tr:last-child td{border-bottom:0}.content-table th:last-child,.content-table td:last-child{border-right:0}
+.content-index{grid-column:2;grid-row:1;position:sticky;top:104px;max-height:calc(100vh - 128px);overflow-y:auto;padding:18px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.content-index strong{display:block;margin-bottom:10px;font:10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}.content-index ol{list-style:none}.content-index a{min-height:40px;display:flex;align-items:center;padding:5px 0;color:var(--dim);font-size:13px;line-height:1.4;transition-property:color,translate,scale;transition-duration:160ms}.content-index a:hover{color:var(--amber);translate:3px 0}.content-index a:active{translate:1px 0;scale:.96}.content-proof{margin:54px 0 0}.content-proof figure{border-radius:16px}.content-proof img{width:100%;height:auto;max-height:650px;object-fit:cover;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}.content-proof figcaption{color:var(--dim);font:11px/1.55 var(--mono)}.content-proof figcaption a{color:var(--amber)}
+.content-layout--docs{grid-template-columns:minmax(190px,.6fr) minmax(0,2fr)}.content-layout--docs .content-index{grid-column:1}.content-layout--docs .content-body{grid-column:2;max-width:72ch}.docs-index a{padding-inline:10px;border-left:2px solid transparent}.docs-index a[aria-current="page"]{border-left-color:var(--amber);background:rgba(255,180,84,.06);color:var(--ink);font-weight:600}.docs-index-current{display:none}
+.content-facts,.content-faq-list,.content-related,.content-sources,.content-skills,.content-demos,.content-discovery,.faq-provenance{margin-top:54px;padding-top:22px;border-top:1px solid var(--line)}.content-facts h2,.content-faq-list h2,.content-related h2,.content-sources h2,.content-skills h2,.content-demos h2{font-size:24px}.content-ruled-list{list-style:none;border-top:1px solid var(--line)}.content-ruled-list li{border-bottom:1px solid var(--line)}.content-ruled-list a{min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:9px 0;color:var(--dim);font-size:14px;transition-property:color,scale;transition-duration:160ms}.content-ruled-list a:after{content:"→";color:var(--amber)}.content-ruled-list a:hover{color:var(--ink)}.content-ruled-list a:active{scale:.96}.content-related .content-ruled-list a{display:grid;grid-template-columns:104px minmax(0,1fr) auto}.content-related-family{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}.content-faq-item{padding:22px 0;border-bottom:1px solid var(--line)}.content-faq-item h3{margin:0;font-size:20px}.content-faq-item h3 a{color:var(--ink)}.content-faq-item p{margin-top:9px;color:var(--dim);font-size:15px}.faq-provenance{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);padding:0}.faq-provenance div{padding:13px;background:var(--bg2)}.faq-provenance dt{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}.faq-provenance dd{margin-top:5px;font:11px/1.45 var(--mono);color:var(--cyan);overflow-wrap:anywhere}.content-discovery{display:flex;flex-wrap:wrap;gap:10px 22px;font:11px/1.5 var(--mono);color:var(--dim)}.content-discovery a{min-height:40px;display:inline-flex;align-items:center;color:var(--amber)}
 @media (max-width:760px){
   .site-nav .wrap{padding-right:0}
-  nav{min-height:104px;display:grid;grid-template-columns:1fr;padding:14px 0 10px;gap:4px}
-  nav .brand{font-size:16px}
-  nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:none;padding-right:20px}
-  nav .links::-webkit-scrollbar{display:none}
-  nav .links a{flex:0 0 auto}
+  .site-nav>.wrap{min-height:104px;display:grid;grid-template-columns:1fr;padding-top:14px;padding-bottom:10px;gap:4px}
+  .site-nav .brand{font-size:16px}
+  .site-nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;scrollbar-color:rgba(255,180,84,.45) transparent;padding:0 20px 4px 0}
+  .site-nav .links::-webkit-scrollbar{height:3px}.site-nav .links::-webkit-scrollbar-thumb{background:rgba(255,180,84,.45);border-radius:99px}
+  .site-nav .links a{flex:0 0 auto}
   .grid,.gallery{grid-template-columns:1fr}
+  footer{grid-template-columns:1fr}.footer-groups{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+@media (max-width:900px){.pathfinder-head,.content-layout{grid-template-columns:1fr}.content-index{grid-column:1;grid-row:1;position:static;max-height:none}.content-body,.content-layout--docs .content-body{grid-column:1;grid-row:2}.docs-index{overflow:hidden}.docs-index-current{display:flex;margin-bottom:8px}.docs-index ol{display:flex;gap:8px;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;padding-bottom:6px}.docs-index li{flex:0 0 min(72vw,260px)}.docs-index .docs-index-list-current{display:none}.docs-index a{min-height:44px;padding:8px 10px;border-left:0;border-bottom:2px solid transparent;background:var(--bg2)}.docs-index a[aria-current="page"]{border-bottom-color:var(--amber)}.pathfinder-row{grid-template-columns:minmax(160px,.6fr) minmax(0,1fr)}.pathfinder-links{grid-column:1/-1;justify-content:flex-start;padding-bottom:18px}.faq-provenance{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.pathfinder-row{grid-template-columns:1fr;gap:6px;padding:18px 0}.pathfinder-links{grid-column:auto;padding:0}.content-hero h1{font-size:clamp(38px,12vw,54px)}.content-answer{padding-left:16px}.content-table{border-radius:8px}.content-table table{min-width:680px}.faq-provenance{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
@@ -217,7 +238,7 @@ header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
   linear-gradient(90deg,rgba(10,12,16,.96) 0%,rgba(10,12,16,.8) 36%,rgba(10,12,16,.24) 68%,rgba(10,12,16,.04) 100%),
   linear-gradient(0deg,rgba(10,12,16,.9) 0%,rgba(10,12,16,.08) 65%,rgba(10,12,16,.62) 100%);z-index:1}
 .crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}.crumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.crumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}
-.crumbs a:hover{color:var(--amber)}
+.crumbs a{min-height:40px;display:inline-flex;align-items:center}.crumbs a:hover{color:var(--amber)}
 h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:0;max-width:18ch}
 .lede{margin-top:24px;max-width:70ch;color:var(--dim)}
 .meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
@@ -257,6 +278,7 @@ a.chip:active{scale:.96}
 .runtime-evidence-disclosure dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;margin-top:16px;overflow:hidden;border-radius:10px;background:var(--line)}.runtime-evidence-disclosure dl div{padding:11px 12px;background:var(--bg2)}.runtime-evidence-disclosure dt{font:10px/1.35 var(--mono);color:var(--dim)}.runtime-evidence-disclosure dd{margin-top:4px;font:500 10px/1.35 var(--mono);color:var(--amber)}.runtime-evidence-disclosure dd[data-verdict="PASS"]{color:var(--lime)}
 .runtime-evidence-disclosure ul{margin:15px 0 0;padding-left:20px}.runtime-evidence-disclosure li{margin-top:5px;color:var(--dim);font-size:14px}
 .evidence-report-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:10px}.evidence-report-links a{display:grid;gap:6px;min-height:72px;padding:14px;border:1px solid var(--line);border-radius:11px;background:var(--bg2)}.evidence-report-links code{color:var(--cyan);font:11px/1.4 var(--mono);overflow-wrap:anywhere}.evidence-report-links span{color:var(--dim);font:10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.05em}
+.skill-guides{margin-top:52px;padding-top:22px;border-top:1px solid var(--line)}.skill-guides h3{font-size:22px}.skill-guides ul{margin-top:12px;list-style:none;border-top:1px solid var(--line)}.skill-guides li{border-bottom:1px solid var(--line)}.skill-guides a{min-height:52px;display:grid;grid-template-columns:120px minmax(0,1fr);align-items:center;gap:18px;color:var(--dim);font-size:14px;transition-property:color,scale;transition-duration:160ms}.skill-guides a span{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}.skill-guides a:hover{color:var(--amber)}.skill-guides a:active{scale:.96}
 @media (max-width:720px){
   .skill-hero{min-height:auto;padding:58px 0 52px}
   .skill-hero-bg{opacity:.3}
@@ -267,43 +289,48 @@ a.chip:active{scale:.96}
 </style>
 </head>
 <body>
-<a class="skip-link" href="#main-content">Skip to content</a><div class="site-nav"><div class="wrap"><nav aria-label="Primary navigation">
-  <a class="brand" href="../">Three.js WebGPU Skill&nbsp;Pack</a>
-  <div class="links"><a href="../#matrix">How it works</a><a href="../#flagships">Examples</a><a href="../#skills">Skills</a><a href="../#labs">Labs</a><a href="../evidence/">Evidence</a><a href="../#install">Install</a><a href="../about/">Method</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
-</nav></div></div>
+<a class="skip-link" href="#main-content">Skip to content</a><header class="site-nav"><div class="wrap">
+  <a class="brand" href="/">Three.js WebGPU Skill&nbsp;Pack</a>
+  <nav class="links" aria-label="Primary navigation"><a href="/#flagships">Examples</a><a href="/#skills">Skills</a><a href="/guides/">Guides</a><a href="/evidence/">Evidence</a><a href="/#install">Install</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub</a></nav>
+</div></header>
 
 <main id="main-content" tabindex="-1">
-<header class="">
+<header class="skill-hero">
+  <picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-quadtree-planet/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-quadtree-planet/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-quadtree-planet/final.design.png" alt="" class="skill-hero-bg" aria-hidden="true" width="1200" height="800" fetchpriority="high" decoding="async" />
+        </picture>
   <div class="wrap">
     <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Procedural Content</a></li><li aria-current="page">Procedural Planets</li></ol></nav>
     <h1 style="view-transition-name:skill-threejs-procedural-planets">Procedural Planets</h1>
-    <p class="lede">Author scalable procedural planetary bodies in Three.js r185 native WebGPU/TSL with explicit cube-sphere/clipmap selection, conservative error-driven LOD, balanced transitions, shared causal fields, validated normals, instanced/indirect submission, and explicit atmosphere handoff.</p>
+    <p class="lede">Scale procedural planetary bodies in Three.js r185 WebGPU/TSL. Use when global curvature needs a cube-sphere quadtree, a sustained ground view needs a tangent clipmap, an orbit-to-ground transition needs both, or a gas-giant cloud deck needs body-scale band fields.</p>
+    <p class="hero-evidence-caption">Image: Quadtree planet correctness presentation. Source lab: webgpu-quadtree-planet.</p>
     <div class="meta-row">
       <span class="chip a">$threejs-procedural-planets</span>
-      <span class="chip">1 primary implementation</span>
-<span class="chip">1 flagship</span>
-<span class="chip">1 secondary surface</span>
+      <span class="chip">1 primary target</span>
+      <span class="chip">1 flagship</span>
+      <span class="chip">1 secondary surface</span>
       <span class="chip">native evidence pending</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-11T12:53:41+03:00">2026-07-11</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/7d9a328a7ddd3fe1bd5e449b2a8159562c7c6c0e">commit 7d9a328 ↗</a>
-      <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-planets/SKILL.md">SKILL.md on GitHub ↗</a>
-      <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-procedural-planets/SKILL.md">raw (for agents) ↗</a>
+      <span class="chip">Latest skill update <time datetime="2026-07-16T11:00:33+03:00">2026-07-16</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/2ce13bcc22695dafa808d6019452752d9a39cc71">commit 2ce13bc ↗</a>
+      <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-planets/SKILL.md">SKILL.md on GitHub ↗</a>
+      <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/skills/threejs-procedural-planets/SKILL.md">raw (for agents) ↗</a>
     </div>
   </div>
 </header>
 
 
   <section class="section" id="primary-implementations" aria-labelledby="primary-implementations-title"><div class="wrap">
-    <h2 id="primary-implementations-title">Primary implementation surface</h2>
-    <p class="sub">These routes are generated from canonical source. Their exact status remains separate from implementation availability.</p>
+    <h2 id="primary-implementations-title">Primary target surface</h2>
+    <p class="sub">These rendering routes are generated from canonical source. Native-WebGPU acceptance remains separate from entrypoint availability.</p>
     <div class="grid">
       <a class="card" href="../demos/webgpu-quadtree-planet/">
-        <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="webgpu-quadtree-planet">
-    <span class="primary-evidence-label">Canonical capture</span>
-    <strong>Runtime evidence pending</strong>
-    <span><code>6c5063ccb8e9</code> source hash</span>
-    <span>17 fixed states · 3 runtime proof requirements</span>
-  </span>
+        <span class="card-preview-wrap" data-preview-for="webgpu-quadtree-planet" data-preview-source="webgpu-quadtree-planet" data-preview-classification="inspected-runtime-evidence-preview"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-quadtree-planet/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-quadtree-planet/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-quadtree-planet/final.design.png" alt="Quadtree planet correctness presentation for Native WebGPU Quadtree Planet" class="card-preview" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><span class="media-caption">Quadtree planet correctness presentation</span></span>
         <span class="card-head"><span class="card-kind">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
         <h3>Native WebGPU Quadtree Planet</h3>
         <p>7 fixed scenarios, 7 mechanism routes, and 3 locked tiers.</p>
@@ -320,7 +347,7 @@ a.chip:active{scale:.96}
         <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="weathered-world">
     <span class="primary-evidence-label">Canonical capture</span>
     <strong>Runtime evidence pending</strong>
-    <span><code>26e74c4ec93d</code> source hash</span>
+    <span><code>76b06d2596d9</code> source hash</span>
     <span>10 fixed states · 5 runtime proof requirements</span>
   </span>
         <span class="card-head"><span class="card-kind">Planetary environment</span><span class="status status--pending">Evidence pending</span></span>
@@ -356,320 +383,225 @@ with amplitude-sorted dominance so overlaps read as impact history.</p></div>
 
   <div class="section" id="validation"><div class="wrap">
     <h2>Preview and evidence ledger</h2>
-    <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; canonical acceptance still requires render-target readback and a schema-v2 bundle.</p>
-    <div class="evidence-ledger"><span class="status status--pending">Canonical runtime evidence pending</span><code>0 published images</code></div>
-
-    <div class="primary-evidence-panel" data-evidence-state="incomplete"><span class="primary-evidence-label">Same-lab evidence</span><strong>No runtime image promoted</strong><span>The page remains image-free until this skill's own lab supplies hash-bound pixels.</span></div>
+    <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; rendering acceptance still requires same-lab readback and a schema-v2 bundle.</p>
+    <div class="evidence-ledger"><span class="status status--pending">Canonical runtime evidence pending</span><code>10 published images</code></div>
+<div class="runtime-evidence-disclosures">
+      <article class="runtime-evidence-disclosure" data-acceptance-status="incomplete">
+        <div class="runtime-evidence-head"><div><code>Native WebGPU runtime evidence preview</code><h3>Native WebGPU Quadtree Planet</h3></div><span class="status status--pending">Evidence pending</span></div>
+        <dl><div><dt>visualCorrectness</dt><dd data-verdict="INSUFFICIENT_EVIDENCE">INSUFFICIENT_EVIDENCE</dd></div><div><dt>mechanismCorrectness</dt><dd data-verdict="PASS">PASS</dd></div><div><dt>performanceCompliance</dt><dd data-verdict="NOT_CLAIMED">NOT_CLAIMED</dd></div><div><dt>gpuAttribution</dt><dd data-verdict="NOT_CLAIMED">NOT_CLAIMED</dd></div><div><dt>lifecycleStability</dt><dd data-verdict="INSUFFICIENT_EVIDENCE">INSUFFICIENT_EVIDENCE</dd></div><div><dt>visualError</dt><dd data-verdict="PASS">PASS</dd></div></dl>
+        <ul><li>Current-source correctness capture after interleaved vertex packing + adapter maxBufferSize request; validate:artifacts structuralVerdict PASS.</li><li>GPU timestamps NOT_CLAIMED; visualCorrectness and lifecycle remain INSUFFICIENT_EVIDENCE; not a publishable release-bundle.</li><li>Root cause fixed: separate BufferAttributes exceeded WebGPU max vertex buffers (16&gt;8); geometry is now one InterleavedBuffer.</li></ul>
+      </article></div>
+    <div class="gallery">
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-quadtree-planet" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-quadtree-planet/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-quadtree-planet/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-quadtree-planet/final.design.png" alt="Procedural Planets: Quadtree planet correctness presentation" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Quadtree planet correctness presentation</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-quadtree-planet" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-quadtree-planet/no-post.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-quadtree-planet/no-post.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-quadtree-planet/no-post.design.png" alt="Procedural Planets: Ambient-only lighting control (no post stack; sun stripped)." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Ambient-only lighting control (no post stack; sun stripped).</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-quadtree-planet" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-quadtree-planet/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-quadtree-planet/diagnostics.mosaic.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-quadtree-planet/diagnostics.mosaic.png" alt="Procedural Planets: Diagnostics mosaic (height alias path)." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Diagnostics mosaic (height alias path).</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-quadtree-planet" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-quadtree-planet/camera.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-quadtree-planet/camera.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-quadtree-planet/camera.design.png" alt="Procedural Planets: Design camera." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Design camera.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-quadtree-planet" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-quadtree-planet/camera.near.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-quadtree-planet/camera.near.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-quadtree-planet/camera.near.png" alt="Procedural Planets: Near camera." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Near camera.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-quadtree-planet" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-quadtree-planet/camera.far.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-quadtree-planet/camera.far.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-quadtree-planet/camera.far.png" alt="Procedural Planets: Far camera." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Far camera.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-quadtree-planet" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-quadtree-planet/seed-0001.final.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-quadtree-planet/seed-0001.final.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-quadtree-planet/seed-0001.final.png" alt="Procedural Planets: Seed 0x1 final." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Seed 0x1 final.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-quadtree-planet" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-quadtree-planet/seed-9e3779b9.final.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-quadtree-planet/seed-9e3779b9.final.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-quadtree-planet/seed-9e3779b9.final.png" alt="Procedural Planets: Seed 0x9e3779b9 final." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Seed 0x9e3779b9 final.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-quadtree-planet" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-quadtree-planet/temporal.t000.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-quadtree-planet/temporal.t000.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-quadtree-planet/temporal.t000.png" alt="Procedural Planets: Temporal t=0 (sun azimuth baseline)." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Temporal t=0 (sun azimuth baseline).</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-quadtree-planet" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-quadtree-planet/temporal.t001.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-quadtree-planet/temporal.t001.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-quadtree-planet/temporal.t001.png" alt="Procedural Planets: Temporal t=1/60 (sun azimuth advanced)." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Temporal t=1/60 (sun azimuth advanced).</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure></div>
   </div></div>
 
 <div class="section" id="skill-text"><div class="wrap">
   <h2>The full skill</h2>
-  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
+  <p class="sub">The complete SKILL.md as loaded by agents, rendered verbatim.</p>
   <div class="skilltext"><h2>Procedural Planets</h2>
-<p>Build a planet from an explicit surface-mapping and LOD decision, not a fixed
-recipe. The default globe/orbit path is a streaming cube-sphere quadtree with
-2:1-balanced neighbors, continuous LOD morphing, and instanced/indirect patch
-submission. A local tangent geometry clipmap can own sustained ground-scale
-views; a hybrid hands it to the global quadtree. The same planet-space causes
-must drive geometry, normals, material identity, scientific/query outputs,
-diagnostics, and atmosphere handoff.</p>
-<p>Any planet output consumed by dynamics, contact, navigation, water, weather,
-or another physics domain must use the route&#39;s
-<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-choose-skills/references/physics-domain-and-interaction-contract.md">physics-domain and interaction contract</a>.
-Publish typed <code>PhysicsSignalDescriptor</code> records bound to the active
-<code>PhysicsContext</code> through the canonical IDs, physics frame/origin epoch,
-transform/chart, <code>clockId</code>/<code>samplePhase</code>, channels, represented-footprint/
-filter, validity/<code>perChannelError</code>, residency/cadence/latency, and state/resource
-version. Encode unavailable channels through the descriptor&#39;s typed
-missing-channel envelope. <code>PhysicsSampleRequest.requestedPhysicsTime</code> and every
-returned <code>SampledChannel.actualPhysicsTime</code>, including static/analytic results,
-remain canonical <code>PhysicsTime</code> discriminated wrappers. For <code>kind: instant</code>,
-the <code>instant</code> arm contains the <code>PhysicsInstant</code> and the <code>interval</code> arm contains
-<code>TypedAbsence</code>; for <code>kind: interval</code>, the <code>interval</code> arm contains the
-<code>PhysicsTimeInterval</code> and the <code>instant</code> arm contains <code>TypedAbsence</code>. The active
-arm specializes the value without changing the field type, and time is not an
-extra descriptor field. A
-quadtree tile, render LOD, TSL function, or cache texture is never the public
-physics ABI.
-The planet/body-field owner is the sole state-equation owner for its
-physics-facing body, gravity, static coast/bathymetry, and hydrology-analysis
-revisions. Its <code>PhysicsGraph</code> stages write provisional versions; one
-exact <code>PhysicsStageExecution</code> records each attempted update or analytic/state-
-hold evaluation and its read/write version resolution. Dropped graph debt is a
-catch-up loss-ledger entry, not a planet execution. One
-<code>PhysicsCommitTransaction</code> prepares each accepted revision and one bijective
-<code>PhysicsCommitReceipt</code> plus <code>CommitPublicationLineage</code> publishes it atomically.
-A project coordinator may commit those prepared
-versions atomically but never becomes a second owner. Do not expose a new
-descriptor revision before that commit appears in <code>PhysicsExecutionLedger</code>.
-When committed state is rendered, publish the immutable
-<code>PresentationTimeCohort -&gt; PhysicsPresentationCandidate -&gt; CameraViewPublication -&gt; ViewPreparationPublication -&gt; PhysicsPresentationSnapshot -&gt; PresentationRenderPlan -&gt; admitted frame slot -&gt; FrameExecutionRecord</code> chain.
-The candidate stays view-independent; field
-bindings carry independent previous/current provenance and leased state
-handles. Camera publication owns render mapping, view preparation owns per-view
-LOD/caches/shadows/resets, and the sealed snapshot references binding IDs and
-leases rather than copying state or transforms. Never mutate an earlier record
-to report a later phase or completion.
-Treat cube-face UV, longitude/latitude, geodetic coordinates, and tangent
-parameterizations as nonlinear charts, not Cartesian frames. Publish their
-metric/Jacobian, domain/seam validity, and chart version; express physical
-vectors in a declared orthonormal body/world frame.
-When dynamics need gravity, publish a point/time vector signal in <code>m s^-2</code>;
-never substitute world <code>-Y</code>, radial up, or a normalized surface normal.</p>
-<p>Physics-facing rock, soil, ice, sediment, and seabed classes resolve through
-the route-selected <code>PhysicsMaterialRegistry</code>. Each exposed field or primitive
-binds a stable <code>PhysicsMaterialId</code> and exact material-record version; pair-law
-selection latches both participants, their state versions, contact frame, and
-resolver revision for the whole interaction interval. Time-varying temperature,
-liquid saturation, ice fraction, or compaction remains separately versioned
-<code>PhysicsMaterialState</code>; PBR color, roughness, and metalness carry no implicit
-constitutive meaning.</p>
-<p>Do not load this skill merely because a scene contains islands. A bounded
-archipelago, coastal site, bathymetric model, or isometric land tile whose
-planetary curvature, horizon, global geodesy, and orbit-to-ground transition are
-outside the visual/error contract belongs to <code>$threejs-procedural-fields</code> plus
-<code>$threejs-procedural-geometry</code>, with <code>$threejs-procedural-materials</code> and the
-appropriate water skill as consumers. Use this skill only when the body-scale
-surface map, curvature, global LOD, georeference, or atmosphere handoff is an
-observable cause.</p>
-<p>Canonical implementation contract: <code>examples/webgpu-quadtree-planet/</code>.
-Run <code>node examples/webgpu-quadtree-planet/validate-planet.mjs</code> after edits.</p>
-<p>Legacy WebGL implementation (deprecated, do not extend): <code>examples/procedural-planet-surface/planet-system.js</code> and <code>examples/procedural-planet-surface/terrain-field.js</code>.</p>
-<h2>Required Architecture</h2>
+<p>Choose the body-scale representation first. One set of planet-space causes must
+drive geometry, normals, material identity, queries, diagnostics, water/coast
+handoffs, and atmosphere inputs.</p>
+<h2>Process</h2>
 <ol>
-<li>Use <code>WebGPURenderer</code> from <code>three/webgpu</code>, <code>MeshStandardNodeMaterial</code> or
-<code>MeshPhysicalNodeMaterial</code>, and TSL from <code>three/tsl</code>.</li>
-<li>Choose normalized cube, spherified cube, or a verified equal-area mapping
-from distortion/error requirements. For plain normalization, the derived
-area-element ratio <code>J_center/J_corner = 3*sqrt(3) ~= 5.196</code>; uniform UV
-sampling is therefore about 5.196 times denser at a corner. Never call it
-uniform. Represent global bodies as six 2:1-balanced face quadtrees with
-stable edge/corner ownership and conservative displaced bounds.</li>
-<li>Generate canonical <code>surfaceDirection</code> from face/patch/grid metadata. Preserve
-it separately from displaced position. Validated mapping derivatives feed
-projected error and normals. Apply the shared
-<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-choose-skills/references/projected-error-contract.md">physical-pixel projected-error contract</a>
-to the complete displaced patch support and every active view; altitude or
-patch-center distance alone is not an LOD metric.</li>
-<li>Define shared TSL <code>Fn</code> field functions for displacement, material causes,
-gradients, queries, and diagnostics. Compute-baked and direct dynamic paths
-call the same functions; render nodes may sample their versioned cache
-outputs instead of reevaluating them. Do not maintain duplicate field math.
-Parity-bearing value-noise corners use the <code>lowbias32-u32-lattice</code> integer
-hash family: its multipliers/shifts are an <strong>[Authored identity]</strong>, not a
-quality claim. CPU uses <code>Math.imul</code>/<code>&gt;&gt;&gt; 0</code> wrapping, and TSL uses <code>uint</code>
-arithmetic plus the exact same identity constants. Do not use
-transcendental hashes for CPU/GPU parity paths.</li>
-<li>For static or slowly changing bodies, compute-bake height, tangent gradient,
-and material causes into dirty patch tiles; rendering samples the cache
-instead of reevaluating macro geology every frame. Use
-<code>StorageBufferAttribute</code>, <code>StorageInstancedBufferAttribute</code>, and r185
-<code>IndirectStorageBufferAttribute</code>/<code>BufferGeometry.setIndirect()</code> where the
-target supports the selected indirect command contract. Do not use float
-atomics for min/max; reduce floats in workgroup memory or use a proven
-ordered-integer encoding.</li>
-<li>Build crater, biome, hydrology, snow/ice, volcanic, ridge, humidity, and
-temperature fields as coupled causes. Do not author isolated color noise
-after terrain. When planetary coastlines feed a water system, export the
-mean-surface, bathymetry, metric coast-distance/frame, material, version,
-and uncertainty contract from the fixed body analysis field; do not make
-the water renderer rediscover coast topology from a transient render LOD.
-Register every physics-facing body/coast/hydrology field as a typed
-<code>PhysicsSignalDescriptor</code>; the descriptor&#39;s analysis revision and error
-bounds, not the visible patch level, determine whether a consumer may use it.
-The environment/project coordinator publishes the immutable
-<code>EnvironmentForcingSnapshot</code>. Planet fields consume its exact committed
-version through graph edges; they do not synthesize a second weather state.
-<code>$threejs-rain-snow-and-wet-surfaces</code> owns precipitation transport and
-receiver-side deposition/splash/ripple/wetness/snow effects, not
-meteorological generation.</li>
-<li>Filter detail by represented vertex spacing and pixel footprint. Camera
-altitude may choose policy but is not a frequency filter. Fade contribution
-strength before aliasing; do not change procedural frequency abruptly.</li>
-<li>Feed the shared world/body transform, sphere or ellipsoid surface model,
-<code>metersPerWorldUnit</code>, surface altitude, and radiometric basis to
-<code>$threejs-sky-atmosphere-and-haze</code>.</li>
-<li>Use <code>RenderPipeline</code> with node passes for the final stack. Prefer built-in
-<code>TRAANode</code>, <code>GTAONode</code>, <code>BloomNode</code>, <code>CSMShadowNode</code>, and <code>TileShadowNode</code>
-when they cover the need; custom nodes must beat or extend them. Default to
-output-only <code>mrt({ output })</code>; allocate normal, velocity, emissive, or other
-attachments only for implemented consumers with measured full-frame cost.</li>
+<li><p><strong>Gate body scale.</strong> Test whether curvature, horizon, global geodesy,
+orbit-to-ground transition, or atmosphere coupling is observable. A bounded
+local site belongs to procedural fields and geometry when tangent-plane
+sagitta, normal rotation, geodesic, horizon, and projected errors all pass.
+Read
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-planets/references/planet-field-and-atmosphere-systems.md">planet-field-and-atmosphere-systems.md</a>
+when deriving the body-scale gate.</p>
+<p><strong>Complete when:</strong> the accepted camera and data domain either proves a local
+approximation or names at least one body-scale observable that requires this
+skill.</p>
+</li>
+<li><p><strong>Freeze the body model and units.</strong> Declare center, sphere radius or
+ellipsoid axes in meters, <code>metersPerWorldUnit</code>, height and sea-level datum,
+body/world transform, origin policy, surface-coordinate meaning, and
+atmosphere bottom/top geometry. When a sphere approximates an ellipsoid,
+apply the reference&#39;s position, normal, area, geodesic, horizon, atmosphere-
+altitude, and optical-depth error gate. Give each changing field one owner
+and one version.</p>
+<p><strong>Complete when:</strong> every length and vector has units and a frame, surface
+altitude has one definition, render-origin changes leave physical field
+identity unchanged, and the spherical branch either passes every declared
+approximation gate or is rejected in favor of the ellipsoid.</p>
+</li>
+<li><p><strong>Select mapping and spatial representation.</strong> Choose normalized,
+spherified, or verified equal-area cube mapping from distortion and inverse
+requirements. Choose a cube-face quadtree for arbitrary globe views, a
+tangent clipmap for sustained local views, or a hybrid with an explicit
+near/far handoff. A gas/cloud-deck body uses continuous wrapped band fields
+rather than solid-terrain displacement. Read the reference when selecting a
+mapping, ellipsoid convention, quadtree, clipmap, or hybrid.</p>
+<p><strong>Complete when:</strong> mapping Jacobian, seams, inverse/domain validity, camera
+domain, and near/far ownership all have falsifiable gates.</p>
+</li>
+<li><p><strong>Build error-bounded LOD and submission.</strong> For the global branch, maintain
+six 2:1-balanced face quadtrees, continuous parent morph, and one of the 16
+four-edge transition masks. Reuse a shared indexed grid and submit compact
+patch records in instanced or indirect mask bins. For clipmaps, bound ring
+error, recentering, and far-field ownership. Evaluate physical-pixel error
+over the complete displaced support for every active view.</p>
+<p>Before allocating compute, storage, or indirect resources, run
+<code>await renderer.init()</code> and require
+<code>renderer.backend.isWebGPUBackend === true</code>. Otherwise keep planning on the
+CPU or report the native-WebGPU branch unavailable.</p>
+<p><strong>Complete when:</strong> projected error, hysteresis, and submission bounds pass,
+plus every selected branch satisfies its own criterion:</p>
+<ul>
+<li><strong>global:</strong> 2:1 balance holds across face edges/corners, all 16 masks are
+crack-free, and production submission has no per-patch draw loop;</li>
+<li><strong>clipmap:</strong> rings cover the local domain, recentering preserves field
+coordinates, curvature/reconstruction error passes, and one far-body owner
+covers beyond the outer ring;</li>
+<li><strong>hybrid:</strong> near/far coverage has no gap and one composite owner in the
+overlap, composite position and normal remain continuous through the
+handoff, and overlap residency is bounded;</li>
+<li><strong>gas/cloud deck:</strong> wrapped-longitude seams, advection continuity, stable
+storm identity, and conservative advected bounds pass.</li>
+</ul>
+</li>
+<li><p><strong>Build shared causal fields.</strong> Define common field functions for reference
+direction, displacement, tangent gradient, geology, craters, climate,
+hydrology, snow/ice, material causes, queries, and diagnostics. Direct,
+compute-cached, and CPU-visible paths use the same schema and identity
+constants. Cache only dirty patch causes, include cross-face filter support,
+and validate gradients independently before using analytic normals. Read the
+reference when implementing caches, crater fields, detail filtering,
+CPU/TSL parity, normals, materials, or gas-band fields.</p>
+<p>GPU patch min/max bounds use workgroup reduction plus deterministic merging,
+or a proven monotonic ordered-integer encoding with explicit sign, NaN, and
+decode-error rules. Do not rely on unsupported float atomics.</p>
+<p><strong>Complete when:</strong> geometry and shading use the same height function, cache
+invalidation follows causes rather than cameras, parity covers every
+published channel, min/max reduction is legal and conservative, and metric
+value and normal errors pass their own gates.</p>
+</li>
+<li><p><strong>Publish narrow handoffs.</strong> A field handoff states producer, consumer,
+owner, units, frame/origin, sample time or interval, represented support and
+filter, validity/staleness, version, and error. A planetary coast additionally
+publishes mean surface, seabed height, metric coast distance/frame, source
+resolution, and uncertainty. Atmosphere receives the same reference surface,
+transform, <code>metersPerWorldUnit</code>, altitude convention, shell geometry, sun
+frame, and scene-linear radiometric basis. Read the coast and atmosphere
+sections of the reference when either consumer is active.</p>
+<p><strong>Complete when:</strong> each consumer names one authoritative producer, rejects
+invalid or stale data, and performs no frame-critical GPU readback.</p>
+</li>
+<li><p><strong>Bind materials and presentation.</strong> Use <code>MeshStandardNodeMaterial</code> or
+<code>MeshPhysicalNodeMaterial</code> from shared field causes. Keep data textures
+linear, preserve declared color encodings, and hand HDR scene color to the
+one <code>RenderPipeline</code> output transform. Rebuild only dirty field tiles or LOD
+frontier state, keep in-flight cache resources immutable, and dispose retired
+buffers, textures, passes, and indirect state.</p>
+<p><strong>Complete when:</strong> output conversion has one owner, direct and cached paths
+agree, origin rebases preserve the body, and repeated resize/replacement
+reaches a stable resource plateau.</p>
+</li>
+<li><p><strong>Verify the selected branches.</strong> Capture orbit, horizon, and close views;
+unlit silhouette; flat albedo without atmosphere; grazing light; mapping,
+patch-error, transition-mask, normal, material, coast, and atmosphere
+diagnostics. Sweep split/merge boundaries and use multiple fixed seeds.</p>
+<p><strong>Complete when:</strong> the scale and sphere/ellipsoid gates, mapping distortion,
+every selected branch criterion above, shared-field parity, derivative
+accuracy, atmosphere units, triangle/draw counts, cache bytes, timing, and
+zero runtime readbacks all have direct evidence.</p>
+</li>
 </ol>
-<p>Cache-tile gutters are not fixed. Derive the source-support radius from maximum
-domain-warp displacement plus the largest reconstruction, derivative-stencil,
-and projected anisotropic-footprint radius, then map the gutter through
-cross-face ownership.</p>
-<p>Submission is part of the algorithm: one indexed grid is reused for every
-patch at a given topology. Bin visible patches by the four-bit transition-edge
-mask and submit at most one instanced/indirect draw per non-empty mask/material
-group. One draw per patch is a diagnostic implementation, not the production
-mobile architecture.</p>
-<p>Read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-planets/references/planet-field-and-atmosphere-systems.md">references/planet-field-and-atmosphere-systems.md</a>
-for the complete field contract, quadtree LOD policy, parity harness, crater
-model, material assembly, atmosphere handoff, diagnostics, and performance
-budgets.</p>
-<h2>Capability Gate And Quality Tiers</h2>
-<p>Initialize the renderer before allocating compute or storage resources:</p>
-<pre><code class="language-js">await renderer.init();
-
-if ( renderer.backend.isWebGPUBackend !== true ) {
-  throw new Error( &quot;threejs-procedural-planets requires a native WebGPU backend&quot; );
-}
-</code></pre>
+<h2>Ownership Boundary</h2>
 <ul>
-<li>Full tier: compute-generated/cached quadtree patches, storage-backed parity
-samples, GPU patch bounds, node material displacement, node post pipeline,
-and dynamic atmosphere handoff.</li>
-<li>Balanced tier: same architecture with lower patch density, fewer crater
-octaves, cached far-field tiles, half-resolution diagnostics, and fewer
-active node passes.</li>
-<li>Minimum-resident path: native WebGPU with a smaller shared grid, cached field
-tiles, CPU quadtree updates at a gated cadence, instanced topology-mask bins,
-no runtime readback, and simpler material channels. It is the same public
-field/LOD architecture, not an alternate renderer.</li>
+<li>Use <code>$threejs-procedural-fields</code> and <code>$threejs-procedural-geometry</code> for local
+terrain whose accepted domain does not expose body curvature or global LOD.</li>
+<li>Use <code>$threejs-water-optics</code> for the time-varying free surface, currents,
+breaking, foam, and water optics; this skill owns the reference surface,
+seabed, and planetary coast analysis.</li>
+<li>Use <code>$threejs-sky-atmosphere-and-haze</code> for scattering and aerial perspective;
+this skill owns the surface-side geometry and units handoff.</li>
+<li>Use <code>$threejs-image-pipeline</code>, <code>$threejs-scalable-real-time-shadows</code>, and
+<code>$threejs-visual-validation</code> for shared output, shadows, and evidence.</li>
 </ul>
-<p>Every change to physics state/equations, native cadence or coupling, represented
-band/footprint/filter, physical error bound, conserved inventory, stable-ID/RNG/
-event policy, or physics residency is represented by an exact
-<code>QualityTransition</code> admitted by the route physics coordinator at a safe step
-boundary. Render LOD leaves those authoritative properties unchanged. Declare
-source/destination <code>PhysicsQualityStateDescriptor</code>s; prepare
-without publication; commit a gated <code>ConservativeStateMap</code>, inventory and
-ID/RNG/event-cursor mappings atomically at a step boundary; increment the
-quality epoch; and retain the old leases until the declared completion join.
-Reject the transition when no conservative/error-bounded map exists.</p>
-<h2>Workload And Performance Evidence</h2>
-<p>Numeric labels: <strong>[Derived]</strong> follows from equations/representation;
-<strong>[Gated]</strong> is an acceptance bound; <strong>[Measured]</strong> names target evidence;
-<strong>[Authored]</strong> is a starting visual/quality choice.</p>
-<p>The following are <strong>[Authored] workload trials</strong>, not device classes, budgets,
-or measured claims:</p>
-<table>
-<thead>
-<tr>
-<th>Trial</th>
-<th align="right">Shared grid side</th>
-<th align="right">Active patches</th>
-<th align="right">Dirty compute policy</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>full-detail</td>
-<td align="right"><strong>[Authored]</strong> 33-65</td>
-<td align="right"><strong>[Authored]</strong> 120-480</td>
-<td align="right"><strong>[Authored]</strong> 1-4 dispatches/update</td>
-</tr>
-<tr>
-<td>budgeted</td>
-<td align="right"><strong>[Authored]</strong> 17-33</td>
-<td align="right"><strong>[Authored]</strong> 80-240</td>
-<td align="right"><strong>[Authored]</strong> 0-2 dispatches/update</td>
-</tr>
-<tr>
-<td>minimum-resident</td>
-<td align="right"><strong>[Authored]</strong> 17-33</td>
-<td align="right"><strong>[Authored]</strong> 48-160</td>
-<td align="right"><strong>[Authored]</strong> 0-1 amortized dispatch/update</td>
-</tr>
-</tbody></table>
-<p>Keep the far field static. Rebuild only newly visible/dirty patch tiles,
-body-identity changes, or LOD-frontier crossings. Report the <strong>[Derived]</strong>
-triangle count <code>activePatches * 2 * (gridSide - 1)^2</code>, cache bytes, indirect
-bytes, field evaluations, and overdraw; active-patch count alone hides cost.
-The <strong>[Derived]</strong> upper bound is 16 transition-mask draws per body/material
-group, not a universal scene draw budget. The product declares full-frame GPU,
-CPU-submit, presented-frame p95, and peak-live-byte budgets, then validates the
-compiled scene. Avoid runtime CPU readback; parity readback belongs to
-validation.</p>
-<h2>Color And Output</h2>
-<ul>
-<li>LDR color art authored in sRGB uses <code>SRGBColorSpace</code>. Calibrated reflectance,
-radiance, elevation, or spectral datasets retain their declared linear/data
-encoding; do not relabel them sRGB because they look like color.</li>
-<li>Data textures, masks, field LUTs, crater atlases, biome tables, and generated
-diagnostic textures use <code>NoColorSpace</code>/linear data.</li>
-<li>Keep HDR working buffers as <code>HalfFloatType</code> until the single tone-map owner.</li>
-<li>The node post pipeline owns the one output conversion through
-<code>RenderPipeline.outputColorTransform</code> or an explicit <code>renderOutput()</code> node.
-Materials and effects must not double-convert.</li>
-</ul>
-<h2>Non-Negotiable Constraints</h2>
-<ul>
-<li>Do not use a single static high-resolution sphere as the general
-orbit-to-ground path. Choose global quadtree, local clipmap, or their hybrid
-from camera-domain and distortion evidence.</li>
-<li>Do not assume <code>normalize(cube)</code> is equal-area, and do not select an
-equal-area mapping without Jacobian and inverse/seam tests.</li>
-<li>Restrict adjacent patch levels to one, use geomorph plus one of 16 transition
-index masks, and validate cross-face/corner adjacency. Skirts may be a
-conservative emergency guard, not the crack algorithm.</li>
-<li>Domain-warp tangentially and renormalize; never stretch regions by radial
-coordinate drift.</li>
-<li>Craters need floor, wall, rim, ejecta, age/degradation, overlap behavior, and
-shared material outputs.</li>
-<li>Continents and biomes are region fields derived from geological and climate
-causes, not isolated threshold bubbles.</li>
-<li>Geometry displacement and material normals describe the same height function.</li>
-<li>Do not promote a fused derivative expression to an analytic-normal path until
-an independent finite-difference, automatic-differentiation, or symbolic
-oracle gates value, direction, and scale over seams, warps, craters, and clamps.</li>
-<li>Domain-warp gradients include the chain rule; omitting the warp Jacobian is a
-shading/displacement mismatch.</li>
-<li>Macro silhouette must survive altitude changes; micro detail may fade out.</li>
-<li>Expose field views, patch error, parity error, detail weights, and
-displacement exaggeration.</li>
-<li>Reject physics queries whose <code>PhysicsContext</code>, body/world frame, origin
-epoch, analysis revision, validity, footprint, or error bound does not match;
-never convert a missing or ambiguous planet sample to a plausible zero.</li>
-<li>A render floating-origin rebase changes only presentation transforms and its
-render-origin epoch; it never changes <code>physicsOriginEpoch</code>, body-field
-source/state revision, stable identity, or SI values.</li>
-</ul>
-<h2>Completion Test</h2>
-<p>Validate at fixed cameras and <strong>[Authored]</strong> at least three seeds:</p>
-<ul>
-<li>unlit silhouette;</li>
-<li>flat albedo with atmosphere disabled;</li>
-<li>grazing directional light;</li>
-<li>orbit, horizon, and close-approach views;</li>
-<li>surface-map Jacobian/area report, cross-face edge/corner equality, restricted
-neighbor invariant, and all 16 transition-mask crack tests;</li>
-<li>biome-mask, crater-topology, normal-only, roughness-only, and patch-error
-views;</li>
-<li><code>PhysicsGraph</code> stage/edge/execution rows, commit-group atomicity, and
-publication lineage for every physics-facing body/gravity/coast/hydrology
-revision;</li>
-<li>prepare/commit/retire evidence for every supported runtime physics-quality
-transition, including inventory, error/filter, cadence, and stable-ID maps;</li>
-<li>CPU query versus TSL compute parity samples with per-channel max, mean, p95,
-worst direction, and metric height error. Report normal angular error only
-after derivative correctness is independently established;</li>
-<li>atmosphere handoff masks and shell/post blend from
-<code>$threejs-sky-atmosphere-and-haze</code>.</li>
-<li>instanced/indirect surface draw count, actual triangle count, cache hit/byte
-totals, CPU/GPU p50/p95, and zero runtime readbacks.</li>
-</ul>
-<h2>Routing Boundary</h2>
-<p>Use <code>$threejs-choose-skills</code> for multi-system preflight when planets are part of
-a larger scene. Local islands and coastal scenes without observable planetary
-curvature/global LOD route to <code>$threejs-procedural-fields</code> and
-<code>$threejs-procedural-geometry</code>, not here. Use <code>$threejs-procedural-fields</code> for reusable field bundles
-without a complete body, <code>$threejs-procedural-materials</code> for standalone
-material authoring, <code>$threejs-ambient-contact-shading</code> for custom GTAO
-work beyond the built-in node, <code>$threejs-scalable-real-time-shadows</code> for
-large-world shadow policy, <code>$threejs-image-pipeline</code> for shared gbuffer,
-velocity, and output ownership, <code>$threejs-visual-validation</code> for screenshot
-and GPU proof, <code>$threejs-exposure-color-grading</code> for metering and tone-map
-ownership, <code>$threejs-water-optics</code> for water volume optics, <code>$threejs-volumetric-clouds</code>
-for cloud volumes, <code>$threejs-rain-snow-and-wet-surfaces</code> for precipitation
-transport and receiver effects, and <code>$threejs-sky-atmosphere-and-haze</code> for scattering
-independent of planet generation. This skill owns the coupled planetary surface
-and its LOD/parity architecture. For a planetary ocean, it owns the static
-reference surface, coastline, bathymetry, seabed classes, and their error
-metadata; the water skill owns the time-varying free surface, flow/wave state,
-foam, and optics. The environment/project coordinator owns the shared
-<code>EnvironmentForcingSnapshot</code>; neither the planet nor rain skill independently
-generates meteorology.</p>
+<p>This skill owns the body-scale surface representation, coupled planetary
+fields, patch LOD/submission, query parity, and surface-side handoffs.</p>
 </div>
   <div class="pn">
     <a href="threejs-procedural-motion-systems.html">← Procedural Motion Systems</a>
@@ -696,10 +628,16 @@ generates meteorology.</p>
 </main>
 
 <div class="wrap"><footer>
-  <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
-  <span style="font-size:13px">Three r185.1 · 41 working implementations · build <code>6c7881ab7386</code></span><br/>
-  <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
-  <span><a href="https://threejs-skills.com/about/">About &amp; methodology</a> · <a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/llms.txt">For coding agents</a></span>
+  <div class="footer-summary">Three.js WebGPU Skill Pack: TSL, procedural graphics, and visual validation.
+    <span>Three r185.1 · 40 primary targets · 25 accepted · build <code>ab7d8d17e058</code></span>
+    <span>Compiling shaders? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span>
+  </div>
+  <div class="footer-groups">
+    <div class="footer-group"><strong>Build</strong><a href="/#skills">Skills</a><a href="/#flagships">Examples</a><a href="/industries/">Industries</a></div>
+    <div class="footer-group"><strong>Decide</strong><a href="/for/">Who it is for</a><a href="/compare/">Compare</a><a href="/alternatives/">Alternatives</a><a href="/pricing/">Pricing</a></div>
+    <div class="footer-group"><strong>Adopt</strong><a href="/docs/">Docs</a><a href="/migrate/">Migration</a><a href="/agents/">Agent docs</a><a href="/faq/">FAQ</a></div>
+    <div class="footer-group"><strong>Proof</strong><a href="/evidence/">Evidence</a><a href="/about/">Method</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a><a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/LICENSE">License</a></div>
+  </div>
 </footer></div>
 </body>
 </html>

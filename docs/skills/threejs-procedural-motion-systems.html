@@ -4,12 +4,12 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Procedural Motion Systems | Three.js WebGPU Skill</title>
-<meta name="description" content="Build representation-selected procedural motion systems in Three.js WebGPU/TSL. Use for launch kinematics, gravity turns, staging, spin docking, target-frame…" />
+<meta name="description" content="Animate semantic state with deterministic Three.js WebGPU/TSL motion. Use for launch or staging kinematics, seekable transform timelines, recurrent fixed-step…" />
 <meta name="author" content="Three.js WebGPU Skill Pack contributors" />
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-procedural-motion-systems.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b" />
+<meta name="skill-pack-build-revision" content="sha256:ab7d8d17e0589a6f5c2462d645b9e0d6797cd92eade36e3615dae091c6f9df5b" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -22,15 +22,15 @@
 <meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
 <meta property="og:title" content="Procedural Motion Systems | Three.js WebGPU Skill" />
-<meta property="og:description" content="Build representation-selected procedural motion systems in Three.js WebGPU/TSL. Use for launch kinematics, gravity turns, staging, spin docking, target-frame…" />
+<meta property="og:description" content="Animate semantic state with deterministic Three.js WebGPU/TSL motion. Use for launch or staging kinematics, seekable transform timelines, recurrent fixed-step…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-procedural-motion-systems.html" />
-<meta property="article:modified_time" content="2026-07-12T14:47:52+03:00" />
+<meta property="article:modified_time" content="2026-07-16T11:00:33+03:00" />
 <meta property="article:published_time" content="2026-07-04T23:30:20+03:00" />
 <meta property="article:section" content="Motion and Effects" />
 
 <meta name="twitter:card" content="summary" />
 <meta name="twitter:title" content="Procedural Motion Systems | Three.js WebGPU Skill" />
-<meta name="twitter:description" content="Build representation-selected procedural motion systems in Three.js WebGPU/TSL. Use for launch kinematics, gravity turns, staging, spin docking, target-frame…" />
+<meta name="twitter:description" content="Animate semantic state with deterministic Three.js WebGPU/TSL motion. Use for launch or staging kinematics, seekable transform timelines, recurrent fixed-step…" />
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
@@ -56,14 +56,14 @@
    ],
    "@id": "https://threejs-skills.com/skills/threejs-procedural-motion-systems.html#article",
    "headline": "Procedural Motion Systems",
-   "description": "Build representation-selected procedural motion systems in Three.js WebGPU/TSL. Use for launch kinematics, gravity turns, staging, spin docking, target-frame decomposition, spring-follow motion, rotating-frame alignment, analytic transform timelines, frame-rate-independent response, storage/instanced animation, and quaternion control.",
+   "description": "Animate semantic state with deterministic Three.js WebGPU/TSL motion. Use for launch or staging kinematics, seekable transform timelines, recurrent fixed-step motion, frame-rate-independent follow, GPU-resident instance motion, moving-frame docking or reparenting, and environment-driven actors.",
    "url": "https://threejs-skills.com/skills/threejs-procedural-motion-systems.html",
    "mainEntityOfPage": {
     "@type": "WebPage",
     "@id": "https://threejs-skills.com/skills/threejs-procedural-motion-systems.html"
    },
    "datePublished": "2026-07-04T23:30:20+03:00",
-   "dateModified": "2026-07-12T14:47:52+03:00",
+   "dateModified": "2026-07-16T11:00:33+03:00",
    "author": {
     "@id": "https://threejs-skills.com/#publisher"
    },
@@ -140,18 +140,18 @@ html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smo
 body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7}
 ::selection{background:rgba(255,180,84,.26);color:var(--ink)}
 a{color:inherit;text-decoration:none}
-a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
+a:focus-visible,button:focus-visible,summary:focus-visible,pre[tabindex]:focus-visible,[role="region"]:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
 main{display:block}
 .skip-link{position:fixed;z-index:100;left:16px;top:12px;translate:0 -160%;font-family:var(--mono);font-size:12px;background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:9px;transition-property:translate;transition-duration:160ms}
 .skip-link:focus{translate:0 0}
 .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
 .site-nav{position:sticky;z-index:50;top:0;background:rgba(8,10,14,.82);border-bottom:1px solid rgba(255,255,255,.075);backdrop-filter:blur(18px) saturate(1.15)}
-nav{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
-nav .brand{white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
-nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
-nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
-nav .links a:hover{color:var(--amber)}
-nav .links a:active{scale:.96}
+.site-nav>.wrap{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+.site-nav .brand{min-height:44px;display:inline-flex;align-items:center;white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
+.site-nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
+.site-nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
+.site-nav .links a:hover{color:var(--amber)}
+.site-nav .links a:active{scale:.96}
 h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:0}
 p{text-wrap:pretty}
 h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
@@ -165,7 +165,7 @@ code{font-family:var(--mono)}
 .card{min-height:100%;background:linear-gradient(145deg,rgba(19,24,33,.96),rgba(12,15,21,.96));border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px;
   box-shadow:var(--shadow-card);transition-property:translate,scale,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
 .card:hover{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
-.card:active{translate:0 -1px;scale:.99}
+.card:active{translate:0 -1px;scale:.96}
 .card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .card-kind{font-family:var(--mono);font-size:10px;color:var(--cyan)}
 .card h3,.card h4{font-size:19px;font-weight:600}
@@ -190,19 +190,29 @@ figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:s
 figcaption{padding:16px 18px;font-size:14.5px}
 figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
 figcaption span{display:block;margin-top:3px;color:var(--dim)}
-footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
+footer{border-top:1px solid var(--line);padding:44px 0 60px;display:grid;grid-template-columns:minmax(260px,1.4fr) minmax(0,2fr);gap:36px 64px;color:var(--dim);font-size:14.5px}
 footer a{color:var(--amber)}
 footer a:hover{text-decoration:underline}
 footer code{color:var(--cyan);font-size:11px}
+.footer-summary{max-width:55ch}.footer-summary>span{display:block;margin-top:8px;font-size:13px}.footer-groups{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}.footer-group{display:grid;align-content:start;gap:8px}.footer-group strong{font:400 10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}.footer-group a{min-height:40px;display:flex;align-items:center;color:var(--dim);font-size:13px;transition-property:color,scale;transition-duration:160ms}.footer-group a:hover{color:var(--amber);text-decoration:none}.footer-group a:active{scale:.96}
+.pathfinder{padding:clamp(52px,7vw,86px) 0;border-bottom:1px solid var(--line)}.pathfinder-head{display:grid;grid-template-columns:minmax(0,.7fr) minmax(320px,1.3fr);align-items:end;gap:28px 72px;margin-bottom:28px}.pathfinder-head h2{margin:0}.pathfinder-head p{max-width:58ch;color:var(--dim)}.pathfinder-rows{border-top:1px solid var(--line)}.pathfinder-row{display:grid;grid-template-columns:minmax(160px,.55fr) minmax(210px,.8fr) minmax(0,1.6fr);gap:20px 32px;align-items:center;min-height:94px;border-bottom:1px solid var(--line)}.pathfinder-stage{font:10px/1.4 var(--mono);letter-spacing:.11em;text-transform:uppercase;color:var(--cyan)}.pathfinder-row>p{color:var(--dim);font-size:14px}.pathfinder-links{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px 18px}.pathfinder-links a{min-height:44px;display:inline-flex;align-items:center;gap:8px;color:var(--amber);font:11px/1.35 var(--mono);transition-property:color,scale;transition-duration:160ms}.pathfinder-links a:after{content:"→"}.pathfinder-links a:hover{color:var(--ink)}.pathfinder-links a:active{scale:.96}
+.content-hero{padding:clamp(54px,8vw,104px) 0 42px;border-bottom:1px solid var(--line)}.breadcrumbs{min-height:44px;display:flex;align-items:center;margin-bottom:28px;font:11px/1.4 var(--mono);color:var(--dim)}.breadcrumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.breadcrumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}.breadcrumbs a{min-height:40px;display:inline-flex;align-items:center;transition-property:color,scale;transition-duration:160ms}.breadcrumbs a:hover{color:var(--amber)}.breadcrumbs a:active{scale:.96}.content-hero h1{max-width:17ch;font-size:clamp(40px,6vw,68px);font-weight:700;line-height:1.02;letter-spacing:-.02em}.content-lede{max-width:66ch;margin-top:22px;color:var(--dim);font-size:clamp(17px,2vw,20px)}.content-meta{display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:28px;font:10px/1.4 var(--mono);color:var(--cyan)}
+.content-answer{max-width:900px;margin-top:34px;padding:3px 0 3px 22px;border-left:2px solid var(--amber);font-size:clamp(19px,2.2vw,21px);line-height:1.62;color:var(--ink)}.content-shell{padding:clamp(46px,7vw,86px) 0}.content-layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(230px,1fr);align-items:start;gap:clamp(36px,6vw,76px)}.content-body{grid-column:1;grid-row:1;max-width:78ch;min-width:0}.content-body h2{margin:52px 0 16px;font-size:clamp(27px,3.5vw,39px);scroll-margin-top:112px}.content-body>h2:first-child{margin-top:0}.content-body h3{margin:34px 0 12px;font-size:21px;scroll-margin-top:112px}.content-body p,.content-body li{color:var(--dim);font-size:16px}.content-body p+p{margin-top:17px}.content-body ul,.content-body ol{margin:16px 0;padding-left:24px}.content-body li+li{margin-top:7px}.content-body a{color:var(--cyan);text-decoration:underline;text-decoration-color:rgba(127,212,193,.35);text-underline-offset:3px}.content-body a:hover{color:var(--amber);text-decoration-color:currentColor}.content-body code:not(pre code){padding:1px 5px;border:1px solid var(--line);border-radius:5px;background:#07090c;color:var(--cyan);font-size:.86em}.content-body pre{margin:20px 0;white-space:pre;tab-size:2}.content-table{max-width:100%;margin:22px 0;overflow-x:auto;border:1px solid var(--line);border-radius:12px}.content-table:focus-visible{outline:2px solid var(--amber);outline-offset:3px}.content-table table{width:100%;border-collapse:collapse;font-size:14px}.content-table th,.content-table td{min-width:150px;padding:11px 13px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);text-align:left;vertical-align:top;color:var(--dim)}.content-table th{color:var(--ink);font-weight:600;background:var(--bg2)}.content-table tr:last-child td{border-bottom:0}.content-table th:last-child,.content-table td:last-child{border-right:0}
+.content-index{grid-column:2;grid-row:1;position:sticky;top:104px;max-height:calc(100vh - 128px);overflow-y:auto;padding:18px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.content-index strong{display:block;margin-bottom:10px;font:10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}.content-index ol{list-style:none}.content-index a{min-height:40px;display:flex;align-items:center;padding:5px 0;color:var(--dim);font-size:13px;line-height:1.4;transition-property:color,translate,scale;transition-duration:160ms}.content-index a:hover{color:var(--amber);translate:3px 0}.content-index a:active{translate:1px 0;scale:.96}.content-proof{margin:54px 0 0}.content-proof figure{border-radius:16px}.content-proof img{width:100%;height:auto;max-height:650px;object-fit:cover;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}.content-proof figcaption{color:var(--dim);font:11px/1.55 var(--mono)}.content-proof figcaption a{color:var(--amber)}
+.content-layout--docs{grid-template-columns:minmax(190px,.6fr) minmax(0,2fr)}.content-layout--docs .content-index{grid-column:1}.content-layout--docs .content-body{grid-column:2;max-width:72ch}.docs-index a{padding-inline:10px;border-left:2px solid transparent}.docs-index a[aria-current="page"]{border-left-color:var(--amber);background:rgba(255,180,84,.06);color:var(--ink);font-weight:600}.docs-index-current{display:none}
+.content-facts,.content-faq-list,.content-related,.content-sources,.content-skills,.content-demos,.content-discovery,.faq-provenance{margin-top:54px;padding-top:22px;border-top:1px solid var(--line)}.content-facts h2,.content-faq-list h2,.content-related h2,.content-sources h2,.content-skills h2,.content-demos h2{font-size:24px}.content-ruled-list{list-style:none;border-top:1px solid var(--line)}.content-ruled-list li{border-bottom:1px solid var(--line)}.content-ruled-list a{min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:9px 0;color:var(--dim);font-size:14px;transition-property:color,scale;transition-duration:160ms}.content-ruled-list a:after{content:"→";color:var(--amber)}.content-ruled-list a:hover{color:var(--ink)}.content-ruled-list a:active{scale:.96}.content-related .content-ruled-list a{display:grid;grid-template-columns:104px minmax(0,1fr) auto}.content-related-family{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}.content-faq-item{padding:22px 0;border-bottom:1px solid var(--line)}.content-faq-item h3{margin:0;font-size:20px}.content-faq-item h3 a{color:var(--ink)}.content-faq-item p{margin-top:9px;color:var(--dim);font-size:15px}.faq-provenance{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);padding:0}.faq-provenance div{padding:13px;background:var(--bg2)}.faq-provenance dt{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}.faq-provenance dd{margin-top:5px;font:11px/1.45 var(--mono);color:var(--cyan);overflow-wrap:anywhere}.content-discovery{display:flex;flex-wrap:wrap;gap:10px 22px;font:11px/1.5 var(--mono);color:var(--dim)}.content-discovery a{min-height:40px;display:inline-flex;align-items:center;color:var(--amber)}
 @media (max-width:760px){
   .site-nav .wrap{padding-right:0}
-  nav{min-height:104px;display:grid;grid-template-columns:1fr;padding:14px 0 10px;gap:4px}
-  nav .brand{font-size:16px}
-  nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:none;padding-right:20px}
-  nav .links::-webkit-scrollbar{display:none}
-  nav .links a{flex:0 0 auto}
+  .site-nav>.wrap{min-height:104px;display:grid;grid-template-columns:1fr;padding-top:14px;padding-bottom:10px;gap:4px}
+  .site-nav .brand{font-size:16px}
+  .site-nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;scrollbar-color:rgba(255,180,84,.45) transparent;padding:0 20px 4px 0}
+  .site-nav .links::-webkit-scrollbar{height:3px}.site-nav .links::-webkit-scrollbar-thumb{background:rgba(255,180,84,.45);border-radius:99px}
+  .site-nav .links a{flex:0 0 auto}
   .grid,.gallery{grid-template-columns:1fr}
+  footer{grid-template-columns:1fr}.footer-groups{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+@media (max-width:900px){.pathfinder-head,.content-layout{grid-template-columns:1fr}.content-index{grid-column:1;grid-row:1;position:static;max-height:none}.content-body,.content-layout--docs .content-body{grid-column:1;grid-row:2}.docs-index{overflow:hidden}.docs-index-current{display:flex;margin-bottom:8px}.docs-index ol{display:flex;gap:8px;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;padding-bottom:6px}.docs-index li{flex:0 0 min(72vw,260px)}.docs-index .docs-index-list-current{display:none}.docs-index a{min-height:44px;padding:8px 10px;border-left:0;border-bottom:2px solid transparent;background:var(--bg2)}.docs-index a[aria-current="page"]{border-bottom-color:var(--amber)}.pathfinder-row{grid-template-columns:minmax(160px,.6fr) minmax(0,1fr)}.pathfinder-links{grid-column:1/-1;justify-content:flex-start;padding-bottom:18px}.faq-provenance{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.pathfinder-row{grid-template-columns:1fr;gap:6px;padding:18px 0}.pathfinder-links{grid-column:auto;padding:0}.content-hero h1{font-size:clamp(38px,12vw,54px)}.content-answer{padding-left:16px}.content-table{border-radius:8px}.content-table table{min-width:680px}.faq-provenance{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
@@ -217,7 +227,7 @@ header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
   linear-gradient(90deg,rgba(10,12,16,.96) 0%,rgba(10,12,16,.8) 36%,rgba(10,12,16,.24) 68%,rgba(10,12,16,.04) 100%),
   linear-gradient(0deg,rgba(10,12,16,.9) 0%,rgba(10,12,16,.08) 65%,rgba(10,12,16,.62) 100%);z-index:1}
 .crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}.crumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.crumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}
-.crumbs a:hover{color:var(--amber)}
+.crumbs a{min-height:40px;display:inline-flex;align-items:center}.crumbs a:hover{color:var(--amber)}
 h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:0;max-width:18ch}
 .lede{margin-top:24px;max-width:70ch;color:var(--dim)}
 .meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
@@ -257,6 +267,7 @@ a.chip:active{scale:.96}
 .runtime-evidence-disclosure dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;margin-top:16px;overflow:hidden;border-radius:10px;background:var(--line)}.runtime-evidence-disclosure dl div{padding:11px 12px;background:var(--bg2)}.runtime-evidence-disclosure dt{font:10px/1.35 var(--mono);color:var(--dim)}.runtime-evidence-disclosure dd{margin-top:4px;font:500 10px/1.35 var(--mono);color:var(--amber)}.runtime-evidence-disclosure dd[data-verdict="PASS"]{color:var(--lime)}
 .runtime-evidence-disclosure ul{margin:15px 0 0;padding-left:20px}.runtime-evidence-disclosure li{margin-top:5px;color:var(--dim);font-size:14px}
 .evidence-report-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:10px}.evidence-report-links a{display:grid;gap:6px;min-height:72px;padding:14px;border:1px solid var(--line);border-radius:11px;background:var(--bg2)}.evidence-report-links code{color:var(--cyan);font:11px/1.4 var(--mono);overflow-wrap:anywhere}.evidence-report-links span{color:var(--dim);font:10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.05em}
+.skill-guides{margin-top:52px;padding-top:22px;border-top:1px solid var(--line)}.skill-guides h3{font-size:22px}.skill-guides ul{margin-top:12px;list-style:none;border-top:1px solid var(--line)}.skill-guides li{border-bottom:1px solid var(--line)}.skill-guides a{min-height:52px;display:grid;grid-template-columns:120px minmax(0,1fr);align-items:center;gap:18px;color:var(--dim);font-size:14px;transition-property:color,scale;transition-duration:160ms}.skill-guides a span{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}.skill-guides a:hover{color:var(--amber)}.skill-guides a:active{scale:.96}
 @media (max-width:720px){
   .skill-hero{min-height:auto;padding:58px 0 52px}
   .skill-hero-bg{opacity:.3}
@@ -267,41 +278,41 @@ a.chip:active{scale:.96}
 </style>
 </head>
 <body>
-<a class="skip-link" href="#main-content">Skip to content</a><div class="site-nav"><div class="wrap"><nav aria-label="Primary navigation">
-  <a class="brand" href="../">Three.js WebGPU Skill&nbsp;Pack</a>
-  <div class="links"><a href="../#matrix">How it works</a><a href="../#flagships">Examples</a><a href="../#skills">Skills</a><a href="../#labs">Labs</a><a href="../evidence/">Evidence</a><a href="../#install">Install</a><a href="../about/">Method</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
-</nav></div></div>
+<a class="skip-link" href="#main-content">Skip to content</a><header class="site-nav"><div class="wrap">
+  <a class="brand" href="/">Three.js WebGPU Skill&nbsp;Pack</a>
+  <nav class="links" aria-label="Primary navigation"><a href="/#flagships">Examples</a><a href="/#skills">Skills</a><a href="/guides/">Guides</a><a href="/evidence/">Evidence</a><a href="/#install">Install</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub</a></nav>
+</div></header>
 
 <main id="main-content" tabindex="-1">
 <header class="">
   <div class="wrap">
     <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Motion and Effects</a></li><li aria-current="page">Procedural Motion Systems</li></ol></nav>
     <h1 style="view-transition-name:skill-threejs-procedural-motion-systems">Procedural Motion Systems</h1>
-    <p class="lede">Build representation-selected procedural motion systems in Three.js WebGPU/TSL. Use for launch kinematics, gravity turns, staging, spin docking, target-frame decomposition, spring-follow motion, rotating-frame alignment, analytic transform timelines, frame-rate-independent response, storage/instanced animation, and quaternion control.</p>
+    <p class="lede">Animate semantic state with deterministic Three.js WebGPU/TSL motion. Use for launch or staging kinematics, seekable transform timelines, recurrent fixed-step motion, frame-rate-independent follow, GPU-resident instance motion, moving-frame docking or reparenting, and environment-driven actors.</p>
     <div class="meta-row">
       <span class="chip a">$threejs-procedural-motion-systems</span>
-      <span class="chip">1 primary implementation</span>
-<span class="chip">2 flagships</span>
-<span class="chip">1 secondary surface</span>
+      <span class="chip">1 primary target</span>
+      <span class="chip">2 flagships</span>
+      <span class="chip">1 secondary surface</span>
       <span class="chip">native evidence pending</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-12T14:47:52+03:00">2026-07-12</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/6c0b23b6f905fc69187f160c61446ad64627642b">commit 6c0b23b ↗</a>
-      <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-motion-systems/SKILL.md">SKILL.md on GitHub ↗</a>
-      <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-procedural-motion-systems/SKILL.md">raw (for agents) ↗</a>
+      <span class="chip">Latest skill update <time datetime="2026-07-16T11:00:33+03:00">2026-07-16</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/2ce13bcc22695dafa808d6019452752d9a39cc71">commit 2ce13bc ↗</a>
+      <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-motion-systems/SKILL.md">SKILL.md on GitHub ↗</a>
+      <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/skills/threejs-procedural-motion-systems/SKILL.md">raw (for agents) ↗</a>
     </div>
   </div>
 </header>
 
 
   <section class="section" id="primary-implementations" aria-labelledby="primary-implementations-title"><div class="wrap">
-    <h2 id="primary-implementations-title">Primary implementation surface</h2>
-    <p class="sub">These routes are generated from canonical source. Their exact status remains separate from implementation availability.</p>
+    <h2 id="primary-implementations-title">Primary target surface</h2>
+    <p class="sub">These rendering routes are generated from canonical source. Native-WebGPU acceptance remains separate from entrypoint availability.</p>
     <div class="grid">
       <a class="card" href="../demos/webgpu-procedural-timelines/">
         <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="webgpu-procedural-timelines">
     <span class="primary-evidence-label">Canonical capture</span>
     <strong>Runtime evidence pending</strong>
-    <span><code>3db072e5c8ac</code> source hash</span>
+    <span><code>75dc31ba17b9</code> source hash</span>
     <span>12 fixed states · 7 runtime proof requirements</span>
   </span>
         <span class="card-head"><span class="card-kind">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
@@ -317,13 +328,12 @@ a.chip:active{scale:.96}
     <p class="sub">This skill contributes to the following cross-skill owner graphs.</p>
     <div class="grid">
       <a class="card" href="../demos/final-image-flight/">
-        <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="final-image-flight">
-    <span class="primary-evidence-label">Canonical capture</span>
-    <strong>Runtime evidence pending</strong>
-    <span><code>0e56ab6926da</code> source hash</span>
-    <span>10 fixed states · 12 runtime proof requirements</span>
-  </span>
-        <span class="card-head"><span class="card-kind">Final image systems</span><span class="status status--pending">Evidence pending</span></span>
+        <span class="card-preview-wrap" data-preview-for="final-image-flight" data-preview-source="final-image-flight" data-preview-classification="inspected-runtime-evidence-preview"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/final-image-flight/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/final-image-flight/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/final-image-flight/final.design.png" alt="Accepted demo-sourced runtime evidence for Final Image Flight" class="card-preview" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><span class="media-caption">Accepted demo-sourced runtime evidence</span></span>
+        <span class="card-head"><span class="card-kind">Final image systems</span><span class="status status--accepted">Accepted</span></span>
         <h3>Final Image Flight</h3>
         <span class="card-meta">6 mechanisms · 3 locked tiers</span>
       </a>
@@ -331,7 +341,7 @@ a.chip:active{scale:.96}
         <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="relativistic-space-shot">
     <span class="primary-evidence-label">Canonical capture</span>
     <strong>Runtime evidence pending</strong>
-    <span><code>5fe1522e9185</code> source hash</span>
+    <span><code>e2e9d6b673af</code> source hash</span>
     <span>10 fixed states · 4 runtime proof requirements</span>
   </span>
         <span class="card-head"><span class="card-kind">Relativistic cinematic</span><span class="status status--pending">Evidence pending</span></span>
@@ -344,7 +354,7 @@ a.chip:active{scale:.96}
   <section class="section" id="evidence-reports" aria-labelledby="evidence-reports-title"><div class="wrap">
     <h2 id="evidence-reports-title">Evidence reports</h2>
     <p class="sub">Source hashes, claim verdicts, promoted same-lab media, fixed routes, exact tier contracts, and current limitations.</p>
-    <nav class="evidence-report-links" aria-label="Evidence reports for Procedural Motion Systems"><a href="../evidence/webgpu-procedural-timelines/"><code>webgpu-procedural-timelines</code><span>evidence pending</span></a><a href="../evidence/final-image-flight/"><code>final-image-flight</code><span>evidence pending</span></a><a href="../evidence/relativistic-space-shot/"><code>relativistic-space-shot</code><span>evidence pending</span></a></nav>
+    <nav class="evidence-report-links" aria-label="Evidence reports for Procedural Motion Systems"><a href="../evidence/webgpu-procedural-timelines/"><code>webgpu-procedural-timelines</code><span>evidence pending</span></a><a href="../evidence/final-image-flight/"><code>final-image-flight</code><span>accepted</span></a><a href="../evidence/relativistic-space-shot/"><code>relativistic-space-shot</code><span>evidence pending</span></a></nav>
   </div></section>
 
   <div class="section" id="approach"><div class="wrap">
@@ -368,7 +378,7 @@ lateral error — each channel driven to zero by its own critically damped contr
 
   <div class="section" id="validation"><div class="wrap">
     <h2>Preview and evidence ledger</h2>
-    <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; canonical acceptance still requires render-target readback and a schema-v2 bundle.</p>
+    <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; rendering acceptance still requires same-lab readback and a schema-v2 bundle.</p>
     <div class="evidence-ledger"><span class="status status--pending">Canonical runtime evidence pending</span><code>0 published images</code></div>
 
     <div class="primary-evidence-panel" data-evidence-state="incomplete"><span class="primary-evidence-label">Same-lab evidence</span><strong>No runtime image promoted</strong><span>The page remains image-free until this skill's own lab supplies hash-bound pixels.</span></div>
@@ -376,390 +386,168 @@ lateral error — each channel driven to zero by its own critically damped contr
 
 <div class="section" id="skill-text"><div class="wrap">
   <h2>The full skill</h2>
-  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
+  <p class="sub">The complete SKILL.md as loaded by agents, rendered verbatim.</p>
   <div class="skilltext"><h2>Procedural Motion Systems</h2>
-<p>Animate semantic state, not unrelated transform curves. The default architecture
-is pinned Three.js r185 <code>WebGPURenderer</code> from <code>three/webgpu</code>, <code>THREE.Timer</code>,
-<code>renderer.setAnimationLoop()</code>, analytic transform timelines, TSL node
-materials, and scale routing to instanced attributes or compute-updated storage
-buffers before per-object updates become the bottleneck.</p>
-<p>Every numeric claim is <code>Authored</code>, <code>Derived</code>, <code>Gated</code>, or <code>Measured</code> with
-source and context. An authored count/rate is a trial point, a derived value
-cites its equation, a gate belongs to the product contract, and a measurement
-names runtime, target, workload, and quantile. None is universal by default.</p>
-<p>Read the shared
-<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-choose-skills/references/physics-domain-and-interaction-contract.md">physics-domain and interaction contract</a>
-before coupling motion to terrain, water, weather, contacts, or another solver.
-It defines the SI physics frame, gravity and unit conversion, clocks/ticks,
-multi-rate scheduler, <code>WaterSurfaceProvider</code>, <code>InteractionRecord</code>, residency,
-state/error versions, and <code>PhysicsPresentationSnapshot</code>. This skill owns motion
-algorithms behind that boundary; it does not create local substitutes.</p>
-<p>The route coordinator owns one canonical <code>PhysicsGraph</code>. This skill contributes
-named motion stages whose read/write version rules, dependencies, execution
-intervals, and commit groups are fixed by that graph; each admitted
-<code>PhysicsStageExecution</code> resolves those ports and joins the graph&#39;s atomic commit
-lineage before its output becomes sampleable.</p>
-<h2>Build order</h2>
-<p>Choose the time model before the throughput model:</p>
+<p>Semantic state is the source of truth; transforms are its presentation. Keep one
+writer for each position, orientation, velocity, phase, and event channel.</p>
+<h2>Process</h2>
+<h3>1. Declare state and its writer</h3>
+<p>Name the observable motion, SI units, coordinate frame, stable actor identity,
+initial state, phase/event state, and duration contract: finite with a terminal
+pose plus velocity/hand-off rule, periodic with a wrap rule, or open-ended with
+a stop/reset policy. Assign one writer to every animated channel; clips,
+procedural roots, instance storage, camera rigs, and external solvers may own
+different channels only through an explicit layering order.</p>
+<p>When another simulation supplies or reacts to motion, declare:</p>
+<ul>
+<li>exchanged quantities, units, frame/origin, state owner, producer, consumers,
+version, and publication order;</li>
+<li>timestamp or half-open interval, cadence, sample phase, interpolation or
+extrapolation, and discontinuity behavior;</li>
+<li>support/filter, validity, staleness, error bound, and missing-value behavior;</li>
+<li>rate versus interval-integrated semantics and one-way or two-way reaction
+ownership and order;</li>
+<li>GPU producer/consumer passes, resource generation, queue order, and actual
+completion evidence;</li>
+<li>immutable previous/current committed samples, stable identity, and reset,
+reuse, retirement, and disposal rules.</li>
+</ul>
+<p>Keep frame-critical state on its owning device; schedule diagnostic readback
+asynchronously outside state advance and presentation.</p>
+<p><strong>Complete when:</strong> every animated channel has exactly one writer, one frame and
+unit convention, one stable identity, and a defined initial state plus finite,
+periodic, or open-ended duration contract; every cross-system boundary closes
+every applicable declaration above.</p>
+<h3>2. Choose the time model and representation</h3>
+<p>Choose by state dependence first, then actor count:</p>
 <table>
 <thead>
 <tr>
-<th>Motion class</th>
-<th>State/update path</th>
-<th>Presentation</th>
+<th>Motion</th>
+<th>Time model</th>
+<th>Representation</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>Closed-form, seekable transform</td>
-<td>Evaluate directly from authoritative time on CPU for few actors or in vertex TSL for many</td>
-<td>No fixed-step integration or interpolation latency</td>
+<td>Seekable authored transform</td>
+<td>closed form at authoritative seconds</td>
+<td><code>Object3D</code> for a few actors; vertex TSL for many</td>
 </tr>
 <tr>
-<td>Event-driven analytic phases</td>
-<td>Evaluate phase curves directly; store only discrete event state</td>
-<td>Exact seek plus deterministic event replay</td>
+<td>Phased authored sequence</td>
+<td>closed form plus discrete event state</td>
+<td>phase-local time and a replayable event log</td>
 </tr>
 <tr>
-<td>ODE, constraint, collision, or spring state</td>
-<td>Fixed-step/substepped integration with previous/current states</td>
-<td>Interpolate with <code>alpha = accumulator / fixedStep</code></td>
+<td>Spring, constraint, collision, or other recurrent state</td>
+<td>fixed step with previous/current state</td>
+<td>CPU arrays or GPU storage selected by measured crossover</td>
 </tr>
 <tr>
-<td>Pure perceptual follow</td>
-<td>Frame-rate-independent exponential response</td>
-<td>Render-time response; do not label it physical simulation</td>
+<td>Perceptual follow</td>
+<td><code>dt</code>-correct exponential response</td>
+<td>render-time state, explicitly non-physical</td>
 </tr>
 </tbody></table>
-<p>Do not dispatch fixed-step compute for a transform already expressible in
-closed form. Conversely, do not sample recurrent spring or constraint state
-from variable render delta.</p>
-<p>A local fixed-step accumulator is only for standalone/authored motion with no
-<code>PhysicsGraph</code> edge. Cross-domain recurrent motion advances exclusively through
-its scheduled <code>PhysicsGraphStage</code> executions. Record every admitted native
-advance or analytic/state-hold evaluation as an exact <code>PhysicsStageExecution</code>;
-dropped debt belongs to the graph catch-up loss ledger, not an invented
-execution. Only the graph applies catch-up, drop, or discontinuity
-policy across the coordination interval. The render loop
-may request work and consume presentation, but never advances coupled state.</p>
-<p>Throughput decision table:</p>
-<table>
-<thead>
-<tr>
-<th>State/reuse shape</th>
-<th>Route</th>
-<th>Notes</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>few heterogeneous semantic objects</td>
-<td>ordinary transforms</td>
-<td>exact phase state, hierarchy semantics, no per-frame allocations</td>
-</tr>
-<tr>
-<td>repeated identical topology/material</td>
-<td><code>InstancedMesh</code></td>
-<td>one instanced draw per visible spatial page/bucket; dirty attributes only</td>
-</tr>
-<tr>
-<td>varied topology sharing compatible material state</td>
-<td><code>BatchedMesh</code></td>
-<td>r185 scene/state management and per-object culling; measure one backend draw item per visible multi-draw entry</td>
-</tr>
-<tr>
-<td>dense independent recurrent state that remains GPU-resident</td>
-<td>storage attributes + measured compute</td>
-<td>use only past the measured CPU/upload crossover; compact only when removed work exceeds dispatch cost</td>
-</tr>
-</tbody></table>
-<ol>
-<li>Choose the throughput class first: a few semantic objects use small CPU phase state;
-repeated actors use <code>InstancedMesh</code> plus node attributes; particle-scale or
-debris-scale motion uses <code>StorageInstancedBufferAttribute</code>,
-<code>StorageBufferAttribute</code>, <code>storage()</code> nodes, and <code>renderer.compute()</code>.</li>
-<li>Create one renderer loop with <code>await renderer.init()</code>,
-<code>timer.connect(document)</code>, and <code>timer.update(timestamp)</code>. Sample analytic
-timelines from authoritative seconds directly. Only standalone recurrent
-simulations use local fixed-step accumulation; coupled recurrent simulations
-use graph executions. Both retain previous/current state and interpolated
-presentation.</li>
-<li>Define phase contracts, event boundaries, seed ownership, phase-local time,
-replay reset/disposal, and a <code>DeltaPolicy</code> with raw delta, clamped delta,
-fixed step, max substeps, simulation time, and presentation time.</li>
-<li>Derive target position/orientation analytically from named coordinate
-frames: world, subject local, orbital radial/tangent, docking axis, rotating
-hull frame, or camera-authored presentation frame.</li>
-<li>Encode high-count transforms as compact state: previous position, current
-position, velocity, base quaternion, angular velocity, phase id, seed, and
-flags in storage buffers; dispatch compute from the standalone fixed-step
-loop or its owning <code>PhysicsGraphStage</code> execution and
-evaluate render pose in vertex TSL from previous/current storage plus alpha
-instead of walking thousands of <code>Object3D</code> transforms.</li>
-<li>Use frame-rate-independent smoothing with <code>alpha = 1 - pow(k, dt)</code> for
-perceptual response, and use bounded second-order springs only when velocity
-is part of the authored motion.</li>
-<li>Preserve world transforms when reparenting semantic children. Compute
-<code>M_local_new = inverse(M_world_newParent) * M_world_old</code>; decompose only when
-TRS residual passes. Non-uniform ancestry may create shear, which requires a
-full local matrix with <code>matrixAutoUpdate=false</code>, a baked/affine wrapper, or
-rejection. <code>Object3D.attach()</code> is only for compatible uniform-scale chains.</li>
-<li>Render with <code>MeshStandardNodeMaterial</code>, <code>MeshPhysicalNodeMaterial</code>, or other
-<code>NodeMaterial</code> family materials; drive animated vertex/instance state with
-TSL attributes/storage, and use <code>RenderPipeline</code> for node post output.
-Node-post apps call <code>renderPipeline.render()</code>, not renderer.render(), and
-keep <code>outputColorTransform</code> as the single output owner.</li>
-</ol>
-<p>Environment-coupled motion is an explicit algorithm boundary. Boats, buoys,
-floating debris, and swimmers consume the canonical batched,
-channel-requested <code>WaterSurfaceProvider</code>. Requests use physics-frame metres and
-declare footprint/filter, frame, and <code>requestedPhysicsTime: PhysicsTime</code> with
-<code>kind: instant</code>, a present <code>instant: PhysicsInstant</code>, and a typed-absent
-<code>interval</code> arm. The provider returns one canonical <code>WaterSurfaceSample</code>; the
-motion stage validates
-its descriptor and generation, bundle <code>sampleInstant</code>, parameterization,
-represented footprint/filter, atomic validity, and per-channel error against
-the request before advancing actor state. Its channels use the exact shared
-names <code>freeSurfacePoint</code>, <code>freeSurfaceNormal</code>,
-<code>geometricNormalVelocityMps</code>, <code>surfacePointVelocityMps</code>,
-<code>materialCurrentVelocityMps</code>,
-<code>waterColumnDepthMeters</code>, optional <code>densityKgPerM3</code>,
-and the returned shared <code>PhysicsSignalDescriptor</code>.
-Each channel is the complete shared <code>SampledChannel</code> and retains
-<code>actualPhysicsTime: PhysicsTime</code> with the same instant-arm shape; the
-<code>WaterSurfaceSample.sampleInstant</code> bundle field remains a raw <code>PhysicsInstant</code>.
-The requested and actual instant-arm values may differ only within the declared
-latency/staleness gates. Missing channels
-follow <code>missingChannelPolicy</code> and are never synthesized as zero; geometric
-surface velocity and material current remain distinct. Consumers do not
-redeclare or subset the descriptor/time envelope. The scalar
-<code>geometricNormalVelocityMps</code> channel is mandatory even when the parameterization-
-dependent full <code>surfacePointVelocityMps</code> is absent.</p>
-<p>Declare one-way coupling (water drives the actor but receives no load) or
-two-way coupling. One-way mode identifies the authoritative source and records
-a <code>[G]</code> upper bound on omitted actor-to-water feedback or explicitly narrows the
-claim/regime. The latter uses the shared scheduler order: both owners
-predict, sample one coupling-time water bracket, emit source
-<code>InteractionRecord</code> entries, conservatively scatter loads by conservation
-group, advance water/subcycles, reduce reaction records, correct both owners,
-check conservation/stability, and atomically commit. Inside one state-equation
-owner, coupling may be explicit, semi-implicit, scheduler-bounded iterated, or
-monolithic; monolithic means that owner advances every coupled unknown. Any
-cross-owner coupling publishes <code>SurfaceExchange</code> with exact mode <code>one-way</code>,
-<code>two-way-explicit</code>, or <code>two-way-iterated</code>; it is never labelled monolithic.
-Gather/scatter are discrete adjoints preserving zeroth/
-first moments and gating force, torque, interface work, and added-mass
-stability. Conservation covers represented mass, linear/angular momentum,
-energy/work, and species; volume is only a fixed-density incompressible
-constraint. A visual wake does not make a one-way model two-way. Never obtain
-state through frame-critical GPU readback; use a shared analytic/CPU query,
-GPU-resident coupled state, or an explicitly latency-bounded service. Route
-metric six-degree-of-freedom hydrodynamics to a domain solver and consume its
-pose through the canonical <code>ExternalSolverAdapter</code>.</p>
-<p>Two-way source/reaction records form an all-or-none
-<code>InteractionReactionGroup</code>; many-to-many reduction is legal, and balance is
-tested after transport to its declared frame/reference point.</p>
-<p>Every motion stage that applies a source or reduced reaction record resolves
-the record&#39;s <code>applicationLedgerKey</code> to a canonical
-<code>InteractionApplicationLedger</code>. The row names the current
-<code>PhysicsStageExecution</code>, exact declared interval and execution overlap, payload
-time semantics and applied integral/fraction, target owner/entity/equation and
-expected state version, cursor before/after, prepared version, commit
-transaction, disposition, <code>applicationContentDigest</code>, and <code>receiptDigest</code>. Rate payloads
-integrate only over the exact overlap; interval-integrated payloads commit once.
-Only a <code>committed</code> receipt may authorize the corresponding target-state
-advance. <code>duplicate-no-op</code>, replayed, disjoint, deferred, and rejected rows
-cannot mutate motion state or become presentation-eligible. The ledger ID must
-resolve from the batch and route inventories and appear in the stage execution,
-<code>StateAdvanceClaim</code>, accepted coupling iteration when present, and atomic commit
-lineage; reading an <code>InteractionRecord</code> or advancing a consumer cursor alone is
-not application authority.</p>
-<p>Presentation is not another physics query. Motion contributes a per-binding/provider
-<code>PresentedStatePair</code> to the view-independent <code>PhysicsPresentationCandidate</code>,
-which contains no camera or render transform. <code>previousPresented</code> and
-<code>currentPresented</code> each carry independent <code>PresentationSampleProvenance</code>,
-<code>presentedInstant</code>, state handle, and global spatial binding; <code>motionBinding</code>
-references both handles and records identity mapping and validity. The camera
-owner publishes <code>CameraViewPublication</code>, preparation owners publish
-<code>ViewPreparationPublication</code>, and the sealed <code>PhysicsPresentationSnapshot</code>
-references candidate binding IDs and lease refs under one
-<code>PresentationTimeCohort</code>. <code>PresentationRenderPlan</code> binds exact pass/resource/
-history generations and frame-slot admission before <code>FrameExecutionRecord</code> records
-multi-target execution and lease disposition keyed by lease ID. Those poses
-need not be solver states <code>n</code> and <code>n+1</code>. Visible transforms, motion vectors,
-shadows, bounds, and temporal history resolve through that immutable chain.
-Physical instants, physics-frame transforms, floating-origin, and source epochs
-remain separate. An incompatible state, transform/source
-epoch, residency, or quality migration invalidates or explicitly migrates
-history through scoped <code>ReactivePublication</code> and <code>ScopedResetAction</code> records in
-<code>ViewPreparationPublication</code>, not extra pair or snapshot flags.
-Teleports, topology/deformation changes, emissive events, and disocclusion
-contribute scoped reactive epochs/regions for the coordinator&#39;s per-view
-publication and reset plan.</p>
-<p>Read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-procedural-motion-systems/references/procedural-motion-and-docking-systems.md">references/procedural-motion-and-docking-systems.md</a>
-for the WebGPU/TSL launch, staging, docking, debris, spring, quaternion,
-compute/storage, replay, and validation contracts.</p>
-<h2>Capability gate and quality tiers</h2>
-<p>Initialize once, then branch only by quality tier. Explicit requests for
-compatibility strategies route to <code>../threejs-compatibility-fallbacks/</code>; this
-skill keeps one flagship architecture.</p>
-<pre><code class="language-js">await renderer.init();
-if ( renderer.backend.isWebGPUBackend !== true ) {
-  throw new Error(
-    &#39;WebGPU is required for the canonical procedural-motion path; explicit fallback teaching belongs to threejs-compatibility-fallbacks.&#39;
-  );
-}
-</code></pre>
-<p>Do not write a parallel renderer implementation in this skill.</p>
-<p>Quality tiers:</p>
+<p>Use <code>InstancedMesh</code> for repeated identical topology. Use <code>BatchedMesh</code> for
+varied topology with compatible material state. Use storage and compute only
+when the measured CPU traversal/upload crossover is passed.</p>
+<p>The canonical path initializes <code>WebGPURenderer</code> from <code>three/webgpu</code> with
+<code>await renderer.init()</code> and verifies <code>renderer.backend.isWebGPUBackend === true</code>.</p>
+<p><strong>Complete when:</strong> each motion branch has one time model and one representation,
+and each GPU route states the measured workload threshold that justifies it.</p>
+<h3>3. Make time deterministic</h3>
+<p>Sample analytic motion directly from authoritative elapsed seconds. Advance
+recurrent state by a fixed step, retain immutable previous/current states, and
+move every complete unprocessed step into separate debt state so
+<code>0 &lt;= accumulator &lt; fixedStep</code> before presenting with
+<code>alpha = accumulator / fixedStep</code>. Define raw-delta clamping, maximum substeps,
+debt handling, pause/resume, and replay behavior once for the whole motion
+owner. A debt drop or scheduled catch-up and a discontinuity reset are separate
+decisions. Coupled state advances on its simulation owner&#39;s cadence, not the
+render callback&#39;s cadence.</p>
+<p>For perceptual follow, declare the target as a continuous function integrated
+over the interval, a timestamped zero-order hold, or timestamped interpolated
+samples. Apply changes at their timestamps; presentation cadence never changes
+the underlying target signal.</p>
+<p>Use stored seeds, counters, and one-shot event flags. A direct seek reconstructs
+the same phase and event state as replay to that time. <code>AnimationMixer</code> either
+updates at the fixed step or uses <code>setTime()</code> for seeking; it does not sample an
+independent clock.</p>
+<p><strong>Complete when:</strong> analytic and recurrent clocks cannot diverge after a stall,
+the interpolation pair brackets presentation time with a bounded accumulator,
+debt and reset decisions are independently observable, and identical initial
+state plus every applicable seed, fixed step, event schedule, and target signal
+reproduce the same matched-time state at every tested presentation cadence.</p>
+<h3>4. Implement frame-safe transforms</h3>
+<p>Name source and destination frames for every position, direction, velocity, and
+quaternion. Normalize axes, handle parallel and antiparallel vector alignment,
+canonicalize quaternion signs before interpolation, state multiplication order,
+and normalize accumulated rotations.</p>
+<p>Preserve world pose during reparenting with
+<code>M_local_new = inverse(M_world_newParent) * M_world_old</code>. Decompose to TRS only
+when the residual passes; retain an affine matrix or wrapper when non-uniform
+ancestry creates shear. Released children inherit moving-frame velocity,
+including <code>omega cross r</code> for a rotating parent. Docking error is decomposed in
+the current docking frame, not a stale world frame.</p>
+<p><strong>Complete when:</strong> every transform has a declared frame chain and quaternion
+order, reparenting preserves the world matrix within tolerance, zero/antiparallel
+inputs stay finite, and moving-frame release includes all transport terms.</p>
+<h3>5. Publish, reset, and dispose</h3>
+<p>Publish immutable previous/current pose generations with stable actor identity;
+derive render pose, motion vectors, bounds, shadows, and temporal consumers from
+that same pair. A cut, teleport, spawn/despawn, reparent, topology or deformation
+change, LOD/quality change, storage-slot reuse, or identity change starts a new
+validity epoch and resets the affected history instead of deriving an extreme
+velocity.</p>
+<p>Reset phase timestamps, accumulator and debt records, seed counters, event
+flags, finite terminal locks, previous/current buffers, and validation staging
+together. Disposal releases storage, compute resources, readback staging,
+listeners, timers, and the renderer loop owned by the system.</p>
+<p><strong>Complete when:</strong> every discontinuity selects preserve, migrate, or reset for
+each history consumer; no old identity can observe a reused slot; reset and
+dispose leave no live owner, listener, buffer, or animation loop.</p>
+<h3>6. Verify the invariants</h3>
+<p>Run analytic and recurrent sequences at 30, 60, 120, and 240 Hz presentation
+while holding their authoritative timeline or fixed-step schedule constant. Run
+perceptual follow at the same rates against one timestamped or analytically
+integrated target signal and compare shared wall-time checkpoints. Check direct
+seek against replay, step-halving for recurrent state, the exact finite terminal
+pose and declared velocity/hand-off, zero residual velocity only for a finite
+terminal lock, phase/wrap continuity for periodic motion, and the declared
+stop/reset transition for open-ended motion.
+Also check quaternion norm and sign continuity, world-matrix equality across
+reparenting, stable instance identity, and reset behavior for every
+discontinuity. For GPU motion, record dispatches, hot bytes, p50/p95 time, and
+zero frame-critical readbacks. Verify one presentation/output owner when node
+post is present.</p>
+<p><strong>Complete when:</strong> every selected branch passes its cadence, ownership, frame,
+reset, lifecycle, and visible-failure checks, with thresholds and target hardware
+recorded where performance claims are made.</p>
+<h2>Conditional references</h2>
 <ul>
-<li>Full: the selected analytic/recurrent solver, complete interaction and
-deformation contract, full-rate active state, and measured timing.</li>
-<li>Balanced: same motion invariants with lower distant update cadence, bounded
-active windows, coarser representation, and explicit presentation error.</li>
-<li>Minimum: native WebGPU, fewer active actors, analytic transforms where
-possible, coarse distant cadence, and static far LODs.</li>
-</ul>
-<h2>Performance contract</h2>
-<ul>
-<li>CPU semantic transforms: record active count, hierarchy depth, changed
-matrices, upload bytes, and update/submission p50/p95. Static and closed-form
-state is sampled directly and does not require recurrent integration.</li>
-<li>Instanced fields: one draw per compatible identical-topology/material page
-after culling; record submitted/visible instances and dirty parameter bytes.
-<code>BatchedMesh</code> varied-topology entries remain separate r185 backend draw items
-and use their own submitted-entry ledger.</li>
-<li>Compute motion: derive invocations from active recurrent state and tune
-workgroup size on the target. Add culling/compaction only when it removes more
-submission/vertex/fragment work than its dispatch and traffic cost; no
-steady-frame readback.</li>
-<li>Provider requests and interaction streams use compact channel-masked SoA,
-bounded queues, generation-bearing identities distinct from storage slots,
-deterministic reductions, and canonical batch-level
-<code>InteractionBatchLedger</code> records; avoid per-sample
-JavaScript objects.</li>
-<li>An <code>ExternalSolverAdapter</code> pose/dynamics route publishes
-<code>PhysicsExternalAdapterCost</code>: request/response/batch counts, logical and
-physical ingress/egress bytes, serialization and frame/unit conversion,
-enqueue/queue/IPC/shared-resource/device/network transport, ownership
-transitions, fences/maps/cache effects, remote wait/solve attribution,
-deserialization and atomic-commit tail, retries/timeouts/duplicate
-suppression, in-flight/staging/recovery bytes, and clock-map/staleness work.
-Measure dependency-aligned p50/p95 under steady, worst catch-up, migration,
-process-failure, and device-loss fixtures. “Zero copy” and unavailable remote
-timers do not mean zero transport cost; unavailable remote attribution stays
-unavailable while the observable adapter tail remains measured.</li>
-<li>A route that owns physical collision/constraint resolution publishes
-<code>PhysicsContactCost</code>: body/shape/proxy population, moved bounds and broadphase
-pairs, shape-pair narrowphase tests, manifolds/points/feature remaps, islands,
-constraint rows/iterations/residuals, warm-start cache behavior,
-deterministic reduction/atomic contention, lifecycle application receipts,
-and pileup/high-speed/topology/migration stress tails. Actor count or average
-contact count alone is not a contact cost model; an external contact owner is
-referenced from the same opportunity rows instead of double-attributed.</li>
-<li>Presentation bindings reference immutable resource generations under a
-frame-in-flight lease/reuse rule; no solver overwrites a pose generation
-still used by a sealed snapshot.</li>
-<li>Physical representation/quality <code>QualityTransition</code> is coordinator-admitted at a tick
-boundary with state projection, conserved-value/error ledger, interaction-
-queue boundary, atomic provider generation, history action, rollback, and
-peak old/new residency. Visual crossfades never duplicate forces/reactions.</li>
-<li>Any physics-facing change to
-<code>PhysicsQualityStateDescriptor.nativeStepAndCouplingControls</code>,
-<code>.stateVariablesAndInventories</code>, <code>.representedBandsFootprintsAndFilters</code>,
-<code>.stableIdPolicy</code>, or <code>.presentationRepresentation</code> requires that exact
-<code>QualityTransition</code>; it maps every
-<code>InteractionRecord.applicationLedgerKey</code> and
-<code>InteractionBatchLedger.exactOnceApplicationLedgerVersion</code>, commits through
-<code>PhysicsCommitTransaction</code>, and publishes new versioned state only through
-<code>PresentationTimeCohort</code>, <code>PhysicsPresentationCandidate</code>,
-<code>CameraViewPublication</code>, <code>ViewPreparationPublication</code>, sealed
-<code>PhysicsPresentationSnapshot</code>, and <code>PresentationRenderPlan</code>.
-In-place mutation or an unledgered presentation crossfade is invalid.</li>
-<li>Memory: derive hot state as <code>activeCapacity * alignedDynamicStrideBytes</code> plus
-history/scan slots. Split immutable parameters from dynamic state and upload
-dirty ranges only.</li>
-<li>Frame target: the router allocates a marginal update ceiling from the whole
-frame. Gate contemporaneous full-frame and paired-marginal p50/p95 CPU/GPU
-update time on target hardware; shed count,
-recurrent-state frequency, and active phase windows before changing the
-authored motion contract.</li>
-</ul>
-<h2>Color and output</h2>
-<ul>
-<li>LDR color textures encoded as sRGB use <code>SRGBColorSpace</code>; HDR/EXR radiance
-remains loader-declared linear. Data maps, pose textures, noise, masks,
-lookup tables, and generated animation data use <code>NoColorSpace</code>.</li>
-<li>Keep HDR buffers as <code>HalfFloatType</code> until tone mapping.</li>
-<li>The node post pipeline has one tone-map owner and one output conversion owner:
-<code>RenderPipeline.outputColorTransform</code> or an explicit <code>renderOutput()</code>, not
-duplicated in materials or effects.</li>
-<li>Prefer built-in node passes where relevant to animated scenes:
-<code>TRAANode</code> for temporal reprojection, <code>BloomNode</code> for emissive events,
-<code>GTAONode</code> for contact grounding, and <code>CSMShadowNode</code>/<code>TileShadowNode</code> for
-scalable directional shadows before custom code.</li>
-</ul>
-<h2>Non-negotiable rules</h2>
-<ul>
-<li>Use elapsed seconds, fixed simulation seconds, and presentation seconds; never
-make motion frame-count based.</li>
-<li>A local accumulator never advances a <code>PhysicsGraph</code> participant; render delta
-is not cross-domain scheduler time.</li>
-<li>Derive orientation from a declared frame, then apply authored roll/spin as a
-separate quaternion with explicit multiplication order.</li>
-<li>Normalize input axes, guard zero-length vectors and antiparallel unit-vector
-cases, and periodically normalize accumulated quaternions.</li>
-<li>Decompose docking error into axial and radial components in the current
-docking frame.</li>
-<li>Switch from spring convergence to an exact terminal pose at the end of a
-sequence; terminal locks must zero residual velocity.</li>
-<li>Use seeded randomness with stored seed, stream/counter, and event flags when
-motion must be reproducible.</li>
-<li>Keep visual shake in a bounded envelope and separate it from trajectory,
-camera shake, and physics state.</li>
-<li>Do not call wave phase velocity, group velocity, or the vertical rate of a
-height field a material current. Every water velocity channel names its
-frame and meaning.</li>
-<li>One-way and two-way water coupling are different contracts. One-way requires
-authoritative-source identity plus a gated omitted-feedback bound or narrowed
-claim. Two-way requires
-predict/sample/source-record/load-scatter/water-advance/reaction-reduce/
-correct/check/atomic-commit order, conservation-group and error gates, and matching state
-versions; a foam trail is not feedback.</li>
-<li>Render transforms, velocities, bounds, shadows, and temporal consumers read
-one sealed per-target/view <code>PhysicsPresentationSnapshot</code>, never a mixture of
-the candidate with live pre-step or post-step resources.</li>
-<li>Spawn, despawn, teleport, reparent, slot reuse, topology/LOD, and discontinuous
-quality changes publish a motion/history validity reason; they never become
-an extreme derived velocity.</li>
-</ul>
-<h2>Replaced techniques</h2>
-<ul>
-<li>Replaced repeated endpoint lerps with analytic transform timelines because
-they provide continuous position/speed, deterministic replay, and direct
-phase seeking.</li>
-<li>Replaced per-object matrix updates for high-count debris with instanced node
-attributes or compute-updated storage buffers because CPU scene traversal and
-matrix uploads lose one to two orders of magnitude at scale.</li>
-<li>Replaced plain <code>exp(-lambda * dt)</code> smoothing spelling with
-<code>1 - pow(k, dt)</code> half-life/retention contracts because authored retention is
-easier to tune consistently across frame rates.</li>
-<li>Replaced unconstrained semi-implicit springs as a default with fixed-step
-substepped springs plus terminal snap, and with analytic timelines whenever
-inertia is not part of the visible motion.</li>
+<li>For analytic interpolation, phase events, launch paths, detachment, or debris,
+read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-motion-systems/references/procedural-motion-and-docking-systems.md#analytic-phases-launch-and-stage-release">Analytic phases, launch, and stage release</a>.</li>
+<li>For recurrent timing, springs, replay, <code>AnimationMixer</code>, or terminal locks,
+read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-motion-systems/references/procedural-motion-and-docking-systems.md#time-and-state-models">Time and state models</a>.</li>
+<li>For <code>InstancedMesh</code>, <code>BatchedMesh</code>, storage attributes, TSL compute, or GPU
+completion, read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-motion-systems/references/procedural-motion-and-docking-systems.md#r185-representation-and-gpu-residency">r185 representation and GPU residency</a>.</li>
+<li>For docking frames, quaternion order, reparenting, or rotating-parent release,
+read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-motion-systems/references/procedural-motion-and-docking-systems.md#moving-frames-docking-and-quaternions">Moving frames, docking, and quaternions</a>.</li>
+<li>For water-, terrain-, weather-, contact-, or solver-driven actors, read
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-motion-systems/references/procedural-motion-and-docking-systems.md#environment-driven-actors">Environment-driven actors</a> and apply the handoff requirements in step 1.</li>
+<li>For temporal publication, reset scope, output ownership, disposal, or failure
+diagnosis, read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-motion-systems/references/procedural-motion-and-docking-systems.md#presentation-resets-output-and-lifecycle">Presentation, resets, output, and lifecycle</a> and
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-motion-systems/references/procedural-motion-and-docking-systems.md#failure-signatures-and-verification">Failure signatures and verification</a>.</li>
 </ul>
 <h2>Routing boundary</h2>
-<p>Use <code>$threejs-choose-skills</code> for preflight when a procedural animation request
-also spans rendering, geometry, materials, shadows, atmosphere, or post.
-Use <code>$threejs-camera-controls-and-rigs</code> for shot composition and camera handoffs.
-Use <code>$threejs-particles-trails-and-effects</code> when the deliverable is primarily plasma, sparks,
-or effect pooling rather than object transform motion.
-Use <code>$threejs-water-optics</code> for bounded/coastal free-surface state and
-<code>$threejs-spectral-ocean</code> for open-ocean wave state. Those skills own the water
-query, solver, and coupling error; this skill owns actor pose integration from
-the shared <code>WaterSurfaceProvider</code> contract. Full rigid-body hydrodynamics,
-collision, and control remain domain-physics ownership, while cross-domain
-ordering and exchange remain governed by the shared physics-domain and
-interaction contract.</p>
+<p>Use <code>$threejs-camera-controls-and-rigs</code> for camera motion and handoffs,
+<code>$threejs-particles-trails-and-effects</code> when pooled effects are the deliverable,
+and the relevant water or terrain skill for environment state. Use
+<code>$threejs-choose-skills</code> when the request spans motion plus rendering, geometry,
+materials, shadows, post, or another simulation.</p>
 </div>
+  <aside class="skill-guides" aria-labelledby="related-guides-title"><h3 id="related-guides-title">Related guides</h3><ul><li><a href="/industries/browser-games/"><span>Industries</span>Three.js WebGPU Skills for Browser Games</a></li></ul></aside>
   <div class="pn">
     <a href="threejs-procedural-materials.html">← Procedural Materials</a>
     <a href="threejs-procedural-planets.html">Procedural Planets →</a>
@@ -785,10 +573,16 @@ interaction contract.</p>
 </main>
 
 <div class="wrap"><footer>
-  <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
-  <span style="font-size:13px">Three r185.1 · 41 working implementations · build <code>6c7881ab7386</code></span><br/>
-  <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
-  <span><a href="https://threejs-skills.com/about/">About &amp; methodology</a> · <a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/llms.txt">For coding agents</a></span>
+  <div class="footer-summary">Three.js WebGPU Skill Pack: TSL, procedural graphics, and visual validation.
+    <span>Three r185.1 · 40 primary targets · 25 accepted · build <code>ab7d8d17e058</code></span>
+    <span>Compiling shaders? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span>
+  </div>
+  <div class="footer-groups">
+    <div class="footer-group"><strong>Build</strong><a href="/#skills">Skills</a><a href="/#flagships">Examples</a><a href="/industries/">Industries</a></div>
+    <div class="footer-group"><strong>Decide</strong><a href="/for/">Who it is for</a><a href="/compare/">Compare</a><a href="/alternatives/">Alternatives</a><a href="/pricing/">Pricing</a></div>
+    <div class="footer-group"><strong>Adopt</strong><a href="/docs/">Docs</a><a href="/migrate/">Migration</a><a href="/agents/">Agent docs</a><a href="/faq/">FAQ</a></div>
+    <div class="footer-group"><strong>Proof</strong><a href="/evidence/">Evidence</a><a href="/about/">Method</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a><a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/LICENSE">License</a></div>
+  </div>
 </footer></div>
 </body>
 </html>

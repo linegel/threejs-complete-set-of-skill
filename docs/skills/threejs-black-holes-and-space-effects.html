@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Black Holes and Space Effects | Three.js WebGPU Skill</title>
-<meta name="description" content="Build WebGPU/TSL black holes, wormholes, accretion disks, and curved-ray space effects in Three.js. Use for black-hole lensing, accretion disks, wormholes…" />
+<title>Curved-Ray Space Effects | Three.js WebGPU Skill</title>
+<meta name="description" content="Build curved-ray space effects in Three.js WebGPU/TSL. Use for artistic ray bending, Ellis wormholes, Schwarzschild black-hole lensing, accretion disks…" />
 <meta name="author" content="Three.js WebGPU Skill Pack contributors" />
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-black-holes-and-space-effects.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b" />
+<meta name="skill-pack-build-revision" content="sha256:ab7d8d17e0589a6f5c2462d645b9e0d6797cd92eade36e3615dae091c6f9df5b" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -21,16 +21,16 @@
 <meta property="og:type" content="article" />
 <meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
-<meta property="og:title" content="Black Holes and Space Effects | Three.js WebGPU Skill" />
-<meta property="og:description" content="Build WebGPU/TSL black holes, wormholes, accretion disks, and curved-ray space effects in Three.js. Use for black-hole lensing, accretion disks, wormholes…" />
+<meta property="og:title" content="Curved-Ray Space Effects | Three.js WebGPU Skill" />
+<meta property="og:description" content="Build curved-ray space effects in Three.js WebGPU/TSL. Use for artistic ray bending, Ellis wormholes, Schwarzschild black-hole lensing, accretion disks…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-black-holes-and-space-effects.html" />
-<meta property="article:modified_time" content="2026-07-11T12:52:06+03:00" />
+<meta property="article:modified_time" content="2026-07-16T12:45:44+03:00" />
 <meta property="article:published_time" content="2026-07-04T23:30:19+03:00" />
 <meta property="article:section" content="Motion and Effects" />
 
 <meta name="twitter:card" content="summary" />
-<meta name="twitter:title" content="Black Holes and Space Effects | Three.js WebGPU Skill" />
-<meta name="twitter:description" content="Build WebGPU/TSL black holes, wormholes, accretion disks, and curved-ray space effects in Three.js. Use for black-hole lensing, accretion disks, wormholes…" />
+<meta name="twitter:title" content="Curved-Ray Space Effects | Three.js WebGPU Skill" />
+<meta name="twitter:description" content="Build curved-ray space effects in Three.js WebGPU/TSL. Use for artistic ray bending, Ellis wormholes, Schwarzschild black-hole lensing, accretion disks…" />
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
@@ -55,15 +55,15 @@
     "TechArticle"
    ],
    "@id": "https://threejs-skills.com/skills/threejs-black-holes-and-space-effects.html#article",
-   "headline": "Black Holes and Space Effects",
-   "description": "Build WebGPU/TSL black holes, wormholes, accretion disks, and curved-ray space effects in Three.js. Use for black-hole lensing, accretion disks, wormholes, curved-ray integration, procedural star fields, relativistic-looking distortion, bounded volumetric structures, and GPU effects that need controlled numerical integration.",
+   "headline": "Curved-Ray Space Effects",
+   "description": "Build curved-ray space effects in Three.js WebGPU/TSL. Use for artistic ray bending, Ellis wormholes, Schwarzschild black-hole lensing, accretion disks, physical thin-disk transport, or requests that need the Kerr/rotating-black-hole support boundary.",
    "url": "https://threejs-skills.com/skills/threejs-black-holes-and-space-effects.html",
    "mainEntityOfPage": {
     "@type": "WebPage",
     "@id": "https://threejs-skills.com/skills/threejs-black-holes-and-space-effects.html"
    },
    "datePublished": "2026-07-04T23:30:19+03:00",
-   "dateModified": "2026-07-11T12:52:06+03:00",
+   "dateModified": "2026-07-16T12:45:44+03:00",
    "author": {
     "@id": "https://threejs-skills.com/#publisher"
    },
@@ -83,7 +83,7 @@
     "Three.js",
     "WebGPU",
     "TSL",
-    "Black Holes and Space Effects"
+    "Curved-Ray Space Effects"
    ],
    "articleSection": "Motion and Effects"
   },
@@ -105,7 +105,7 @@
     {
      "@type": "ListItem",
      "position": 3,
-     "name": "Black Holes and Space Effects",
+     "name": "Curved-Ray Space Effects",
      "item": "https://threejs-skills.com/skills/threejs-black-holes-and-space-effects.html"
     }
    ]
@@ -140,18 +140,18 @@ html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smo
 body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7}
 ::selection{background:rgba(255,180,84,.26);color:var(--ink)}
 a{color:inherit;text-decoration:none}
-a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
+a:focus-visible,button:focus-visible,summary:focus-visible,pre[tabindex]:focus-visible,[role="region"]:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
 main{display:block}
 .skip-link{position:fixed;z-index:100;left:16px;top:12px;translate:0 -160%;font-family:var(--mono);font-size:12px;background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:9px;transition-property:translate;transition-duration:160ms}
 .skip-link:focus{translate:0 0}
 .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
 .site-nav{position:sticky;z-index:50;top:0;background:rgba(8,10,14,.82);border-bottom:1px solid rgba(255,255,255,.075);backdrop-filter:blur(18px) saturate(1.15)}
-nav{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
-nav .brand{white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
-nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
-nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
-nav .links a:hover{color:var(--amber)}
-nav .links a:active{scale:.96}
+.site-nav>.wrap{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+.site-nav .brand{min-height:44px;display:inline-flex;align-items:center;white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
+.site-nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
+.site-nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
+.site-nav .links a:hover{color:var(--amber)}
+.site-nav .links a:active{scale:.96}
 h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:0}
 p{text-wrap:pretty}
 h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
@@ -165,7 +165,7 @@ code{font-family:var(--mono)}
 .card{min-height:100%;background:linear-gradient(145deg,rgba(19,24,33,.96),rgba(12,15,21,.96));border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px;
   box-shadow:var(--shadow-card);transition-property:translate,scale,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
 .card:hover{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
-.card:active{translate:0 -1px;scale:.99}
+.card:active{translate:0 -1px;scale:.96}
 .card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .card-kind{font-family:var(--mono);font-size:10px;color:var(--cyan)}
 .card h3,.card h4{font-size:19px;font-weight:600}
@@ -190,19 +190,29 @@ figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:s
 figcaption{padding:16px 18px;font-size:14.5px}
 figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
 figcaption span{display:block;margin-top:3px;color:var(--dim)}
-footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
+footer{border-top:1px solid var(--line);padding:44px 0 60px;display:grid;grid-template-columns:minmax(260px,1.4fr) minmax(0,2fr);gap:36px 64px;color:var(--dim);font-size:14.5px}
 footer a{color:var(--amber)}
 footer a:hover{text-decoration:underline}
 footer code{color:var(--cyan);font-size:11px}
+.footer-summary{max-width:55ch}.footer-summary>span{display:block;margin-top:8px;font-size:13px}.footer-groups{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}.footer-group{display:grid;align-content:start;gap:8px}.footer-group strong{font:400 10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}.footer-group a{min-height:40px;display:flex;align-items:center;color:var(--dim);font-size:13px;transition-property:color,scale;transition-duration:160ms}.footer-group a:hover{color:var(--amber);text-decoration:none}.footer-group a:active{scale:.96}
+.pathfinder{padding:clamp(52px,7vw,86px) 0;border-bottom:1px solid var(--line)}.pathfinder-head{display:grid;grid-template-columns:minmax(0,.7fr) minmax(320px,1.3fr);align-items:end;gap:28px 72px;margin-bottom:28px}.pathfinder-head h2{margin:0}.pathfinder-head p{max-width:58ch;color:var(--dim)}.pathfinder-rows{border-top:1px solid var(--line)}.pathfinder-row{display:grid;grid-template-columns:minmax(160px,.55fr) minmax(210px,.8fr) minmax(0,1.6fr);gap:20px 32px;align-items:center;min-height:94px;border-bottom:1px solid var(--line)}.pathfinder-stage{font:10px/1.4 var(--mono);letter-spacing:.11em;text-transform:uppercase;color:var(--cyan)}.pathfinder-row>p{color:var(--dim);font-size:14px}.pathfinder-links{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px 18px}.pathfinder-links a{min-height:44px;display:inline-flex;align-items:center;gap:8px;color:var(--amber);font:11px/1.35 var(--mono);transition-property:color,scale;transition-duration:160ms}.pathfinder-links a:after{content:"→"}.pathfinder-links a:hover{color:var(--ink)}.pathfinder-links a:active{scale:.96}
+.content-hero{padding:clamp(54px,8vw,104px) 0 42px;border-bottom:1px solid var(--line)}.breadcrumbs{min-height:44px;display:flex;align-items:center;margin-bottom:28px;font:11px/1.4 var(--mono);color:var(--dim)}.breadcrumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.breadcrumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}.breadcrumbs a{min-height:40px;display:inline-flex;align-items:center;transition-property:color,scale;transition-duration:160ms}.breadcrumbs a:hover{color:var(--amber)}.breadcrumbs a:active{scale:.96}.content-hero h1{max-width:17ch;font-size:clamp(40px,6vw,68px);font-weight:700;line-height:1.02;letter-spacing:-.02em}.content-lede{max-width:66ch;margin-top:22px;color:var(--dim);font-size:clamp(17px,2vw,20px)}.content-meta{display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:28px;font:10px/1.4 var(--mono);color:var(--cyan)}
+.content-answer{max-width:900px;margin-top:34px;padding:3px 0 3px 22px;border-left:2px solid var(--amber);font-size:clamp(19px,2.2vw,21px);line-height:1.62;color:var(--ink)}.content-shell{padding:clamp(46px,7vw,86px) 0}.content-layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(230px,1fr);align-items:start;gap:clamp(36px,6vw,76px)}.content-body{grid-column:1;grid-row:1;max-width:78ch;min-width:0}.content-body h2{margin:52px 0 16px;font-size:clamp(27px,3.5vw,39px);scroll-margin-top:112px}.content-body>h2:first-child{margin-top:0}.content-body h3{margin:34px 0 12px;font-size:21px;scroll-margin-top:112px}.content-body p,.content-body li{color:var(--dim);font-size:16px}.content-body p+p{margin-top:17px}.content-body ul,.content-body ol{margin:16px 0;padding-left:24px}.content-body li+li{margin-top:7px}.content-body a{color:var(--cyan);text-decoration:underline;text-decoration-color:rgba(127,212,193,.35);text-underline-offset:3px}.content-body a:hover{color:var(--amber);text-decoration-color:currentColor}.content-body code:not(pre code){padding:1px 5px;border:1px solid var(--line);border-radius:5px;background:#07090c;color:var(--cyan);font-size:.86em}.content-body pre{margin:20px 0;white-space:pre;tab-size:2}.content-table{max-width:100%;margin:22px 0;overflow-x:auto;border:1px solid var(--line);border-radius:12px}.content-table:focus-visible{outline:2px solid var(--amber);outline-offset:3px}.content-table table{width:100%;border-collapse:collapse;font-size:14px}.content-table th,.content-table td{min-width:150px;padding:11px 13px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);text-align:left;vertical-align:top;color:var(--dim)}.content-table th{color:var(--ink);font-weight:600;background:var(--bg2)}.content-table tr:last-child td{border-bottom:0}.content-table th:last-child,.content-table td:last-child{border-right:0}
+.content-index{grid-column:2;grid-row:1;position:sticky;top:104px;max-height:calc(100vh - 128px);overflow-y:auto;padding:18px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.content-index strong{display:block;margin-bottom:10px;font:10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}.content-index ol{list-style:none}.content-index a{min-height:40px;display:flex;align-items:center;padding:5px 0;color:var(--dim);font-size:13px;line-height:1.4;transition-property:color,translate,scale;transition-duration:160ms}.content-index a:hover{color:var(--amber);translate:3px 0}.content-index a:active{translate:1px 0;scale:.96}.content-proof{margin:54px 0 0}.content-proof figure{border-radius:16px}.content-proof img{width:100%;height:auto;max-height:650px;object-fit:cover;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}.content-proof figcaption{color:var(--dim);font:11px/1.55 var(--mono)}.content-proof figcaption a{color:var(--amber)}
+.content-layout--docs{grid-template-columns:minmax(190px,.6fr) minmax(0,2fr)}.content-layout--docs .content-index{grid-column:1}.content-layout--docs .content-body{grid-column:2;max-width:72ch}.docs-index a{padding-inline:10px;border-left:2px solid transparent}.docs-index a[aria-current="page"]{border-left-color:var(--amber);background:rgba(255,180,84,.06);color:var(--ink);font-weight:600}.docs-index-current{display:none}
+.content-facts,.content-faq-list,.content-related,.content-sources,.content-skills,.content-demos,.content-discovery,.faq-provenance{margin-top:54px;padding-top:22px;border-top:1px solid var(--line)}.content-facts h2,.content-faq-list h2,.content-related h2,.content-sources h2,.content-skills h2,.content-demos h2{font-size:24px}.content-ruled-list{list-style:none;border-top:1px solid var(--line)}.content-ruled-list li{border-bottom:1px solid var(--line)}.content-ruled-list a{min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:9px 0;color:var(--dim);font-size:14px;transition-property:color,scale;transition-duration:160ms}.content-ruled-list a:after{content:"→";color:var(--amber)}.content-ruled-list a:hover{color:var(--ink)}.content-ruled-list a:active{scale:.96}.content-related .content-ruled-list a{display:grid;grid-template-columns:104px minmax(0,1fr) auto}.content-related-family{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}.content-faq-item{padding:22px 0;border-bottom:1px solid var(--line)}.content-faq-item h3{margin:0;font-size:20px}.content-faq-item h3 a{color:var(--ink)}.content-faq-item p{margin-top:9px;color:var(--dim);font-size:15px}.faq-provenance{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);padding:0}.faq-provenance div{padding:13px;background:var(--bg2)}.faq-provenance dt{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}.faq-provenance dd{margin-top:5px;font:11px/1.45 var(--mono);color:var(--cyan);overflow-wrap:anywhere}.content-discovery{display:flex;flex-wrap:wrap;gap:10px 22px;font:11px/1.5 var(--mono);color:var(--dim)}.content-discovery a{min-height:40px;display:inline-flex;align-items:center;color:var(--amber)}
 @media (max-width:760px){
   .site-nav .wrap{padding-right:0}
-  nav{min-height:104px;display:grid;grid-template-columns:1fr;padding:14px 0 10px;gap:4px}
-  nav .brand{font-size:16px}
-  nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:none;padding-right:20px}
-  nav .links::-webkit-scrollbar{display:none}
-  nav .links a{flex:0 0 auto}
+  .site-nav>.wrap{min-height:104px;display:grid;grid-template-columns:1fr;padding-top:14px;padding-bottom:10px;gap:4px}
+  .site-nav .brand{font-size:16px}
+  .site-nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;scrollbar-color:rgba(255,180,84,.45) transparent;padding:0 20px 4px 0}
+  .site-nav .links::-webkit-scrollbar{height:3px}.site-nav .links::-webkit-scrollbar-thumb{background:rgba(255,180,84,.45);border-radius:99px}
+  .site-nav .links a{flex:0 0 auto}
   .grid,.gallery{grid-template-columns:1fr}
+  footer{grid-template-columns:1fr}.footer-groups{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+@media (max-width:900px){.pathfinder-head,.content-layout{grid-template-columns:1fr}.content-index{grid-column:1;grid-row:1;position:static;max-height:none}.content-body,.content-layout--docs .content-body{grid-column:1;grid-row:2}.docs-index{overflow:hidden}.docs-index-current{display:flex;margin-bottom:8px}.docs-index ol{display:flex;gap:8px;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;padding-bottom:6px}.docs-index li{flex:0 0 min(72vw,260px)}.docs-index .docs-index-list-current{display:none}.docs-index a{min-height:44px;padding:8px 10px;border-left:0;border-bottom:2px solid transparent;background:var(--bg2)}.docs-index a[aria-current="page"]{border-bottom-color:var(--amber)}.pathfinder-row{grid-template-columns:minmax(160px,.6fr) minmax(0,1fr)}.pathfinder-links{grid-column:1/-1;justify-content:flex-start;padding-bottom:18px}.faq-provenance{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.pathfinder-row{grid-template-columns:1fr;gap:6px;padding:18px 0}.pathfinder-links{grid-column:auto;padding:0}.content-hero h1{font-size:clamp(38px,12vw,54px)}.content-answer{padding-left:16px}.content-table{border-radius:8px}.content-table table{min-width:680px}.faq-provenance{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
@@ -217,7 +227,7 @@ header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
   linear-gradient(90deg,rgba(10,12,16,.96) 0%,rgba(10,12,16,.8) 36%,rgba(10,12,16,.24) 68%,rgba(10,12,16,.04) 100%),
   linear-gradient(0deg,rgba(10,12,16,.9) 0%,rgba(10,12,16,.08) 65%,rgba(10,12,16,.62) 100%);z-index:1}
 .crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}.crumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.crumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}
-.crumbs a:hover{color:var(--amber)}
+.crumbs a{min-height:40px;display:inline-flex;align-items:center}.crumbs a:hover{color:var(--amber)}
 h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:0;max-width:18ch}
 .lede{margin-top:24px;max-width:70ch;color:var(--dim)}
 .meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
@@ -257,6 +267,7 @@ a.chip:active{scale:.96}
 .runtime-evidence-disclosure dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;margin-top:16px;overflow:hidden;border-radius:10px;background:var(--line)}.runtime-evidence-disclosure dl div{padding:11px 12px;background:var(--bg2)}.runtime-evidence-disclosure dt{font:10px/1.35 var(--mono);color:var(--dim)}.runtime-evidence-disclosure dd{margin-top:4px;font:500 10px/1.35 var(--mono);color:var(--amber)}.runtime-evidence-disclosure dd[data-verdict="PASS"]{color:var(--lime)}
 .runtime-evidence-disclosure ul{margin:15px 0 0;padding-left:20px}.runtime-evidence-disclosure li{margin-top:5px;color:var(--dim);font-size:14px}
 .evidence-report-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:10px}.evidence-report-links a{display:grid;gap:6px;min-height:72px;padding:14px;border:1px solid var(--line);border-radius:11px;background:var(--bg2)}.evidence-report-links code{color:var(--cyan);font:11px/1.4 var(--mono);overflow-wrap:anywhere}.evidence-report-links span{color:var(--dim);font:10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.05em}
+.skill-guides{margin-top:52px;padding-top:22px;border-top:1px solid var(--line)}.skill-guides h3{font-size:22px}.skill-guides ul{margin-top:12px;list-style:none;border-top:1px solid var(--line)}.skill-guides li{border-bottom:1px solid var(--line)}.skill-guides a{min-height:52px;display:grid;grid-template-columns:120px minmax(0,1fr);align-items:center;gap:18px;color:var(--dim);font-size:14px;transition-property:color,scale;transition-duration:160ms}.skill-guides a span{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}.skill-guides a:hover{color:var(--amber)}.skill-guides a:active{scale:.96}
 @media (max-width:720px){
   .skill-hero{min-height:auto;padding:58px 0 52px}
   .skill-hero-bg{opacity:.3}
@@ -267,44 +278,44 @@ a.chip:active{scale:.96}
 </style>
 </head>
 <body>
-<a class="skip-link" href="#main-content">Skip to content</a><div class="site-nav"><div class="wrap"><nav aria-label="Primary navigation">
-  <a class="brand" href="../">Three.js WebGPU Skill&nbsp;Pack</a>
-  <div class="links"><a href="../#matrix">How it works</a><a href="../#flagships">Examples</a><a href="../#skills">Skills</a><a href="../#labs">Labs</a><a href="../evidence/">Evidence</a><a href="../#install">Install</a><a href="../about/">Method</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
-</nav></div></div>
+<a class="skip-link" href="#main-content">Skip to content</a><header class="site-nav"><div class="wrap">
+  <a class="brand" href="/">Three.js WebGPU Skill&nbsp;Pack</a>
+  <nav class="links" aria-label="Primary navigation"><a href="/#flagships">Examples</a><a href="/#skills">Skills</a><a href="/guides/">Guides</a><a href="/evidence/">Evidence</a><a href="/#install">Install</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub</a></nav>
+</div></header>
 
 <main id="main-content" tabindex="-1">
 <header class="">
   <div class="wrap">
-    <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Motion and Effects</a></li><li aria-current="page">Black Holes and Space Effects</li></ol></nav>
-    <h1 style="view-transition-name:skill-threejs-black-holes-and-space-effects">Black Holes and Space Effects</h1>
-    <p class="lede">Build WebGPU/TSL black holes, wormholes, accretion disks, and curved-ray space effects in Three.js. Use for black-hole lensing, accretion disks, wormholes, curved-ray integration, procedural star fields, relativistic-looking distortion, bounded volumetric structures, and GPU effects that need controlled numerical integration.</p>
+    <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Motion and Effects</a></li><li aria-current="page">Curved-Ray Space Effects</li></ol></nav>
+    <h1 style="view-transition-name:skill-threejs-black-holes-and-space-effects">Curved-Ray Space Effects</h1>
+    <p class="lede">Build curved-ray space effects in Three.js WebGPU/TSL. Use for artistic ray bending, Ellis wormholes, Schwarzschild black-hole lensing, accretion disks, physical thin-disk transport, or requests that need the Kerr/rotating-black-hole support boundary.</p>
     <div class="meta-row">
       <span class="chip a">$threejs-black-holes-and-space-effects</span>
-      <span class="chip">1 primary implementation</span>
-<span class="chip">1 flagship</span>
-<span class="chip">1 secondary surface</span>
-      <span class="chip">native evidence pending</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-11T12:52:06+03:00">2026-07-11</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/63d611c6334e22c990a555d818ea1548765ede65">commit 63d611c ↗</a>
-      <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-black-holes-and-space-effects/SKILL.md">SKILL.md on GitHub ↗</a>
-      <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-black-holes-and-space-effects/SKILL.md">raw (for agents) ↗</a>
+      <span class="chip">1 primary target</span>
+      <span class="chip">1 flagship</span>
+      <span class="chip">1 secondary surface</span>
+      <span class="chip">accepted runtime evidence</span>
+      <span class="chip">Latest skill update <time datetime="2026-07-16T12:45:44+03:00">2026-07-16</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/8749183dffd84731506239dd86590c92bf958969">commit 8749183 ↗</a>
+      <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-black-holes-and-space-effects/SKILL.md">SKILL.md on GitHub ↗</a>
+      <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/skills/threejs-black-holes-and-space-effects/SKILL.md">raw (for agents) ↗</a>
     </div>
   </div>
 </header>
 
 
   <section class="section" id="primary-implementations" aria-labelledby="primary-implementations-title"><div class="wrap">
-    <h2 id="primary-implementations-title">Primary implementation surface</h2>
-    <p class="sub">These routes are generated from canonical source. Their exact status remains separate from implementation availability.</p>
+    <h2 id="primary-implementations-title">Primary target surface</h2>
+    <p class="sub">These rendering routes are generated from canonical source. Native-WebGPU acceptance remains separate from entrypoint availability.</p>
     <div class="grid">
       <a class="card" href="../demos/tsl-curved-ray/">
-        <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="tsl-curved-ray">
+        <span class="primary-evidence-panel " data-evidence-state="accepted" data-preview-for="tsl-curved-ray">
     <span class="primary-evidence-label">Canonical capture</span>
-    <strong>Runtime evidence pending</strong>
-    <span><code>88f02b547cf8</code> source hash</span>
+    <strong>Accepted evidence published</strong>
+    <span><code>c0bee8cf5535</code> source hash</span>
     <span>16 fixed states · 9 runtime proof requirements</span>
   </span>
-        <span class="card-head"><span class="card-kind">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+        <span class="card-head"><span class="card-kind">Canonical lab</span><span class="status status--accepted">Accepted</span></span>
         <h3>TSL Curved Ray</h3>
         <p>6 fixed scenarios, 6 mechanism routes, and 4 locked tiers.</p>
         <span class="card-meta">Open published implementation →</span>
@@ -320,7 +331,7 @@ a.chip:active{scale:.96}
         <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="relativistic-space-shot">
     <span class="primary-evidence-label">Canonical capture</span>
     <strong>Runtime evidence pending</strong>
-    <span><code>5fe1522e9185</code> source hash</span>
+    <span><code>e2e9d6b673af</code> source hash</span>
     <span>10 fixed states · 4 runtime proof requirements</span>
   </span>
         <span class="card-head"><span class="card-kind">Relativistic cinematic</span><span class="status status--pending">Evidence pending</span></span>
@@ -333,7 +344,7 @@ a.chip:active{scale:.96}
   <section class="section" id="evidence-reports" aria-labelledby="evidence-reports-title"><div class="wrap">
     <h2 id="evidence-reports-title">Evidence reports</h2>
     <p class="sub">Source hashes, claim verdicts, promoted same-lab media, fixed routes, exact tier contracts, and current limitations.</p>
-    <nav class="evidence-report-links" aria-label="Evidence reports for Black Holes and Space Effects"><a href="../evidence/tsl-curved-ray/"><code>tsl-curved-ray</code><span>evidence pending</span></a><a href="../evidence/relativistic-space-shot/"><code>relativistic-space-shot</code><span>evidence pending</span></a></nav>
+    <nav class="evidence-report-links" aria-label="Evidence reports for Curved-Ray Space Effects"><a href="../evidence/tsl-curved-ray/"><code>tsl-curved-ray</code><span>accepted</span></a><a href="../evidence/relativistic-space-shot/"><code>relativistic-space-shot</code><span>evidence pending</span></a></nav>
   </div></section>
 
   <div class="section" id="approach"><div class="wrap">
@@ -353,415 +364,184 @@ march deterministic and framerate-safe.</p></div>
   </div></div>
 
 
+  <div class="section" id="examples"><div class="wrap">
+    <h2>Accepted primary labs</h2>
+    <p class="sub">Only schema-v2 labs with accepted runtime and evidence contracts appear here. Other source directories remain visible through the demo registry without being promoted to runnable proof.</p>
+    <div class="grid">
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-black-holes-and-space-effects/examples/tsl-curved-ray">
+        <h4>tsl-curved-ray</h4>
+        <span class="card-meta">threejs-black-holes-and-space-effects/examples/tsl-curved-ray</span>
+      </a>
+    </div>
+  </div></div>
 
   <div class="section" id="validation"><div class="wrap">
     <h2>Preview and evidence ledger</h2>
-    <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; canonical acceptance still requires render-target readback and a schema-v2 bundle.</p>
-    <div class="evidence-ledger"><span class="status status--pending">Canonical runtime evidence pending</span><code>0 published images</code></div>
+    <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; rendering acceptance still requires same-lab readback and a schema-v2 bundle.</p>
+    <div class="evidence-ledger"><span class="status status--accepted">Accepted runtime evidence available</span><code>0 published images</code></div>
 
     <div class="primary-evidence-panel" data-evidence-state="incomplete"><span class="primary-evidence-label">Same-lab evidence</span><strong>No runtime image promoted</strong><span>The page remains image-free until this skill's own lab supplies hash-bound pixels.</span></div>
   </div></div>
 
 <div class="section" id="skill-text"><div class="wrap">
   <h2>The full skill</h2>
-  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
-  <div class="skilltext"><h2>Black Holes and Space Effects</h2>
-<p>Treat these effects as numerical renderers with explicit integration state. The
-implementation path is pinned Three.js r185 with <code>WebGPURenderer</code> from <code>three/webgpu</code>,
-TSL from <code>three/tsl</code>, <code>NodeMaterial</code> materials, <code>RenderPipeline</code>, node passes,
-and compute/storage where caching or diagnostics need GPU-written data. State
-whether a shot uses a geodesic model, a radiative-transfer approximation, or an
-art-directed deformation; numerical integration does not by itself make a
-model physical.</p>
-<h2>Shared Physics Boundary</h2>
-<p>When lens, metric, observer, or emitter state changes with the routed scene,
-read the shared
-<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-choose-skills/references/physics-domain-and-interaction-contract.md">physics domain and interaction contract</a>.
-Register those producers and the presentation consumer in <code>PhysicsGraph</code>.
-Consume one <code>PhysicsContext</code> for <code>schemaId</code>, <code>contextVersion</code>, the canonical SI
-<code>worldFrameId</code>/<code>physicsRootFrameId</code>, <code>worldToPhysicsTransform</code> and
-<code>worldTransformRevision</code>, <code>physicsFrameRegistry</code>, <code>metersPerWorldUnit</code>,
-<code>physicsOriginEpoch</code>, and the named source clock. Camera-relative rendering is
-a presentation adapter; it never owns metric or emitter state.</p>
-<p>Publish each metric/lens/emitter source through <code>PhysicsSignalDescriptor</code> with
-stable provider/signal identity, model kind and revision, physics-frame pose,
-valid <code>PhysicsTimeInterval</code>, sample <code>PhysicsInstant</code>, bounded domain or query
-footprint, units/nondimensionalization, state version, residency, validity, and
-typed per-channel error. A physical scale is explicit: for example Schwarzschild
-state records <code>r_s = 2 G M / c^2</code> in metres (or mass in kilograms with the
-conversion provenance), Kerr spin records either <code>J [kg m^2 s^-1]</code> or declared
-<code>a* = c J / (G M^2)</code>, and Ellis state records throat radius in metres. Do not
-hide any of these in Three.js scene scale.</p>
-<p>Keep metric coordinate time, proper time where a massive emitter uses it, null
-affine parameter, any solver-only reparameterization such as Mino time, source
-simulation time, requested render time, and each binding&#39;s actual presented
-time distinct. The ODE parameter advances a ray. Map the observer event from
-the canonical source <code>PhysicsInstant</code> into the metric chart; for a
-nonstationary metric, integrate or recover <code>t_coord(lambda)</code> and
-sample/interpolate the metric and emitter fields at each mapped coordinate
-event with their versions and error.
-Using one immutable metric state for the complete ray is a frozen/quasi-static
-approximation with a declared evolution-error gate, not a general
-time-dependent geodesic solution.</p>
-<p><code>PhysicsPresentationCandidate.requestedPresentationInstant</code> is <code>t_request</code>.
-For each stable binding <code>b</code>, resolve the candidate&#39;s <code>PresentedStatePair</code> and
-use <code>currentPresented.presentedInstant</code> as <code>t_presented[b]</code>; its previous and
-current states each carry independent <code>PresentationSampleProvenance</code>, clock
-mapping, brackets, interpolation/extrapolation policy, and error. Never assume
-those instants equal the request or share one interpolation alpha across lens,
-observer, disk, and emitter providers. For a view, use
-<code>CameraViewPublication.previousRenderSampleInstant</code> and
-<code>currentRenderSampleInstant</code>. When current is later and their clock mapping and
-discontinuity epoch agree, form the exact half-open <code>PhysicsTimeInterval</code> for
-temporal reconstruction. Equal instants mean no elapsed interval, not a
-zero-length interval record; reversal or discontinuity forces the scoped reset
-policy. Render delta is neither an affine step nor a physics step.</p>
-<p>Consume the sealed <code>PhysicsPresentationSnapshot</code> only as a reference closure:
-resolve its exact view-independent candidate, per-view <code>CameraViewPublication</code>,
-and preceding <code>ViewPreparationPublication</code>. The candidate owns the
-previous/current lens, observer, and emitter/disk pairs and read leases; the
-camera publication owns previous/current global-to-render transforms, render
-sample instants, and projection; the view-preparation publication owns
-visibility/shadow/cache publications, reactive state, and scoped reset actions.
-The snapshot contains binding and lease references, not copied pairs or those
-view fields. Validate model/signal version, provenance, validity, and error
-through the resolved <code>PhysicsSignalDescriptor</code> and pair.
-Lens history derives from these presented states and resets on model/revision,
-exterior/termination class, origin/projection, or validity discontinuity.
-Consume environment and emitter radiometry through the matching
-<code>LightingTransportSnapshot</code>; retain each sampled channel&#39;s radiometric
-quantity, working/spectral/angular basis, factor identity, validity, and error
-so attenuation is not applied twice. Do not invent a bundle-wide basis that
-overrides channel metadata.</p>
-<p>Ray escape, horizon/core hit, disk crossing, and step-cap termination are
-numerical integration events, not <code>InteractionRecord</code> values. A spacetime,
-metric parameter, or emissive medium is not a <code>PhysicsMaterialId</code> registered
-in <code>PhysicsMaterialRegistry</code>. This renderer does not publish force or impulse
-merely because it bends light; body dynamics must consume the same metric/mass
-signal through a separate dynamics owner.
-A <code>QualityTransition</code> may change tolerances, cache/map resolution, cadence, or
-reconstruction only while preserving the selected model class and physical or
-artistic claim. A metric/model-class change is a new truth contract and forces
-explicit history invalidation or migration.</p>
-<h2>Model Claim Gate</h2>
+  <p class="sub">The complete SKILL.md as loaded by agents, rendered verbatim.</p>
+  <div class="skilltext"><h2>Curved-Ray Space Effects</h2>
+<p>Treat every result as one of three claims: an artistic deformation, an Ellis
+null-geodesic solution, or a Schwarzschild null-geodesic solution. Numerical
+integration alone does not turn an artistic field into a metric solution.</p>
+<h2>1. Select the claim</h2>
 <table>
 <thead>
 <tr>
-<th>Model</th>
-<th>Defensible claim</th>
-<th>Required evidence</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Null geodesics derived from a named metric</td>
-<td>Physical within that metric and its stated idealizations</td>
-<td>Equations, units/nondimensionalization, conserved quantities, CPU <code>float64</code> reference rays, convergence</td>
-</tr>
-<tr>
-<td>Ellis/Morris-Thorne ultrastatic throat in the reference</td>
-<td>Physical geodesics for that wormhole metric; not a black-hole solution</td>
-<td>Hamiltonian invariant and exterior-side/tetrad mapping</td>
-</tr>
-<tr>
-<td>Inverse-square direction steering or UV distortion</td>
-<td>Artistic lens-like deformation</td>
-<td>Fixed-view visual contract and step-halving stability; no GR claim</td>
-</tr>
-<tr>
-<td>Procedural disk density/emission</td>
-<td>Art-directed participating medium</td>
-<td>Explicit extinction/emission units and bounded integration error</td>
-</tr>
-<tr>
-<td>Screen-space swirl</td>
-<td>Image distortion</td>
-<td>Never label it gravitational lensing</td>
-</tr>
-</tbody></table>
-<h2>Performance-First Build Order</h2>
-<ol>
-<li>Use <code>$threejs-choose-skills</code> preflight when the request also touches
-atmosphere, bloom, temporal reconstruction, shadows, or validation.</li>
-<li>Define a bounded effect volume in local space and intersect the camera ray
-with that volume before any march work.</li>
-<li>Run the raymarch as a TSL <code>Fn</code> attached to a <code>MeshBasicNodeMaterial</code> or a
-compute pass; keep the integrator and disk/throat/shell shading as separate
-node functions.</li>
-<li>Advance the ray exactly once per accepted iteration. Do not copy the
-historical double-advance defect from the legacy example.</li>
-<li>Choose step length from distance, density, curvature, or a real local-error
-estimator. A curvature heuristic controls sampling but is not an RK error
-estimate. Use continuous event tests for disks and shells even when the step
-is clamped.</li>
-<li>Accumulate radiance front-to-back with transmittance and terminate on escape,
-core absorption, saturated opacity, invalid state, or max-step cap.</li>
-<li>Keep opaque scene/depth at its required resolution. A small projected bound
-may use a full-resolution scissor; broad coverage may use a measured reduced
-target away from critical curves. Reconstruct with lens-specific history
-validity and edge/Jacobian masks. Temporal history reduces stochastic/
-interleaved sampling noise; it does not repair deterministic ODE truncation
-bias.</li>
-<li>Use <code>StorageTexture</code>, <code>StorageBufferAttribute</code>, or
-<code>StorageInstancedBufferAttribute</code> with <code>renderer.compute()</code> /
-<code>renderer.computeAsync()</code> for lens-map caches, per-tile bounds, temporal
-history, and diagnostics that are expensive to rebuild in a material node.
-After initialization prefer <code>renderer.compute()</code>; r185 <code>computeAsync()</code> is
-not a GPU-completion fence.</li>
-<li>Compose through <code>RenderPipeline</code>, <code>pass()</code>, <code>mrt()</code>,
-<code>PassNode.setResolutionScale()</code>, <code>outputColorTransform</code>, and
-<code>renderOutput()</code>. <code>PostProcessing</code> is the renamed deprecated predecessor;
-use <code>RenderPipeline</code>. <code>setResolutionScale()</code> scales the entire pass, so do
-not apply it to the full host scene merely to reduce the lens effect.</li>
-</ol>
-<p>Algorithm class dominates this skill. A fixed full-budget ray loop is the
-reference cost ceiling; bounded work, accepted-step control, early termination,
-and temporal amortization are the production architecture.</p>
-<h2>Capability Gate</h2>
-<p>Any compute, storage, MRT, or reduced-resolution path starts with an explicit
-backend gate:</p>
-<pre><code class="language-js">await renderer.init();
-
-if (renderer.backend.isWebGPUBackend) {
-  // Canonical path: TSL raymarch, compute/storage caches, MRT diagnostics.
-} else {
-  throw new Error(&quot;WebGPU backend unavailable for the canonical path.&quot;);
-}
-</code></pre>
-<p>Do not add a second renderer branch to this flagship specification. A missing
-WebGPU backend is a reported capability failure.</p>
-<h3>r185 API Verification</h3>
-<p>Verified against the repository&#39;s installed Three.js <code>REVISION === &quot;185&quot;</code>:
-<code>WebGPURenderer</code>, <code>RenderPipeline</code>, <code>StorageTexture</code>, and <code>Storage3DTexture</code> are
-exports of <code>three/webgpu</code>; <code>Fn</code>, <code>Loop</code>, <code>pass</code>, <code>mrt</code>, <code>renderOutput</code>,
-<code>storage</code>, <code>storageTexture</code>, <code>storageTexture3D</code>, and <code>textureStore</code> are exports
-of <code>three/tsl</code>. <code>TRAANode</code>, <code>BloomNode</code>, and <code>DepthOfFieldNode</code> are default
-exports from their <code>three/addons/tsl/display/*Node.js</code> modules. Re-run import
-smoke tests when the pinned revision changes.
-For temporal upscaling, r185 provides default <code>TAAUNode</code> and named <code>taau</code> from
-<code>three/addons/tsl/display/TAAUNode.js</code>; <code>TRAANode</code>/<code>traa</code> is temporal AA, not an
-upscaler. Explicitly configure storage texture format/type/filter/mipmap policy.</p>
-<h2>Quality Tiers And Budgets</h2>
-<table>
-<thead>
-<tr>
-<th>Workload</th>
-<th>Resolution</th>
-<th>Numerical work</th>
-<th>History/cache</th>
-<th>Cost status</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Artistic accretion hero</td>
-<td>half, full-res edge/critical mask</td>
-<td>96-160 midpoint/RK steps (<strong>Authored</strong>)</td>
-<td>lens-valid history</td>
-<td>Must be <strong>Measured</strong> per target</td>
-</tr>
-<tr>
-<td>Static Ellis lens</td>
-<td>full or reduced away from critical curve</td>
-<td>nonuniform 1D transfer lookup plus footprint refinement</td>
-<td>transfer LUT + optional Jacobian</td>
-<td>Must be <strong>Measured</strong> per target</td>
-</tr>
-<tr>
-<td>Varying metric</td>
-<td>selected by angular/invariant/event error</td>
-<td>adaptive accepted/rejected work is <strong>Gated</strong>, not tier-fixed</td>
-<td>optional tile cache</td>
-<td>Must be <strong>Measured</strong> per target</td>
-</tr>
-<tr>
-<td>Background coherent lens</td>
-<td>quarter or cached</td>
-<td>low-rate direction-map refresh</td>
-<td>angular invalidation</td>
-<td>Must be <strong>Measured</strong> per target</td>
-</tr>
-<tr>
-<td>Distant authored effect</td>
-<td>impostor/cubemap</td>
-<td>no geodesic claim</td>
-<td>optional asset</td>
-<td>Must be <strong>Measured</strong> per target</td>
-</tr>
-</tbody></table>
-<p>Treat authored counts as initial configuration only. A tier becomes <strong>Measured</strong> only
-when its GPU timestamp distribution, resolution, renderer revision, device,
-browser, thermal state, and scene are recorded. A quality threshold is
-<strong>Gated</strong> when it is computed from a screen-space or radiance-error limit.
-Memory arithmetic and analytic error bounds are <strong>Derived</strong>.</p>
-<p>Report whole-frame p50/p95 and paired marginal p50/p95 from matched frames with
-the effect enabled/disabled. Do not sum pass percentiles or subtract unpaired
-percentile summaries.</p>
-<p>At half-linear 1080p, 920-step RK4 costs
-<code>960*540*920*4 = 1,907,712,000</code> derivative evaluations before shading
-(<strong>Derived</strong>). This rules out a universal mobile-time promise and motivates a
-transfer LUT for the static spherical Ellis model.</p>
-<p>Budget storage explicitly: two half-resolution <code>HalfFloatType</code> history textures
-for radiance/transmittance, one reduced-resolution velocity/depth validity
-input, optional one-channel step-count/termination texture for diagnostics, and
-one bounded lens-map <code>StorageTexture</code> per cached view or probe. Compute bytes as
-<code>ceil(W*s) * ceil(H*s) * bytesPerTexel * liveTextureCount</code> (<strong>Derived</strong>); do not
-infer mobile feasibility from resolution scale alone.</p>
-<h2>Algorithm Selection</h2>
-<table>
-<thead>
-<tr>
-<th>Error requirement</th>
-<th>Occupancy/coherence</th>
+<th>Requested observable</th>
 <th>Select</th>
-<th>Reject or escalate when</th>
+<th>Conditional reference</th>
+<th>Completion criterion</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>Art-directed bending; only stable silhouette required</td>
-<td>Local bound, moderate temporal coherence</td>
-<td>Heun/midpoint direction update, structure-limited step, segment events</td>
-<td>Step-halving changes a fixed-view edge or termination class</td>
+<td>Stylized bending, bounded glow, or a decorative disk</td>
+<td>Artistic bounded ray</td>
+<td>Read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-black-holes-and-space-effects/references/artistic-rays-and-disks.md">artistic-rays-and-disks.md</a>.</td>
+<td>The implementation and its documentation say <code>artistic</code>, and fixed-view refinement bounds the visible change.</td>
 </tr>
 <tr>
-<td>Static spherical Ellis lens</td>
-<td>High coherence</td>
-<td>Nonuniform 1D transfer LUT split/refined around critical <code>B=1</code></td>
-<td>Interpolation or footprint angular gate fails</td>
+<td>Traversal or turning through an ultrastatic spherical throat</td>
+<td>Ellis wormhole</td>
+<td>Read the Ellis section of <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-black-holes-and-space-effects/references/metric-rays.md">metric-rays.md</a>.</td>
+<td>The throat scale, exterior mapping, invariant, and <code>B &lt; 1</code>, <code>B = 1</code>, <code>B &gt; 1</code> termination classes are explicit.</td>
 </tr>
 <tr>
-<td>Static Schwarzschild lens</td>
-<td>High coherence</td>
-<td>Critical-split impact-parameter quadrature/transfer LUT plus footprint refinement</td>
-<td>Strong-deflection interpolation or disk-event gate fails</td>
+<td>Nonrotating black-hole lensing or a physical thin-disk image</td>
+<td>Schwarzschild</td>
+<td>Read the Schwarzschild and physical-transfer sections of <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-black-holes-and-space-effects/references/metric-rays.md">metric-rays.md</a>.</td>
+<td>The mass scale, horizon, photon sphere, critical impact, invariant, continuous events, and observer/emitter frames are explicit.</td>
 </tr>
 <tr>
-<td>Static Kerr metric and fixed view</td>
-<td>High coherence</td>
-<td>Separated radial/polar geodesic transfer or validated 2D screen map</td>
-<td>Caustic/event/redshift error or camera invalidation gate fails</td>
-</tr>
-<tr>
-<td>Metric geodesic; ordinary rays</td>
-<td>Bounded domain, per-pixel evaluation</td>
-<td>RK4 with invariant monitoring, or embedded RK pair when curvature varies</td>
-<td>Invariant/final-direction gate fails</td>
-</tr>
-<tr>
-<td>Metric geodesic near a separatrix or critical orbit</td>
-<td>Small image region, high view coherence</td>
-<td>Higher-accuracy compute lens map, then interpolate and invalidate by camera error</td>
-<td>Per-pixel rejection divergence or <code>float32</code> cannot meet the angular gate</td>
-</tr>
-<tr>
-<td>Static or slowly changing lens</td>
-<td>High view/probe coherence</td>
-<td>Cached direction/depth/Jacobian map</td>
-<td>Camera/projection change moves the mapped direction beyond the texel-error gate</td>
-</tr>
-<tr>
-<td>Sparse emitting volume</td>
-<td>Low occupancy</td>
-<td>Conservative tile/brick bounds plus empty-space skip</td>
-<td>Bound lookup and divergence cost exceed saved field evaluations</td>
-</tr>
-<tr>
-<td>Rapid camera/effect change</td>
-<td>Low coherence</td>
-<td>Current-frame march at reduced history weight</td>
-<td>History rejection rate removes the expected amortization</td>
+<td>Rotating black hole</td>
+<td>Unsupported here</td>
+<td>Integrate an independently validated Kerr solver as an external lens-map producer.</td>
+<td>The solver supplies its metric/sign conventions, constants of motion, tetrads, event semantics, and independent convergence evidence; otherwise return an unsupported-model result.</td>
 </tr>
 </tbody></table>
-<h2>Numerical Rules</h2>
+<p><strong>Complete when:</strong> exactly one claim owns the ray path, and every visual claim
+is no stronger than that branch&#39;s evidence.</p>
+<h2>2. Declare the numerical domain</h2>
+<p>Define before authoring the march:</p>
 <ul>
-<li>Do not call a UV swirl gravitational lensing. Lensing changes the final lookup
-direction after numerical integration.</li>
-<li>Bound the domain first; never march the full camera range for a local space
-effect.</li>
-<li>Use continuous segment crossing tests for thin disks, shells, throats, and
-event boundaries.</li>
-<li>Keep integration independent from frame rate; animated fields are inputs, not
-variable time steps.</li>
-<li>Nondimensionalize geodesic state with a declared length scale. Keep rendering
-distances and medium coefficients in one consistent unit system.</li>
-<li>For RK4 step-doubling, estimate the fine-solution local error with
-<code>(y_twoHalf - y_full) / 15</code>, scale each state component by
-<code>atol + rtol * max(abs(y0), abs(y1))</code>, and accept only when the resulting norm
-is at most one. Rejected attempts do not advance state or event accumulators.</li>
-<li>A heuristic such as <code>errorTarget / curvature</code> is not dimensional error
-control. Use it only as a step proposal and validate it by convergence.</li>
-<li>Reconstruct the escaped environment ray from the integrated tangent in an
-explicit exterior tetrad. Orbital position angle alone is not the outgoing
-ray direction.</li>
-<li>Root-refine escape/core/disk events and bound any metric tail outside the
-proxy. A step that overshoots the boundary is not an accurate exit state.</li>
-<li>For the dimensionless Ellis model <code>B=b/a</code>, classify <code>B&lt;1</code> traversal, <code>B&gt;1</code>
-turning, and the critical <code>B=1</code> light ring. A capped critical ray is not an
-escaped ray.</li>
-<li>Use deterministic star/environment data for validation, then replace only
-after fixed-camera tests pass.</li>
-<li>Track termination reason, accepted step count, accumulated opacity,
-remaining transmittance, final environment direction, and invalid-state mask.</li>
-<li>Run independent CPU <code>float64</code> reference rays for numerical parity with a
-declared metric before treating the result as more than an artistic
-approximation.</li>
-<li>Gate the GPU against termination class, exterior side, invariant drift,
-event count/location, and final angular error. A capped or minimum-step ray is
-invalid evidence, not a visually plausible success.</li>
-<li>Reject temporal history across termination/exterior changes, critical/Jacobian
-discontinuities, disk animation, or large bent-direction residuals. Generic
-mesh velocity/depth alone is insufficient for a lens.</li>
+<li>the effect-to-world transform and a finite local integration bound;</li>
+<li>the camera event, ray origin, normalized direction, and exterior side;</li>
+<li>one length basis for positions, steps, horizons/cores, and medium
+coefficients;</li>
+<li>the state vector, its integration parameter, its owner, and its valid time;</li>
+<li>the environment orientation and the orthonormal frame used for escaped-ray
+lookup;</li>
+<li>horizon, core, disk, shell, proxy-exit, invalid-state, opacity, step-cap, and
+attempt-cap events that apply to the selected branch.</li>
 </ul>
-<p>For a physical emitting medium after the declared SI adapter, let <code>sigma_t</code> be
-extinction in <code>m^-1</code>, <code>j</code> be an emission coefficient in
-<code>W m^-3 sr^-1</code> (or the declared wavelength-resolved equivalent), radiance be
-in <code>W m^-2 sr^-1</code>, and <code>tau = sigma_t * ds</code> be dimensionless. Declare the
-local comoving tetrad/spectral basis; curved-spacetime frequency transfer still
-obeys the invariant transfer rules above. An explicitly artistic medium may
-instead declare a coherent scene-length basis, but then it
-makes no SI radiometric claim. A constant segment contributes
-<code>T * (j / sigma_t) * (1 - exp(-tau))</code>; use the <code>j * ds</code> limit as <code>sigma_t</code>
-approaches zero. If code instead multiplies <code>segmentEmission</code> by alpha, document
-that value as the source function <code>j / sigma_t</code>, not an emission coefficient.</p>
-<h2>Color And Output</h2>
+<p>For metric rays, nondimensionalize with the Ellis throat radius <code>a</code> or the
+Schwarzschild mass length <code>M = G M_SI / c^2</code>, while retaining the conversion
+back to metres. Render delta never becomes a ray step. Preserve either spherical
+metric through a similarity transform: translation, rotation, and uniform
+scale. A nonuniform transform requires an explicitly derived transformed
+metric and frame plus renewed invariant, event, and convergence validation;
+otherwise reject it at setup.</p>
+<p>Nonstationary metrics require an external solver that integrates or recovers
+coordinate time and samples or interpolates metric and emitter state, with
+validity and error, at every mapped integration evaluation. A frozen metric is
+a quasi-static approximation only when its declared evolution-error gate
+passes; otherwise report the model unsupported.</p>
+<p><strong>Complete when:</strong> every state component and event surface has a declared
+basis, owner, and finite validity domain, and world-to-solver-to-render round
+trips preserve the chosen scale and exterior. Each spherical metric uses a
+similarity transform or supplies validated transformed-metric evidence, and
+every nonstationary claim uses mapped coordinate-time sampling, is explicitly
+labeled quasi-static with a passing evolution-error gate, or is unsupported.</p>
+<h2>3. Build one bounded march</h2>
+<p>Use <code>WebGPURenderer</code> with TSL node functions. Initialize the renderer and
+confirm the WebGPU backend before selecting compute, storage, or MRT resources.
+The canonical march is:</p>
+<ol>
+<li>Transform the camera ray into effect space and intersect the finite bound.
+A miss returns before numerical work.</li>
+<li>Initialize position, tangent or canonical momentum, radiance,
+transmittance, event state, accepted-step count, and termination ID.</li>
+<li>Propose one candidate segment. An error-controlled rejection changes only
+the next attempted step size.</li>
+<li>Locate every applicable event continuously on the segment. Root-refine the
+earliest event; preserve ordered disk crossings when several contribute.</li>
+<li>Accumulate the accepted segment&#39;s transfer, then commit exactly one state
+advance and increment the accepted-step count once.</li>
+<li>Terminate as <code>escaped</code>, <code>horizon</code>, <code>core</code>, <code>opaque</code>, <code>invalid</code>,
+<code>unresolved-critical</code>, <code>minimum-step</code>, <code>step-cap</code>, or <code>attempt-cap</code>.</li>
+</ol>
+<p>The attempt cap bounds divergent work independently of the accepted-step cap.
+<code>step-cap</code> bounds committed accepted steps; <code>attempt-cap</code> bounds accepted plus
+rejected attempts. A curvature or distance heuristic may propose a step;
+refinement against a tighter solution decides whether it is accurate.</p>
+<p><strong>Complete when:</strong> a trace proves one committed advance per accepted step,
+rejected attempts leave physical and event state unchanged, every ray receives
+an explicit termination ID, and event residuals meet their declared bounds.</p>
+<h2>4. Resolve transfer and the escaped direction</h2>
+<p>Sample an exterior environment only for <code>escaped</code> rays. Reconstruct its lookup
+direction from the integrated outgoing tangent in the declared orthonormal
+frame; orbital position angle alone is not a direction. Bound or integrate any
+far-field tail truncated by the proxy.</p>
+<p>Keep transfer aligned with the claim:</p>
 <ul>
-<li>LDR PNG/JPEG star/environment color authored in sRGB uses <code>SRGBColorSpace</code>.
-HDR/EXR or procedurally generated radiance remains in the declared linear
-working color space; do not tag every environment as sRGB.</li>
-<li>Noise, density, masks, lens maps, LUTs, step counts, and termination IDs use
-<code>NoColorSpace</code> or linear data settings.</li>
-<li>Accumulate radiance and transmittance in linear HDR buffers. Use
-<code>HalfFloatType</code> working targets until tone mapping.</li>
-<li>The app has exactly one tone-map owner and one output conversion owner. The
-node pipeline owns output conversion through <code>outputColorTransform</code> or an
-explicit <code>renderOutput()</code> node. With explicit <code>renderOutput()</code>, set
-<code>renderPipeline.outputColorTransform = false</code>; set
-<code>renderPipeline.needsUpdate = true</code> after changing diagnostic <code>outputNode</code>.</li>
+<li>An artistic disk declares a scene-length basis and a linear-HDR source
+basis. Integrate extinction/emission front-to-back and label the result
+artistic.</li>
+<li>A physical disk uses ordered geodesic crossings, a named emitter
+four-velocity and observer tetrad, and invariant frequency transfer. Its
+geometry and orbital model must match the selected Schwarzschild claim.</li>
 </ul>
-<h2>References</h2>
-<p>The shared physics ABI is defined only by
-<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-choose-skills/references/physics-domain-and-interaction-contract.md">the physics domain and interaction contract</a>;
-this skill supplies the curved-ray adapter, not a parallel physics schema.</p>
-<p>Read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-black-holes-and-space-effects/references/curved-ray-integrators.md">references/curved-ray-integrators.md</a>
-for the WebGPU/TSL architecture, RK4 wormhole state reduction, artistic
-curved-ray accretion integrator, continuous disk crossing, compute/storage
-caches, diagnostics, and validation requirements.</p>
-<p>Canonical WebGPU lab: <code>examples/tsl-curved-ray/</code>. It retains the artistic
-bounded accretion shader and adds GPU-sampled, critical-split Ellis and
-Schwarzschild direction-transfer stages, a compute direction cache, and
-world-position-reprojected, termination-aware temporal ping-pong. A separate
-direct-GPU probe path executes Ellis/Schwarzschild ODEs, and the convergence
-route dispatches three Schwarzschild step caps. Independent float64 Ellis quadrature and
-Schwarzschild Hamiltonian rays gate tables and validation readback. These CPU/source
-checks do not replace the native-browser readback/timestamp evidence required
-by <code>lab.manifest.json</code>.</p>
-<p>Legacy WebGL implementation (deprecated, do not extend): <code>examples/curved-ray-accretion-volume/curved-ray-effect.js</code></p>
-<h2>Routing Boundary</h2>
-<p>Use <code>$threejs-particles-trails-and-effects</code> for ordinary particles, trails, plasma, and event
-effects. Use <code>$threejs-volumetric-clouds</code> for weather-density volumes,
-<code>$threejs-sky-atmosphere-and-haze</code> for planetary scattering,
-<code>$threejs-bloom</code> and <code>$threejs-exposure-color-grading</code> for post effects, and
-<code>$threejs-visual-validation</code> for fixed-view visual contracts. This skill owns
-per-pixel numerical ray integration through curved or bounded space-effect
-domains.</p>
+<p>Accumulate into linear HDR. One pipeline stage owns tone mapping and output
+conversion; diagnostics that replace the output mark the pipeline graph dirty.</p>
+<p><strong>Complete when:</strong> misses and non-escaped terminations cannot sample an
+exterior, the escaped tangent is finite and normalized, disk crossings retain
+their order, and transfer units reduce to radiance.</p>
+<h2>5. Select direct work or reuse</h2>
+<p>Use a direct bounded march for changing lenses, sparse probes, or artistic
+fields whose per-pixel work meets the target. Use a critical-split transfer
+map for a static spherical Ellis or Schwarzschild lens when coherent reuse
+beats direct integration. Use a local high-accuracy map near separatrices when
+GPU <code>float32</code> direct rays miss the angular gate.</p>
+<p>When a lens map, compute cache, or temporal reconstruction is selected, read
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-black-holes-and-space-effects/references/lens-cache-and-history.md">lens-cache-and-history.md</a> before
+allocating it. Keep the opaque scene and required depth at their required
+resolution; scale only the effect pass whose error was measured.</p>
+<p><strong>Complete when:</strong> each cache or history resource has a reuse reason, a stable
+identity, an invalidation rule, a completion/lifetime rule, and measured
+benefit over the direct path.</p>
+<h2>6. Verify the selected claim</h2>
+<p>Use a deterministic, seeded environment with high-frequency directional
+features so angular, critical-curve, and history errors remain visible. It is a
+validation input generated by the project, not a bundled visual preset.</p>
+<p>For every branch:</p>
+<ul>
+<li>capture termination, accepted/rejected attempts, event count/location,
+remaining transmittance, final direction, and invalid-state diagnostics;</li>
+<li>compare <code>h</code>, <code>h/2</code>, and <code>h/4</code> or an equivalent tolerance sequence at fixed
+rays and cameras;</li>
+<li>compare final angular error against the environment footprint and compare
+event residuals against the relevant geometric thickness;</li>
+<li>verify moved, uniformly scaled, camera-inside, miss, and far-from-origin
+bounds, plus nonuniform-scale rejection or the explicitly transformed metric;</li>
+<li>verify the required Three.js revision, backend, final-output owner, resize,
+reset, and disposal behavior.</li>
+</ul>
+<p>Artistic rays pass when refinement preserves fixed-view silhouette,
+termination class, ordered disk events, and radiance within declared bounds.
+Ellis and Schwarzschild rays additionally require an independent CPU <code>float64</code>
+reference, invariant drift, critical-regime classification, exterior/escape
+agreement, and convergence of the final tetrad direction. A capped,
+minimum-step, invalid, or unresolved-critical ray is diagnostic output rather
+than physical evidence.</p>
+<p><strong>Complete when:</strong> every requested observable has a passing branch-specific
+gate, every failure class is visible in diagnostics, and the final claim lists
+the numerical and domain limits that remain.</p>
 </div>
   <div class="pn">
     <a href="threejs-ambient-contact-shading.html">← Ambient Contact Shading</a>
@@ -788,10 +568,16 @@ domains.</p>
 </main>
 
 <div class="wrap"><footer>
-  <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
-  <span style="font-size:13px">Three r185.1 · 41 working implementations · build <code>6c7881ab7386</code></span><br/>
-  <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
-  <span><a href="https://threejs-skills.com/about/">About &amp; methodology</a> · <a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/llms.txt">For coding agents</a></span>
+  <div class="footer-summary">Three.js WebGPU Skill Pack: TSL, procedural graphics, and visual validation.
+    <span>Three r185.1 · 40 primary targets · 25 accepted · build <code>ab7d8d17e058</code></span>
+    <span>Compiling shaders? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span>
+  </div>
+  <div class="footer-groups">
+    <div class="footer-group"><strong>Build</strong><a href="/#skills">Skills</a><a href="/#flagships">Examples</a><a href="/industries/">Industries</a></div>
+    <div class="footer-group"><strong>Decide</strong><a href="/for/">Who it is for</a><a href="/compare/">Compare</a><a href="/alternatives/">Alternatives</a><a href="/pricing/">Pricing</a></div>
+    <div class="footer-group"><strong>Adopt</strong><a href="/docs/">Docs</a><a href="/migrate/">Migration</a><a href="/agents/">Agent docs</a><a href="/faq/">FAQ</a></div>
+    <div class="footer-group"><strong>Proof</strong><a href="/evidence/">Evidence</a><a href="/about/">Method</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a><a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/LICENSE">License</a></div>
+  </div>
 </footer></div>
 </body>
 </html>

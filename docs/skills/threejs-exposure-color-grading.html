@@ -4,12 +4,12 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Exposure And Color Grading | Three.js WebGPU Skill</title>
-<meta name="description" content="Build a workload-selected WebGPU/TSL exposure and grading path in Three.js. Use for fixed, sampled, reduced, or histogram luminance metering; GPU-resident EV…" />
+<meta name="description" content="Meter and grade scene-linear Three.js WebGPU images. Use for choosing fixed or automatic exposure; adapting EV on the GPU; assigning tone-map and output…" />
 <meta name="author" content="Three.js WebGPU Skill Pack contributors" />
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-exposure-color-grading.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b" />
+<meta name="skill-pack-build-revision" content="sha256:ab7d8d17e0589a6f5c2462d645b9e0d6797cd92eade36e3615dae091c6f9df5b" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -17,26 +17,20 @@
 <link rel="manifest" href="../site.webmanifest" />
 <link rel="alternate" type="text/plain" href="https://threejs-skills.com/llms.txt" title="LLM-readable skill catalog" />
 <link rel="alternate" type="application/json" href="https://threejs-skills.com/skills.json" title="Machine-readable skill catalog" />
-<link rel="preload" as="image" href="../visual-validation/webgpu-exposure-color-pipeline/final.design.avif" type="image/avif" fetchpriority="high" />
+
 <meta property="og:type" content="article" />
 <meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
 <meta property="og:title" content="Exposure And Color Grading | Three.js WebGPU Skill" />
-<meta property="og:description" content="Build a workload-selected WebGPU/TSL exposure and grading path in Three.js. Use for fixed, sampled, reduced, or histogram luminance metering; GPU-resident EV…" />
+<meta property="og:description" content="Meter and grade scene-linear Three.js WebGPU images. Use for choosing fixed or automatic exposure; adapting EV on the GPU; assigning tone-map and output…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-exposure-color-grading.html" />
-<meta property="article:modified_time" content="2026-07-11T13:30:23+03:00" />
+<meta property="article:modified_time" content="2026-07-16T12:45:44+03:00" />
 <meta property="article:published_time" content="2026-07-04T23:30:20+03:00" />
 <meta property="article:section" content="Cameras, Lighting, and Final Image" />
-<meta property="og:image" content="https://threejs-skills.com/visual-validation/webgpu-exposure-color-pipeline/final.design.png" />
-<meta property="og:image:type" content="image/png" />
-<meta property="og:image:width" content="1200" />
-<meta property="og:image:height" content="800" />
-<meta property="og:image:alt" content="Exposure and grading render-target readback for Exposure And Color Grading" />
-<meta name="twitter:image" content="https://threejs-skills.com/visual-validation/webgpu-exposure-color-pipeline/final.design.png" />
-<meta name="twitter:image:alt" content="Exposure and grading render-target readback for Exposure And Color Grading" />
-<meta name="twitter:card" content="summary_large_image" />
+
+<meta name="twitter:card" content="summary" />
 <meta name="twitter:title" content="Exposure And Color Grading | Three.js WebGPU Skill" />
-<meta name="twitter:description" content="Build a workload-selected WebGPU/TSL exposure and grading path in Three.js. Use for fixed, sampled, reduced, or histogram luminance metering; GPU-resident EV…" />
+<meta name="twitter:description" content="Meter and grade scene-linear Three.js WebGPU images. Use for choosing fixed or automatic exposure; adapting EV on the GPU; assigning tone-map and output…" />
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
@@ -62,19 +56,14 @@
    ],
    "@id": "https://threejs-skills.com/skills/threejs-exposure-color-grading.html#article",
    "headline": "Exposure And Color Grading",
-   "description": "Build a workload-selected WebGPU/TSL exposure and grading path in Three.js. Use for fixed, sampled, reduced, or histogram luminance metering; GPU-resident EV adaptation; explicit tone-map/output ownership; and domain-correct lut3D grading chosen from measured scene and target requirements.",
+   "description": "Meter and grade scene-linear Three.js WebGPU images. Use for choosing fixed or automatic exposure; adapting EV on the GPU; assigning tone-map and output conversion; or placing and validating 3D LUTs.",
    "url": "https://threejs-skills.com/skills/threejs-exposure-color-grading.html",
    "mainEntityOfPage": {
     "@type": "WebPage",
     "@id": "https://threejs-skills.com/skills/threejs-exposure-color-grading.html"
    },
-   "image": [
-    "https://threejs-skills.com/seo/article/threejs-exposure-color-grading-1x1.png",
-    "https://threejs-skills.com/seo/article/threejs-exposure-color-grading-4x3.png",
-    "https://threejs-skills.com/seo/article/threejs-exposure-color-grading-16x9.png"
-   ],
    "datePublished": "2026-07-04T23:30:20+03:00",
-   "dateModified": "2026-07-11T13:30:23+03:00",
+   "dateModified": "2026-07-16T12:45:44+03:00",
    "author": {
     "@id": "https://threejs-skills.com/#publisher"
    },
@@ -151,18 +140,18 @@ html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smo
 body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7}
 ::selection{background:rgba(255,180,84,.26);color:var(--ink)}
 a{color:inherit;text-decoration:none}
-a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
+a:focus-visible,button:focus-visible,summary:focus-visible,pre[tabindex]:focus-visible,[role="region"]:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
 main{display:block}
 .skip-link{position:fixed;z-index:100;left:16px;top:12px;translate:0 -160%;font-family:var(--mono);font-size:12px;background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:9px;transition-property:translate;transition-duration:160ms}
 .skip-link:focus{translate:0 0}
 .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
 .site-nav{position:sticky;z-index:50;top:0;background:rgba(8,10,14,.82);border-bottom:1px solid rgba(255,255,255,.075);backdrop-filter:blur(18px) saturate(1.15)}
-nav{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
-nav .brand{white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
-nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
-nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
-nav .links a:hover{color:var(--amber)}
-nav .links a:active{scale:.96}
+.site-nav>.wrap{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+.site-nav .brand{min-height:44px;display:inline-flex;align-items:center;white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
+.site-nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
+.site-nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
+.site-nav .links a:hover{color:var(--amber)}
+.site-nav .links a:active{scale:.96}
 h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:0}
 p{text-wrap:pretty}
 h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
@@ -176,7 +165,7 @@ code{font-family:var(--mono)}
 .card{min-height:100%;background:linear-gradient(145deg,rgba(19,24,33,.96),rgba(12,15,21,.96));border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px;
   box-shadow:var(--shadow-card);transition-property:translate,scale,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
 .card:hover{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
-.card:active{translate:0 -1px;scale:.99}
+.card:active{translate:0 -1px;scale:.96}
 .card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .card-kind{font-family:var(--mono);font-size:10px;color:var(--cyan)}
 .card h3,.card h4{font-size:19px;font-weight:600}
@@ -201,19 +190,29 @@ figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:s
 figcaption{padding:16px 18px;font-size:14.5px}
 figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
 figcaption span{display:block;margin-top:3px;color:var(--dim)}
-footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
+footer{border-top:1px solid var(--line);padding:44px 0 60px;display:grid;grid-template-columns:minmax(260px,1.4fr) minmax(0,2fr);gap:36px 64px;color:var(--dim);font-size:14.5px}
 footer a{color:var(--amber)}
 footer a:hover{text-decoration:underline}
 footer code{color:var(--cyan);font-size:11px}
+.footer-summary{max-width:55ch}.footer-summary>span{display:block;margin-top:8px;font-size:13px}.footer-groups{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}.footer-group{display:grid;align-content:start;gap:8px}.footer-group strong{font:400 10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}.footer-group a{min-height:40px;display:flex;align-items:center;color:var(--dim);font-size:13px;transition-property:color,scale;transition-duration:160ms}.footer-group a:hover{color:var(--amber);text-decoration:none}.footer-group a:active{scale:.96}
+.pathfinder{padding:clamp(52px,7vw,86px) 0;border-bottom:1px solid var(--line)}.pathfinder-head{display:grid;grid-template-columns:minmax(0,.7fr) minmax(320px,1.3fr);align-items:end;gap:28px 72px;margin-bottom:28px}.pathfinder-head h2{margin:0}.pathfinder-head p{max-width:58ch;color:var(--dim)}.pathfinder-rows{border-top:1px solid var(--line)}.pathfinder-row{display:grid;grid-template-columns:minmax(160px,.55fr) minmax(210px,.8fr) minmax(0,1.6fr);gap:20px 32px;align-items:center;min-height:94px;border-bottom:1px solid var(--line)}.pathfinder-stage{font:10px/1.4 var(--mono);letter-spacing:.11em;text-transform:uppercase;color:var(--cyan)}.pathfinder-row>p{color:var(--dim);font-size:14px}.pathfinder-links{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px 18px}.pathfinder-links a{min-height:44px;display:inline-flex;align-items:center;gap:8px;color:var(--amber);font:11px/1.35 var(--mono);transition-property:color,scale;transition-duration:160ms}.pathfinder-links a:after{content:"→"}.pathfinder-links a:hover{color:var(--ink)}.pathfinder-links a:active{scale:.96}
+.content-hero{padding:clamp(54px,8vw,104px) 0 42px;border-bottom:1px solid var(--line)}.breadcrumbs{min-height:44px;display:flex;align-items:center;margin-bottom:28px;font:11px/1.4 var(--mono);color:var(--dim)}.breadcrumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.breadcrumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}.breadcrumbs a{min-height:40px;display:inline-flex;align-items:center;transition-property:color,scale;transition-duration:160ms}.breadcrumbs a:hover{color:var(--amber)}.breadcrumbs a:active{scale:.96}.content-hero h1{max-width:17ch;font-size:clamp(40px,6vw,68px);font-weight:700;line-height:1.02;letter-spacing:-.02em}.content-lede{max-width:66ch;margin-top:22px;color:var(--dim);font-size:clamp(17px,2vw,20px)}.content-meta{display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:28px;font:10px/1.4 var(--mono);color:var(--cyan)}
+.content-answer{max-width:900px;margin-top:34px;padding:3px 0 3px 22px;border-left:2px solid var(--amber);font-size:clamp(19px,2.2vw,21px);line-height:1.62;color:var(--ink)}.content-shell{padding:clamp(46px,7vw,86px) 0}.content-layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(230px,1fr);align-items:start;gap:clamp(36px,6vw,76px)}.content-body{grid-column:1;grid-row:1;max-width:78ch;min-width:0}.content-body h2{margin:52px 0 16px;font-size:clamp(27px,3.5vw,39px);scroll-margin-top:112px}.content-body>h2:first-child{margin-top:0}.content-body h3{margin:34px 0 12px;font-size:21px;scroll-margin-top:112px}.content-body p,.content-body li{color:var(--dim);font-size:16px}.content-body p+p{margin-top:17px}.content-body ul,.content-body ol{margin:16px 0;padding-left:24px}.content-body li+li{margin-top:7px}.content-body a{color:var(--cyan);text-decoration:underline;text-decoration-color:rgba(127,212,193,.35);text-underline-offset:3px}.content-body a:hover{color:var(--amber);text-decoration-color:currentColor}.content-body code:not(pre code){padding:1px 5px;border:1px solid var(--line);border-radius:5px;background:#07090c;color:var(--cyan);font-size:.86em}.content-body pre{margin:20px 0;white-space:pre;tab-size:2}.content-table{max-width:100%;margin:22px 0;overflow-x:auto;border:1px solid var(--line);border-radius:12px}.content-table:focus-visible{outline:2px solid var(--amber);outline-offset:3px}.content-table table{width:100%;border-collapse:collapse;font-size:14px}.content-table th,.content-table td{min-width:150px;padding:11px 13px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);text-align:left;vertical-align:top;color:var(--dim)}.content-table th{color:var(--ink);font-weight:600;background:var(--bg2)}.content-table tr:last-child td{border-bottom:0}.content-table th:last-child,.content-table td:last-child{border-right:0}
+.content-index{grid-column:2;grid-row:1;position:sticky;top:104px;max-height:calc(100vh - 128px);overflow-y:auto;padding:18px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.content-index strong{display:block;margin-bottom:10px;font:10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}.content-index ol{list-style:none}.content-index a{min-height:40px;display:flex;align-items:center;padding:5px 0;color:var(--dim);font-size:13px;line-height:1.4;transition-property:color,translate,scale;transition-duration:160ms}.content-index a:hover{color:var(--amber);translate:3px 0}.content-index a:active{translate:1px 0;scale:.96}.content-proof{margin:54px 0 0}.content-proof figure{border-radius:16px}.content-proof img{width:100%;height:auto;max-height:650px;object-fit:cover;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}.content-proof figcaption{color:var(--dim);font:11px/1.55 var(--mono)}.content-proof figcaption a{color:var(--amber)}
+.content-layout--docs{grid-template-columns:minmax(190px,.6fr) minmax(0,2fr)}.content-layout--docs .content-index{grid-column:1}.content-layout--docs .content-body{grid-column:2;max-width:72ch}.docs-index a{padding-inline:10px;border-left:2px solid transparent}.docs-index a[aria-current="page"]{border-left-color:var(--amber);background:rgba(255,180,84,.06);color:var(--ink);font-weight:600}.docs-index-current{display:none}
+.content-facts,.content-faq-list,.content-related,.content-sources,.content-skills,.content-demos,.content-discovery,.faq-provenance{margin-top:54px;padding-top:22px;border-top:1px solid var(--line)}.content-facts h2,.content-faq-list h2,.content-related h2,.content-sources h2,.content-skills h2,.content-demos h2{font-size:24px}.content-ruled-list{list-style:none;border-top:1px solid var(--line)}.content-ruled-list li{border-bottom:1px solid var(--line)}.content-ruled-list a{min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:9px 0;color:var(--dim);font-size:14px;transition-property:color,scale;transition-duration:160ms}.content-ruled-list a:after{content:"→";color:var(--amber)}.content-ruled-list a:hover{color:var(--ink)}.content-ruled-list a:active{scale:.96}.content-related .content-ruled-list a{display:grid;grid-template-columns:104px minmax(0,1fr) auto}.content-related-family{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}.content-faq-item{padding:22px 0;border-bottom:1px solid var(--line)}.content-faq-item h3{margin:0;font-size:20px}.content-faq-item h3 a{color:var(--ink)}.content-faq-item p{margin-top:9px;color:var(--dim);font-size:15px}.faq-provenance{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);padding:0}.faq-provenance div{padding:13px;background:var(--bg2)}.faq-provenance dt{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}.faq-provenance dd{margin-top:5px;font:11px/1.45 var(--mono);color:var(--cyan);overflow-wrap:anywhere}.content-discovery{display:flex;flex-wrap:wrap;gap:10px 22px;font:11px/1.5 var(--mono);color:var(--dim)}.content-discovery a{min-height:40px;display:inline-flex;align-items:center;color:var(--amber)}
 @media (max-width:760px){
   .site-nav .wrap{padding-right:0}
-  nav{min-height:104px;display:grid;grid-template-columns:1fr;padding:14px 0 10px;gap:4px}
-  nav .brand{font-size:16px}
-  nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:none;padding-right:20px}
-  nav .links::-webkit-scrollbar{display:none}
-  nav .links a{flex:0 0 auto}
+  .site-nav>.wrap{min-height:104px;display:grid;grid-template-columns:1fr;padding-top:14px;padding-bottom:10px;gap:4px}
+  .site-nav .brand{font-size:16px}
+  .site-nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;scrollbar-color:rgba(255,180,84,.45) transparent;padding:0 20px 4px 0}
+  .site-nav .links::-webkit-scrollbar{height:3px}.site-nav .links::-webkit-scrollbar-thumb{background:rgba(255,180,84,.45);border-radius:99px}
+  .site-nav .links a{flex:0 0 auto}
   .grid,.gallery{grid-template-columns:1fr}
+  footer{grid-template-columns:1fr}.footer-groups{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+@media (max-width:900px){.pathfinder-head,.content-layout{grid-template-columns:1fr}.content-index{grid-column:1;grid-row:1;position:static;max-height:none}.content-body,.content-layout--docs .content-body{grid-column:1;grid-row:2}.docs-index{overflow:hidden}.docs-index-current{display:flex;margin-bottom:8px}.docs-index ol{display:flex;gap:8px;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;padding-bottom:6px}.docs-index li{flex:0 0 min(72vw,260px)}.docs-index .docs-index-list-current{display:none}.docs-index a{min-height:44px;padding:8px 10px;border-left:0;border-bottom:2px solid transparent;background:var(--bg2)}.docs-index a[aria-current="page"]{border-bottom-color:var(--amber)}.pathfinder-row{grid-template-columns:minmax(160px,.6fr) minmax(0,1fr)}.pathfinder-links{grid-column:1/-1;justify-content:flex-start;padding-bottom:18px}.faq-provenance{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.pathfinder-row{grid-template-columns:1fr;gap:6px;padding:18px 0}.pathfinder-links{grid-column:auto;padding:0}.content-hero h1{font-size:clamp(38px,12vw,54px)}.content-answer{padding-left:16px}.content-table{border-radius:8px}.content-table table{min-width:680px}.faq-provenance{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
@@ -228,7 +227,7 @@ header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
   linear-gradient(90deg,rgba(10,12,16,.96) 0%,rgba(10,12,16,.8) 36%,rgba(10,12,16,.24) 68%,rgba(10,12,16,.04) 100%),
   linear-gradient(0deg,rgba(10,12,16,.9) 0%,rgba(10,12,16,.08) 65%,rgba(10,12,16,.62) 100%);z-index:1}
 .crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}.crumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.crumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}
-.crumbs a:hover{color:var(--amber)}
+.crumbs a{min-height:40px;display:inline-flex;align-items:center}.crumbs a:hover{color:var(--amber)}
 h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:0;max-width:18ch}
 .lede{margin-top:24px;max-width:70ch;color:var(--dim)}
 .meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
@@ -268,6 +267,7 @@ a.chip:active{scale:.96}
 .runtime-evidence-disclosure dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;margin-top:16px;overflow:hidden;border-radius:10px;background:var(--line)}.runtime-evidence-disclosure dl div{padding:11px 12px;background:var(--bg2)}.runtime-evidence-disclosure dt{font:10px/1.35 var(--mono);color:var(--dim)}.runtime-evidence-disclosure dd{margin-top:4px;font:500 10px/1.35 var(--mono);color:var(--amber)}.runtime-evidence-disclosure dd[data-verdict="PASS"]{color:var(--lime)}
 .runtime-evidence-disclosure ul{margin:15px 0 0;padding-left:20px}.runtime-evidence-disclosure li{margin-top:5px;color:var(--dim);font-size:14px}
 .evidence-report-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:10px}.evidence-report-links a{display:grid;gap:6px;min-height:72px;padding:14px;border:1px solid var(--line);border-radius:11px;background:var(--bg2)}.evidence-report-links code{color:var(--cyan);font:11px/1.4 var(--mono);overflow-wrap:anywhere}.evidence-report-links span{color:var(--dim);font:10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.05em}
+.skill-guides{margin-top:52px;padding-top:22px;border-top:1px solid var(--line)}.skill-guides h3{font-size:22px}.skill-guides ul{margin-top:12px;list-style:none;border-top:1px solid var(--line)}.skill-guides li{border-bottom:1px solid var(--line)}.skill-guides a{min-height:52px;display:grid;grid-template-columns:120px minmax(0,1fr);align-items:center;gap:18px;color:var(--dim);font-size:14px;transition-property:color,scale;transition-duration:160ms}.skill-guides a span{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}.skill-guides a:hover{color:var(--amber)}.skill-guides a:active{scale:.96}
 @media (max-width:720px){
   .skill-hero{min-height:auto;padding:58px 0 52px}
   .skill-hero-bg{opacity:.3}
@@ -278,49 +278,44 @@ a.chip:active{scale:.96}
 </style>
 </head>
 <body>
-<a class="skip-link" href="#main-content">Skip to content</a><div class="site-nav"><div class="wrap"><nav aria-label="Primary navigation">
-  <a class="brand" href="../">Three.js WebGPU Skill&nbsp;Pack</a>
-  <div class="links"><a href="../#matrix">How it works</a><a href="../#flagships">Examples</a><a href="../#skills">Skills</a><a href="../#labs">Labs</a><a href="../evidence/">Evidence</a><a href="../#install">Install</a><a href="../about/">Method</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
-</nav></div></div>
+<a class="skip-link" href="#main-content">Skip to content</a><header class="site-nav"><div class="wrap">
+  <a class="brand" href="/">Three.js WebGPU Skill&nbsp;Pack</a>
+  <nav class="links" aria-label="Primary navigation"><a href="/#flagships">Examples</a><a href="/#skills">Skills</a><a href="/guides/">Guides</a><a href="/evidence/">Evidence</a><a href="/#install">Install</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub</a></nav>
+</div></header>
 
 <main id="main-content" tabindex="-1">
-<header class="skill-hero">
-  <picture class="responsive-preview">
-          <source type="image/avif" srcset="../visual-validation/webgpu-exposure-color-pipeline/final.design.avif" />
-          <source type="image/webp" srcset="../visual-validation/webgpu-exposure-color-pipeline/final.design.webp" />
-          <img data-responsive-preview src="../visual-validation/webgpu-exposure-color-pipeline/final.design.png" alt="" class="skill-hero-bg" aria-hidden="true" width="1200" height="800" fetchpriority="high" decoding="async" />
-        </picture>
+<header class="">
   <div class="wrap">
     <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Cameras, Lighting, and Final Image</a></li><li aria-current="page">Exposure And Color Grading</li></ol></nav>
     <h1 style="view-transition-name:skill-threejs-exposure-color-grading">Exposure And Color Grading</h1>
-    <p class="lede">Build a workload-selected WebGPU/TSL exposure and grading path in Three.js. Use for fixed, sampled, reduced, or histogram luminance metering; GPU-resident EV adaptation; explicit tone-map/output ownership; and domain-correct lut3D grading chosen from measured scene and target requirements.</p>
-    <p class="hero-evidence-caption">Image: Exposure and grading render-target readback. Source lab: webgpu-exposure-color-pipeline.</p>
+    <p class="lede">Meter and grade scene-linear Three.js WebGPU images. Use for choosing fixed or automatic exposure; adapting EV on the GPU; assigning tone-map and output conversion; or placing and validating 3D LUTs.</p>
     <div class="meta-row">
       <span class="chip a">$threejs-exposure-color-grading</span>
-      <span class="chip">1 primary implementation</span>
-<span class="chip">2 flagships</span>
-<span class="chip">1 secondary surface</span>
-      <span class="chip">native evidence pending</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-11T13:30:23+03:00">2026-07-11</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/d508c69a72089690a6801144692591b8a1fe0e11">commit d508c69 ↗</a>
-      <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-exposure-color-grading/SKILL.md">SKILL.md on GitHub ↗</a>
-      <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-exposure-color-grading/SKILL.md">raw (for agents) ↗</a>
+      <span class="chip">1 primary target</span>
+      <span class="chip">2 flagships</span>
+      <span class="chip">1 secondary surface</span>
+      <span class="chip">accepted runtime evidence</span>
+      <span class="chip">Latest skill update <time datetime="2026-07-16T12:45:44+03:00">2026-07-16</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/8749183dffd84731506239dd86590c92bf958969">commit 8749183 ↗</a>
+      <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-exposure-color-grading/SKILL.md">SKILL.md on GitHub ↗</a>
+      <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/skills/threejs-exposure-color-grading/SKILL.md">raw (for agents) ↗</a>
     </div>
   </div>
 </header>
 
 
   <section class="section" id="primary-implementations" aria-labelledby="primary-implementations-title"><div class="wrap">
-    <h2 id="primary-implementations-title">Primary implementation surface</h2>
-    <p class="sub">These routes are generated from canonical source. Their exact status remains separate from implementation availability.</p>
+    <h2 id="primary-implementations-title">Primary target surface</h2>
+    <p class="sub">These rendering routes are generated from canonical source. Native-WebGPU acceptance remains separate from entrypoint availability.</p>
     <div class="grid">
       <a class="card" href="../demos/webgpu-exposure-color-pipeline/">
-        <span class="card-preview-wrap" data-preview-for="webgpu-exposure-color-pipeline" data-preview-source="webgpu-exposure-color-pipeline" data-preview-classification="inspected-runtime-evidence-preview"><picture class="responsive-preview">
-          <source type="image/avif" srcset="../visual-validation/webgpu-exposure-color-pipeline/final.design.avif" />
-          <source type="image/webp" srcset="../visual-validation/webgpu-exposure-color-pipeline/final.design.webp" />
-          <img data-responsive-preview src="../visual-validation/webgpu-exposure-color-pipeline/final.design.png" alt="Exposure and grading render-target readback for WebGPU Exposure Color Pipeline" class="card-preview" width="1200" height="800" loading="lazy" decoding="async" />
-        </picture><span class="media-caption">Exposure and grading render-target readback</span></span>
-        <span class="card-head"><span class="card-kind">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+        <span class="primary-evidence-panel " data-evidence-state="accepted" data-preview-for="webgpu-exposure-color-pipeline">
+    <span class="primary-evidence-label">Canonical capture</span>
+    <strong>Accepted evidence published</strong>
+    <span><code>f238d4795026</code> source hash</span>
+    <span>14 fixed states · 3 runtime proof requirements</span>
+  </span>
+        <span class="card-head"><span class="card-kind">Canonical lab</span><span class="status status--accepted">Accepted</span></span>
         <h3>WebGPU Exposure Color Pipeline</h3>
         <p>5 fixed scenarios, 6 mechanism routes, and 3 locked tiers.</p>
         <span class="card-meta">Open published implementation →</span>
@@ -333,13 +328,12 @@ a.chip:active{scale:.96}
     <p class="sub">This skill contributes to the following cross-skill owner graphs.</p>
     <div class="grid">
       <a class="card" href="../demos/final-image-flight/">
-        <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="final-image-flight">
-    <span class="primary-evidence-label">Canonical capture</span>
-    <strong>Runtime evidence pending</strong>
-    <span><code>0e56ab6926da</code> source hash</span>
-    <span>10 fixed states · 12 runtime proof requirements</span>
-  </span>
-        <span class="card-head"><span class="card-kind">Final image systems</span><span class="status status--pending">Evidence pending</span></span>
+        <span class="card-preview-wrap" data-preview-for="final-image-flight" data-preview-source="final-image-flight" data-preview-classification="inspected-runtime-evidence-preview"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/final-image-flight/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/final-image-flight/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/final-image-flight/final.design.png" alt="Accepted demo-sourced runtime evidence for Final Image Flight" class="card-preview" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><span class="media-caption">Accepted demo-sourced runtime evidence</span></span>
+        <span class="card-head"><span class="card-kind">Final image systems</span><span class="status status--accepted">Accepted</span></span>
         <h3>Final Image Flight</h3>
         <span class="card-meta">6 mechanisms · 3 locked tiers</span>
       </a>
@@ -347,7 +341,7 @@ a.chip:active{scale:.96}
         <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="relativistic-space-shot">
     <span class="primary-evidence-label">Canonical capture</span>
     <strong>Runtime evidence pending</strong>
-    <span><code>5fe1522e9185</code> source hash</span>
+    <span><code>e2e9d6b673af</code> source hash</span>
     <span>10 fixed states · 4 runtime proof requirements</span>
   </span>
         <span class="card-head"><span class="card-kind">Relativistic cinematic</span><span class="status status--pending">Evidence pending</span></span>
@@ -360,7 +354,7 @@ a.chip:active{scale:.96}
   <section class="section" id="evidence-reports" aria-labelledby="evidence-reports-title"><div class="wrap">
     <h2 id="evidence-reports-title">Evidence reports</h2>
     <p class="sub">Source hashes, claim verdicts, promoted same-lab media, fixed routes, exact tier contracts, and current limitations.</p>
-    <nav class="evidence-report-links" aria-label="Evidence reports for Exposure And Color Grading"><a href="../evidence/webgpu-exposure-color-pipeline/"><code>webgpu-exposure-color-pipeline</code><span>evidence pending</span></a><a href="../evidence/final-image-flight/"><code>final-image-flight</code><span>evidence pending</span></a><a href="../evidence/relativistic-space-shot/"><code>relativistic-space-shot</code><span>evidence pending</span></a></nav>
+    <nav class="evidence-report-links" aria-label="Evidence reports for Exposure And Color Grading"><a href="../evidence/webgpu-exposure-color-pipeline/"><code>webgpu-exposure-color-pipeline</code><span>accepted</span></a><a href="../evidence/final-image-flight/"><code>final-image-flight</code><span>accepted</span></a><a href="../evidence/relativistic-space-shot/"><code>relativistic-space-shot</code><span>evidence pending</span></a></nav>
   </div></section>
 
   <div class="section" id="approach"><div class="wrap">
@@ -380,238 +374,152 @@ transform is the classic double-transform bug.</p></div>
   </div></div>
 
 
+  <div class="section" id="examples"><div class="wrap">
+    <h2>Accepted primary labs</h2>
+    <p class="sub">Only schema-v2 labs with accepted runtime and evidence contracts appear here. Other source directories remain visible through the demo registry without being promoted to runnable proof.</p>
+    <div class="grid">
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline">
+        <h4>webgpu-exposure-color-pipeline</h4>
+        <span class="card-meta">threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline</span>
+      </a>
+    </div>
+  </div></div>
 
   <div class="section" id="validation"><div class="wrap">
     <h2>Preview and evidence ledger</h2>
-    <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; canonical acceptance still requires render-target readback and a schema-v2 bundle.</p>
-    <div class="evidence-ledger"><span class="status status--pending">Canonical runtime evidence pending</span><code>6 published images</code></div>
-<div class="runtime-evidence-disclosures">
-      <article class="runtime-evidence-disclosure" data-acceptance-status="incomplete">
-        <div class="runtime-evidence-head"><div><code>Native WebGPU runtime evidence preview</code><h3>WebGPU Exposure Color Pipeline</h3></div><span class="status status--pending">Acceptance pending</span></div>
-        <dl><div><dt>mechanismCorrectness</dt><dd data-verdict="INSUFFICIENT_EVIDENCE">INSUFFICIENT_EVIDENCE</dd></div><div><dt>performanceCompliance</dt><dd data-verdict="INSUFFICIENT_EVIDENCE">INSUFFICIENT_EVIDENCE</dd></div><div><dt>lifecycleStability</dt><dd data-verdict="INSUFFICIENT_EVIDENCE">INSUFFICIENT_EVIDENCE</dd></div></dl>
-        <ul><li>The correctness bundle records a native r185 WebGPU backend, but named-adapter timestamp evidence is absent.</li><li>The promoted percentile frame is a selection mask, not proof that histogram bin totals, prefix scan, or f64 oracle parity pass.</li><li>Lifecycle stability remains unaccepted.</li></ul>
-      </article></div>
-    <div class="gallery">
-      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-exposure-color-pipeline" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><picture class="responsive-preview">
-          <source type="image/avif" srcset="../visual-validation/webgpu-exposure-color-pipeline/final.design.avif" />
-          <source type="image/webp" srcset="../visual-validation/webgpu-exposure-color-pipeline/final.design.webp" />
-          <img data-responsive-preview src="../visual-validation/webgpu-exposure-color-pipeline/final.design.png" alt="Exposure And Color Grading: Exposure and grading render-target readback" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
-        </picture></span>
-        <figcaption itemprop="caption"><strong>Exposure and grading render-target readback</strong><span>inspected runtime evidence preview</span></figcaption>
-      </figure>
-      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-exposure-color-pipeline" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><picture class="responsive-preview">
-          <source type="image/avif" srcset="../visual-validation/webgpu-exposure-color-pipeline/meter-source.avif" />
-          <source type="image/webp" srcset="../visual-validation/webgpu-exposure-color-pipeline/meter-source.webp" />
-          <img data-responsive-preview src="../visual-validation/webgpu-exposure-color-pipeline/meter-source.png" alt="Exposure And Color Grading: Weighted log-luminance meter source diagnostic." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
-        </picture></span>
-        <figcaption itemprop="caption"><strong>Weighted log-luminance meter source diagnostic.</strong><span>inspected runtime evidence preview</span></figcaption>
-      </figure>
-      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-exposure-color-pipeline" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><picture class="responsive-preview">
-          <source type="image/avif" srcset="../visual-validation/webgpu-exposure-color-pipeline/histogram-percentiles.avif" />
-          <source type="image/webp" srcset="../visual-validation/webgpu-exposure-color-pipeline/histogram-percentiles.webp" />
-          <img data-responsive-preview src="../visual-validation/webgpu-exposure-color-pipeline/histogram-percentiles.png" alt="Exposure And Color Grading: Percentile-selection mask emitted by the histogram path; not a plotted histogram." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
-        </picture></span>
-        <figcaption itemprop="caption"><strong>Percentile-selection mask emitted by the histogram path; not a plotted histogram.</strong><span>inspected runtime evidence preview</span></figcaption>
-      </figure>
-      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-exposure-color-pipeline" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><picture class="responsive-preview">
-          <source type="image/avif" srcset="../visual-validation/webgpu-exposure-color-pipeline/meter-mask.avif" />
-          <source type="image/webp" srcset="../visual-validation/webgpu-exposure-color-pipeline/meter-mask.webp" />
-          <img data-responsive-preview src="../visual-validation/webgpu-exposure-color-pipeline/meter-mask.png" alt="Exposure And Color Grading: Metering-mask diagnostic." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
-        </picture></span>
-        <figcaption itemprop="caption"><strong>Metering-mask diagnostic.</strong><span>inspected runtime evidence preview</span></figcaption>
-      </figure>
-      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-exposure-color-pipeline" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><picture class="responsive-preview">
-          <source type="image/avif" srcset="../visual-validation/webgpu-exposure-color-pipeline/tone-map.avif" />
-          <source type="image/webp" srcset="../visual-validation/webgpu-exposure-color-pipeline/tone-map.webp" />
-          <img data-responsive-preview src="../visual-validation/webgpu-exposure-color-pipeline/tone-map.png" alt="Exposure And Color Grading: Tone-map stage diagnostic before the creative LUT." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
-        </picture></span>
-        <figcaption itemprop="caption"><strong>Tone-map stage diagnostic before the creative LUT.</strong><span>inspected runtime evidence preview</span></figcaption>
-      </figure>
-      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-exposure-color-pipeline" itemscope itemtype="https://schema.org/ImageObject">
-        <span class="preview-media"><picture class="responsive-preview">
-          <source type="image/avif" srcset="../visual-validation/webgpu-exposure-color-pipeline/lut.avif" />
-          <source type="image/webp" srcset="../visual-validation/webgpu-exposure-color-pipeline/lut.webp" />
-          <img data-responsive-preview src="../visual-validation/webgpu-exposure-color-pipeline/lut.png" alt="Exposure And Color Grading: Creative LUT stage diagnostic." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
-        </picture></span>
-        <figcaption itemprop="caption"><strong>Creative LUT stage diagnostic.</strong><span>inspected runtime evidence preview</span></figcaption>
-      </figure></div>
+    <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; rendering acceptance still requires same-lab readback and a schema-v2 bundle.</p>
+    <div class="evidence-ledger"><span class="status status--accepted">Accepted runtime evidence available</span><code>0 published images</code></div>
+
+    <div class="primary-evidence-panel" data-evidence-state="incomplete"><span class="primary-evidence-label">Same-lab evidence</span><strong>No runtime image promoted</strong><span>The page remains image-free until this skill's own lab supplies hash-bound pixels.</span></div>
   </div></div>
 
 <div class="section" id="skill-text"><div class="wrap">
   <h2>The full skill</h2>
-  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
+  <p class="sub">The complete SKILL.md as loaded by agents, rendered verbatim.</p>
   <div class="skilltext"><h2>Exposure And Color Grading</h2>
-<p>Use one <code>WebGPURenderer</code>, one <code>RenderPipeline</code>, one scene-linear HDR source, one
-GPU-resident exposure state per declared exposure-control group, one tone-map
-owner, and one output conversion owner. A group may span target/views only when
-their radiance binding, meter mask, exposure-key policy, sample-time policy, and
-reset history are identical. Choose the meter by measured marginal cost. For an exact global mean, a
-direct full-pixel reduction has fewer intermediate writes than an exposure-only
-pyramid; a sampled estimator reads fewer source pixels but is not exact.</p>
-<p>Read
-<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-exposure-color-grading/references/scene-referred-color-pipeline.md">references/scene-referred-color-pipeline.md</a>
-before implementation. It defines the metering decision, temporal taps, EV
-adaptation, LUT domains, r185 API proof, and measured budget contract.</p>
-<h2>Numeric Evidence Rule</h2>
-<p>Every numeric value in an implementation or recommendation must carry one tag:</p>
-<ul>
-<li><code>[Derived]</code>: follows from a formula, format, dimensions, or verified API;</li>
-<li><code>[Gated]</code>: legal only after a named capability/correctness gate;</li>
-<li><code>[Measured]</code>: captured on the named browser, device, resolution, and graph;</li>
-<li><code>[Authored]</code>: an intentional look/control starting value, never a performance
-fact.</li>
-</ul>
-<p>Do not publish an untagged workgroup size, sample grid, percentile, EV clamp,
-time constant, LUT dimension, cadence, memory figure, or timing target.</p>
-<h2>Canonical Ordering</h2>
-<pre><code class="language-text">scene-linear lighting / AO / atmosphere
-  -&gt; temporal reconstruction of stable scene radiance, when enabled
-  -&gt; meter tap from resolved pre-bloom HDR by default
-  -&gt; bloom and other authored scene-linear optical contributions
-  -&gt; apply adapted exposure
-  -&gt; tone map
-  -&gt; tone-mapped-linear LUT, when that is the LUT contract
-  -&gt; output conversion
-  -&gt; display-encoded effects / dither / UI, when their domains require it
-</code></pre>
-<p>The pre-bloom tap avoids an exposure/bloom feedback loop. Metering bloom is an
-<code>[Authored]</code> shot policy and must be regression-tested. Keep temporal history
-unexposed; otherwise rescale history by the exposure ratio or reject it.</p>
-<h2>Lighting-Transport And Physics Snapshot Contract</h2>
-<p>When the route declares a physics-to-render boundary, consume the immutable
-<code>PhysicsPresentationCandidate</code> -&gt; <code>CameraViewPublication</code> -&gt;
-<code>ViewPreparationPublication</code> -&gt;
-<code>PhysicsPresentationSnapshot</code> chain and bind its matching
-<code>LightingTransportSnapshot</code> through a provider-wide <code>PresentedStatePair</code>
-(<code>entityId: typed-absence</code>) in the Candidate and referenced by the Snapshot, as defined by the
-<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-choose-skills/references/physics-domain-and-interaction-contract.md">physics domain and interaction contract</a>.
-Validate the exact central lighting and presentation schemas; do not redeclare
-an exposure-local record. Each consumed <code>incidentRadiance</code>,
-<code>surfaceIrradiance</code>, <code>directSolarIrradiance</code>, <code>skyIrradiance</code>, <code>transmittance</code>,
-and <code>sourceDirection</code> channel has its own basis, quantity, SI unit,
-<code>sampleInstant</code>/<code>actualPhysicsTime</code>, validity, and error. Normalization belongs only to the derived
-render-local signal described below. Applied atmosphere/cloud/
-visibility factors are versioned through <code>attenuationFactorIds</code>. Match the
-pair&#39;s context/provider/signal IDs, descriptor/state/resource generations,
-<code>PresentationStateHandle</code>, requested presentation instant and mapped source
-instant. Channel clocks may differ from the presentation clock only through the
-declared <code>PresentationSampleProvenance</code> clock mapping; validate channel
-<code>actualPhysicsTime</code>, age, filter, maximum staleness, validity, and error against
-the target/view <code>currentRenderSampleInstant</code>.</p>
-<p>The provenance <code>requestedPresentationInstant</code> and bundle <code>sampleInstant</code> are
-narrow <code>PhysicsInstant</code> values. Provider <code>requestedPhysicsTime</code> and channel
-<code>actualPhysicsTime</code> are <code>PhysicsTime</code> wrappers whose discriminant selects
-exactly one arm consistent with the signal descriptor&#39;s <code>timeSemantics</code>; a raw
-<code>PhysicsInstant</code> or <code>PhysicsTimeInterval</code> is invalid in either wrapper field.</p>
-<p>Canonical lighting-provider channels remain SI-valued. The meter input is
-scene-linear radiance in the declared working basis. A physically calibrated
-render basis may retain those units. A normalized RGB render basis is a
-separately named render-local signal produced by a versioned SI-to-render
-conversion with reference scale, provenance, and error; it is not a normalized
-canonical lighting channel. Do not let auto exposure conceal incompatible
-radiance/irradiance units or per-skill compensating gains.
-If transport values are irradiance, the lighting model converts them through
-the declared BRDF/emission contract before the radiance meter tap.
-A nonphysical route leaves the router physics fields <code>not used</code> and declares
-only its render-local color contract.</p>
-<p><code>ViewPreparationPublication.reactivePublications</code> and
-<code>ViewPreparationPublication.resetDependencies</code>
-distinguish local radiance changes
-from basis changes. Shadow commits and discontinuous foam/emissive/optical
-updates flow through the meter normally and do not reset adaptation by default.
-A change to radiance scale/basis, working primaries, quantity convention, or
-the authored exposure key must either provide an exact EV conversion or reseed
-meter accumulation and adapted state before use. Invalid lighting executes a
-bounded canonical <code>hold-prior</code> action or selects an explicitly authored fixed
-EV; it never mixes the bad sample into GPU state.</p>
-<p><code>ViewPreparationPublication.resetDependencies</code> is the immutable plan; record actual exposure conversion,
-reduction reset, reseed, hold, and GPU submission in <code>FrameExecutionRecord</code>.
-Do not use <code>computeAsync()</code> as a completion fence. Device loss invalidates the
-exposure buffers, meter history, and timing evidence, then appends a
-<code>FrameExecutionRecord</code> with <code>overallStatus: device-lost</code>, affected target
-execution statuses <code>device-lost</code>, cancelled dependent actions, and
-lost-generation entries in <code>leaseDispositionById</code>. The immutable snapshot remains audit
-evidence but its lost-generation resource references are not bindable; rebuild
-and reseed under the new backend/resource generation.</p>
-<h2>Meter Decision</h2>
+<p>Keep the photographed signal scene-linear until the final image chain. One
+declared owner controls each exposure group, tone map, and output conversion.</p>
+<h2>1. Lock the color contract</h2>
+<p>Name the scene-linear working primaries, radiance scale, alpha convention, and
+every producer that enters the photographed signal. Convert irradiance through
+the material/lighting model before metering radiance. Apply one shared physical
+or perceptual radiance scale to lights, environment, atmosphere, emissive
+materials, bloom sources, and optical effects.</p>
+<p>Partition targets or views into exposure-control groups. A group may share GPU
+state only when its radiance basis, exposure policy, and reset history are
+identical; an automatic group also requires the same meter mask, key, and
+sample schedule. Assign exactly one exposure owner, one tone-map owner, and one
+output-conversion owner per group.</p>
+<p><strong>Complete when:</strong> every photographed input has one basis and scale, and every
+group names its members, exposure/tone-map/output owners, and state-sharing
+policy.</p>
+<h2>2. Choose the cheapest meter that meets the image requirement</h2>
 <p>Choose in dependency order:</p>
-<ul>
-<li>Prefer authored/fixed exposure for a controlled shot or product view.</li>
-<li>Otherwise use a stratified screen grid or tile sampler for the default global
-meter.</li>
-<li>Escalate to direct full-pixel hierarchical reduction when exact masks or
-subpixel emitters are acceptance requirements.</li>
-<li>Build an explicit log-luminance/weight pyramid only when another feature
-consumes its levels or spatial statistics.</li>
-<li>Add a log-luminance histogram only when percentile clipping solves a proven
-outlier or bimodal-lighting failure.</li>
-</ul>
-<p>Do not infer that an internal <code>BloomNode</code> pyramid is reusable: r185 exposes the
-bloom result, not its private mip chain.</p>
-<h2>Capability Gate</h2>
-<pre><code class="language-js">// r185 API literals and backend test: [Gated: installed source]
-await renderer.init();
-
-if ( renderer.backend.isWebGPUBackend !== true ) {
-  throw new Error( &#39;Native WebGPU is required for this exposure path.&#39; );
-}
-
-const canTimeGpu = renderer.hasFeature( &#39;timestamp-query&#39; );
-renderer.compute( exposureComputeNodes );
+<ol>
+<li>fixed EV for a controlled or calibrated view;</li>
+<li>a stratified grid or tile sampler for ordinary global auto exposure;</li>
+<li>exact full-pixel hierarchical reduction when every pixel or exact mask must
+contribute;</li>
+<li>a log-luminance pyramid only when another feature consumes its levels or
+spatial statistics;</li>
+<li>a histogram only when percentile clipping fixes a demonstrated outlier or
+bimodal-lighting failure.</li>
+</ol>
+<p>Tap resolved, pre-bloom HDR by default. This keeps temporal noise out of the
+meter and avoids bloom/exposure feedback. A different tap is an authored image
+policy with a regression fixture.</p>
+<p>Read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-exposure-color-grading/references/scene-referred-color-pipeline.md#meter-implementations">the color-pipeline reference</a>
+when implementing sampled, exact, pyramid, or histogram metering; it contains
+the weighted-log equations, traffic model, and small-emitter failure tests.</p>
+<p><strong>Complete when:</strong> fixed EV names its value/calibration and requires zero meter
+source reads; otherwise one meter is selected, its source and mask are named,
+and each cheaper rejected option has a concrete correctness failure.</p>
+<h2>3. Build the selected exposure controller</h2>
+<p>For fixed EV, bind the authored or calibrated value directly and allocate no
+meter, reduction, target-publication, or adaptation state.</p>
+<p>For automatic exposure, keep <code>targetEV</code>, <code>currentEV</code>, validity, and frame
+indices in GPU state. Advance adaptation every rendered frame toward the last
+valid target, even when the meter runs less often. Keep CPU readback
+diagnostic-only.</p>
+<p>Use this producer schedule only for automatic exposure:</p>
+<pre><code class="language-text">adapt currentEV from the last completed target
+  -&gt; render and present with currentEV
+  -&gt; reduce the new meter source
+  -&gt; publish targetEV for a later frame
 </code></pre>
-<p><code>renderer.computeAsync()</code> is valid and initializes on demand, but in r185 it
-does not constitute a GPU-completion fence. Use <code>getArrayBufferAsync()</code> only for
-scheduled diagnostics; exposure must never wait for CPU readback.</p>
-<p>If, and only if, the user explicitly asks for teaching how to apply fallback
-when WebGPU is unavailable, route that request to
-<code>../threejs-compatibility-fallbacks/</code>.</p>
-<h2>Ownership Invariants</h2>
+<p>Bind the source texture as a real node dependency and expose both the source
+frame and state frame. Initialize or clear the source before the first
+reduction. Read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-exposure-color-grading/references/scene-referred-color-pipeline.md#gpu-exposure-state">GPU exposure state</a>
+for reduction state, EV adaptation, invalid aggregates, and r185 compute
+semantics.</p>
+<p><strong>Complete when:</strong> fixed EV has zero metering/adaptation work, or an automatic
+frame trace proves which source produced each target, adaptation remains
+GPU-resident, and an invalid aggregate holds the prior valid target without a
+CPU substitute.</p>
+<h2>4. Handle discontinuities before presentation</h2>
+<p>Give cuts an authored <code>hold</code>, <code>reseed</code>, or fixed-EV policy. Treat a radiance
+basis, working-primary, quantity, nonlinear-normalization, or exposure-key
+change as a new exposure epoch. For a pure positive scale change
+<code>L_new = k * L_old</code> with otherwise identical semantics, preserve the displayed
+product by shifting the fixed EV, or both automatic states, by <code>-log2(k)</code>:</p>
+<pre><code class="language-text">currentEV_new = currentEV_old - log2(k)
+targetEV_new  = targetEV_old  - log2(k)
+</code></pre>
+<p>Every other incompatible change starts a new exposure epoch. Automatic
+exposure resets meter accumulation and reseeds adapted state; fixed exposure
+rebinds its authored value before the new signal is presented. Resize or DPR
+changes rebuild only admitted resolution-dependent meter resources and sampling
+coordinates. Device loss recreates and reseeds only admitted GPU state under
+the new resource generation.</p>
+<p><strong>Complete when:</strong> every cut, invalid input, basis/scale change, resize, and
+device-loss event maps to one conversion, hold, rebuild, or reseed action that
+finishes before the affected frame is admitted.</p>
+<h2>5. Compose one final-image chain</h2>
+<p>Use this domain order unless the LUT declares another complete contract:</p>
+<pre><code class="language-text">scene-linear HDR
+  -&gt; exposure
+  -&gt; tone map
+  -&gt; tone-mapped-linear LUT, when admitted
+  -&gt; alpha restoration
+  -&gt; output conversion
+</code></pre>
+<p>Unpremultiply before nonlinear RGB operations and premultiply afterward;
+exposure preserves alpha. A scene-linear LUT needs a declared shaper. A
+display-encoded LUT owns the exact output primaries and transfer function and
+therefore sits after <code>renderOutput()</code>.</p>
+<p>With explicit <code>renderOutput()</code>, set
+<code>RenderPipeline.outputColorTransform = false</code>. Mark
+<code>renderPipeline.needsUpdate = true</code> after changing the output node or output
+ownership. Read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-exposure-color-grading/references/scene-referred-color-pipeline.md#tone-mapping-and-luts">tone mapping and LUTs</a>
+only when loading, authoring, or placing a cube.</p>
+<p><strong>Complete when:</strong> the graph contains one exposure multiply, one tone map, one
+working-to-output conversion, and—only when admitted—one LUT placement in its
+declared domain.</p>
+<h2>6. Prove the selected branches</h2>
+<p>Capture deterministic fixtures:</p>
 <ul>
-<li>meter scene-linear working color, never transfer-encoded or graded color;</li>
-<li>adapt exposure in EV/log space in GPU state;</li>
-<li>keep <code>renderer.toneMappingExposure</code> fixed when adapted exposure is applied
-explicitly;</li>
-<li>use <code>toneMapping()</code> before a tone-mapped-linear LUT, then
-<code>renderOutput(..., NoToneMapping, renderer.outputColorSpace)</code>;</li>
-<li>use <code>renderOutput()</code> before a LUT only when that LUT is explicitly authored
-for the exact display primaries and transfer function;</li>
-<li>set <code>RenderPipeline.outputColorTransform = false</code> whenever the graph contains
-an explicit <code>renderOutput()</code>;</li>
-<li>set <code>renderPipeline.needsUpdate = true</code> after changing <code>outputNode</code> or output
-ownership.</li>
+<li>a key-gray calibration card with the expected target EV;</li>
+<li>for automatic exposure, a bright source entering and leaving frame with
+monotone target/current EV trajectories, plus the selected meter&#39;s mask,
+small-emitter, and cadence cases;</li>
+<li>when a LUT is admitted, an identity LUT with ramps and saturated swatches in
+its declared domain;</li>
+<li>output isolation showing exactly one tone map and one output conversion.</li>
 </ul>
-<h2>Failure Conditions</h2>
-<ul>
-<li>a sampled grid is described as a full-pixel reduction, or vice versa;</li>
-<li>a one-sample-per-cell grid is trusted for tiny emitters without a jitter or
-box-filter validation;</li>
-<li>a histogram uses global per-pixel atomics instead of local aggregation without
-<code>[Measured]</code> proof;</li>
-<li>a luminance pyramid exists only for exposure and costs more traffic than the
-statistic it replaces;</li>
-<li>CPU readback drives current-frame exposure;</li>
-<li>readback staleness changes GPU exposure state;</li>
-<li>exposure is applied before temporal history without ratio compensation;</li>
-<li>bloom output meters itself through exposure feedback;</li>
-<li>tone mapping, transfer conversion, or dynamic exposure has two owners;</li>
-<li>LUT primaries, transfer, shaper, legal range, interpolation, and tone-map
-dependency are undocumented;</li>
-<li>an sRGB-encoded LUT is sampled as though it were tone-mapped linear data;</li>
-<li>authored numbers are presented as device budgets.</li>
-</ul>
-<h2>Routing Boundary</h2>
-<p>Run <code>$threejs-choose-skills</code> for broad ownership. Use
-<code>$threejs-image-pipeline</code> for shared MRT, temporal history, adaptive DPR, or
-transient-lifetime decisions; <code>$threejs-bloom</code> for the HDR glare source; and
-<code>$threejs-visual-validation</code> for fixed-view exposure and LUT evidence.</p>
+<p>Measure each admitted meter or LUT as a paired graph delta after warmup on the
+target. GPU time is available only after post-init timestamp-query support is
+proven; otherwise report the timing as unavailable.</p>
+<p><strong>Complete when:</strong> all applicable fixtures pass, the final image is inspected,
+and each failed fixture identifies the meter, adaptation, LUT-domain, alpha, or
+output-ownership cause.</p>
+<h2>Routing</h2>
+<p>Use <code>$threejs-image-pipeline</code> for shared MRT, temporal history, adaptive DPR,
+and transient lifetime; <code>$threejs-bloom</code> for glare source ownership; and
+<code>$threejs-visual-validation</code> for fixed-view image evidence.</p>
 </div>
+  <aside class="skill-guides" aria-labelledby="related-guides-title"><h3 id="related-guides-title">Related guides</h3><ul><li><a href="/compare/renderpipeline-vs-effectcomposer/"><span>Comparisons</span>Three.js RenderPipeline vs EffectComposer</a></li><li><a href="/industries/"><span>Industries</span>Three.js WebGPU Workflows by Industry</a></li><li><a href="/faq/why-does-my-tsl-post-processing-look-double-tone-mapped/"><span>FAQ</span>Why Does My TSL Post-Processing Look Double Tone-Mapped?</a></li></ul></aside>
   <div class="pn">
-    <a href="threejs-dynamic-surface-effects.html">← Dynamic Surface Effects</a>
+    <a href="threejs-dynamic-surface-effects.html">← State-Transition Dynamic Surface Effects</a>
     <a href="threejs-image-pipeline.html">Image Pipeline →</a>
   </div>
 </div></div>
@@ -635,10 +543,16 @@ transient-lifetime decisions; <code>$threejs-bloom</code> for the HDR glare sour
 </main>
 
 <div class="wrap"><footer>
-  <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
-  <span style="font-size:13px">Three r185.1 · 41 working implementations · build <code>6c7881ab7386</code></span><br/>
-  <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
-  <span><a href="https://threejs-skills.com/about/">About &amp; methodology</a> · <a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/llms.txt">For coding agents</a></span>
+  <div class="footer-summary">Three.js WebGPU Skill Pack: TSL, procedural graphics, and visual validation.
+    <span>Three r185.1 · 40 primary targets · 25 accepted · build <code>ab7d8d17e058</code></span>
+    <span>Compiling shaders? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span>
+  </div>
+  <div class="footer-groups">
+    <div class="footer-group"><strong>Build</strong><a href="/#skills">Skills</a><a href="/#flagships">Examples</a><a href="/industries/">Industries</a></div>
+    <div class="footer-group"><strong>Decide</strong><a href="/for/">Who it is for</a><a href="/compare/">Compare</a><a href="/alternatives/">Alternatives</a><a href="/pricing/">Pricing</a></div>
+    <div class="footer-group"><strong>Adopt</strong><a href="/docs/">Docs</a><a href="/migrate/">Migration</a><a href="/agents/">Agent docs</a><a href="/faq/">FAQ</a></div>
+    <div class="footer-group"><strong>Proof</strong><a href="/evidence/">Evidence</a><a href="/about/">Method</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a><a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/LICENSE">License</a></div>
+  </div>
 </footer></div>
 </body>
 </html>

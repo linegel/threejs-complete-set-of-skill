@@ -4,12 +4,12 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Scalable Real-Time Shadows | Three.js WebGPU Skill</title>
-<meta name="description" content="Design scalable directional cast shadows for Three.js r185 WebGPU/TSL scenes. Use for bounded shadow projections, cascades, tiled array shadows, cached…" />
+<meta name="description" content="Fit scalable directional cast shadows in Three.js r185 WebGPU/TSL. Use when choosing one bounded shadow, CSM, tiled arrays, or cached clipmaps; stabilizing…" />
 <meta name="author" content="Three.js WebGPU Skill Pack contributors" />
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-scalable-real-time-shadows.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b" />
+<meta name="skill-pack-build-revision" content="sha256:ab7d8d17e0589a6f5c2462d645b9e0d6797cd92eade36e3615dae091c6f9df5b" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -17,20 +17,26 @@
 <link rel="manifest" href="../site.webmanifest" />
 <link rel="alternate" type="text/plain" href="https://threejs-skills.com/llms.txt" title="LLM-readable skill catalog" />
 <link rel="alternate" type="application/json" href="https://threejs-skills.com/skills.json" title="Machine-readable skill catalog" />
-
+<link rel="preload" as="image" href="../visual-validation/webgpu-shadow-architecture-bench/final.design.avif" type="image/avif" fetchpriority="high" />
 <meta property="og:type" content="article" />
 <meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
 <meta property="og:title" content="Scalable Real-Time Shadows | Three.js WebGPU Skill" />
-<meta property="og:description" content="Design scalable directional cast shadows for Three.js r185 WebGPU/TSL scenes. Use for bounded shadow projections, cascades, tiled array shadows, cached…" />
+<meta property="og:description" content="Fit scalable directional cast shadows in Three.js r185 WebGPU/TSL. Use when choosing one bounded shadow, CSM, tiled arrays, or cached clipmaps; stabilizing…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-scalable-real-time-shadows.html" />
-<meta property="article:modified_time" content="2026-07-11T12:53:58+03:00" />
+<meta property="article:modified_time" content="2026-07-16T11:00:33+03:00" />
 <meta property="article:published_time" content="2026-07-04T23:30:21+03:00" />
 <meta property="article:section" content="Cameras, Lighting, and Final Image" />
-
-<meta name="twitter:card" content="summary" />
+<meta property="og:image" content="https://threejs-skills.com/visual-validation/webgpu-shadow-architecture-bench/final.design.png" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="800" />
+<meta property="og:image:alt" content="Shadow architecture bench hardware WebGPU readback for Scalable Real-Time Shadows" />
+<meta name="twitter:image" content="https://threejs-skills.com/visual-validation/webgpu-shadow-architecture-bench/final.design.png" />
+<meta name="twitter:image:alt" content="Shadow architecture bench hardware WebGPU readback for Scalable Real-Time Shadows" />
+<meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Scalable Real-Time Shadows | Three.js WebGPU Skill" />
-<meta name="twitter:description" content="Design scalable directional cast shadows for Three.js r185 WebGPU/TSL scenes. Use for bounded shadow projections, cascades, tiled array shadows, cached…" />
+<meta name="twitter:description" content="Fit scalable directional cast shadows in Three.js r185 WebGPU/TSL. Use when choosing one bounded shadow, CSM, tiled arrays, or cached clipmaps; stabilizing…" />
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
@@ -56,14 +62,19 @@
    ],
    "@id": "https://threejs-skills.com/skills/threejs-scalable-real-time-shadows.html#article",
    "headline": "Scalable Real-Time Shadows",
-   "description": "Design scalable directional cast shadows for Three.js r185 WebGPU/TSL scenes. Use for bounded shadow projections, cascades, tiled array shadows, cached clipmaps, stable texel snapping, filter/bias footprints, cache invalidation, caster parity, binding pressure, and sustained mobile budgets.",
+   "description": "Fit scalable directional cast shadows in Three.js r185 WebGPU/TSL. Use when choosing one bounded shadow, CSM, tiled arrays, or cached clipmaps; stabilizing projection, filtering, or bias; or fixing invalidation, caster parity, bindings, or sustained cost.",
    "url": "https://threejs-skills.com/skills/threejs-scalable-real-time-shadows.html",
    "mainEntityOfPage": {
     "@type": "WebPage",
     "@id": "https://threejs-skills.com/skills/threejs-scalable-real-time-shadows.html"
    },
+   "image": [
+    "https://threejs-skills.com/seo/article/threejs-scalable-real-time-shadows-1x1.png",
+    "https://threejs-skills.com/seo/article/threejs-scalable-real-time-shadows-4x3.png",
+    "https://threejs-skills.com/seo/article/threejs-scalable-real-time-shadows-16x9.png"
+   ],
    "datePublished": "2026-07-04T23:30:21+03:00",
-   "dateModified": "2026-07-11T12:53:58+03:00",
+   "dateModified": "2026-07-16T11:00:33+03:00",
    "author": {
     "@id": "https://threejs-skills.com/#publisher"
    },
@@ -140,18 +151,18 @@ html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smo
 body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7}
 ::selection{background:rgba(255,180,84,.26);color:var(--ink)}
 a{color:inherit;text-decoration:none}
-a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
+a:focus-visible,button:focus-visible,summary:focus-visible,pre[tabindex]:focus-visible,[role="region"]:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
 main{display:block}
 .skip-link{position:fixed;z-index:100;left:16px;top:12px;translate:0 -160%;font-family:var(--mono);font-size:12px;background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:9px;transition-property:translate;transition-duration:160ms}
 .skip-link:focus{translate:0 0}
 .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
 .site-nav{position:sticky;z-index:50;top:0;background:rgba(8,10,14,.82);border-bottom:1px solid rgba(255,255,255,.075);backdrop-filter:blur(18px) saturate(1.15)}
-nav{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
-nav .brand{white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
-nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
-nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
-nav .links a:hover{color:var(--amber)}
-nav .links a:active{scale:.96}
+.site-nav>.wrap{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+.site-nav .brand{min-height:44px;display:inline-flex;align-items:center;white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
+.site-nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
+.site-nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
+.site-nav .links a:hover{color:var(--amber)}
+.site-nav .links a:active{scale:.96}
 h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:0}
 p{text-wrap:pretty}
 h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
@@ -165,7 +176,7 @@ code{font-family:var(--mono)}
 .card{min-height:100%;background:linear-gradient(145deg,rgba(19,24,33,.96),rgba(12,15,21,.96));border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px;
   box-shadow:var(--shadow-card);transition-property:translate,scale,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
 .card:hover{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
-.card:active{translate:0 -1px;scale:.99}
+.card:active{translate:0 -1px;scale:.96}
 .card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .card-kind{font-family:var(--mono);font-size:10px;color:var(--cyan)}
 .card h3,.card h4{font-size:19px;font-weight:600}
@@ -190,19 +201,29 @@ figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:s
 figcaption{padding:16px 18px;font-size:14.5px}
 figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
 figcaption span{display:block;margin-top:3px;color:var(--dim)}
-footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
+footer{border-top:1px solid var(--line);padding:44px 0 60px;display:grid;grid-template-columns:minmax(260px,1.4fr) minmax(0,2fr);gap:36px 64px;color:var(--dim);font-size:14.5px}
 footer a{color:var(--amber)}
 footer a:hover{text-decoration:underline}
 footer code{color:var(--cyan);font-size:11px}
+.footer-summary{max-width:55ch}.footer-summary>span{display:block;margin-top:8px;font-size:13px}.footer-groups{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}.footer-group{display:grid;align-content:start;gap:8px}.footer-group strong{font:400 10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}.footer-group a{min-height:40px;display:flex;align-items:center;color:var(--dim);font-size:13px;transition-property:color,scale;transition-duration:160ms}.footer-group a:hover{color:var(--amber);text-decoration:none}.footer-group a:active{scale:.96}
+.pathfinder{padding:clamp(52px,7vw,86px) 0;border-bottom:1px solid var(--line)}.pathfinder-head{display:grid;grid-template-columns:minmax(0,.7fr) minmax(320px,1.3fr);align-items:end;gap:28px 72px;margin-bottom:28px}.pathfinder-head h2{margin:0}.pathfinder-head p{max-width:58ch;color:var(--dim)}.pathfinder-rows{border-top:1px solid var(--line)}.pathfinder-row{display:grid;grid-template-columns:minmax(160px,.55fr) minmax(210px,.8fr) minmax(0,1.6fr);gap:20px 32px;align-items:center;min-height:94px;border-bottom:1px solid var(--line)}.pathfinder-stage{font:10px/1.4 var(--mono);letter-spacing:.11em;text-transform:uppercase;color:var(--cyan)}.pathfinder-row>p{color:var(--dim);font-size:14px}.pathfinder-links{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px 18px}.pathfinder-links a{min-height:44px;display:inline-flex;align-items:center;gap:8px;color:var(--amber);font:11px/1.35 var(--mono);transition-property:color,scale;transition-duration:160ms}.pathfinder-links a:after{content:"→"}.pathfinder-links a:hover{color:var(--ink)}.pathfinder-links a:active{scale:.96}
+.content-hero{padding:clamp(54px,8vw,104px) 0 42px;border-bottom:1px solid var(--line)}.breadcrumbs{min-height:44px;display:flex;align-items:center;margin-bottom:28px;font:11px/1.4 var(--mono);color:var(--dim)}.breadcrumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.breadcrumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}.breadcrumbs a{min-height:40px;display:inline-flex;align-items:center;transition-property:color,scale;transition-duration:160ms}.breadcrumbs a:hover{color:var(--amber)}.breadcrumbs a:active{scale:.96}.content-hero h1{max-width:17ch;font-size:clamp(40px,6vw,68px);font-weight:700;line-height:1.02;letter-spacing:-.02em}.content-lede{max-width:66ch;margin-top:22px;color:var(--dim);font-size:clamp(17px,2vw,20px)}.content-meta{display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:28px;font:10px/1.4 var(--mono);color:var(--cyan)}
+.content-answer{max-width:900px;margin-top:34px;padding:3px 0 3px 22px;border-left:2px solid var(--amber);font-size:clamp(19px,2.2vw,21px);line-height:1.62;color:var(--ink)}.content-shell{padding:clamp(46px,7vw,86px) 0}.content-layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(230px,1fr);align-items:start;gap:clamp(36px,6vw,76px)}.content-body{grid-column:1;grid-row:1;max-width:78ch;min-width:0}.content-body h2{margin:52px 0 16px;font-size:clamp(27px,3.5vw,39px);scroll-margin-top:112px}.content-body>h2:first-child{margin-top:0}.content-body h3{margin:34px 0 12px;font-size:21px;scroll-margin-top:112px}.content-body p,.content-body li{color:var(--dim);font-size:16px}.content-body p+p{margin-top:17px}.content-body ul,.content-body ol{margin:16px 0;padding-left:24px}.content-body li+li{margin-top:7px}.content-body a{color:var(--cyan);text-decoration:underline;text-decoration-color:rgba(127,212,193,.35);text-underline-offset:3px}.content-body a:hover{color:var(--amber);text-decoration-color:currentColor}.content-body code:not(pre code){padding:1px 5px;border:1px solid var(--line);border-radius:5px;background:#07090c;color:var(--cyan);font-size:.86em}.content-body pre{margin:20px 0;white-space:pre;tab-size:2}.content-table{max-width:100%;margin:22px 0;overflow-x:auto;border:1px solid var(--line);border-radius:12px}.content-table:focus-visible{outline:2px solid var(--amber);outline-offset:3px}.content-table table{width:100%;border-collapse:collapse;font-size:14px}.content-table th,.content-table td{min-width:150px;padding:11px 13px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);text-align:left;vertical-align:top;color:var(--dim)}.content-table th{color:var(--ink);font-weight:600;background:var(--bg2)}.content-table tr:last-child td{border-bottom:0}.content-table th:last-child,.content-table td:last-child{border-right:0}
+.content-index{grid-column:2;grid-row:1;position:sticky;top:104px;max-height:calc(100vh - 128px);overflow-y:auto;padding:18px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.content-index strong{display:block;margin-bottom:10px;font:10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}.content-index ol{list-style:none}.content-index a{min-height:40px;display:flex;align-items:center;padding:5px 0;color:var(--dim);font-size:13px;line-height:1.4;transition-property:color,translate,scale;transition-duration:160ms}.content-index a:hover{color:var(--amber);translate:3px 0}.content-index a:active{translate:1px 0;scale:.96}.content-proof{margin:54px 0 0}.content-proof figure{border-radius:16px}.content-proof img{width:100%;height:auto;max-height:650px;object-fit:cover;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}.content-proof figcaption{color:var(--dim);font:11px/1.55 var(--mono)}.content-proof figcaption a{color:var(--amber)}
+.content-layout--docs{grid-template-columns:minmax(190px,.6fr) minmax(0,2fr)}.content-layout--docs .content-index{grid-column:1}.content-layout--docs .content-body{grid-column:2;max-width:72ch}.docs-index a{padding-inline:10px;border-left:2px solid transparent}.docs-index a[aria-current="page"]{border-left-color:var(--amber);background:rgba(255,180,84,.06);color:var(--ink);font-weight:600}.docs-index-current{display:none}
+.content-facts,.content-faq-list,.content-related,.content-sources,.content-skills,.content-demos,.content-discovery,.faq-provenance{margin-top:54px;padding-top:22px;border-top:1px solid var(--line)}.content-facts h2,.content-faq-list h2,.content-related h2,.content-sources h2,.content-skills h2,.content-demos h2{font-size:24px}.content-ruled-list{list-style:none;border-top:1px solid var(--line)}.content-ruled-list li{border-bottom:1px solid var(--line)}.content-ruled-list a{min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:9px 0;color:var(--dim);font-size:14px;transition-property:color,scale;transition-duration:160ms}.content-ruled-list a:after{content:"→";color:var(--amber)}.content-ruled-list a:hover{color:var(--ink)}.content-ruled-list a:active{scale:.96}.content-related .content-ruled-list a{display:grid;grid-template-columns:104px minmax(0,1fr) auto}.content-related-family{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}.content-faq-item{padding:22px 0;border-bottom:1px solid var(--line)}.content-faq-item h3{margin:0;font-size:20px}.content-faq-item h3 a{color:var(--ink)}.content-faq-item p{margin-top:9px;color:var(--dim);font-size:15px}.faq-provenance{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);padding:0}.faq-provenance div{padding:13px;background:var(--bg2)}.faq-provenance dt{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}.faq-provenance dd{margin-top:5px;font:11px/1.45 var(--mono);color:var(--cyan);overflow-wrap:anywhere}.content-discovery{display:flex;flex-wrap:wrap;gap:10px 22px;font:11px/1.5 var(--mono);color:var(--dim)}.content-discovery a{min-height:40px;display:inline-flex;align-items:center;color:var(--amber)}
 @media (max-width:760px){
   .site-nav .wrap{padding-right:0}
-  nav{min-height:104px;display:grid;grid-template-columns:1fr;padding:14px 0 10px;gap:4px}
-  nav .brand{font-size:16px}
-  nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:none;padding-right:20px}
-  nav .links::-webkit-scrollbar{display:none}
-  nav .links a{flex:0 0 auto}
+  .site-nav>.wrap{min-height:104px;display:grid;grid-template-columns:1fr;padding-top:14px;padding-bottom:10px;gap:4px}
+  .site-nav .brand{font-size:16px}
+  .site-nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;scrollbar-color:rgba(255,180,84,.45) transparent;padding:0 20px 4px 0}
+  .site-nav .links::-webkit-scrollbar{height:3px}.site-nav .links::-webkit-scrollbar-thumb{background:rgba(255,180,84,.45);border-radius:99px}
+  .site-nav .links a{flex:0 0 auto}
   .grid,.gallery{grid-template-columns:1fr}
+  footer{grid-template-columns:1fr}.footer-groups{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+@media (max-width:900px){.pathfinder-head,.content-layout{grid-template-columns:1fr}.content-index{grid-column:1;grid-row:1;position:static;max-height:none}.content-body,.content-layout--docs .content-body{grid-column:1;grid-row:2}.docs-index{overflow:hidden}.docs-index-current{display:flex;margin-bottom:8px}.docs-index ol{display:flex;gap:8px;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;padding-bottom:6px}.docs-index li{flex:0 0 min(72vw,260px)}.docs-index .docs-index-list-current{display:none}.docs-index a{min-height:44px;padding:8px 10px;border-left:0;border-bottom:2px solid transparent;background:var(--bg2)}.docs-index a[aria-current="page"]{border-bottom-color:var(--amber)}.pathfinder-row{grid-template-columns:minmax(160px,.6fr) minmax(0,1fr)}.pathfinder-links{grid-column:1/-1;justify-content:flex-start;padding-bottom:18px}.faq-provenance{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.pathfinder-row{grid-template-columns:1fr;gap:6px;padding:18px 0}.pathfinder-links{grid-column:auto;padding:0}.content-hero h1{font-size:clamp(38px,12vw,54px)}.content-answer{padding-left:16px}.content-table{border-radius:8px}.content-table table{min-width:680px}.faq-provenance{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
@@ -217,7 +238,7 @@ header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
   linear-gradient(90deg,rgba(10,12,16,.96) 0%,rgba(10,12,16,.8) 36%,rgba(10,12,16,.24) 68%,rgba(10,12,16,.04) 100%),
   linear-gradient(0deg,rgba(10,12,16,.9) 0%,rgba(10,12,16,.08) 65%,rgba(10,12,16,.62) 100%);z-index:1}
 .crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}.crumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.crumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}
-.crumbs a:hover{color:var(--amber)}
+.crumbs a{min-height:40px;display:inline-flex;align-items:center}.crumbs a:hover{color:var(--amber)}
 h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:0;max-width:18ch}
 .lede{margin-top:24px;max-width:70ch;color:var(--dim)}
 .meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
@@ -257,6 +278,7 @@ a.chip:active{scale:.96}
 .runtime-evidence-disclosure dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;margin-top:16px;overflow:hidden;border-radius:10px;background:var(--line)}.runtime-evidence-disclosure dl div{padding:11px 12px;background:var(--bg2)}.runtime-evidence-disclosure dt{font:10px/1.35 var(--mono);color:var(--dim)}.runtime-evidence-disclosure dd{margin-top:4px;font:500 10px/1.35 var(--mono);color:var(--amber)}.runtime-evidence-disclosure dd[data-verdict="PASS"]{color:var(--lime)}
 .runtime-evidence-disclosure ul{margin:15px 0 0;padding-left:20px}.runtime-evidence-disclosure li{margin-top:5px;color:var(--dim);font-size:14px}
 .evidence-report-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:10px}.evidence-report-links a{display:grid;gap:6px;min-height:72px;padding:14px;border:1px solid var(--line);border-radius:11px;background:var(--bg2)}.evidence-report-links code{color:var(--cyan);font:11px/1.4 var(--mono);overflow-wrap:anywhere}.evidence-report-links span{color:var(--dim);font:10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.05em}
+.skill-guides{margin-top:52px;padding-top:22px;border-top:1px solid var(--line)}.skill-guides h3{font-size:22px}.skill-guides ul{margin-top:12px;list-style:none;border-top:1px solid var(--line)}.skill-guides li{border-bottom:1px solid var(--line)}.skill-guides a{min-height:52px;display:grid;grid-template-columns:120px minmax(0,1fr);align-items:center;gap:18px;color:var(--dim);font-size:14px;transition-property:color,scale;transition-duration:160ms}.skill-guides a span{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}.skill-guides a:hover{color:var(--amber)}.skill-guides a:active{scale:.96}
 @media (max-width:720px){
   .skill-hero{min-height:auto;padding:58px 0 52px}
   .skill-hero-bg{opacity:.3}
@@ -267,41 +289,47 @@ a.chip:active{scale:.96}
 </style>
 </head>
 <body>
-<a class="skip-link" href="#main-content">Skip to content</a><div class="site-nav"><div class="wrap"><nav aria-label="Primary navigation">
-  <a class="brand" href="../">Three.js WebGPU Skill&nbsp;Pack</a>
-  <div class="links"><a href="../#matrix">How it works</a><a href="../#flagships">Examples</a><a href="../#skills">Skills</a><a href="../#labs">Labs</a><a href="../evidence/">Evidence</a><a href="../#install">Install</a><a href="../about/">Method</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
-</nav></div></div>
+<a class="skip-link" href="#main-content">Skip to content</a><header class="site-nav"><div class="wrap">
+  <a class="brand" href="/">Three.js WebGPU Skill&nbsp;Pack</a>
+  <nav class="links" aria-label="Primary navigation"><a href="/#flagships">Examples</a><a href="/#skills">Skills</a><a href="/guides/">Guides</a><a href="/evidence/">Evidence</a><a href="/#install">Install</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub</a></nav>
+</div></header>
 
 <main id="main-content" tabindex="-1">
-<header class="">
+<header class="skill-hero">
+  <picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-shadow-architecture-bench/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-shadow-architecture-bench/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-shadow-architecture-bench/final.design.png" alt="" class="skill-hero-bg" aria-hidden="true" width="1200" height="800" fetchpriority="high" decoding="async" />
+        </picture>
   <div class="wrap">
     <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Cameras, Lighting, and Final Image</a></li><li aria-current="page">Scalable Real-Time Shadows</li></ol></nav>
     <h1 style="view-transition-name:skill-threejs-scalable-real-time-shadows">Scalable Real-Time Shadows</h1>
-    <p class="lede">Design scalable directional cast shadows for Three.js r185 WebGPU/TSL scenes. Use for bounded shadow projections, cascades, tiled array shadows, cached clipmaps, stable texel snapping, filter/bias footprints, cache invalidation, caster parity, binding pressure, and sustained mobile budgets.</p>
+    <p class="lede">Fit scalable directional cast shadows in Three.js r185 WebGPU/TSL. Use when choosing one bounded shadow, CSM, tiled arrays, or cached clipmaps; stabilizing projection, filtering, or bias; or fixing invalidation, caster parity, bindings, or sustained cost.</p>
+    <p class="hero-evidence-caption">Image: Shadow architecture bench hardware WebGPU readback. Source lab: webgpu-shadow-architecture-bench.</p>
     <div class="meta-row">
       <span class="chip a">$threejs-scalable-real-time-shadows</span>
-      <span class="chip">3 primary implementations</span>
-<span class="chip">4 flagships</span>
-<span class="chip">1 secondary surface</span>
-      <span class="chip">native evidence pending</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-11T12:53:58+03:00">2026-07-11</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/5d79faad0c4a1ac3ba6f0952f848f315c8f7ffb7">commit 5d79faa ↗</a>
-      <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-scalable-real-time-shadows/SKILL.md">SKILL.md on GitHub ↗</a>
-      <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-scalable-real-time-shadows/SKILL.md">raw (for agents) ↗</a>
+      <span class="chip">3 primary targets</span>
+      <span class="chip">4 flagships</span>
+      <span class="chip">1 secondary surface</span>
+      <span class="chip">accepted runtime evidence</span>
+      <span class="chip">Latest skill update <time datetime="2026-07-16T11:00:33+03:00">2026-07-16</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/2ce13bcc22695dafa808d6019452752d9a39cc71">commit 2ce13bc ↗</a>
+      <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-scalable-real-time-shadows/SKILL.md">SKILL.md on GitHub ↗</a>
+      <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/skills/threejs-scalable-real-time-shadows/SKILL.md">raw (for agents) ↗</a>
     </div>
   </div>
 </header>
 
 
   <section class="section" id="primary-implementations" aria-labelledby="primary-implementations-title"><div class="wrap">
-    <h2 id="primary-implementations-title">Primary implementation surface</h2>
-    <p class="sub">These routes are generated from canonical source. Their exact status remains separate from implementation availability.</p>
+    <h2 id="primary-implementations-title">Primary target surface</h2>
+    <p class="sub">These rendering routes are generated from canonical source. Native-WebGPU acceptance remains separate from entrypoint availability.</p>
     <div class="grid">
       <a class="card" href="../demos/webgpu-cached-clipmap-shadow/">
         <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="webgpu-cached-clipmap-shadow">
     <span class="primary-evidence-label">Canonical capture</span>
     <strong>Runtime evidence pending</strong>
-    <span><code>ef8576bd7bb4</code> source hash</span>
+    <span><code>cb4d3abfaab1</code> source hash</span>
     <span>21 fixed states · 9 runtime proof requirements</span>
   </span>
         <span class="card-head"><span class="card-kind">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
@@ -310,25 +338,23 @@ a.chip:active{scale:.96}
         <span class="card-meta">Open published implementation →</span>
       </a>
       <a class="card" href="../demos/webgpu-shadow-architecture-bench/">
-        <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="webgpu-shadow-architecture-bench">
-    <span class="primary-evidence-label">Canonical capture</span>
-    <strong>Runtime evidence pending</strong>
-    <span><code>40940db67adf</code> source hash</span>
-    <span>9 fixed states · 6 runtime proof requirements</span>
-  </span>
-        <span class="card-head"><span class="card-kind">Mechanism bench</span><span class="status status--pending">Evidence pending</span></span>
+        <span class="card-preview-wrap" data-preview-for="webgpu-shadow-architecture-bench" data-preview-source="webgpu-shadow-architecture-bench" data-preview-classification="inspected-runtime-evidence-preview"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-shadow-architecture-bench/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-shadow-architecture-bench/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-shadow-architecture-bench/final.design.png" alt="Shadow architecture bench hardware WebGPU readback for WebGPU Directional Shadow Architecture Bench" class="card-preview" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><span class="media-caption">Shadow architecture bench hardware WebGPU readback</span></span>
+        <span class="card-head"><span class="card-kind">Mechanism bench</span><span class="status status--accepted">Accepted</span></span>
         <h3>WebGPU Directional Shadow Architecture Bench</h3>
         <p>4 fixed scenarios, 4 mechanism routes, and 1 locked tiers.</p>
         <span class="card-meta">Open published implementation →</span>
       </a>
       <a class="card" href="../demos/webgpu-shadow-pipeline-integration/">
-        <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="webgpu-shadow-pipeline-integration">
-    <span class="primary-evidence-label">Canonical capture</span>
-    <strong>Runtime evidence pending</strong>
-    <span><code>27394576b055</code> source hash</span>
-    <span>5 fixed states · 6 runtime proof requirements</span>
-  </span>
-        <span class="card-head"><span class="card-kind">Integration</span><span class="status status--pending">Evidence pending</span></span>
+        <span class="card-preview-wrap" data-preview-for="webgpu-shadow-pipeline-integration" data-preview-source="webgpu-shadow-pipeline-integration" data-preview-classification="inspected-runtime-evidence-preview"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-shadow-pipeline-integration/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-shadow-pipeline-integration/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-shadow-pipeline-integration/final.design.png" alt="Shadow pipeline integration hardware WebGPU readback for WebGPU Cached Shadow Pipeline Integration" class="card-preview" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><span class="media-caption">Shadow pipeline integration hardware WebGPU readback</span></span>
+        <span class="card-head"><span class="card-kind">Integration</span><span class="status status--accepted">Accepted</span></span>
         <h3>WebGPU Cached Shadow Pipeline Integration</h3>
         <p>1 fixed scenarios, 3 mechanism routes, and 1 locked tiers.</p>
         <span class="card-meta">Open published implementation →</span>
@@ -341,13 +367,12 @@ a.chip:active{scale:.96}
     <p class="sub">This skill contributes to the following cross-skill owner graphs.</p>
     <div class="grid">
       <a class="card" href="../demos/final-image-flight/">
-        <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="final-image-flight">
-    <span class="primary-evidence-label">Canonical capture</span>
-    <strong>Runtime evidence pending</strong>
-    <span><code>0e56ab6926da</code> source hash</span>
-    <span>10 fixed states · 12 runtime proof requirements</span>
-  </span>
-        <span class="card-head"><span class="card-kind">Final image systems</span><span class="status status--pending">Evidence pending</span></span>
+        <span class="card-preview-wrap" data-preview-for="final-image-flight" data-preview-source="final-image-flight" data-preview-classification="inspected-runtime-evidence-preview"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/final-image-flight/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/final-image-flight/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/final-image-flight/final.design.png" alt="Accepted demo-sourced runtime evidence for Final Image Flight" class="card-preview" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><span class="media-caption">Accepted demo-sourced runtime evidence</span></span>
+        <span class="card-head"><span class="card-kind">Final image systems</span><span class="status status--accepted">Accepted</span></span>
         <h3>Final Image Flight</h3>
         <span class="card-meta">6 mechanisms · 3 locked tiers</span>
       </a>
@@ -355,7 +380,7 @@ a.chip:active{scale:.96}
         <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="weathered-world">
     <span class="primary-evidence-label">Canonical capture</span>
     <strong>Runtime evidence pending</strong>
-    <span><code>26e74c4ec93d</code> source hash</span>
+    <span><code>76b06d2596d9</code> source hash</span>
     <span>10 fixed states · 5 runtime proof requirements</span>
   </span>
         <span class="card-head"><span class="card-kind">Planetary environment</span><span class="status status--pending">Evidence pending</span></span>
@@ -366,7 +391,7 @@ a.chip:active{scale:.96}
         <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="procedural-district">
     <span class="primary-evidence-label">Canonical capture</span>
     <strong>Runtime evidence pending</strong>
-    <span><code>919817c6e63f</code> source hash</span>
+    <span><code>3c2448b5b07d</code> source hash</span>
     <span>10 fixed states · 4 runtime proof requirements</span>
   </span>
         <span class="card-head"><span class="card-kind">Authored procedural world</span><span class="status status--pending">Evidence pending</span></span>
@@ -374,13 +399,12 @@ a.chip:active{scale:.96}
         <span class="card-meta">6 mechanisms · 3 locked tiers</span>
       </a>
       <a class="card" href="../demos/creature-habitat/">
-        <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="creature-habitat">
-    <span class="primary-evidence-label">Canonical capture</span>
-    <strong>Runtime evidence pending</strong>
-    <span><code>25111e22bb87</code> source hash</span>
-    <span>9 fixed states · 5 runtime proof requirements</span>
-  </span>
-        <span class="card-head"><span class="card-kind">Actors and environment</span><span class="status status--pending">Evidence pending</span></span>
+        <span class="card-preview-wrap" data-preview-for="creature-habitat" data-preview-source="creature-habitat" data-preview-classification="inspected-runtime-evidence-preview"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/creature-habitat/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/creature-habitat/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/creature-habitat/final.design.png" alt="Accepted demo-sourced runtime evidence for Creature Habitat" class="card-preview" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><span class="media-caption">Accepted demo-sourced runtime evidence</span></span>
+        <span class="card-head"><span class="card-kind">Actors and environment</span><span class="status status--accepted">Accepted</span></span>
         <h3>Creature Habitat</h3>
         <span class="card-meta">5 mechanisms · 3 locked tiers</span>
       </a>
@@ -390,7 +414,7 @@ a.chip:active{scale:.96}
   <section class="section" id="evidence-reports" aria-labelledby="evidence-reports-title"><div class="wrap">
     <h2 id="evidence-reports-title">Evidence reports</h2>
     <p class="sub">Source hashes, claim verdicts, promoted same-lab media, fixed routes, exact tier contracts, and current limitations.</p>
-    <nav class="evidence-report-links" aria-label="Evidence reports for Scalable Real-Time Shadows"><a href="../evidence/webgpu-cached-clipmap-shadow/"><code>webgpu-cached-clipmap-shadow</code><span>evidence pending</span></a><a href="../evidence/webgpu-shadow-architecture-bench/"><code>webgpu-shadow-architecture-bench</code><span>evidence pending</span></a><a href="../evidence/webgpu-shadow-pipeline-integration/"><code>webgpu-shadow-pipeline-integration</code><span>evidence pending</span></a><a href="../evidence/final-image-flight/"><code>final-image-flight</code><span>evidence pending</span></a><a href="../evidence/weathered-world/"><code>weathered-world</code><span>evidence pending</span></a><a href="../evidence/procedural-district/"><code>procedural-district</code><span>evidence pending</span></a><a href="../evidence/creature-habitat/"><code>creature-habitat</code><span>evidence pending</span></a></nav>
+    <nav class="evidence-report-links" aria-label="Evidence reports for Scalable Real-Time Shadows"><a href="../evidence/webgpu-cached-clipmap-shadow/"><code>webgpu-cached-clipmap-shadow</code><span>evidence pending</span></a><a href="../evidence/webgpu-shadow-architecture-bench/"><code>webgpu-shadow-architecture-bench</code><span>accepted</span></a><a href="../evidence/webgpu-shadow-pipeline-integration/"><code>webgpu-shadow-pipeline-integration</code><span>accepted</span></a><a href="../evidence/final-image-flight/"><code>final-image-flight</code><span>accepted</span></a><a href="../evidence/weathered-world/"><code>weathered-world</code><span>evidence pending</span></a><a href="../evidence/procedural-district/"><code>procedural-district</code><span>evidence pending</span></a><a href="../evidence/creature-habitat/"><code>creature-habitat</code><span>accepted</span></a></nav>
   </div></section>
 
   <div class="section" id="approach"><div class="wrap">
@@ -410,424 +434,364 @@ vertex displacement in the visible pass must run identically in the caster pass
   </div></div>
 
 
+  <div class="section" id="examples"><div class="wrap">
+    <h2>Accepted primary labs</h2>
+    <p class="sub">Only schema-v2 labs with accepted runtime and evidence contracts appear here. Other source directories remain visible through the demo registry without being promoted to runnable proof.</p>
+    <div class="grid">
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-scalable-real-time-shadows/examples/webgpu-shadow-architecture-bench">
+        <h4>webgpu-shadow-architecture-bench</h4>
+        <span class="card-meta">threejs-scalable-real-time-shadows/examples/webgpu-shadow-architecture-bench</span>
+      </a>
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow">
+        <h4>webgpu-cached-clipmap-shadow</h4>
+        <span class="card-meta">threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow</span>
+      </a>
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-scalable-real-time-shadows/examples/webgpu-shadow-pipeline-integration">
+        <h4>webgpu-shadow-pipeline-integration</h4>
+        <span class="card-meta">threejs-scalable-real-time-shadows/examples/webgpu-shadow-pipeline-integration</span>
+      </a>
+    </div>
+  </div></div>
 
   <div class="section" id="validation"><div class="wrap">
     <h2>Preview and evidence ledger</h2>
-    <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; canonical acceptance still requires render-target readback and a schema-v2 bundle.</p>
-    <div class="evidence-ledger"><span class="status status--pending">Canonical runtime evidence pending</span><code>0 published images</code></div>
-
-    <div class="primary-evidence-panel" data-evidence-state="incomplete"><span class="primary-evidence-label">Same-lab evidence</span><strong>No runtime image promoted</strong><span>The page remains image-free until this skill's own lab supplies hash-bound pixels.</span></div>
+    <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; rendering acceptance still requires same-lab readback and a schema-v2 bundle.</p>
+    <div class="evidence-ledger"><span class="status status--accepted">Accepted runtime evidence available</span><code>20 published images</code></div>
+<div class="runtime-evidence-disclosures">
+      <article class="runtime-evidence-disclosure" data-acceptance-status="accepted">
+        <div class="runtime-evidence-head"><div><code>Native WebGPU runtime evidence preview</code><h3>WebGPU Directional Shadow Architecture Bench</h3></div><span class="status status--accepted">Accepted</span></div>
+        <dl><div><dt>visualCorrectness</dt><dd data-verdict="PASS">PASS</dd></div><div><dt>mechanismCorrectness</dt><dd data-verdict="PASS">PASS</dd></div><div><dt>performanceCompliance</dt><dd data-verdict="NOT_CLAIMED">NOT_CLAIMED</dd></div><div><dt>gpuAttribution</dt><dd data-verdict="NOT_CLAIMED">NOT_CLAIMED</dd></div><div><dt>lifecycleStability</dt><dd data-verdict="PASS">PASS</dd></div><div><dt>visualError</dt><dd data-verdict="PASS">PASS</dd></div></dl>
+        <ul><li>Correctness and CDP Chrome hardware physical-route visual review pass on the current source closure.</li><li>Named-adapter GPU timestamp timing remains NOT_CLAIMED.</li></ul>
+      </article>
+      <article class="runtime-evidence-disclosure" data-acceptance-status="accepted">
+        <div class="runtime-evidence-head"><div><code>Native WebGPU runtime evidence preview</code><h3>WebGPU Cached Shadow Pipeline Integration</h3></div><span class="status status--accepted">Accepted</span></div>
+        <dl><div><dt>visualCorrectness</dt><dd data-verdict="PASS">PASS</dd></div><div><dt>mechanismCorrectness</dt><dd data-verdict="PASS">PASS</dd></div><div><dt>performanceCompliance</dt><dd data-verdict="NOT_CLAIMED">NOT_CLAIMED</dd></div><div><dt>gpuAttribution</dt><dd data-verdict="NOT_CLAIMED">NOT_CLAIMED</dd></div><div><dt>lifecycleStability</dt><dd data-verdict="PASS">PASS</dd></div><div><dt>visualError</dt><dd data-verdict="PASS">PASS</dd></div></dl>
+        <ul><li>Correctness and CDP Chrome hardware physical-route visual review pass on the current source closure.</li><li>Named-adapter GPU timestamp timing remains NOT_CLAIMED.</li></ul>
+      </article></div>
+    <div class="gallery">
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-shadow-architecture-bench" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-shadow-architecture-bench/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-shadow-architecture-bench/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-shadow-architecture-bench/final.design.png" alt="Scalable Real-Time Shadows: Shadow architecture bench hardware WebGPU readback" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Shadow architecture bench hardware WebGPU readback</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-shadow-architecture-bench" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-shadow-architecture-bench/no-post.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-shadow-architecture-bench/no-post.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-shadow-architecture-bench/no-post.design.png" alt="Scalable Real-Time Shadows: Shadow contribution / no-post path" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Shadow contribution / no-post path</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-shadow-architecture-bench" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-shadow-architecture-bench/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-shadow-architecture-bench/diagnostics.mosaic.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-shadow-architecture-bench/diagnostics.mosaic.png" alt="Scalable Real-Time Shadows: Owner-graph diagnostics" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Owner-graph diagnostics</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-shadow-architecture-bench" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-shadow-architecture-bench/camera.near.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-shadow-architecture-bench/camera.near.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-shadow-architecture-bench/camera.near.png" alt="Scalable Real-Time Shadows: Near camera" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Near camera</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-shadow-architecture-bench" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-shadow-architecture-bench/camera.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-shadow-architecture-bench/camera.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-shadow-architecture-bench/camera.design.png" alt="Scalable Real-Time Shadows: Design camera" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Design camera</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-shadow-architecture-bench" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-shadow-architecture-bench/camera.far.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-shadow-architecture-bench/camera.far.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-shadow-architecture-bench/camera.far.png" alt="Scalable Real-Time Shadows: Far camera" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Far camera</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-shadow-architecture-bench" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-shadow-architecture-bench/seed-0001.final.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-shadow-architecture-bench/seed-0001.final.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-shadow-architecture-bench/seed-0001.final.png" alt="Scalable Real-Time Shadows: Seed 0x1 final" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Seed 0x1 final</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-shadow-architecture-bench" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-shadow-architecture-bench/seed-9e3779b9.final.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-shadow-architecture-bench/seed-9e3779b9.final.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-shadow-architecture-bench/seed-9e3779b9.final.png" alt="Scalable Real-Time Shadows: Seed 0x9e3779b9 final" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Seed 0x9e3779b9 final</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-shadow-architecture-bench" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-shadow-architecture-bench/temporal.t000.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-shadow-architecture-bench/temporal.t000.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-shadow-architecture-bench/temporal.t000.png" alt="Scalable Real-Time Shadows: Temporal t0" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Temporal t0</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-shadow-architecture-bench" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-shadow-architecture-bench/temporal.t001.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-shadow-architecture-bench/temporal.t001.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-shadow-architecture-bench/temporal.t001.png" alt="Scalable Real-Time Shadows: Temporal t1" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Temporal t1</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-shadow-pipeline-integration" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-shadow-pipeline-integration/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-shadow-pipeline-integration/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-shadow-pipeline-integration/final.design.png" alt="Scalable Real-Time Shadows: Shadow pipeline integration hardware WebGPU readback" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Shadow pipeline integration hardware WebGPU readback</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-shadow-pipeline-integration" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-shadow-pipeline-integration/no-post.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-shadow-pipeline-integration/no-post.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-shadow-pipeline-integration/no-post.design.png" alt="Scalable Real-Time Shadows: Shadow contribution / no-post path" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Shadow contribution / no-post path</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-shadow-pipeline-integration" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-shadow-pipeline-integration/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-shadow-pipeline-integration/diagnostics.mosaic.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-shadow-pipeline-integration/diagnostics.mosaic.png" alt="Scalable Real-Time Shadows: Owner-graph diagnostics" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Owner-graph diagnostics</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-shadow-pipeline-integration" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-shadow-pipeline-integration/camera.near.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-shadow-pipeline-integration/camera.near.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-shadow-pipeline-integration/camera.near.png" alt="Scalable Real-Time Shadows: Near camera" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Near camera</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-shadow-pipeline-integration" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-shadow-pipeline-integration/camera.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-shadow-pipeline-integration/camera.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-shadow-pipeline-integration/camera.design.png" alt="Scalable Real-Time Shadows: Design camera" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Design camera</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-shadow-pipeline-integration" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-shadow-pipeline-integration/camera.far.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-shadow-pipeline-integration/camera.far.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-shadow-pipeline-integration/camera.far.png" alt="Scalable Real-Time Shadows: Far camera" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Far camera</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-shadow-pipeline-integration" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-shadow-pipeline-integration/seed-0001.final.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-shadow-pipeline-integration/seed-0001.final.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-shadow-pipeline-integration/seed-0001.final.png" alt="Scalable Real-Time Shadows: Seed 0x1 final" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Seed 0x1 final</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-shadow-pipeline-integration" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-shadow-pipeline-integration/seed-9e3779b9.final.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-shadow-pipeline-integration/seed-9e3779b9.final.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-shadow-pipeline-integration/seed-9e3779b9.final.png" alt="Scalable Real-Time Shadows: Seed 0x9e3779b9 final" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Seed 0x9e3779b9 final</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-shadow-pipeline-integration" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-shadow-pipeline-integration/temporal.t000.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-shadow-pipeline-integration/temporal.t000.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-shadow-pipeline-integration/temporal.t000.png" alt="Scalable Real-Time Shadows: Temporal t0" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Temporal t0</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-shadow-pipeline-integration" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-shadow-pipeline-integration/temporal.t001.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-shadow-pipeline-integration/temporal.t001.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-shadow-pipeline-integration/temporal.t001.png" alt="Scalable Real-Time Shadows: Temporal t1" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Temporal t1</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure></div>
   </div></div>
 
 <div class="section" id="skill-text"><div class="wrap">
   <h2>The full skill</h2>
-  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
+  <p class="sub">The complete SKILL.md as loaded by agents, rendered verbatim.</p>
   <div class="skilltext"><h2>Scalable Real-Time Shadows</h2>
-<p>Choose shadow topology from spatial coverage, caster change rate, receiver
-pixel coverage, and adapter resources. A custom cache is justified only when
-measured reuse beats the built-in WebGPU nodes.</p>
-<h2>Number Labels</h2>
-<p>Every consequential number must be labelled:</p>
-<ul>
-<li><strong>Derived</strong>: computed from bounds, texel density, workload, adapter limits,
-target refresh rate, or an equation.</li>
-<li><strong>Gated</strong>: a hard resource/correctness ceiling enforced by validation.</li>
-<li><strong>Measured</strong>: captured on the named device, resolution, DPR, scene, and
-sustained trace.</li>
-<li><strong>Authored</strong>: visual intent such as coverage, softness, fade width, or
-acceptable update latency.</li>
-</ul>
-<p>Unlabelled map sizes, level counts, bias constants, and millisecond claims are
-invalid.</p>
-<h2>Architecture Decision</h2>
+<p>Directional shadows are a fit problem: fit the smallest light-space
+representation that covers required caster-to-receiver rays, then spend work on
+the projection, filter, and updates receivers actually use.</p>
+<p><code>$threejs-choose-skills</code> is an optional multi-system coordinator. Use
+<code>$threejs-visual-validation</code> for capture/readback evidence.</p>
+<h2>1. Choose one topology</h2>
+<p>Compare the same seeded workload, projection, filter, and receiver policy:</p>
 <table>
 <thead>
 <tr>
-<th>Spatial/change problem</th>
-<th>First WebGPU path</th>
-<th>Actual r185 topology</th>
+<th>Gate</th>
+<th>First r185 WebGPU branch</th>
+<th>Cost topology</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>Bounded light-space receiver/caster volume</td>
+<td>A bounded receiver/caster volume passes world-texel and depth-precision gates</td>
 <td>one <code>DirectionalLight</code> shadow</td>
-<td>one shadow view and one depth texture</td>
+<td>one view, one depth texture, one filter evaluation</td>
 </tr>
 <tr>
-<td>Camera-depth coverage whose visible region changes continuously</td>
-<td><code>CSMShadowNode</code> from <code>three/addons/csm/CSMShadowNode.js</code></td>
-<td><code>L</code> lightweight placeholder light objects with cloned shadows, views, and depth textures; no persistent coarse cache</td>
+<td>Camera-depth coverage changes continuously</td>
+<td><code>CSMShadowNode</code></td>
+<td><code>L</code> shadow views/maps; normally one active filter, two in a fade</td>
 </tr>
 <tr>
-<td>Large fixed orthographic projection partitioned into rectangles</td>
-<td><code>TileShadowNode</code> from <code>three/addons/tsl/shadows/TileShadowNode.js</code></td>
-<td>one depth-array texture, one <code>ArrayCamera</code> renderer invocation, <code>N = tilesX * tilesY</code> backend layer passes, and <code>N</code> coordinate/containment branches with conditional comparison work; one union-frustum render list can draw each listed caster into every layer</td>
+<td>One fixed orthographic footprint is partitioned spatially</td>
+<td><code>TileShadowNode</code></td>
+<td>one depth array, <code>N</code> backend layer passes, <code>N</code> containment branches, and a union render list that can draw each caster in every layer</td>
 </tr>
 <tr>
-<td>Very large mostly persistent coverage with reusable coarse maps</td>
-<td>custom cached clipmap attached through <code>light.shadow.shadowNode</code></td>
-<td><code>L</code> persistent levels; useful only when changed casters do not force most nested full maps to redraw</td>
+<td>Very large coverage persists and measured reuse survives invalidation</td>
+<td>custom cached clipmap</td>
+<td><code>L</code> persistent levels; selected updates; <code>L</code> portable filters or one/two target-proven array/atlas filters</td>
 </tr>
 <tr>
-<td>Broadly animated/deforming caster field</td>
-<td>one shadow or CSM, or an explicitly separated dynamic overlay</td>
-<td>caching stale silhouettes is not a valid optimization</td>
+<td>Casters deform or change broadly each frame</td>
+<td>one fitted shadow, CSM, or a same-light static/dynamic split</td>
+<td>Cache invalidation approaches full redraw.</td>
 </tr>
 </tbody></table>
-<p>The table states comparison-depth sampling topology. r185 core shadows still
-allocate a color-bearing render target beside depth, and Tile allocates a red
-color array beside its depth array even when transmitted shadows are disabled.
-VSM adds distribution/blur targets and passes.</p>
-<p><code>TileShadowNode</code> is not a clipmap: it updates all tile layers together and has
-no per-tile persistence scheduler. r185 builds one render list using visibility
-in any subcamera, then its WebGPU backend can issue each listed object&#39;s draw in
-every layer; it does not independently recull that list per tile. The array
-reduces sampled-texture binding pressure, not backend layer passes, worst-case
-caster draws, or receiver-side coordinate/branch/filter work.</p>
-<h2>r185 WebGPU Gate And API Facts</h2>
-<pre><code class="language-js">import { WebGPURenderer } from &quot;three/webgpu&quot;;
-
-await renderer.init();
-
-if (renderer.backend.isWebGPUBackend !== true) {
-  throw new Error(&quot;This shadow architecture requires the WebGPU backend.&quot;);
+<p>Core and Tile shadow targets retain color-bearing attachments beside depth; VSM
+adds distribution/blur resources and passes. <code>TileShadowNode</code> updates all layers
+together and is not a persistent tile cache.</p>
+<p>Classify consequential numbers as <strong>Derived</strong> from bounds/equations,
+<strong>Authored</strong> intent, <strong>Gated</strong> limits, or target <strong>Measured</strong> evidence.</p>
+<p><strong>Complete when:</strong> one topology is selected from measured draw/raster/receiver/
+binding/reuse pressure, every rejected branch has a failed gate, and no copied
+map size, level count, bias, or millisecond promise drives the choice.</p>
+<h2>2. Fit projection, texels, filtering, and bias</h2>
+<ul>
+<li>Fit XY to required biased receiver coordinates plus filter, snap, and coverage
+guards. Fit Z independently to receivers and every occluder on their light
+rays; XY texel width does not define a valid Z quantum.</li>
+<li>Use one stable directional-light basis and global/light anchor. Snap each
+committed center to its fixed <code>dx/dy</code> grid with one deterministic quantizer.
+A basis/sign/anchor change starts a new content epoch.</li>
+<li>Derive filter support from the actual Basic/PCF/PCFSoft/VSM implementation and
+backend. Reserve that support inside containment and match world footprints
+across blends.</li>
+<li>Treat <code>normalBias</code> as a world-space normal offset and <code>bias</code>/<code>biasNode</code> as a
+normalized comparison-depth offset. Derive and validate them separately.</li>
+</ul>
+<p>When stabilizing crawl, seams, acne, or peter-panning, read
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-scalable-real-time-shadows/references/cached-clipmap-shadows.md#projection-filter-and-bias">projection, filter, and bias mechanics</a>.</p>
+<p><strong>Complete when:</strong> slow sub-texel motion is stable; every XY/Z boundary remains
+covered; filter support cannot escape its domain; and front-facing, grazing,
+thin-contact, and cross-level fixtures pass under the selected depth convention.</p>
+<h2>3. Gate the exact r185 implementation</h2>
+<p>Initialize WebGPU before inspecting capabilities:</p>
+<pre><code class="language-js">await renderer.init();
+if ( renderer.backend.isWebGPUBackend !== true ) {
+  throw new Error( &#39;Directional shadows require WebGPU.&#39; );
 }
 </code></pre>
-<p>r185 source verifies:</p>
-<ul>
-<li><code>AnalyticLightNode</code> consumes <code>light.shadow.shadowNode</code> when defined;
-otherwise it creates the default shadow node.</li>
-<li>The selected light shadow node is cached in built material/light graphs.
-Attach before first build; changing/deleting the property later affects future
-builds only unless every affected graph/pipeline is rebuilt and lifecycle-tested.</li>
-<li><code>ShadowNode.updateBefore()</code>, <code>updateShadow()</code>, <code>renderShadow()</code>,
-<code>setupShadowCoord()</code>, <code>setupShadowFilter()</code>, and <code>setupRenderTarget()</code> are the
-relevant extension points.</li>
-<li><code>LightShadow.biasNode</code> overrides numeric <code>bias</code> in the node path.</li>
-<li><code>NodeMaterial.positionNode</code> and <code>castShadowPositionNode</code> are local-space
-geometry hooks. <code>receivedShadowPositionNode</code> is a world-space receiver
-lookup-position hook through <code>shadowPositionWorld</code>; it is not the third copy
-of a local caster deformation node.</li>
-<li>r185 <code>CSMShadowNode</code> texel-snaps each cascade center. Its clone scaling changes
-numeric <code>bias</code> only, becomes inert when cloned <code>biasNode</code> is present, and the
-dynamic <code>filterNode</code> property is not copied. It fits XY but retains the source
-shadow near/far. Gate custom filtering, <code>normalBias</code>, filter support, and
-caster/receiver light-depth coverage per cascade.</li>
-<li><code>LightShadow.copy()</code> omits <code>mapType</code>; CSM clones lose a non-default source
-color-attachment type. <code>FloatType</code> there does not select depth32float—custom
-depth precision requires an explicit <code>DepthTexture</code>/target override.</li>
-<li>r185 <code>CSMShadowNode.updateFrustums()</code> must be called after camera projection
-or CSM split settings change, but it does not propagate all source-shadow
-changes or rebuild cascade topology. Configure before first build or
-explicitly synchronize/rebuild children.</li>
-<li>r185 <code>TileShadowNode</code> uses one array depth texture and does not support VSM.
-Its source initializes array comparison with <code>LessCompare</code> without a reversed
-depth branch. <strong>Gated:</strong> do not combine it with <code>reversedDepthBuffer</code> unless a
-target r185 depth diagnostic proves the comparison convention or the local
-implementation is corrected. It also supplies no filter gutter between tile
-layers; test PCF/PCFSoft support at every border.</li>
-<li>Tile&#39;s resolution option is later overwritten by cloned source <code>mapSize</code>, and
-its shared Red color array cannot represent RGBA transmitted shadows. Set and
-verify the source map size or patch the addon; reject transmitted color.</li>
-<li>r185 core shadow depth defaults map to <code>depth24plus</code>; reversed depth is not a
-promise of float32 shadow precision. Core receiver containment omits
-<code>shadowCoord.z &gt;= 0</code>; first-frame reversed matrices, layered reversed clears,
-CSM split/receiver boundaries, non-default layers, and multi-camera updates
-all require fixed-scene diagnostics before acceptance.</li>
-</ul>
-<h2>Custom Cached-Clipmap Contract</h2>
-<p>Use a custom clipmap only after the decision comparison. It must:</p>
-<ol>
-<li>define levels in one stable directional-light basis;</li>
-<li>derive XY world texel widths from committed orthographic extents and map
-dimensions;</li>
-<li>snap the light-space center to that grid relative to a stable global anchor;</li>
-<li>distinguish desired, rendered/committed, dirty, and invalid state;</li>
-<li>publish a center/extent only after its matching depth render completes;</li>
-<li>choose and validate one receiver topology: a portable independent-texture
-path with unconditional level samples, or a target-proven array/atlas path
-that selects one layer (two in a cross-fade) with explicit border gutters;</li>
-<li>refresh always-changing near coverage and schedule reusable levels under a
-measured update-debt gate;</li>
-<li>route correctness invalidations outside the ordinary cache-age budget;</li>
-<li>coalesce swept caster bounds and either refresh before sampling or mark a
-stale level invalid until repaired;</li>
-<li>share local-space visible/caster deformation and coverage logic while
-keeping receiver-position overrides in world space;</li>
-<li>reject transmitted-color/VSM caching unless color/distribution resources,
-filtering, blending, and their invalidation dependencies are implemented;</li>
-<li>dispose the attached node, cloned shadows/lights, targets/textures,
-storage, debug resources, and listeners.</li>
-</ol>
-<p>Read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-scalable-real-time-shadows/references/cached-clipmap-shadows.md">references/cached-clipmap-shadows.md</a>
-before implementing the custom path.</p>
-<h2>Texel, Filter, And Bias Footprints</h2>
-<p>For level extent <code>[left,right] x [bottom,top]</code> and map <code>W x H</code>:</p>
-<pre><code class="language-text">dx = (right - left) / W    // Derived world units per texel
-dy = (top - bottom) / H
-centerX = quantize((desiredX - anchorX) / dx) * dx + anchorX
-centerY = quantize((desiredY - anchorY) / dy) * dy + anchorY
+<p>Attach a custom node through <code>light.shadow.shadowNode</code> before the affected
+material/light graphs build. A runtime change requires every affected graph and
+pipeline to rebuild and pass disposal/recreation.</p>
+<p>When using core, CSM, Tile, reversed depth, or custom shadow hooks, read the
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-scalable-real-time-shadows/references/cached-clipmap-shadows.md#r185-source-gates">r185 source gates</a> for
+clone omissions, depth comparisons, layer behavior, transform conventions, and
+lifecycle caveats.</p>
+<p><strong>Complete when:</strong> revision/imports, backend/depth policy, camera ownership,
+shadow target type, layer behavior, material bind layout, and every selected
+built-in caveat have a fixed-scene diagnostic or a rejected configuration.</p>
+<h2>4. Build an explicit custom cache only when selected</h2>
+<p>Each level owns distinct state:</p>
+<pre><code class="language-text">desired  = next coverage request
+rendered = center/range/content encoded into an inactive target
+committed = exact valid target and parameters sampled by receivers
+dirty    = desired coverage differs, while committed content may remain valid
+invalid  = committed depth no longer represents required content
 </code></pre>
-<p>Choose one deterministic <code>floor</code> or nearest policy and validate slow motion;
-do not change quantizer or anchor between frames. Z is a light-ray coverage
-problem, not the projected texel grid: fit biased receiver lookup positions and
-every relevant occluder between them and the light, add a Derived/Authored
-guard, and use hysteresis instead of an arbitrary XY-derived Z quantum.</p>
-<p>r185 filter cost and footprint are algorithm-specific:</p>
-<ul>
-<li><code>BasicShadowMap</code>: one comparison sample.</li>
-<li><code>PCFShadowMap</code>: five Vogel-disk comparison samples; with supported hardware
-linear comparison the source describes an effective twenty filtered taps.
-<code>shadow.radius</code> scales by <code>1 / mapSize.x</code> for both axes, so non-square maps can
-produce anisotropic world footprints.</li>
-<li><code>PCFSoftShadowMap</code>: four gather-compare operations reconstruct a weighted
-local kernel; r185 does not use <code>shadow.radius</code> in this filter.</li>
-<li><code>VSMShadowMap</code>: adds two blur render passes and distribution targets; r185
-<code>TileShadowNode</code> rejects it.</li>
-</ul>
-<p>For PCF, <code>radius * dx</code> is the nominal Vogel sample-center scale, not the exact
-support: the outer sample lies inside that radius and hardware linear comparison
-adds a bilinear texel footprint. Derive a conservative anisotropic support
-<code>(rhoX,rhoY)</code> from the actual pattern/backend. Decide whether softness is
-Authored constant-world-size or grows with level, then match support across
-cross-fades and reserve it inside every containment/tile edge.</p>
-<p><code>normalBias</code> is a world-space normal offset; numeric <code>bias</code>/<code>biasNode</code> is a
-normalized comparison-depth offset. Scale and diagnose them separately. Bound
-world depth uncertainty with anisotropic receiver-plane gradients, for example
-<code>abs(dz/dx)*rhoX + abs(dz/dy)*rhoY + rasterQuantization</code>, then divide by the
-orthographic light-depth span and apply the sign verified for normal/reversed
-depth. Gate normal offset by a contact-detachment test. Never hide oversized
-filter footprints with excessive bias.</p>
-<h2>Cache Invalidation</h2>
-<h3>Physics presentation and reactive publication</h3>
-<p>Keep the existing shadow node/cache as sole owner of desired, invalid,
-rendered, and committed map state. When the route declares a physics-to-render
-boundary, bind shadow preparation to the immutable pair of
-<code>PhysicsPresentationCandidate</code> and target/view <code>CameraViewPublication</code> from the
-<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-choose-skills/references/physics-domain-and-interaction-contract.md">physics domain and interaction contract</a>,
-and validate its exact central per-binding/provider presented pairs, signal descriptors,
-camera render transforms/projection, validity, and errors. After cache
-publications return, the preparation owner emits <code>ViewPreparationPublication</code>
-and the central writer seals <code>PhysicsPresentationSnapshot</code>; visible receivers
-and temporal consumers resolve committed shadow refs, <code>reactivePublications</code>,
-<code>resetDependencies</code>, and resource lease refs transitively through
-<code>viewPreparationId</code>.</p>
-<p>Caster invalidation uses the domain&#39;s current <code>PresentedStatePair</code>; swept
-bounds use both presented states. Do not use fixed-step endpoints or poll an external physics
-engine from the shadow pass. A pure render-origin rebase leaves semantic
-light/caster geometry invariant when both camera transforms are applied; it
-does not dirty depth content merely because float render coordinates changed.
-A physics-origin rebase may preserve cached depth only after the accepted
-<code>PhysicsOriginRebaseTransaction</code> transforms every caster/receiver/cache binding
-and a light-space round-trip invariant passes; otherwise invalidate the cache
-and its dependent temporal region.</p>
-<p>For a physically sourced directional light, bind the canonical
-<code>LightingTransportSnapshot.sourceDirection</code> through its provider-wide
-<code>PresentedStatePair</code> and validate context/provider/signal IDs, basis, support,
-<code>PresentationSampleProvenance.requestedPresentationInstant: PhysicsInstant</code>,
-bundle <code>sampleInstant: PhysicsInstant</code>, and channel
-<code>actualPhysicsTime: PhysicsTime</code>, whose discriminant selects exactly one arm
-consistent with the descriptor&#39;s <code>timeSemantics</code>. Validate the declared clock
-mapping and maximum staleness,
-state/resource generations, lease, validity, and angular error.
-A broad directional distribution that exceeds the single-direction projection
-gate cannot be silently collapsed into one shadow camera. A nonphysical route
-keeps this lighting binding <code>not used</code> and declares an authored light basis.</p>
-<p>The cache owns, but does not publish as a parallel ABI, two internal states:</p>
-<ul>
-<li><code>shadowContentEpoch</code>: newest caster/light/alpha/deformation/resource content version that
-correct shadow content must represent;</li>
-<li><code>shadowCommittedEpoch</code>: exact valid content version and map identity actually
-sampled by receivers, plus changed receiver bounds or a conservative screen
-mask.</li>
-</ul>
-<p>On an accepted commit, map those states into the exact central records: return a
-<code>shadowViewPublicationRefs</code> entry containing <code>shadowOwner</code>, <code>shadowViewId</code>,
-<code>cameraProjectionRevision</code>, <code>shadowContentEpoch</code>, <code>resourceLeaseRefs</code>, and
-<code>boundedDelay</code>, plus one <code>ReactivePublication</code> with <code>kind: shadow-content</code>,
-<code>sourceVersion</code> equal to the committed epoch, canonical <code>affectedRegion</code>,
-<code>resourceLeaseId</code>, validity/error, and <code>plannedConsumerActions</code>. Return a
-versioned shadow-visibility factor ID as
-radiometric provenance; downstream lighting/render-radiance provenance includes
-that ID exactly once in <code>attenuationFactorIds</code>. Never mutate the already
-published lighting snapshot to retrofit it.</p>
-<p>That entry is the canonical <code>ShadowViewPublicationRef</code>: it identifies the
-committed content, target/receiver view, camera publication and projection
-revision, factor provenance, leased resource generation, and any bounded delay
-consumed by this exact preparation. A desired, scheduled, or unsubmitted cache
-state may not occupy the reference.</p>
-<p>Keep <code>desiredCoverageEpoch</code> and update debt separate. Camera/snapped-center
-motion may leave the prior committed map correct within its committed domain;
-it is not a content/radiance change until containment fails or a new map
-actually commits.</p>
-<p>Key both records by presentation target, view/camera-projection identity, and
-light; one camera&#39;s committed coverage cannot authorize another
-view. Publications also pin resource generation/layout/layer and a queue-safe
-lease until every receiver has submitted and its central
-<code>reuseProhibitedUntil</code> condition is satisfied; append release to
-<code>FrameExecutionRecord.leaseDispositionById</code> with its completion join/evidence.</p>
-<p>The preparation owner writes those refs, publications, actions, and leases into
-a new immutable <code>ViewPreparationPublication</code> before sealing the Snapshot.
-Candidate, camera publication, preparation publication, and Snapshot are
-immutable; a shadow node never patches an earlier record. If a render-hook update finishes after sealing, both publication
-and receiver use are deferred to the next snapshot/presentation epoch; the
-current scene continues sampling the prior committed resource named by its
-snapshot. This requires an inactive resource generation while the prior leased
-generation remains untouched, followed by an atomic next-snapshot swap.
-Otherwise suppress the late update; an in-place render-hook write violates
-snapshot/content agreement. Same-presentation commits run before the seal.
-Never label desired or merely scheduled content as committed. A changed commit
-is a radiance discontinuity: reject the affected temporal-radiance pixels, or
-reset the full radiance history when no conservative mask exists. Shadow cache
-age and update scheduling remain owned here; the central contract standardizes
-only the published boundary and ordering.</p>
-<p><code>ViewPreparationPublication.resetDependencies</code> is only the immutable action
-plan. Append actual shadow
-renders, queue submissions, cache commits, reseeds, failures, and deferred
-feedback to <code>FrameExecutionRecord</code>. Do not treat logical content epoch,
-submission epoch, GPU queue availability, or host readback as equivalent.
-<code>computeAsync()</code> is not a completion fence. If required shadow preparation
-cannot return a valid committed or declared prior/degraded version before seal,
-append a <code>FrameExecutionRecord</code> with <code>overallStatus: aborted</code> (or
-<code>partial-failure</code> when another target survives), exclude the failed target from
-<code>snapshotIds</code>, store typed absence in its target execution&#39;s <code>snapshotId</code>,
-cancel or defer actions, retire only failed-target-exclusive preparation
-leases, and retain Candidate/shared leases until all surviving snapshot
-consumers join through <code>leaseDispositionById</code>. Device loss appends
-<code>overallStatus: device-lost</code> and
-affected target statuses <code>device-lost</code>, advances
-<code>deviceLossGeneration</code>, cancels actions, and invalidates lost-generation shadow
-resources/leases without mutating Candidate/Snapshot records or inventing a
-normal completion token. Rebuild the cache under the new generation before
-publication.</p>
-<p>Track at least these dirty causes:</p>
-<ul>
-<li>snapped coverage center or fitted depth range changed;</li>
-<li>directional-light basis changed;</li>
-<li>caster transform, geometry, LOD, visibility, layer, <code>castShadow</code>, alpha/mask,
-or deformation envelope changed;</li>
-<li>caster arrival/removal or spatial-chunk generation changed;</li>
-<li>map resolution/format/resource identity changed.</li>
-</ul>
-<p>Receiver-only motion does not change opaque comparison depth while committed
-coverage remains valid; it changes lookup/coverage. r185 VSM is exceptional
-because its submission includes <code>receiveShadow</code> objects. Filter, bias, or fade
-changes usually rebuild sampling state, not caster depth. Do not redraw maps
-for the wrong dependency.</p>
-<p>For a moved/deformed caster, invalidate the union/swept bound of its previous
-and current conservative light-space silhouette. A content invalidation cannot
-wait silently behind an age refresh. Either:</p>
-<ul>
-<li>refresh the affected level before it is sampled; or</li>
-<li>set <code>valid = false</code>, remove that level from containment so valid coarser maps
-inherit its remaining weight, and repair it through a separately Gated
-correctness queue. Only unresolved outer remainder becomes fully lit.</li>
-</ul>
-<p>Coalesce overlapping bounds before level tests. A local change near the center
-of nested full maps can intersect every level and force <code>L</code> full redraws; a
-level-granular clipmap does not make that update cheap. Exclude dynamic casters
-into an overlay/proxy, use nonoverlapping ring ownership, or adopt paged/tiled
-partial residency when measurements require locality. Continuously deforming
-content otherwise defeats coarse caching.</p>
-<p>A static-cache/dynamic-overlay design belongs inside the same light/shadow
-node; a second <code>DirectionalLight</code> duplicates illumination. For opaque binary
-visibility with matched light-plane taps, exact union filtering is
-<code>sum_k(w_k * Vstatic_k * Vdynamic_k)</code>, with out-of-overlay coverage equal to
-one. <code>min()</code> or multiplying already-filtered averages is an approximation that
-needs a quality gate. Transmitted color needs a separate composition contract.</p>
-<p>Keep the scheduler CPU-visible. A GPU dirty bit cannot be consumed by
-<code>updateBefore()</code> without readback. Use CPU chunk generations/spatial indices to
-select level renders; use GPU compute for caster compaction only when the render
-path remains GPU-driven and a target measurement proves the benefit.</p>
-<h2>Caster Parity</h2>
-<ul>
-<li><code>material.positionNode</code> and <code>material.castShadowPositionNode</code> may reference
-the same local-space deformation node object.</li>
-<li>Leave <code>receivedShadowPositionNode</code> null for the normal world-space receiver
-position. If overridden, provide an explicitly world-space node and validate
-it independently.</li>
-<li>Morphing, skinning, instancing, and batched transforms are already applied by
-the r185 NodeMaterial position path; custom overrides must preserve them.</li>
-<li>Share alpha/coverage semantics through map/color alpha, <code>alphaTest</code>,
-<code>maskNode</code>/<code>maskShadowNode</code>, and <code>castShadowNode</code> as applicable.</li>
-<li>Audit side, layers, cast/receive flags, deformation time/version, and caster
-proxies. Formula text equality is not parity; shared data and coordinate
-contracts are.</li>
-</ul>
-<h2>Bind, Memory, And Workload Budgets</h2>
-<p>Query the initialized WebGPU device limits and inspect the compiled binding
-layout. Do not assume one sampler binding per texture; deduplication is graph
-and backend dependent.</p>
-<pre><code class="language-text">nominal target bytes = sum(width * height * layers *
-                           (bytesPerColorTexel + bytesPerDepthTexel)) // Derived lower bound
-shadow draw work     = sum_v(visibleCasterDraws_v)                   // Derived
-shadow triangle work = sum_v(visibleCasterTriangles_v)               // Derived
-shadow vertex work   = sum_v(vertexInvocations_v)                    // Measured/Derived
-shadow raster work   = sum_v(coveredDepthSamples_v * meanOverdraw_v) // Measured estimate
-                     // or direct fragment invocations, never both
-alpha work           = sum_v(alphaTexelFetches_v + discardedFragments_v)
-receiver filter ops  = sum_pixels(sum_activeEvaluations(filterOps))  // Derived
-frame allowance      = 1000 / targetRefreshHz                        // Derived ms
-</code></pre>
-<p>Topology pressure:</p>
-<ul>
-<li>CSM: <code>L</code> depth-texture bindings and approximately one active cascade filter
-per receiver in its built-in selection path; <code>L</code> shadow views update.</li>
-<li>Tile: one array depth texture with <code>N</code> layers and <code>N</code> backend layer passes.
-With r185 union-frustum render-list construction, caster work can approach
-<code>N * unionVisibleCasterDraws</code>. The shader performs <code>N</code> transforms/tests but
-normally branches into one in-range comparison filter (two on inclusive
-borders); divergence may serialize different branches. A custom tile-array
-selector can issue one layer comparison but must solve filter-border gutters.</li>
-<li>Per-level clipmap textures: <code>L</code> texture bindings. The portable unconditional
-path performs <code>L</code> filters; an array/atlas selector can reduce to one or two
-filters but needs common format/dimensions, dynamic-layer validation, and
-filter-safe borders.</li>
-</ul>
-<p><strong>Gated:</strong> sampled textures, samplers, bindings per group, bind groups, array
-layers, texture dimensions, memory ceiling, update debt, and maximum invalid
-coverage stay below the target adapter/product limits. Leave headroom for all
-other material and post resources.</p>
-<p><strong>Measured sustained mobile evidence:</strong> target resolution/DPR and refresh goal;
-thermal-steady trace; CPU/GPU frame quantiles; shadow-view draws/triangles;
-vertex invocations, depth-fragment coverage/overdraw, alpha/mask/deformation
-cost, pass clears/transitions, CPU traversal/cull time, receiver filter
-coverage; update spike/debt/age; bind-layout manifest; GPU allocation estimate;
-streaming/invalidation bursts. Allocate shadow time from the complete measured
-frame architecture, but declare independent CPU, GPU, presented-frame, memory,
-and spike/headroom gates before the acceptance trace. CPU and GPU overlap; do
-not sum them. The measured trace tests the gates rather than defining them.</p>
-<p>Optimize the measured bottleneck: update/draw-bound work needs fewer views,
-casters, overdraw, or refreshes; receiver-bound work needs fewer active filters
-or lower filter cost; binding/memory-bound work needs packing/count/format
-changes; traversal-bound work needs spatial ownership/culling. Do not lower
-update cadence to solve receiver-filter cost. Increase resolution only after
-projection fit, snapping, bias, and filter support are correct.</p>
-<h2>Failure Conditions</h2>
-<ul>
-<li>custom cache chosen without a same-scene comparison against one shadow, CSM,
-and tiled projection;</li>
-<li>desired centers published while maps still represent committed centers;</li>
-<li>center quantized in screen/camera space or against a moving origin;</li>
-<li>Z quantization clips casters or wastes the depth range;</li>
-<li>stale content remains sampled after explicit invalidation;</li>
-<li>divergent comparison branches used without target/UA shader validation or a
-portable unconditional/array-layer design;</li>
-<li>fixed texel-radius filters create visible world-size jumps at level borders;</li>
-<li>one bias constant used across incompatible world texel/depth spans;</li>
-<li>local caster deformation assigned to <code>receivedShadowPositionNode</code>;</li>
-<li>tile array selected solely to reduce bindings while view/filter cost is
-ignored;</li>
-<li>GPU dirty masks require hidden frame-loop readback;</li>
-<li>passing average timing hides periodic cache-expiry/invalidation spikes.</li>
-</ul>
-<h2>Routing Boundary</h2>
-<p>Use this skill for directional cast-shadow projections. Use
-<code>$threejs-ambient-contact-shading</code> for view-dependent ambient visibility,
-<code>$threejs-image-pipeline</code> for shared depth/post ownership, and
-<code>$threejs-visual-validation</code> for fixed-view shimmer, cache, resource, and
-sustained-budget evidence.</p>
+<p>Receivers sample committed state only. Invalid levels contribute zero weight;
+the next valid coarser level inherits the remainder, and unresolved outer
+coverage is lit. Correctness invalidations outrank age/quality refreshes.</p>
+<p>Freeze desired center, depth interval, basis epoch, and content epoch; render;
+restore renderer state; then atomically commit center, interval, target/layer,
+matrix, and rendered epoch. Work encoded after the current presentation seal
+uses an inactive resource generation and commits to the next presentation;
+the prior committed generation remains immutable until its consumers finish.</p>
+<p>When a custom cache is selected, read the
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-scalable-real-time-shadows/references/cached-clipmap-shadows.md#cached-clipmap-state-and-sampling">cache state, scheduling, and sampling contract</a>
+before implementing it.</p>
+<p><strong>Complete when:</strong> rendered metadata matches its inactive target; committed
+metadata matches the resource receivers sample; desired state differs only
+while committed coverage remains valid; first-use state is invalid; failed
+updates preserve only still-correct commits; late updates cannot mutate a
+sampled generation; and every invalid level is excluded until repaired.</p>
+<h2>5. Invalidate swept causes and preserve caster parity</h2>
+<p>Track light basis; caster previous/current transform; geometry/LOD; visibility,
+layer, and cast flags; alpha/mask/coverage; deformation envelope; asset/chunk
+generation; and resource identity. Union or sweep previous/current conservative
+caster silhouettes so vacated and newly occupied shadow depths both invalidate.</p>
+<p>A central change can intersect every nested full map. When that redraw is too
+expensive, use non-overlapping ownership, paged residency, proxies, or a dynamic
+overlay inside the same light/shadow node. A second directional light would
+duplicate illumination.</p>
+<p>Visible and shadow passes share local-space deformation and alpha/coverage.
+<code>positionNode</code> and <code>castShadowPositionNode</code> are local-space hooks;
+<code>receivedShadowPositionNode</code> is world-space receiver lookup and is validated
+separately.</p>
+<p>For the invalidation event table, swept receiver influence, and parity contract,
+read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-scalable-real-time-shadows/references/cached-clipmap-shadows.md#swept-invalidation-and-caster-parity">swept invalidation and caster parity</a>.</p>
+<p>When another system supplies light/caster motion, rebasing, or presentation
+cadence, bind units, coordinate frame, current/previous sample times, authority,
+version, resource generation, validity, staleness, and reset conditions before
+use. The shadow cache remains sole writer of its desired, dirty, invalid,
+rendered, and committed state.</p>
+<p><strong>Complete when:</strong> every content dependency maps to redraw, sampling-only update,
+or no-op; every moved/deformed caster invalidates its swept old/new influence;
+and visible/caster silhouette parity passes for morphing, skinning, instancing,
+batching, sidedness, layers, and alpha coverage.</p>
+<h2>6. Validate sustained behavior and lifecycle</h2>
+<p>Capture committed coverage/weights, light depth, filter support, bias, invalid
+fallback, caster parity, binding layout, target inventory, and fixed final views.
+Exercise camera crawl; all XY/Z boundaries; cross-level fades; localized and
+broad invalidation; light-basis changes; resize/DPR; multi-camera use; update
+spikes/debt; and dispose/recreate.</p>
+<p>Measure warmed, thermal-steady CPU/GPU frame quantiles, shadow view draws and
+triangles, vertex/raster/alpha work, receiver filter evaluations, traversal,
+allocations, bindings, invalid coverage, and update spikes. Optimize the
+measured bottleneck rather than a topology proxy.</p>
+<p>For binding/resource inventory, workload equations, and acceptance gates, read
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-scalable-real-time-shadows/references/cached-clipmap-shadows.md#binding-workload-and-validation">binding, workload, and validation</a>.</p>
+<p><strong>Complete when:</strong> rendered output matches the selected baseline and diagnostic
+causes; stale invalid content is never sampled; adapter and product headroom
+gates pass; sustained frame and spike gates pass; and detaching the node,
+targets/textures, cloned shadows/lights, storage, listeners, and debug resources
+returns counters to baseline.</p>
+<h2>Ownership</h2>
+<p>This skill owns directional shadow projection, filtering/bias, caster parity,
+cache state/invalidation, receiver sampling, and shadow diagnostics. The scene
+owner supplies caster/light inputs; the pipeline owner controls shared output
+and temporal-radiance rejection caused by changed shadow content.</p>
 </div>
+  <aside class="skill-guides" aria-labelledby="related-guides-title"><h3 id="related-guides-title">Related guides</h3><ul><li><a href="/industries/browser-games/"><span>Industries</span>Three.js WebGPU Skills for Browser Games</a></li></ul></aside>
   <div class="pn">
     <a href="threejs-rain-snow-and-wet-surfaces.html">← Rain, Snow, and Wet Surfaces</a>
     <a href="threejs-sky-atmosphere-and-haze.html">Sky, Atmosphere, and Haze →</a>
@@ -853,10 +817,16 @@ sustained-budget evidence.</p>
 </main>
 
 <div class="wrap"><footer>
-  <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
-  <span style="font-size:13px">Three r185.1 · 41 working implementations · build <code>6c7881ab7386</code></span><br/>
-  <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
-  <span><a href="https://threejs-skills.com/about/">About &amp; methodology</a> · <a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/llms.txt">For coding agents</a></span>
+  <div class="footer-summary">Three.js WebGPU Skill Pack: TSL, procedural graphics, and visual validation.
+    <span>Three r185.1 · 40 primary targets · 25 accepted · build <code>ab7d8d17e058</code></span>
+    <span>Compiling shaders? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span>
+  </div>
+  <div class="footer-groups">
+    <div class="footer-group"><strong>Build</strong><a href="/#skills">Skills</a><a href="/#flagships">Examples</a><a href="/industries/">Industries</a></div>
+    <div class="footer-group"><strong>Decide</strong><a href="/for/">Who it is for</a><a href="/compare/">Compare</a><a href="/alternatives/">Alternatives</a><a href="/pricing/">Pricing</a></div>
+    <div class="footer-group"><strong>Adopt</strong><a href="/docs/">Docs</a><a href="/migrate/">Migration</a><a href="/agents/">Agent docs</a><a href="/faq/">FAQ</a></div>
+    <div class="footer-group"><strong>Proof</strong><a href="/evidence/">Evidence</a><a href="/about/">Method</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a><a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/LICENSE">License</a></div>
+  </div>
 </footer></div>
 </body>
 </html>

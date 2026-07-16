@@ -4,12 +4,12 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Ambient Contact Shading | Three.js WebGPU Skill</title>
-<meta name="description" content="Design and implement ambient visibility in Three.js r185 WebGPU/TSL, including the forward-lighting placement cost, GTAO input/reconstruction choices…" />
+<meta name="description" content="Ground indirect lighting with ambient visibility in Three.js r185 WebGPU/TSL. Use when choosing authored material AO, dynamic GTAO, forward-lighting…" />
 <meta name="author" content="Three.js WebGPU Skill Pack contributors" />
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-ambient-contact-shading.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b" />
+<meta name="skill-pack-build-revision" content="sha256:ab7d8d17e0589a6f5c2462d645b9e0d6797cd92eade36e3615dae091c6f9df5b" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -17,20 +17,26 @@
 <link rel="manifest" href="../site.webmanifest" />
 <link rel="alternate" type="text/plain" href="https://threejs-skills.com/llms.txt" title="LLM-readable skill catalog" />
 <link rel="alternate" type="application/json" href="https://threejs-skills.com/skills.json" title="Machine-readable skill catalog" />
-
+<link rel="preload" as="image" href="../visual-validation/integration-image-pipeline-ao/final.design.avif" type="image/avif" fetchpriority="high" />
 <meta property="og:type" content="article" />
 <meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
 <meta property="og:title" content="Ambient Contact Shading | Three.js WebGPU Skill" />
-<meta property="og:description" content="Design and implement ambient visibility in Three.js r185 WebGPU/TSL, including the forward-lighting placement cost, GTAO input/reconstruction choices…" />
+<meta property="og:description" content="Ground indirect lighting with ambient visibility in Three.js r185 WebGPU/TSL. Use when choosing authored material AO, dynamic GTAO, forward-lighting…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-ambient-contact-shading.html" />
-<meta property="article:modified_time" content="2026-07-12T14:48:34+03:00" />
+<meta property="article:modified_time" content="2026-07-16T11:00:33+03:00" />
 <meta property="article:published_time" content="2026-07-04T23:30:19+03:00" />
 <meta property="article:section" content="Cameras, Lighting, and Final Image" />
-
-<meta name="twitter:card" content="summary" />
+<meta property="og:image" content="https://threejs-skills.com/visual-validation/integration-image-pipeline-ao/final.design.png" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="800" />
+<meta property="og:image:alt" content="Image-pipeline AO integration final presentation (from demo browserEntry) for Ambient Contact Shading" />
+<meta name="twitter:image" content="https://threejs-skills.com/visual-validation/integration-image-pipeline-ao/final.design.png" />
+<meta name="twitter:image:alt" content="Image-pipeline AO integration final presentation (from demo browserEntry) for Ambient Contact Shading" />
+<meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Ambient Contact Shading | Three.js WebGPU Skill" />
-<meta name="twitter:description" content="Design and implement ambient visibility in Three.js r185 WebGPU/TSL, including the forward-lighting placement cost, GTAO input/reconstruction choices…" />
+<meta name="twitter:description" content="Ground indirect lighting with ambient visibility in Three.js r185 WebGPU/TSL. Use when choosing authored material AO, dynamic GTAO, forward-lighting…" />
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
@@ -56,14 +62,19 @@
    ],
    "@id": "https://threejs-skills.com/skills/threejs-ambient-contact-shading.html#article",
    "headline": "Ambient Contact Shading",
-   "description": "Design and implement ambient visibility in Three.js r185 WebGPU/TSL, including the forward-lighting placement cost, GTAO input/reconstruction choices, temporal gates, mobile bandwidth, and optional bent normals.",
+   "description": "Ground indirect lighting with ambient visibility in Three.js r185 WebGPU/TSL. Use when choosing authored material AO, dynamic GTAO, forward-lighting placement, reduced-resolution reconstruction, temporal AO, or bent normals.",
    "url": "https://threejs-skills.com/skills/threejs-ambient-contact-shading.html",
    "mainEntityOfPage": {
     "@type": "WebPage",
     "@id": "https://threejs-skills.com/skills/threejs-ambient-contact-shading.html"
    },
+   "image": [
+    "https://threejs-skills.com/seo/article/threejs-ambient-contact-shading-1x1.png",
+    "https://threejs-skills.com/seo/article/threejs-ambient-contact-shading-4x3.png",
+    "https://threejs-skills.com/seo/article/threejs-ambient-contact-shading-16x9.png"
+   ],
    "datePublished": "2026-07-04T23:30:19+03:00",
-   "dateModified": "2026-07-12T14:48:34+03:00",
+   "dateModified": "2026-07-16T11:00:33+03:00",
    "author": {
     "@id": "https://threejs-skills.com/#publisher"
    },
@@ -140,18 +151,18 @@ html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smo
 body{min-width:320px;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7}
 ::selection{background:rgba(255,180,84,.26);color:var(--ink)}
 a{color:inherit;text-decoration:none}
-a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
+a:focus-visible,button:focus-visible,summary:focus-visible,pre[tabindex]:focus-visible,[role="region"]:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
 main{display:block}
 .skip-link{position:fixed;z-index:100;left:16px;top:12px;translate:0 -160%;font-family:var(--mono);font-size:12px;background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:9px;transition-property:translate;transition-duration:160ms}
 .skip-link:focus{translate:0 0}
 .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
 .site-nav{position:sticky;z-index:50;top:0;background:rgba(8,10,14,.82);border-bottom:1px solid rgba(255,255,255,.075);backdrop-filter:blur(18px) saturate(1.15)}
-nav{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
-nav .brand{white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
-nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
-nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
-nav .links a:hover{color:var(--amber)}
-nav .links a:active{scale:.96}
+.site-nav>.wrap{min-height:76px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+.site-nav .brand{min-height:44px;display:inline-flex;align-items:center;white-space:nowrap;font-family:var(--disp);font-weight:600;font-size:18px;letter-spacing:0}
+.site-nav .links{display:flex;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:12px;color:var(--dim)}
+.site-nav .links a{min-height:44px;display:inline-flex;align-items:center;padding:0 7px;transition-property:color,scale;transition-duration:160ms}
+.site-nav .links a:hover{color:var(--amber)}
+.site-nav .links a:active{scale:.96}
 h1,h2,h3,h4{text-wrap:balance;font-family:var(--disp);font-weight:600;letter-spacing:0}
 p{text-wrap:pretty}
 h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:14px}
@@ -165,7 +176,7 @@ code{font-family:var(--mono)}
 .card{min-height:100%;background:linear-gradient(145deg,rgba(19,24,33,.96),rgba(12,15,21,.96));border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px;
   box-shadow:var(--shadow-card);transition-property:translate,scale,box-shadow;transition-duration:200ms;transition-timing-function:cubic-bezier(.2,0,0,1)}
 .card:hover{translate:0 -3px;box-shadow:var(--shadow-card-hover)}
-.card:active{translate:0 -1px;scale:.99}
+.card:active{translate:0 -1px;scale:.96}
 .card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .card-kind{font-family:var(--mono);font-size:10px;color:var(--cyan)}
 .card h3,.card h4{font-size:19px;font-weight:600}
@@ -190,19 +201,29 @@ figure img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;filter:s
 figcaption{padding:16px 18px;font-size:14.5px}
 figcaption strong{display:block;font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:0;margin-bottom:4px}
 figcaption span{display:block;margin-top:3px;color:var(--dim)}
-footer{border-top:1px solid var(--line);padding:44px 0 60px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;color:var(--dim);font-size:14.5px}
+footer{border-top:1px solid var(--line);padding:44px 0 60px;display:grid;grid-template-columns:minmax(260px,1.4fr) minmax(0,2fr);gap:36px 64px;color:var(--dim);font-size:14.5px}
 footer a{color:var(--amber)}
 footer a:hover{text-decoration:underline}
 footer code{color:var(--cyan);font-size:11px}
+.footer-summary{max-width:55ch}.footer-summary>span{display:block;margin-top:8px;font-size:13px}.footer-groups{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}.footer-group{display:grid;align-content:start;gap:8px}.footer-group strong{font:400 10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}.footer-group a{min-height:40px;display:flex;align-items:center;color:var(--dim);font-size:13px;transition-property:color,scale;transition-duration:160ms}.footer-group a:hover{color:var(--amber);text-decoration:none}.footer-group a:active{scale:.96}
+.pathfinder{padding:clamp(52px,7vw,86px) 0;border-bottom:1px solid var(--line)}.pathfinder-head{display:grid;grid-template-columns:minmax(0,.7fr) minmax(320px,1.3fr);align-items:end;gap:28px 72px;margin-bottom:28px}.pathfinder-head h2{margin:0}.pathfinder-head p{max-width:58ch;color:var(--dim)}.pathfinder-rows{border-top:1px solid var(--line)}.pathfinder-row{display:grid;grid-template-columns:minmax(160px,.55fr) minmax(210px,.8fr) minmax(0,1.6fr);gap:20px 32px;align-items:center;min-height:94px;border-bottom:1px solid var(--line)}.pathfinder-stage{font:10px/1.4 var(--mono);letter-spacing:.11em;text-transform:uppercase;color:var(--cyan)}.pathfinder-row>p{color:var(--dim);font-size:14px}.pathfinder-links{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px 18px}.pathfinder-links a{min-height:44px;display:inline-flex;align-items:center;gap:8px;color:var(--amber);font:11px/1.35 var(--mono);transition-property:color,scale;transition-duration:160ms}.pathfinder-links a:after{content:"→"}.pathfinder-links a:hover{color:var(--ink)}.pathfinder-links a:active{scale:.96}
+.content-hero{padding:clamp(54px,8vw,104px) 0 42px;border-bottom:1px solid var(--line)}.breadcrumbs{min-height:44px;display:flex;align-items:center;margin-bottom:28px;font:11px/1.4 var(--mono);color:var(--dim)}.breadcrumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.breadcrumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}.breadcrumbs a{min-height:40px;display:inline-flex;align-items:center;transition-property:color,scale;transition-duration:160ms}.breadcrumbs a:hover{color:var(--amber)}.breadcrumbs a:active{scale:.96}.content-hero h1{max-width:17ch;font-size:clamp(40px,6vw,68px);font-weight:700;line-height:1.02;letter-spacing:-.02em}.content-lede{max-width:66ch;margin-top:22px;color:var(--dim);font-size:clamp(17px,2vw,20px)}.content-meta{display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:28px;font:10px/1.4 var(--mono);color:var(--cyan)}
+.content-answer{max-width:900px;margin-top:34px;padding:3px 0 3px 22px;border-left:2px solid var(--amber);font-size:clamp(19px,2.2vw,21px);line-height:1.62;color:var(--ink)}.content-shell{padding:clamp(46px,7vw,86px) 0}.content-layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(230px,1fr);align-items:start;gap:clamp(36px,6vw,76px)}.content-body{grid-column:1;grid-row:1;max-width:78ch;min-width:0}.content-body h2{margin:52px 0 16px;font-size:clamp(27px,3.5vw,39px);scroll-margin-top:112px}.content-body>h2:first-child{margin-top:0}.content-body h3{margin:34px 0 12px;font-size:21px;scroll-margin-top:112px}.content-body p,.content-body li{color:var(--dim);font-size:16px}.content-body p+p{margin-top:17px}.content-body ul,.content-body ol{margin:16px 0;padding-left:24px}.content-body li+li{margin-top:7px}.content-body a{color:var(--cyan);text-decoration:underline;text-decoration-color:rgba(127,212,193,.35);text-underline-offset:3px}.content-body a:hover{color:var(--amber);text-decoration-color:currentColor}.content-body code:not(pre code){padding:1px 5px;border:1px solid var(--line);border-radius:5px;background:#07090c;color:var(--cyan);font-size:.86em}.content-body pre{margin:20px 0;white-space:pre;tab-size:2}.content-table{max-width:100%;margin:22px 0;overflow-x:auto;border:1px solid var(--line);border-radius:12px}.content-table:focus-visible{outline:2px solid var(--amber);outline-offset:3px}.content-table table{width:100%;border-collapse:collapse;font-size:14px}.content-table th,.content-table td{min-width:150px;padding:11px 13px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);text-align:left;vertical-align:top;color:var(--dim)}.content-table th{color:var(--ink);font-weight:600;background:var(--bg2)}.content-table tr:last-child td{border-bottom:0}.content-table th:last-child,.content-table td:last-child{border-right:0}
+.content-index{grid-column:2;grid-row:1;position:sticky;top:104px;max-height:calc(100vh - 128px);overflow-y:auto;padding:18px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.content-index strong{display:block;margin-bottom:10px;font:10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}.content-index ol{list-style:none}.content-index a{min-height:40px;display:flex;align-items:center;padding:5px 0;color:var(--dim);font-size:13px;line-height:1.4;transition-property:color,translate,scale;transition-duration:160ms}.content-index a:hover{color:var(--amber);translate:3px 0}.content-index a:active{translate:1px 0;scale:.96}.content-proof{margin:54px 0 0}.content-proof figure{border-radius:16px}.content-proof img{width:100%;height:auto;max-height:650px;object-fit:cover;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}.content-proof figcaption{color:var(--dim);font:11px/1.55 var(--mono)}.content-proof figcaption a{color:var(--amber)}
+.content-layout--docs{grid-template-columns:minmax(190px,.6fr) minmax(0,2fr)}.content-layout--docs .content-index{grid-column:1}.content-layout--docs .content-body{grid-column:2;max-width:72ch}.docs-index a{padding-inline:10px;border-left:2px solid transparent}.docs-index a[aria-current="page"]{border-left-color:var(--amber);background:rgba(255,180,84,.06);color:var(--ink);font-weight:600}.docs-index-current{display:none}
+.content-facts,.content-faq-list,.content-related,.content-sources,.content-skills,.content-demos,.content-discovery,.faq-provenance{margin-top:54px;padding-top:22px;border-top:1px solid var(--line)}.content-facts h2,.content-faq-list h2,.content-related h2,.content-sources h2,.content-skills h2,.content-demos h2{font-size:24px}.content-ruled-list{list-style:none;border-top:1px solid var(--line)}.content-ruled-list li{border-bottom:1px solid var(--line)}.content-ruled-list a{min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:9px 0;color:var(--dim);font-size:14px;transition-property:color,scale;transition-duration:160ms}.content-ruled-list a:after{content:"→";color:var(--amber)}.content-ruled-list a:hover{color:var(--ink)}.content-ruled-list a:active{scale:.96}.content-related .content-ruled-list a{display:grid;grid-template-columns:104px minmax(0,1fr) auto}.content-related-family{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}.content-faq-item{padding:22px 0;border-bottom:1px solid var(--line)}.content-faq-item h3{margin:0;font-size:20px}.content-faq-item h3 a{color:var(--ink)}.content-faq-item p{margin-top:9px;color:var(--dim);font-size:15px}.faq-provenance{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);padding:0}.faq-provenance div{padding:13px;background:var(--bg2)}.faq-provenance dt{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}.faq-provenance dd{margin-top:5px;font:11px/1.45 var(--mono);color:var(--cyan);overflow-wrap:anywhere}.content-discovery{display:flex;flex-wrap:wrap;gap:10px 22px;font:11px/1.5 var(--mono);color:var(--dim)}.content-discovery a{min-height:40px;display:inline-flex;align-items:center;color:var(--amber)}
 @media (max-width:760px){
   .site-nav .wrap{padding-right:0}
-  nav{min-height:104px;display:grid;grid-template-columns:1fr;padding:14px 0 10px;gap:4px}
-  nav .brand{font-size:16px}
-  nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:none;padding-right:20px}
-  nav .links::-webkit-scrollbar{display:none}
-  nav .links a{flex:0 0 auto}
+  .site-nav>.wrap{min-height:104px;display:grid;grid-template-columns:1fr;padding-top:14px;padding-bottom:10px;gap:4px}
+  .site-nav .brand{font-size:16px}
+  .site-nav .links{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;scrollbar-color:rgba(255,180,84,.45) transparent;padding:0 20px 4px 0}
+  .site-nav .links::-webkit-scrollbar{height:3px}.site-nav .links::-webkit-scrollbar-thumb{background:rgba(255,180,84,.45);border-radius:99px}
+  .site-nav .links a{flex:0 0 auto}
   .grid,.gallery{grid-template-columns:1fr}
+  footer{grid-template-columns:1fr}.footer-groups{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+@media (max-width:900px){.pathfinder-head,.content-layout{grid-template-columns:1fr}.content-index{grid-column:1;grid-row:1;position:static;max-height:none}.content-body,.content-layout--docs .content-body{grid-column:1;grid-row:2}.docs-index{overflow:hidden}.docs-index-current{display:flex;margin-bottom:8px}.docs-index ol{display:flex;gap:8px;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;padding-bottom:6px}.docs-index li{flex:0 0 min(72vw,260px)}.docs-index .docs-index-list-current{display:none}.docs-index a{min-height:44px;padding:8px 10px;border-left:0;border-bottom:2px solid transparent;background:var(--bg2)}.docs-index a[aria-current="page"]{border-bottom-color:var(--amber)}.pathfinder-row{grid-template-columns:minmax(160px,.6fr) minmax(0,1fr)}.pathfinder-links{grid-column:1/-1;justify-content:flex-start;padding-bottom:18px}.faq-provenance{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.pathfinder-row{grid-template-columns:1fr;gap:6px;padding:18px 0}.pathfinder-links{grid-column:auto;padding:0}.content-hero h1{font-size:clamp(38px,12vw,54px)}.content-answer{padding-left:16px}.content-table{border-radius:8px}.content-table table{min-width:680px}.faq-provenance{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
@@ -217,7 +238,7 @@ header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
   linear-gradient(90deg,rgba(10,12,16,.96) 0%,rgba(10,12,16,.8) 36%,rgba(10,12,16,.24) 68%,rgba(10,12,16,.04) 100%),
   linear-gradient(0deg,rgba(10,12,16,.9) 0%,rgba(10,12,16,.08) 65%,rgba(10,12,16,.62) 100%);z-index:1}
 .crumbs{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-bottom:22px}.crumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none}.crumbs li+li:before{content:"/";margin-right:6px;color:rgba(255,255,255,.3)}
-.crumbs a:hover{color:var(--amber)}
+.crumbs a{min-height:40px;display:inline-flex;align-items:center}.crumbs a:hover{color:var(--amber)}
 h1{font-weight:700;font-size:clamp(34px,5vw,62px);line-height:1.06;letter-spacing:0;max-width:18ch}
 .lede{margin-top:24px;max-width:70ch;color:var(--dim)}
 .meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
@@ -257,6 +278,7 @@ a.chip:active{scale:.96}
 .runtime-evidence-disclosure dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;margin-top:16px;overflow:hidden;border-radius:10px;background:var(--line)}.runtime-evidence-disclosure dl div{padding:11px 12px;background:var(--bg2)}.runtime-evidence-disclosure dt{font:10px/1.35 var(--mono);color:var(--dim)}.runtime-evidence-disclosure dd{margin-top:4px;font:500 10px/1.35 var(--mono);color:var(--amber)}.runtime-evidence-disclosure dd[data-verdict="PASS"]{color:var(--lime)}
 .runtime-evidence-disclosure ul{margin:15px 0 0;padding-left:20px}.runtime-evidence-disclosure li{margin-top:5px;color:var(--dim);font-size:14px}
 .evidence-report-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:10px}.evidence-report-links a{display:grid;gap:6px;min-height:72px;padding:14px;border:1px solid var(--line);border-radius:11px;background:var(--bg2)}.evidence-report-links code{color:var(--cyan);font:11px/1.4 var(--mono);overflow-wrap:anywhere}.evidence-report-links span{color:var(--dim);font:10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.05em}
+.skill-guides{margin-top:52px;padding-top:22px;border-top:1px solid var(--line)}.skill-guides h3{font-size:22px}.skill-guides ul{margin-top:12px;list-style:none;border-top:1px solid var(--line)}.skill-guides li{border-bottom:1px solid var(--line)}.skill-guides a{min-height:52px;display:grid;grid-template-columns:120px minmax(0,1fr);align-items:center;gap:18px;color:var(--dim);font-size:14px;transition-property:color,scale;transition-duration:160ms}.skill-guides a span{font:9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}.skill-guides a:hover{color:var(--amber)}.skill-guides a:active{scale:.96}
 @media (max-width:720px){
   .skill-hero{min-height:auto;padding:58px 0 52px}
   .skill-hero-bg{opacity:.3}
@@ -267,56 +289,61 @@ a.chip:active{scale:.96}
 </style>
 </head>
 <body>
-<a class="skip-link" href="#main-content">Skip to content</a><div class="site-nav"><div class="wrap"><nav aria-label="Primary navigation">
-  <a class="brand" href="../">Three.js WebGPU Skill&nbsp;Pack</a>
-  <div class="links"><a href="../#matrix">How it works</a><a href="../#flagships">Examples</a><a href="../#skills">Skills</a><a href="../#labs">Labs</a><a href="../evidence/">Evidence</a><a href="../#install">Install</a><a href="../about/">Method</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub&nbsp;↗</a></div>
-</nav></div></div>
+<a class="skip-link" href="#main-content">Skip to content</a><header class="site-nav"><div class="wrap">
+  <a class="brand" href="/">Three.js WebGPU Skill&nbsp;Pack</a>
+  <nav class="links" aria-label="Primary navigation"><a href="/#flagships">Examples</a><a href="/#skills">Skills</a><a href="/guides/">Guides</a><a href="/evidence/">Evidence</a><a href="/#install">Install</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">GitHub</a></nav>
+</div></header>
 
 <main id="main-content" tabindex="-1">
-<header class="">
+<header class="skill-hero">
+  <picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/integration-image-pipeline-ao/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/integration-image-pipeline-ao/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/integration-image-pipeline-ao/final.design.png" alt="" class="skill-hero-bg" aria-hidden="true" width="1200" height="800" fetchpriority="high" decoding="async" />
+        </picture>
   <div class="wrap">
     <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Cameras, Lighting, and Final Image</a></li><li aria-current="page">Ambient Contact Shading</li></ol></nav>
     <h1 style="view-transition-name:skill-threejs-ambient-contact-shading">Ambient Contact Shading</h1>
-    <p class="lede">Design and implement ambient visibility in Three.js r185 WebGPU/TSL, including the forward-lighting placement cost, GTAO input/reconstruction choices, temporal gates, mobile bandwidth, and optional bent normals.</p>
+    <p class="lede">Ground indirect lighting with ambient visibility in Three.js r185 WebGPU/TSL. Use when choosing authored material AO, dynamic GTAO, forward-lighting placement, reduced-resolution reconstruction, temporal AO, or bent normals.</p>
+    <p class="hero-evidence-caption">Image: Image-pipeline AO integration final presentation (from demo browserEntry). Source lab: integration-image-pipeline-ao.</p>
     <div class="meta-row">
       <span class="chip a">$threejs-ambient-contact-shading</span>
-      <span class="chip">2 primary implementations</span>
-<span class="chip">2 flagships</span>
-<span class="chip">1 secondary surface</span>
-      <span class="chip">native evidence pending</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-12T14:48:34+03:00">2026-07-12</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/64e4201d36ab48ce0a094a2e9ca55055b68ea8c0">commit 64e4201 ↗</a>
-      <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-ambient-contact-shading/SKILL.md">SKILL.md on GitHub ↗</a>
-      <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/threejs-ambient-contact-shading/SKILL.md">raw (for agents) ↗</a>
+      <span class="chip">2 primary targets</span>
+      <span class="chip">2 flagships</span>
+      <span class="chip">1 secondary surface</span>
+      <span class="chip">accepted runtime evidence</span>
+      <span class="chip">Latest skill update <time datetime="2026-07-16T11:00:33+03:00">2026-07-16</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/2ce13bcc22695dafa808d6019452752d9a39cc71">commit 2ce13bc ↗</a>
+      <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-ambient-contact-shading/SKILL.md">SKILL.md on GitHub ↗</a>
+      <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/skills/threejs-ambient-contact-shading/SKILL.md">raw (for agents) ↗</a>
     </div>
   </div>
 </header>
 
 
   <section class="section" id="primary-implementations" aria-labelledby="primary-implementations-title"><div class="wrap">
-    <h2 id="primary-implementations-title">Primary implementation surface</h2>
-    <p class="sub">These routes are generated from canonical source. Their exact status remains separate from implementation availability.</p>
+    <h2 id="primary-implementations-title">Primary target surface</h2>
+    <p class="sub">These rendering routes are generated from canonical source. Native-WebGPU acceptance remains separate from entrypoint availability.</p>
     <div class="grid">
       <a class="card" href="../demos/webgpu-node-gtao/">
-        <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="webgpu-node-gtao">
+        <span class="primary-evidence-panel " data-evidence-state="accepted" data-preview-for="webgpu-node-gtao">
     <span class="primary-evidence-label">Canonical capture</span>
-    <strong>Runtime evidence pending</strong>
-    <span><code>1f8f4fbc0e5e</code> source hash</span>
+    <strong>Accepted evidence published</strong>
+    <span><code>d151b7e9512b</code> source hash</span>
     <span>16 fixed states · 6 runtime proof requirements</span>
   </span>
-        <span class="card-head"><span class="card-kind">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+        <span class="card-head"><span class="card-kind">Canonical lab</span><span class="status status--accepted">Accepted</span></span>
         <h3>WebGPU Node GTAO</h3>
         <p>7 fixed scenarios, 6 mechanism routes, and 3 locked tiers.</p>
         <span class="card-meta">Open published implementation →</span>
       </a>
       <a class="card" href="../demos/integration-image-pipeline-ao/">
-        <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="integration-image-pipeline-ao">
-    <span class="primary-evidence-label">Canonical capture</span>
-    <strong>Runtime evidence pending</strong>
-    <span><code>537c8cde4852</code> source hash</span>
-    <span>8 fixed states · 7 runtime proof requirements</span>
-  </span>
-        <span class="card-head"><span class="card-kind">Integration</span><span class="status status--pending">Evidence pending</span></span>
+        <span class="card-preview-wrap" data-preview-for="integration-image-pipeline-ao" data-preview-source="integration-image-pipeline-ao" data-preview-classification="inspected-runtime-evidence-preview"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/integration-image-pipeline-ao/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/integration-image-pipeline-ao/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/integration-image-pipeline-ao/final.design.png" alt="Image-pipeline AO integration final presentation (from demo browserEntry) for Image Pipeline and Material-context AO Integration" class="card-preview" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><span class="media-caption">Image-pipeline AO integration final presentation (from demo browserEntry)</span></span>
+        <span class="card-head"><span class="card-kind">Integration</span><span class="status status--accepted">Accepted</span></span>
         <h3>Image Pipeline and Material-context AO Integration</h3>
         <p>2 fixed scenarios, 3 mechanism routes, and 3 locked tiers.</p>
         <span class="card-meta">Open published implementation →</span>
@@ -329,13 +356,12 @@ a.chip:active{scale:.96}
     <p class="sub">This skill contributes to the following cross-skill owner graphs.</p>
     <div class="grid">
       <a class="card" href="../demos/final-image-flight/">
-        <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="final-image-flight">
-    <span class="primary-evidence-label">Canonical capture</span>
-    <strong>Runtime evidence pending</strong>
-    <span><code>0e56ab6926da</code> source hash</span>
-    <span>10 fixed states · 12 runtime proof requirements</span>
-  </span>
-        <span class="card-head"><span class="card-kind">Final image systems</span><span class="status status--pending">Evidence pending</span></span>
+        <span class="card-preview-wrap" data-preview-for="final-image-flight" data-preview-source="final-image-flight" data-preview-classification="inspected-runtime-evidence-preview"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/final-image-flight/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/final-image-flight/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/final-image-flight/final.design.png" alt="Accepted demo-sourced runtime evidence for Final Image Flight" class="card-preview" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><span class="media-caption">Accepted demo-sourced runtime evidence</span></span>
+        <span class="card-head"><span class="card-kind">Final image systems</span><span class="status status--accepted">Accepted</span></span>
         <h3>Final Image Flight</h3>
         <span class="card-meta">6 mechanisms · 3 locked tiers</span>
       </a>
@@ -343,7 +369,7 @@ a.chip:active{scale:.96}
         <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="procedural-district">
     <span class="primary-evidence-label">Canonical capture</span>
     <strong>Runtime evidence pending</strong>
-    <span><code>919817c6e63f</code> source hash</span>
+    <span><code>3c2448b5b07d</code> source hash</span>
     <span>10 fixed states · 4 runtime proof requirements</span>
   </span>
         <span class="card-head"><span class="card-kind">Authored procedural world</span><span class="status status--pending">Evidence pending</span></span>
@@ -356,7 +382,7 @@ a.chip:active{scale:.96}
   <section class="section" id="evidence-reports" aria-labelledby="evidence-reports-title"><div class="wrap">
     <h2 id="evidence-reports-title">Evidence reports</h2>
     <p class="sub">Source hashes, claim verdicts, promoted same-lab media, fixed routes, exact tier contracts, and current limitations.</p>
-    <nav class="evidence-report-links" aria-label="Evidence reports for Ambient Contact Shading"><a href="../evidence/webgpu-node-gtao/"><code>webgpu-node-gtao</code><span>evidence pending</span></a><a href="../evidence/integration-image-pipeline-ao/"><code>integration-image-pipeline-ao</code><span>evidence pending</span></a><a href="../evidence/final-image-flight/"><code>final-image-flight</code><span>evidence pending</span></a><a href="../evidence/procedural-district/"><code>procedural-district</code><span>evidence pending</span></a></nav>
+    <nav class="evidence-report-links" aria-label="Evidence reports for Ambient Contact Shading"><a href="../evidence/webgpu-node-gtao/"><code>webgpu-node-gtao</code><span>accepted</span></a><a href="../evidence/integration-image-pipeline-ao/"><code>integration-image-pipeline-ao</code><span>accepted</span></a><a href="../evidence/final-image-flight/"><code>final-image-flight</code><span>accepted</span></a><a href="../evidence/procedural-district/"><code>procedural-district</code><span>evidence pending</span></a></nav>
   </div></section>
 
   <div class="section" id="approach"><div class="wrap">
@@ -375,338 +401,248 @@ indirect diffuse term of the lighting equation — the composition point is the 
   </div></div>
 
 
+  <div class="section" id="examples"><div class="wrap">
+    <h2>Accepted primary labs</h2>
+    <p class="sub">Only schema-v2 labs with accepted runtime and evidence contracts appear here. Other source directories remain visible through the demo registry without being promoted to runnable proof.</p>
+    <div class="grid">
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-ambient-contact-shading/examples/integration-image-pipeline-ao">
+        <h4>integration-image-pipeline-ao</h4>
+        <span class="card-meta">threejs-ambient-contact-shading/examples/integration-image-pipeline-ao</span>
+      </a>
+      <a class="card" href="https://github.com/linegel/threejs-complete-set-of-skill/tree/main/threejs-ambient-contact-shading/examples/webgpu-node-gtao">
+        <h4>webgpu-node-gtao</h4>
+        <span class="card-meta">threejs-ambient-contact-shading/examples/webgpu-node-gtao</span>
+      </a>
+    </div>
+  </div></div>
 
   <div class="section" id="validation"><div class="wrap">
     <h2>Preview and evidence ledger</h2>
-    <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; canonical acceptance still requires render-target readback and a schema-v2 bundle.</p>
-    <div class="evidence-ledger"><span class="status status--pending">Canonical runtime evidence pending</span><code>0 published images</code></div>
-
-    <div class="primary-evidence-panel" data-evidence-state="incomplete"><span class="primary-evidence-label">Same-lab evidence</span><strong>No runtime image promoted</strong><span>The page remains image-free until this skill's own lab supplies hash-bound pixels.</span></div>
+    <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; rendering acceptance still requires same-lab readback and a schema-v2 bundle.</p>
+    <div class="evidence-ledger"><span class="status status--accepted">Accepted runtime evidence available</span><code>9 published images</code></div>
+<div class="runtime-evidence-disclosures">
+      <article class="runtime-evidence-disclosure" data-acceptance-status="accepted">
+        <div class="runtime-evidence-head"><div><code>Native WebGPU runtime evidence preview</code><h3>Image Pipeline and Material-context AO Integration</h3></div><span class="status status--accepted">Accepted</span></div>
+        <dl><div><dt>visualCorrectness</dt><dd data-verdict="PASS">PASS</dd></div><div><dt>mechanismCorrectness</dt><dd data-verdict="PASS">PASS</dd></div><div><dt>performanceCompliance</dt><dd data-verdict="NOT_CLAIMED">NOT_CLAIMED</dd></div><div><dt>gpuAttribution</dt><dd data-verdict="NOT_CLAIMED">NOT_CLAIMED</dd></div><div><dt>lifecycleStability</dt><dd data-verdict="PASS">PASS</dd></div><div><dt>visualError</dt><dd data-verdict="PASS">PASS</dd></div></dl>
+        <ul><li>Evidence pixels are native-WebGPU readbacks from threejs-ambient-contact-shading/examples/integration-image-pipeline-ao/index.html (the live demo), not substitute gallery art.</li><li>Tracked v2 release bundle: docs/visual-validation/integration-image-pipeline-ao/bundle.</li><li>hardwarePerformance remains NOT_CLAIMED without named-adapter GPU timestamps.</li></ul>
+      </article></div>
+    <div class="gallery">
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="integration-image-pipeline-ao" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/integration-image-pipeline-ao/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/integration-image-pipeline-ao/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/integration-image-pipeline-ao/final.design.png" alt="Ambient Contact Shading: Image-pipeline AO integration final presentation (from demo browserEntry)" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Image-pipeline AO integration final presentation (from demo browserEntry)</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="integration-image-pipeline-ao" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/integration-image-pipeline-ao/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="../visual-validation/integration-image-pipeline-ao/diagnostics.mosaic.webp" />
+          <img data-responsive-preview src="../visual-validation/integration-image-pipeline-ao/diagnostics.mosaic.png" alt="Ambient Contact Shading: diagnostics.mosaic.png from demo capture" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>diagnostics.mosaic.png from demo capture</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="integration-image-pipeline-ao" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/integration-image-pipeline-ao/camera.near.avif" />
+          <source type="image/webp" srcset="../visual-validation/integration-image-pipeline-ao/camera.near.webp" />
+          <img data-responsive-preview src="../visual-validation/integration-image-pipeline-ao/camera.near.png" alt="Ambient Contact Shading: camera.near.png from demo capture" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>camera.near.png from demo capture</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="integration-image-pipeline-ao" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/integration-image-pipeline-ao/camera.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/integration-image-pipeline-ao/camera.design.webp" />
+          <img data-responsive-preview src="../visual-validation/integration-image-pipeline-ao/camera.design.png" alt="Ambient Contact Shading: camera.design.png from demo capture" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>camera.design.png from demo capture</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="integration-image-pipeline-ao" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/integration-image-pipeline-ao/camera.far.avif" />
+          <source type="image/webp" srcset="../visual-validation/integration-image-pipeline-ao/camera.far.webp" />
+          <img data-responsive-preview src="../visual-validation/integration-image-pipeline-ao/camera.far.png" alt="Ambient Contact Shading: camera.far.png from demo capture" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>camera.far.png from demo capture</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="integration-image-pipeline-ao" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/integration-image-pipeline-ao/seed-0001.final.avif" />
+          <source type="image/webp" srcset="../visual-validation/integration-image-pipeline-ao/seed-0001.final.webp" />
+          <img data-responsive-preview src="../visual-validation/integration-image-pipeline-ao/seed-0001.final.png" alt="Ambient Contact Shading: seed-0001.final.png from demo capture" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>seed-0001.final.png from demo capture</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="integration-image-pipeline-ao" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/integration-image-pipeline-ao/seed-9e3779b9.final.avif" />
+          <source type="image/webp" srcset="../visual-validation/integration-image-pipeline-ao/seed-9e3779b9.final.webp" />
+          <img data-responsive-preview src="../visual-validation/integration-image-pipeline-ao/seed-9e3779b9.final.png" alt="Ambient Contact Shading: seed-9e3779b9.final.png from demo capture" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>seed-9e3779b9.final.png from demo capture</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="integration-image-pipeline-ao" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/integration-image-pipeline-ao/temporal.t000.avif" />
+          <source type="image/webp" srcset="../visual-validation/integration-image-pipeline-ao/temporal.t000.webp" />
+          <img data-responsive-preview src="../visual-validation/integration-image-pipeline-ao/temporal.t000.png" alt="Ambient Contact Shading: temporal.t000.png from demo capture" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>temporal.t000.png from demo capture</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="integration-image-pipeline-ao" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/integration-image-pipeline-ao/temporal.t001.avif" />
+          <source type="image/webp" srcset="../visual-validation/integration-image-pipeline-ao/temporal.t001.webp" />
+          <img data-responsive-preview src="../visual-validation/integration-image-pipeline-ao/temporal.t001.png" alt="Ambient Contact Shading: temporal.t001.png from demo capture" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>temporal.t001.png from demo capture</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure></div>
   </div></div>
 
 <div class="section" id="skill-text"><div class="wrap">
   <h2>The full skill</h2>
-  <p class="sub">The complete SKILL.md as loaded by agents — verbatim, rendered.</p>
+  <p class="sub">The complete SKILL.md as loaded by agents, rendered verbatim.</p>
   <div class="skilltext"><h2>Ambient Contact Shading</h2>
 <p>AO is visibility of indirect illumination. It may attenuate indirect diffuse and
-environment/specular response; it must not multiply direct light, emission, UI,
-or a tone-mapped frame.</p>
-<p>Use <code>$threejs-choose-skills</code> for renderer and budget preflight. Use
-<code>$threejs-image-pipeline</code> when depth, normal, velocity, history, tone mapping,
-or adaptive resolution are shared.</p>
-<h2>Numeric provenance</h2>
-<p>Every quantitative claim is tagged:</p>
-<ul>
-<li><strong>[Derived]</strong> follows from r185 source or an explicit formula.</li>
-<li><strong>[Gated]</strong> is a branch condition that must pass on the target scene/device.</li>
-<li><strong>[Measured]</strong> is recorded target-device evidence, never a portable promise.</li>
-<li><strong>[Authored]</strong> is a starting value or planning ceiling, not a fact of hardware.</li>
-</ul>
-<p>Release numbers and list ordering are identifiers, not tuning claims.</p>
-<h2>Decide whether screen AO is the right algorithm</h2>
-<p>Use the first row whose gate passes:</p>
+environment/specular response. Direct light, emission, UI, and the tone-mapped
+frame remain invariant.</p>
+<p><code>$threejs-choose-skills</code> is an optional multi-system coordinator. Use
+<code>$threejs-image-pipeline</code> when AO shares depth, normals, velocity, history, or
+final-output ownership.</p>
+<h2>1. Choose the ambient-visibility branch</h2>
+<p>Use the first branch whose gate passes:</p>
 <table>
 <thead>
 <tr>
-<th>Situation</th>
-<th>Algorithm</th>
-<th>Gate and consequence</th>
+<th>Gate</th>
+<th>Branch</th>
+<th>Consequence</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>Static or slowly changing local occlusion can be authored in assets</td>
+<td>Required occlusion is static/local and can be authored in assets</td>
 <td>material <code>aoMap</code> / <code>aoNode</code></td>
-<td>Prefer it: one forward scene render and correct lighting placement. Dynamic inter-object contact is absent.</td>
+<td>One forward render; no dynamic inter-object contact.</td>
 </tr>
 <tr>
-<td>The renderer already exposes an indirect-light term or uses deferred lighting</td>
+<td>Dynamic screen contact is required and the renderer exposes indirect lighting separately</td>
 <td>apply GTAO visibility to that term</td>
-<td>One geometry pass can remain possible; the lighting decomposition owns correctness.</td>
+<td>One geometry pass can remain possible.</td>
 </tr>
 <tr>
-<td>Stock r185 forward <code>NodeMaterial</code> lighting and dynamic screen contact are required</td>
+<td>Stock forward <code>NodeMaterial</code> needs dynamic contact and the complete marginal cost passes</td>
 <td>depth/normal pass -&gt; GTAO -&gt; optional reconstruction -&gt; second lit pass with <code>builtinAOContext()</code></td>
-<td>Correct placement costs a second scene traversal and shaded scene render. Accept only when <code>measuredMarginalAO &lt;= declaredMarginalAOBudget</code> <strong>[Gated]</strong>.</td>
+<td>Correct placement costs two scene traversals.</td>
 </tr>
 <tr>
-<td>The previous rows fail their quality or budget gate</td>
+<td>No previous branch meets its quality and cost gates</td>
 <td>omit screen AO</td>
-<td>Keep direct shadows, materials, and silhouette readable. Do not replace ambient visibility with a final-color multiply.</td>
+<td>Preserve materials, direct shadows, and silhouette readability.</td>
 </tr>
 </tbody></table>
-<p>The second lit pass is not an implementation detail. r185 <code>GTAONode</code> needs
-current depth/normal before AO exists, while <code>builtinAOContext()</code> must be present
-when materials are lit. A single stock forward pass cannot satisfy both
-dependencies. If the first pass exists only for AO, count its color attachment,
-material evaluation, deformation, alpha testing, draw submission, and depth/
-normal writes; calling it a cheap prepass is incorrect.</p>
-<h2>r185 API proof and non-negotiable constraints</h2>
-<p>Verified against installed <code>three@0.185.1</code> <strong>[Measured]</strong>:</p>
-<table>
-<thead>
-<tr>
-<th>Fact</th>
-<th>Local proof</th>
-<th>Decision</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>ao(depthNode, normalNode, camera)</code> exists; <code>normalNode</code> may be <code>null</code></td>
-<td><code>examples/jsm/tsl/display/GTAONode.js</code></td>
-<td>Use the built-in node as the scalar baseline.</td>
-</tr>
-<tr>
-<td><code>GTAONode.resolutionScale</code> is a property; it has no <code>setResolutionScale()</code></td>
-<td>same source</td>
-<td>Assign the property directly.</td>
-</tr>
-<tr>
-<td>Scalar AO target is <code>RedFormat</code>; its default scale is <code>1</code> <strong>[Derived]</strong></td>
-<td>same source</td>
-<td>Scalar visibility does not need an HDR RGBA target. Start below full resolution only with a reconstruction/temporal plan.</td>
-</tr>
-<tr>
-<td><code>DenoiseNode</code> is an inline node with center plus <code>16</code> neighbor samples <strong>[Derived]</strong></td>
-<td><code>DenoiseNode.js</code></td>
-<td>If inserted directly into a material context, its taps execute per shaded fragment. Materialize once with <code>rtt()</code> when a full-screen reconstruction pass is intended.</td>
-</tr>
-<tr>
-<td>Depth-normal reconstruction performs <code>9</code> depth loads per normal evaluation <strong>[Derived]</strong></td>
-<td><code>src/nodes/utils/PostProcessingUtils.js</code></td>
-<td>Reconstructing normals is not free; avoid it inside a <code>17</code>-sample denoise.</td>
-</tr>
-<tr>
-<td><code>useTemporalFiltering</code> only rotates the GTAO pattern; <code>TRAANode</code> supplies history/reprojection</td>
-<td><code>GTAONode.js</code>, <code>TRAANode.js</code></td>
-<td>Never enable it without a live TRAA resolve.</td>
-</tr>
-<tr>
-<td>r185 <code>GTAONode</code> has no reversed-depth branch and rejects sky with <code>depth &gt;= 1</code> <strong>[Derived]</strong></td>
-<td><code>GTAONode.js</code></td>
-<td>Stock GTAO is gated to non-reversed depth. Do not claim reversed-depth support without a tested custom adapter/node.</td>
-</tr>
-<tr>
-<td><code>TRAANode</code> restarts history on resize but exposes no public camera-cut reset <strong>[Derived]</strong></td>
-<td><code>TRAANode.js</code></td>
-<td>On a camera/projection discontinuity, replace and dispose the TRAA node, replace the output graph, and set <code>RenderPipeline.needsUpdate = true</code>.</td>
-</tr>
-<tr>
-<td><code>builtinAOContext()</code> skips transparent materials <strong>[Derived]</strong></td>
-<td><code>src/nodes/core/ContextNode.js</code></td>
-<td>Transparent indirect occlusion needs an authored material policy; do not assume the context affects it.</td>
-</tr>
-<tr>
-<td>A texture node without an explicit coordinate falls back to mesh <code>uv()</code> in a material graph <strong>[Derived]</strong></td>
-<td><code>src/nodes/accessors/TextureNode.js</code>, <code>UV.js</code></td>
-<td>Feed the context <code>visibilityTexture.sample(screenUV).r</code>; using <code>.r</code> directly maps AO through each mesh&#39;s UVs.</td>
-</tr>
-</tbody></table>
-<p>Initialize and hard-gate WebGPU before graph construction:</p>
-<pre><code class="language-js">await renderer.init();
-
-if ( renderer.backend.isWebGPUBackend !== true ) {
-  throw new Error( &#39;threejs-ambient-contact-shading requires WebGPU.&#39; );
-}
-
-if ( renderer.reversedDepthBuffer === true ) {
-  throw new Error( &#39;r185 GTAONode baseline is not validated for reversed depth.&#39; );
-}
-</code></pre>
-<p>There is no non-WebGPU implementation in this skill.</p>
-<h2>Production graph</h2>
-<pre><code class="language-text">shared-or-AO-owned scene pass: depth + optional normal/velocity
-  -&gt; GTAONode scalar visibility
-  -&gt; optional materialized depth+normal-aware reconstruction
-  -&gt; second forward scene pass with builtinAOContext(visibility)
-  -&gt; optional TRAANode over final HDR beauty
-  -&gt; single tone-map/output-transform owner
-</code></pre>
-<p>Rules:</p>
+<p>r185 <code>GTAONode</code> needs current depth/normal before AO exists, while
+<code>builtinAOContext()</code> must be present during material lighting. Treat the first
+pass as a full material/deformation/alpha-tested scene pass unless a parity-
+proven depth/normal-only pass replaces it.</p>
+<p><strong>Complete when:</strong> the chosen branch names the indirect-light owner and either
+charges every added pass/attachment or records screen AO as omitted.</p>
+<h2>2. Fix the input contract</h2>
 <ul>
-<li>Share an existing depth/normal/velocity pass when it is already required. Do
-not create duplicate G-buffers.</li>
-<li>A half-scale raw AO texture receives only ordinary texture filtering when
-sampled at full resolution; that is not bilateral reconstruction.</li>
-<li>Use <code>rtt(denoise(...))</code> to materialize reconstruction once before the second
-scene pass. Directly embedding <code>denoise(...)</code> in <code>builtinAOContext()</code> repeats
-its taps over scene overdraw.</li>
-<li>Sample the materialized texture with <code>screenUV</code> before passing it to
-<code>builtinAOContext()</code>. Pass textures default to fullscreen <code>uv()</code> only while
-evaluated by a fullscreen quad; material evaluation otherwise resolves
-ordinary mesh UV attributes.</li>
-<li>Use the full-resolution normal MRT when reconstruction is enabled or when
-another effect already owns normals. For raw reduced-resolution GTAO alone,
-benchmark a normal attachment against depth reconstruction.</li>
-<li>Keep scalar visibility in a single channel. Use <code>RGBA16F</code> only when a custom
-bent direction and scalar visibility must coexist.</li>
-<li>Bypass inactive AO nodes. Zeroing strength while keeping dependencies in the
-output graph still executes work.</li>
+<li>Initialize the renderer and require a WebGPU backend before graph creation.
+Stock r185 GTAO is gated to standard depth; a custom reversed-depth adapter
+must prove sky classification, reconstruction, and occluder ordering.</li>
+<li>Define opaque occluders, opaque receivers, alpha coverage, and one transparent
+policy: no screen AO, authored material AO, or a validated custom lighting
+model. Stock <code>builtinAOContext()</code> skips transparent materials.</li>
+<li>Bind AO to the active view&#39;s <code>screenUV</code>, drawing-buffer dimensions, and
+projection. Keep width and height independent for non-square/asymmetric views.</li>
+<li>Choose depth-reconstructed normals for reduced raw AO only when edge fixtures
+and target timing pass. Choose an MRT normal when it is shared, reconstruction
+is materialized, smooth/thin geometry fails, or its measured attachment delta
+is cheaper.</li>
+<li>Express physical contact radii in world units:
+<code>radiusRender = radiusMeters * renderUnitsPerMeter</code>, with the same conversion
+for dimensioned thickness and bias. An authored-look branch instead declares
+scene-unit-only controls and revalidates them after asset/world scaling.</li>
 </ul>
-<p>Read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-ambient-contact-shading/references/gtao-bent-normal-pipeline.md">references/gtao-bent-normal-pipeline.md</a>
-for the exact graph, tap model, memory equations, temporal contract, and bent-
-normal validation.</p>
-<h2>Physics Scale And Presentation Contract</h2>
-<p>When the route declares physical metre-scale contact, resolve AO distances
-through <code>PhysicsContext</code> and the current presentation transform in the
-<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/threejs-choose-skills/references/physics-domain-and-interaction-contract.md">physics domain and interaction contract</a>.
-Let <code>sRender</code> be <code>CameraViewPublication.globalToRenderCurrent.renderUnitsPerMeter</code>:</p>
-<pre><code class="language-text">radiusRender    = radiusMeters    * sRender                  [Derived]
-thicknessRender = thicknessMeters * sRender                  [Derived]
-biasRender      = biasMeters      * sRender                  [Derived]
+<p>When another system supplies scale, motion, or resources, bind units, coordinate
+frame, current/previous presentation times, authority, version, resource
+generation, validity, and reset conditions before using those inputs.</p>
+<p><strong>Complete when:</strong> depth convention, screen coordinates, normal source,
+transparency, scale meaning, and every external producer are explicit and
+dimensionally compatible.</p>
+<h2>3. Materialize scalar visibility</h2>
+<p>Build the selected screen-space branch in this order:</p>
+<pre><code class="language-text">shared-or-AO-owned depth + optional normal/velocity
+  -&gt; GTAO scalar visibility
+  -&gt; optional materialized edge-aware reconstruction
+  -&gt; indirect-light application
+  -&gt; optional temporal resolve
+  -&gt; one tone-map/output-transform owner
 </code></pre>
-<p>For the ordinary authored-world mapping, gate
-<code>sRender = 1 / PhysicsContext.metersPerWorldUnit</code>; a deliberate visualization
-rescale declares a new <code>RenderSimilarityTransform.transformRevision</code> and uses
-its exact dimensioned transform. <code>biasRender</code> applies only to a custom AO bias that is dimensionally a world
-distance; normalized-depth or angular biases retain their own declared units.
-If the route intentionally uses perceptual scene units, label radius,
-thickness, and bias as scene-unit-only and do not compare them across scaled
-assets, physics contexts, or rebases as metres. A static/stylistic route may use
-this mode without instantiating the physics ABI.</p>
-<p>Latch the immutable central <code>PhysicsPresentationSnapshot</code> and resolve its exact
-Candidate, <code>CameraViewPublication</code>, and <code>ViewPreparationPublication</code>; do not
-define an AO-local subset. AO, depth, velocity, camera, and downstream history
-consume candidate pair refs/signal descriptors, camera transforms/matrices, and
-the preparation reactive/reset plan from the same chain. Temporal velocity uses adjacent
-presented poses, never fixed-step endpoints. A compensated origin rebase keeps
-AO radius, depth, and motion invariant only when previous/current uniform scales
-are equal. A scale change converts AO parameters and resets/reseeds history; it
-is not an origin rebase.</p>
-<p>The Candidate supplies pose/deformation pairs, the camera publication supplies
-complete render transforms/matrices, and the Snapshot references both plus the
-preparation publication. Depth, normal, and velocity are target/view render-pass
-resources produced after sealing and carry their image-pipeline resource
-versions; never misclassify those attachments as physics provider signals.</p>
-<p>Reset/reject AO history for changed geometry/deformation/coverage, camera or
-projection discontinuity, uncompensated rebase, AO scale/parameter change, or
-quality/resolution migration. A shadow or emissive-only radiance change does
-not change scalar ambient visibility; preserve AO history, but propagate its
-radiance-reactive mask to a downstream color history only when that temporal
-implementation supports it. Stock r185 <code>TRAANode</code> does not; use evidenced
-rebuild/bypass/reseed or a conservative full reset. When no local mask can
-bound a geometry discontinuity, reset the affected history conservatively.
-<code>ViewPreparationPublication.resetDependencies</code> is immutable; append executed actions to
-<code>FrameExecutionRecord</code>. Device loss appends a <code>FrameExecutionRecord</code> with
-<code>overallStatus: device-lost</code>, affected target execution statuses
-<code>device-lost</code>, cancelled dependent actions, and lost-generation entries in
-<code>leaseDispositionById</code>; it invalidates AO/history resources and timing proof without
-mutating the sealed snapshot. Rebuild under the new backend/resource generation.</p>
-<h2>Quality gates</h2>
-<table>
-<thead>
-<tr>
-<th>Tier</th>
-<th>Authored start</th>
-<th>Mandatory gate</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Full</td>
-<td>scale <code>0.5</code>, samples <code>16</code>, MRT normal, materialized denoise, optional TRAA <strong>[Authored]</strong></td>
-<td>Complete marginal cost including the second scene pass fits; thin silhouettes and camera cuts pass.</td>
-</tr>
-<tr>
-<td>Balanced</td>
-<td>scale <code>0.5</code>, samples <code>8-12</code>, MRT normal if shared, no temporal history <strong>[Authored]</strong></td>
-<td>Raw/denoised edge error passes fixed-view comparison; no cross-edge halo.</td>
-</tr>
-<tr>
-<td>Constrained WebGPU</td>
-<td>scale <code>0.25-0.33</code>, samples <code>8</code>, depth-reconstructed normal only if it beats the MRT attachment <strong>[Authored]</strong></td>
-<td>Target-device GPU time and tile bandwidth pass; otherwise omit screen AO.</td>
-</tr>
-</tbody></table>
-<p><code>samples</code> is not the number of depth taps. In r185:</p>
-<pre><code class="language-text">D = samples &lt; 30 ? 3 : 5                         [Derived]
-S = floor((samples + D - 1) / D)                [Derived]
-horizon depth taps per GTAO pixel = 2 * D * S    [Derived]
-samples = 16 -&gt; 36 depth taps                    [Derived]
-samples = 8  -&gt; 18 depth taps                    [Derived]
-</code></pre>
-<p>Increase samples only after scale, radius, reconstruction, and temporal policy
-have been validated.</p>
-<h2>Composable marginal budget</h2>
-<p>Measure toggles with the same camera path and warmed pipelines:</p>
-<pre><code class="language-text">deltaAO = time(complete AO graph) - time(no-screen-AO graph)       [Measured]
-deltaNormal = time(scene pass with normal) - time(without normal)  [Measured]
-deltaVelocity = analogous velocity attachment delta               [Measured]
-deltaSecondScene = time(second lit pass)                           [Measured]
-route valid iff deltaAO &lt;= declaredMarginalAOBudget                [Gated]
-</code></pre>
-<p>Do not add the shared scene pass twice in a composed budget. Charge only its
-measured attachment delta to AO when another selected system already owns that
-pass; charge the entire first pass when AO created it.</p>
-<p>For the stock half-float <code>PassNode</code> MRT, each extra full-resolution normal or
-velocity attachment is <code>8 * width * height</code> bytes <strong>[Derived]</strong> before MSAA,
-backend padding, and tile scratch. The built-in scalar GTAO target is
-approximately <code>scale^2 * width * height</code> bytes for R8 <strong>[Derived]</strong>. On a tile
-GPU, an extra MRT attachment can reduce tile residency or force stores; this is
-a measured architecture decision, not a desktop assumption.</p>
-<p>Do not seed the search with adapter-class millisecond tables. They hide scene
-complexity, DPR, attachment traffic, browser state, and thermal drift. Start
-from the cheapest representation that can meet the declared contact-radius and
-edge-error gates, then measure <code>deltaAO</code>, <code>deltaNormal</code>,
-<code>deltaVelocity</code>, and any <code>deltaSecondScene</code> separately on each named target.
-The product&#39;s marginal AO budget is <strong>[Gated]</strong>; only matched, warmed A/B traces
-are <strong>[Measured]</strong>.</p>
-<h2>Visual wrongness signatures</h2>
-<table>
-<thead>
-<tr>
-<th>Signature</th>
-<th>Cause / action</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Direct highlights or emitters turn gray</td>
-<td>Final-color multiply. Move AO into indirect lighting.</td>
-</tr>
-<tr>
-<td>Dark fringe around a foreground silhouette</td>
-<td>Reduced AO crossed a depth discontinuity; materialize depth+normal-aware reconstruction or reduce thickness/radius.</td>
-</tr>
-<tr>
-<td>Creases look inked at every scale</td>
-<td>Radius/thickness are image-style controls rather than scene-scale contact visibility.</td>
-</tr>
-<tr>
-<td>Contact vanishes at the screen edge or when an occluder leaves view</td>
-<td>Screen-space information loss; accept explicitly or use authored/baked visibility.</td>
-</tr>
-<tr>
-<td>Crawling grain on a static camera</td>
-<td>Too few samples without denoise, or temporal rotation enabled without TRAA.</td>
-</tr>
-<tr>
-<td>Trails behind deforming or alpha-masked geometry</td>
-<td>Invalid velocity/history rejection; disable temporal AO or repair motion vectors.</td>
-</tr>
-<tr>
-<td>Faceted or unstable AO on smooth thin surfaces</td>
-<td>Depth-reconstructed normals failed; use MRT normals or omit AO for that tier.</td>
-</tr>
-<tr>
-<td>AO follows UV seams, stretches per object, or differs across meshes</td>
-<td>The visibility texture used mesh <code>uv()</code>; sample it explicitly with <code>screenUV</code>.</td>
-</tr>
-<tr>
-<td>Camera rotation changes bent tint twice or not at all</td>
-<td>View/world transform or bent-direction sign is wrong. Keep directional tint disabled.</td>
-</tr>
-<tr>
-<td>AO-off timing is unchanged</td>
-<td>The output graph still depends on AO. Replace the graph and mark the pipeline dirty.</td>
-</tr>
-</tbody></table>
-<h2>Ownership boundary</h2>
-<p>This skill owns scalar GTAO, reconstruction choice, ambient-light placement,
-temporal eligibility, optional bent normals, and AO diagnostics. The image-
-pipeline owner controls shared MRTs, global pass order, history, tone mapping,
-output conversion, and adaptive resolution.</p>
+<ul>
+<li>Reuse a shared scene pass; do not create a second G-buffer for AO.</li>
+<li>Raw reduced-resolution AO receives ordinary texture filtering, not bilateral
+reconstruction. When edges fail, evaluate <code>rtt(denoise(...))</code> once, then
+sample the materialized texture with <code>screenUV</code>.</li>
+<li>Inside a mesh material graph, sample both raw and reconstructed visibility
+explicitly with <code>screenUV</code>; implicit texture coordinates resolve to mesh UVs.</li>
+<li>Keep scalar visibility single-channel. Replace the output graph and mark the
+<code>RenderPipeline</code> dirty when AO is disabled so inactive work is unreachable.</li>
+</ul>
+<p>When implementing GTAO or choosing reconstruction, read
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-ambient-contact-shading/references/gtao-bent-normal-pipeline.md#r185-graph-and-api-gates">the r185 GTAO pipeline</a>
+and <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-ambient-contact-shading/references/gtao-bent-normal-pipeline.md#reconstruction-and-cost">its reconstruction tradeoff</a>.</p>
+<p><strong>Complete when:</strong> the active graph has one depth/normal owner, visibility is
+sampled in screen space, AO reaches only indirect lighting, and AO-off removes
+every AO pass and dependency.</p>
+<h2>4. Admit temporal filtering only with valid history</h2>
+<p><code>GTAONode.useTemporalFiltering</code> rotates samples; it does not create or reproject
+history. Enable it only with a live TRAA/custom resolve, valid camera and object
+motion (including deformation/instancing/alpha coverage), matching beauty/depth/
+velocity dimensions, rejection, and reset behavior.</p>
+<p>Reset or reseed on camera/projection cuts, uncompensated rebases, geometry or
+coverage discontinuities, AO parameter/scale/resolution changes, and quality
+migration. r185 <code>TRAANode</code> has no public camera-cut reset: rebuild and dispose
+the node, replace the output graph, and mark the pipeline dirty.</p>
+<p>When temporal AO is selected, read the
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-ambient-contact-shading/references/gtao-bent-normal-pipeline.md#temporal-contract">temporal contract</a>
+before constructing history.</p>
+<p><strong>Complete when:</strong> moving-occluder, disocclusion, camera-cut, resize, and AO-
+parameter-change fixtures either pass with explicit rejection/reset or temporal
+AO is disabled.</p>
+<h2>5. Add bent normals only after scalar AO passes</h2>
+<p>A bent normal is the visibility-weighted mean unoccluded direction. Add this
+branch only when scalar AO already passes, directional environment response is
+visible and required, and the one-wall fixture proves the direction points away
+from the blocked hemisphere.</p>
+<p>When bent normals are selected, read the
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-ambient-contact-shading/references/gtao-bent-normal-pipeline.md#bent-normal-extension">bent-normal contract</a>
+for basis, filtering, normalization, storage, and sign checks.</p>
+<p><strong>Complete when:</strong> scalar visibility remains independently available, the
+direction is transformed exactly once, and the one-wall fixture passes; otherwise
+directional use stays disabled.</p>
+<h2>6. Verify the finished graph</h2>
+<p>Capture raw depth, normals, raw/reconstructed AO, indirect contribution,
+direct/emissive residuals, velocity/history rejection when present, and AO off.
+Exercise UV-seam meshes, thin silhouettes, transparent crossings, smooth curves,
+screen edges, asymmetric projections, motion, resize, and disposal/recreation.</p>
+<p><strong>Complete when:</strong> direct light and emission are invariant; no UV-following,
+cross-edge halo, seam, crawl, or trail remains in the accepted branch; AO-off
+shows zero AO work; target-device marginal time and resource use pass; and
+recreation returns resource counters to baseline.</p>
+<h2>Ownership</h2>
+<p>This skill owns scalar GTAO, reconstruction choice, indirect-light placement,
+temporal eligibility, bent normals, and AO diagnostics. The image-pipeline owner
+owns shared MRTs, global pass order, history infrastructure, tone mapping, output
+conversion, and adaptive resolution.</p>
 </div>
+  <aside class="skill-guides" aria-labelledby="related-guides-title"><h3 id="related-guides-title">Related guides</h3><ul><li><a href="/compare/renderpipeline-vs-effectcomposer/"><span>Comparisons</span>Three.js RenderPipeline vs EffectComposer</a></li></ul></aside>
   <div class="pn">
     <a href="threejs-water-optics.html">← Water Optics</a>
-    <a href="threejs-black-holes-and-space-effects.html">Black Holes and Space Effects →</a>
+    <a href="threejs-black-holes-and-space-effects.html">Curved-Ray Space Effects →</a>
   </div>
 </div></div>
 
@@ -729,10 +665,16 @@ output conversion, and adaptive resolution.</p>
 </main>
 
 <div class="wrap"><footer>
-  <span>Three.js WebGPU Skill Pack — TSL, procedural graphics, and visual validation.<br/>
-  <span style="font-size:13px">Three r185.1 · 41 working implementations · build <code>6c7881ab7386</code></span><br/>
-  <span style="font-size:13px">Compiling shaders? Bored between builds? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span></span>
-  <span><a href="https://threejs-skills.com/about/">About &amp; methodology</a> · <a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a> · <a href="https://threejs-skills.com/llms.txt">For coding agents</a></span>
+  <div class="footer-summary">Three.js WebGPU Skill Pack: TSL, procedural graphics, and visual validation.
+    <span>Three r185.1 · 40 primary targets · 25 accepted · build <code>ab7d8d17e058</code></span>
+    <span>Compiling shaders? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span>
+  </div>
+  <div class="footer-groups">
+    <div class="footer-group"><strong>Build</strong><a href="/#skills">Skills</a><a href="/#flagships">Examples</a><a href="/industries/">Industries</a></div>
+    <div class="footer-group"><strong>Decide</strong><a href="/for/">Who it is for</a><a href="/compare/">Compare</a><a href="/alternatives/">Alternatives</a><a href="/pricing/">Pricing</a></div>
+    <div class="footer-group"><strong>Adopt</strong><a href="/docs/">Docs</a><a href="/migrate/">Migration</a><a href="/agents/">Agent docs</a><a href="/faq/">FAQ</a></div>
+    <div class="footer-group"><strong>Proof</strong><a href="/evidence/">Evidence</a><a href="/about/">Method</a><a href="https://github.com/linegel/threejs-complete-set-of-skill">Repository</a><a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/LICENSE">License</a></div>
+  </div>
 </footer></div>
 </body>
 </html>
