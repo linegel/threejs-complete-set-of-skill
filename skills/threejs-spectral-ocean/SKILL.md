@@ -75,6 +75,11 @@ Load the reference sections for
 [displacement and derivative spectra](references/spectral-cascade-ocean-system.md#displacement-and-derivative-spectra),
 [packing and inverse FFT](references/spectral-cascade-ocean-system.md#packing-and-inverse-fft),
 and the [transform gate](references/spectral-cascade-ocean-system.md#transform-gate).
+When implementing or changing the transform, import or adapt the
+[FFT convention oracle](scripts/fft-convention-oracle.mjs). Feed every
+`makeConventionFixtures()` spectrum through the implementation, then pass its
+`measureTransform()` metrics and caller-declared gates to `applyTolerances()`
+before loading the production spectrum.
 
 For directional angular-frequency variance density `S_omega`,
 
@@ -207,9 +212,10 @@ for backend, resource, dispatch, precision, and lifecycle requirements.
 
 Initialize `WebGPURenderer` before checking its backend or limits. Use
 `StorageTexture` data with `NoColorSpace` and explicit precision. A global
-producer/consumer dependency crosses a dispatch boundary. Select global
-Stockham or workgroup-resident rows from transform correctness, initialized
-device limits, occupancy, traffic, and sustained timing.
+producer/consumer dependency crosses a dispatch boundary. Select a validated
+global ping-pong FFT—Stockham autosort or explicit-bit-reversal radix-2—or
+workgroup-resident rows from transform correctness, initialized device limits,
+occupancy, traffic, and sustained timing.
 
 Render through one `RenderPipeline` and one output transform. Keep coefficient,
 resolved-map, foam, query, and presentation generations immutable while a

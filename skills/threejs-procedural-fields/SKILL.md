@@ -48,11 +48,6 @@ state. Materialize common intermediates once with `.toVar()` or an equivalent
 local; inspect generated WGSL when separate outputs might rebuild the same
 warp, hash, or octave chain.
 
-```js
-import { WebGPURenderer, StorageTexture } from 'three/webgpu';
-import { Fn, storageTexture, textureStore } from 'three/tsl';
-```
-
 Use `WebGPURenderer` and verify `renderer.backend.isWebGPUBackend === true`
 after `await renderer.init()`. `renderer.compute()` submits ordinary compute
 work. In r185, `computeAsync()` initializes before enqueueing but is not a GPU
@@ -62,6 +57,13 @@ Carry parity-critical seeds as `u32`, not f32. Gate floored lattice coordinates
 to the i32 domain before bit reinterpretation. Apply a domain warp once to the
 coordinates, propagate its Jacobian into analytic gradients, and keep spherical
 warps tangent before renormalization.
+
+Before implementing an integer-lattice CPU/TSL parity branch, read
+[the canonical parity core](examples/cpu-tsl-field-parity.mjs). It shows the
+signed-i32 gate, wrapping `Math.imul`/TSL `uint` hash, explicit f32 normalization,
+and one shared `.toVar()` bundle without prescribing a field spectrum. CPU
+callers reject `valid === false`; TSL callers route the `valid` node into an
+explicit mask, select, or invalid-state diagnostic before consuming hash/value.
 
 This step is complete when all consumers call the same cause graph, each shared
 intermediate is evaluated once per invocation, and every stage restriction is

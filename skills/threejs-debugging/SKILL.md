@@ -17,19 +17,22 @@ unknown values as unknown.
 
 ## 1. Reproduce the exact environment
 
-Record the resolved package version, runtime `THREE.REVISION`, lockfile
-resolution, import entrypoints, renderer class, initialized backend,
-browser/OS/GPU, relevant capabilities, seed, asset revisions, and exact command
-or interaction. Build the smallest deterministic reproduction that still fails.
+Record every environment fact that can affect the failure: resolved package
+version, runtime `THREE.REVISION`, lockfile resolution, import entrypoints,
+browser/OS, seed, asset revisions, and exact command or interaction. For a
+rendering or backend claim, also record renderer class, initialized backend,
+GPU, and relevant capabilities. Build the smallest deterministic reproduction
+that still fails.
 
-Canonical conclusions require an initialized `WebGPURenderer` with
-`renderer.backend.isWebGPUBackend === true`. Otherwise record the canonical
-blocker; reach `$threejs-compatibility-fallbacks` only when the user explicitly
-requests that branch.
+A conclusion about the canonical WebGPU path requires an initialized
+`WebGPURenderer` with `renderer.backend.isWebGPUBackend === true`. Otherwise
+record that claim's blocker; reach `$threejs-compatibility-fallbacks` only when
+the user explicitly requests that branch. Do not impose a renderer or backend
+gate on a non-rendering API, export, asset, or version conclusion.
 
-This step is complete when backend truth is recorded, the reproduction fails
-repeatedly under the recorded environment, and another run can distinguish
-reproduced from not reproduced.
+This step is complete when the relevant environment truth is recorded, the
+reproduction fails repeatedly under that environment, and another run can
+distinguish reproduced from not reproduced.
 
 ## 2. Name the violated contract and first failure
 

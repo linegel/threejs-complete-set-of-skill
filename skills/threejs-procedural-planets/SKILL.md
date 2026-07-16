@@ -16,7 +16,7 @@ handoffs, and atmosphere inputs.
    local site belongs to procedural fields and geometry when tangent-plane
    sagitta, normal rotation, geodesic, horizon, and projected errors all pass.
    Read
-   [planet-field-and-atmosphere-systems.md](references/planet-field-and-atmosphere-systems.md)
+   [body-model-mapping-and-lod.md](references/body-model-mapping-and-lod.md)
    when deriving the body-scale gate.
 
    **Complete when:** the accepted camera and data domain either proves a local
@@ -27,9 +27,11 @@ handoffs, and atmosphere inputs.
    ellipsoid axes in meters, `metersPerWorldUnit`, height and sea-level datum,
    body/world transform, origin policy, surface-coordinate meaning, and
    atmosphere bottom/top geometry. When a sphere approximates an ellipsoid,
-   apply the reference's position, normal, area, geodesic, horizon, atmosphere-
-   altitude, and optical-depth error gate. Give each changing field one owner
-   and one version.
+   read
+   [body-model-mapping-and-lod.md](references/body-model-mapping-and-lod.md)
+   and apply its position, normal, area, geodesic, horizon, atmosphere-altitude,
+   and optical-depth error gate. Give each changing field one owner and one
+   version.
 
    **Complete when:** every length and vector has units and a frame, surface
    altitude has one definition, render-origin changes leave physical field
@@ -41,8 +43,11 @@ handoffs, and atmosphere inputs.
    requirements. Choose a cube-face quadtree for arbitrary globe views, a
    tangent clipmap for sustained local views, or a hybrid with an explicit
    near/far handoff. A gas/cloud-deck body uses continuous wrapped band fields
-   rather than solid-terrain displacement. Read the reference when selecting a
-   mapping, ellipsoid convention, quadtree, clipmap, or hybrid.
+   rather than solid-terrain displacement. Read
+   [body-model-mapping-and-lod.md](references/body-model-mapping-and-lod.md)
+   for a solid-body mapping, ellipsoid convention, quadtree, clipmap, or hybrid.
+   Read [gas-cloud-deck.md](references/gas-cloud-deck.md) for a gas/cloud-deck
+   body.
 
    **Complete when:** mapping Jacobian, seams, inverse/domain validity, camera
    domain, and near/far ownership all have falsifiable gates.
@@ -53,6 +58,14 @@ handoffs, and atmosphere inputs.
    patch records in instanced or indirect mask bins. For clipmaps, bound ring
    error, recentering, and far-field ownership. Evaluate physical-pixel error
    over the complete displaced support for every active view.
+
+   A global patch identity is
+   `(bodyId, mappingVersion, face, level, x, y)`. Frontier order, visibility,
+   draw bin, allocation slot, and cache address are not identity. A clipmap cell
+   identity is `(bodyId, mappingVersion, level, bodySpaceCellCoordinates)`.
+   Reusing a physical slot binds a new identity and resets every slot-bound
+   temporal or dynamic state; recentering changes slot bindings, not body-space
+   field identity.
 
    Before allocating compute, storage, or indirect resources, run
    `await renderer.init()` and require
@@ -78,9 +91,11 @@ handoffs, and atmosphere inputs.
    hydrology, snow/ice, material causes, queries, and diagnostics. Direct,
    compute-cached, and CPU-visible paths use the same schema and identity
    constants. Cache only dirty patch causes, include cross-face filter support,
-   and validate gradients independently before using analytic normals. Read the
-   reference when implementing caches, crater fields, detail filtering,
-   CPU/TSL parity, normals, materials, or gas-band fields.
+   and validate gradients independently before using analytic normals. Read
+   [solid-fields-and-coast.md](references/solid-fields-and-coast.md) when
+   implementing solid-body caches, crater fields, detail filtering, CPU/TSL
+   parity, normals, materials, or coast data. Read
+   [gas-cloud-deck.md](references/gas-cloud-deck.md) for gas-band fields.
 
    GPU patch min/max bounds use workgroup reduction plus deterministic merging,
    or a proven monotonic ordered-integer encoding with explicit sign, NaN, and
@@ -97,8 +112,11 @@ handoffs, and atmosphere inputs.
    publishes mean surface, seabed height, metric coast distance/frame, source
    resolution, and uncertainty. Atmosphere receives the same reference surface,
    transform, `metersPerWorldUnit`, altitude convention, shell geometry, sun
-   frame, and scene-linear radiometric basis. Read the coast and atmosphere
-   sections of the reference when either consumer is active.
+   frame, and scene-linear radiometric basis. Read
+   [solid-fields-and-coast.md](references/solid-fields-and-coast.md) when a
+   coast/water consumer is active. Read
+   [surface-atmosphere-handoff.md](references/surface-atmosphere-handoff.md)
+   when an atmosphere consumer is active.
 
    **Complete when:** each consumer names one authoritative producer, rejects
    invalid or stale data, and performs no frame-critical GPU readback.
@@ -138,3 +156,7 @@ handoffs, and atmosphere inputs.
 
 This skill owns the body-scale surface representation, coupled planetary
 fields, patch LOD/submission, query parity, and surface-side handoffs.
+
+For work spanning multiple planet branches, use
+[planet-field-and-atmosphere-systems.md](references/planet-field-and-atmosphere-systems.md)
+as the branch index and common contract.

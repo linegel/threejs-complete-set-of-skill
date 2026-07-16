@@ -33,6 +33,10 @@ minimum step or attempt cap. Continuous horizon, throat, disk, shell, and
 escape events are located from the pre-step state with dense output or bounded
 root refinement.
 
+Record `regime` and `termination` independently. A regime describes the ray's
+phase-space class; a termination describes why finite computation stopped.
+Reject an inadmissible initial state as `setup-rejected` before integration.
+
 ## Ellis ultrastatic wormhole
 
 Use the Ellis/Morris-Thorne metric with `c = 1`:
@@ -77,13 +81,16 @@ B = 1   approaches the throat light ring and remains unresolved at finite work
 ```
 
 An outward state, `L*p_l > 0`, escapes through its current exterior rather
-than entering this capture/turning classification. At `L*p_l = 0`, classify
-the state from the invariant and radial derivative as a turning or critical
-initial condition.
+than entering this capture/turning classification. At `L*p_l = 0`, distinguish
+the zero factor: `L = 0`, `p_l != 0` is a traversing throat crossing;
+`p_l = 0`, `L != 0` is a turning point; and `L = p_l = 0`, `B = 1` is the
+critical throat orbit.
 
-Keep `escaped`, `turning`, `traversing`, `unresolved-critical`, `step-cap`,
-`attempt-cap`, and `invalid` distinct. At finite escape radius reconstruct the
-outgoing tangent:
+Use `outward`, `traversing`, `turning`, or `critical` as the Ellis `regime`.
+Use `escaped`, `unresolved-critical`, `minimum-step`, `step-cap`,
+`attempt-cap`, or `invalid` as the march `termination`; `turning` and
+`traversing` are never termination IDs. At finite escape radius reconstruct
+the outgoing tangent:
 
 ```text
 e_r         = u*cos(phi) + v*sin(phi)
@@ -125,7 +132,7 @@ p_r0  = -sqrt(1 - V_R)
 ```
 
 Require `V_R < 1` for the inward root. `V_R = 1` is the tangent/turning state;
-`V_R > 1` is inadmissible. A camera at an arbitrary finite event instead
+`V_R > 1` is `setup-rejected`. A camera at an arbitrary finite event instead
 initializes `E`, `L`, the orbital plane, and the ingoing or outgoing
 radial-potential root from its local tetrad. It does not inherit the outer-
 boundary capture/scatter classification. The reduced model has:
@@ -133,16 +140,26 @@ boundary capture/scatter classification. The reduced model has:
 ```text
 horizon radius       r_h = 2M
 photon-sphere radius r_p = 3M
-critical impact      b_c = 3*sqrt(3)*M
+critical impact magnitude b_c = 3*sqrt(3)*M
 ```
 
-Classify an exact critical inward ray from `R > 3M` as
-`unresolved-critical`. Under the same boundary contract, a subcritical inward
-ray reaches the horizon and a supercritical inward ray turns and may escape.
-Refine the first crossing of `r = 2M`. Declare escape only after the radial
-momentum has turned outward and the ray crosses `r = R`; refine that crossing
-from the pre-step state. The accepted-step cap is `step-cap`, the attempted-step
-cap is `attempt-cap`, and neither is an escape.
+The sign of `b` records orbital orientation; radial classification uses
+`abs(b)`. Classify an exact critical inward ray with `abs(b) = b_c` from
+`R > 3M` as `unresolved-critical`. Under the same boundary contract, an inward
+ray with `abs(b) < b_c` reaches the horizon, while one with `abs(b) > b_c`
+turns and may escape. Refine the first crossing of `r = 2M`. Declare escape
+only after the radial momentum has turned outward and the ray crosses `r = R`;
+refine that crossing from the pre-step state. The accepted-step cap is
+`step-cap`, the attempted-step cap is `attempt-cap`, and neither is an escape.
+
+Keep the Schwarzschild `regime` (`inward-subcritical` for `abs(b) < b_c`,
+`critical-separatrix` for `abs(b) = b_c`, `inward-supercritical` for
+`abs(b) > b_c`, `tangent-initial`, or a `finite-event-ingoing` or
+`finite-event-outgoing` class) separate from the `termination` (`horizon`,
+`escaped`, `opaque`, `unresolved-critical`, `minimum-step`, `step-cap`,
+`attempt-cap`, or `invalid`). `opaque` is available only when an admitted
+physical-transfer branch exhausts its remaining-radiance bound before a
+geometric termination.
 
 At the finite boundary, use the static Schwarzschild orthonormal frame. With
 `F = 1 - 2M/R`, the outgoing spatial direction is:
@@ -155,18 +172,19 @@ This follows the invariant and retains the tangential momentum omitted by a
 radial-position lookup. Continue or bound the far-field deflection beyond `R`
 when the claimed metric extends to infinity.
 
-A coherent static lens may use two transfer tables split at `b_c`, sampled
-dense in `log(abs(b-b_c))`. Store termination class, azimuth or tangent,
-minimum radius, and optionally the direction Jacobian. Gate interpolation
-against direct independent rays, especially across the critical pixel
-footprint.
+A coherent static lens may split signed `b` at `-b_c` and `+b_c`, or index by
+`(abs(b), sign(b))` and split the magnitude at `b_c`. Sample densely in
+`log(abs(abs(b)-b_c))`. Store orientation, termination class, azimuth or
+tangent, minimum radius, and optionally the direction Jacobian. Gate
+interpolation against direct independent rays, especially across the critical
+pixel footprint.
 
 **Schwarzschild criterion:** independent CPU `float64` rays launched inward
 from `R > 3M` cover `V_R < 1`, the `V_R = 1` tangent, inadmissible `V_R > 1`,
-and impacts below, at, and above `b_c`; arbitrary finite-camera rays cover both
-tetrad-derived radial roots. Valid rays agree on event class/residual, maximum
-invariant drift, minimum radius, and final static-frame direction under
-successive refinement.
+and impact magnitudes below, at, and above `b_c` in both orientations;
+arbitrary finite-camera rays cover both tetrad-derived radial roots. Valid rays
+agree on event class/residual, maximum invariant drift, minimum radius, and
+final static-frame direction under successive refinement.
 
 ## Physical disk transfer
 

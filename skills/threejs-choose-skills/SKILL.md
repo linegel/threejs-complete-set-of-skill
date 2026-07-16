@@ -20,25 +20,31 @@ Record the installed revision and initialized backend. Then state:
   physically plausible, or perceptual;
 - the authoritative input, units, coordinate frame, scale, topology, time
   behavior, target views, and interaction;
-- the deployment matrix and checkable bounds for error, latency, frame time,
-  and peak live memory;
-- the reproducible seed, input trace, or camera path used for comparison.
+- each applicable deployment target and checkable bound for error, latency,
+  frame time, and peak live memory;
+- the reproducible seed, input trace, or camera path required by any comparison
+  or replay.
 
 Treat missing authoritative inputs as explicit gaps. Canonical claims require an
 initialized WebGPU backend. Route compatibility teaching only when the user
 explicitly asks how to apply a fallback.
 
-**Complete when:** the requested result, source of truth, target matrix, and
-acceptance bounds are explicit and mutually consistent.
+When the route claims frame time, latency, peak live memory, adaptive quality,
+or sustained performance, read
+[composed-route-performance.md](references/composed-route-performance.md)
+before freezing those bounds.
+
+**Complete when:** the requested result, source of truth, and every applicable
+target and acceptance bound are explicit and mutually consistent.
 
 ### 2. Select causal owners
 
 Find the earliest missing cause: data/topology, geometry, field, material,
 illumination, transport volume, motion, camera/projection, or image transform.
-Compare the least-complex viable mechanisms and name the evidence that rejects
-each losing candidate. Assign one primary owner to the earliest missing cause,
-then add only skills that own a requested cause, required input, or verification
-method.
+When more than one viable mechanism remains, compare the least-complex
+candidates and name the evidence that rejects each losing candidate. Assign one
+primary owner to the earliest missing cause, then add only skills that own a
+requested cause, required input, or verification method.
 
 When LOD, tessellation, impostors, field bands, or simulation extent depend on
 screen error, read [projected-error-contract.md](references/projected-error-contract.md)
@@ -166,33 +172,6 @@ authority/version, validity/error, ordering, lifetime, and reset rows in
 [cross-system-handoffs.md](references/cross-system-handoffs.md). Every resource
 names its format, physical extent, lifetime, and consumers. `verification`
 tests the selected cause rather than image plausibility alone.
-
-## Composed-frame performance truths
-
-- Derive the frame interval as `1000 ms / target Hz`; freeze CPU, GPU,
-  presentation, memory, and latency bounds separately.
-- Accept performance from the full composed route on the target device,
-  viewport, DPR, quality state, camera/input trace, and sustained thermal state.
-- Trace the measured critical path across state advance, CPU preparation,
-  uploads, GPU queues, synchronization, and presentation; the constraining path
-  must satisfy the frame interval.
-- Treat CPU and GPU work as overlapping unless a measured dependency serializes
-  them. Independent percentiles and standalone totals do not form a valid sum.
-- Count each semantic pass or dispatch once. Shared signals have one producer
-  and any number of consumers; a changed encoding or resolution is a conversion
-  with its own cost.
-- Derive physical extent from CSS extent, renderer DPR, and pass scale. Derive
-  logical attachment payload from width, height, bytes per texel, samples, and
-  live slots; measure actual allocation and traffic separately.
-- Compare minimal-forward and shared-MRT variants on representative target
-  hardware. Each attachment must earn its store/read bandwidth through a named
-  consumer.
-- Use paired feature-on/off samples from the same composed trace for marginal
-  cost. GPU verdicts require GPU timestamps; unavailable timestamps produce an
-  `unmeasurable` GPU claim.
-- Give one hysteretic controller ownership of DPR and subsystem tiers. A
-  transition updates dependent attachments, texel uniforms, jitter, velocity,
-  histories, resets, and disposal as one transaction.
 
 Routing is complete when every requested observable or constraint has exactly
 one owning skill or an explicit gap; every selected skill owns at least one

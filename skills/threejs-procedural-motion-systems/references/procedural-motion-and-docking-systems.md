@@ -26,7 +26,9 @@ policy:
 
 ```text
 debtDecision = none
-accumulator += min(rawDelta, maxFrameDelta)
+clampedDelta = min(rawDelta, maxFrameDelta)
+clampDebt = rawDelta - clampedDelta
+accumulator += clampedDelta
 while accumulator >= fixedStep and substeps < maxSubsteps:
   previous = valueCopy(current)
   current = step(current, fixedStep, simulationTime + fixedStep)
@@ -36,7 +38,10 @@ while accumulator >= fixedStep and substeps < maxSubsteps:
 if accumulator >= fixedStep:
   wholeStepDebt = floor(accumulator / fixedStep) * fixedStep
   accumulator -= wholeStepDebt
-  debtDecision = recordDropCatchUpOrDiscontinuity(wholeStepDebt)
+  clampDebt += wholeStepDebt
+
+if clampDebt > 0:
+  debtDecision = recordCatchUpExplicitTimeDropOrDiscontinuity(clampDebt)
 
 if debtDecision is discontinuity:
   resynchronize state and clocks
@@ -52,9 +57,14 @@ presented = interpolate(previous, current, alpha)
 ```
 
 Debt accounts for complete unprocessed steps outside the interpolation
-accumulator. Dropping or scheduling that debt does not itself reset history. A
-reset occurs only when the state/time mapping becomes discontinuous, and then
-the state pair, clocks, and dependent history reset explicitly.
+accumulator plus time excluded by raw-delta clamping. Every excluded interval is
+recorded as scheduled catch-up, an explicit authoritative-time drop, or a
+discontinuity; it never disappears silently. Dropping time or scheduling debt
+does not itself reset history when the same dropped interval is removed from the
+shared timeline and all coupled analytic motion uses the resulting delayed
+presentation time. Skipping an interval while advancing that timeline is a
+discontinuity and resets the state pair, clocks, and dependent history
+explicitly.
 
 The pair brackets presentation time. If analytic and recurrent actors share a
 shot, either sample both at the deliberately delayed presentation time or
@@ -403,11 +413,12 @@ Every discontinuity chooses a scoped history action:
 | topology, deformation, or LOD change | migrate only with a defined correspondence; otherwise reset |
 | abrupt quality/state representation change | project both pose states with bounded error or reset |
 
-An explicit reset clears phase/event state, accumulator and debt records,
-seeds/counters, previous/current buffers, finite terminal locks, and validation
-staging together. A debt drop or scheduled catch-up without a discontinuity
-preserves history. A reset creates a valid zero/unknown motion vector rather
-than a large derived velocity.
+A semantic motion reset clears phase/event state, accumulator and debt records,
+seeds/counters, previous/current buffers, and finite terminal locks together. A
+temporal-only reset, such as a camera cut, clears affected presentation history
+without changing semantic motion. A debt drop or scheduled catch-up without a
+discontinuity preserves history. Either reset publishes a valid zero/unknown
+motion vector rather than a large derived velocity.
 
 ### Output and resource ownership
 

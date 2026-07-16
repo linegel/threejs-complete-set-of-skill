@@ -1,6 +1,6 @@
 ---
 name: threejs-particles-trails-and-effects
-description: Representation-first Three.js WebGPU/TSL particles, trails, and effects. Use for analytic or recurrent particle motion, stable-slot or scan-compacted GPU pools, flow-conforming shells and wakes, dissolving debris, or effect-specific HDR and depth integration.
+description: Representation-first Three.js WebGPU/TSL particles, ribbon or history trails, and effects. Use for analytic or recurrent particle motion, stable-slot or scan-compacted GPU pools, flow-conforming shells and wakes, dissolving debris, or effect-specific HDR and depth integration.
 ---
 
 # Representation-First Particles, Trails, and Effects
@@ -71,8 +71,10 @@ Select allocation independently:
 
 For recurrent or compacted pools, read
 [state and compaction](references/particles-trails-and-effects-system.md#state-and-compaction)
-before implementation. The step is complete when every writable lane and every
-compaction phase is justified by a downstream consumer or measured saving.
+before implementation. For neighbor interactions, read
+[neighborhood interactions](references/particles-trails-and-effects-system.md#neighborhood-interactions).
+The step is complete when every writable lane and every selected compaction or
+neighborhood phase is justified by a downstream consumer or measured saving.
 
 ### 3. Specify the state transition and identity lifecycle
 
@@ -81,8 +83,10 @@ Keep the order explicit:
 ```text
 ordered event packets
   -> deterministic spawn/range allocation
-  -> analytic evaluation or one recurrent update
+  -> optional neighborhood build from committed source state
+  -> analytic evaluation or one recurrent next-state update, including interaction
   -> optional ordered compaction
+  -> optional trail sample and publication
   -> draw from the committed state/count
   -> post consumers
 ```
@@ -94,10 +98,17 @@ trails, interpolation, and temporal history before presentation. Analytic
 particles evaluate both previous and current presentation times; recurrent
 pools retain adjacent immutable presentation states.
 
+A camera cut or other presentation-only discontinuity resets affected
+screen-space motion and temporal accumulation without restarting particle
+simulation, lifetimes, identities, or valid world-space trail histories.
+
 Read [temporal identity](references/particles-trails-and-effects-system.md#temporal-identity)
 when the effect feeds TAA, motion vectors, trails, or multi-frame post. The step
 is complete when each state version has one writer, draw consumes a committed
 version, and a reused slot cannot inherit prior entity history.
+
+For ribbon or history trails, read
+[trail histories and ribbons](references/particles-trails-and-effects-system.md#trail-histories-and-ribbons).
 
 ### 4. Build the r185 GPU path
 
@@ -117,8 +128,9 @@ counts and state GPU-resident.
 
 Read [r185 execution facts](references/particles-trails-and-effects-system.md#r185-execution-facts)
 when implementing compute, indirect draw, bounds, or completion. The step is
-complete when spawn, update, compaction, and draw have explicit GPU ordering and
-the steady frame path performs no readback or per-particle object update.
+complete when every admitted spawn, update, neighborhood, compaction, trail
+publication, and draw phase has explicit GPU ordering and the steady frame path
+performs no readback or per-particle object update.
 
 ### 5. Bind representation, depth, and output
 
@@ -143,22 +155,25 @@ one tested owner.
 
 ### 6. Prove the mechanism and budget
 
-Capture seeded fixed-time states and expose event/spawn count, live/slot count,
-overflow, identity mapping, age/velocity, compaction count, bounds, depth mode,
-raw HDR, optional selective signal, bloom contribution, overdraw, and GPU time
-per compute/draw class. Compare analytic versus recurrent cost, and stable slots
-versus compaction, at the same occupancy.
+Capture seeded fixed-time states and expose only applicable evidence: event and
+spawn ranges; live/slot count, overflow, identity, and age/velocity for pooled
+state; compaction count and mapping for compacted state; trail head/count,
+chronological samples, and breaks for trails; neighborhood occupancy and
+overflow for local interactions; bounds, depth mode, raw HDR, optional selective
+signal, bloom contribution, overdraw, and GPU time for the selected draw and
+post classes. Compare only admitted alternatives at the same visible workload.
 
-Verify the beauty path with bloom disabled. Preserve readable silhouette,
-layer roles, depth, and motion without halo support. Scale by stopping idle
-work, removing unnecessary writable state or compaction, then reducing active
-count, field bandwidth, transparent layers, and post extent while preserving
-the selected motion class and owners.
+When bloom is admitted, verify the beauty path with bloom disabled and preserve
+readable silhouette, layer roles, depth, and motion without halo support. Scale
+by stopping idle work, removing unnecessary writable state or compaction, then
+reducing active count, field bandwidth, transparent layers, and post extent
+while preserving the selected motion class and owners.
 
 Read [resource accounting](references/particles-trails-and-effects-system.md#resource-accounting)
 and [diagnostics and failure signatures](references/particles-trails-and-effects-system.md#diagnostics-and-failure-signatures)
 for the applicable branches. The skill is complete when the seeded result is
-repeatable; event, update, compaction, and draw order is evidenced; stable
-identity and reset controls pass; the frame path has zero required readbacks;
-depth and output ownership are singular; the bloom-off image remains legible;
-and the complete scene meets its named resource and timing budget.
+repeatable; every admitted event, update, neighborhood, compaction, trail,
+draw, and post phase has evidenced order; stable identity and reset controls
+pass; the frame path has zero required readbacks; depth and output ownership
+are singular; the bloom-off image remains legible when bloom is admitted; and
+the complete scene meets its named resource and timing budget.

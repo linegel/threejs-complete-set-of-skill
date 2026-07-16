@@ -48,23 +48,26 @@ on domain and extent, and every optional signal has a working disable path.
 
 ## 3. Admit attachments
 
-Compare each candidate attachment with reconstruction or a narrow rerender on
-the target graph:
+First reject any reconstruction, attachment, or narrow-rerender candidate that
+cannot meet the signal's declared domain, precision/error bound, spatial
+coverage, temporal stability, or discard semantics. Compare the remaining
+correct candidates on the target graph:
 
 ```text
 costMRT(a) = export + store/resolve + all later reads
 costAlt(a) = reconstruction or narrow rerender + its traffic
 ```
 
-Keep the attachment when paired evidence shows `costMRT(a) < costAlt(a)` and
-the peak resident budget still passes. Inspect compiled physical formats:
+Keep the attachment when paired evidence shows `costMRT(a) < costAlt(a)` among
+the correct candidates and the peak resident budget still passes. Inspect
+compiled physical formats:
 r185 named `PassNode` attachments clone the pass output by default, so compact
 normal or velocity storage exists only after explicit configuration and
 verification.
 
 This step is complete when every retained attachment has a named reader,
-verified physical format, measured winning alternative, and accounted peak
-bytes.
+verified domain and physical format, declared error/coverage contract, measured
+winning correct alternative, and accounted peak bytes.
 
 When implementing `pass()`, MRT, compact formats, or depth branches, read
 [Graph construction and signal formats](references/production-image-pipeline.md#graph-construction-and-signal-formats).
@@ -97,6 +100,12 @@ an executable reset, and every temporal allocation has an owner.
 When temporal reconstruction is present, read
 [Temporal admission and resets](references/production-image-pipeline.md#temporal-admission-and-resets)
 before creating velocity or history nodes.
+
+When stock `TRAANode` is rebuilt for a supported reset, read
+[the minimal rebuild example](examples/rebuild-traa-node.mjs) for its public-API
+replacement, output rebind, graph invalidation, and explicit old/new ownership.
+Retire the returned previous node only after the replacement graph has
+compiled/rendered successfully and the prior GPU generation has completed.
 
 ## 5. Compose once
 
@@ -142,9 +151,9 @@ Add adaptive DPR only after the fixed-DPR graph has sustained timings. Use
 asymmetric dwell and cooldown, distinguish fixed from pixel-scaled work, and
 remeasure every quality tier after a size change.
 
-This step is complete when repeated enable/disable, resize, tier-switch, and
-dispose cycles stabilize resource counts and every graph mutation marks the
-pipeline dirty.
+This step is complete when repeated cycles for every supported toggle, size,
+tier, and admitted resource stabilize resource counts, and every graph mutation
+marks the pipeline dirty.
 
 When estimating traffic, private target residency, marginal cost, or adaptive
 DPR, read
@@ -154,14 +163,16 @@ DPR, read
 
 Capture the no-post baseline, each admitted signal, the diagnostics for each
 admitted temporal/meter/bloom/color branch, final output, and physical target
-inventory. Measure the complete warmed graph and paired marginal
-variants at identical scene state. Exercise negative controls: disable each
-effect, force each reset class, resize, and destroy/recreate the graph.
+inventory. Measure the complete warmed graph and paired marginal variants only
+for admitted alternatives at identical scene state. Exercise the applicable
+negative controls: disable each supported optional effect, force each reset
+class owned by an admitted history, resize admitted size-dependent resources,
+and destroy/recreate the graph.
 
 When a capture, timing scope, reset, output-isolation, or lifecycle control fails, read [Diagnostics and failure signatures](references/production-image-pipeline.md#diagnostics-and-failure-signatures).
 
-The pipeline is complete when all shipping tiers preserve the visual contract,
-the full graph and resident targets meet declared budgets, output isolation
-shows one output conversion and—when admitted—one tone map, diagnostics pass
-for every admitted temporal branch and axis, and lifecycle counts plateau after
-disposal.
+The pipeline is complete when every supported shipping tier preserves the
+visual contract, the full graph and resident targets meet declared budgets,
+output isolation shows one output conversion and—when admitted—one tone map,
+diagnostics pass for every admitted temporal branch and axis, and lifecycle
+counts plateau after disposal.

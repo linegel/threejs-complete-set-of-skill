@@ -58,13 +58,14 @@ glare.smoothWidth.value = softKnee;
 glare.setResolutionScale( bloomScale );
 
 pipeline.outputNode = renderOutput(
-  vec4( sceneHDR.rgb.add( glare.rgb ), sceneHDR.a )
+  vec4( sceneHDR.rgb.add( glare.rgb ), 1 )
 );
 pipeline.needsUpdate = true;
 ```
 
 This path captures visible emission, direct response, reflection,
-transmission, and composited transparency without a membership attachment.
+transmission, and composited transparency without a membership attachment. The
+snippet targets an opaque or already-composited final output.
 
 ### Selective graph
 
@@ -90,13 +91,65 @@ glare.setResolutionScale( bloomScale );
 
 pipeline.outputColorTransform = false;
 pipeline.outputNode = renderOutput(
-  vec4( sceneHDR.rgb.add( glare.rgb ), sceneHDR.a )
+  vec4( sceneHDR.rgb.add( glare.rgb ), 1 )
 );
 pipeline.needsUpdate = true;
 ```
 
 Both graphs use one scene traversal. The selective graph adds a full-resolution
 HDR attachment; it does not add a selection render.
+
+### Hybrid graph
+
+Use one selective scene MRT, then run independent BloomNodes for optical glare
+and the deliberate selective boost:
+
+```js
+const sceneHDR = scenePass.getTextureNode( 'output' );
+const contribution = scenePass.getTextureNode( 'emissive' );
+
+const optical = bloom(
+  sceneHDR, opticalStrength, opticalSpread, opticalThreshold
+);
+optical.smoothWidth.value = opticalSoftKnee;
+optical.setResolutionScale( opticalScale );
+
+const boost = bloom(
+  contribution, boostStrength, boostSpread, boostThreshold
+);
+boost.smoothWidth.value = boostSoftKnee;
+boost.setResolutionScale( boostScale );
+
+pipeline.outputColorTransform = false;
+pipeline.outputNode = renderOutput(
+  vec4(
+    sceneHDR.rgb.add( optical.rgb ).add( boost.rgb ),
+    1
+  )
+);
+pipeline.needsUpdate = true;
+```
+
+The hybrid branch still has one scene traversal and one emissive attachment, but
+it owns two complete BloomNode pyramids. Apply the minimum-dimension gate,
+threshold domain, lifecycle, timing, and disposal contract independently to
+both nodes.
+
+### Final output alpha
+
+The three graph snippets above target opaque or already-composited output.
+Choose one final-output branch:
+
+| Output contract | Composition | Consequence |
+| --- | --- | --- |
+| Opaque or already composited | `vec4(sceneHDR.rgb + glare.rgb, 1)` | The output owns a fully covered background. |
+| Transparent, coverage-clipped | `vec4(sceneHDR.rgb + glare.rgb, sceneHDR.a)` | Glare outside source coverage is discarded; this branch does not preserve optical halos beyond that coverage. |
+| Transparent, halo-preserving | Composite over a known background before `renderOutput()`, or publish separate glare RGB plus a declared coverage/compositing contract | Halo energy is not falsely packed into unchanged source alpha. |
+
+r185 `renderOutput()` clamps alpha, unpremultiplies RGB, applies tone/output
+conversion, then premultiplies again. At alpha `0`, unpremultiplication returns
+zero RGB. Therefore adding glare RGB while preserving zero or partial source
+alpha is a coverage-clipped policy, not a halo-preserving transparent output.
 
 ### Transparent contribution
 
@@ -124,6 +177,7 @@ material.emissiveNode = radiance.mul( alpha );
 `BlendMode(MaterialBlending)` makes the emissive attachment use that material
 blend state. For ordinary alpha/transmission or custom factors, derive the
 contribution from the same alpha convention and verify order and occlusion.
+This contribution-buffer policy is independent of the final-output alpha branch.
 
 When visible emission must diverge from bloom membership, use a separately
 timed contribution pass or a source-verified merge fix. That branch no longer
@@ -208,9 +262,10 @@ then exposure, tone map, grade, and one output conversion. Decode source color
 textures according to their transfer; keep render targets and contribution
 buffers scene-linear rather than tagging them sRGB.
 
-With explicit `renderOutput()`, set `outputColorTransform = false`. Add glare
-RGB while preserving source alpha. A plain vec4 sum is valid only when alpha is
-provably discarded.
+With explicit `renderOutput()`, set `outputColorTransform = false`. Use the
+declared final-output alpha branch above. Preserving source alpha is valid only
+for the explicitly coverage-clipped transparent branch; it cannot prove
+halo-preserving transparent output.
 
 ### Lifecycle
 
@@ -262,16 +317,39 @@ time. Tiling, cache, blending, attachment stores, and scheduling require target
 measurement. A selective RGBA16F attachment adds `8 * W * H` resolved bytes,
 plus multisample/tile costs when enabled.
 
+For a hybrid branch with optical and boost scales `sOptical` and `sBoost`,
+evaluate the level dimensions and equations separately for each scale:
+
+```text
+hybridInternalBytes =
+  internalBytes(sOptical) + internalBytes(sBoost)
+
+hybridIncrementalLogicalBytes =
+  8WH + hybridInternalBytes
+
+hybridFullscreenDraws = 12 + 12 = 24
+hybridSamples = totalSamples(sOptical) + totalSamples(sBoost)
+hybridWrites = totalWrites(sOptical) + totalWrites(sBoost)
+```
+
+`8WH` is the single resolved emissive attachment. The incremental expression
+excludes the scene output and depth already required by the base scene, plus
+MSAA, alignment, backend padding, and tile scratch. Both scales must separately
+satisfy the deepest-level gate.
+
 Measure paired warmed variants:
 
 ```text
 deltaFull = time(scene + full bloom) - time(scene)
 deltaMRT = time(scene with contribution) - time(scene)
 deltaSelective = time(scene + contribution + bloom) - time(scene)
+deltaHybrid = time(scene + contribution + optical bloom + boost bloom) - time(scene)
 ```
 
 Charge a genuinely shared contribution attachment once, but accept the branch
-using the complete paired delta. For a pixel-bound miss, estimate:
+using the complete paired delta. The hybrid delta includes both BloomNodes; do
+not infer it from either single-node measurement. For a pixel-bound miss,
+estimate:
 
 ```text
 nextScale = currentScale * sqrt(budgetMs / measuredMs)
@@ -303,9 +381,9 @@ Route visible failures by cause:
 | sparse hot pixels create huge halos | repair or robustly cap fireflies upstream |
 | scene form vanishes bloom-off | repair source geometry/material/lighting |
 | bloom-off timing is unchanged | replace output graph and mark it dirty |
-| transparent canvas gains opaque edges | preserve scene alpha during RGB add |
+| transparent output loses halo outside scene coverage | accept the coverage-clipped branch, composite over a known background, or publish separate glare coverage |
 
 Accept bloom only when its source-decision error, transparent fixtures,
-viewport endpoints, exposure sweep, bloom-off control, target-device marginal
-time, sustained thermal behavior where relevant, and resource-disposal loop all
-pass their declared limits.
+final-output alpha branch, viewport endpoints, exposure sweep, bloom-off
+control, target-device marginal time, sustained thermal behavior where
+relevant, and resource-disposal loop all pass their declared limits.

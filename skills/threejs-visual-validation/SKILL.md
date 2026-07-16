@@ -78,9 +78,15 @@ dispatch, resource, and output owner that produced it.
 ## 4. Measure in the native domain
 
 Compare each observable with its declared truth using the frozen metric and
-gate. Inspect the important final and diagnostic images directly; a nonblank
-capture or scalar summary is only transport evidence. Store the error map or
-worst interval when a global statistic can hide a local failure.
+gate. For visual or mechanism claims, inspect the important final and diagnostic
+images directly; a nonblank capture or scalar summary is only transport
+evidence. Store the error map or worst interval when a global statistic can hide
+a local failure.
+
+When decoding a padded WebGPU texture-to-buffer copy, use the
+[aligned-readback helper](scripts/aligned-readback.mjs) with the actual
+integer `bytesPerRow` supplied to the copy encoder; never recover row stride
+from width or total buffer length.
 
 Read
 [the graphics validation protocol](references/graphics-validation-protocol.md)
@@ -108,8 +114,9 @@ Run only the branches the claims require:
 CPU-visible completion requires an actual readback/map, while GPU cost requires
 timestamp evidence.
 
-This step is complete when every state transition named by a claim has a
-before/after diagnostic, reset policy, and bounded resource outcome.
+This step is complete when every state transition named by a claim has the
+required before/after diagnostic, plus a reset policy or bounded resource
+outcome when that claim concerns reset or resources.
 
 ## 6. Return claim-scoped verdicts
 
@@ -123,7 +130,7 @@ Missing required GPU timestamps produce `INSUFFICIENT_EVIDENCE` for GPU-cost
 claims; CPU frame time and presentation cadence do not become GPU timing.
 Report unsupported claims and the exact evidence needed to close them.
 
-Validation is complete when every declared claim has one verdict, every verdict
-resolves to direct evidence, the sole output owner is identified, deterministic
-reset is checked where state exists, and persistent resources either plateau or
-fail lifecycle acceptance.
+Validation is complete when every declared claim has one verdict and every
+verdict resolves to direct evidence. Identify the sole output owner when the run
+produces rendered output; check deterministic reset for declared temporal state;
+require a bounded plateau only for declared resource or lifecycle claims.

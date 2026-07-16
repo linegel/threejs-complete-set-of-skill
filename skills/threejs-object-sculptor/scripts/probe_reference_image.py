@@ -139,20 +139,26 @@ def probe(path: Path) -> dict:
     else:
         width, height = size
         aspect = width / height if height else None
-        if width < 512 or height < 512:
-            warnings.append("low resolution; small geometry/material details may be unreliable")
-        if aspect and (aspect > 3.0 or aspect < 0.33):
-            warnings.append("extreme aspect ratio; object may be cropped or surrounded by empty space")
+    if image_type and size:
+        metadata_status = "parsed"
+        status_meaning = "format and dimensions were parsed"
+    elif image_type or size:
+        metadata_status = "partial"
+        status_meaning = "only part of the requested file metadata was parsed"
+    else:
+        metadata_status = "unparsed"
+        status_meaning = "format and dimensions could not be parsed"
     return {
         "path": str(path),
-        "type": image_type,
+        "format": image_type,
         "bytes": len(data),
         "width": width,
         "height": height,
         "aspectRatio": aspect,
-        "technicalReadability": "conditional" if warnings else "readable",
+        "metadataStatus": metadata_status,
+        "metadataStatusMeaning": status_meaning,
         "warnings": warnings,
-        "note": "This probe covers file-level technical readability only; object evidence still requires visual inspection.",
+        "note": "Metadata status describes parsing only; visual inspection alone determines evidence readability.",
     }
 
 

@@ -46,14 +46,28 @@ Keep the canonical selective path on the regular `emissiveNode`; use a separate
 measured contribution pass or source-verified custom merge only when visible
 emission and bloom contribution must diverge.
 
-Compose `vec4(scene.rgb + bloom.rgb, scene.a)`. Verify transparent overlap in
-both insertion orders and under the chosen premultiplied/straight-alpha policy.
+Choose the final-output alpha branch before adding bloom RGB:
+
+- opaque or already composited output: use
+  `vec4(scene.rgb + bloom.rgb, 1)`;
+- transparent coverage-clipped output: use
+  `vec4(scene.rgb + bloom.rgb, scene.a)` and explicitly accept that glare
+  outside source coverage is discarded;
+- transparent output that must preserve halos outside source coverage:
+  composite over the known background before `renderOutput()`, or publish
+  separate glare RGB with an explicit coverage/compositing contract.
+
+Unchanged source alpha cannot claim preserved transparent halos. Verify
+transparent contribution overlap in both insertion orders and under the chosen
+premultiplied/straight-alpha policy.
 
 This step is complete when scene traversal count is known, every contribution
 uses the intended depth/sort/blend/alpha state, overlapping contributors
-accumulate correctly, and scene alpha is unchanged by bloom.
+accumulate correctly, and the final-output alpha branch states whether halo
+outside source coverage is discarded, composited, or represented separately.
 
-When implementing either graph or transparent selective contribution, read
+When implementing the full-scene, selective, or hybrid graph, or transparent
+selective contribution, read
 [r185 graphs and transparent blending](references/hdr-bloom-system.md#r185-graphs-and-transparent-blending).
 
 ## 4. Set threshold and footprint
@@ -100,8 +114,9 @@ bloom unless the visual contract includes them. After changing the active
 output graph, set `RenderPipeline.needsUpdate = true`.
 
 This step is complete when bloom has one owner, every admitted meter, exposure,
-tone map, alpha operation, and output conversion has one owner, and the
-bloom-off graph is genuinely reachable.
+tone map, alpha operation, and output conversion has one owner, the selected
+output-alpha branch is preserved through presentation, and the bloom-off graph
+is genuinely reachable.
 
 When coupling threshold to exposure or selecting final output ownership, read
 [Exposure, output, and lifecycle](references/hdr-bloom-system.md#exposure-output-and-lifecycle).

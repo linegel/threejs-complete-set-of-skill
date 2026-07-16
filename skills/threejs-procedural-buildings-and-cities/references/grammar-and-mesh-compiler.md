@@ -174,21 +174,38 @@ an unused registered builder is diagnostic information.
 
 ### Deterministic heterogeneous site placement
 
-Generate each candidate from a fixed-width identity tuple:
+Generate each candidate from this fixed-arity typed identity tuple:
 
 ```text
-(generatorSchemaVersion, stableSeed, familyId, sourceCellId, candidateOrdinal)
+(
+  generatorSchemaVersion: nonempty NFC string,
+  stableSeed: uint32,
+  familyId: nonempty NFC canonical domain ID,
+  sourceCellId: nonempty NFC canonical domain cell ID,
+  candidateOrdinal: uint32
+)
 ```
 
-Namespace randomness by that full tuple, and compare the full tuple when hashes
-collide. Adding an unrelated family or loading chunks in another order must not
-change an existing family's candidates.
+Do not derive either domain ID from locale formatting, iteration order, or the
+requesting chunk. Do not coerce lane types. Encode the validated five-lane
+array with `JSON.stringify`; that string is the canonical candidate key. Derive
+`placementId` as `"placement:" + canonicalCandidateKey`, and namespace each
+deterministic random lane by the canonical key plus an explicit `uint32` lane.
+A hash may index a lookup bucket, but it never owns identity or tie-breaking:
+compare the canonical keys or all typed lanes when hashes collide. Adding an
+unrelated family or loading chunks in another order must not change an existing
+family's candidates.
 
-Close placement phases in order. Within a phase, give each candidate one total
-winner key—declared priority, score, then the full candidate tuple—and accept it
-only when its key strictly wins against every conflicting candidate. Support
-and validity may read the immutable environment and completed prior phases, but
-not acceptance order within the current phase.
+Close placement phases in order. Before generating a phase, declare the meaning
+and units, or dimensionless status, of `priorityRank` and `scoreRank`; convert
+higher-is-better values to a lower-is-better rank. Reject non-finite ranks.
+Compare `(priorityRank, scoreRank, candidateTuple)` lexicographically: numeric
+order for ranks and `uint32` lanes, code-unit order for the canonical NFC string
+lanes. The lower key wins. Equal tuples are duplicate candidate identities and
+are a plan error. Accept a candidate only when its key strictly wins against
+every conflicting candidate. Support and validity may read the immutable
+environment and completed prior phases, but not acceptance order within the
+current phase.
 
 `environmentRevision` versions terrain, parcel, support, access, and registry
 inputs for acceptance-cache invalidation; it is not part of candidate identity

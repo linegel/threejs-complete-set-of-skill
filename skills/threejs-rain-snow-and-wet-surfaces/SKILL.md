@@ -88,6 +88,13 @@ extensive mass and momentum across impacts so their sum closes the parent
 transfer exactly once. Keep rendered streak/flake density, sprite size, and
 visual LOD outside this calculation.
 
+When implementing or independently auditing this physical-deposition branch,
+read or copy the
+[physical-area deposition oracle](examples/physical-area-deposition.mjs). It
+accepts varying quadrature areas, never normalizes impact partitions, and
+checks the receiver owner's extensive-mass ledger. It is a CPU oracle, not a
+runtime state owner.
+
 This step is complete when changing visual particle count and visual LOD under
 the same forcing trace leaves deposited mass and momentum unchanged, and
 changing receiver cadence leaves the time integral unchanged within the named

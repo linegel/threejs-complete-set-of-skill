@@ -18,14 +18,17 @@ emitter, medium, and transfer identity by revision and sample instant; any
 mismatch rejects that radiance sample.
 
 Use a nonuniform critical-split transfer table for a static spherical Ellis or
-Schwarzschild lens. Split at `B = 1` or `b = 3*sqrt(3)M`, concentrate samples
-in `log(abs(impact-impact_critical))`, and keep the two termination sides
-separate. Resolve a critical pixel footprint by integration or controlled
-supersampling; one sample of a divergent mapping aliases regardless of solver
-accuracy.
+Schwarzschild lens. Split Ellis at `B = 1`. For Schwarzschild, split signed
+`b` at `-b_c` and `+b_c`, or index by `(abs(b), sign(b))` and split the
+magnitude at `b_c = 3*sqrt(3)M`. Concentrate samples in
+`log(abs(impactMagnitude-impactCritical))`, and keep radial regime, orientation,
+termination, and exterior identity separate. Resolve a critical pixel
+footprint by integration or controlled supersampling; one sample of a
+divergent mapping aliases regardless of solver accuracy.
 
-Each cache key includes the model and revision, nondimensional scale, lens
-transform, camera event/frame, projection, viewport, integration bound,
+Each cache key includes the model and revision, the full dimensionless
+metric/solver parameter tuple (for example Kerr `a/M`), nondimensional scale,
+lens transform, camera event/frame, projection, viewport, integration bound,
 tolerance, and map layout. Refresh when their change moves the mapped direction
 beyond the declared fraction of an environment texel or changes a discrete
 termination/event class.

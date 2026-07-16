@@ -51,11 +51,11 @@ Bind the meter to the intended texture and frame. The default image order is:
 scene-linear radiance
   -> effect-local temporal filters
   -> temporal color resolve, when enabled
-  -> meter tap from resolved pre-bloom HDR
+  -> meter tap from resolved pre-bloom HDR, when automatic exposure is admitted
   -> bloom and other scene-linear optical terms
   -> exposure
   -> tone map
-  -> grade
+  -> grade, when admitted
   -> output conversion
 ```
 
@@ -251,9 +251,9 @@ authored schedule; an untracked previous-frame texture is a scheduling defect.
 - A primary, spectral basis, quantity, nonlinear normalization, or key change
   clears meter statistics and reseeds adaptation before presentation.
 - A resize/DPR change rebuilds source-sized resources and regenerates sample
-  coordinates.
-- Device loss recreates buffers and seeds the new resource generation from an
-  authored valid state.
+  coordinates only when the admitted automatic meter owns them.
+- Device loss recreates and seeds only the GPU state admitted by the selected
+  exposure branch.
 
 Diagnostic readback age affects telemetry only. It never changes controller
 state or gates the current frame.
@@ -344,16 +344,20 @@ initialization. r185 render timestamps cover timestamped render passes, not
 compute, copies, queue gaps, or presentation; label narrower evidence
 accordingly.
 
-Acceptance requires:
+Acceptance requires exactly one exposure, tone map, and output conversion, plus
+unchanged alpha through every admitted nonlinear RGB operation. Add only the
+evidence required by the selected branches:
 
-- key-card target EV;
-- monotone target/current EV response to a bright-source trajectory;
-- sampled-versus-exact small-emitter and mask evidence when sampling is used;
-- histogram underflow/overflow and interval evidence when a histogram is used;
-- meter invariance under excluded UI;
-- identity-cube ramps, saturated swatches, and declared-domain error;
-- unchanged alpha through exposure and grading;
-- exactly one exposure, tone map, and output conversion.
+- fixed exposure: calibrated EV and multiplier, with zero meter reads,
+  reduction, target-publication, or adaptation state;
+- automatic exposure: key-card target EV and monotone target/current EV
+  response to a bright-source trajectory;
+- sampled metering: sampled-versus-exact small-emitter, mask, and excluded-UI
+  evidence;
+- histogram metering: underflow, overflow, weighted-total, and accepted
+  percentile-interval evidence;
+- LUT grading: identity-cube ramps, saturated swatches, declared-domain error,
+  and unchanged alpha through grading.
 
 Failure signatures localize the cause: pumping implicates source stability,
 sampling, or cadence; a one-frame jump implicates source/state ordering or

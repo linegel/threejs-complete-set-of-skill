@@ -14,7 +14,7 @@ installed Three.js revision. Source paths are anchors; line numbers are not.
 | `pass()` / `mrt()` / `renderOutput()` | canonical signal/output nodes | `node_modules/three/src/nodes/` and `node_modules/three/src/Three.TSL.js` | inventory serialized or removed signals rather than implying parity |
 | `ShaderMaterial` / `EffectComposer` / `WebGLRenderTarget` | legacy primitives | `node_modules/three/src/materials/` and `node_modules/three/examples/jsm/postprocessing/` | keep inside the isolated branch and own lifetime/disposal |
 | `InstancedMesh` | static/baked representation | `node_modules/three/src/objects/InstancedMesh.js` | batching does not imply compute/storage parity |
-| `SRGBColorSpace` / `NoColorSpace` | color/data domains | `node_modules/three/src/constants.js` | color inputs use sRGB; computational data stays linear |
+| `SRGBColorSpace` / `LinearSRGBColorSpace` / `NoColorSpace` | color/data domains | `node_modules/three/src/constants.js` | color textures declare their actual sRGB or Linear-sRGB space; non-color data textures use `NoColorSpace` |
 
 API limits and alignments are `Gated` facts from the installed API. Runtime
 observations are `Measured`; copy neither across devices nor revisions.

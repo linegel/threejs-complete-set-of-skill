@@ -118,29 +118,33 @@ validity epoch and resets the affected history instead of deriving an extreme
 velocity.
 
 Reset phase timestamps, accumulator and debt records, seed counters, event
-flags, finite terminal locks, previous/current buffers, and validation staging
-together. Disposal releases storage, compute resources, readback staging,
-listeners, timers, and the renderer loop owned by the system.
+flags, finite terminal locks, and previous/current buffers together only for a
+semantic motion reset. A camera cut or other temporal-only reset clears the
+affected presentation history without restarting semantic motion. Disposal
+releases storage, compute resources, readback staging, listeners, timers, and
+the renderer loop owned by the system.
 
 **Complete when:** every discontinuity selects preserve, migrate, or reset for
-each history consumer; no old identity can observe a reused slot; reset and
-dispose leave no live owner, listener, buffer, or animation loop.
+each history consumer; temporal-only resets preserve semantic state; semantic
+resets restore the declared initial state atomically; no old identity can
+observe a reused slot; disposal leaves no live owner, listener, buffer, or
+animation loop.
 
 ### 6. Verify the invariants
 
-Run analytic and recurrent sequences at 30, 60, 120, and 240 Hz presentation
-while holding their authoritative timeline or fixed-step schedule constant. Run
-perceptual follow at the same rates against one timestamped or analytically
-integrated target signal and compare shared wall-time checkpoints. Check direct
-seek against replay, step-halving for recurrent state, the exact finite terminal
-pose and declared velocity/hand-off, zero residual velocity only for a finite
-terminal lock, phase/wrap continuity for periodic motion, and the declared
-stop/reset transition for open-ended motion.
-Also check quaternion norm and sign continuity, world-matrix equality across
-reparenting, stable instance identity, and reset behavior for every
-discontinuity. For GPU motion, record dispatches, hot bytes, p50/p95 time, and
-zero frame-critical readbacks. Verify one presentation/output owner when node
-post is present.
+For each selected branch, run only its applicable checks. Analytic motion
+compares direct seek with replay at 30, 60, 120, and 240 Hz presentation.
+Recurrent motion holds one fixed-step schedule across those presentation rates
+and passes step-halving. Perceptual follow consumes one timestamped or
+analytically integrated target signal and compares shared wall-time checkpoints.
+Finite motion reaches its exact terminal pose and declared velocity or hand-off;
+only a terminal lock requires zero residual velocity. Periodic and open-ended
+motion verify their declared wrap or stop/reset transition.
+
+Where selected, also check quaternion norm and sign continuity, world-matrix
+equality across reparenting, stable instance identity, and reset behavior for
+every discontinuity. GPU motion records dispatches, hot bytes, p50/p95 time, and
+zero frame-critical readbacks. Node post proves one presentation/output owner.
 
 **Complete when:** every selected branch passes its cadence, ownership, frame,
 reset, lifecycle, and visible-failure checks, with thresholds and target hardware

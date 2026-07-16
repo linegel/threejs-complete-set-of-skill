@@ -16,8 +16,9 @@ A single view determines only visible evidence. Hidden surfaces, thickness, abso
 For a local image, set `<skill-dir>` to the directory containing this `SKILL.md`,
 then run `python3 "<skill-dir>/scripts/probe_reference_image.py" "<image>"` using
 [probe_reference_image.py](scripts/probe_reference_image.py). It reports format,
-dimensions, aspect ratio, and technical warnings; it does not judge the pictured
-object.
+byte count, dimensions, aspect ratio, and metadata parsing status. That status
+describes file metadata only; visual inspection in stage 1 alone determines
+whether the pictured object is readable.
 
 ## Six-stage sculpt
 
@@ -30,7 +31,7 @@ Inspect every view before planning geometry. Record:
 - which contours, negative spaces, contacts, material regions, and repeated features are directly observed;
 - which hidden forms or physical properties remain assumptions.
 
-Assign a **technical readability** verdict:
+Visual inspection alone assigns an **evidence readability** verdict:
 
 - `readable`: the target and its dominant silhouette are clear enough to choose a reconstruction;
 - `conditional`: a useful approximation is possible with named assumptions, reduced scope, or another view;
@@ -111,4 +112,4 @@ Verification is complete when the artifact passes the checks appropriate to its 
 
 ## Result
 
-Return the technical-readability verdict, evidence and assumptions, decomposition and identity anchors, representation decisions, branch results, verification evidence, and remaining limits. For implementation requests, edit the target code and report only checks and images actually inspected.
+Return the evidence-readability verdict, evidence and assumptions, decomposition and identity anchors, representation decisions, branch results, verification evidence, and remaining limits. For implementation requests, edit the target code and report only checks and images actually inspected.

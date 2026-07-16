@@ -139,6 +139,15 @@ Custom specular AA adds only unresolved material-detail variance. Read
 [derivative normals and specular AA](references/procedural-pbr-system.md#derivative-normals-and-specular-aa)
 before adding procedural bump, custom normal filtering, or roughness variance.
 
+When a scalar procedural height supplies both normal detail and specular AA,
+read [the filtered-height normal example](examples/filtered-height-normal.mjs).
+Supply its dimensionless `footprintCyclesPerSample` from the full post-warp
+Jacobian spectral norm, physical support frequency in cycles per length unit,
+and positive band half-range around the supplied mean. `heightHalfAmplitude`
+uses the same length unit as the surface. It keeps attenuation, removed slope
+variance, double-sided surface-gradient normal handling, and `roughness^2`
+widening in one causal path.
+
 This step is complete when all retained bands pass the projected footprint,
 removed slope/normal variance is accounted for exactly once, and a no-post
 close/mid/far comparison rejects distance-dependent sharpening and grazing

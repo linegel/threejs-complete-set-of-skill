@@ -54,15 +54,20 @@ extinction also gives the same fixture optical depth on CPU and GPU.
 ### 3. Build products in dependency order
 
 The authored local branch samples its sky and distance/height haze directly
-from the shared model and host depth. The compact LUT branch generates:
+from the shared model. It needs host depth only when haze is a separate
+depth-aware post. For the compact LUT branch, allocate no product merely
+because the branch was selected. Admit products by consumer:
 
-```text
-transmittance
-  -> multiscatter and optional irradiance
-  -> camera/sun sky-view
-  -> aerial RGB inscattering plus RGB optical depth
-  -> scene composition
-```
+| Product | Allocate only when |
+| --- | --- |
+| Transmittance | an admitted sky, aerial, or lighting path requires it directly or through a dependent product |
+| Multiscatter | an admitted sky, aerial, or lighting closure includes higher-order response |
+| Irradiance | an admitted diffuse-lighting consumer samples it |
+| Sky-view | an admitted visible-sky consumer samples it |
+| Aerial RGB inscattering and RGB optical depth | an admitted depth-aware composition consumer samples the paired payload |
+
+A sky-only or lighting-only branch has no aerial allocation or aerial view
+dependencies.
 
 Give each product its own dependency key and last-update reason. Atmosphere
 profile and body changes dirty base products. Camera body-relative pose,
@@ -78,16 +83,21 @@ readback, reuse, and retirement with an actual completion mechanism.
 
 **Complete when:** every sampled product names all of its physical and view
 dependencies, no consumer can observe a newer dependency with an older
-dependent product, and unchanged base LUTs survive camera-only changes.
+dependent product, every unadmitted product has zero allocation and no
+dependency state, and unchanged base LUTs survive camera-only changes.
 
-### 4. Compose sky and aerial perspective
+### 4. Compose the selected branch
 
-Reuse the host scene color and depth. Reconstruct the active perspective,
-reversed, logarithmic, or orthographic depth convention into a metric segment,
-then intersect that segment with the atmosphere. Classify sky through explicit
-coverage or the declared clear-depth encoding.
+For an in-scene authored branch, attach the `SkyMesh` and TSL fog/haze to the
+host scene and keep their output scene-linear.
 
-For a visible surface, apply exactly:
+For a separate depth-aware haze or LUT aerial branch, reuse the host scene
+color and depth. Reconstruct the active perspective, reversed, logarithmic, or
+orthographic depth convention into a metric segment, then intersect that
+segment with the atmosphere. Classify sky through explicit coverage or the
+declared clear-depth encoding.
+
+For a visible surface in that branch, apply exactly:
 
 ```text
 C_out = C_scene * T_segment + S_segment
@@ -102,14 +112,15 @@ For planetary bodies, exterior cameras, ellipsoids, non-perspective depth, or a
 shell/post handoff, read
 [references/body-depth-and-composition.md](references/body-depth-and-composition.md).
 
-**Complete when:** standard and enabled alternate depth modes reconstruct known
-positions within the declared tolerance, sky/surface coverage is stable, the
-zero-atmosphere control returns `C_scene`, and tone mapping/output conversion
-runs once.
+**Complete when:** each admitted in-scene branch reaches the host output path
+once; each enabled depth-aware branch reconstructs known positions within the
+declared tolerance, keeps sky/surface coverage stable, and returns `C_scene`
+under the zero-atmosphere control; tone mapping/output conversion runs once.
 
-### 5. Expose the lighting handoff
+### 5. Expose an admitted lighting handoff
 
-Expose only the quantities another system needs:
+When another system consumes atmosphere-derived lighting, expose only the
+quantities it needs:
 
 - sample time, model revision, physics frame/origin, support, filter, age, and
   error;
@@ -125,9 +136,10 @@ Clouds add cloud-only optical depth; geometry adds visibility; water adds its
 own path extinction. A consumer chooses one atmosphere direct-light form and
 applies each factor once.
 
-**Complete when:** every lighting consumer can identify quantity, unit, frame,
-sample age, and included attenuation, and a factor trace proves that atmosphere,
-cloud, geometry, water, and aerial transport each appear at most once.
+**Complete when:** a visual-only branch has no unused lighting interface; every
+admitted lighting consumer can identify quantity, unit, frame, sample age, and
+included attenuation, and its factor trace proves that atmosphere, cloud,
+geometry, water, and aerial transport each appear at most once.
 
 ### 6. Verify the selected branch
 

@@ -132,7 +132,10 @@ Nperturbed = normalize(abs(det)*N - heightScale*surfaceGradient)
 ```
 
 Evaluate it in derivative-uniform fragment control flow. Vertex/compute users
-need analytic or stored gradients. Filter `h` before perturbation.
+need analytic or stored gradients. Filter `h` before perturbation. When `N` is
+r185 `normalView` on a double-sided material, multiply `det` by
+`faceDirection`, matching `BumpMapNode`; otherwise restrict the branch to front
+faces.
 
 Normal/height mip contracts retain unresolved detail:
 

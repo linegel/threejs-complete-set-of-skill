@@ -100,7 +100,8 @@ For Three.js r185:
 - feed one `RenderPipeline`; reuse its color/depth rather than rendering the
   scene again.
 
-A compact real-time branch uses these products:
+A compact real-time branch admits only products consumed by its selected
+workload, directly or as dependencies:
 
 | Product | Meaning | Dependencies |
 | --- | --- | --- |
@@ -133,15 +134,15 @@ magnitude. Factor sun direction out only when it is an explicit LUT coordinate.
 
 Update in this order:
 
-1. Validate units, coefficient inequalities, body radii/axes, density support,
-   formats, and dependency keys.
-2. Generate transmittance.
-3. Generate multiscatter and optional irradiance from the committed
-   transmittance generation.
-4. Generate sky-view from committed base products and its body-local camera/sun
-   parameters.
-5. Generate or reproject aerial inscattering and optical depth together.
-6. Publish the complete product set, then compose the scene.
+1. Validate the admitted product set, units, coefficient inequalities, body
+   radii/axes, density support, formats, and dependency keys.
+2. Generate transmittance only when an admitted path requires it.
+3. Generate admitted multiscatter, then admitted irradiance, from their
+   committed dependencies.
+4. Generate sky-view only for an admitted visible-sky consumer.
+5. Generate or reproject aerial inscattering and optical depth together only
+   for an admitted depth-aware composition consumer.
+6. Publish the complete admitted product set, then compose the scene.
 
 Publish a product generation only when every dependency revision matches.
 Camera yaw/roll, temporal jitter, and a pure floating-origin translation do not

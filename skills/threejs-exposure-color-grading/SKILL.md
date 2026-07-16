@@ -103,7 +103,8 @@ the new resource generation.
 
 **Complete when:** every cut, invalid input, basis/scale change, resize, and
 device-loss event maps to one conversion, hold, rebuild, or reseed action that
-finishes before the affected frame is admitted.
+finishes before the affected frame is admitted, or to an explicit no-op because
+the selected branch owns no affected state.
 
 ## 5. Compose one final-image chain
 
@@ -129,6 +130,11 @@ With explicit `renderOutput()`, set
 ownership. Read [tone mapping and LUTs](references/scene-referred-color-pipeline.md#tone-mapping-and-luts)
 only when loading, authoring, or placing a cube.
 
+When a tone-mapped-linear cube is admitted, read
+[the identity 3D-LUT example](examples/identity-3d-lut.mjs) for voxel ordering
+and `Data3DTexture` configuration. It is a correctness fixture, not a look or
+performance bypass.
+
 **Complete when:** the graph contains one exposure multiply, one tone map, one
 working-to-output conversion, and—only when admitted—one LUT placement in its
 declared domain.
@@ -137,10 +143,13 @@ declared domain.
 
 Capture deterministic fixtures:
 
-- a key-gray calibration card with the expected target EV;
-- for automatic exposure, a bright source entering and leaving frame with
-  monotone target/current EV trajectories, plus the selected meter's mask,
-  small-emitter, and cadence cases;
+- for fixed exposure, a calibration card proving the authored EV and multiplier
+  with zero meter source reads or adaptation state;
+- for automatic exposure, a key-gray card with the expected target EV and a
+  bright source entering and leaving frame with monotone target/current EV
+  trajectories;
+- for a sampled automatic meter, its mask, small-emitter, and cadence cases;
+- for a histogram, its underflow, overflow, and accepted percentile interval;
 - when a LUT is admitted, an identity LUT with ramps and saturated swatches in
   its declared domain;
 - output isolation showing exactly one tone map and one output conversion.

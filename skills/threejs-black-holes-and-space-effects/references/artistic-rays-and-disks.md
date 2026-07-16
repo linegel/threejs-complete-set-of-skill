@@ -103,7 +103,7 @@ Generate a seeded environment containing high-frequency directional markers.
 At fixed cameras compare step sequences such as `h`, `h/2`, and `h/4`:
 
 - silhouette and final-direction angular difference;
-- miss/core/escape/step-cap agreement;
+- miss/core/escaped/step-cap agreement;
 - disk crossing count, order, and location;
 - accumulated radiance and transmittance;
 - camera-inside, moved, scaled, and far-from-origin proxy behavior.

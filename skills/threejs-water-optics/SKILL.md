@@ -126,6 +126,13 @@ sources, an explicit boundary condition, and this dispatch order:
 event gather -> propagate -> swap -> derivatives -> optical auxiliaries.
 ```
 
+Before accepting this branch, import the
+[bounded-heightfield dispersion comparator](scripts/bounded-heightfield-dispersion.mjs)
+and call `boundedHeightfieldDispersion()` with the selected `c`, `dt`, `dx`,
+`dz`, `kx`, and `kz`. It predicts the undamped (`gamma=0`) discrete phase;
+compare that prediction with the measured analytic-mode phase. Measure
+amplitude error independently for the actual damping and source configuration.
+
 **Branch complete when:** the CFL margin is positive; analytic-mode phase and
 amplitude errors, boundary reflection, mean drift, precision error, and
 finite-value scan pass; overlapping events have no write race; and every

@@ -71,11 +71,15 @@ pipeline.outputColorTransform = false;
 
 const inputPass = pass( scene, camera, { samples: 0 } );
 inputPass.transparent = false;
-inputPass.setMRT( mrt( { output, normal: normalView, velocity } ) );
+const inputOutputs = { output, normal: normalView };
+if ( temporalEnabled ) inputOutputs.velocity = velocity;
+inputPass.setMRT( mrt( inputOutputs ) );
 
 const depth = inputPass.getTextureNode( 'depth' );
 const normal = inputPass.getTextureNode( 'normal' );
-const motion = inputPass.getTextureNode( 'velocity' );
+const motion = temporalEnabled
+  ? inputPass.getTextureNode( 'velocity' )
+  : null;
 
 const gtao = ao( depth, normal, camera );
 gtao.resolutionScale = 0.5; // Authored start
@@ -92,7 +96,10 @@ const reconstructed = rtt( denoise( raw, depth, normal, camera ), null, null, {
 } );
 
 const visibility = reconstructed.sample( screenUV ).r;
+const separateExcludedLayers =
+  temporalEnabled || externalLayerCompositorOwned;
 const litPass = pass( scene, camera );
+litPass.transparent = ! separateExcludedLayers;
 litPass.contextNode = builtinAOContext( visibility );
 let finalHDR = litPass.getTextureNode( 'output' );
 
@@ -101,9 +108,32 @@ if ( temporalEnabled ) {
   finalHDR = traa( finalHDR, depth, motion, camera );
 }
 
+if ( separateExcludedLayers ) {
+  finalHDR = composeExcludedLayers(
+    finalHDR,
+    excludedTransparentAndRefractiveLayers
+  );
+}
+
 pipeline.outputNode = renderOutput( finalHDR );
 pipeline.needsUpdate = true;
 ```
+
+`composeExcludedLayers(...)`, `excludedTransparentAndRefractiveLayers`, and
+`externalLayerCompositorOwned` are application-owned placeholders, not r185
+exports. The ordinary non-temporal
+stock-forward branch leaves `litPass.transparent` enabled, so r185 keeps its
+built-in transparent/transmission rendering and no extra composition is added.
+A temporal resolve, or an already-owned external compositor, renders only the
+admitted layers and composes excluded layers afterward with the declared alpha
+and ordering contract. Do not send excluded layers through TRAA unless beauty,
+depth, velocity, coverage, and rejection describe the same membership. Charge
+their separate rendering and composition whenever `separateExcludedLayers` is
+true; when an external compositor is shared, charge AO only its marginal delta.
+
+The non-temporal graph omits the velocity MRT output and its full-resolution
+attachment. Add it only when the selected temporal resolve consumes motion, or
+reuse a compatible velocity attachment already owned by the shared scene pass.
 
 With no reconstruction, use `raw.sample(screenUV).r`. Embedding `raw.r` or the
 materialized texture's `.r` directly in a mesh material samples through mesh UVs.
@@ -199,7 +229,10 @@ history. Temporal AO requires:
 
 - MSAA disabled for r185 TRAA;
 - beauty, depth, and velocity at identical dimensions;
+- identical admitted layer membership across beauty, depth, and velocity;
 - camera, rigid, skinned/deforming, instanced, and relevant alpha motion;
+- excluded transparent/refractive layers composed after the resolve unless they
+  provide matching depth, velocity, coverage, and rejection inputs;
 - disocclusion rejection and passing motion/resize fixtures;
 - the entire TRAA marginal cost charged when it was not already selected.
 

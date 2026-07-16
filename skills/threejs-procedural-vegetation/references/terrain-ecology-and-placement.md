@@ -109,7 +109,7 @@ changes; instantaneous wind deformation is a separate dynamic branch.
 World-anchored candidates use a fixed-width tuple:
 
 ```text
-(generatorSchemaVersion, globalSeedWords, speciesRegistryIndex,
+(generatorSchemaVersion, globalSeedWords, stableSpeciesIdWords,
  biasedWorldCellWords, candidateOrdinal)
 ```
 
@@ -121,10 +121,26 @@ priorities with the full tuple:
 winnerKey = lexicographic(priorityHashU32, candidateTuple)
 ```
 
+The higher lexicographic `(priorityHashU32, candidateTuple)` wins. The full
+tuple therefore resolves equal priority hashes without treating a hash
+collision as identity equality.
+
 Specify the integer mixer, wraparound, serialization, signed-coordinate bias,
 and CPU/TSL test vectors. Environmental revisions invalidate acceptance but do
 not renumber unaffected candidates. A mutable RNG stream is inappropriate
 because loading another chunk or adding a species would shift later results.
+`stableSpeciesIdWords` are immutable identifiers, not the current position of a
+species in a registry. If an implementation uses a numeric registry index, the
+index must remain append-only for the complete generator-schema lifetime;
+reordering or reusing an index requires a new `generatorSchemaVersion`.
+
+Use [placement-oracle.mjs](../scripts/placement-oracle.mjs) as the executable
+oracle for tuple serialization, collision-aware winner comparison, half-open
+chunk ownership, Matérn-II acceptance, and nested LOD rank selection.
+Its schema uses two global-seed words, two authored immutable species-ID words,
+three biased signed-cell-coordinate words, and one candidate ordinal. A
+different tuple width or field order requires a new generator schema and its
+own parity oracle.
 
 ## Conflict selection
 
@@ -140,9 +156,10 @@ Choose one process and preserve its semantics:
 Declare the symmetric conflict distance, such as `max(r_i,r_j)` or a
 species-pair matrix.
 
-- **Matérn-II/local maximum:** accept `i` exactly when its total `winnerKey`
-  outranks every directly conflicting candidate. A halo covering the maximum
-  conflict reach plus all sampled-field support is sufficient.
+- **Matérn-II/local maximum:** accept `i` exactly when its total `winnerKey` is
+  lexicographically higher than every directly conflicting candidate's key. A
+  halo covering the maximum conflict reach plus all sampled-field support is
+  sufficient.
 - **Global priority-greedy:** visit all candidates in total priority order and
   accept each candidate with no already accepted conflict. Influence may cross
   arbitrarily long conflict chains, so use a global/offline compile, an
@@ -160,12 +177,13 @@ clump across a boundary or path.
 
 ## LOD population invariant
 
-Accepted placement is immutable across render LOD. Assign each plant a stable
-thinning rank. Lower-density tiers retain nested thresholds of that ordering,
-with explicit preservation of landmarks and protected species/community
-fractions. A transition passes only when canopy or ground-cover error and
-habitat-boundary movement remain inside the declared limits. Chunk loading and
-camera motion cannot reshuffle survivors.
+Accepted placement is immutable across render LOD. Derive a stable thinning key
+independently from the placement winner key, order plants from higher to lower
+thinning key, and define every lower-density tier as a prefix of that same
+ordering. Preserve landmarks and protected species/community fractions
+explicitly without reordering unrelated plants. A transition passes only when
+canopy or ground-cover error and habitat-boundary movement remain inside the
+declared limits. Chunk loading and camera motion cannot reshuffle survivors.
 
 Static placement normally compiles on the CPU or a worker into compact records.
 Compute earns the branch only when changed data volume, regeneration cadence,

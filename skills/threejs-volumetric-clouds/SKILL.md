@@ -26,19 +26,31 @@ Select each independent workload branch:
 | Local versus broad | full-resolution scissored march for a small projected bound; reduced-resolution march for broad coverage | complete-branch GPU cost and image error |
 | Full versus reduced current grid | full current grid for low reuse; reduced grid plus reconstruction for coherent broad clouds | current-sample, bandwidth, and reconstruction error |
 | Dense versus sparse | bounded adaptive march for dense occupancy; conservative macrocell DDA for sparse occupancy | saved samples exceed hierarchy build/traversal cost |
-| Receiver shadow | full-column 2D optical depth for ground/opaque receivers; short sun march or depth-aware light product for in-cloud samples | receiver query and transmittance error |
+| Receiver shadow | none when no external receiver queries cloud shadow; full-column 2D optical depth for ground/opaque receivers; short sun march or depth-aware light product for in-cloud samples | admitted receiver query and transmittance error |
 | Precipitation | appearance-only cues; or causal liquid/ice emission consumed by `$threejs-rain-snow-and-wet-surfaces` | dimensioned emission, support, transport delay, and conservation error |
 
 For causal precipitation, publish liquid and ice mass flux in `kg m^-2 s^-1`,
 or interval-integrated areal mass in `kg m^-2`, explicitly identified with its
-sample interval, physical support, area/Jacobian convention, fall delay or
-transport model, owner, version, validity, conservation gate, and error.
-Otherwise label precipitation appearance-only and do not drive receiver
-accumulation.
+sample time, sample interval, physics frame/origin, physical support,
+area/Jacobian convention, fall delay or transport model, owner, contract
+version, generation, validity, conservation gate, and error. Publish each
+interval once to `$threejs-rain-snow-and-wet-surfaces`. The receiver converts
+flux to interval mass once, preserves the declared support/Jacobian, and applies
+the declared delay or transport before accumulation.
 
-**Complete when:** all five decisions name the selected representation, the
-observable it serves, and a falsifiable cost or error gate; causal
-precipitation additionally has one dimensioned producer and consumer.
+A density/emission recipe, incompatible physics frame/origin mapping,
+support/Jacobian convention, or delay model change starts a new generation.
+The receiver rejects stale or incompatible generations and never reinterprets
+prior interval mass. An appearance-only branch remains visual-only and
+publishes no receiver input.
+
+Allocate no receiver-shadow product for the `none` branch.
+
+**Complete when:** all five decisions name the selected representation and its
+observable; every admitted workload has a falsifiable cost or error gate; a
+`none` receiver-shadow branch records no receiver consumer and zero allocation;
+appearance-only precipitation publishes no receiver input; causal precipitation
+has one dimensioned generation accepted by one compatible consumer.
 
 ### 2. Define one optical and motion model
 
@@ -138,7 +150,7 @@ cloud shadows, or shadow filtering.
 
 **Complete when:** step-halving and higher-light-sample controls fit the linear
 HDR error gate, the cloud-off control returns unit transmittance and zero cloud
-radiance, and each shadow query decodes the optical depth from its actual
+radiance, and each admitted shadow query decodes optical depth from its actual
 receiver position.
 
 ### 5. Reconstruct broad clouds
@@ -186,11 +198,17 @@ not cross the opaque surface.
 
 ### 6. Integrate the lighting and image handoffs
 
-Consume atmosphere lighting with its sample time, frame, quantity, unit, basis,
-support, filter, age, and error. Choose either direct light already attenuated
-by the atmosphere or an unattenuated source plus atmosphere transmittance.
-Multiply cloud-only transmittance and opaque visibility separately. Keep
-directional sky radiance distinct from hemispherical sky irradiance.
+Choose one incident-light contract:
+
+- an authored source that declares owner, revision, sample time and age, frame,
+  quantity, unit, basis, direction or angular support, filter, included
+  attenuation, validity, and error; or
+- atmosphere lighting that declares the same tuple.
+
+For the atmosphere branch, choose either direct light already attenuated by the
+atmosphere or an unattenuated source plus atmosphere transmittance. Multiply
+each admitted cloud-only transmittance and opaque-visibility factor separately.
+Keep directional sky radiance distinct from hemispherical sky irradiance.
 
 Composite clouds before the host tone map:
 
@@ -203,9 +221,10 @@ with explicit format/filter/mip policy and `NoColorSpace`. Let the host
 `renderOutput()` or `outputColorTransform` own the one display conversion;
 mark the pipeline dirty after replacing a diagnostic output node.
 
-**Complete when:** an attenuation trace accounts for atmosphere, cloud, and
-geometry once each; cloud buffers remain linear HDR; and toggling clouds off
-returns the identical host image path.
+**Complete when:** the incident source has a complete contract, an attenuation
+trace accounts for every admitted atmosphere, cloud, and geometry factor once,
+cloud buffers remain linear HDR, and toggling clouds off returns the identical
+host image path.
 
 ### 7. Verify the system
 
@@ -214,16 +233,23 @@ Verify:
 - homogeneous-slab transfer, zero-extinction limit, and phase normalization;
 - bounds, opaque-depth clamp, conservative skipping, and early-exit error;
 - fixed-seed weather mass, erosion, octave filtering, and advection continuity;
-- ground and in-cloud shadow decoding, cadence, and stale-product rejection;
-- translating density, depth encoding, history rejection, response time, and
-  depth-aware upsample, including mapped and incompatible origin rebases;
+- each admitted ground or in-cloud shadow decoder, cadence, and stale-product
+  rejection;
+- for causal precipitation, flux-to-interval integration, conserved mass under
+  cadence repartition and physical-support/Jacobian area repartition, declared
+  delay-to-arrival mapping, and stale-generation rejection; the appearance-only
+  control publishes no receiver input;
+- for each admitted temporal branch, translating density, depth encoding,
+  history rejection, response time, and depth-aware upsample, including mapped
+  and incompatible origin rebases;
 - fixed-view HDR radiance, transmittance, silhouette, and halo against a
   higher-quality reference;
-- create, resize/tier-switch, history reset, GPU completion, and disposal.
+- create, GPU completion, disposal, and each admitted resize/tier-switch or
+  history-reset lifecycle.
 
 **Complete when:** every selected branch passes its numeric, temporal, visual,
-and lifecycle gates, and diagnostics identify current density, shadow, and
-history generations.
+and lifecycle gates, and diagnostics identify each retained density, shadow,
+history, and causal-precipitation generation.
 
 ## Failure signatures
 

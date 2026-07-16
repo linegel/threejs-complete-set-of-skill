@@ -66,7 +66,8 @@ among unavailable capabilities. Read the
 the legacy/API branch; reverify each symbol against the installed revision.
 
 This step is complete when the selected representation is the earliest row
-that passes every `preserved` invariant and every remaining loss is explicit.
+that passes every `preserved` invariant and every `weakened` invariant's frozen
+gate, and every remaining loss is explicit.
 
 ## 4. Isolate ownership
 
@@ -87,21 +88,22 @@ resource has one owner and disposal path.
 
 ## 5. Validate the changed claims
 
-Invoke `$threejs-visual-validation` for every preserved or weakened claim. Use
-the canonical evidence as truth. For visual or mechanism claims, capture the
-final/no-post/contribution views needed to isolate the cause; for temporal,
-performance, resource, or lifecycle claims, capture only their producing trace
-and diagnostics. Return `PASS`, `FAIL`, or `INSUFFICIENT_EVIDENCE` per claim.
+Invoke `$threejs-visual-validation` for every preserved or weakened claim when
+it is installed. With that owner, use canonical evidence as truth, capture only
+the views, traces, and diagnostics that produce the claim, and exercise its
+applicable reset, resize/DPR, transition, teardown, and dispose/recreate paths.
+Persistent resources must plateau after declared warm-up.
 
-Exercise the branch-specific reset, resize/DPR, repeated transition, teardown,
-and dispose/recreate paths. Persistent resources must plateau after declared
-warm-up. Missing timestamps make a required GPU-attribution claim
-`INSUFFICIENT_EVIDENCE`; presentation or CPU duration remains end-to-end
-evidence only.
+If the owner is absent, report it and return `INSUFFICIENT_EVIDENCE` for the
+affected claims; do not construct replacement validation inside this skill.
+Missing timestamps likewise make required GPU attribution
+`INSUFFICIENT_EVIDENCE`; presentation or CPU duration is end-to-end evidence
+only.
 
-This step is complete when every surviving claim has a direct verdict, every
-removed claim is absent from product language, output conversion has one owner,
-and lifecycle resources plateau or fail.
+This step is complete when every surviving claim has a verdict, every removed
+claim is absent from product language, output conversion has one owner, and
+lifecycle/resource claims either plateau or fail under validation or remain
+`INSUFFICIENT_EVIDENCE` with the missing evidence named.
 
 ## Output
 
@@ -111,5 +113,5 @@ Return one row per feature:
 | --- | --- | --- | --- | --- | --- | --- |
 
 Also record the activation facts, isolated entrypoint and maintenance owner,
-output owner, lifecycle result, unsupported claims, and the exact evidence
-needed for any `INSUFFICIENT_EVIDENCE` verdict.
+output owner, lifecycle result, unsupported claims, any missing verification
+owner, and the exact evidence needed for each `INSUFFICIENT_EVIDENCE` verdict.

@@ -99,7 +99,9 @@ attachmentTraffic >= Wp * Hp * b * l * (m + 1)
 ```
 
 Alignment, compression, tile residency, resolves, allocator granularity, and
-cache behavior require target evidence. Measure paired complete graphs:
+cache behavior require target evidence. Reject any candidate that misses the
+signal's domain, error, coverage, temporal, or discard contract before timing
+it. Compare only correct implementations in paired complete graphs:
 
 ```text
 deltaMRT(a) = graphWithAttachment(a) - graphWithout(a)
@@ -331,6 +333,8 @@ Use these signatures to route fixes:
 | adaptive DPR oscillates | thresholds/dwell/cooldown or cost model is invalid |
 | GPU time excludes visible work | timestamp scope omits copies, compute, or presentation |
 
-Accept the graph only after paired attachment alternatives, both velocity axes,
-every reset class, output isolation, fixed-view shipping tiers, and repeated
-create/resize/toggle/dispose cycles pass their declared criteria.
+Accept the graph after output isolation and the checks required by its admitted
+branches: paired attachment alternatives for each selected attachment; both
+velocity axes and every owned reset class for temporal history; fixed views for
+each supported shipping tier; and repeated create, resize, toggle, and dispose
+cycles for the resources the graph actually owns.

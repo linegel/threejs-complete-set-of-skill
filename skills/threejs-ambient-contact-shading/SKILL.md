@@ -68,7 +68,8 @@ shared-or-AO-owned depth + optional normal/velocity
   -> GTAO scalar visibility
   -> optional materialized edge-aware reconstruction
   -> indirect-light application
-  -> optional temporal resolve
+  -> optional temporal resolve over the matching admitted layers
+  -> excluded-layer composition only when those layers were separated
   -> one tone-map/output-transform owner
 ```
 
@@ -78,6 +79,11 @@ shared-or-AO-owned depth + optional normal/velocity
   sample the materialized texture with `screenUV`.
 - Inside a mesh material graph, sample both raw and reconstructed visibility
   explicitly with `screenUV`; implicit texture coordinates resolve to mesh UVs.
+- Keep stock transparent/transmission rendering in the non-temporal lit pass;
+  `builtinAOContext()` already skips transparent materials. Use an opaque-only
+  lit pass plus separate layer composition only for a temporal resolve or an
+  already-owned external compositor. Account for its full cost; charge AO only
+  the marginal delta when that compositor is shared.
 - Keep scalar visibility single-channel. Replace the output graph and mark the
   `RenderPipeline` dirty when AO is disabled so inactive work is unreachable.
 
@@ -94,7 +100,10 @@ every AO pass and dependency.
 `GTAONode.useTemporalFiltering` rotates samples; it does not create or reproject
 history. Enable it only with a live TRAA/custom resolve, valid camera and object
 motion (including deformation/instancing/alpha coverage), matching beauty/depth/
-velocity dimensions, rejection, and reset behavior.
+velocity dimensions and layer membership, rejection, and reset behavior. Resolve
+only layers represented by those depth and velocity signals. Composite excluded
+transparent or refractive layers afterward; admit them to the resolve only when
+their matching depth, motion, coverage, and rejection behavior are proven.
 
 Reset or reseed on camera/projection cuts, uncompensated rebases, geometry or
 coverage discontinuities, AO parameter/scale/resolution changes, and quality
@@ -105,9 +114,10 @@ When temporal AO is selected, read the
 [temporal contract](references/gtao-bent-normal-pipeline.md#temporal-contract)
 before constructing history.
 
-**Complete when:** moving-occluder, disocclusion, camera-cut, resize, and AO-
-parameter-change fixtures either pass with explicit rejection/reset or temporal
-AO is disabled.
+**Complete when:** beauty, depth, and velocity cover the same admitted layers;
+any excluded transparent/refractive layers are composed after the resolve; and
+moving-occluder, disocclusion, camera-cut, resize, and AO-parameter-change
+fixtures either pass with explicit rejection/reset or temporal AO is disabled.
 
 ## 5. Add bent normals only after scalar AO passes
 
@@ -126,14 +136,21 @@ directional use stays disabled.
 
 ## 6. Verify the finished graph
 
-Capture raw depth, normals, raw/reconstructed AO, indirect contribution,
-direct/emissive residuals, velocity/history rejection when present, and AO off.
-Exercise UV-seam meshes, thin silhouettes, transparent crossings, smooth curves,
-screen edges, asymmetric projections, motion, resize, and disposal/recreation.
+For an active screen-space branch, capture raw depth, the selected normal input,
+raw/reconstructed AO when admitted, indirect contribution, direct/emissive
+residuals, velocity/history rejection when temporal filtering is present, and
+AO off. Exercise UV-invariance, thin silhouettes, transparent crossings, smooth
+curves, screen edges, asymmetric projections, motion when present, resize, and
+disposal/recreation.
 
-**Complete when:** direct light and emission are invariant; no UV-following,
-cross-edge halo, seam, crawl, or trail remains in the accepted branch; AO-off
-shows zero AO work; target-device marginal time and resource use pass; and
+For authored material AO, validate the authored UV set, asset/world scaling, and
+indirect-only placement instead. For omitted screen AO, record that no screen-AO
+pass, attachment, history, or dependency is reachable.
+
+**Complete when:** direct light and emission are invariant; every fixture for
+the selected branch passes; an active screen-space branch has no unintended
+UV-following, cross-edge halo, crawl, or trail; AO-off or omission shows zero
+screen-AO work; target-device marginal time and resource use pass; and
 recreation returns resource counters to baseline.
 
 ## Ownership

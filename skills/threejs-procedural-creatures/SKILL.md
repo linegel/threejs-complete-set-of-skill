@@ -53,11 +53,18 @@ error gate, hysteresis/dwell, simultaneous-memory budget, and reset action.
 
 ## 3. Compile the generated body
 
-When the request needs a field-derived body, extracted skin, skinning,
-correction, semantic rig, creature locomotion, or repeated pose storage, read
-[creature-body-systems.md](references/creature-body-systems.md). Apply its
-spaces, compiler identities, blend-graph and field-parity rules,
-shipping-surface, fixed-step, support-relative IK, and pose-page contracts.
+When a selected branch needs a field-derived body, extracted skin, skinning,
+correction, semantic rig, creature locomotion, or repeated pose storage, open
+only its applicable sections of [creature-body-systems.md](references/creature-body-systems.md):
+
+- every selected branch reads [Spaces and state ownership](references/creature-body-systems.md#spaces-and-state-ownership)
+  and [Spec and compiler](references/creature-body-systems.md#spec-and-compiler);
+- generated-body work reads [Field and blend contract](references/creature-body-systems.md#field-and-blend-contract)
+  and [Reference surface and correction](references/creature-body-systems.md#reference-surface-and-correction);
+- rig or locomotion work reads [Pose and locomotion](references/creature-body-systems.md#pose-and-locomotion);
+- repeated-population work reads [Repeated populations and rendering](references/creature-body-systems.md#repeated-populations-and-rendering);
+- verification reads [Completion evidence](references/creature-body-systems.md#completion-evidence)
+  for the selected branches.
 
 When the body is a hierarchy of rigid shells or plates, read
 [articulated-hard-shell-creatures.md](references/articulated-hard-shell-creatures.md).

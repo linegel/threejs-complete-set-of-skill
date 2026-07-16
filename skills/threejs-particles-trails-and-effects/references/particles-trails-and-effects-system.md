@@ -6,7 +6,9 @@ the sections selected by the process in `SKILL.md`.
 ## Contents
 
 - [State and compaction](#state-and-compaction)
+- [Neighborhood interactions](#neighborhood-interactions)
 - [Temporal identity](#temporal-identity)
+- [Trail histories and ribbons](#trail-histories-and-ribbons)
 - [r185 execution facts](#r185-execution-facts)
 - [Coupled inputs](#coupled-inputs)
 - [Flow-conforming shells and wakes](#flow-conforming-shells-and-wakes)
@@ -113,6 +115,36 @@ Use a named fixed-step integrator for position-dependent forces, collision, or
 constraints. Convert units and frames once at the boundary; keep lateral spawn
 velocity in the event frame until that conversion.
 
+## Neighborhood Interactions
+
+Admit a neighborhood structure only when particles read bounded local state
+from other particles. Declare the interaction radius, cell size, grid
+frame/origin, finite domain or key range, and policy outside that domain. Cell
+size covers the interaction radius through a stated adjacent-cell stencil; a
+smaller cell is valid only when the larger stencil is enumerated.
+
+Use separately ordered stages:
+
+```text
+derive cell key from committed source state
+-> stable sort or bounded hash insertion
+-> publish cell ranges/buckets and overflow
+-> read immutable ranges for local interaction
+-> publish the next particle state
+```
+
+Sort equal keys by stable entity identity when deterministic accumulation is
+claimed. A hash route declares bucket capacity, collision handling, maximum
+neighbors examined, and whether overflow rejects the claim, defers work, or
+uses a bounded approximation. Workgroup barriers do not publish ranges between
+workgroups. Reset or rebuild after origin, bounds, representation, identity, or
+resource-generation changes.
+
+The branch is complete when neighbor enumeration cannot read partially built
+ranges, every accepted neighbor lies within the declared support, overflow is
+observable, and repeated seeded input produces the same accepted order or the
+declared bounded nondeterministic result.
+
 ## Temporal Identity
 
 Temporal consumers bind stable entity generation, not a transient slot index.
@@ -125,6 +157,12 @@ Reset motion vectors, trails, interpolation, and history for birth, death,
 generation or slot reuse, teleport, reparenting, topology/representation
 change, missing prior state, or incompatible resource generation. A moved
 entity keeps its history; a new entity in the old slot does not.
+
+A camera cut or other presentation-only discontinuity resets screen-space
+motion and temporal accumulation while preserving particle simulation,
+lifetimes, stable identities, and valid world-space trail samples. Reset a
+world-space trail only when its entity, frame/origin mapping, or sample
+continuity becomes invalid.
 
 Transparent effects choose one temporal policy explicitly:
 
@@ -140,6 +178,46 @@ Keep previous/current resources immutable until every consuming submission has
 completed. Resource rings are safe only when reuse is gated by the actual GPU
 completion for all consumers; device loss invalidates the resource generation
 and forces a reset.
+
+## Trail Histories and Ribbons
+
+Choose the least stateful trail:
+
+| Trail source | Representation |
+| --- | --- |
+| Seekable analytic trajectory | Evaluate positions at authoritative sample times or arc-length positions; store no evolving history |
+| Recurrent or externally driven actor | Fixed-capacity ring of committed `{position, time, entityId, generation, breakBefore}` samples |
+
+Sample by authoritative elapsed time or traveled distance in declared units,
+never by presentation-frame count. State the sampling interval, lifetime,
+capacity, and decimation error. Time sampling consumes timestamped committed
+poses; distance sampling measures in one declared frame. A render callback may
+request publication but does not invent samples.
+
+For a history ring, one writer commits sample payload before publishing `head`
+and `count`. Draw reconstructs chronological order from one committed
+generation. Capacity overflow drops the oldest presentation sample and marks
+the new oldest sample as a break; it never changes authoritative body state.
+GPU storage reuse waits for every consumer of the previous generation.
+
+Break the strip before the first sample after birth, teleport, reparent,
+incompatible origin/frame change, excessive timestamp gap, missing prior state,
+or entity-generation change. Identity change clears the ring before the new
+entity writes. A valid origin rebase may migrate every stored point through one
+versioned mapping; otherwise reset. Lifetime expiry and decimation preserve
+chronological order and cannot connect across a break.
+
+Build ribbon tangents from adjacent chronological samples. Reject zero-length
+segments; use the previous valid side vector or a declared world-axis fallback
+when tangent and view/up are parallel. Keep side-vector signs continuous to
+prevent ribbon flips. Define joins, caps, width units, depth/blend behavior, and
+whether width is world-space or screen-space.
+
+Use [the deterministic trail-ring oracle](../scripts/trail-ring-oracle.mjs) for
+time- or distance-gated insertion, wrap order, identity reset, and segment
+breaks. Failure signatures: trail length changes with display Hz, a teleport
+creates a spanning segment, ring wrap connects newest to oldest, a reused slot
+inherits history, or ribbon sides alternate sign.
 
 ## r185 Execution Facts
 
@@ -318,15 +396,18 @@ HDR, bloom-only, and bloom-disabled beauty.
 | Recurrent state | `N_active * dynamicStrideBytes` plus invocations and traffic for every named stage |
 | Stable slots | capacity, live count, hole ratio, submitted/visible work |
 | Scan compaction | mark/scan/scatter reads+writes, moved lanes, identity traffic, indirect publication |
+| Neighborhood | key/range or hash storage, build/query stages, accepted neighbors, overflow |
+| Trail history | sample capacity and stride, committed samples, wraps, ribbon vertices, covered pixels |
 | Draw | draw classes, submitted/visible instances, triangles, covered pixels |
 | Transparency | covered pixels times mean/p95 layers per pixel |
 | Post | exact formats, extents, reads/writes, mip/history slots, and peak-live bytes |
 
 Record `{N_active, strideBytes, stages, compactionMode, coveredPixels,
-layersPerPixel, drawClasses, postExtent}` with contemporaneous whole-frame
-p50/p95 and paired marginal cost on the named target. Compare alternatives at
-the same visible workload. Account event binning, neighbor search, transparent
-fragments, attachment traffic, peak-live memory, and sustained behavior.
+layersPerPixel, drawClasses, postExtent}` plus admitted neighborhood and trail
+capacity/traffic with contemporaneous whole-frame p50/p95 and paired marginal
+cost on the named target. Compare alternatives at the same visible workload.
+Account event binning, neighbor search, transparent fragments, attachment
+traffic, peak-live memory, and sustained behavior.
 
 ## Diagnostics and Failure Signatures
 
@@ -336,6 +417,8 @@ Expose only applicable views and counters:
 event seed/count and spawn ranges
 live count, slot generations, hole ratio, compaction count, overflow
 entity-to-slot and slot-to-entity consistency
+trail head/count, chronological samples, breaks, and rejected zero-length segments
+neighborhood cell occupancy, accepted count, and overflow
 age, velocity, acceleration, radius, and flow/support frame
 previous/current presented pose and temporal rejection
 shell core/envelope/shock masks and wake profile/tail
@@ -344,12 +427,14 @@ raw HDR by layer, selective contribution when active, bloom-only, bloom-off
 compute/draw GPU time, traffic estimate, backend, workload tuple
 ```
 
-Required negative controls:
+For admitted branches, run the applicable negative controls:
 
 - repeat the seeded fixed-time capture;
 - disable recurrent update and confirm only recurrent branches freeze;
 - force holes and compaction, then verify every identity/state lane;
 - reuse a slot and confirm prior temporal history is rejected;
+- wrap and reuse a trail ring, then confirm chronological order and breaks;
+- overflow a neighborhood bucket and confirm the declared policy;
 - toggle bloom and selective MRT independently;
 - place unrelated occluders through transparent effects;
 - resize/recreate resources and verify reset plus disposal;

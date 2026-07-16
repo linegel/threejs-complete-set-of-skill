@@ -267,10 +267,12 @@ Store two complex lanes per RGBA texture. Component interleaving such as
 `[A.re,B.re,A.im,B.im]` is a different representation and cannot use this
 unpack rule.
 
-Two FFT layouts are useful:
+Three FFT layouts are useful:
 
 - **Global Stockham autosort:** correctness reference; ping-pong every stage;
   no separate bit reversal.
+- **Global explicit-bit-reversal radix-2:** bit-reverse exactly once, then
+  ping-pong every butterfly stage.
 - **Workgroup-resident rows plus transpose:** eligible only when row storage,
   invocations, occupancy, and precision pass on the initialized target.
 
@@ -280,9 +282,10 @@ workgroup memory, not 8.
 
 Every output texel has one writer. A whole-grid read-after-write dependency
 crosses a dispatch boundary. A workgroup barrier does not synchronize
-workgroups. For Stockham, both butterfly inputs read the source texture,
-identical indices/twiddles serve both complex lanes, and source/destination swap
-only after a complete stage.
+workgroups. For either global layout, both butterfly inputs read the source
+texture, identical indices and twiddles serve both complex lanes, and
+source/destination swap only after a complete stage. Stockham performs no
+separate bit reversal; explicit-bit-reversal radix-2 performs it exactly once.
 
 ## Transform gate
 

@@ -88,17 +88,23 @@ Carry the actual integer row stride used by the copy encoder into decoding:
 ```text
 logicalRowBytes = width * bytesPerPixel
 requiredApiAlignment = 256 bytes under the current WebGPU copy contract
-bytesPerRow = alignUp(logicalRowBytes, requiredApiAlignment)
+minimumAlignedBytesPerRow = alignUp(logicalRowBytes, requiredApiAlignment)
+bytesPerRow = actual stride supplied to the copy encoder
 minimumCopyBytes = (height - 1) * bytesPerRow + logicalRowBytes
 ```
 
 Record width, height, format, bytes per pixel, logical row bytes, API alignment,
-encoded `bytesPerRow`, actual buffer byte length, and map completion. A fully
-padded `bytesPerRow * height` allocation is also valid; the current r185
-readback path uses the minimum formula above. Decode row `y` from
-`mappedOffset + y * bytesPerRow`; never infer stride from total buffer length
-divided by height. Reject fractional, undersized, or assumed-tight row layouts.
-Mapping/readback completion proves host visibility; submission or
+encoded `bytesPerRow`, encoded copy offset, mapped-view offset, actual buffer
+byte length, and map completion.
+`bytesPerRow` may exceed the minimum aligned stride. Decode row `y` from
+`viewOffset + y * bytesPerRow`. `viewOffset` is relative to the supplied mapped
+view; `copyOffset` is the GPU-buffer offset encoded in the copy command and is
+validated and recorded without being added during host decoding. Never infer
+stride from width or total buffer length. Reject fractional, misaligned,
+undersized, or assumed-tight row layouts. Use
+[the aligned-readback helper](../scripts/aligned-readback.mjs) for this branch.
+It accepts the actual stride and permits backing buffers larger than the minimum
+copy span. Mapping/readback completion proves host visibility; submission or
 `computeAsync()` alone does not.
 
 ## Temporal claims

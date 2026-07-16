@@ -63,6 +63,10 @@ exposed surfaces, placements, material slots, and stable identity.
    clearance volumes, anchor, and LOD policy. Apply the deterministic
    heterogeneous-site-placement rules in
    [grammar-and-mesh-compiler.md](references/grammar-and-mesh-compiler.md).
+   When implementing candidate identity, random lanes, or phase ranking, import
+   [deterministic-placement-key.mjs](scripts/deterministic-placement-key.mjs).
+   The helper does not own support, clearance, conflict detection, or phase
+   admission.
    Place the landmark first, then solve access, support, and clearance before
    repeated detail.
 

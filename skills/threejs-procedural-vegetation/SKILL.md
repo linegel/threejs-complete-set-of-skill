@@ -54,6 +54,13 @@ gate, hysteresis/dwell, and simultaneous-memory budget.
 1. Partition the domain into deterministic chunks with global IDs, fixed seeds,
    half-open ownership, conservative deformed bounds, and a visible bounds/LOD
    diagnostic.
+   A world-anchored record identity is
+   `(generatorSchemaVersion, globalSeedWords, stableSpeciesIdWords,
+   biasedWorldCellWords, candidateOrdinal)`. A hash is only a compact label,
+   priority, or random lane; full-tuple equality owns identity and resolves hash
+   collisions. A species or functional-group ID is immutable rather than its
+   position in a registry. Adding another population family or changing chunk
+   traversal cannot renumber existing records.
 2. Compare implicit reconstruction, clump records, compact CPU attributes, and
    storage records. Count the actual aligned stride, duplicate LOD data, and hot
    vertex reads. In r185, `computeAsync()` waits for initialization before

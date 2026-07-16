@@ -5,18 +5,20 @@ description: Build curved-ray space effects in Three.js WebGPU/TSL. Use for arti
 
 # Curved-Ray Space Effects
 
-Treat every result as one of three claims: an artistic deformation, an Ellis
-null-geodesic solution, or a Schwarzschild null-geodesic solution. Numerical
-integration alone does not turn an artistic field into a metric solution.
+This skill owns three native claims: an artistic deformation, an Ellis
+null-geodesic solution, or a Schwarzschild null-geodesic solution. A Kerr
+result is owned by an independently validated external solver; without one,
+return `unsupported-model`. Numerical integration alone does not turn an
+artistic field into a metric solution.
 
 ## 1. Select the claim
 
 | Requested observable | Select | Conditional reference | Completion criterion |
 | --- | --- | --- | --- |
 | Stylized bending, bounded glow, or a decorative disk | Artistic bounded ray | Read [artistic-rays-and-disks.md](references/artistic-rays-and-disks.md). | The implementation and its documentation say `artistic`, and fixed-view refinement bounds the visible change. |
-| Traversal or turning through an ultrastatic spherical throat | Ellis wormhole | Read the Ellis section of [metric-rays.md](references/metric-rays.md). | The throat scale, exterior mapping, invariant, and `B < 1`, `B = 1`, `B > 1` termination classes are explicit. |
+| Traversal or turning through an ultrastatic spherical throat | Ellis wormhole | Read the Ellis section of [metric-rays.md](references/metric-rays.md). | The throat scale, exterior mapping, invariant, and `B < 1`, `B = 1`, `B > 1` regimes are explicit. |
 | Nonrotating black-hole lensing or a physical thin-disk image | Schwarzschild | Read the Schwarzschild and physical-transfer sections of [metric-rays.md](references/metric-rays.md). | The mass scale, horizon, photon sphere, critical impact, invariant, continuous events, and observer/emitter frames are explicit. |
-| Rotating black hole | Unsupported here | Integrate an independently validated Kerr solver as an external lens-map producer. | The solver supplies its metric/sign conventions, constants of motion, tetrads, event semantics, and independent convergence evidence; otherwise return an unsupported-model result. |
+| Rotating black hole | Unsupported here | Integrate an independently validated Kerr solver as an external ray/transfer producer; a lens map is an optional reuse form. | The solver supplies its metric/sign conventions, constants of motion, tetrads, event semantics, and independent convergence evidence; otherwise return an unsupported-model result. |
 
 **Complete when:** exactly one claim owns the ray path, and every visual claim
 is no stronger than that branch's evidence.
@@ -32,8 +34,9 @@ Define before authoring the march:
 - the state vector, its integration parameter, its owner, and its valid time;
 - the environment orientation and the orthonormal frame used for escaped-ray
   lookup;
-- horizon, core, disk, shell, proxy-exit, invalid-state, opacity, step-cap, and
-  attempt-cap events that apply to the selected branch.
+- the pre-march results `miss`, `setup-rejected`, and `unsupported-model`;
+  applicable continuous horizon, core, disk, shell, and proxy-exit surfaces;
+  and the invalid-state, opacity, step-cap, and attempt-cap outcomes.
 
 For metric rays, nondimensionalize with the Ellis throat radius `a` or the
 Schwarzschild mass length `M = G M_SI / c^2`, while retaining the conversion
@@ -63,7 +66,10 @@ confirm the WebGPU backend before selecting compute, storage, or MRT resources.
 The canonical march is:
 
 1. Transform the camera ray into effect space and intersect the finite bound.
-   A miss returns before numerical work.
+   A miss returns `miss` before numerical work. An inadmissible initial state,
+   unsupported transform, or invalid frame/domain returns `setup-rejected`
+   before the march. A requested model without a supported native branch or
+   admitted external solver returns `unsupported-model`.
 2. Initialize position, tangent or canonical momentum, radiance,
    transmittance, event state, accepted-step count, and termination ID.
 3. Propose one candidate segment. An error-controlled rejection changes only
@@ -72,8 +78,9 @@ The canonical march is:
    earliest event; preserve ordered disk crossings when several contribute.
 5. Accumulate the accepted segment's transfer, then commit exactly one state
    advance and increment the accepted-step count once.
-6. Terminate as `escaped`, `horizon`, `core`, `opaque`, `invalid`,
-   `unresolved-critical`, `minimum-step`, `step-cap`, or `attempt-cap`.
+6. After the march starts, terminate as `escaped`, `horizon`, `core`, `opaque`,
+   `invalid`, `unresolved-critical`, `minimum-step`, `step-cap`, or
+   `attempt-cap`.
 
 The attempt cap bounds divergent work independently of the accepted-step cap.
 `step-cap` bounds committed accepted steps; `attempt-cap` bounds accepted plus
@@ -81,8 +88,9 @@ rejected attempts. A curvature or distance heuristic may propose a step;
 refinement against a tighter solution decides whether it is accurate.
 
 **Complete when:** a trace proves one committed advance per accepted step,
-rejected attempts leave physical and event state unchanged, every ray receives
-an explicit termination ID, and event residuals meet their declared bounds.
+rejected attempts leave physical and event state unchanged, every input
+receives `miss`, `setup-rejected`, `unsupported-model`, or an explicit march
+termination ID, and event residuals meet their declared bounds.
 
 ## 4. Resolve transfer and the escaped direction
 
