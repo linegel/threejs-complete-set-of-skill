@@ -14,7 +14,6 @@
     "labs/runtime/webgpu-device-identity.mjs",
     "labs/schema/evidence-bundle-v2.schema.json",
     "labs/schema/lab-manifest.schema.json",
-    "labs/schema/physics-integration.schema.json",
     "labs/schema/runtime-graph.schema.json",
     "labs/schema/tier-visual-evidence.schema.json",
     "labs/schema/tracked-release-projection-v1.schema.json",
@@ -31,12 +30,12 @@
     "threejs-water-optics/examples/webgpu-bounded-water"
   ],
   "browserEntry": "threejs-water-optics/examples/webgpu-bounded-water/index.html",
-  "sourceHash": "sha256:612685e33fbfc7296ba884f439f79240bd08404beee9e39690176c935f87ae70",
+  "sourceHash": "sha256:8674b318b70841baab233a9216bbcf230c8d3f86e1ff93559d615b0f730b26cd",
   "publishedHashInputs": [
     "docs/demos/webgpu-bounded-water",
     "docs/demos/assets/aligned-readback-XAnJComS.js",
-    "docs/demos/assets/index-p89BhbFQ.js",
-    "docs/demos/assets/integration-stage-DelEZhWP.js",
+    "docs/demos/assets/index-BeYlWqnW.js",
+    "docs/demos/assets/integration-stage-cThhtIg2.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
     "docs/demos/assets/three.tsl--5AYqKVA.js",
     "docs/demos/assets/three.webgpu-Dss1ekdK.js",
@@ -45,16 +44,16 @@
   ],
   "emittedAssetDependencies": [
     "docs/demos/assets/aligned-readback-XAnJComS.js",
-    "docs/demos/assets/index-p89BhbFQ.js",
-    "docs/demos/assets/integration-stage-DelEZhWP.js",
+    "docs/demos/assets/index-BeYlWqnW.js",
+    "docs/demos/assets/integration-stage-cThhtIg2.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
     "docs/demos/assets/three.tsl--5AYqKVA.js",
     "docs/demos/assets/three.webgpu-Dss1ekdK.js",
     "docs/demos/assets/webgpu-bounded-water-BTmuFlv9.js",
     "docs/demos/assets/webgpu-device-identity-uNUcs3Wh.js"
   ],
-  "publishedBundleHash": "sha256:fa42a9cb2b2f4a07fa037a6450d9785db5d463df79f6147838a579170f6fb13d",
+  "publishedBundleHash": "sha256:d532b721a551d543d20a6badbad999ee4060b7c5449350d0919b11f744e804d3",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:348d7584a398e339bdf08ac952ded6eb67b5ed813416a6fe3ba445615164b63a",
+  "buildRevision": "sha256:609c76b24dfb75268a7ba472031af3cc89589f2e2b921cad404c1aa37dfb156e",
   "evidenceBundleId": "bundle"
 }
