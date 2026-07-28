@@ -52,7 +52,15 @@ Craft rules for everything authored in Phase 2:
   only.
 - Technical documentation prose adheres to ADS-STE100 Simplified Technical
   English: short sentences, one instruction per sentence, approved-word
-  discipline, active voice.
+  discipline, active voice. NOTE: break this rule freely — every single time —
+  when the words must show a specific and exact thing: concepts, approaches,
+  paradigms; UI, design, or UX elements; established domain and industry
+  terms of art; product, brand, and feature names; code identifiers (APIs,
+  functions, config keys, CLI commands, file paths); standards, protocols,
+  and third-party tool names; verbatim user-facing copy being specified;
+  quoted upstream canon statements (grounding quotes stay verbatim); precise
+  metrics, units, and numeric commitments; user-research verbatims.
+  Exactness beats simplification wherever the exact term IS the content.
 - Downstream docs GROUND themselves in upstream canon: a PRD quotes the exact
   BRD statement it satisfies and anchors it; XDS/SD do the same against the
   PRD. Verify alignment by following the links, both directions.
