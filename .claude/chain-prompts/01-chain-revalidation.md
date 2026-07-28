@@ -6,6 +6,13 @@ NOT rebaselined on 2026-07-28 (held batch). Phase 1 carries the full weight
 here: verify every doc claim against current source and live state before
 any design work.
 
+## Precedence
+
+The skill wins over this prompt; the unit preamble above wins over this body
+where they conflict (it carries repo-specific constraints this shared body
+cannot know). If a `00-family-business.md` sits beside this file, execute it
+first in Stage 2, before repo-level chains.
+
 ## Mission
 
 Bring this project's product documentation to current, verified state, then
@@ -76,7 +83,11 @@ mediums:**
   relationships, timelines → inline SVG: exact, diffable, controllable.
 - Visual/illustrative content — concept art, mood and style direction, hero
   imagery, product illustration, anything photographic or artistic →
-  GENERATED IMAGE. Do not fake these with SVG.
+  GENERATED IMAGE via gpt-image-2. Do not fake these with SVG; a missing
+  generation route is a blocker to report, not a reason to switch medium.
+
+SVG lives inline in the HTML or as a sibling `.svg` file; generated rasters
+are committed under `docs/assets/` and referenced from the doc.
 
 Whichever medium: iterate until the figure is actually correct for its
 description. Figure-finalization loops are VERIFICATION — repeat as many
@@ -108,8 +119,10 @@ walking trees.
 Read the skill, this prompt's preamble, AGENTS.md/CLAUDE.md, the family
 README if any, and the docs index. Inventory: every doc, every product
 surface (routes, pages, commands), every configured hostname. Count candidate
-BRD chains and rank them by business value. **Cap: at most 5 BRD chains in
-this run; one agent carries at most 5 BRDs.** If real scope exceeds 5, take
+BRD chains and rank them by business value. One BRD chain = one BRD plus
+whatever PRD/XDS/SD that decision requires — the cap counts CHAINS, not
+documents. **Cap: at most 5 BRD chains in this run; one agent carries at
+most 5 BRDs.** If real scope exceeds 5, take
 the top 5 and record the ordered remainder for the report. Decide what gets
 delegated and what you do directly; write the partition down before
 launching anything.
