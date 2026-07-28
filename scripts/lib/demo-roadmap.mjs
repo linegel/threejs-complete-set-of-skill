@@ -28,7 +28,12 @@ function gateItem(category, entry) {
 export function buildDemoRoadmap(lab) {
   if (!lab || typeof lab !== 'object') throw new TypeError('buildDemoRoadmap requires a demo registry record');
 
-  if (lab.status === 'accepted') {
+  const capabilityGates = openGates(lab.capabilityRequirements);
+  const runtimeGates = openGates(lab.runtimeProof);
+  const openTiers = (lab.tiers ?? []).filter((tier) => tier.acceptanceStatus !== 'accepted');
+  const tiersWithoutFrameTarget = (lab.tiers ?? []).filter((tier) => tier.frameTargetMs == null);
+
+  if (lab.status === 'accepted' && capabilityGates.length === 0 && runtimeGates.length === 0 && openTiers.length === 0) {
     return {
       status: lab.status,
       summary: 'The declared published contract has accepted evidence and no open acceptance gates.',
@@ -52,10 +57,6 @@ export function buildDemoRoadmap(lab) {
     };
   }
 
-  const capabilityGates = openGates(lab.capabilityRequirements);
-  const runtimeGates = openGates(lab.runtimeProof);
-  const openTiers = (lab.tiers ?? []).filter((tier) => tier.acceptanceStatus !== 'accepted');
-  const tiersWithoutFrameTarget = (lab.tiers ?? []).filter((tier) => tier.frameTargetMs == null);
   const items = [];
 
   if (tiersWithoutFrameTarget.length > 0) {

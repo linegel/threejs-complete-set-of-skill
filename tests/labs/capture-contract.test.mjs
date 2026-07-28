@@ -917,7 +917,6 @@ test('browser, request, and device failures remain independent blocking channels
     ],
     requestErrors: [
       '404 GET http://127.0.0.1:5174/favicon.ico',
-      '404 GET http://127.0.0.1:5174/favicon.svg',
     ],
   }));
 });

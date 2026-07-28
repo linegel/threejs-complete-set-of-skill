@@ -169,7 +169,7 @@
       "id": "standard-depth",
       "required": true,
       "evidence": null,
-      "status": "accepted"
+      "status": "incomplete"
     }
   ],
   "runtimeProof": [
@@ -201,13 +201,13 @@
       "id": "one-prepass-one-lit-pass",
       "required": true,
       "evidence": null,
-      "status": "accepted"
+      "status": "incomplete"
     },
     {
       "id": "current-adapter-gpu-timestamps",
       "required": true,
       "evidence": "capture-status.gpuTimingVerdict remains INSUFFICIENT_EVIDENCE; no named-adapter timestamp ledger was accepted.",
-      "status": "accepted"
+      "status": "incomplete"
     }
   ],
   "evidenceContract": "v2",

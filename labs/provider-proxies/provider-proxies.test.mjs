@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 import { readFile, readdir } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { PROVIDER_DEMOS } from '../../scripts/provider-demos.mjs';
 
 const root = dirname(fileURLToPath(import.meta.url));
 const manifest = JSON.parse(await readFile(join(root, 'assets.manifest.json'), 'utf8'));
@@ -44,7 +45,10 @@ assert.doesNotMatch(source, /QA Evidence/);
 
 const providerDemos = skills.skills.flatMap((skill) => skill.demos ?? [])
   .filter((demo) => (demo.canonicalSource ?? []).some((path) => path.startsWith('labs/provider-proxies/')));
-assert.equal(providerDemos.length, 26);
+assert.deepEqual(
+  providerDemos.map(({ id }) => id).sort(),
+  PROVIDER_DEMOS.map(({ id }) => id).sort(),
+);
 for (const demo of providerDemos) {
   assert.ok(['proxy-demo', 'generated-asset-demo'].includes(demo.kind), `${demo.id} kind`);
   assert.equal(demo.status, 'secondary', `${demo.id} status`);

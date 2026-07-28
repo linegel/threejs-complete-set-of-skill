@@ -14,7 +14,7 @@ export function quickCommandStartsBrowser(command) {
     /\bvite\s+(?:dev|preview)\b/i,
     /\b(?:npm|pnpm|yarn)\b(?:(?![;&|()]).)*?\b(?:run\s+)?(?:labs:)?capture\b/i,
     /\b(?:bash|sh|zsh)\b(?:(?![;&|()]).)*?\b[^\s;&|()]*capture[^\s;&|()]*/i,
-    /\bnode\s+(?:--[^\s;&|()]+\s+)*(?!-)[^\s;&|()]*(?:browser|capture)[^\s;&|()]*\.(?:[cm]?js|ts)\b/i,
+    /\bnode\s+(?:--[^\s;&|()]+\s+)*(?!-)(?:[^\s;&|()]*\/)?(?!(?:test[-_]|[^/]*\.test\.))[^\s;&|()]*(?:browser|capture)[^\s;&|()]*\.(?:[cm]?js|ts)\b/i,
   ].some((pattern) => pattern.test(executable));
 }
 

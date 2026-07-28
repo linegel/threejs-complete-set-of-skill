@@ -780,6 +780,14 @@ export function normalizePixelCapture(payload) {
   return {
     target: payload.target ?? 'final',
     ...(captureMode === null ? {} : { captureMode }),
+    ...(Object.hasOwn(payload, 'maskKind') ? { maskKind: payload.maskKind } : {}),
+    ...(Object.hasOwn(payload, 'semanticNodeIds')
+      ? {
+          semanticNodeIds: Array.isArray(payload.semanticNodeIds)
+            ? [...payload.semanticNodeIds]
+            : [],
+        }
+      : {}),
     width,
     height,
     bytesPerPixel,
@@ -1070,6 +1078,11 @@ async function capturePixelsThroughController(page, method, target) {
     return {
       target: capture.target ?? captureTarget,
       ...(Object.hasOwn(capture, 'captureMode') ? { captureMode: capture.captureMode } : {}),
+      // Preserve lab-specific PixelCapture metadata (Object Sculptor target-mask).
+      ...(Object.hasOwn(capture, 'maskKind') ? { maskKind: capture.maskKind } : {}),
+      ...(Object.hasOwn(capture, 'semanticNodeIds')
+        ? { semanticNodeIds: Array.isArray(capture.semanticNodeIds) ? [...capture.semanticNodeIds] : capture.semanticNodeIds }
+        : {}),
       width: transportLayout?.width ?? capture.width,
       height: transportLayout?.height ?? capture.height,
       bytesPerPixel: capture.bytesPerPixel,
@@ -1634,6 +1647,14 @@ export function buildCaptureArtifactPayload(capture, filename) {
     ...(Object.hasOwn(capture, 'captureMode')
       ? { captureMode: requireCaptureMode(capture.captureMode) }
       : {}),
+    ...(Object.hasOwn(capture, 'maskKind') ? { maskKind: capture.maskKind } : {}),
+    ...(Object.hasOwn(capture, 'semanticNodeIds')
+      ? {
+          semanticNodeIds: Object.freeze(
+            Array.isArray(capture.semanticNodeIds) ? [...capture.semanticNodeIds] : [],
+          ),
+        }
+      : {}),
     width: capture.width,
     height: capture.height,
     bytesPerPixel: capture.bytesPerPixel,
@@ -2131,6 +2152,30 @@ export async function captureLabBrowser({
       }).catch(() => {});
     }
     page = await context.newPage();
+    // CDP default browser windows often run at devicePixelRatio 2, so lab
+    // metrics report 2400×1600 buffer sizes while correctness locks 1200×800@1.
+    // Force CSS viewport + DPR via CDP Emulation before the lab boots.
+    if (cdpEndpoint) {
+      try {
+        const session = await context.newCDPSession(page);
+        await session.send('Emulation.setDeviceMetricsOverride', {
+          width: profileConfig.width,
+          height: profileConfig.height,
+          deviceScaleFactor: profileConfig.dpr,
+          mobile: false,
+        });
+      } catch {
+        // Older Chrome may reject Emulation; resize() below is still applied.
+      }
+      try {
+        await page.setViewportSize({
+          width: profileConfig.width,
+          height: profileConfig.height,
+        });
+      } catch {
+        // ignore
+      }
+    }
     await page.addInitScript(({ captureProfile, expectedLabId }) => {
       // CDP-connected Chrome often has navigator.webdriver === false. The
       // validation-harness correctness gate requires webdriver === true plus the
