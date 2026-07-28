@@ -53,6 +53,9 @@ and end your report with the ordered remainder list.
   compliance. A separate agent lane owns legal. If work runs into a legal
   surface, write one line — "legal-surface item observed at <path> — out of
   scope, legal lane owns it" — and move on. Functional claims only.
+- **Committed secrets** — if you encounter credentials or secrets anywhere in
+  the repo, report presence and location only; NEVER reproduce values in docs,
+  reports, or commits.
 - **No bureaucracy** — no statuses, hashes, approval records, resolvers,
   registers, or merge gates. Document validity is human review.
 - **No subagents** — complete all work directly yourself.
