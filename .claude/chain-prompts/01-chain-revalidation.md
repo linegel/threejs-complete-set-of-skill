@@ -258,7 +258,9 @@ the unreliable claim — never add a process layer.
 - **Repo checks** — if the repo defines a check command (package.json
   `check`/`lint`/`typecheck` scripts, a Makefile target), run it before
   committing and fix whatever YOUR changes broke.
-- Commit with message prefix `docs(chain):`. ALWAYS push when done.
+- Commit with message prefix `docs(chain):` and push after every commit —
+  drafts and incomplete states included. Push, then keep working until the
+  remaining issues are resolved, pushing as you go.
 
 ## REPORT — and its durable landing
 
