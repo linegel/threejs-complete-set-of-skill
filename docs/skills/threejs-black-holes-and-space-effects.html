@@ -9,7 +9,7 @@
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-black-holes-and-space-effects.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:ab7d8d17e0589a6f5c2462d645b9e0d6797cd92eade36e3615dae091c6f9df5b" />
+<meta name="skill-pack-build-revision" content="sha256:c151ad21626b93f809ec207d33636612320aa54cbc192958a440b1ebbffa2dc9" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -24,7 +24,7 @@
 <meta property="og:title" content="Curved-Ray Space Effects | Three.js WebGPU Skill" />
 <meta property="og:description" content="Build curved-ray space effects in Three.js WebGPU/TSL. Use for artistic ray bending, Ellis wormholes, Schwarzschild black-hole lensing, accretion disks…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-black-holes-and-space-effects.html" />
-<meta property="article:modified_time" content="2026-07-16T12:45:44+03:00" />
+<meta property="article:modified_time" content="2026-07-16T19:46:25+03:00" />
 <meta property="article:published_time" content="2026-07-04T23:30:19+03:00" />
 <meta property="article:section" content="Motion and Effects" />
 
@@ -63,7 +63,7 @@
     "@id": "https://threejs-skills.com/skills/threejs-black-holes-and-space-effects.html"
    },
    "datePublished": "2026-07-04T23:30:19+03:00",
-   "dateModified": "2026-07-16T12:45:44+03:00",
+   "dateModified": "2026-07-16T19:46:25+03:00",
    "author": {
     "@id": "https://threejs-skills.com/#publisher"
    },
@@ -295,8 +295,8 @@ a.chip:active{scale:.96}
       <span class="chip">1 flagship</span>
       <span class="chip">1 secondary surface</span>
       <span class="chip">accepted runtime evidence</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-16T12:45:44+03:00">2026-07-16</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/8749183dffd84731506239dd86590c92bf958969">commit 8749183 ↗</a>
+      <span class="chip">Latest skill update <time datetime="2026-07-16T19:46:25+03:00">2026-07-16</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/62a9bc59330c44827824665323823883e88f100c">commit 62a9bc5 ↗</a>
       <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-black-holes-and-space-effects/SKILL.md">SKILL.md on GitHub ↗</a>
       <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/skills/threejs-black-holes-and-space-effects/SKILL.md">raw (for agents) ↗</a>
     </div>
@@ -387,9 +387,11 @@ march deterministic and framerate-safe.</p></div>
   <h2>The full skill</h2>
   <p class="sub">The complete SKILL.md as loaded by agents, rendered verbatim.</p>
   <div class="skilltext"><h2>Curved-Ray Space Effects</h2>
-<p>Treat every result as one of three claims: an artistic deformation, an Ellis
-null-geodesic solution, or a Schwarzschild null-geodesic solution. Numerical
-integration alone does not turn an artistic field into a metric solution.</p>
+<p>This skill owns three native claims: an artistic deformation, an Ellis
+null-geodesic solution, or a Schwarzschild null-geodesic solution. A Kerr
+result is owned by an independently validated external solver; without one,
+return <code>unsupported-model</code>. Numerical integration alone does not turn an
+artistic field into a metric solution.</p>
 <h2>1. Select the claim</h2>
 <table>
 <thead>
@@ -410,7 +412,7 @@ integration alone does not turn an artistic field into a metric solution.</p>
 <td>Traversal or turning through an ultrastatic spherical throat</td>
 <td>Ellis wormhole</td>
 <td>Read the Ellis section of <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-black-holes-and-space-effects/references/metric-rays.md">metric-rays.md</a>.</td>
-<td>The throat scale, exterior mapping, invariant, and <code>B &lt; 1</code>, <code>B = 1</code>, <code>B &gt; 1</code> termination classes are explicit.</td>
+<td>The throat scale, exterior mapping, invariant, and <code>B &lt; 1</code>, <code>B = 1</code>, <code>B &gt; 1</code> regimes are explicit.</td>
 </tr>
 <tr>
 <td>Nonrotating black-hole lensing or a physical thin-disk image</td>
@@ -421,7 +423,7 @@ integration alone does not turn an artistic field into a metric solution.</p>
 <tr>
 <td>Rotating black hole</td>
 <td>Unsupported here</td>
-<td>Integrate an independently validated Kerr solver as an external lens-map producer.</td>
+<td>Integrate an independently validated Kerr solver as an external ray/transfer producer; a lens map is an optional reuse form.</td>
 <td>The solver supplies its metric/sign conventions, constants of motion, tetrads, event semantics, and independent convergence evidence; otherwise return an unsupported-model result.</td>
 </tr>
 </tbody></table>
@@ -437,8 +439,9 @@ coefficients;</li>
 <li>the state vector, its integration parameter, its owner, and its valid time;</li>
 <li>the environment orientation and the orthonormal frame used for escaped-ray
 lookup;</li>
-<li>horizon, core, disk, shell, proxy-exit, invalid-state, opacity, step-cap, and
-attempt-cap events that apply to the selected branch.</li>
+<li>the pre-march results <code>miss</code>, <code>setup-rejected</code>, and <code>unsupported-model</code>;
+applicable continuous horizon, core, disk, shell, and proxy-exit surfaces;
+and the invalid-state, opacity, step-cap, and attempt-cap outcomes.</li>
 </ul>
 <p>For metric rays, nondimensionalize with the Ellis throat radius <code>a</code> or the
 Schwarzschild mass length <code>M = G M_SI / c^2</code>, while retaining the conversion
@@ -464,7 +467,10 @@ confirm the WebGPU backend before selecting compute, storage, or MRT resources.
 The canonical march is:</p>
 <ol>
 <li>Transform the camera ray into effect space and intersect the finite bound.
-A miss returns before numerical work.</li>
+A miss returns <code>miss</code> before numerical work. An inadmissible initial state,
+unsupported transform, or invalid frame/domain returns <code>setup-rejected</code>
+before the march. A requested model without a supported native branch or
+admitted external solver returns <code>unsupported-model</code>.</li>
 <li>Initialize position, tangent or canonical momentum, radiance,
 transmittance, event state, accepted-step count, and termination ID.</li>
 <li>Propose one candidate segment. An error-controlled rejection changes only
@@ -473,16 +479,18 @@ the next attempted step size.</li>
 earliest event; preserve ordered disk crossings when several contribute.</li>
 <li>Accumulate the accepted segment&#39;s transfer, then commit exactly one state
 advance and increment the accepted-step count once.</li>
-<li>Terminate as <code>escaped</code>, <code>horizon</code>, <code>core</code>, <code>opaque</code>, <code>invalid</code>,
-<code>unresolved-critical</code>, <code>minimum-step</code>, <code>step-cap</code>, or <code>attempt-cap</code>.</li>
+<li>After the march starts, terminate as <code>escaped</code>, <code>horizon</code>, <code>core</code>, <code>opaque</code>,
+<code>invalid</code>, <code>unresolved-critical</code>, <code>minimum-step</code>, <code>step-cap</code>, or
+<code>attempt-cap</code>.</li>
 </ol>
 <p>The attempt cap bounds divergent work independently of the accepted-step cap.
 <code>step-cap</code> bounds committed accepted steps; <code>attempt-cap</code> bounds accepted plus
 rejected attempts. A curvature or distance heuristic may propose a step;
 refinement against a tighter solution decides whether it is accurate.</p>
 <p><strong>Complete when:</strong> a trace proves one committed advance per accepted step,
-rejected attempts leave physical and event state unchanged, every ray receives
-an explicit termination ID, and event residuals meet their declared bounds.</p>
+rejected attempts leave physical and event state unchanged, every input
+receives <code>miss</code>, <code>setup-rejected</code>, <code>unsupported-model</code>, or an explicit march
+termination ID, and event residuals meet their declared bounds.</p>
 <h2>4. Resolve transfer and the escaped direction</h2>
 <p>Sample an exterior environment only for <code>escaped</code> rays. Reconstruct its lookup
 direction from the integrated outgoing tangent in the declared orthonormal
@@ -569,7 +577,7 @@ the numerical and domain limits that remain.</p>
 
 <div class="wrap"><footer>
   <div class="footer-summary">Three.js WebGPU Skill Pack: TSL, procedural graphics, and visual validation.
-    <span>Three r185.1 · 40 primary targets · 25 accepted · build <code>ab7d8d17e058</code></span>
+    <span>Three r185.1 · 40 primary targets · 29 accepted · build <code>c151ad21626b</code></span>
     <span>Compiling shaders? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span>
   </div>
   <div class="footer-groups">

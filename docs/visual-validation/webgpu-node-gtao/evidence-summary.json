@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "labId": "webgpu-node-gtao",
   "classification": "inspected-runtime-evidence-preview",
-  "acceptanceStatus": "accepted",
+  "acceptanceStatus": "incomplete",
   "evidenceBundleId": "correctness",
   "canonicalSource": [
     "threejs-ambient-contact-shading/examples/webgpu-node-gtao"

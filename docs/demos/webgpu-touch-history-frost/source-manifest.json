@@ -15,11 +15,11 @@
     "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost"
   ],
   "browserEntry": "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/index.html",
-  "sourceHash": "sha256:03e91ff6e6dd78f32c9b32143a28ca560c1332ca6e6abede836c387430b534fe",
+  "sourceHash": "sha256:b0c813da4e4b80b0ea29db2de71920922ae0f3c1e4e80e0012874d13f9560e8b",
   "publishedHashInputs": [
     "docs/demos/webgpu-touch-history-frost",
     "docs/demos/assets/frost-surface-effect-DC3Wu82M.js",
-    "docs/demos/assets/index-BNdE34b82.js",
+    "docs/demos/assets/index-BNdE34b8.js",
     "docs/demos/assets/lifecycle-profile-CbPBnctU.js",
     "docs/demos/assets/main-pPOLtyEv.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
@@ -30,7 +30,7 @@
   ],
   "emittedAssetDependencies": [
     "docs/demos/assets/frost-surface-effect-DC3Wu82M.js",
-    "docs/demos/assets/index-BNdE34b82.js",
+    "docs/demos/assets/index-BNdE34b8.js",
     "docs/demos/assets/lifecycle-profile-CbPBnctU.js",
     "docs/demos/assets/main-pPOLtyEv.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
@@ -39,10 +39,8 @@
     "docs/demos/assets/three.tsl--5AYqKVA.js",
     "docs/demos/assets/three.webgpu-Dss1ekdK.js"
   ],
-  "publishedBundleHash": "sha256:ba883dba08f33c61c31c6bcd27531b3d6249ed1816a1c192ce537fab37069aa2",
+  "publishedBundleHash": "sha256:70b909faaaed2bf73746ddd0dacd7f1df9ee64da790d7da6435b416a8daf5bc2",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:36e4490fcd74f5f358440cf8a67dbb057ea2e2c73bcfde6078bc53b0a5e63ee2",
-  "evidenceBundleId": "bundle",
-  "skill": "threejs-dynamic-surface-effects",
-  "publishPath": "/demos/webgpu-touch-history-frost/"
+  "buildRevision": "sha256:c151ad21626b93f809ec207d33636612320aa54cbc192958a440b1ebbffa2dc9",
+  "evidenceBundleId": "bundle"
 }

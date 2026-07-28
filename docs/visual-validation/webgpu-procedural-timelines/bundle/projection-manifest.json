@@ -1,0 +1,384 @@
+{
+  "schemaVersion": 1,
+  "projectionKind": "tracked-release-projection-v1",
+  "policy": {
+    "id": "native-webgpu-tracked-release-v1",
+    "digest": "sha256:e349900d79da27cb5570ea959707f741e03ea7e206d85a717a1129b27268f6a4"
+  },
+  "labId": "webgpu-procedural-timelines",
+  "skill": "threejs-procedural-motion-systems",
+  "threeRevision": "0.185.1",
+  "sourceClosureHash": "sha256:75dc31ba17b9a98981bc67e8517eaaa97542ffa9d2bbef2e72929db178ebe709",
+  "buildRevision": "sha256:d0a86105ba9377cff43d80cb7d36ab40dba78558b51fd1d9fb98d16a3b7bb511",
+  "sourceRelease": {
+    "path": "evidence-manifest.json",
+    "sha256": "sha256:235da9ca0dad7c3245785af04ecdadd4403cb85b35fbbbb75c285aa0426477cd",
+    "byteLength": 34342,
+    "promotionBindingDigest": "sha256:beb1cf0772088c63d4685912ddedb76fc46c8d2ff58addd3e02bd13ecc7dcb5a",
+    "candidateBindingDigest": "sha256:fe33e6529c4d71c373888938246cd374762f73e2a04824cb0effb15933a541c6",
+    "artifactLedgerDigest": "sha256:dea3a17668784e30c67b9ec3d43b91e2bb7c232006990c656f7233aa19eae3cd",
+    "imageLedgerDigest": "sha256:629923f2654bae2a3a4902da2605724f467aa92a6d2ec0f8897a80bd093c1313"
+  },
+  "sourceClosure": {
+    "algorithm": "demo-registry-transitive-source-closure-v2",
+    "roots": [
+      "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines"
+    ],
+    "files": [
+      {
+        "repositoryPath": "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/browser.mjs",
+        "sha256": "sha256:11ffb8ac94c18474c48338a29bfe88eb75d10d34b97abf03f5412fdf759fcb66",
+        "byteLength": 508
+      },
+      {
+        "repositoryPath": "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/capture-hook.mjs",
+        "sha256": "sha256:2595f1549e6a3237b61856ddb389a5582d855e29ddc01dfa99bc8616db00975b",
+        "byteLength": 36219
+      },
+      {
+        "repositoryPath": "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/capture.mjs",
+        "sha256": "sha256:72928457d902df7afb252f4a53c31b58d1cdaced62065d23922e36f93c53cf81",
+        "byteLength": 844
+      },
+      {
+        "repositoryPath": "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/evidence-plan-test.mjs",
+        "sha256": "sha256:f6053f44a53d548917707d32c4f932a404ac67d7413dd16eea190a05de169d36",
+        "byteLength": 7581
+      },
+      {
+        "repositoryPath": "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/gpu-instance-motion.js",
+        "sha256": "sha256:9f151f35a09897c5978ba4bbb7a2cfa2f52b85198981fd4d5f9a3f72380a1d1a",
+        "byteLength": 58021
+      },
+      {
+        "repositoryPath": "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/index.html",
+        "sha256": "sha256:f4185147f40c0f656f8ec8d3f29663ad9eaa27d25f64f42d8d3f5709e3f29b84",
+        "byteLength": 915
+      },
+      {
+        "repositoryPath": "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/local-lab-command.mjs",
+        "sha256": "sha256:e4174301c6ce9a8bbf8f5142718099d05af410b22a5a5816d44c53875cfe529b",
+        "byteLength": 711
+      },
+      {
+        "repositoryPath": "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/main.js",
+        "sha256": "sha256:19aae55dabda122d9d610aec1f073aa0dfab9245c5fb4a8af0ea9591d6198e6f",
+        "byteLength": 40413
+      },
+      {
+        "repositoryPath": "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/manifest-test.mjs",
+        "sha256": "sha256:b423ec88e492934bc6ae6b573c7490940348d0b21ce443e367788b519c17fd4a",
+        "byteLength": 1326
+      },
+      {
+        "repositoryPath": "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/mechanism/compute-storage/index.html",
+        "sha256": "sha256:99156ebe54096dc59d8e054005e3c99956172b16ea51770193fd30dbba386095",
+        "byteLength": 785
+      },
+      {
+        "repositoryPath": "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/mechanism/debris-release/index.html",
+        "sha256": "sha256:5438016664f4d12400994b2330b19f2706e4041342d34977c7437e01e6e231eb",
+        "byteLength": 783
+      },
+      {
+        "repositoryPath": "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/mechanism/interpolation-and-velocity/index.html",
+        "sha256": "sha256:18a0219b90b3f79d05e54a865b79b5b893d60c949f9000ee1734214c2c7cd0cc",
+        "byteLength": 807
+      },
+      {
+        "repositoryPath": "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/mechanism/launch-and-staging/index.html",
+        "sha256": "sha256:be547b4f5aa23e88373bed2035704e1d093d566dfb40fca1b100b4bc031de65b",
+        "byteLength": 791
+      },
+      {
+        "repositoryPath": "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/mechanism/quaternion-and-reparent/index.html",
+        "sha256": "sha256:7225de1078d80322ef9a7e569735aa8cd24d49d414a32cda93620d5de0a68a65",
+        "byteLength": 801
+      },
+      {
+        "repositoryPath": "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/mechanism/spin-docking/index.html",
+        "sha256": "sha256:1870cb2e1d0844f44e1fd490e294f27aae4156be4fcf37e7bc18b3867ec2f70e",
+        "byteLength": 779
+      },
+      {
+        "repositoryPath": "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/mutation-test.js",
+        "sha256": "sha256:d7ae44c529babbba849dc3cbd076a9c7b11472bab741cd9a50475b0a3db59be4",
+        "byteLength": 20777
+      },
+      {
+        "repositoryPath": "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/package.json",
+        "sha256": "sha256:41a91efad76ca399d4b5a346b0abaf8b01350db1a492f1f221008813da1b5427",
+        "byteLength": 1169
+      },
+      {
+        "repositoryPath": "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/quaternion-helpers.js",
+        "sha256": "sha256:0dc67f527e674a133f066a66be6ccddb0d1863198710c44b8eae3805945c4c3b",
+        "byteLength": 3939
+      },
+      {
+        "repositoryPath": "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/README.md",
+        "sha256": "sha256:1f52b97229cbcfad68cf9013db22b361f3de0014368558b6abc47fc4f53de81c",
+        "byteLength": 3332
+      },
+      {
+        "repositoryPath": "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/route-state.js",
+        "sha256": "sha256:d98fe84e184b57f1003fb155ddbe83c414d019ca782c659069b289fbbcfa6aae",
+        "byteLength": 2753
+      },
+      {
+        "repositoryPath": "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/shader-identifier-test.mjs",
+        "sha256": "sha256:284cbff16a5419ecedfdb8440fdaa5be22f6f1c9c81cf53848bf61df6484f98f",
+        "byteLength": 1725
+      },
+      {
+        "repositoryPath": "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/tier/balanced/index.html",
+        "sha256": "sha256:68175cd7d758b0df0be2909b1f28883460f4fb448ad9e7498b8f50e7b8ee87f2",
+        "byteLength": 781
+      },
+      {
+        "repositoryPath": "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/tier/full/index.html",
+        "sha256": "sha256:b1ed6b9c90c43c106f6e183e90f0e3a8c45b9b949df157206974ee5d9d670c03",
+        "byteLength": 773
+      },
+      {
+        "repositoryPath": "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/tier/test-minimum/index.html",
+        "sha256": "sha256:f32ce977db55fd772335af5ea113e73720fac203de2f435dd46bb4ec14b3678f",
+        "byteLength": 789
+      },
+      {
+        "repositoryPath": "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/timeline.js",
+        "sha256": "sha256:7496ce6d469ba90e3aec6ab1d026076746eb8bae86c0a7996fe5a57dfde66ea9",
+        "byteLength": 31611
+      },
+      {
+        "repositoryPath": "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/validate-artifacts.mjs",
+        "sha256": "sha256:0bce7fa838bc63e602cb098e7be4d6b4ead3be17b3249812bddf46843ecedbdb",
+        "byteLength": 2973
+      },
+      {
+        "repositoryPath": "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/validation.js",
+        "sha256": "sha256:9f7fa007d65d5ea93e4d0cd7b849c9a26f9a31ad79ec582d57410ddd3392bf01",
+        "byteLength": 37847
+      }
+    ],
+    "threeRevision": "0.185.1",
+    "sourceHash": "sha256:75dc31ba17b9a98981bc67e8517eaaa97542ffa9d2bbef2e72929db178ebe709",
+    "buildRevision": "sha256:d0a86105ba9377cff43d80cb7d36ab40dba78558b51fd1d9fb98d16a3b7bb511"
+  },
+  "retainedFiles": [
+    {
+      "path": "visual-contract.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:f0d803192ab5122462cfc9ae54a071ada2175d113706397dcb5ff5dd290089ea",
+      "byteLength": 890
+    },
+    {
+      "path": "renderer-info.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:ce98dc437ff1e48283efdd61f5f63f5c0cc95934b77e56c419199c8db5c3b599",
+      "byteLength": 466
+    },
+    {
+      "path": "pipeline-graph.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:b518c69237cf649eb3fc344e31a7979c2610b2c6965c95e5cd727dd2cb7fb8e3",
+      "byteLength": 901
+    },
+    {
+      "path": "performance-envelope.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:62e1abb57e217febce5044e04788aae2967a749c9dd5c70432f279fc3c45e507",
+      "byteLength": 634
+    },
+    {
+      "path": "frame-trace.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:61e2604f805c8759b4999cc2b6ef8e27ea9446acb8902d2b4f38c58f787479e7",
+      "byteLength": 280
+    },
+    {
+      "path": "quality-governor.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:8ec24238455cf8d4237d55d80449333b22bbdc1cca1a33fcc0ea3b756a26e8d9",
+      "byteLength": 265
+    },
+    {
+      "path": "render-targets.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:57d4c36c0f7a5f00e76e6eb2c2cd53189be3cf3ea2f770ee43c8a596d9a5e240",
+      "byteLength": 18242
+    },
+    {
+      "path": "storage-resources.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:579719a4f114bada5939fff4c4a645ac178e5b40a8f18de1cfb9532f02a92486",
+      "byteLength": 333
+    },
+    {
+      "path": "resident-resources.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:8a479af8bbef2517b620d2b6daba2b8d15e60abd692db3d6ca0de819d1d54181",
+      "byteLength": 1604
+    },
+    {
+      "path": "bandwidth-model.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:e921c52741c0a3b03c5a02ac0b1337262a182750cd76a01d10c49323c047a034",
+      "byteLength": 956
+    },
+    {
+      "path": "visual-errors.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:f4b2464fc52bef50bc4fdd264442c77fe07b680905d615eb5be53d0d84a8ff9c",
+      "byteLength": 752
+    },
+    {
+      "path": "leak-loop.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:143dea43431cbcf07950b9adc8f8aa54e7fd1d530e6ff39ea4024fb17ae2be39",
+      "byteLength": 131671
+    },
+    {
+      "path": "mechanism-metrics.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:6b19a508304bcbe585347e3f2dab6357f42ffbf3bec1eec2e366fbb68112e5f1",
+      "byteLength": 7679
+    },
+    {
+      "path": "capture-write-ledger.json",
+      "status": "captured",
+      "kind": "capture-session-write-ledger",
+      "sha256": "sha256:ce11a3d92fd418b06092f48628100f5a1f60e4600656ff65e23ee4fe0376890d",
+      "byteLength": 63966
+    },
+    {
+      "path": "sessions/physical-route.write-ledger.json",
+      "status": "captured",
+      "kind": "capture-session-write-ledger",
+      "sha256": "sha256:06c9618bf14e223e0294a1151c0c7f4c428fcfe705695f09db86dd64eb5c441c",
+      "byteLength": 1500
+    }
+  ],
+  "retainedImages": [
+    {
+      "path": "final.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "final.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:a8b991b33d6632f9b134f9177b3b1c1b0bd185b5a31693056a688c4fe8372f52",
+      "byteLength": 16190
+    },
+    {
+      "path": "diagnostics.mosaic.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "diagnostics.mosaic",
+      "mediaType": "image/png",
+      "sha256": "sha256:d5c41825d5cd5f1f7013098e102c16e088153930c42ff3356d944f0e4f2c0212",
+      "byteLength": 47585
+    },
+    {
+      "path": "camera.near.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.near",
+      "mediaType": "image/png",
+      "sha256": "sha256:897c500ee4f5bea642c6bb3ae0e873cde88ed3066c15eb95e8243bfbff15606a",
+      "byteLength": 24116
+    },
+    {
+      "path": "camera.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:fd32bbcf464c5b147f844c8f39538300838d6fe1e689dc21f1915db418376aed",
+      "byteLength": 13168
+    },
+    {
+      "path": "camera.far.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.far",
+      "mediaType": "image/png",
+      "sha256": "sha256:426f329a73f6ece7a82e93e60d5c15f6c6aaec26b53a3abaee45057725b24217",
+      "byteLength": 7753
+    },
+    {
+      "path": "seed-0001.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "seed-0001.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:fccb597a7a49618c0965d67803397a5984482fe0c0944f5a6bd08bae46ffb505",
+      "byteLength": 16298
+    },
+    {
+      "path": "seed-9e3779b9.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "seed-9e3779b9.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:c51860daa525d6738d80e8a1401f59d3808b05494229f28a5b7bb502220796de",
+      "byteLength": 16633
+    },
+    {
+      "path": "temporal.t000.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "temporal.t000",
+      "mediaType": "image/png",
+      "sha256": "sha256:b7bc6bee82fa4751490360b3fe5a3eeae98859633b6ee4ee59733a060d210573",
+      "byteLength": 15651
+    },
+    {
+      "path": "temporal.t001.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "temporal.t001",
+      "mediaType": "image/png",
+      "sha256": "sha256:f8221e6658e7d820d979c8479c07ed371241a9cc35b7ce1bb015c599c6114dea",
+      "byteLength": 16369
+    }
+  ],
+  "omittedFiles": {
+    "ledgerDigest": "sha256:094e9e2d9bb43ef29b3847605c52bc0e11656e3475b88dd8d2aff18bec18e53c",
+    "count": 3,
+    "byteLength": 391183,
+    "byKind": [
+      {
+        "kind": "capture-session-document",
+        "count": 2,
+        "byteLength": 387607
+      },
+      {
+        "kind": "supplementary-json",
+        "count": 1,
+        "byteLength": 3576
+      }
+    ]
+  },
+  "checkoutLimitations": [
+    {
+      "id": "detached-source-payloads",
+      "status": "ACTIVE",
+      "statement": "Raw readbacks and capture-session transcript bytes are omitted from the tracked projection. Checkout validation verifies their approved hash and byte-length commitments, not the detached bytes themselves.",
+      "affectedClaims": []
+    }
+  ],
+  "projectionDigest": "sha256:18b0744569344e64ebfaa5a01977f2541f9704dff462554b9faab9dab0c6b54d"
+}

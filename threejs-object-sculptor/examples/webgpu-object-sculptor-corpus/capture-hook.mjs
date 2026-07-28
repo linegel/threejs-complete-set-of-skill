@@ -1019,6 +1019,31 @@ export async function captureLab(session) {
     ? computeCorpusRasterComparisons((filename) => readFileSync(resolve(session.outputDir, filename)))
     : Object.freeze([]);
 
+  // Multi-subject sweeps intentionally leave the controller on the last subject.
+  // capture-lab-browser asserts final metrics against the harness-locked state
+  // (first scenario / default capture target). Restore that lock before return.
+  const locked = session.lockedState;
+  if (locked && typeof locked === "object") {
+    await configureState(session, {
+      subjectId: locked.scenario,
+      mode: locked.mode,
+      tier: locked.tier,
+      camera: locked.camera,
+      seed: locked.seed,
+      time: locked.timeSeconds ?? 0,
+    });
+    await session.controllerCall("renderOnce");
+    const restored = await session.controllerCall("getMetrics");
+    assertAppliedState(restored, {
+      subjectId: locked.scenario,
+      mode: locked.mode,
+      tier: locked.tier,
+      camera: locked.camera,
+      seed: locked.seed,
+      time: locked.timeSeconds ?? 0,
+    });
+  }
+
   return Object.freeze({
     schemaVersion: 2,
     evidenceRunId,

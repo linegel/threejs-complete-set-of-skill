@@ -4,7 +4,8 @@
   "packageManager": "npm@10.9.4",
   "description": "Agent skill pack for Three.js WebGPU/TSL procedural graphics, image pipelines, and visual validation.",
   "engines": {
-    "node": ">=22"
+    "node": "22.22.0",
+    "npm": "10.9.4"
   },
   "scripts": {
     "toolchain:preflight": "node scripts/toolchain-preflight.mjs",
@@ -69,11 +70,13 @@
     "url": "https://github.com/linegel/threejs-complete-set-of-skill/issues"
   },
   "license": "ISC",
+  "dependencies": {
+    "three": "0.185.1"
+  },
   "devDependencies": {
     "marked": "18.0.5",
     "playwright": "1.61.1",
     "sharp": "0.35.3",
-    "three": "0.185.1",
     "vite": "8.1.3"
   }
 }

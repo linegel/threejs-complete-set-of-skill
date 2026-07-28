@@ -5,10 +5,13 @@ import { captureLabBrowser } from '../../../scripts/capture-lab-browser.mjs';
 import { finalizeFrostRawEvidence } from './finalize-frost-evidence.mjs';
 
 const here = dirname( fileURLToPath( import.meta.url ) );
-const outputDir = resolve( here, '../../../artifacts/visual-validation/webgpu-touch-history-frost/correctness' );
+const profileIndex = process.argv.indexOf( '--profile' );
+if ( profileIndex >= 0 && !process.argv[ profileIndex + 1 ] ) throw new Error( '--profile requires correctness or performance' );
+const profile = profileIndex < 0 ? 'correctness' : process.argv[ profileIndex + 1 ];
+const outputDir = resolve( here, `../../../artifacts/visual-validation/webgpu-touch-history-frost/${profile}` );
 const session = await captureLabBrowser( {
 	labId: 'webgpu-touch-history-frost',
-	profile: 'correctness',
+	profile,
 	outputDir,
 	hookPath: resolve( here, 'capture-hook.mjs' ),
 	target: 'final'

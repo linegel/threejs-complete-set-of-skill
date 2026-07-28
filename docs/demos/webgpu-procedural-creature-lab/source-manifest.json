@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "labId": "webgpu-procedural-creature-lab",
   "kind": "canonical-lab",
-  "status": "incomplete",
+  "status": "accepted",
   "canonicalSource": [
     "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab"
   ],
@@ -10,7 +10,7 @@
     "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab"
   ],
   "browserEntry": "threejs-procedural-creatures/examples/webgpu-procedural-creature-lab/index.html",
-  "sourceHash": "sha256:0a63491b4d4001ff2bef75e7a00c05ba887642cdb15d58643d1cd02f6a41e560",
+  "sourceHash": "sha256:66a3fc6e27a7e6499d3a360ff4b9cf1c66de0275b5d5aa083b218f11af08f6c8",
   "publishedHashInputs": [
     "docs/demos/webgpu-procedural-creature-lab",
     "docs/demos/assets/biped.surface-HbTvx8TV.bin",
@@ -21,7 +21,7 @@
     "docs/demos/assets/hexapod.surface-Btz742Ic.bin",
     "docs/demos/assets/hopper.surface-Be6hX9D1.json",
     "docs/demos/assets/hopper.surface-DyxQjmj5.bin",
-    "docs/demos/assets/index-DhkgGIy3.js",
+    "docs/demos/assets/index-CPFIlauP.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
     "docs/demos/assets/pose-storage-DshYPy6_.js",
     "docs/demos/assets/quadruped.surface-C3celXol.bin",
@@ -40,7 +40,7 @@
     "docs/demos/assets/hexapod.surface-Btz742Ic.bin",
     "docs/demos/assets/hopper.surface-Be6hX9D1.json",
     "docs/demos/assets/hopper.surface-DyxQjmj5.bin",
-    "docs/demos/assets/index-DhkgGIy3.js",
+    "docs/demos/assets/index-CPFIlauP.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
     "docs/demos/assets/pose-storage-DshYPy6_.js",
     "docs/demos/assets/quadruped.surface-C3celXol.bin",
@@ -50,10 +50,8 @@
     "docs/demos/assets/three.tsl--5AYqKVA.js",
     "docs/demos/assets/three.webgpu-Dss1ekdK.js"
   ],
-  "publishedBundleHash": "sha256:9627cb65305270936f0f959a87612291ff576dc31e79b389e4c3c4c01ae1ed32",
+  "publishedBundleHash": "sha256:f6fcff148e4319daab21c3a87aa85b44f6bd25f35040b042594ba33e2105f13a",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:16a8b5868643f52a1e053ac5f8f1efbbf4c97028701cf3578e1acef775c65a89",
-  "evidenceBundleId": "correctness",
-  "skill": "threejs-procedural-creatures",
-  "publishPath": "/demos/webgpu-procedural-creature-lab/"
+  "buildRevision": "sha256:c151ad21626b93f809ec207d33636612320aa54cbc192958a440b1ebbffa2dc9",
+  "evidenceBundleId": "bundle"
 }

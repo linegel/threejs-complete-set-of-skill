@@ -1,0 +1,337 @@
+{
+  "schemaVersion": 1,
+  "projectionKind": "tracked-release-projection-v1",
+  "policy": {
+    "id": "native-webgpu-tracked-release-v1",
+    "digest": "sha256:e349900d79da27cb5570ea959707f741e03ea7e206d85a717a1129b27268f6a4"
+  },
+  "labId": "integration-precipitation-image-pipeline",
+  "skill": "threejs-rain-snow-and-wet-surfaces",
+  "threeRevision": "0.185.1",
+  "sourceClosureHash": "sha256:7493e81f66d3f1baf848f9d22cff443725229157220b6fc2616cf800dcf03a96",
+  "buildRevision": "sha256:1f4090c81cacf439efa953295cee3d5ed177de2e470938946fe360836515c70d",
+  "sourceRelease": {
+    "path": "evidence-manifest.json",
+    "sha256": "sha256:391d1a3f34f9c14fa51cf3db440716db204a29af6de58e106dad7d5f5d8f46bf",
+    "byteLength": 34544,
+    "promotionBindingDigest": "sha256:cc85e8116225ed6bb88cbd46552a471bf69c9f118f289f463d72aa6dc65aceda",
+    "candidateBindingDigest": "sha256:e771e3ad5f4ed65c797e9d0f307dc9ba5f114929d8211ede66307563fb089728",
+    "artifactLedgerDigest": "sha256:e2f5ddb2138eea9390ba7c7ede2c2aa3411decfc0b682316a99ff49b402f5bbe",
+    "imageLedgerDigest": "sha256:9ca5f3b729afce3c86053ea2e72c9c145860d5d5d6b76ca8f2de0dc925a78b9d"
+  },
+  "sourceClosure": {
+    "algorithm": "demo-registry-transitive-source-closure-v2",
+    "roots": [
+      "labs/runtime/webgpu-device-identity.mjs",
+      "README.md",
+      "threejs-rain-snow-and-wet-surfaces/examples/integration-precipitation-image-pipeline",
+      "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/precipitation-system.js",
+      "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/weather-webgpu-lab.js"
+    ],
+    "files": [
+      {
+        "repositoryPath": "labs/runtime/webgpu-device-identity.mjs",
+        "sha256": "sha256:4bc6eb92755516473bc39b488c0bcfd419e5f23800c497bc44bbf3d07d509bfe",
+        "byteLength": 4095
+      },
+      {
+        "repositoryPath": "README.md",
+        "sha256": "sha256:1a5d41b3715305d1317429b8f69ab4618cfd6c30c468e8203ea63cd89da5e363",
+        "byteLength": 43493
+      },
+      {
+        "repositoryPath": "threejs-rain-snow-and-wet-surfaces/examples/integration-precipitation-image-pipeline/browser-host.js",
+        "sha256": "sha256:e4cc7b24da975085fc30d61f2496eab95a9f0c5a2cdbf168b5d3608c5b99d1eb",
+        "byteLength": 13355
+      },
+      {
+        "repositoryPath": "threejs-rain-snow-and-wet-surfaces/examples/integration-precipitation-image-pipeline/capture-hook.mjs",
+        "sha256": "sha256:74641feb6ca07e96c7e21848b430c4f637b2383bbd6aaf22a9e8adea67a42163",
+        "byteLength": 3735
+      },
+      {
+        "repositoryPath": "threejs-rain-snow-and-wet-surfaces/examples/integration-precipitation-image-pipeline/evidence-status.mjs",
+        "sha256": "sha256:72d17fe31bf95d196b76b7a92cf4c01e4940726ae415e3dcb88be95ab740edb4",
+        "byteLength": 2841
+      },
+      {
+        "repositoryPath": "threejs-rain-snow-and-wet-surfaces/examples/integration-precipitation-image-pipeline/index.html",
+        "sha256": "sha256:5c2a929f956a13c8af5e5228666ed2f304a7b6cfc960c1dc119a8f47e2694298",
+        "byteLength": 1410
+      },
+      {
+        "repositoryPath": "threejs-rain-snow-and-wet-surfaces/examples/integration-precipitation-image-pipeline/main.js",
+        "sha256": "sha256:e99f3b8c73fa91037c4b15277e196e4d06e78b66753fb9920fe285c6305d1e42",
+        "byteLength": 2483
+      },
+      {
+        "repositoryPath": "threejs-rain-snow-and-wet-surfaces/examples/integration-precipitation-image-pipeline/package.json",
+        "sha256": "sha256:450f38c22f249b0f19346bf7f984dc0dc937b9ffd8a3a4bf191353bc4a4405c8",
+        "byteLength": 779
+      },
+      {
+        "repositoryPath": "threejs-rain-snow-and-wet-surfaces/examples/integration-precipitation-image-pipeline/precipitation-image-pipeline-integration.js",
+        "sha256": "sha256:766a684f578445417dcb1bc57a8fa69a020fd89149a051e9557d3b3ef7aa3773",
+        "byteLength": 11600
+      },
+      {
+        "repositoryPath": "threejs-rain-snow-and-wet-surfaces/examples/integration-precipitation-image-pipeline/README.md",
+        "sha256": "sha256:86f6abe59dffd6d2c07b85f04aa1cd15a6465ea66f23534a904e6447836f13d2",
+        "byteLength": 1069
+      },
+      {
+        "repositoryPath": "threejs-rain-snow-and-wet-surfaces/examples/integration-precipitation-image-pipeline/route-state.mjs",
+        "sha256": "sha256:680d0d380f3636101e67fd9d10dd471235a61b7cf41c212ce0650b3a5b77ca43",
+        "byteLength": 2964
+      },
+      {
+        "repositoryPath": "threejs-rain-snow-and-wet-surfaces/examples/integration-precipitation-image-pipeline/test-mutations.mjs",
+        "sha256": "sha256:2d51e442c908548f09f9cbc3d2201fafd89b95ff9304c8a3f9d3ce47f1302a27",
+        "byteLength": 2356
+      },
+      {
+        "repositoryPath": "threejs-rain-snow-and-wet-surfaces/examples/integration-precipitation-image-pipeline/validate-integration.mjs",
+        "sha256": "sha256:9eabed2c3b0b6a4bd7ce3e8c2511aebc0abd942aa47bac16330ea8771da9f0b7",
+        "byteLength": 5560
+      },
+      {
+        "repositoryPath": "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/precipitation-system.js",
+        "sha256": "sha256:ce40afec1f35dc662c36cc32e036c270ed509d3702b3c7e2e0afd2c0ee2586b0",
+        "byteLength": 23368
+      },
+      {
+        "repositoryPath": "threejs-rain-snow-and-wet-surfaces/examples/webgpu-rain-snow-and-wet-surfaces/weather-webgpu-lab.js",
+        "sha256": "sha256:dd3a900ef233c686cc2e771fbd39031c5ee1e245b53f0a676ab61f15468ab7cc",
+        "byteLength": 39059
+      }
+    ],
+    "threeRevision": "0.185.1",
+    "sourceHash": "sha256:7493e81f66d3f1baf848f9d22cff443725229157220b6fc2616cf800dcf03a96",
+    "buildRevision": "sha256:1f4090c81cacf439efa953295cee3d5ed177de2e470938946fe360836515c70d"
+  },
+  "retainedFiles": [
+    {
+      "path": "visual-contract.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:9a19ebf3261a9cbba779b968bb0975c73035c8ad7464b2769f1d2435cd4f98a5",
+      "byteLength": 917
+    },
+    {
+      "path": "renderer-info.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:ce98dc437ff1e48283efdd61f5f63f5c0cc95934b77e56c419199c8db5c3b599",
+      "byteLength": 466
+    },
+    {
+      "path": "pipeline-graph.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:d7099ebb0807f11ba272badfa0bc47954e01ad0c03b6650e302594095843202f",
+      "byteLength": 1086
+    },
+    {
+      "path": "performance-envelope.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:62e1abb57e217febce5044e04788aae2967a749c9dd5c70432f279fc3c45e507",
+      "byteLength": 634
+    },
+    {
+      "path": "frame-trace.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:61e2604f805c8759b4999cc2b6ef8e27ea9446acb8902d2b4f38c58f787479e7",
+      "byteLength": 280
+    },
+    {
+      "path": "quality-governor.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:f187a1358b9b033580853d04a26f10a2061e1a921980c421e170579cba1bf775",
+      "byteLength": 259
+    },
+    {
+      "path": "render-targets.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:5b9e4ecaaaf704569d2a62f03540f2d1d8b5238f5e171c682f75f4ae66e19ea8",
+      "byteLength": 10900
+    },
+    {
+      "path": "storage-resources.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:579719a4f114bada5939fff4c4a645ac178e5b40a8f18de1cfb9532f02a92486",
+      "byteLength": 333
+    },
+    {
+      "path": "resident-resources.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:6fc1377d8131845b579a304b535bc8832ac8ad8663760f592519d1c3ab76a856",
+      "byteLength": 1329
+    },
+    {
+      "path": "bandwidth-model.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:e921c52741c0a3b03c5a02ac0b1337262a182750cd76a01d10c49323c047a034",
+      "byteLength": 956
+    },
+    {
+      "path": "visual-errors.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:f4b2464fc52bef50bc4fdd264442c77fe07b680905d615eb5be53d0d84a8ff9c",
+      "byteLength": 752
+    },
+    {
+      "path": "leak-loop.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:d8bf4d4404192219f6f4c7f92c1851f64fc1eb9c7df82130041a6597f6eb1491",
+      "byteLength": 131684
+    },
+    {
+      "path": "mechanism-metrics.json",
+      "status": "captured",
+      "kind": "normative-json",
+      "sha256": "sha256:d685a82ea680c87b72fb95bf6beaee90eae9e583a3c95e026171bdbeeefd3b63",
+      "byteLength": 4748
+    },
+    {
+      "path": "capture-write-ledger.json",
+      "status": "captured",
+      "kind": "capture-session-write-ledger",
+      "sha256": "sha256:57ebc8075d99400b1415e414074b9adf751ae00495ebe9ed43152c8cdbcc5dc4",
+      "byteLength": 10646
+    },
+    {
+      "path": "sessions/physical-route.write-ledger.json",
+      "status": "captured",
+      "kind": "capture-session-write-ledger",
+      "sha256": "sha256:c68c2da0ddcb32406bd648ce9ecfe1b61bb3eca4258b57010dfed17ca20e64cc",
+      "byteLength": 1498
+    }
+  ],
+  "retainedImages": [
+    {
+      "path": "final.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "final.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:81702bd0221dd9188ad77d1399eadda48e986d8ed1fe4548f2aaf8046f8befed",
+      "byteLength": 120368
+    },
+    {
+      "path": "no-post.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "no-post.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:25be35a85ed72024e30e92d9a9e680f99da13ad582b5dafd4b7f84519c3a26c0",
+      "byteLength": 38443
+    },
+    {
+      "path": "diagnostics.mosaic.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "diagnostics.mosaic",
+      "mediaType": "image/png",
+      "sha256": "sha256:2c85733583bb4abeb24029566fdb8a3e675c67e3bac5386f05d6b3cc6ea63575",
+      "byteLength": 85670
+    },
+    {
+      "path": "camera.near.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.near",
+      "mediaType": "image/png",
+      "sha256": "sha256:b7844428d63fca7e039f5e7c3a181448259bf99f4329e27c6c311e5104b79fe8",
+      "byteLength": 92159
+    },
+    {
+      "path": "camera.design.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.design",
+      "mediaType": "image/png",
+      "sha256": "sha256:81702bd0221dd9188ad77d1399eadda48e986d8ed1fe4548f2aaf8046f8befed",
+      "byteLength": 120368
+    },
+    {
+      "path": "camera.far.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "camera.far",
+      "mediaType": "image/png",
+      "sha256": "sha256:9413ca98da1c9c2c5d999243119e365fadf9370dda6f779ff7bbf19af80920d3",
+      "byteLength": 116246
+    },
+    {
+      "path": "seed-0001.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "seed-0001.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:81702bd0221dd9188ad77d1399eadda48e986d8ed1fe4548f2aaf8046f8befed",
+      "byteLength": 120368
+    },
+    {
+      "path": "seed-9e3779b9.final.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "seed-9e3779b9.final",
+      "mediaType": "image/png",
+      "sha256": "sha256:0a18fd8073f8da1f11335ddab231f960a5f03d0aa32245351bb973b84f3dd43e",
+      "byteLength": 119022
+    },
+    {
+      "path": "temporal.t000.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "temporal.t000",
+      "mediaType": "image/png",
+      "sha256": "sha256:1fa23efc906bddba717f3585a53daed79216723eeb940804ad42ac8fba7437b5",
+      "byteLength": 98753
+    },
+    {
+      "path": "temporal.t001.png",
+      "status": "captured",
+      "kind": "direct-capture",
+      "role": "temporal.t001",
+      "mediaType": "image/png",
+      "sha256": "sha256:f84ad7472321eedbe321b77746825b8c3015ee34fcd9bf31461bdb22ae52c440",
+      "byteLength": 134619
+    }
+  ],
+  "omittedFiles": {
+    "ledgerDigest": "sha256:af13ca134f1115d5ff7ce81a09c4f486c48e76abfa53716409c38bf88d94e873",
+    "count": 3,
+    "byteLength": 102860,
+    "byKind": [
+      {
+        "kind": "capture-session-document",
+        "count": 2,
+        "byteLength": 99258
+      },
+      {
+        "kind": "supplementary-json",
+        "count": 1,
+        "byteLength": 3602
+      }
+    ]
+  },
+  "checkoutLimitations": [
+    {
+      "id": "detached-source-payloads",
+      "status": "ACTIVE",
+      "statement": "Raw readbacks and capture-session transcript bytes are omitted from the tracked projection. Checkout validation verifies their approved hash and byte-length commitments, not the detached bytes themselves.",
+      "affectedClaims": []
+    }
+  ],
+  "projectionDigest": "sha256:54eb7b3323901ffe06b213e4db6d0cc595bfac664b013df1e457e0773490c823"
+}

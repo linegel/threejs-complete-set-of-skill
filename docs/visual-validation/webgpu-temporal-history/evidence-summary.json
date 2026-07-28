@@ -10,7 +10,7 @@
     "threejs-image-pipeline/examples/webgpu-image-pipeline/lab-identity.js",
     "threejs-image-pipeline/examples/webgpu-temporal-history"
   ],
-  "canonicalSourceHash": "sha256:39f9466604b4a394eed972080dcc689b24b1bdaed7a1d0c94de62a8b07b08022",
+  "canonicalSourceHash": "sha256:2f41080c1ecbec60bc1f3678e21c2039ede72793e8ba39260302cef254c97c3f",
   "threeRevision": "0.185.1",
   "runtime": {
     "renderer": "WebGPURenderer",

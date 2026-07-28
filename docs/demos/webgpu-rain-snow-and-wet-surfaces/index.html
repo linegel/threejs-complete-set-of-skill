@@ -70,11 +70,19 @@
       <h1>WebGPU Rain Snow And Wet Surfaces</h1>
       <p>Interactive Three.js WebGPU/TSL demo for WebGPU Rain Snow And Wet Surfaces, with 1 scenario, 6 mechanisms, and 3 quality tiers and evidence-gated validation.</p>
       <p class="demo-seo-shell__evidence"><strong>Evidence status:</strong> Accepted runtime evidence is available for the published contract represented by this demo.</p>
-      <details class="demo-roadmap" data-demo-roadmap data-roadmap-status="accepted" data-open-count="0">
-        <summary>Readiness &amp; remaining fixes <span>0</span></summary>
+      <details class="demo-roadmap" data-demo-roadmap data-roadmap-status="accepted" data-open-count="2">
+        <summary>Readiness &amp; remaining fixes <span>2</span></summary>
         <div class="demo-roadmap__body">
-          <p>The declared published contract has accepted evidence and no open acceptance gates.</p>
-          <ol><li data-roadmap-item data-priority="done" data-category="accepted"><div><span>DONE</span><strong>No open acceptance gates</strong></div><p>The declared published contract is accepted.</p><code>status.accepted</code></li></ol>
+          <p>2 open closure items. Loadable does not mean accepted or performance-valid.</p>
+          <ol><li data-roadmap-item data-priority="P0" data-category="performance">
+          <div><span>P0</span><strong>Define and measure the target performance contract</strong></div>
+          <p>The high, medium, budgeted tiers have no accepted frame target. Record named device/browser/GPU, viewport, DPR, sustained CPU/GPU/presentation p50 and p95, deadline misses, memory, and settled quality. Submission time is not GPU timing.</p>
+          <code>tiers[].frameTargetMs</code>
+        </li><li data-roadmap-item data-priority="P0" data-category="runtime">
+          <div><span>P0</span><strong>Current Adapter Timing runtime proof</strong></div>
+          <p>required before any performance acceptance</p>
+          <code>runtimeProof.current-adapter-timing</code>
+        </li></ol>
         </div>
       </details>
       <p>Use the linked skill and source to inspect route ownership and evidence classification before treating this presentation as an accepted implementation.</p>

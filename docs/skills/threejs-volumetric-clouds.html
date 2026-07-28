@@ -9,7 +9,7 @@
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-volumetric-clouds.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:ab7d8d17e0589a6f5c2462d645b9e0d6797cd92eade36e3615dae091c6f9df5b" />
+<meta name="skill-pack-build-revision" content="sha256:c151ad21626b93f809ec207d33636612320aa54cbc192958a440b1ebbffa2dc9" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -24,7 +24,7 @@
 <meta property="og:title" content="Volumetric Clouds | Three.js WebGPU Skill" />
 <meta property="og:description" content="Build volumetric clouds in Three.js WebGPU/TSL. Use for weather-shaped density, bounded cloud raymarching, cloud optical-depth shadows, cloud-specific…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-volumetric-clouds.html" />
-<meta property="article:modified_time" content="2026-07-16T12:45:44+03:00" />
+<meta property="article:modified_time" content="2026-07-16T19:46:25+03:00" />
 <meta property="article:published_time" content="2026-07-04T23:30:21+03:00" />
 <meta property="article:section" content="Worlds and Environments" />
 <meta property="og:image" content="https://threejs-skills.com/visual-validation/webgpu-weather-volume-clouds/final.design.png" />
@@ -74,7 +74,7 @@
     "https://threejs-skills.com/seo/article/threejs-volumetric-clouds-16x9.png"
    ],
    "datePublished": "2026-07-04T23:30:21+03:00",
-   "dateModified": "2026-07-16T12:45:44+03:00",
+   "dateModified": "2026-07-16T19:46:25+03:00",
    "author": {
     "@id": "https://threejs-skills.com/#publisher"
    },
@@ -312,8 +312,8 @@ a.chip:active{scale:.96}
       <span class="chip">1 flagship</span>
       <span class="chip">1 secondary surface</span>
       <span class="chip">accepted runtime evidence</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-16T12:45:44+03:00">2026-07-16</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/8749183dffd84731506239dd86590c92bf958969">commit 8749183 ↗</a>
+      <span class="chip">Latest skill update <time datetime="2026-07-16T19:46:25+03:00">2026-07-16</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/62a9bc59330c44827824665323823883e88f100c">commit 62a9bc5 ↗</a>
       <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-volumetric-clouds/SKILL.md">SKILL.md on GitHub ↗</a>
       <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/skills/threejs-volumetric-clouds/SKILL.md">raw (for agents) ↗</a>
     </div>
@@ -347,7 +347,7 @@ a.chip:active{scale:.96}
         <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="weathered-world">
     <span class="primary-evidence-label">Canonical capture</span>
     <strong>Runtime evidence pending</strong>
-    <span><code>76b06d2596d9</code> source hash</span>
+    <span><code>b03441c869cf</code> source hash</span>
     <span>10 fixed states · 5 runtime proof requirements</span>
   </span>
         <span class="card-head"><span class="card-kind">Planetary environment</span><span class="status status--pending">Evidence pending</span></span>
@@ -523,8 +523,8 @@ approximations until validated against a transport reference.</p>
 </tr>
 <tr>
 <td>Receiver shadow</td>
-<td>full-column 2D optical depth for ground/opaque receivers; short sun march or depth-aware light product for in-cloud samples</td>
-<td>receiver query and transmittance error</td>
+<td>none when no external receiver queries cloud shadow; full-column 2D optical depth for ground/opaque receivers; short sun march or depth-aware light product for in-cloud samples</td>
+<td>admitted receiver query and transmittance error</td>
 </tr>
 <tr>
 <td>Precipitation</td>
@@ -534,13 +534,23 @@ approximations until validated against a transport reference.</p>
 </tbody></table>
 <p>For causal precipitation, publish liquid and ice mass flux in <code>kg m^-2 s^-1</code>,
 or interval-integrated areal mass in <code>kg m^-2</code>, explicitly identified with its
-sample interval, physical support, area/Jacobian convention, fall delay or
-transport model, owner, version, validity, conservation gate, and error.
-Otherwise label precipitation appearance-only and do not drive receiver
-accumulation.</p>
-<p><strong>Complete when:</strong> all five decisions name the selected representation, the
-observable it serves, and a falsifiable cost or error gate; causal
-precipitation additionally has one dimensioned producer and consumer.</p>
+sample time, sample interval, physics frame/origin, physical support,
+area/Jacobian convention, fall delay or transport model, owner, contract
+version, generation, validity, conservation gate, and error. Publish each
+interval once to <code>$threejs-rain-snow-and-wet-surfaces</code>. The receiver converts
+flux to interval mass once, preserves the declared support/Jacobian, and applies
+the declared delay or transport before accumulation.</p>
+<p>A density/emission recipe, incompatible physics frame/origin mapping,
+support/Jacobian convention, or delay model change starts a new generation.
+The receiver rejects stale or incompatible generations and never reinterprets
+prior interval mass. An appearance-only branch remains visual-only and
+publishes no receiver input.</p>
+<p>Allocate no receiver-shadow product for the <code>none</code> branch.</p>
+<p><strong>Complete when:</strong> all five decisions name the selected representation and its
+observable; every admitted workload has a falsifiable cost or error gate; a
+<code>none</code> receiver-shadow branch records no receiver consumer and zero allocation;
+appearance-only precipitation publishes no receiver input; causal precipitation
+has one dimensioned generation accepted by one compatible consumer.</p>
 <h3>2. Define one optical and motion model</h3>
 <p>Choose dimensionless shape density with <code>beta_s</code> and <code>beta_a</code> in
 <code>length^-1</code>, or physical mass density with mass-specific coefficients. Keep
@@ -617,7 +627,7 @@ when the task includes scattering, atmosphere-derived light, phase fitting,
 cloud shadows, or shadow filtering.</p>
 <p><strong>Complete when:</strong> step-halving and higher-light-sample controls fit the linear
 HDR error gate, the cloud-off control returns unit transmittance and zero cloud
-radiance, and each shadow query decodes the optical depth from its actual
+radiance, and each admitted shadow query decodes optical depth from its actual
 receiver position.</p>
 <h3>5. Reconstruct broad clouds</h3>
 <p>For a reduced broad-coverage branch, store opacity-weighted representative
@@ -652,11 +662,17 @@ camera-cut/topology/incompatible-origin controls give history confidence zero,
 measured ghost decay matches the response model, and depth-edge upsampling does
 not cross the opaque surface.</p>
 <h3>6. Integrate the lighting and image handoffs</h3>
-<p>Consume atmosphere lighting with its sample time, frame, quantity, unit, basis,
-support, filter, age, and error. Choose either direct light already attenuated
-by the atmosphere or an unattenuated source plus atmosphere transmittance.
-Multiply cloud-only transmittance and opaque visibility separately. Keep
-directional sky radiance distinct from hemispherical sky irradiance.</p>
+<p>Choose one incident-light contract:</p>
+<ul>
+<li>an authored source that declares owner, revision, sample time and age, frame,
+quantity, unit, basis, direction or angular support, filter, included
+attenuation, validity, and error; or</li>
+<li>atmosphere lighting that declares the same tuple.</li>
+</ul>
+<p>For the atmosphere branch, choose either direct light already attenuated by the
+atmosphere or an unattenuated source plus atmosphere transmittance. Multiply
+each admitted cloud-only transmittance and opaque-visibility factor separately.
+Keep directional sky radiance distinct from hemispherical sky irradiance.</p>
 <p>Composite clouds before the host tone map:</p>
 <pre><code class="language-text">C_out = L_cloud + T_cloud * C_scene
 </code></pre>
@@ -664,25 +680,33 @@ directional sky radiance distinct from hemispherical sky irradiance.</p>
 with explicit format/filter/mip policy and <code>NoColorSpace</code>. Let the host
 <code>renderOutput()</code> or <code>outputColorTransform</code> own the one display conversion;
 mark the pipeline dirty after replacing a diagnostic output node.</p>
-<p><strong>Complete when:</strong> an attenuation trace accounts for atmosphere, cloud, and
-geometry once each; cloud buffers remain linear HDR; and toggling clouds off
-returns the identical host image path.</p>
+<p><strong>Complete when:</strong> the incident source has a complete contract, an attenuation
+trace accounts for every admitted atmosphere, cloud, and geometry factor once,
+cloud buffers remain linear HDR, and toggling clouds off returns the identical
+host image path.</p>
 <h3>7. Verify the system</h3>
 <p>Verify:</p>
 <ul>
 <li>homogeneous-slab transfer, zero-extinction limit, and phase normalization;</li>
 <li>bounds, opaque-depth clamp, conservative skipping, and early-exit error;</li>
 <li>fixed-seed weather mass, erosion, octave filtering, and advection continuity;</li>
-<li>ground and in-cloud shadow decoding, cadence, and stale-product rejection;</li>
-<li>translating density, depth encoding, history rejection, response time, and
-depth-aware upsample, including mapped and incompatible origin rebases;</li>
+<li>each admitted ground or in-cloud shadow decoder, cadence, and stale-product
+rejection;</li>
+<li>for causal precipitation, flux-to-interval integration, conserved mass under
+cadence repartition and physical-support/Jacobian area repartition, declared
+delay-to-arrival mapping, and stale-generation rejection; the appearance-only
+control publishes no receiver input;</li>
+<li>for each admitted temporal branch, translating density, depth encoding,
+history rejection, response time, and depth-aware upsample, including mapped
+and incompatible origin rebases;</li>
 <li>fixed-view HDR radiance, transmittance, silhouette, and halo against a
 higher-quality reference;</li>
-<li>create, resize/tier-switch, history reset, GPU completion, and disposal.</li>
+<li>create, GPU completion, disposal, and each admitted resize/tier-switch or
+history-reset lifecycle.</li>
 </ul>
 <p><strong>Complete when:</strong> every selected branch passes its numeric, temporal, visual,
-and lifecycle gates, and diagnostics identify current density, shadow, and
-history generations.</p>
+and lifecycle gates, and diagnostics identify each retained density, shadow,
+history, and causal-precipitation generation.</p>
 <h2>Failure signatures</h2>
 <table>
 <thead>
@@ -755,7 +779,7 @@ for opaque-geometry shadow maps.</p>
 
 <div class="wrap"><footer>
   <div class="footer-summary">Three.js WebGPU Skill Pack: TSL, procedural graphics, and visual validation.
-    <span>Three r185.1 · 40 primary targets · 25 accepted · build <code>ab7d8d17e058</code></span>
+    <span>Three r185.1 · 40 primary targets · 29 accepted · build <code>c151ad21626b</code></span>
     <span>Compiling shaders? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span>
   </div>
   <div class="footer-groups">

@@ -2,38 +2,34 @@
   "schemaVersion": 2,
   "labId": "tsl-curved-ray",
   "kind": "canonical-lab",
-  "status": "incomplete",
+  "status": "accepted",
   "canonicalSource": [
-    "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/space-lab.mjs",
-    "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/space-transfer-stage.js",
-    "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/space-gpu-probes.js",
-    "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/space-integrators.js",
-    "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/curved-ray-accretion.js"
+    "threejs-black-holes-and-space-effects/examples/tsl-curved-ray"
   ],
   "sourceHashInputs": [
     "threejs-black-holes-and-space-effects/examples/tsl-curved-ray"
   ],
   "browserEntry": "threejs-black-holes-and-space-effects/examples/tsl-curved-ray/index.html",
-  "sourceHash": "sha256:88f02b547cf8c5ad93a38e88b1a3bc1fe8de1185524820c282eec39e9bc3bde8",
+  "sourceHash": "sha256:c0bee8cf5535d232c7af888c5ef3a7313b27afc656742ed271a5a49c36c780c2",
   "publishedHashInputs": [
     "docs/demos/tsl-curved-ray",
-    "docs/demos/assets/BloomNode-qktuf1Q7.js",
-    "docs/demos/assets/index-CHtg9ro9.js",
+    "docs/demos/assets/BloomNode-B7VcMtwE.js",
+    "docs/demos/assets/index-Bcd1Fs_H.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/space-transfer-stage-Biw3Y0fc.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+    "docs/demos/assets/space-transfer-stage-BRldC5yw.js",
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js"
   ],
   "emittedAssetDependencies": [
-    "docs/demos/assets/BloomNode-qktuf1Q7.js",
-    "docs/demos/assets/index-CHtg9ro9.js",
+    "docs/demos/assets/BloomNode-B7VcMtwE.js",
+    "docs/demos/assets/index-Bcd1Fs_H.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/space-transfer-stage-Biw3Y0fc.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+    "docs/demos/assets/space-transfer-stage-BRldC5yw.js",
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js"
   ],
-  "publishedBundleHash": "sha256:f1b842d5fa4e0b162f12149438f73a3c38c6052775eb417916bfd2680c513f94",
+  "publishedBundleHash": "sha256:0f937bd720ca9857fb9860f095ce7dfc9a7d7c635421166c7470c25e1b121518",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b",
-  "evidenceBundleId": null
+  "buildRevision": "sha256:c151ad21626b93f809ec207d33636612320aa54cbc192958a440b1ebbffa2dc9",
+  "evidenceBundleId": "bundle"
 }

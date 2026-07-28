@@ -335,7 +335,6 @@
   "modes": [
     "final",
     "no-post",
-    "diagnostics",
     "velocity",
     "ao",
     "emissive",

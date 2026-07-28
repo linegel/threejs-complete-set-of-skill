@@ -11,12 +11,12 @@
     "threejs-object-sculptor/examples/webgpu-tower-ship-sculptor"
   ],
   "browserEntry": "threejs-object-sculptor/examples/webgpu-tower-ship-sculptor/index.html",
-  "sourceHash": "sha256:7865ac08c4e28a3d873f7296f0c422b276e3a2a3503bb28511b416109c925c5e",
+  "sourceHash": "sha256:23543812e0d47c905610422df3df9e6032244ef6db2c6664a2b82ad606137b3c",
   "publishedHashInputs": [
     "docs/demos/webgpu-tower-ship-sculptor",
     "docs/demos/assets/OrbitControls-BPue_ISR.js",
     "docs/demos/assets/aligned-readback-XAnJComS.js",
-    "docs/demos/assets/index-WA3-uWsI2.js",
+    "docs/demos/assets/index-CcmpFQ4w2.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
     "docs/demos/assets/three.tsl--5AYqKVA.js",
     "docs/demos/assets/three.webgpu-Dss1ekdK.js",
@@ -25,14 +25,14 @@
   "emittedAssetDependencies": [
     "docs/demos/assets/OrbitControls-BPue_ISR.js",
     "docs/demos/assets/aligned-readback-XAnJComS.js",
-    "docs/demos/assets/index-WA3-uWsI2.js",
+    "docs/demos/assets/index-CcmpFQ4w2.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
     "docs/demos/assets/three.tsl--5AYqKVA.js",
     "docs/demos/assets/three.webgpu-Dss1ekdK.js",
     "docs/demos/assets/tower-ship-reference-D3qlgi5o.png"
   ],
-  "publishedBundleHash": "sha256:82743a77c4f79db0aa857d41d4b3b78734af5715efdba40894a9093af95ef261",
+  "publishedBundleHash": "sha256:059d185f125a89f27419a9c3905e3fbbe800eb33c87f3df7ced4194bf7114ca0",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:7ba7b3cc2b0ff75eb71ecf5d8b8e7b6bdf9407d8570076f6a6bce907a7e649d6",
+  "buildRevision": "sha256:c151ad21626b93f809ec207d33636612320aa54cbc192958a440b1ebbffa2dc9",
   "evidenceBundleId": "bundle"
 }

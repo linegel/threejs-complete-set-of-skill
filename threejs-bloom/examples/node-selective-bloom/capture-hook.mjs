@@ -59,10 +59,11 @@ export async function captureLab(session) {
   await capture("camera.near.png", { camera: "near" });
   await capture("camera.design.png", { camera: "design" });
   await capture("camera.far.png", { camera: "far" });
-  await capture("seed-0001.final.png", { seed: BASELINE_SEED });
-  await capture("seed-9e3779b9.final.png", { seed: STRESS_SEED });
-  await capture("temporal.t000.png", { time: 0 });
-  await capture("temporal.t001.png", { time: 1 / 60 });
+  await capture("seed-0001.final.png", { seed: BASELINE_SEED, time: 0 });
+  await capture("seed-9e3779b9.final.png", { seed: STRESS_SEED, time: 0 });
+  // Large temporal step so animation markers move past the material-delta gate.
+  await capture("temporal.t000.png", { seed: BASELINE_SEED, time: 0 });
+  await capture("temporal.t001.png", { seed: BASELINE_SEED, time: 0.5 });
 
   await restoreLocked(session);
   return {

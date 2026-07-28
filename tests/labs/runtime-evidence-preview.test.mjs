@@ -74,6 +74,23 @@ test('runtime evidence extracts native backend and bounded claims from capture s
     backend: 'WebGPUBackend',
     isWebGPUBackend: true,
     threeRevision: '0.185.1',
+    nativeWebGPU: true,
+    initialized: true,
+    adapterClass: 'unknown',
+    adapterIdentity: {
+      source: 'capture-session.rendererBackendEvidence',
+      backendType: 'WebGPUBackend',
+      deviceType: null,
+      deviceIdentityVerified: false,
+      lossPromiseObservedOnActualDevice: false,
+      rendererDeviceGeneration: null,
+    },
+    deviceIdentity: {
+      verified: false,
+      source: null,
+      deviceType: null,
+      generation: null,
+    },
   });
   assert.deepEqual(normalizedPreviewClaimVerdicts(session), {
     visualCorrectness: 'PASS',

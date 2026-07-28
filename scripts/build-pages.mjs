@@ -1714,7 +1714,7 @@ ${renderFooter()}
 </body>
 </html>
 `;
-  writeFileSync(join(root, 'docs', 'skills', `${slug}.html`), html);
+  writeFileSync(join(root, 'docs', 'skills', `${slug}.html`), html.replace(/[ \t]+$/gm, ''));
 }
 
 /* ------------------------- machine-readable ------------------------- */

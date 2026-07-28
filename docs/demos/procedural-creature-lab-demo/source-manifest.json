@@ -4,7 +4,7 @@
   "kind": "proxy-demo",
   "status": "secondary",
   "canonicalSource": [
-    "threejs-procedural-creatures/SKILL.md",
+    "skills/threejs-procedural-creatures/SKILL.md",
     "scripts/provider-demos.mjs",
     "labs/provider-proxies/provider-demo.mjs",
     "labs/provider-proxies/provider-demo.css",
@@ -15,13 +15,13 @@
     "labs/provider-proxies/provider-demo.css",
     "labs/provider-proxies/provider-demo.mjs",
     "scripts/provider-demos.mjs",
-    "threejs-procedural-creatures/SKILL.md"
+    "skills/threejs-procedural-creatures/SKILL.md"
   ],
   "browserEntry": null,
-  "sourceHash": "sha256:416a5a1d74a0fdc08544a713a63d04b186594fb53c77f6d756a8badb761630e9",
+  "sourceHash": "sha256:313821546c0d7789106676410f62e7079089a48f42a1407659f6866977ecc7c6",
   "publishedHashInputs": [
     "docs/demos/procedural-creature-lab-demo",
-    "docs/demos/assets/OrbitControls-CJtJSLBE.js",
+    "docs/demos/assets/OrbitControls-BPue_ISR.js",
     "docs/demos/assets/biome-field-a-R50xQW_s.png",
     "docs/demos/assets/biome-field-b-DSx0H3Jp.png",
     "docs/demos/assets/biome-field-c-BZ_lWbL6.png",
@@ -37,7 +37,7 @@
     "docs/demos/assets/frost-crystal-a-CjHo8bxl.png",
     "docs/demos/assets/frost-crystal-b-kNAvb4JM.png",
     "docs/demos/assets/frost-crystal-c-Djo5kuxi.png",
-    "docs/demos/assets/index-BdFa2PXL2.js",
+    "docs/demos/assets/index-BZQfOcRX2.js",
     "docs/demos/assets/index-DXnOktML.css",
     "docs/demos/assets/lava-cause-a-CBm0KOVs.png",
     "docs/demos/assets/lava-cause-b-BnS0O13v.png",
@@ -52,13 +52,13 @@
     "docs/demos/assets/starfield-tile-a-DskCqFuO.png",
     "docs/demos/assets/starfield-tile-b-DVehl-cc.png",
     "docs/demos/assets/starfield-tile-c-n_f64xn1.png",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js",
     "docs/demos/assets/weather-map-a-BZhzXSIs.png",
     "docs/demos/assets/weather-map-b-BdrawmJ-.png",
     "docs/demos/assets/weather-map-c-CZsKB9yR.png"
   ],
   "emittedAssetDependencies": [
-    "docs/demos/assets/OrbitControls-CJtJSLBE.js",
+    "docs/demos/assets/OrbitControls-BPue_ISR.js",
     "docs/demos/assets/biome-field-a-R50xQW_s.png",
     "docs/demos/assets/biome-field-b-DSx0H3Jp.png",
     "docs/demos/assets/biome-field-c-BZ_lWbL6.png",
@@ -74,7 +74,7 @@
     "docs/demos/assets/frost-crystal-a-CjHo8bxl.png",
     "docs/demos/assets/frost-crystal-b-kNAvb4JM.png",
     "docs/demos/assets/frost-crystal-c-Djo5kuxi.png",
-    "docs/demos/assets/index-BdFa2PXL2.js",
+    "docs/demos/assets/index-BZQfOcRX2.js",
     "docs/demos/assets/index-DXnOktML.css",
     "docs/demos/assets/lava-cause-a-CBm0KOVs.png",
     "docs/demos/assets/lava-cause-b-BnS0O13v.png",
@@ -89,13 +89,13 @@
     "docs/demos/assets/starfield-tile-a-DskCqFuO.png",
     "docs/demos/assets/starfield-tile-b-DVehl-cc.png",
     "docs/demos/assets/starfield-tile-c-n_f64xn1.png",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js",
     "docs/demos/assets/weather-map-a-BZhzXSIs.png",
     "docs/demos/assets/weather-map-b-BdrawmJ-.png",
     "docs/demos/assets/weather-map-c-CZsKB9yR.png"
   ],
-  "publishedBundleHash": "sha256:1c49125c5766baee1833f5f0fa15b4b4b9d32a177885bc38a6d5c5a3c0c5e286",
+  "publishedBundleHash": "sha256:9c58b832d3e4badcdd2d3ec3c26ba10f5fbcfffa87d792c7ffe3e0634160b164",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b",
+  "buildRevision": "sha256:c151ad21626b93f809ec207d33636612320aa54cbc192958a440b1ebbffa2dc9",
   "evidenceBundleId": null
 }

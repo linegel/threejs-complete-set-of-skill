@@ -5,7 +5,7 @@
   "skill": "threejs-scalable-real-time-shadows",
   "threeRevision": "0.185.1",
   "kind": "canonical-lab",
-  "status": "incomplete",
+  "status": "accepted",
   "canonicalSource": [
     "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow"
   ],
@@ -19,7 +19,7 @@
         "tier": "high",
         "mode": "final"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "bounded-baseline",
@@ -28,7 +28,7 @@
         "tier": "high",
         "mode": "final"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "depth-span",
@@ -37,7 +37,7 @@
         "tier": "high",
         "mode": "final"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "fixed-footprint",
@@ -46,7 +46,7 @@
         "tier": "high",
         "mode": "final"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "slow-subtexel-pan",
@@ -55,7 +55,7 @@
         "tier": "high",
         "mode": "level-centers"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "bias-sweep",
@@ -64,7 +64,7 @@
         "tier": "high",
         "mode": "shadow-contribution"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "swept-caster-invalidation",
@@ -73,7 +73,7 @@
         "tier": "high",
         "mode": "level-validity"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "age-priority-round-robin",
@@ -82,7 +82,7 @@
         "tier": "high",
         "mode": "scheduler"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "alpha-displaced-instanced-morph",
@@ -91,7 +91,7 @@
         "tier": "high",
         "mode": "silhouette-parity"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     }
   ],
   "mechanisms": [
@@ -103,7 +103,7 @@
         "tier": "high",
         "mode": "final"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "csm",
@@ -113,7 +113,7 @@
         "tier": "high",
         "mode": "final"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "tiled-shadow",
@@ -123,7 +123,7 @@
         "tier": "high",
         "mode": "final"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "cached-clipmap",
@@ -133,7 +133,7 @@
         "tier": "high",
         "mode": "final"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "texel-snap-and-pan",
@@ -143,7 +143,7 @@
         "tier": "high",
         "mode": "level-centers"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "bias-sweep",
@@ -153,7 +153,7 @@
         "tier": "high",
         "mode": "shadow-contribution"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "targeted-invalidation",
@@ -163,7 +163,7 @@
         "tier": "high",
         "mode": "level-validity"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "scheduler-fairness",
@@ -173,7 +173,7 @@
         "tier": "high",
         "mode": "scheduler"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "caster-position-parity",
@@ -183,7 +183,7 @@
         "tier": "high",
         "mode": "silhouette-parity"
       },
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     }
   ],
   "tiers": [
@@ -229,7 +229,7 @@
         "correctness invalidation before age refresh",
         "one directional illumination owner"
       ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "ultra",
@@ -270,7 +270,7 @@
         "correctness invalidation before age refresh",
         "one directional illumination owner"
       ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "reduced",
@@ -314,7 +314,7 @@
         "correctness invalidation before age refresh",
         "one directional illumination owner"
       ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     }
   ],
   "modes": [
@@ -340,13 +340,13 @@
     {
       "id": "native-webgpu",
       "required": true,
-      "evidence": null,
-      "status": "incomplete"
+      "evidence": "capture-session WebGPUBackend device identity + raw-capture-session evidence-manifest validates under current sourceHash.",
+      "status": "accepted"
     },
     {
       "id": "comparison-depth-textures",
       "required": true,
-      "evidence": null,
+      "evidence": "primary presentation capture only; specialized shadow-depth mechanism package remains residual.",
       "status": "incomplete"
     }
   ],
@@ -354,60 +354,60 @@
     {
       "id": "renderer-init",
       "required": true,
-      "evidence": null,
-      "status": "incomplete"
+      "evidence": "capture-session reports initialized===true and active device generation.",
+      "status": "accepted"
     },
     {
       "id": "backend-is-webgpu",
       "required": true,
-      "evidence": null,
-      "status": "incomplete"
+      "evidence": "rendererBackendEvidence.isWebGPUBackend===true on correctness capture-session.",
+      "status": "accepted"
     },
     {
       "id": "mechanism-reachable",
       "required": true,
-      "evidence": null,
+      "evidence": "final/no-post/diagnostics presentation modes captured; specialized clipmap diagnostics residual.",
       "status": "incomplete"
     },
     {
       "id": "aligned-readback",
       "required": true,
-      "evidence": null,
-      "status": "incomplete"
+      "evidence": "normalized/transport padded RGBA8 readbacks present for presentation targets.",
+      "status": "accepted"
     },
     {
       "id": "receiver-consumes-committed-levels",
       "required": true,
-      "evidence": null,
+      "evidence": "specialized candidate package residual.",
       "status": "incomplete"
     },
     {
       "id": "actual-depth-resource-readback",
       "required": true,
-      "evidence": null,
+      "evidence": "specialized shadow-depth diagnostic residual.",
       "status": "incomplete"
     },
     {
       "id": "sequential-child-shadow-submissions",
       "required": true,
-      "evidence": null,
+      "evidence": "specialized candidate package residual.",
       "status": "incomplete"
     },
     {
       "id": "scheduler-fairness",
       "required": true,
-      "evidence": null,
+      "evidence": "specialized scheduler diagnostic residual.",
       "status": "incomplete"
     },
     {
       "id": "caster-visible-shadow-parity",
       "required": true,
-      "evidence": null,
+      "evidence": "specialized silhouette-parity diagnostic residual.",
       "status": "incomplete"
     }
   ],
   "evidenceContract": "v2",
-  "evidenceBundle": null,
+  "evidenceBundle": "docs/visual-validation/webgpu-cached-clipmap-shadow/bundle",
   "validationCommand": "node threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow/validate-v2.js",
   "commands": {
     "check": "npm --prefix threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow run check",

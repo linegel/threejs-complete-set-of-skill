@@ -602,6 +602,7 @@ test('browser-free quick validation permits capture syntax checks but rejects ex
   assert.equal(quickCommandStartsBrowser('npm run labs:capture'), true);
   assert.equal(quickCommandStartsBrowser('bash capture.sh'), true);
   assert.equal(quickCommandStartsBrowser('node browser.mjs'), true);
+  assert.equal(quickCommandStartsBrowser('node test-capture-contract.mjs'), false);
   assert.equal(quickCommandStartsBrowser('node --input-type=module -e "await import(\'./browser-module.mjs\')"'), false);
 });
 

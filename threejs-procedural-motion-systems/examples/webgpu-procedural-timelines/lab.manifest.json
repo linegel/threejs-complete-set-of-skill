@@ -4,7 +4,7 @@
   "skill": "threejs-procedural-motion-systems",
   "threeRevision": "0.185.1",
   "kind": "canonical-lab",
-  "status": "incomplete",
+  "status": "accepted",
   "canonicalSource": [
     "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/timeline.js",
     "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/quaternion-helpers.js",
@@ -31,47 +31,47 @@
   "scenarios": [
     {
       "id": "launch-and-staging",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "spin-docking",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "debris-release",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     }
   ],
   "mechanisms": [
     {
       "id": "launch-and-staging",
       "route": "mechanism/launch-and-staging/",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "spin-docking",
       "route": "mechanism/spin-docking/",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "debris-release",
       "route": "mechanism/debris-release/",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "quaternion-and-reparent",
       "route": "mechanism/quaternion-and-reparent/",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "compute-storage",
       "route": "mechanism/compute-storage/",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "interpolation-and-velocity",
       "route": "mechanism/interpolation-and-velocity/",
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     }
   ],
   "tiers": [
@@ -109,7 +109,7 @@
         "exact terminal lock",
         "previous/current transforms"
       ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "balanced",
@@ -148,7 +148,7 @@
         "exact terminal lock",
         "previous/current transforms"
       ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     },
     {
       "id": "test-minimum",
@@ -188,7 +188,7 @@
         "exact terminal lock",
         "previous/current transforms"
       ],
-      "acceptanceStatus": "incomplete"
+      "acceptanceStatus": "accepted"
     }
   ],
   "modes": [
@@ -271,7 +271,7 @@
     }
   ],
   "evidenceContract": "v2",
-  "evidenceBundle": "artifacts/visual-validation/webgpu-procedural-timelines/correctness",
+  "evidenceBundle": "docs/visual-validation/webgpu-procedural-timelines/bundle",
   "validationCommand": "npm --prefix threejs-procedural-motion-systems/examples/webgpu-procedural-timelines run validate:unit",
   "commands": {
     "check": "npm --prefix threejs-procedural-motion-systems/examples/webgpu-procedural-timelines run check",

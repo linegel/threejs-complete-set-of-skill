@@ -9,7 +9,7 @@
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-procedural-planets.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:ab7d8d17e0589a6f5c2462d645b9e0d6797cd92eade36e3615dae091c6f9df5b" />
+<meta name="skill-pack-build-revision" content="sha256:c151ad21626b93f809ec207d33636612320aa54cbc192958a440b1ebbffa2dc9" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -24,7 +24,7 @@
 <meta property="og:title" content="Procedural Planets | Three.js WebGPU Skill" />
 <meta property="og:description" content="Scale procedural planetary bodies in Three.js r185 WebGPU/TSL. Use when global curvature needs a cube-sphere quadtree, a sustained ground view needs a tangent…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-procedural-planets.html" />
-<meta property="article:modified_time" content="2026-07-16T11:00:33+03:00" />
+<meta property="article:modified_time" content="2026-07-16T19:46:25+03:00" />
 <meta property="article:published_time" content="2026-07-04T23:30:20+03:00" />
 <meta property="article:section" content="Procedural Content" />
 <meta property="og:image" content="https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/final.design.png" />
@@ -74,7 +74,7 @@
     "https://threejs-skills.com/seo/article/threejs-procedural-planets-16x9.png"
    ],
    "datePublished": "2026-07-04T23:30:20+03:00",
-   "dateModified": "2026-07-16T11:00:33+03:00",
+   "dateModified": "2026-07-16T19:46:25+03:00",
    "author": {
     "@id": "https://threejs-skills.com/#publisher"
    },
@@ -312,8 +312,8 @@ a.chip:active{scale:.96}
       <span class="chip">1 flagship</span>
       <span class="chip">1 secondary surface</span>
       <span class="chip">native evidence pending</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-16T11:00:33+03:00">2026-07-16</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/2ce13bcc22695dafa808d6019452752d9a39cc71">commit 2ce13bc ↗</a>
+      <span class="chip">Latest skill update <time datetime="2026-07-16T19:46:25+03:00">2026-07-16</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/62a9bc59330c44827824665323823883e88f100c">commit 62a9bc5 ↗</a>
       <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-planets/SKILL.md">SKILL.md on GitHub ↗</a>
       <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/skills/threejs-procedural-planets/SKILL.md">raw (for agents) ↗</a>
     </div>
@@ -347,7 +347,7 @@ a.chip:active{scale:.96}
         <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="weathered-world">
     <span class="primary-evidence-label">Canonical capture</span>
     <strong>Runtime evidence pending</strong>
-    <span><code>76b06d2596d9</code> source hash</span>
+    <span><code>b03441c869cf</code> source hash</span>
     <span>10 fixed states · 5 runtime proof requirements</span>
   </span>
         <span class="card-head"><span class="card-kind">Planetary environment</span><span class="status status--pending">Evidence pending</span></span>
@@ -488,7 +488,7 @@ orbit-to-ground transition, or atmosphere coupling is observable. A bounded
 local site belongs to procedural fields and geometry when tangent-plane
 sagitta, normal rotation, geodesic, horizon, and projected errors all pass.
 Read
-<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-planets/references/planet-field-and-atmosphere-systems.md">planet-field-and-atmosphere-systems.md</a>
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-planets/references/body-model-mapping-and-lod.md">body-model-mapping-and-lod.md</a>
 when deriving the body-scale gate.</p>
 <p><strong>Complete when:</strong> the accepted camera and data domain either proves a local
 approximation or names at least one body-scale observable that requires this
@@ -498,9 +498,11 @@ skill.</p>
 ellipsoid axes in meters, <code>metersPerWorldUnit</code>, height and sea-level datum,
 body/world transform, origin policy, surface-coordinate meaning, and
 atmosphere bottom/top geometry. When a sphere approximates an ellipsoid,
-apply the reference&#39;s position, normal, area, geodesic, horizon, atmosphere-
-altitude, and optical-depth error gate. Give each changing field one owner
-and one version.</p>
+read
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-planets/references/body-model-mapping-and-lod.md">body-model-mapping-and-lod.md</a>
+and apply its position, normal, area, geodesic, horizon, atmosphere-altitude,
+and optical-depth error gate. Give each changing field one owner and one
+version.</p>
 <p><strong>Complete when:</strong> every length and vector has units and a frame, surface
 altitude has one definition, render-origin changes leave physical field
 identity unchanged, and the spherical branch either passes every declared
@@ -511,8 +513,11 @@ spherified, or verified equal-area cube mapping from distortion and inverse
 requirements. Choose a cube-face quadtree for arbitrary globe views, a
 tangent clipmap for sustained local views, or a hybrid with an explicit
 near/far handoff. A gas/cloud-deck body uses continuous wrapped band fields
-rather than solid-terrain displacement. Read the reference when selecting a
-mapping, ellipsoid convention, quadtree, clipmap, or hybrid.</p>
+rather than solid-terrain displacement. Read
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-planets/references/body-model-mapping-and-lod.md">body-model-mapping-and-lod.md</a>
+for a solid-body mapping, ellipsoid convention, quadtree, clipmap, or hybrid.
+Read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-planets/references/gas-cloud-deck.md">gas-cloud-deck.md</a> for a gas/cloud-deck
+body.</p>
 <p><strong>Complete when:</strong> mapping Jacobian, seams, inverse/domain validity, camera
 domain, and near/far ownership all have falsifiable gates.</p>
 </li>
@@ -522,6 +527,13 @@ four-edge transition masks. Reuse a shared indexed grid and submit compact
 patch records in instanced or indirect mask bins. For clipmaps, bound ring
 error, recentering, and far-field ownership. Evaluate physical-pixel error
 over the complete displaced support for every active view.</p>
+<p>A global patch identity is
+<code>(bodyId, mappingVersion, face, level, x, y)</code>. Frontier order, visibility,
+draw bin, allocation slot, and cache address are not identity. A clipmap cell
+identity is <code>(bodyId, mappingVersion, level, bodySpaceCellCoordinates)</code>.
+Reusing a physical slot binds a new identity and resets every slot-bound
+temporal or dynamic state; recentering changes slot bindings, not body-space
+field identity.</p>
 <p>Before allocating compute, storage, or indirect resources, run
 <code>await renderer.init()</code> and require
 <code>renderer.backend.isWebGPUBackend === true</code>. Otherwise keep planning on the
@@ -546,9 +558,11 @@ direction, displacement, tangent gradient, geology, craters, climate,
 hydrology, snow/ice, material causes, queries, and diagnostics. Direct,
 compute-cached, and CPU-visible paths use the same schema and identity
 constants. Cache only dirty patch causes, include cross-face filter support,
-and validate gradients independently before using analytic normals. Read the
-reference when implementing caches, crater fields, detail filtering,
-CPU/TSL parity, normals, materials, or gas-band fields.</p>
+and validate gradients independently before using analytic normals. Read
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-planets/references/solid-fields-and-coast.md">solid-fields-and-coast.md</a> when
+implementing solid-body caches, crater fields, detail filtering, CPU/TSL
+parity, normals, materials, or coast data. Read
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-planets/references/gas-cloud-deck.md">gas-cloud-deck.md</a> for gas-band fields.</p>
 <p>GPU patch min/max bounds use workgroup reduction plus deterministic merging,
 or a proven monotonic ordered-integer encoding with explicit sign, NaN, and
 decode-error rules. Do not rely on unsupported float atomics.</p>
@@ -563,8 +577,11 @@ filter, validity/staleness, version, and error. A planetary coast additionally
 publishes mean surface, seabed height, metric coast distance/frame, source
 resolution, and uncertainty. Atmosphere receives the same reference surface,
 transform, <code>metersPerWorldUnit</code>, altitude convention, shell geometry, sun
-frame, and scene-linear radiometric basis. Read the coast and atmosphere
-sections of the reference when either consumer is active.</p>
+frame, and scene-linear radiometric basis. Read
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-planets/references/solid-fields-and-coast.md">solid-fields-and-coast.md</a> when a
+coast/water consumer is active. Read
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-planets/references/surface-atmosphere-handoff.md">surface-atmosphere-handoff.md</a>
+when an atmosphere consumer is active.</p>
 <p><strong>Complete when:</strong> each consumer names one authoritative producer, rejects
 invalid or stale data, and performs no frame-critical GPU readback.</p>
 </li>
@@ -602,6 +619,9 @@ this skill owns the surface-side geometry and units handoff.</li>
 </ul>
 <p>This skill owns the body-scale surface representation, coupled planetary
 fields, patch LOD/submission, query parity, and surface-side handoffs.</p>
+<p>For work spanning multiple planet branches, use
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-planets/references/planet-field-and-atmosphere-systems.md">planet-field-and-atmosphere-systems.md</a>
+as the branch index and common contract.</p>
 </div>
   <div class="pn">
     <a href="threejs-procedural-motion-systems.html">← Procedural Motion Systems</a>
@@ -629,7 +649,7 @@ fields, patch LOD/submission, query parity, and surface-side handoffs.</p>
 
 <div class="wrap"><footer>
   <div class="footer-summary">Three.js WebGPU Skill Pack: TSL, procedural graphics, and visual validation.
-    <span>Three r185.1 · 40 primary targets · 25 accepted · build <code>ab7d8d17e058</code></span>
+    <span>Three r185.1 · 40 primary targets · 29 accepted · build <code>c151ad21626b</code></span>
     <span>Compiling shaders? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span>
   </div>
   <div class="footer-groups">

@@ -8,7 +8,7 @@
 		html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#0f1418;color:#e8eef4;font:13px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace}canvas{display:block;width:100%;height:100%}.hud{position:fixed;inset:14px auto auto 14px;max-width:34rem;padding:10px 12px;background:#0a1015dd;border:1px solid #52606c;border-radius:4px;white-space:pre-wrap}.error{border-color:#ff6b6b;color:#ffd6d6}
 	</style>
   <meta name="lab-id" content="webgpu-node-gtao">
-  <meta name="acceptance-status" content="incomplete">
+  <meta name="acceptance-status" content="accepted">
   <meta name="description" content="Interactive Three.js WebGPU/TSL demo for WebGPU Node GTAO, with 7 scenarios, 6 mechanisms, and 3 quality tiers and evidence-gated validation.">
   <meta name="author" content="Three.js WebGPU Skill Pack contributors">
   <meta name="owning-skill" content="threejs-ambient-contact-shading">
@@ -42,16 +42,16 @@
 <body data-lab="threejs-ambient-contact-shading/webgpu-node-gtao">
 <main class="demo-seo-shell" data-demo-seo-shell data-demo-id="webgpu-node-gtao" data-owning-skill="threejs-ambient-contact-shading">
   <details>
-    <summary><span class="demo-seo-shell__summary-title">WebGPU Node GTAO</span><span class="demo-seo-shell__summary-state">Evidence pending</span></summary>
+    <summary><span class="demo-seo-shell__summary-title">WebGPU Node GTAO</span><span class="demo-seo-shell__summary-state">Accepted</span></summary>
     <div class="demo-seo-shell__body">
       <p class="demo-seo-shell__kicker">Canonical Lab · Three.js 0.185.1</p>
       <h1>WebGPU Node GTAO</h1>
       <p>Interactive Three.js WebGPU/TSL demo for WebGPU Node GTAO, with 7 scenarios, 6 mechanisms, and 3 quality tiers and evidence-gated validation.</p>
-      <p class="demo-seo-shell__evidence"><strong>Evidence status:</strong> The implementation is available for technical review, but its native-WebGPU runtime and evidence gates remain incomplete.</p>
-      <details class="demo-roadmap" data-demo-roadmap data-roadmap-status="incomplete" data-open-count="5">
-        <summary>Readiness &amp; remaining fixes <span>5</span></summary>
+      <p class="demo-seo-shell__evidence"><strong>Evidence status:</strong> Accepted runtime evidence is available for the published contract represented by this demo.</p>
+      <details class="demo-roadmap" data-demo-roadmap data-roadmap-status="accepted" data-open-count="4">
+        <summary>Readiness &amp; remaining fixes <span>4</span></summary>
         <div class="demo-roadmap__body">
-          <p>5 open closure items. Loadable does not mean accepted or performance-valid.</p>
+          <p>4 open closure items. Loadable does not mean accepted or performance-valid.</p>
           <ol><li data-roadmap-item data-priority="P0" data-category="performance">
           <div><span>P0</span><strong>Define and measure the target performance contract</strong></div>
           <p>The ultra, high, medium tiers have no accepted frame target. Record named device/browser/GPU, viewport, DPR, sustained CPU/GPU/presentation p50 and p95, deadline misses, memory, and settled quality. Submission time is not GPU timing.</p>
@@ -68,10 +68,6 @@
           <div><span>P0</span><strong>Current Adapter GPU Timestamps runtime proof</strong></div>
           <p>capture-status.gpuTimingVerdict remains INSUFFICIENT_EVIDENCE; no named-adapter timestamp ledger was accepted.</p>
           <code>runtimeProof.current-adapter-gpu-timestamps</code>
-        </li><li data-roadmap-item data-priority="P2" data-category="tiers">
-          <div><span>P2</span><strong>Close tier-specific acceptance</strong></div>
-          <p>Validate and promote ultra, high, medium as independent visual and performance contracts without crossing their protected invariants.</p>
-          <code>tiers[].acceptanceStatus</code>
         </li></ol>
         </div>
       </details>

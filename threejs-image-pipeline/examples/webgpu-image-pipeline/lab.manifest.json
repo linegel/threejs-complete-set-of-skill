@@ -4,7 +4,7 @@
   "skill": "threejs-image-pipeline",
   "threeRevision": "0.185.1",
   "kind": "canonical-lab",
-  "status": "incomplete",
+  "status": "accepted",
   "canonicalSource": [
     "threejs-image-pipeline/examples/webgpu-image-pipeline"
   ],

@@ -1,0 +1,323 @@
+{
+  "schemaVersion": 2,
+  "subjectAdapter": "webgpu-procedural-timelines",
+  "proofKind": "native-browser-runtime",
+  "captureProfile": "correctness",
+  "pipelineGraphDigest": "sha256:63625b3444d7480f337841aa7d6e5eb5015aa772e1d243d928b7b7846fd2aecc",
+  "runtimeReachability": {
+    "signals": [
+      "output"
+    ],
+    "resources": [],
+    "routes": [
+      "diagnostic.normal.png",
+      "diagnostic.emissive.png",
+      "final.design.png",
+      "diagnostic.velocity.png",
+      "camera.near.png",
+      "camera.design.png",
+      "camera.far.png",
+      "seed-0001.final.png",
+      "seed-9e3779b9.final.png",
+      "temporal.t000.png",
+      "temporal.t001.png",
+      "mechanism.launch-and-staging.png",
+      "mechanism.spin-docking.png",
+      "mechanism.debris-release.png",
+      "mechanism.quaternion-and-reparent.png",
+      "mechanism.compute-storage.png",
+      "mechanism.interpolation-and-velocity.png"
+    ]
+  },
+  "routeExecutions": [
+    {
+      "filename": "diagnostic.normal.png",
+      "target": "presentation",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "diagnostic.emissive.png",
+      "target": "presentation",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "final.design.png",
+      "target": "presentation",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "diagnostic.velocity.png",
+      "target": "presentation",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "camera.near.png",
+      "target": "presentation",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "camera.design.png",
+      "target": "presentation",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "camera.far.png",
+      "target": "presentation",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "seed-0001.final.png",
+      "target": "presentation",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "seed-9e3779b9.final.png",
+      "target": "presentation",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "temporal.t000.png",
+      "target": "presentation",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "temporal.t001.png",
+      "target": "presentation",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "mechanism.launch-and-staging.png",
+      "target": "presentation",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "mechanism.spin-docking.png",
+      "target": "presentation",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "mechanism.debris-release.png",
+      "target": "presentation",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "mechanism.quaternion-and-reparent.png",
+      "target": "presentation",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "mechanism.compute-storage.png",
+      "target": "presentation",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    },
+    {
+      "filename": "mechanism.interpolation-and-velocity.png",
+      "target": "presentation",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "capture metadata"
+      }
+    }
+  ],
+  "transactionalRouteStateMatrix": [],
+  "negativeControls": [],
+  "diagnosticComparisons": [],
+  "metrics": {
+    "writtenCaptures": {
+      "value": 17,
+      "unit": "captures",
+      "label": "Measured",
+      "source": "capture-session writtenCaptures"
+    }
+  },
+  "verdicts": {
+    "mechanismCorrectness": "PASS",
+    "lifecycleStability": "PASS",
+    "visualError": "PASS"
+  },
+  "verdict": "PASS"
+}

@@ -4,12 +4,12 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Representation-First Particles, Trails, and Effects | Three.js…</title>
-<meta name="description" content="Representation-first Three.js WebGPU/TSL particles, trails, and effects. Use for analytic or recurrent particle motion, stable-slot or scan-compacted GPU…" />
+<meta name="description" content="Representation-first Three.js WebGPU/TSL particles, ribbon or history trails, and effects. Use for analytic or recurrent particle motion, stable-slot or…" />
 <meta name="author" content="Three.js WebGPU Skill Pack contributors" />
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-particles-trails-and-effects.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:ab7d8d17e0589a6f5c2462d645b9e0d6797cd92eade36e3615dae091c6f9df5b" />
+<meta name="skill-pack-build-revision" content="sha256:c151ad21626b93f809ec207d33636612320aa54cbc192958a440b1ebbffa2dc9" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -22,9 +22,9 @@
 <meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
 <meta property="og:title" content="Representation-First Particles, Trails, and Effects | Three.js…" />
-<meta property="og:description" content="Representation-first Three.js WebGPU/TSL particles, trails, and effects. Use for analytic or recurrent particle motion, stable-slot or scan-compacted GPU…" />
+<meta property="og:description" content="Representation-first Three.js WebGPU/TSL particles, ribbon or history trails, and effects. Use for analytic or recurrent particle motion, stable-slot or…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-particles-trails-and-effects.html" />
-<meta property="article:modified_time" content="2026-07-16T11:00:33+03:00" />
+<meta property="article:modified_time" content="2026-07-16T19:46:25+03:00" />
 <meta property="article:published_time" content="2026-07-04T23:30:20+03:00" />
 <meta property="article:section" content="Motion and Effects" />
 <meta property="og:image" content="https://threejs-skills.com/visual-validation/webgpu-pooled-effects/final.design.png" />
@@ -36,7 +36,7 @@
 <meta name="twitter:image:alt" content="Pooled effects correctness presentation for Representation-First Particles, Trails, and Effects" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Representation-First Particles, Trails, and Effects | Three.js…" />
-<meta name="twitter:description" content="Representation-first Three.js WebGPU/TSL particles, trails, and effects. Use for analytic or recurrent particle motion, stable-slot or scan-compacted GPU…" />
+<meta name="twitter:description" content="Representation-first Three.js WebGPU/TSL particles, ribbon or history trails, and effects. Use for analytic or recurrent particle motion, stable-slot or…" />
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
@@ -62,7 +62,7 @@
    ],
    "@id": "https://threejs-skills.com/skills/threejs-particles-trails-and-effects.html#article",
    "headline": "Representation-First Particles, Trails, and Effects",
-   "description": "Representation-first Three.js WebGPU/TSL particles, trails, and effects. Use for analytic or recurrent particle motion, stable-slot or scan-compacted GPU pools, flow-conforming shells and wakes, dissolving debris, or effect-specific HDR and depth integration.",
+   "description": "Representation-first Three.js WebGPU/TSL particles, ribbon or history trails, and effects. Use for analytic or recurrent particle motion, stable-slot or scan-compacted GPU pools, flow-conforming shells and wakes, dissolving debris, or effect-specific HDR and depth integration.",
    "url": "https://threejs-skills.com/skills/threejs-particles-trails-and-effects.html",
    "mainEntityOfPage": {
     "@type": "WebPage",
@@ -74,7 +74,7 @@
     "https://threejs-skills.com/seo/article/threejs-particles-trails-and-effects-16x9.png"
    ],
    "datePublished": "2026-07-04T23:30:20+03:00",
-   "dateModified": "2026-07-16T11:00:33+03:00",
+   "dateModified": "2026-07-16T19:46:25+03:00",
    "author": {
     "@id": "https://threejs-skills.com/#publisher"
    },
@@ -304,7 +304,7 @@ a.chip:active{scale:.96}
   <div class="wrap">
     <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Motion and Effects</a></li><li aria-current="page">Representation-First Particles, Trails, and Effects</li></ol></nav>
     <h1 style="view-transition-name:skill-threejs-particles-trails-and-effects">Representation-First Particles, Trails, and Effects</h1>
-    <p class="lede">Representation-first Three.js WebGPU/TSL particles, trails, and effects. Use for analytic or recurrent particle motion, stable-slot or scan-compacted GPU pools, flow-conforming shells and wakes, dissolving debris, or effect-specific HDR and depth integration.</p>
+    <p class="lede">Representation-first Three.js WebGPU/TSL particles, ribbon or history trails, and effects. Use for analytic or recurrent particle motion, stable-slot or scan-compacted GPU pools, flow-conforming shells and wakes, dissolving debris, or effect-specific HDR and depth integration.</p>
     <p class="hero-evidence-caption">Image: Pooled effects correctness presentation. Source lab: webgpu-pooled-effects.</p>
     <div class="meta-row">
       <span class="chip a">$threejs-particles-trails-and-effects</span>
@@ -312,8 +312,8 @@ a.chip:active{scale:.96}
       <span class="chip">1 flagship</span>
       <span class="chip">1 secondary surface</span>
       <span class="chip">native evidence pending</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-16T11:00:33+03:00">2026-07-16</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/2ce13bcc22695dafa808d6019452752d9a39cc71">commit 2ce13bc ↗</a>
+      <span class="chip">Latest skill update <time datetime="2026-07-16T19:46:25+03:00">2026-07-16</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/62a9bc59330c44827824665323823883e88f100c">commit 62a9bc5 ↗</a>
       <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-particles-trails-and-effects/SKILL.md">SKILL.md on GitHub ↗</a>
       <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/skills/threejs-particles-trails-and-effects/SKILL.md">raw (for agents) ↗</a>
     </div>
@@ -551,14 +551,18 @@ every input has a frame, time, validity policy, and consumer.</p>
 </tbody></table>
 <p>For recurrent or compacted pools, read
 <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-particles-trails-and-effects/references/particles-trails-and-effects-system.md#state-and-compaction">state and compaction</a>
-before implementation. The step is complete when every writable lane and every
-compaction phase is justified by a downstream consumer or measured saving.</p>
+before implementation. For neighbor interactions, read
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-particles-trails-and-effects/references/particles-trails-and-effects-system.md#neighborhood-interactions">neighborhood interactions</a>.
+The step is complete when every writable lane and every selected compaction or
+neighborhood phase is justified by a downstream consumer or measured saving.</p>
 <h3>3. Specify the state transition and identity lifecycle</h3>
 <p>Keep the order explicit:</p>
 <pre><code class="language-text">ordered event packets
   -&gt; deterministic spawn/range allocation
-  -&gt; analytic evaluation or one recurrent update
+  -&gt; optional neighborhood build from committed source state
+  -&gt; analytic evaluation or one recurrent next-state update, including interaction
   -&gt; optional ordered compaction
+  -&gt; optional trail sample and publication
   -&gt; draw from the committed state/count
   -&gt; post consumers
 </code></pre>
@@ -568,10 +572,15 @@ representation change, and unavailable prior state invalidate motion vectors,
 trails, interpolation, and temporal history before presentation. Analytic
 particles evaluate both previous and current presentation times; recurrent
 pools retain adjacent immutable presentation states.</p>
+<p>A camera cut or other presentation-only discontinuity resets affected
+screen-space motion and temporal accumulation without restarting particle
+simulation, lifetimes, identities, or valid world-space trail histories.</p>
 <p>Read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-particles-trails-and-effects/references/particles-trails-and-effects-system.md#temporal-identity">temporal identity</a>
 when the effect feeds TAA, motion vectors, trails, or multi-frame post. The step
 is complete when each state version has one writer, draw consumes a committed
 version, and a reused slot cannot inherit prior entity history.</p>
+<p>For ribbon or history trails, read
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-particles-trails-and-effects/references/particles-trails-and-effects-system.md#trail-histories-and-ribbons">trail histories and ribbons</a>.</p>
 <h3>4. Build the r185 GPU path</h3>
 <p>Use <code>WebGPURenderer</code> from <code>three/webgpu</code>, call <code>await renderer.init()</code>, and
 require <code>renderer.backend.isWebGPUBackend === true</code> for this canonical path.
@@ -587,8 +596,9 @@ Express global phase dependencies as ordered dispatches and keep frame-critical
 counts and state GPU-resident.</p>
 <p>Read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-particles-trails-and-effects/references/particles-trails-and-effects-system.md#r185-execution-facts">r185 execution facts</a>
 when implementing compute, indirect draw, bounds, or completion. The step is
-complete when spawn, update, compaction, and draw have explicit GPU ordering and
-the steady frame path performs no readback or per-particle object update.</p>
+complete when every admitted spawn, update, neighborhood, compaction, trail
+publication, and draw phase has explicit GPU ordering and the steady frame path
+performs no readback or per-particle object update.</p>
 <h3>5. Bind representation, depth, and output</h3>
 <p>Use sprites or instanced quads for camera-facing sparks, instanced lit meshes
 for shaped debris, hull-derived geometry for conforming plasma, and generated
@@ -607,23 +617,26 @@ before accepting transparent or emissive effects. The step is complete when
 occlusion, ordering, bounds, HDR contribution, and final conversion each have
 one tested owner.</p>
 <h3>6. Prove the mechanism and budget</h3>
-<p>Capture seeded fixed-time states and expose event/spawn count, live/slot count,
-overflow, identity mapping, age/velocity, compaction count, bounds, depth mode,
-raw HDR, optional selective signal, bloom contribution, overdraw, and GPU time
-per compute/draw class. Compare analytic versus recurrent cost, and stable slots
-versus compaction, at the same occupancy.</p>
-<p>Verify the beauty path with bloom disabled. Preserve readable silhouette,
-layer roles, depth, and motion without halo support. Scale by stopping idle
-work, removing unnecessary writable state or compaction, then reducing active
-count, field bandwidth, transparent layers, and post extent while preserving
-the selected motion class and owners.</p>
+<p>Capture seeded fixed-time states and expose only applicable evidence: event and
+spawn ranges; live/slot count, overflow, identity, and age/velocity for pooled
+state; compaction count and mapping for compacted state; trail head/count,
+chronological samples, and breaks for trails; neighborhood occupancy and
+overflow for local interactions; bounds, depth mode, raw HDR, optional selective
+signal, bloom contribution, overdraw, and GPU time for the selected draw and
+post classes. Compare only admitted alternatives at the same visible workload.</p>
+<p>When bloom is admitted, verify the beauty path with bloom disabled and preserve
+readable silhouette, layer roles, depth, and motion without halo support. Scale
+by stopping idle work, removing unnecessary writable state or compaction, then
+reducing active count, field bandwidth, transparent layers, and post extent
+while preserving the selected motion class and owners.</p>
 <p>Read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-particles-trails-and-effects/references/particles-trails-and-effects-system.md#resource-accounting">resource accounting</a>
 and <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-particles-trails-and-effects/references/particles-trails-and-effects-system.md#diagnostics-and-failure-signatures">diagnostics and failure signatures</a>
 for the applicable branches. The skill is complete when the seeded result is
-repeatable; event, update, compaction, and draw order is evidenced; stable
-identity and reset controls pass; the frame path has zero required readbacks;
-depth and output ownership are singular; the bloom-off image remains legible;
-and the complete scene meets its named resource and timing budget.</p>
+repeatable; every admitted event, update, neighborhood, compaction, trail,
+draw, and post phase has evidenced order; stable identity and reset controls
+pass; the frame path has zero required readbacks; depth and output ownership
+are singular; the bloom-off image remains legible when bloom is admitted; and
+the complete scene meets its named resource and timing budget.</p>
 </div>
   <aside class="skill-guides" aria-labelledby="related-guides-title"><h3 id="related-guides-title">Related guides</h3><ul><li><a href="/industries/browser-games/"><span>Industries</span>Three.js WebGPU Skills for Browser Games</a></li></ul></aside>
   <div class="pn">
@@ -652,7 +665,7 @@ and the complete scene meets its named resource and timing budget.</p>
 
 <div class="wrap"><footer>
   <div class="footer-summary">Three.js WebGPU Skill Pack: TSL, procedural graphics, and visual validation.
-    <span>Three r185.1 · 40 primary targets · 25 accepted · build <code>ab7d8d17e058</code></span>
+    <span>Three r185.1 · 40 primary targets · 29 accepted · build <code>c151ad21626b</code></span>
     <span>Compiling shaders? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span>
   </div>
   <div class="footer-groups">

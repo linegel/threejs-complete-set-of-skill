@@ -9,7 +9,7 @@
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-exposure-color-grading.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:ab7d8d17e0589a6f5c2462d645b9e0d6797cd92eade36e3615dae091c6f9df5b" />
+<meta name="skill-pack-build-revision" content="sha256:c151ad21626b93f809ec207d33636612320aa54cbc192958a440b1ebbffa2dc9" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -24,7 +24,7 @@
 <meta property="og:title" content="Exposure And Color Grading | Three.js WebGPU Skill" />
 <meta property="og:description" content="Meter and grade scene-linear Three.js WebGPU images. Use for choosing fixed or automatic exposure; adapting EV on the GPU; assigning tone-map and output…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-exposure-color-grading.html" />
-<meta property="article:modified_time" content="2026-07-16T12:45:44+03:00" />
+<meta property="article:modified_time" content="2026-07-16T19:46:25+03:00" />
 <meta property="article:published_time" content="2026-07-04T23:30:20+03:00" />
 <meta property="article:section" content="Cameras, Lighting, and Final Image" />
 
@@ -63,7 +63,7 @@
     "@id": "https://threejs-skills.com/skills/threejs-exposure-color-grading.html"
    },
    "datePublished": "2026-07-04T23:30:20+03:00",
-   "dateModified": "2026-07-16T12:45:44+03:00",
+   "dateModified": "2026-07-16T19:46:25+03:00",
    "author": {
     "@id": "https://threejs-skills.com/#publisher"
    },
@@ -295,8 +295,8 @@ a.chip:active{scale:.96}
       <span class="chip">2 flagships</span>
       <span class="chip">1 secondary surface</span>
       <span class="chip">accepted runtime evidence</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-16T12:45:44+03:00">2026-07-16</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/8749183dffd84731506239dd86590c92bf958969">commit 8749183 ↗</a>
+      <span class="chip">Latest skill update <time datetime="2026-07-16T19:46:25+03:00">2026-07-16</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/62a9bc59330c44827824665323823883e88f100c">commit 62a9bc5 ↗</a>
       <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-exposure-color-grading/SKILL.md">SKILL.md on GitHub ↗</a>
       <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/skills/threejs-exposure-color-grading/SKILL.md">raw (for agents) ↗</a>
     </div>
@@ -473,7 +473,8 @@ coordinates. Device loss recreates and reseeds only admitted GPU state under
 the new resource generation.</p>
 <p><strong>Complete when:</strong> every cut, invalid input, basis/scale change, resize, and
 device-loss event maps to one conversion, hold, rebuild, or reseed action that
-finishes before the affected frame is admitted.</p>
+finishes before the affected frame is admitted, or to an explicit no-op because
+the selected branch owns no affected state.</p>
 <h2>5. Compose one final-image chain</h2>
 <p>Use this domain order unless the LUT declares another complete contract:</p>
 <pre><code class="language-text">scene-linear HDR
@@ -492,16 +493,23 @@ therefore sits after <code>renderOutput()</code>.</p>
 <code>renderPipeline.needsUpdate = true</code> after changing the output node or output
 ownership. Read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-exposure-color-grading/references/scene-referred-color-pipeline.md#tone-mapping-and-luts">tone mapping and LUTs</a>
 only when loading, authoring, or placing a cube.</p>
+<p>When a tone-mapped-linear cube is admitted, read
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-exposure-color-grading/examples/identity-3d-lut.mjs">the identity 3D-LUT example</a> for voxel ordering
+and <code>Data3DTexture</code> configuration. It is a correctness fixture, not a look or
+performance bypass.</p>
 <p><strong>Complete when:</strong> the graph contains one exposure multiply, one tone map, one
 working-to-output conversion, and—only when admitted—one LUT placement in its
 declared domain.</p>
 <h2>6. Prove the selected branches</h2>
 <p>Capture deterministic fixtures:</p>
 <ul>
-<li>a key-gray calibration card with the expected target EV;</li>
-<li>for automatic exposure, a bright source entering and leaving frame with
-monotone target/current EV trajectories, plus the selected meter&#39;s mask,
-small-emitter, and cadence cases;</li>
+<li>for fixed exposure, a calibration card proving the authored EV and multiplier
+with zero meter source reads or adaptation state;</li>
+<li>for automatic exposure, a key-gray card with the expected target EV and a
+bright source entering and leaving frame with monotone target/current EV
+trajectories;</li>
+<li>for a sampled automatic meter, its mask, small-emitter, and cadence cases;</li>
+<li>for a histogram, its underflow, overflow, and accepted percentile interval;</li>
 <li>when a LUT is admitted, an identity LUT with ramps and saturated swatches in
 its declared domain;</li>
 <li>output isolation showing exactly one tone map and one output conversion.</li>
@@ -544,7 +552,7 @@ and transient lifetime; <code>$threejs-bloom</code> for glare source ownership; 
 
 <div class="wrap"><footer>
   <div class="footer-summary">Three.js WebGPU Skill Pack: TSL, procedural graphics, and visual validation.
-    <span>Three r185.1 · 40 primary targets · 25 accepted · build <code>ab7d8d17e058</code></span>
+    <span>Three r185.1 · 40 primary targets · 29 accepted · build <code>c151ad21626b</code></span>
     <span>Compiling shaders? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span>
   </div>
   <div class="footer-groups">
