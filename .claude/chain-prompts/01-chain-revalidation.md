@@ -22,9 +22,21 @@ execute bounded assignments and never delegate further.
 ## METHOD — binding, read before anything else
 
 Read `.claude/skills/product-from-scratch/SKILL.md` in this repo FULLY (canon:
-`github.com/LocSo/product-from-scratch`). Follow it exactly, including its
-budget law and its bureaucracy prohibitions. Everything below is subordinate
-to that skill — where this prompt and the skill disagree, the skill wins.
+`github.com/LocSo/product-from-scratch`) — reading it is MANDATORY, before
+any other work. Follow it exactly, including its budget law and its
+bureaucracy prohibitions. Everything below is subordinate to that skill —
+where this prompt and the skill disagree, the skill wins.
+
+The conditional decision chain — each link exists only when its condition
+holds:
+
+```text
+BRD when business intent changes
+  → PRD when product behaviour changes
+    → UX/XDS when a material experience decision exists
+      → SDD when a material technical decision exists
+        → implementation → verification
+```
 
 Two phases govern all content work:
 
@@ -34,6 +46,16 @@ Two phases govern all content work:
   against the live surface. Public copy that promises behavior the code does
   not implement is REPORTED, not fixed. No BRD/PRD/XDS/SD authoring in this
   phase; no backfilling a chain for work already shipped.
+  Phase 1 also runs the budget law BACKWARD — the prune lane: list every
+  document, section, and field that records no decision, including survivors
+  of retired machinery (hand-typed statuses, approval or conformance
+  records, per-feature stubs authored under old quotas). RECOMMEND removal
+  in the report with a count and a per-item reason; NEVER execute
+  corpus-scale deletion — that call stays with the owner.
+  Canon is not immutable: correct any claim that fails verification, and
+  Phase 2 may supersede a recorded decision with evidence. What is forbidden
+  is rebuilding healthy content for style. In peer-curated corpora (the
+  preamble says so), corrections are coordinated via `hey.md` first.
 - **PHASE 2 — design only what a decision requires.** No per-feature artifact
   quota; weight comes from the skill's proportionality rules: small change →
   a short experience brief in the plan or PR; a feature → one design
@@ -72,6 +94,17 @@ Craft rules for everything authored in Phase 2:
   BRD statement it satisfies and anchors it; XDS/SD do the same against the
   PRD. Verify alignment by following the links, both directions.
 
+## LINKAGE INVARIANTS — what "chain intact" means
+
+- Every PRD requirement traces UP to a named BRD outcome, with the anchored
+  quote.
+- Every BRD outcome traces DOWN to at least one PRD surface — or to an
+  explicit open question.
+- Every story maps to a real, current surface (route, page, command) — or is
+  marked unrealized, with a reason.
+- Every XDS/SD decision cites the PRD statement it serves.
+- An orphan in either direction is a FINDING, never a silent fix.
+
 ## FIGURES — documentation visualization is a feature, not decoration
 
 Figures materially help humans and agents understand the docs — author them
@@ -83,8 +116,10 @@ mediums:**
   relationships, timelines → inline SVG: exact, diffable, controllable.
 - Visual/illustrative content — concept art, mood and style direction, hero
   imagery, product illustration, anything photographic or artistic →
-  GENERATED IMAGE via gpt-image-2. Do not fake these with SVG; a missing
-  generation route is a blocker to report, not a reason to switch medium.
+  GENERATED IMAGE with gpt-image-2, invoked through the imagegen skill —
+  NEVER by calling the model/API directly. Do not fake these with SVG; a
+  missing generation route is a blocker to report, not a reason to switch
+  medium.
 
 SVG lives inline in the HTML or as a sibling `.svg` file; generated rasters
 are committed under `docs/assets/` and referenced from the doc.
@@ -107,7 +142,8 @@ yourself.
 
 **Work-separation law (all stages):** you are the ONLY writer and the only
 committer. Subagents read, verify, and draft in their reports; they never
-edit repo files, never commit, never delegate. Partition assignments so no
+edit repo files, never commit, never delegate. Hard ceiling: at most 8
+subagents in the whole run — proportionality usually wants fewer. Partition assignments so no
 two subagents own the same doc or surface for the same purpose — overlap is
 reserved for deliberate cross-verification of the riskiest claims. Every
 assignment states its bounded reading budget: named docs in full, source only
@@ -117,7 +153,10 @@ walking trees.
 ### Stage 0 — scoping (orchestrator, solo)
 
 Read the skill, this prompt's preamble, AGENTS.md/CLAUDE.md, the family
-README if any, and the docs index. Inventory: every doc, every product
+README if any, and the docs index. If canon at
+`~/_reps/skills/product-from-scratch` is reachable, diff the vendored copy
+against it and report any drift; the vendored copy remains the binding
+method for this run either way. Inventory: every doc, every product
 surface (routes, pages, commands), every configured hostname. Count candidate
 BRD chains and rank them by business value. One BRD chain = one BRD plus
 whatever PRD/XDS/SD that decision requires — the cap counts CHAINS, not
@@ -209,11 +248,22 @@ the unreliable claim — never add a process layer.
 - **Browser hygiene** — inspect open tabs first and reuse a suitable one;
   close every tab you open before finishing; never orphan an authenticated
   tab.
+- **Repo checks** — if the repo defines a check command (package.json
+  `check`/`lint`/`typecheck` scripts, a Makefile target), run it before
+  committing and fix whatever YOUR changes broke.
 - Commit in THIS repo only, message prefix `docs(chain):`. NEVER push.
 
-## REPORT
+## REPORT — and its durable landing
 
-Commit hashes; per-doc summary of what changed and why; functional findings
-with file:line citations; owner-only questions; the ordered remainder list if
-the 5-chain cap was hit; every subagent launched, its assignment, and whether
-you accepted or rejected its claims.
+The run report (final text): commit hashes; per-doc summary of what changed
+and why; functional findings with file:line citations; prune-lane
+recommendations with counts; owner-only questions; the ordered remainder
+list if the 5-chain cap was hit; every subagent launched, its assignment,
+and whether you accepted or rejected its claims.
+
+Reports evaporate — findings must not. Maintain `docs/open-questions.html`
+in this repo: current OPEN items only — each dated, file:line-cited, tied to
+this run's commit hashes. Delete entries when they are resolved; git keeps
+history. Record there whether the review round was spent
+(`review rounds used: 1/1`) so a continuation run knows the budget state.
+Prune-lane recommendations live there too until the owner rules on them.
