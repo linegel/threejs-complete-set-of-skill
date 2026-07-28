@@ -50,6 +50,33 @@ Craft rules for everything authored in Phase 2:
   summary, so nothing duplicate gets written.
 - Docs are clean RFC-style HTML, cross-linked many-to-many, current state
   only.
+- Technical documentation prose adheres to ADS-STE100 Simplified Technical
+  English: short sentences, one instruction per sentence, approved-word
+  discipline, active voice.
+- Downstream docs GROUND themselves in upstream canon: a PRD quotes the exact
+  BRD statement it satisfies and anchors it; XDS/SD do the same against the
+  PRD. Verify alignment by following the links, both directions.
+
+## FIGURES — documentation visualization is a feature, not decoration
+
+Figures materially help humans and agents understand the docs — author them
+wherever a picture carries the meaning better than prose. **The medium is
+chosen by the figure's job — different use cases require different
+mediums:**
+
+- Precise structure — architecture, flows, state charts, wireframes, data
+  relationships, timelines → inline SVG: exact, diffable, controllable.
+- Visual/illustrative content — concept art, mood and style direction, hero
+  imagery, product illustration, anything photographic or artistic →
+  GENERATED IMAGE. Do not fake these with SVG.
+
+Whichever medium: iterate until the figure is actually correct for its
+description. Figure-finalization loops are VERIFICATION — repeat as many
+times as needed; they never consume the review budget. Only when image
+generation repeatedly fails to produce a correct image for a description
+that precision could express, switch that one figure to a
+precisely-controllable form. Every figure is referenced from the text that
+depends on it, and stills never certify motion or interaction feel.
 
 ## STAGES — how the run is orchestrated
 
@@ -150,8 +177,18 @@ the unreliable claim — never add a process layer.
   claims only.
 - **Committed secrets** — report presence and location only; NEVER reproduce
   values in docs, reports, or commits.
-- Commit in THIS repo only, message prefix `docs(chain):`. NEVER push. Never
-  stage files you did not author — other agents may have uncommitted work.
+- **Shared tree only** — work on the current branch in this checkout. Never
+  create branches, worktrees, alternate clones, or isolated copies.
+- **Coexistence** — read `hey.md` (repo root) before starting; other agents
+  may be active. Leave a note there for anything they must know; never block
+  on them. Never stage files you did not author.
+- **Scratch discipline** — keep working notes outside the repo. Any temp file
+  that must land in-repo is registered in `TEMP_ARTIFACTS.md` the same turn
+  it is created and deleted the same session once absorbed.
+- **Browser hygiene** — inspect open tabs first and reuse a suitable one;
+  close every tab you open before finishing; never orphan an authenticated
+  tab.
+- Commit in THIS repo only, message prefix `docs(chain):`. NEVER push.
 
 ## REPORT
 
