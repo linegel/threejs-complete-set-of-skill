@@ -9,7 +9,7 @@
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-compatibility-fallbacks.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:ab7d8d17e0589a6f5c2462d645b9e0d6797cd92eade36e3615dae091c6f9df5b" />
+<meta name="skill-pack-build-revision" content="sha256:c151ad21626b93f809ec207d33636612320aa54cbc192958a440b1ebbffa2dc9" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -24,7 +24,7 @@
 <meta property="og:title" content="Three.js Compatibility Fallbacks | Three.js WebGPU Skill" />
 <meta property="og:description" content="Fallback unavailable WebGPU features through an isolated compatibility branch. Use only when the user explicitly asks how to handle an initialized non-WebGPU…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-compatibility-fallbacks.html" />
-<meta property="article:modified_time" content="2026-07-16T12:45:44+03:00" />
+<meta property="article:modified_time" content="2026-07-16T19:46:25+03:00" />
 <meta property="article:published_time" content="2026-07-04T23:30:19+03:00" />
 <meta property="article:section" content="Planning and Validation" />
 <meta property="og:image" content="https://threejs-skills.com/previews/primary/browser-fallback-harness.png" />
@@ -74,7 +74,7 @@
     "https://threejs-skills.com/seo/article/threejs-compatibility-fallbacks-16x9.png"
    ],
    "datePublished": "2026-07-04T23:30:19+03:00",
-   "dateModified": "2026-07-16T12:45:44+03:00",
+   "dateModified": "2026-07-16T19:46:25+03:00",
    "author": {
     "@id": "https://threejs-skills.com/#publisher"
    },
@@ -311,8 +311,8 @@ a.chip:active{scale:.96}
       <span class="chip">1 primary target</span>
       <span class="chip">1 secondary surface</span>
       <span class="chip">accepted runtime evidence</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-16T12:45:44+03:00">2026-07-16</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/8749183dffd84731506239dd86590c92bf958969">commit 8749183 ↗</a>
+      <span class="chip">Latest skill update <time datetime="2026-07-16T19:46:25+03:00">2026-07-16</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/62a9bc59330c44827824665323823883e88f100c">commit 62a9bc5 ↗</a>
       <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-compatibility-fallbacks/SKILL.md">SKILL.md on GitHub ↗</a>
       <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/skills/threejs-compatibility-fallbacks/SKILL.md">raw (for agents) ↗</a>
     </div>
@@ -442,7 +442,8 @@ among unavailable capabilities. Read the
 <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-compatibility-fallbacks/references/r185-api-map.md">r185 API map</a> only when implementing or verifying
 the legacy/API branch; reverify each symbol against the installed revision.</p>
 <p>This step is complete when the selected representation is the earliest row
-that passes every <code>preserved</code> invariant and every remaining loss is explicit.</p>
+that passes every <code>preserved</code> invariant and every <code>weakened</code> invariant&#39;s frozen
+gate, and every remaining loss is explicit.</p>
 <h2>4. Isolate ownership</h2>
 <p>Give the compatibility branch separate imports, build/deployment entrypoint,
 tests, artifacts, capability gate, and maintenance ownership. Keep one scene
@@ -457,19 +458,20 @@ compatibility product rather than the canonical renderer.</p>
 leaves the canonical build and runtime graph unchanged, and every branch-owned
 resource has one owner and disposal path.</p>
 <h2>5. Validate the changed claims</h2>
-<p>Invoke <code>$threejs-visual-validation</code> for every preserved or weakened claim. Use
-the canonical evidence as truth. For visual or mechanism claims, capture the
-final/no-post/contribution views needed to isolate the cause; for temporal,
-performance, resource, or lifecycle claims, capture only their producing trace
-and diagnostics. Return <code>PASS</code>, <code>FAIL</code>, or <code>INSUFFICIENT_EVIDENCE</code> per claim.</p>
-<p>Exercise the branch-specific reset, resize/DPR, repeated transition, teardown,
-and dispose/recreate paths. Persistent resources must plateau after declared
-warm-up. Missing timestamps make a required GPU-attribution claim
-<code>INSUFFICIENT_EVIDENCE</code>; presentation or CPU duration remains end-to-end
-evidence only.</p>
-<p>This step is complete when every surviving claim has a direct verdict, every
-removed claim is absent from product language, output conversion has one owner,
-and lifecycle resources plateau or fail.</p>
+<p>Invoke <code>$threejs-visual-validation</code> for every preserved or weakened claim when
+it is installed. With that owner, use canonical evidence as truth, capture only
+the views, traces, and diagnostics that produce the claim, and exercise its
+applicable reset, resize/DPR, transition, teardown, and dispose/recreate paths.
+Persistent resources must plateau after declared warm-up.</p>
+<p>If the owner is absent, report it and return <code>INSUFFICIENT_EVIDENCE</code> for the
+affected claims; do not construct replacement validation inside this skill.
+Missing timestamps likewise make required GPU attribution
+<code>INSUFFICIENT_EVIDENCE</code>; presentation or CPU duration is end-to-end evidence
+only.</p>
+<p>This step is complete when every surviving claim has a verdict, every removed
+claim is absent from product language, output conversion has one owner, and
+lifecycle/resource claims either plateau or fail under validation or remain
+<code>INSUFFICIENT_EVIDENCE</code> with the missing evidence named.</p>
 <h2>Output</h2>
 <p>Return one row per feature:</p>
 <table>
@@ -486,8 +488,8 @@ and lifecycle resources plateau or fail.</p>
 </thead>
 </table>
 <p>Also record the activation facts, isolated entrypoint and maintenance owner,
-output owner, lifecycle result, unsupported claims, and the exact evidence
-needed for any <code>INSUFFICIENT_EVIDENCE</code> verdict.</p>
+output owner, lifecycle result, unsupported claims, any missing verification
+owner, and the exact evidence needed for each <code>INSUFFICIENT_EVIDENCE</code> verdict.</p>
 </div>
   <aside class="skill-guides" aria-labelledby="related-guides-title"><h3 id="related-guides-title">Related guides</h3><ul><li><a href="/compare/webgpurenderer-vs-webglrenderer/"><span>Comparisons</span>Three.js WebGPURenderer vs WebGLRenderer</a></li></ul></aside>
   <div class="pn">
@@ -516,7 +518,7 @@ needed for any <code>INSUFFICIENT_EVIDENCE</code> verdict.</p>
 
 <div class="wrap"><footer>
   <div class="footer-summary">Three.js WebGPU Skill Pack: TSL, procedural graphics, and visual validation.
-    <span>Three r185.1 · 40 primary targets · 25 accepted · build <code>ab7d8d17e058</code></span>
+    <span>Three r185.1 · 40 primary targets · 29 accepted · build <code>c151ad21626b</code></span>
     <span>Compiling shaders? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span>
   </div>
   <div class="footer-groups">

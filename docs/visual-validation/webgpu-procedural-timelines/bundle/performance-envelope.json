@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "claimStatus": "NOT_CLAIMED",
+  "targetFrameTime": {
+    "value": 16.67,
+    "unit": "milliseconds",
+    "label": "Authored",
+    "source": "authored 60 Hz target for future physical-browser measurement"
+  },
+  "correctnessResolution": {
+    "value": 1200,
+    "unit": "pixels-wide",
+    "label": "Authored",
+    "source": "correctness capture contract"
+  },
+  "performanceResolution": {
+    "value": 1920,
+    "unit": "pixels-wide",
+    "label": "Authored",
+    "source": "future performance capture contract"
+  },
+  "reason": "The Playwright correctness lane has no named-hardware timestamp population."
+}

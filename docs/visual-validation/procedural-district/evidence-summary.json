@@ -7,7 +7,7 @@
   "canonicalSource": [
     "integration-labs/procedural-district"
   ],
-  "canonicalSourceHash": "sha256:9d462fbe5d3bd51617c1874c1fae9e278509f1b104e0b1e7ea2ff9da4541d795",
+  "canonicalSourceHash": "sha256:3c2448b5b07d5c420110bd92c9993bf65286c7b109b71c41c137156aafbb87e3",
   "threeRevision": "0.185.1",
   "runtime": {
     "renderer": "WebGPURenderer",

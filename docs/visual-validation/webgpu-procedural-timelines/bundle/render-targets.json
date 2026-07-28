@@ -1,0 +1,631 @@
+{
+  "schemaVersion": 2,
+  "targets": [
+    {
+      "name": "webgpu-procedural-timelines-capture-target-1",
+      "owner": "threejs-procedural-motion-systems",
+      "semantic": "diagnostic.normal.png native WebGPU RGBA8 readback",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "diagnostic.normal.png retained capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "diagnostic.normal.png retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples",
+        "label": "Authored",
+        "source": "single-sample capture target"
+      },
+      "residentBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * 4"
+      }
+    },
+    {
+      "name": "webgpu-procedural-timelines-capture-target-2",
+      "owner": "threejs-procedural-motion-systems",
+      "semantic": "diagnostic.emissive.png native WebGPU RGBA8 readback",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "diagnostic.emissive.png retained capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "diagnostic.emissive.png retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples",
+        "label": "Authored",
+        "source": "single-sample capture target"
+      },
+      "residentBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * 4"
+      }
+    },
+    {
+      "name": "webgpu-procedural-timelines-capture-target-3",
+      "owner": "threejs-procedural-motion-systems",
+      "semantic": "final.design.png native WebGPU RGBA8 readback",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "final.design.png retained capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "final.design.png retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples",
+        "label": "Authored",
+        "source": "single-sample capture target"
+      },
+      "residentBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * 4"
+      }
+    },
+    {
+      "name": "webgpu-procedural-timelines-capture-target-4",
+      "owner": "threejs-procedural-motion-systems",
+      "semantic": "diagnostic.velocity.png native WebGPU RGBA8 readback",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "diagnostic.velocity.png retained capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "diagnostic.velocity.png retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples",
+        "label": "Authored",
+        "source": "single-sample capture target"
+      },
+      "residentBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * 4"
+      }
+    },
+    {
+      "name": "webgpu-procedural-timelines-capture-target-5",
+      "owner": "threejs-procedural-motion-systems",
+      "semantic": "camera.near.png native WebGPU RGBA8 readback",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "camera.near.png retained capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "camera.near.png retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples",
+        "label": "Authored",
+        "source": "single-sample capture target"
+      },
+      "residentBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * 4"
+      }
+    },
+    {
+      "name": "webgpu-procedural-timelines-capture-target-6",
+      "owner": "threejs-procedural-motion-systems",
+      "semantic": "camera.design.png native WebGPU RGBA8 readback",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "camera.design.png retained capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "camera.design.png retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples",
+        "label": "Authored",
+        "source": "single-sample capture target"
+      },
+      "residentBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * 4"
+      }
+    },
+    {
+      "name": "webgpu-procedural-timelines-capture-target-7",
+      "owner": "threejs-procedural-motion-systems",
+      "semantic": "camera.far.png native WebGPU RGBA8 readback",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "camera.far.png retained capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "camera.far.png retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples",
+        "label": "Authored",
+        "source": "single-sample capture target"
+      },
+      "residentBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * 4"
+      }
+    },
+    {
+      "name": "webgpu-procedural-timelines-capture-target-8",
+      "owner": "threejs-procedural-motion-systems",
+      "semantic": "seed-0001.final.png native WebGPU RGBA8 readback",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "seed-0001.final.png retained capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "seed-0001.final.png retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples",
+        "label": "Authored",
+        "source": "single-sample capture target"
+      },
+      "residentBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * 4"
+      }
+    },
+    {
+      "name": "webgpu-procedural-timelines-capture-target-9",
+      "owner": "threejs-procedural-motion-systems",
+      "semantic": "seed-9e3779b9.final.png native WebGPU RGBA8 readback",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "seed-9e3779b9.final.png retained capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "seed-9e3779b9.final.png retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples",
+        "label": "Authored",
+        "source": "single-sample capture target"
+      },
+      "residentBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * 4"
+      }
+    },
+    {
+      "name": "webgpu-procedural-timelines-capture-target-10",
+      "owner": "threejs-procedural-motion-systems",
+      "semantic": "temporal.t000.png native WebGPU RGBA8 readback",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "temporal.t000.png retained capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "temporal.t000.png retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples",
+        "label": "Authored",
+        "source": "single-sample capture target"
+      },
+      "residentBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * 4"
+      }
+    },
+    {
+      "name": "webgpu-procedural-timelines-capture-target-11",
+      "owner": "threejs-procedural-motion-systems",
+      "semantic": "temporal.t001.png native WebGPU RGBA8 readback",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "temporal.t001.png retained capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "temporal.t001.png retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples",
+        "label": "Authored",
+        "source": "single-sample capture target"
+      },
+      "residentBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * 4"
+      }
+    },
+    {
+      "name": "webgpu-procedural-timelines-capture-target-12",
+      "owner": "threejs-procedural-motion-systems",
+      "semantic": "mechanism.launch-and-staging.png native WebGPU RGBA8 readback",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "mechanism.launch-and-staging.png retained capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "mechanism.launch-and-staging.png retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples",
+        "label": "Authored",
+        "source": "single-sample capture target"
+      },
+      "residentBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * 4"
+      }
+    },
+    {
+      "name": "webgpu-procedural-timelines-capture-target-13",
+      "owner": "threejs-procedural-motion-systems",
+      "semantic": "mechanism.spin-docking.png native WebGPU RGBA8 readback",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "mechanism.spin-docking.png retained capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "mechanism.spin-docking.png retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples",
+        "label": "Authored",
+        "source": "single-sample capture target"
+      },
+      "residentBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * 4"
+      }
+    },
+    {
+      "name": "webgpu-procedural-timelines-capture-target-14",
+      "owner": "threejs-procedural-motion-systems",
+      "semantic": "mechanism.debris-release.png native WebGPU RGBA8 readback",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "mechanism.debris-release.png retained capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "mechanism.debris-release.png retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples",
+        "label": "Authored",
+        "source": "single-sample capture target"
+      },
+      "residentBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * 4"
+      }
+    },
+    {
+      "name": "webgpu-procedural-timelines-capture-target-15",
+      "owner": "threejs-procedural-motion-systems",
+      "semantic": "mechanism.quaternion-and-reparent.png native WebGPU RGBA8 readback",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "mechanism.quaternion-and-reparent.png retained capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "mechanism.quaternion-and-reparent.png retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples",
+        "label": "Authored",
+        "source": "single-sample capture target"
+      },
+      "residentBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * 4"
+      }
+    },
+    {
+      "name": "webgpu-procedural-timelines-capture-target-16",
+      "owner": "threejs-procedural-motion-systems",
+      "semantic": "mechanism.compute-storage.png native WebGPU RGBA8 readback",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "mechanism.compute-storage.png retained capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "mechanism.compute-storage.png retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples",
+        "label": "Authored",
+        "source": "single-sample capture target"
+      },
+      "residentBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * 4"
+      }
+    },
+    {
+      "name": "webgpu-procedural-timelines-capture-target-17",
+      "owner": "threejs-procedural-motion-systems",
+      "semantic": "mechanism.interpolation-and-velocity.png native WebGPU RGBA8 readback",
+      "width": {
+        "value": 1200,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "mechanism.interpolation-and-velocity.png retained capture metadata"
+      },
+      "height": {
+        "value": 800,
+        "unit": "pixels",
+        "label": "Measured",
+        "source": "mechanism.interpolation-and-velocity.png retained capture metadata"
+      },
+      "format": "rgba8unorm",
+      "bytesPerTexel": {
+        "value": 4,
+        "unit": "bytes-per-texel",
+        "label": "Derived",
+        "source": "RGBA8 format width"
+      },
+      "sampleCount": {
+        "value": 1,
+        "unit": "samples",
+        "label": "Authored",
+        "source": "single-sample capture target"
+      },
+      "residentBytes": {
+        "value": 3840000,
+        "unit": "bytes",
+        "label": "Derived",
+        "source": "width * height * 4"
+      }
+    }
+  ],
+  "accountingScope": "transactional-capture-targets-only",
+  "completeness": "PARTIAL",
+  "trackedRenderTargetBytes": {
+    "value": 65280000,
+    "unit": "bytes",
+    "label": "Derived",
+    "source": "sum of 17 transactional RGBA8 capture target extents"
+  },
+  "trackedPeakLiveRenderTargetBytes": {
+    "value": 3840000,
+    "unit": "bytes",
+    "label": "Derived",
+    "source": "one transactional capture target is live at a time"
+  }
+}

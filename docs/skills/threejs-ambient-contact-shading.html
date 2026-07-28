@@ -9,7 +9,7 @@
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-ambient-contact-shading.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:ab7d8d17e0589a6f5c2462d645b9e0d6797cd92eade36e3615dae091c6f9df5b" />
+<meta name="skill-pack-build-revision" content="sha256:c151ad21626b93f809ec207d33636612320aa54cbc192958a440b1ebbffa2dc9" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -24,7 +24,7 @@
 <meta property="og:title" content="Ambient Contact Shading | Three.js WebGPU Skill" />
 <meta property="og:description" content="Ground indirect lighting with ambient visibility in Three.js r185 WebGPU/TSL. Use when choosing authored material AO, dynamic GTAO, forward-lighting…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-ambient-contact-shading.html" />
-<meta property="article:modified_time" content="2026-07-16T11:00:33+03:00" />
+<meta property="article:modified_time" content="2026-07-16T19:46:25+03:00" />
 <meta property="article:published_time" content="2026-07-04T23:30:19+03:00" />
 <meta property="article:section" content="Cameras, Lighting, and Final Image" />
 <meta property="og:image" content="https://threejs-skills.com/visual-validation/integration-image-pipeline-ao/final.design.png" />
@@ -74,7 +74,7 @@
     "https://threejs-skills.com/seo/article/threejs-ambient-contact-shading-16x9.png"
    ],
    "datePublished": "2026-07-04T23:30:19+03:00",
-   "dateModified": "2026-07-16T11:00:33+03:00",
+   "dateModified": "2026-07-16T19:46:25+03:00",
    "author": {
     "@id": "https://threejs-skills.com/#publisher"
    },
@@ -312,8 +312,8 @@ a.chip:active{scale:.96}
       <span class="chip">2 flagships</span>
       <span class="chip">1 secondary surface</span>
       <span class="chip">accepted runtime evidence</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-16T11:00:33+03:00">2026-07-16</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/2ce13bcc22695dafa808d6019452752d9a39cc71">commit 2ce13bc ↗</a>
+      <span class="chip">Latest skill update <time datetime="2026-07-16T19:46:25+03:00">2026-07-16</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/62a9bc59330c44827824665323823883e88f100c">commit 62a9bc5 ↗</a>
       <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-ambient-contact-shading/SKILL.md">SKILL.md on GitHub ↗</a>
       <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/skills/threejs-ambient-contact-shading/SKILL.md">raw (for agents) ↗</a>
     </div>
@@ -366,12 +366,11 @@ a.chip:active{scale:.96}
         <span class="card-meta">6 mechanisms · 3 locked tiers</span>
       </a>
       <a class="card" href="../demos/procedural-district/">
-        <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="procedural-district">
-    <span class="primary-evidence-label">Canonical capture</span>
-    <strong>Runtime evidence pending</strong>
-    <span><code>3c2448b5b07d</code> source hash</span>
-    <span>10 fixed states · 4 runtime proof requirements</span>
-  </span>
+        <span class="card-preview-wrap" data-preview-for="procedural-district" data-preview-source="procedural-district" data-preview-classification="inspected-runtime-evidence-preview"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/procedural-district/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/procedural-district/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/procedural-district/final.design.png" alt="Procedural district integration presentation for Procedural District" class="card-preview" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><span class="media-caption">Procedural district integration presentation</span></span>
         <span class="card-head"><span class="card-kind">Authored procedural world</span><span class="status status--pending">Evidence pending</span></span>
         <h3>Procedural District</h3>
         <span class="card-meta">6 mechanisms · 3 locked tiers</span>
@@ -579,7 +578,8 @@ dimensionally compatible.</p>
   -&gt; GTAO scalar visibility
   -&gt; optional materialized edge-aware reconstruction
   -&gt; indirect-light application
-  -&gt; optional temporal resolve
+  -&gt; optional temporal resolve over the matching admitted layers
+  -&gt; excluded-layer composition only when those layers were separated
   -&gt; one tone-map/output-transform owner
 </code></pre>
 <ul>
@@ -589,6 +589,11 @@ reconstruction. When edges fail, evaluate <code>rtt(denoise(...))</code> once, t
 sample the materialized texture with <code>screenUV</code>.</li>
 <li>Inside a mesh material graph, sample both raw and reconstructed visibility
 explicitly with <code>screenUV</code>; implicit texture coordinates resolve to mesh UVs.</li>
+<li>Keep stock transparent/transmission rendering in the non-temporal lit pass;
+<code>builtinAOContext()</code> already skips transparent materials. Use an opaque-only
+lit pass plus separate layer composition only for a temporal resolve or an
+already-owned external compositor. Account for its full cost; charge AO only
+the marginal delta when that compositor is shared.</li>
 <li>Keep scalar visibility single-channel. Replace the output graph and mark the
 <code>RenderPipeline</code> dirty when AO is disabled so inactive work is unreachable.</li>
 </ul>
@@ -602,7 +607,10 @@ every AO pass and dependency.</p>
 <p><code>GTAONode.useTemporalFiltering</code> rotates samples; it does not create or reproject
 history. Enable it only with a live TRAA/custom resolve, valid camera and object
 motion (including deformation/instancing/alpha coverage), matching beauty/depth/
-velocity dimensions, rejection, and reset behavior.</p>
+velocity dimensions and layer membership, rejection, and reset behavior. Resolve
+only layers represented by those depth and velocity signals. Composite excluded
+transparent or refractive layers afterward; admit them to the resolve only when
+their matching depth, motion, coverage, and rejection behavior are proven.</p>
 <p>Reset or reseed on camera/projection cuts, uncompensated rebases, geometry or
 coverage discontinuities, AO parameter/scale/resolution changes, and quality
 migration. r185 <code>TRAANode</code> has no public camera-cut reset: rebuild and dispose
@@ -610,9 +618,10 @@ the node, replace the output graph, and mark the pipeline dirty.</p>
 <p>When temporal AO is selected, read the
 <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-ambient-contact-shading/references/gtao-bent-normal-pipeline.md#temporal-contract">temporal contract</a>
 before constructing history.</p>
-<p><strong>Complete when:</strong> moving-occluder, disocclusion, camera-cut, resize, and AO-
-parameter-change fixtures either pass with explicit rejection/reset or temporal
-AO is disabled.</p>
+<p><strong>Complete when:</strong> beauty, depth, and velocity cover the same admitted layers;
+any excluded transparent/refractive layers are composed after the resolve; and
+moving-occluder, disocclusion, camera-cut, resize, and AO-parameter-change
+fixtures either pass with explicit rejection/reset or temporal AO is disabled.</p>
 <h2>5. Add bent normals only after scalar AO passes</h2>
 <p>A bent normal is the visibility-weighted mean unoccluded direction. Add this
 branch only when scalar AO already passes, directional environment response is
@@ -625,13 +634,19 @@ for basis, filtering, normalization, storage, and sign checks.</p>
 direction is transformed exactly once, and the one-wall fixture passes; otherwise
 directional use stays disabled.</p>
 <h2>6. Verify the finished graph</h2>
-<p>Capture raw depth, normals, raw/reconstructed AO, indirect contribution,
-direct/emissive residuals, velocity/history rejection when present, and AO off.
-Exercise UV-seam meshes, thin silhouettes, transparent crossings, smooth curves,
-screen edges, asymmetric projections, motion, resize, and disposal/recreation.</p>
-<p><strong>Complete when:</strong> direct light and emission are invariant; no UV-following,
-cross-edge halo, seam, crawl, or trail remains in the accepted branch; AO-off
-shows zero AO work; target-device marginal time and resource use pass; and
+<p>For an active screen-space branch, capture raw depth, the selected normal input,
+raw/reconstructed AO when admitted, indirect contribution, direct/emissive
+residuals, velocity/history rejection when temporal filtering is present, and
+AO off. Exercise UV-invariance, thin silhouettes, transparent crossings, smooth
+curves, screen edges, asymmetric projections, motion when present, resize, and
+disposal/recreation.</p>
+<p>For authored material AO, validate the authored UV set, asset/world scaling, and
+indirect-only placement instead. For omitted screen AO, record that no screen-AO
+pass, attachment, history, or dependency is reachable.</p>
+<p><strong>Complete when:</strong> direct light and emission are invariant; every fixture for
+the selected branch passes; an active screen-space branch has no unintended
+UV-following, cross-edge halo, crawl, or trail; AO-off or omission shows zero
+screen-AO work; target-device marginal time and resource use pass; and
 recreation returns resource counters to baseline.</p>
 <h2>Ownership</h2>
 <p>This skill owns scalar GTAO, reconstruction choice, indirect-light placement,
@@ -666,7 +681,7 @@ conversion, and adaptive resolution.</p>
 
 <div class="wrap"><footer>
   <div class="footer-summary">Three.js WebGPU Skill Pack: TSL, procedural graphics, and visual validation.
-    <span>Three r185.1 · 40 primary targets · 25 accepted · build <code>ab7d8d17e058</code></span>
+    <span>Three r185.1 · 40 primary targets · 29 accepted · build <code>c151ad21626b</code></span>
     <span>Compiling shaders? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span>
   </div>
   <div class="footer-groups">

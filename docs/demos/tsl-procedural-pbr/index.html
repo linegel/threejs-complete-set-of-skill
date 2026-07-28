@@ -35,7 +35,7 @@
     </style>
 
     <meta name="lab-id" content="tsl-procedural-pbr">
-  <meta name="acceptance-status" content="incomplete">
+  <meta name="acceptance-status" content="accepted">
   <meta name="description" content="Interactive Three.js WebGPU/TSL demo for TSL Procedural PBR, with 6 scenarios, 6 mechanisms, and 3 quality tiers and evidence-gated validation.">
   <meta name="author" content="Three.js WebGPU Skill Pack contributors">
   <meta name="owning-skill" content="threejs-procedural-materials">
@@ -68,87 +68,27 @@
         }
       }
     </script>
-  <script type="module" crossorigin src="../assets/index-CPwhrrkI.js"></script>
+  <script type="module" crossorigin src="../assets/index-THlXS3Ww.js"></script>
   <link rel="modulepreload" crossorigin href="../assets/modulepreload-polyfill-Dezn_h7o.js">
-  <link rel="modulepreload" crossorigin href="../assets/three.webgpu-Bjfb9xWU.js">
-  <link rel="modulepreload" crossorigin href="../assets/three.tsl-0l0bfIsw.js">
-  <link rel="modulepreload" crossorigin href="../assets/BloomNode-qktuf1Q7.js">
-  <link rel="modulepreload" crossorigin href="../assets/procedural-pbr-materials-uYZjnkN3.js">
+  <link rel="modulepreload" crossorigin href="../assets/three.webgpu-Dss1ekdK.js">
+  <link rel="modulepreload" crossorigin href="../assets/three.tsl--5AYqKVA.js">
+  <link rel="modulepreload" crossorigin href="../assets/BloomNode-B7VcMtwE.js">
+  <link rel="modulepreload" crossorigin href="../assets/procedural-pbr-materials-CwQBni-l.js">
 </head>
   <body>
 <main class="demo-seo-shell" data-demo-seo-shell data-demo-id="tsl-procedural-pbr" data-owning-skill="threejs-procedural-materials">
   <details>
-    <summary><span class="demo-seo-shell__summary-title">TSL Procedural PBR</span><span class="demo-seo-shell__summary-state">Evidence pending</span></summary>
+    <summary><span class="demo-seo-shell__summary-title">TSL Procedural PBR</span><span class="demo-seo-shell__summary-state">Accepted</span></summary>
     <div class="demo-seo-shell__body">
       <p class="demo-seo-shell__kicker">Canonical Lab · Three.js 0.185.1</p>
       <h1>TSL Procedural PBR</h1>
       <p>Interactive Three.js WebGPU/TSL demo for TSL Procedural PBR, with 6 scenarios, 6 mechanisms, and 3 quality tiers and evidence-gated validation.</p>
-      <p class="demo-seo-shell__evidence"><strong>Evidence status:</strong> The implementation is available for technical review, but its native-WebGPU runtime and evidence gates remain incomplete.</p>
-      <details class="demo-roadmap" data-demo-roadmap data-roadmap-status="incomplete" data-open-count="15">
-        <summary>Readiness &amp; remaining fixes <span>15</span></summary>
+      <p class="demo-seo-shell__evidence"><strong>Evidence status:</strong> Accepted runtime evidence is available for the published contract represented by this demo.</p>
+      <details class="demo-roadmap" data-demo-roadmap data-roadmap-status="accepted" data-open-count="0">
+        <summary>Readiness &amp; remaining fixes <span>0</span></summary>
         <div class="demo-roadmap__body">
-          <p>15 open closure items. Loadable does not mean accepted or performance-valid.</p>
-          <ol><li data-roadmap-item data-priority="P0" data-category="performance">
-          <div><span>P0</span><strong>Define and measure the target performance contract</strong></div>
-          <p>The ultra, high, mobile tiers have no accepted frame target. Record named device/browser/GPU, viewport, DPR, sustained CPU/GPU/presentation p50 and p95, deadline misses, memory, and settled quality. Submission time is not GPU timing.</p>
-          <code>tiers[].frameTargetMs</code>
-        </li><li data-roadmap-item data-priority="P0" data-category="capability">
-          <div><span>P0</span><strong>Native Webgpu capability proof</strong></div>
-          <p>Capture current-source evidence for the declared native webgpu gate.</p>
-          <code>capabilityRequirements.native-webgpu</code>
-        </li><li data-roadmap-item data-priority="P0" data-category="capability">
-          <div><span>P0</span><strong>Node Material capability proof</strong></div>
-          <p>Capture current-source evidence for the declared node material gate.</p>
-          <code>capabilityRequirements.node-material</code>
-        </li><li data-roadmap-item data-priority="P0" data-category="capability">
-          <div><span>P0</span><strong>MRT capability proof</strong></div>
-          <p>Capture current-source evidence for the declared mrt gate.</p>
-          <code>capabilityRequirements.mrt</code>
-        </li><li data-roadmap-item data-priority="P0" data-category="capability">
-          <div><span>P0</span><strong>Texture Array capability proof</strong></div>
-          <p>Capture current-source evidence for the declared texture array gate.</p>
-          <code>capabilityRequirements.texture-array</code>
-        </li><li data-roadmap-item data-priority="P0" data-category="capability">
-          <div><span>P0</span><strong>Shadow Depth Texture capability proof</strong></div>
-          <p>Capture current-source evidence for the declared shadow depth texture gate.</p>
-          <code>capabilityRequirements.shadow-depth-texture</code>
-        </li><li data-roadmap-item data-priority="P0" data-category="runtime">
-          <div><span>P0</span><strong>Backend Is Webgpu runtime proof</strong></div>
-          <p>Capture current-source evidence for the declared backend is webgpu gate.</p>
-          <code>runtimeProof.backend-is-webgpu</code>
-        </li><li data-roadmap-item data-priority="P0" data-category="runtime">
-          <div><span>P0</span><strong>Material Channel Readback runtime proof</strong></div>
-          <p>Capture current-source evidence for the declared material channel readback gate.</p>
-          <code>runtimeProof.material-channel-readback</code>
-        </li><li data-roadmap-item data-priority="P0" data-category="runtime">
-          <div><span>P0</span><strong>Aligned Readback runtime proof</strong></div>
-          <p>Capture current-source evidence for the declared aligned readback gate.</p>
-          <code>runtimeProof.aligned-readback</code>
-        </li><li data-roadmap-item data-priority="P0" data-category="runtime">
-          <div><span>P0</span><strong>Atlas Gutter Mip Runtime runtime proof</strong></div>
-          <p>Capture current-source evidence for the declared atlas gutter mip runtime gate.</p>
-          <code>runtimeProof.atlas-gutter-mip-runtime</code>
-        </li><li data-roadmap-item data-priority="P0" data-category="runtime">
-          <div><span>P0</span><strong>Dissolve Shadow Atlas Parity runtime proof</strong></div>
-          <p>Capture current-source evidence for the declared dissolve shadow atlas parity gate.</p>
-          <code>runtimeProof.dissolve-shadow-atlas-parity</code>
-        </li><li data-roadmap-item data-priority="P0" data-category="runtime">
-          <div><span>P0</span><strong>Supersampled Specular Error runtime proof</strong></div>
-          <p>Capture current-source evidence for the declared supersampled specular error gate.</p>
-          <code>runtimeProof.supersampled-specular-error</code>
-        </li><li data-roadmap-item data-priority="P0" data-category="runtime">
-          <div><span>P0</span><strong>Current Adapter Timing runtime proof</strong></div>
-          <p>Capture current-source evidence for the declared current adapter timing gate.</p>
-          <code>runtimeProof.current-adapter-timing</code>
-        </li><li data-roadmap-item data-priority="P1" data-category="evidence">
-          <div><span>P1</span><strong>Capture a current-source evidence bundle</strong></div>
-          <p>Publish source-hash-bound renderer/backend facts, required diagnostic images, aligned readbacks, resource inventory, timing method, and limitations; directly inspect the important artifacts before promotion.</p>
-          <code>evidenceBundle</code>
-        </li><li data-roadmap-item data-priority="P2" data-category="tiers">
-          <div><span>P2</span><strong>Close tier-specific acceptance</strong></div>
-          <p>Validate and promote ultra, high, mobile as independent visual and performance contracts without crossing their protected invariants.</p>
-          <code>tiers[].acceptanceStatus</code>
-        </li></ol>
+          <p>The declared published contract has accepted evidence and no open acceptance gates.</p>
+          <ol><li data-roadmap-item data-priority="done" data-category="accepted"><div><span>DONE</span><strong>No open acceptance gates</strong></div><p>The declared published contract is accepted.</p><code>status.accepted</code></li></ol>
         </div>
       </details>
       <p>Use the linked skill and source to inspect route ownership and evidence classification before treating this presentation as an accepted implementation.</p>

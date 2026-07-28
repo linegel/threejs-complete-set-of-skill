@@ -9,7 +9,7 @@
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-procedural-materials.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:ab7d8d17e0589a6f5c2462d645b9e0d6797cd92eade36e3615dae091c6f9df5b" />
+<meta name="skill-pack-build-revision" content="sha256:c151ad21626b93f809ec207d33636612320aa54cbc192958a440b1ebbffa2dc9" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -24,7 +24,7 @@
 <meta property="og:title" content="Procedural Materials | Three.js WebGPU Skill" />
 <meta property="og:description" content="Procedural materials for coherent NodeMaterial PBR systems in Three.js WebGPU/TSL. Use when a task needs shared identities across PBR channels, must select…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-procedural-materials.html" />
-<meta property="article:modified_time" content="2026-07-16T11:00:33+03:00" />
+<meta property="article:modified_time" content="2026-07-16T19:46:25+03:00" />
 <meta property="article:published_time" content="2026-07-04T23:30:20+03:00" />
 <meta property="article:section" content="Procedural Content" />
 
@@ -63,7 +63,7 @@
     "@id": "https://threejs-skills.com/skills/threejs-procedural-materials.html"
    },
    "datePublished": "2026-07-04T23:30:20+03:00",
-   "dateModified": "2026-07-16T11:00:33+03:00",
+   "dateModified": "2026-07-16T19:46:25+03:00",
    "author": {
     "@id": "https://threejs-skills.com/#publisher"
    },
@@ -295,8 +295,8 @@ a.chip:active{scale:.96}
       <span class="chip">1 flagship</span>
       <span class="chip">1 secondary surface</span>
       <span class="chip">accepted runtime evidence</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-16T11:00:33+03:00">2026-07-16</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/2ce13bcc22695dafa808d6019452752d9a39cc71">commit 2ce13bc ↗</a>
+      <span class="chip">Latest skill update <time datetime="2026-07-16T19:46:25+03:00">2026-07-16</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/62a9bc59330c44827824665323823883e88f100c">commit 62a9bc5 ↗</a>
       <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-materials/SKILL.md">SKILL.md on GitHub ↗</a>
       <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/skills/threejs-procedural-materials/SKILL.md">raw (for agents) ↗</a>
     </div>
@@ -328,12 +328,11 @@ a.chip:active{scale:.96}
     <p class="sub">This skill contributes to the following cross-skill owner graphs.</p>
     <div class="grid">
       <a class="card" href="../demos/procedural-district/">
-        <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="procedural-district">
-    <span class="primary-evidence-label">Canonical capture</span>
-    <strong>Runtime evidence pending</strong>
-    <span><code>3c2448b5b07d</code> source hash</span>
-    <span>10 fixed states · 4 runtime proof requirements</span>
-  </span>
+        <span class="card-preview-wrap" data-preview-for="procedural-district" data-preview-source="procedural-district" data-preview-classification="inspected-runtime-evidence-preview"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/procedural-district/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/procedural-district/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/procedural-district/final.design.png" alt="Procedural district integration presentation for Procedural District" class="card-preview" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><span class="media-caption">Procedural district integration presentation</span></span>
         <span class="card-head"><span class="card-kind">Authored procedural world</span><span class="status status--pending">Evidence pending</span></span>
         <h3>Procedural District</h3>
         <span class="card-meta">6 mechanisms · 3 locked tiers</span>
@@ -489,6 +488,14 @@ mips instead of normalizing the mean and discarding its length.</p>
 Custom specular AA adds only unresolved material-detail variance. Read
 <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-materials/references/procedural-pbr-system.md#derivative-normals-and-specular-aa">derivative normals and specular AA</a>
 before adding procedural bump, custom normal filtering, or roughness variance.</p>
+<p>When a scalar procedural height supplies both normal detail and specular AA,
+read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-materials/examples/filtered-height-normal.mjs">the filtered-height normal example</a>.
+Supply its dimensionless <code>footprintCyclesPerSample</code> from the full post-warp
+Jacobian spectral norm, physical support frequency in cycles per length unit,
+and positive band half-range around the supplied mean. <code>heightHalfAmplitude</code>
+uses the same length unit as the surface. It keeps attenuation, removed slope
+variance, double-sided surface-gradient normal handling, and <code>roughness^2</code>
+widening in one causal path.</p>
 <p>This step is complete when all retained bands pass the projected footprint,
 removed slope/normal variance is accounted for exactly once, and a no-post
 close/mid/far comparison rejects distance-dependent sharpening and grazing
@@ -554,7 +561,7 @@ reset path; and raw material output, shadows, post, and resource lifetimes agree
 
 <div class="wrap"><footer>
   <div class="footer-summary">Three.js WebGPU Skill Pack: TSL, procedural graphics, and visual validation.
-    <span>Three r185.1 · 40 primary targets · 25 accepted · build <code>ab7d8d17e058</code></span>
+    <span>Three r185.1 · 40 primary targets · 29 accepted · build <code>c151ad21626b</code></span>
     <span>Compiling shaders? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span>
   </div>
   <div class="footer-groups">

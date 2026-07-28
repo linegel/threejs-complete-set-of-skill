@@ -19,36 +19,129 @@
     }
   ],
   "skills": {
-    "threejs-choose-skills": {
-      "ownerId": "router-manifest-lab",
-      "source": "https://threejs-skills.com/previews/primary/router-manifest-lab.png",
-      "sourceSha256": "sha256:41f0f4ac9ae1c75b93faac8e8eb855582f9b4cb874bbfae3baad2e04faa41882",
+    "threejs-ambient-contact-shading": {
+      "ownerId": "integration-image-pipeline-ao",
+      "source": "https://threejs-skills.com/visual-validation/integration-image-pipeline-ao/final.design.png",
+      "sourceSha256": "sha256:e775a795c6c8f0a4b2eee552fdb5defc2370b54671e7308fe2af09c5a4a698f7",
+      "sourceWidth": 1200,
+      "sourceHeight": 800,
+      "images": {
+        "1x1": {
+          "url": "https://threejs-skills.com/seo/article/threejs-ambient-contact-shading-1x1.png",
+          "width": 1200,
+          "height": 1200,
+          "bytes": 45469,
+          "sha256": "sha256:692e76623bc6fc7287e642f07b72fb62f5be504cd917008d80d0a2f489e98898"
+        },
+        "4x3": {
+          "url": "https://threejs-skills.com/seo/article/threejs-ambient-contact-shading-4x3.png",
+          "width": 1200,
+          "height": 900,
+          "bytes": 36982,
+          "sha256": "sha256:a99433781bea3682d5d09c554dda05a214dd271065de0643d1f7206ec9447479"
+        },
+        "16x9": {
+          "url": "https://threejs-skills.com/seo/article/threejs-ambient-contact-shading-16x9.png",
+          "width": 1200,
+          "height": 675,
+          "bytes": 34108,
+          "sha256": "sha256:162554815ca6436536f3156ceb948f8a857eb0e27863f87ade98262781902052"
+        }
+      },
+      "dependencyClosureHash": "sha256:7b7ff7453b874198ca281511fe781ba57a0a3ffc2f6733c65257b2ef050c6551"
+    },
+    "threejs-bloom": {
+      "ownerId": "node-selective-bloom",
+      "source": "https://threejs-skills.com/visual-validation/node-selective-bloom/final.design.png",
+      "sourceSha256": "sha256:1c63e176b1088eae54a0d2ad612171362ce1f5bf6d269254fd26024644dac566",
+      "sourceWidth": 1200,
+      "sourceHeight": 800,
+      "images": {
+        "1x1": {
+          "url": "https://threejs-skills.com/seo/article/threejs-bloom-1x1.png",
+          "width": 1200,
+          "height": 1200,
+          "bytes": 519154,
+          "sha256": "sha256:e30ea1ef9c2add48651b938190b55e6496d288cf3221b417c7df043e5a6b98f8"
+        },
+        "4x3": {
+          "url": "https://threejs-skills.com/seo/article/threejs-bloom-4x3.png",
+          "width": 1200,
+          "height": 900,
+          "bytes": 365191,
+          "sha256": "sha256:c53c66c4dd4048e57de5163e2be5d9d58430bd2e6f2da29f57d8faca0344a818"
+        },
+        "16x9": {
+          "url": "https://threejs-skills.com/seo/article/threejs-bloom-16x9.png",
+          "width": 1200,
+          "height": 675,
+          "bytes": 261472,
+          "sha256": "sha256:6ee72e5f7ffbfeb50da65ec9be2c682a772acabad9022611674721e27700549f"
+        }
+      },
+      "dependencyClosureHash": "sha256:227ee6b2c2976d937f41a6186d1d8a509364c732ed170bd55ec63550101e0fc4"
+    },
+    "threejs-camera-controls-and-rigs": {
+      "ownerId": "webgpu-camera-rig",
+      "source": "https://threejs-skills.com/visual-validation/webgpu-camera-rig/final.design.png",
+      "sourceSha256": "sha256:3274c243d181c75401328dfc062e052d77b9ee5172d5c2fe87e3de0ad25a80c5",
+      "sourceWidth": 1200,
+      "sourceHeight": 800,
+      "images": {
+        "1x1": {
+          "url": "https://threejs-skills.com/seo/article/threejs-camera-controls-and-rigs-1x1.png",
+          "width": 1200,
+          "height": 1200,
+          "bytes": 11612,
+          "sha256": "sha256:5ff946f58df39c7c2355c8aa2d58b2e34d844610bfda518e954099851bc9b6a2"
+        },
+        "4x3": {
+          "url": "https://threejs-skills.com/seo/article/threejs-camera-controls-and-rigs-4x3.png",
+          "width": 1200,
+          "height": 900,
+          "bytes": 29439,
+          "sha256": "sha256:e16bea02da636407af672c74daf92c7bcc0d41301568b5ae9d0ef0b321c3593f"
+        },
+        "16x9": {
+          "url": "https://threejs-skills.com/seo/article/threejs-camera-controls-and-rigs-16x9.png",
+          "width": 1200,
+          "height": 675,
+          "bytes": 8895,
+          "sha256": "sha256:19c5090b878a3cf8d28b60963a8cfc353cfa48516a6d82af34f0da090f2a9f67"
+        }
+      },
+      "dependencyClosureHash": "sha256:68ca0be8dad3b8e79f496bc77e39cb27c6769da5b0670f780c6211cb3425f26d"
+    },
+    "threejs-compatibility-fallbacks": {
+      "ownerId": "browser-fallback-harness",
+      "source": "https://threejs-skills.com/previews/primary/browser-fallback-harness.png",
+      "sourceSha256": "sha256:99dc2f89814faed8862eeba48ac6f7d0119e21dc99182598371f9d7e17888570",
       "sourceWidth": 1200,
       "sourceHeight": 760,
       "images": {
         "1x1": {
-          "url": "https://threejs-skills.com/seo/article/threejs-choose-skills-1x1.png",
+          "url": "https://threejs-skills.com/seo/article/threejs-compatibility-fallbacks-1x1.png",
           "width": 1200,
           "height": 1200,
-          "bytes": 219109,
-          "sha256": "sha256:95acf997af309c307b82f7ce7f473e8b618a93ebb3a14189b6dccc6c9be4754c"
+          "bytes": 222334,
+          "sha256": "sha256:b18d352b296009a9073e69f56f4d6c623ca673e8e1272935d430da83b84f5f09"
         },
         "4x3": {
-          "url": "https://threejs-skills.com/seo/article/threejs-choose-skills-4x3.png",
+          "url": "https://threejs-skills.com/seo/article/threejs-compatibility-fallbacks-4x3.png",
           "width": 1200,
           "height": 900,
-          "bytes": 154411,
-          "sha256": "sha256:692f0e6825b58a9344eab45f023d3b29d94082bc82cb70e80465e3a194c76910"
+          "bytes": 173398,
+          "sha256": "sha256:07d7a47384e117237e23d90aa69f09bd7e8902fcce559e0107045c28b30e8447"
         },
         "16x9": {
-          "url": "https://threejs-skills.com/seo/article/threejs-choose-skills-16x9.png",
+          "url": "https://threejs-skills.com/seo/article/threejs-compatibility-fallbacks-16x9.png",
           "width": 1200,
           "height": 675,
-          "bytes": 61320,
-          "sha256": "sha256:95bbcef0e898fb9de1b751cf1a600b46f2ecfd6b659334be24c861a09ea10619"
+          "bytes": 76362,
+          "sha256": "sha256:7fe55c5a97ff9c7e277d2c71930df0d8776974179b79b55bd65418f39cdffdfd"
         }
       },
-      "dependencyClosureHash": "sha256:f00dfc971e3a146a76b293f9dd16a08d31289d5d51a6a93b0c1e279c69165f73"
+      "dependencyClosureHash": "sha256:38b8ff450a7ffc050c51213de2d0aa2661e8c6136d19e6f8a30c324ee7b4192b"
     },
     "threejs-debugging": {
       "ownerId": "debugging-contract-lab",
@@ -81,41 +174,10 @@
       },
       "dependencyClosureHash": "sha256:216b01d30a9b68a92816dc50dbb095cfc52125addbed6e8bf8b9d43ebea1f7aa"
     },
-    "threejs-exposure-color-grading": {
-      "ownerId": "webgpu-exposure-color-pipeline",
-      "source": "https://threejs-skills.com/visual-validation/webgpu-exposure-color-pipeline/final.design.png",
-      "sourceSha256": "sha256:fe08f16a1076862bc019175eb990eef3ba275871605efc10d70cdb73c3802f42",
-      "sourceWidth": 1200,
-      "sourceHeight": 800,
-      "images": {
-        "1x1": {
-          "url": "https://threejs-skills.com/seo/article/threejs-exposure-color-grading-1x1.png",
-          "width": 1200,
-          "height": 1200,
-          "bytes": 12317,
-          "sha256": "sha256:5d8b6a6e10c1fba6ec84b97a791c38d744392b2d9ea71898002e3eb9eeef2fba"
-        },
-        "4x3": {
-          "url": "https://threejs-skills.com/seo/article/threejs-exposure-color-grading-4x3.png",
-          "width": 1200,
-          "height": 900,
-          "bytes": 10323,
-          "sha256": "sha256:2d3eb37af607bd385c407d86f4d052329f84ee416d2ef995cd945942196bc10d"
-        },
-        "16x9": {
-          "url": "https://threejs-skills.com/seo/article/threejs-exposure-color-grading-16x9.png",
-          "width": 1200,
-          "height": 675,
-          "bytes": 4069,
-          "sha256": "sha256:de20141683a0e2aa061df52e1ee36a8540780952e0597ebb06cea8f3d87d066b"
-        }
-      },
-      "dependencyClosureHash": "sha256:ca5d9baeade553514e2339782020d737dc8ae25031835c1162dd872c3e8d4c78"
-    },
     "threejs-image-pipeline": {
-      "ownerId": "webgpu-image-pipeline",
-      "source": "https://threejs-skills.com/visual-validation/webgpu-image-pipeline/final.design.png",
-      "sourceSha256": "sha256:494ca78d45b7d6f038f633da172c5365f67a43a802e01c3c56b4321778e6f732",
+      "ownerId": "creature-habitat",
+      "source": "https://threejs-skills.com/visual-validation/creature-habitat/final.design.png",
+      "sourceSha256": "sha256:8b3cd0ec172175917d28f26795f2e71909af8acbf81bf54c2032b4eb93f3044d",
       "sourceWidth": 1200,
       "sourceHeight": 800,
       "images": {
@@ -123,25 +185,366 @@
           "url": "https://threejs-skills.com/seo/article/threejs-image-pipeline-1x1.png",
           "width": 1200,
           "height": 1200,
-          "bytes": 137110,
-          "sha256": "sha256:f189c54caf08d96e37191952e78945409b1e4e8830e43da4c99334ca068b8c89"
+          "bytes": 557098,
+          "sha256": "sha256:3a8355e520e295c5b79a35c00ba61bf874b46ac9d870583ffa612beda23fbd4b"
         },
         "4x3": {
           "url": "https://threejs-skills.com/seo/article/threejs-image-pipeline-4x3.png",
           "width": 1200,
           "height": 900,
-          "bytes": 104030,
-          "sha256": "sha256:34e1fd061c1edf4d7271b9f8ef5050c303fa109c23347978a47c496764c47e20"
+          "bytes": 533854,
+          "sha256": "sha256:ea5dc21d11e9ec26fdae4f141ecb127f234456990de11613b1bda1d9d9fec403"
         },
         "16x9": {
           "url": "https://threejs-skills.com/seo/article/threejs-image-pipeline-16x9.png",
           "width": 1200,
           "height": 675,
-          "bytes": 69824,
-          "sha256": "sha256:9433efb9f2eeb61a0f7474aede8a3cf415400fccdd20715a3a3a68417df8da25"
+          "bytes": 241006,
+          "sha256": "sha256:37fffd283e79b1a031dcdaacbcc874ae72117bfb239a20dc2c0483413ae88538"
         }
       },
-      "dependencyClosureHash": "sha256:c8623648691ddd9228a4504a76fd53221c602f7639efbab6ca6361355f5bc9c2"
+      "dependencyClosureHash": "sha256:6a8819c7eaec3607d421bc4295d7d378df4f9645427f78851097f0eadb80214c"
+    },
+    "threejs-particles-trails-and-effects": {
+      "ownerId": "webgpu-pooled-effects",
+      "source": "https://threejs-skills.com/visual-validation/webgpu-pooled-effects/final.design.png",
+      "sourceSha256": "sha256:7421b703583d7e678e745397292185573c5ac0969056e9ce76aef9333ebab190",
+      "sourceWidth": 1200,
+      "sourceHeight": 800,
+      "images": {
+        "1x1": {
+          "url": "https://threejs-skills.com/seo/article/threejs-particles-trails-and-effects-1x1.png",
+          "width": 1200,
+          "height": 1200,
+          "bytes": 326945,
+          "sha256": "sha256:53fb224fb40a63178f7e2cf9a1009d493ccbe642e8bcc2a79a4e7f6cc0fcae1a"
+        },
+        "4x3": {
+          "url": "https://threejs-skills.com/seo/article/threejs-particles-trails-and-effects-4x3.png",
+          "width": 1200,
+          "height": 900,
+          "bytes": 221753,
+          "sha256": "sha256:cd79736bbd162f9c49777fbf22d9400a9dd8d6dfc0637fdafdaba1d1bdc7036f"
+        },
+        "16x9": {
+          "url": "https://threejs-skills.com/seo/article/threejs-particles-trails-and-effects-16x9.png",
+          "width": 1200,
+          "height": 675,
+          "bytes": 177180,
+          "sha256": "sha256:9a9f83fb68d9ef426d77726e34bd6cd56aba49e96b0224767abdc09219c64be0"
+        }
+      },
+      "dependencyClosureHash": "sha256:e410c20c773176f4929954b791b3d2af88ecf4964557cf756059b1c693990156"
+    },
+    "threejs-procedural-buildings-and-cities": {
+      "ownerId": "webgpu-material-slot-compiler",
+      "source": "https://threejs-skills.com/visual-validation/webgpu-material-slot-compiler/final.design.png",
+      "sourceSha256": "sha256:2fe4485816dbfc87e8eba17f116dcd094539d66bced9c53f8f1236f195f4292d",
+      "sourceWidth": 1200,
+      "sourceHeight": 800,
+      "images": {
+        "1x1": {
+          "url": "https://threejs-skills.com/seo/article/threejs-procedural-buildings-and-cities-1x1.png",
+          "width": 1200,
+          "height": 1200,
+          "bytes": 149204,
+          "sha256": "sha256:09a2f48fecd8707eba11e98df352f9f56a5cebea4f05c6a5e81896b5ab9c6d4e"
+        },
+        "4x3": {
+          "url": "https://threejs-skills.com/seo/article/threejs-procedural-buildings-and-cities-4x3.png",
+          "width": 1200,
+          "height": 900,
+          "bytes": 113736,
+          "sha256": "sha256:8d362868afa75f671cab3fd1e346fa59c3a8305aa762e7f5563586264896eb08"
+        },
+        "16x9": {
+          "url": "https://threejs-skills.com/seo/article/threejs-procedural-buildings-and-cities-16x9.png",
+          "width": 1200,
+          "height": 675,
+          "bytes": 71290,
+          "sha256": "sha256:66be00a80635c03bb956a37ee61c2f06fafbb2f5d4b5a85c12372817c2fa252e"
+        }
+      },
+      "dependencyClosureHash": "sha256:92bbcae569282965c94bccd5c19551c1047dd382980ab6225fe29d3e974ff5bd"
+    },
+    "threejs-procedural-fields": {
+      "ownerId": "webgpu-field-bake",
+      "source": "https://threejs-skills.com/visual-validation/webgpu-field-bake/final.design.png",
+      "sourceSha256": "sha256:926505d9adda6663257f4c9de598d986fad3ef1df132c1d5ae72637328495310",
+      "sourceWidth": 1200,
+      "sourceHeight": 800,
+      "images": {
+        "1x1": {
+          "url": "https://threejs-skills.com/seo/article/threejs-procedural-fields-1x1.png",
+          "width": 1200,
+          "height": 1200,
+          "bytes": 772022,
+          "sha256": "sha256:dd887934a5382d3407c7e95d844b4563686e6642ed4e03b9f30273d251757228"
+        },
+        "4x3": {
+          "url": "https://threejs-skills.com/seo/article/threejs-procedural-fields-4x3.png",
+          "width": 1200,
+          "height": 900,
+          "bytes": 616609,
+          "sha256": "sha256:1b0541a1b13b258b0464f45d54463ff3ed72f7beec29d53529641e305f4c5a51"
+        },
+        "16x9": {
+          "url": "https://threejs-skills.com/seo/article/threejs-procedural-fields-16x9.png",
+          "width": 1200,
+          "height": 675,
+          "bytes": 477153,
+          "sha256": "sha256:20943def0948bf62f65a974974321a3b1c7e9a9e71687e3ee732b0c340ad22d2"
+        }
+      },
+      "dependencyClosureHash": "sha256:6f99f787f8e1240635882d65d64662200b9cf0ef5bc4167cbbd772273f430dd8"
+    },
+    "threejs-procedural-planets": {
+      "ownerId": "webgpu-quadtree-planet",
+      "source": "https://threejs-skills.com/visual-validation/webgpu-quadtree-planet/final.design.png",
+      "sourceSha256": "sha256:bc54d722365be433fe42139ed88cd8cf22746eb21092a39695affd7ccde693a1",
+      "sourceWidth": 1200,
+      "sourceHeight": 800,
+      "images": {
+        "1x1": {
+          "url": "https://threejs-skills.com/seo/article/threejs-procedural-planets-1x1.png",
+          "width": 1200,
+          "height": 1200,
+          "bytes": 303459,
+          "sha256": "sha256:5233f5601cb85937d2db5e875290a7edb8f87e0431cd51c847e1aff3665d1d1a"
+        },
+        "4x3": {
+          "url": "https://threejs-skills.com/seo/article/threejs-procedural-planets-4x3.png",
+          "width": 1200,
+          "height": 900,
+          "bytes": 262492,
+          "sha256": "sha256:8cb987a1e7c8af964567cd0f38be16cf146b87395d2f8f84d11470a2d97394d2"
+        },
+        "16x9": {
+          "url": "https://threejs-skills.com/seo/article/threejs-procedural-planets-16x9.png",
+          "width": 1200,
+          "height": 675,
+          "bytes": 153036,
+          "sha256": "sha256:10fe99afd7a6af83dbfb368a1594090d926a7a69351104a16a4f5d176cd46a8d"
+        }
+      },
+      "dependencyClosureHash": "sha256:bf2eabd8c35a5ebe81ad204672d14d356a7a729b9747db954a30cf7d607d231c"
+    },
+    "threejs-procedural-vegetation": {
+      "ownerId": "webgpu-dense-grass",
+      "source": "https://threejs-skills.com/visual-validation/webgpu-dense-grass/final.design.png",
+      "sourceSha256": "sha256:49b02d5351a9a14d594ee5b85a13a5adb646142dae8af2242da0d3faa96d61ef",
+      "sourceWidth": 1200,
+      "sourceHeight": 800,
+      "images": {
+        "1x1": {
+          "url": "https://threejs-skills.com/seo/article/threejs-procedural-vegetation-1x1.png",
+          "width": 1200,
+          "height": 1200,
+          "bytes": 164978,
+          "sha256": "sha256:7ca4c1c3ebd852eee0f14fd28946d0cea88735d148a7dfb7d3da8a86428f148f"
+        },
+        "4x3": {
+          "url": "https://threejs-skills.com/seo/article/threejs-procedural-vegetation-4x3.png",
+          "width": 1200,
+          "height": 900,
+          "bytes": 171554,
+          "sha256": "sha256:60d279db26e93c7aee57860e620cc3433e6e24ca2a20ba07853c28ae5270854f"
+        },
+        "16x9": {
+          "url": "https://threejs-skills.com/seo/article/threejs-procedural-vegetation-16x9.png",
+          "width": 1200,
+          "height": 675,
+          "bytes": 127901,
+          "sha256": "sha256:dd5bd2d9cbc6393f06d362aadfd15a7227793e16df28d9080e1719a5b1ab878e"
+        }
+      },
+      "dependencyClosureHash": "sha256:16856f8fbb63807830194abc0d397dfb3b402da28c089b8f6ca2a025ce085ece"
+    },
+    "threejs-rain-snow-and-wet-surfaces": {
+      "ownerId": "webgpu-rain-snow-and-wet-surfaces",
+      "source": "https://threejs-skills.com/visual-validation/webgpu-rain-snow-and-wet-surfaces/final.design.png",
+      "sourceSha256": "sha256:0acf38d817ccfea4b83645f05c7db4cda300cbfcb58708132c115c3a5889c1d8",
+      "sourceWidth": 1200,
+      "sourceHeight": 800,
+      "images": {
+        "1x1": {
+          "url": "https://threejs-skills.com/seo/article/threejs-rain-snow-and-wet-surfaces-1x1.png",
+          "width": 1200,
+          "height": 1200,
+          "bytes": 195318,
+          "sha256": "sha256:4367eb37d8c34a99a4100367bbe487c50ac292e41f18f037cdfd927e269ac696"
+        },
+        "4x3": {
+          "url": "https://threejs-skills.com/seo/article/threejs-rain-snow-and-wet-surfaces-4x3.png",
+          "width": 1200,
+          "height": 900,
+          "bytes": 231787,
+          "sha256": "sha256:2ed6780d0dd21eac79d4c1d214872f052ed6054fe5646be9cdce5b3ab52bf7f8"
+        },
+        "16x9": {
+          "url": "https://threejs-skills.com/seo/article/threejs-rain-snow-and-wet-surfaces-16x9.png",
+          "width": 1200,
+          "height": 675,
+          "bytes": 47462,
+          "sha256": "sha256:5e1a67e1ef8dbb1fc59efe540a90241d1adb2cac0470f91b89f3f4d8c0c852d5"
+        }
+      },
+      "dependencyClosureHash": "sha256:db17829f0f897b93e328dce2801bd9d597e34e74a63153219cd14ed9fe14a57d"
+    },
+    "threejs-scalable-real-time-shadows": {
+      "ownerId": "webgpu-cached-clipmap-shadow",
+      "source": "https://threejs-skills.com/visual-validation/webgpu-cached-clipmap-shadow/final.design.png",
+      "sourceSha256": "sha256:53c2de2322e1015539b66714ee8251b122ce24f031d22a32c660050e7de5d791",
+      "sourceWidth": 1200,
+      "sourceHeight": 800,
+      "images": {
+        "1x1": {
+          "url": "https://threejs-skills.com/seo/article/threejs-scalable-real-time-shadows-1x1.png",
+          "width": 1200,
+          "height": 1200,
+          "bytes": 59861,
+          "sha256": "sha256:ca2a3aa22df2d81c190b7711397848e676b914e628f88a64a7bb8c0458e0e7b9"
+        },
+        "4x3": {
+          "url": "https://threejs-skills.com/seo/article/threejs-scalable-real-time-shadows-4x3.png",
+          "width": 1200,
+          "height": 900,
+          "bytes": 73497,
+          "sha256": "sha256:471baf4771782970d517132dafabbcdf14e75bd1e9e0d7e4824b24aade55a2d0"
+        },
+        "16x9": {
+          "url": "https://threejs-skills.com/seo/article/threejs-scalable-real-time-shadows-16x9.png",
+          "width": 1200,
+          "height": 675,
+          "bytes": 44462,
+          "sha256": "sha256:847f0326537c96d594bf115d437828066de6eb33e29b42b9f0bd8179135c381f"
+        }
+      },
+      "dependencyClosureHash": "sha256:e5336b353c2fa1854bdeb7265e3156b2a2106c74561cf56744f3a78afe5f7647"
+    },
+    "threejs-sky-atmosphere-and-haze": {
+      "ownerId": "webgpu-lut-atmosphere",
+      "source": "https://threejs-skills.com/visual-validation/webgpu-lut-atmosphere/final.design.png",
+      "sourceSha256": "sha256:83c227dc44efa0295c326a35626a160232be328b3d0cda9dd485442492def034",
+      "sourceWidth": 1200,
+      "sourceHeight": 800,
+      "images": {
+        "1x1": {
+          "url": "https://threejs-skills.com/seo/article/threejs-sky-atmosphere-and-haze-1x1.png",
+          "width": 1200,
+          "height": 1200,
+          "bytes": 347870,
+          "sha256": "sha256:3c2f1e450668fbfdf9c8127c0b8a2951813291dea70f5dd1609360ed8400c499"
+        },
+        "4x3": {
+          "url": "https://threejs-skills.com/seo/article/threejs-sky-atmosphere-and-haze-4x3.png",
+          "width": 1200,
+          "height": 900,
+          "bytes": 221814,
+          "sha256": "sha256:9a40b313564e1d1e8b7a15f8977254d718046697dc2da67f73f28af0bb8e7075"
+        },
+        "16x9": {
+          "url": "https://threejs-skills.com/seo/article/threejs-sky-atmosphere-and-haze-16x9.png",
+          "width": 1200,
+          "height": 675,
+          "bytes": 167275,
+          "sha256": "sha256:980a0b494db91a44bec3def540285753075172b5816cc01a5a6e22d80b7c7f57"
+        }
+      },
+      "dependencyClosureHash": "sha256:fec8dd7b245254a885361c809bd90e6d8651b252d86e9a4b5652ca1b368211f1"
+    },
+    "threejs-spectral-ocean": {
+      "ownerId": "webgpu-fft-ocean",
+      "source": "https://threejs-skills.com/visual-validation/webgpu-fft-ocean/final.design.png",
+      "sourceSha256": "sha256:61b5f55069e727447b93646505bc166980167a7610b2e91f62b370e3298900d1",
+      "sourceWidth": 1200,
+      "sourceHeight": 800,
+      "images": {
+        "1x1": {
+          "url": "https://threejs-skills.com/seo/article/threejs-spectral-ocean-1x1.png",
+          "width": 1200,
+          "height": 1200,
+          "bytes": 178089,
+          "sha256": "sha256:3d442d9a63ff8af7c52e7c2717e7dc40792bbac0b6572bdf8e0664dbc517dfcd"
+        },
+        "4x3": {
+          "url": "https://threejs-skills.com/seo/article/threejs-spectral-ocean-4x3.png",
+          "width": 1200,
+          "height": 900,
+          "bytes": 146862,
+          "sha256": "sha256:4f3ec3c90a60a737d105a085c6a175c098b3e6399f09147a3487c2c4fd61be96"
+        },
+        "16x9": {
+          "url": "https://threejs-skills.com/seo/article/threejs-spectral-ocean-16x9.png",
+          "width": 1200,
+          "height": 675,
+          "bytes": 137063,
+          "sha256": "sha256:0b38eb80a7279beff315886454287491b3c48743968c63777bf6de35c9f32157"
+        }
+      },
+      "dependencyClosureHash": "sha256:baec565de8a611961b280e9dc6a9cfaa9f296eef00adbccb08f82dfce48d558a"
+    },
+    "threejs-visual-validation": {
+      "ownerId": "webgpu-validation-harness",
+      "source": "https://threejs-skills.com/visual-validation/webgpu-validation-harness/final.design.png",
+      "sourceSha256": "sha256:4a02ce8c369fd0a8fc9416f392d0a1decbce7f377f238b07ae0db85b0a07c794",
+      "sourceWidth": 1200,
+      "sourceHeight": 800,
+      "images": {
+        "1x1": {
+          "url": "https://threejs-skills.com/seo/article/threejs-visual-validation-1x1.png",
+          "width": 1200,
+          "height": 1200,
+          "bytes": 65487,
+          "sha256": "sha256:24ab3c86c167d184eba1f478b8659c1b3e99e645ffee7c6e477e6ca221eb584c"
+        },
+        "4x3": {
+          "url": "https://threejs-skills.com/seo/article/threejs-visual-validation-4x3.png",
+          "width": 1200,
+          "height": 900,
+          "bytes": 42525,
+          "sha256": "sha256:c440f1fb4cc07fc26e453a52bc52145fd8a109a5a4f6bf88113deca3ad1521cf"
+        },
+        "16x9": {
+          "url": "https://threejs-skills.com/seo/article/threejs-visual-validation-16x9.png",
+          "width": 1200,
+          "height": 675,
+          "bytes": 26814,
+          "sha256": "sha256:d32e6f3ac336156626e1bd745c879c40f5f0bf2412d0afc959e2c621fa97ada8"
+        }
+      },
+      "dependencyClosureHash": "sha256:eb182b54dff2ad392911a8a2a437e4af1fc63b64dee5918915bf435458354898"
+    },
+    "threejs-volumetric-clouds": {
+      "ownerId": "webgpu-weather-volume-clouds",
+      "source": "https://threejs-skills.com/visual-validation/webgpu-weather-volume-clouds/final.design.png",
+      "sourceSha256": "sha256:78978c32c107a234119b5c29245c9c55820c170823717c4cb5eb47065ec38a81",
+      "sourceWidth": 1200,
+      "sourceHeight": 800,
+      "images": {
+        "1x1": {
+          "url": "https://threejs-skills.com/seo/article/threejs-volumetric-clouds-1x1.png",
+          "width": 1200,
+          "height": 1200,
+          "bytes": 101284,
+          "sha256": "sha256:9ba1c1571129f50a925540412482f50be7bbd6f4d2f1c462ff27af787aa59784"
+        },
+        "4x3": {
+          "url": "https://threejs-skills.com/seo/article/threejs-volumetric-clouds-4x3.png",
+          "width": 1200,
+          "height": 900,
+          "bytes": 86574,
+          "sha256": "sha256:b1d0d9a43c42b583c38d8e01aef9898d0b5a617e638de0b36c2f81b71da3f357"
+        },
+        "16x9": {
+          "url": "https://threejs-skills.com/seo/article/threejs-volumetric-clouds-16x9.png",
+          "width": 1200,
+          "height": 675,
+          "bytes": 66680,
+          "sha256": "sha256:62a3568d2c9b934157e563e4a205f73875da25f3374bd9d210f8f5c5714f9baa"
+        }
+      },
+      "dependencyClosureHash": "sha256:41d3fa4cec676f61a13b8197f5c71c18281d2e60540f158c16176644c5b8c34a"
     }
   }
 }

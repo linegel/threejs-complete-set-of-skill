@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "labId": "webgpu-procedural-timelines",
   "kind": "canonical-lab",
-  "status": "incomplete",
+  "status": "accepted",
   "canonicalSource": [
     "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/timeline.js",
     "threejs-procedural-motion-systems/examples/webgpu-procedural-timelines/quaternion-helpers.js",
@@ -44,10 +44,8 @@
     "docs/demos/assets/three.tsl--5AYqKVA.js",
     "docs/demos/assets/three.webgpu-Dss1ekdK.js"
   ],
-  "publishedBundleHash": "sha256:75debb9aee031b9381f49214cf212267b80a3d5888d886f6a059b0f1eea0f1b7",
+  "publishedBundleHash": "sha256:3bbbce556dd8da2b94ea781ffa4724f1c6c75e49e976d679f6112d58d5a3be86",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:16a8b5868643f52a1e053ac5f8f1efbbf4c97028701cf3578e1acef775c65a89",
-  "evidenceBundleId": "correctness",
-  "skill": "threejs-procedural-motion-systems",
-  "publishPath": "/demos/webgpu-procedural-timelines/"
+  "buildRevision": "sha256:c151ad21626b93f809ec207d33636612320aa54cbc192958a440b1ebbffa2dc9",
+  "evidenceBundleId": "bundle"
 }

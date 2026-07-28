@@ -9,7 +9,7 @@
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-image-pipeline.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:ab7d8d17e0589a6f5c2462d645b9e0d6797cd92eade36e3615dae091c6f9df5b" />
+<meta name="skill-pack-build-revision" content="sha256:c151ad21626b93f809ec207d33636612320aa54cbc192958a440b1ebbffa2dc9" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -24,7 +24,7 @@
 <meta property="og:title" content="Image Pipeline | Three.js WebGPU Skill" />
 <meta property="og:description" content="Coordinate Three.js WebGPU/TSL final-image graphs. Use when effects share scene-pass signals or output ownership, when choosing MRT versus reconstruction or…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-image-pipeline.html" />
-<meta property="article:modified_time" content="2026-07-16T12:45:44+03:00" />
+<meta property="article:modified_time" content="2026-07-16T19:46:25+03:00" />
 <meta property="article:published_time" content="2026-07-04T23:30:20+03:00" />
 <meta property="article:section" content="Cameras, Lighting, and Final Image" />
 <meta property="og:image" content="https://threejs-skills.com/visual-validation/creature-habitat/final.design.png" />
@@ -74,7 +74,7 @@
     "https://threejs-skills.com/seo/article/threejs-image-pipeline-16x9.png"
    ],
    "datePublished": "2026-07-04T23:30:20+03:00",
-   "dateModified": "2026-07-16T12:45:44+03:00",
+   "dateModified": "2026-07-16T19:46:25+03:00",
    "author": {
     "@id": "https://threejs-skills.com/#publisher"
    },
@@ -312,8 +312,8 @@ a.chip:active{scale:.96}
       <span class="chip">5 flagships</span>
       <span class="chip">1 secondary surface</span>
       <span class="chip">accepted runtime evidence</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-16T12:45:44+03:00">2026-07-16</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/8749183dffd84731506239dd86590c92bf958969">commit 8749183 ↗</a>
+      <span class="chip">Latest skill update <time datetime="2026-07-16T19:46:25+03:00">2026-07-16</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/62a9bc59330c44827824665323823883e88f100c">commit 62a9bc5 ↗</a>
       <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-image-pipeline/SKILL.md">SKILL.md on GitHub ↗</a>
       <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/skills/threejs-image-pipeline/SKILL.md">raw (for agents) ↗</a>
     </div>
@@ -326,24 +326,23 @@ a.chip:active{scale:.96}
     <p class="sub">These rendering routes are generated from canonical source. Native-WebGPU acceptance remains separate from entrypoint availability.</p>
     <div class="grid">
       <a class="card" href="../demos/webgpu-image-pipeline/">
-        <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="webgpu-image-pipeline">
+        <span class="primary-evidence-panel " data-evidence-state="accepted" data-preview-for="webgpu-image-pipeline">
     <span class="primary-evidence-label">Canonical capture</span>
-    <strong>Runtime evidence pending</strong>
+    <strong>Accepted evidence published</strong>
     <span><code>367f880e1d52</code> source hash</span>
     <span>10 fixed states · 8 runtime proof requirements</span>
   </span>
-        <span class="card-head"><span class="card-kind">Canonical lab</span><span class="status status--pending">Evidence pending</span></span>
+        <span class="card-head"><span class="card-kind">Canonical lab</span><span class="status status--accepted">Accepted</span></span>
         <h3>WebGPU Image Pipeline</h3>
         <p>1 fixed scenarios, 6 mechanism routes, and 3 locked tiers.</p>
         <span class="card-meta">Open published implementation →</span>
       </a>
       <a class="card" href="../demos/webgpu-temporal-history/">
-        <span class="primary-evidence-panel " data-evidence-state="accepted" data-preview-for="webgpu-temporal-history">
-    <span class="primary-evidence-label">Canonical capture</span>
-    <strong>Accepted evidence published</strong>
-    <span><code>2f41080c1ecb</code> source hash</span>
-    <span>3 fixed states · 4 runtime proof requirements</span>
-  </span>
+        <span class="card-preview-wrap" data-preview-for="webgpu-temporal-history" data-preview-source="webgpu-temporal-history" data-preview-classification="inspected-runtime-evidence-preview"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-temporal-history/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-temporal-history/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-temporal-history/final.design.png" alt="Temporal history hardware WebGPU readback for WebGPU Temporal History" class="card-preview" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><span class="media-caption">Temporal history hardware WebGPU readback</span></span>
         <span class="card-head"><span class="card-kind">Mechanism bench</span><span class="status status--accepted">Accepted</span></span>
         <h3>WebGPU Temporal History</h3>
         <p>1 fixed scenarios, 1 mechanism routes, and 1 locked tiers.</p>
@@ -372,12 +371,11 @@ a.chip:active{scale:.96}
         <span class="card-meta">Open published implementation →</span>
       </a>
       <a class="card" href="../demos/procedural-district/">
-        <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="procedural-district">
-    <span class="primary-evidence-label">Canonical capture</span>
-    <strong>Runtime evidence pending</strong>
-    <span><code>3c2448b5b07d</code> source hash</span>
-    <span>10 fixed states · 4 runtime proof requirements</span>
-  </span>
+        <span class="card-preview-wrap" data-preview-for="procedural-district" data-preview-source="procedural-district" data-preview-classification="inspected-runtime-evidence-preview"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/procedural-district/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/procedural-district/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/procedural-district/final.design.png" alt="Procedural district integration presentation for Procedural District" class="card-preview" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><span class="media-caption">Procedural district integration presentation</span></span>
         <span class="card-head"><span class="card-kind">Integration</span><span class="status status--pending">Evidence pending</span></span>
         <h3>Procedural District</h3>
         <p>1 fixed scenarios, 6 mechanism routes, and 3 locked tiers.</p>
@@ -399,7 +397,7 @@ a.chip:active{scale:.96}
         <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="weathered-world">
     <span class="primary-evidence-label">Canonical capture</span>
     <strong>Runtime evidence pending</strong>
-    <span><code>76b06d2596d9</code> source hash</span>
+    <span><code>b03441c869cf</code> source hash</span>
     <span>10 fixed states · 5 runtime proof requirements</span>
   </span>
         <span class="card-head"><span class="card-kind">Integration</span><span class="status status--pending">Evidence pending</span></span>
@@ -414,7 +412,7 @@ a.chip:active{scale:.96}
   <section class="section" id="evidence-reports" aria-labelledby="evidence-reports-title"><div class="wrap">
     <h2 id="evidence-reports-title">Evidence reports</h2>
     <p class="sub">Source hashes, claim verdicts, promoted same-lab media, fixed routes, exact tier contracts, and current limitations.</p>
-    <nav class="evidence-report-links" aria-label="Evidence reports for Image Pipeline"><a href="../evidence/webgpu-image-pipeline/"><code>webgpu-image-pipeline</code><span>evidence pending</span></a><a href="../evidence/webgpu-temporal-history/"><code>webgpu-temporal-history</code><span>accepted</span></a><a href="../evidence/creature-habitat/"><code>creature-habitat</code><span>accepted</span></a><a href="../evidence/final-image-flight/"><code>final-image-flight</code><span>accepted</span></a><a href="../evidence/procedural-district/"><code>procedural-district</code><span>evidence pending</span></a><a href="../evidence/relativistic-space-shot/"><code>relativistic-space-shot</code><span>evidence pending</span></a><a href="../evidence/weathered-world/"><code>weathered-world</code><span>evidence pending</span></a></nav>
+    <nav class="evidence-report-links" aria-label="Evidence reports for Image Pipeline"><a href="../evidence/webgpu-image-pipeline/"><code>webgpu-image-pipeline</code><span>accepted</span></a><a href="../evidence/webgpu-temporal-history/"><code>webgpu-temporal-history</code><span>accepted</span></a><a href="../evidence/creature-habitat/"><code>creature-habitat</code><span>accepted</span></a><a href="../evidence/final-image-flight/"><code>final-image-flight</code><span>accepted</span></a><a href="../evidence/procedural-district/"><code>procedural-district</code><span>evidence pending</span></a><a href="../evidence/relativistic-space-shot/"><code>relativistic-space-shot</code><span>evidence pending</span></a><a href="../evidence/weathered-world/"><code>weathered-world</code><span>evidence pending</span></a></nav>
   </div></section>
 
   <div class="section" id="approach"><div class="wrap">
@@ -452,8 +450,13 @@ producer.</p></div>
   <div class="section" id="validation"><div class="wrap">
     <h2>Preview and evidence ledger</h2>
     <p class="sub">Every image identifies what it proves. Page screenshots demonstrate the published presentation only; generated inputs demonstrate asset channels only; rendering acceptance still requires same-lab readback and a schema-v2 bundle.</p>
-    <div class="evidence-ledger"><span class="status status--accepted">Accepted runtime evidence available</span><code>20 published images</code></div>
+    <div class="evidence-ledger"><span class="status status--accepted">Accepted runtime evidence available</span><code>40 published images</code></div>
 <div class="runtime-evidence-disclosures">
+      <article class="runtime-evidence-disclosure" data-acceptance-status="accepted">
+        <div class="runtime-evidence-head"><div><code>Native WebGPU runtime evidence preview</code><h3>WebGPU Temporal History</h3></div><span class="status status--accepted">Accepted</span></div>
+        <dl><div><dt>visualCorrectness</dt><dd data-verdict="PASS">PASS</dd></div><div><dt>mechanismCorrectness</dt><dd data-verdict="PASS">PASS</dd></div><div><dt>performanceCompliance</dt><dd data-verdict="NOT_CLAIMED">NOT_CLAIMED</dd></div><div><dt>gpuAttribution</dt><dd data-verdict="NOT_CLAIMED">NOT_CLAIMED</dd></div><div><dt>lifecycleStability</dt><dd data-verdict="PASS">PASS</dd></div><div><dt>visualError</dt><dd data-verdict="PASS">PASS</dd></div></dl>
+        <ul><li>Correctness and CDP Chrome hardware physical-route visual review pass on the current source closure.</li><li>Named-adapter GPU timestamp timing remains NOT_CLAIMED.</li></ul>
+      </article>
       <article class="runtime-evidence-disclosure" data-acceptance-status="accepted">
         <div class="runtime-evidence-head"><div><code>Native WebGPU runtime evidence preview</code><h3>Creature Habitat</h3></div><span class="status status--accepted">Accepted</span></div>
         <dl><div><dt>visualCorrectness</dt><dd data-verdict="PASS">PASS</dd></div><div><dt>mechanismCorrectness</dt><dd data-verdict="PASS">PASS</dd></div><div><dt>performanceCompliance</dt><dd data-verdict="NOT_CLAIMED">NOT_CLAIMED</dd></div><div><dt>gpuAttribution</dt><dd data-verdict="NOT_CLAIMED">NOT_CLAIMED</dd></div><div><dt>lifecycleStability</dt><dd data-verdict="PASS">PASS</dd></div></dl>
@@ -463,6 +466,11 @@ producer.</p></div>
         <div class="runtime-evidence-head"><div><code>Native WebGPU runtime evidence preview</code><h3>Final Image Flight</h3></div><span class="status status--accepted">Accepted</span></div>
         <dl><div><dt>visualCorrectness</dt><dd data-verdict="PASS">PASS</dd></div><div><dt>mechanismCorrectness</dt><dd data-verdict="PASS">PASS</dd></div><div><dt>performanceCompliance</dt><dd data-verdict="NOT_CLAIMED">NOT_CLAIMED</dd></div><div><dt>gpuAttribution</dt><dd data-verdict="NOT_CLAIMED">NOT_CLAIMED</dd></div><div><dt>lifecycleStability</dt><dd data-verdict="PASS">PASS</dd></div></dl>
         <ul><li>hardwarePerformance remains NOT_CLAIMED without finite GPU timestamp windows</li></ul>
+      </article>
+      <article class="runtime-evidence-disclosure" data-acceptance-status="incomplete">
+        <div class="runtime-evidence-head"><div><code>Native WebGPU runtime evidence preview</code><h3>Procedural District</h3></div><span class="status status--pending">Evidence pending</span></div>
+        <dl><div><dt>visualCorrectness</dt><dd data-verdict="INSUFFICIENT_EVIDENCE">INSUFFICIENT_EVIDENCE</dd></div><div><dt>mechanismCorrectness</dt><dd data-verdict="INSUFFICIENT_EVIDENCE">INSUFFICIENT_EVIDENCE</dd></div><div><dt>performanceCompliance</dt><dd data-verdict="NOT_CLAIMED">NOT_CLAIMED</dd></div><div><dt>gpuAttribution</dt><dd data-verdict="NOT_CLAIMED">NOT_CLAIMED</dd></div><div><dt>lifecycleStability</dt><dd data-verdict="INSUFFICIENT_EVIDENCE">INSUFFICIENT_EVIDENCE</dd></div></dl>
+        <ul><li>Native WebGPU correctness capture includes standard presentation and tier presentation readbacks for the current source hash.</li><li>Nine primary dependency labs remain incomplete, so formal integration acceptance is blocked.</li><li>Field storage readback, lifecycle loop, and GPU timestamps remain INSUFFICIENT_EVIDENCE.</li></ul>
       </article></div>
     <div class="gallery">
       <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="creature-habitat" itemscope itemtype="https://schema.org/ImageObject">
@@ -472,6 +480,86 @@ producer.</p></div>
           <img data-responsive-preview src="../visual-validation/creature-habitat/final.design.png" alt="Image Pipeline: Accepted demo-sourced runtime evidence" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
         </picture></span>
         <figcaption itemprop="caption"><strong>Accepted demo-sourced runtime evidence</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-temporal-history" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-temporal-history/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-temporal-history/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-temporal-history/final.design.png" alt="Image Pipeline: Temporal history hardware WebGPU readback" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Temporal history hardware WebGPU readback</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-temporal-history" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-temporal-history/no-post.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-temporal-history/no-post.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-temporal-history/no-post.design.png" alt="Image Pipeline: No-post / HDR path" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>No-post / HDR path</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-temporal-history" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-temporal-history/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-temporal-history/diagnostics.mosaic.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-temporal-history/diagnostics.mosaic.png" alt="Image Pipeline: Temporal-history diagnostic" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Temporal-history diagnostic</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-temporal-history" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-temporal-history/camera.near.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-temporal-history/camera.near.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-temporal-history/camera.near.png" alt="Image Pipeline: Near camera" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Near camera</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-temporal-history" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-temporal-history/camera.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-temporal-history/camera.design.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-temporal-history/camera.design.png" alt="Image Pipeline: Design camera" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Design camera</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-temporal-history" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-temporal-history/camera.far.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-temporal-history/camera.far.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-temporal-history/camera.far.png" alt="Image Pipeline: Far camera" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Far camera</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-temporal-history" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-temporal-history/seed-0001.final.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-temporal-history/seed-0001.final.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-temporal-history/seed-0001.final.png" alt="Image Pipeline: Seed 0x1 final" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Seed 0x1 final</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-temporal-history" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-temporal-history/seed-9e3779b9.final.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-temporal-history/seed-9e3779b9.final.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-temporal-history/seed-9e3779b9.final.png" alt="Image Pipeline: Seed 0x9e3779b9 final" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Seed 0x9e3779b9 final</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-temporal-history" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-temporal-history/temporal.t000.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-temporal-history/temporal.t000.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-temporal-history/temporal.t000.png" alt="Image Pipeline: Temporal t0" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Temporal t0</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="webgpu-temporal-history" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/webgpu-temporal-history/temporal.t001.avif" />
+          <source type="image/webp" srcset="../visual-validation/webgpu-temporal-history/temporal.t001.webp" />
+          <img data-responsive-preview src="../visual-validation/webgpu-temporal-history/temporal.t001.png" alt="Image Pipeline: Temporal t1" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Temporal t1</strong><span>inspected runtime evidence preview</span></figcaption>
       </figure>
       <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="creature-habitat" itemscope itemtype="https://schema.org/ImageObject">
         <span class="preview-media"><picture class="responsive-preview">
@@ -624,6 +712,86 @@ producer.</p></div>
           <img data-responsive-preview src="../visual-validation/final-image-flight/temporal.t001.png" alt="Image Pipeline: Accepted release-bundle: temporal.t001.png" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
         </picture></span>
         <figcaption itemprop="caption"><strong>Accepted release-bundle: temporal.t001.png</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="procedural-district" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/procedural-district/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/procedural-district/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/procedural-district/final.design.png" alt="Image Pipeline: Procedural district integration presentation" itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Procedural district integration presentation</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="procedural-district" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/procedural-district/no-post.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/procedural-district/no-post.design.webp" />
+          <img data-responsive-preview src="../visual-validation/procedural-district/no-post.design.png" alt="Image Pipeline: No-post / diagnostic baseline presentation." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>No-post / diagnostic baseline presentation.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="procedural-district" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/procedural-district/diagnostics.mosaic.avif" />
+          <source type="image/webp" srcset="../visual-validation/procedural-district/diagnostics.mosaic.webp" />
+          <img data-responsive-preview src="../visual-validation/procedural-district/diagnostics.mosaic.png" alt="Image Pipeline: Mechanism/owner diagnostic presentation." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Mechanism/owner diagnostic presentation.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="procedural-district" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/procedural-district/camera.near.avif" />
+          <source type="image/webp" srcset="../visual-validation/procedural-district/camera.near.webp" />
+          <img data-responsive-preview src="../visual-validation/procedural-district/camera.near.png" alt="Image Pipeline: Near camera presentation." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Near camera presentation.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="procedural-district" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/procedural-district/camera.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/procedural-district/camera.design.webp" />
+          <img data-responsive-preview src="../visual-validation/procedural-district/camera.design.png" alt="Image Pipeline: Design camera presentation." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Design camera presentation.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="procedural-district" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/procedural-district/camera.far.avif" />
+          <source type="image/webp" srcset="../visual-validation/procedural-district/camera.far.webp" />
+          <img data-responsive-preview src="../visual-validation/procedural-district/camera.far.png" alt="Image Pipeline: Far camera presentation." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Far camera presentation.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="procedural-district" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/procedural-district/seed-0001.final.avif" />
+          <source type="image/webp" srcset="../visual-validation/procedural-district/seed-0001.final.webp" />
+          <img data-responsive-preview src="../visual-validation/procedural-district/seed-0001.final.png" alt="Image Pipeline: Baseline seed presentation." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Baseline seed presentation.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="procedural-district" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/procedural-district/seed-9e3779b9.final.avif" />
+          <source type="image/webp" srcset="../visual-validation/procedural-district/seed-9e3779b9.final.webp" />
+          <img data-responsive-preview src="../visual-validation/procedural-district/seed-9e3779b9.final.png" alt="Image Pipeline: Stress seed presentation." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Stress seed presentation.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="procedural-district" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/procedural-district/temporal.t000.avif" />
+          <source type="image/webp" srcset="../visual-validation/procedural-district/temporal.t000.webp" />
+          <img data-responsive-preview src="../visual-validation/procedural-district/temporal.t000.png" alt="Image Pipeline: Temporal t=0 presentation." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Temporal t=0 presentation.</strong><span>inspected runtime evidence preview</span></figcaption>
+      </figure>
+      <figure data-preview-classification="inspected-runtime-evidence-preview" data-preview-source="procedural-district" itemscope itemtype="https://schema.org/ImageObject">
+        <span class="preview-media"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/procedural-district/temporal.t001.avif" />
+          <source type="image/webp" srcset="../visual-validation/procedural-district/temporal.t001.webp" />
+          <img data-responsive-preview src="../visual-validation/procedural-district/temporal.t001.png" alt="Image Pipeline: Temporal t=1/60 presentation." itemprop="contentUrl" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture></span>
+        <figcaption itemprop="caption"><strong>Temporal t=1/60 presentation.</strong><span>inspected runtime evidence preview</span></figcaption>
       </figure></div>
   </div></div>
 
@@ -663,19 +831,22 @@ only signals with a real reader.</p>
 <p>This step is complete when every graph edge has one writer, all consumers agree
 on domain and extent, and every optional signal has a working disable path.</p>
 <h2>3. Admit attachments</h2>
-<p>Compare each candidate attachment with reconstruction or a narrow rerender on
-the target graph:</p>
+<p>First reject any reconstruction, attachment, or narrow-rerender candidate that
+cannot meet the signal&#39;s declared domain, precision/error bound, spatial
+coverage, temporal stability, or discard semantics. Compare the remaining
+correct candidates on the target graph:</p>
 <pre><code class="language-text">costMRT(a) = export + store/resolve + all later reads
 costAlt(a) = reconstruction or narrow rerender + its traffic
 </code></pre>
-<p>Keep the attachment when paired evidence shows <code>costMRT(a) &lt; costAlt(a)</code> and
-the peak resident budget still passes. Inspect compiled physical formats:
+<p>Keep the attachment when paired evidence shows <code>costMRT(a) &lt; costAlt(a)</code> among
+the correct candidates and the peak resident budget still passes. Inspect
+compiled physical formats:
 r185 named <code>PassNode</code> attachments clone the pass output by default, so compact
 normal or velocity storage exists only after explicit configuration and
 verification.</p>
 <p>This step is complete when every retained attachment has a named reader,
-verified physical format, measured winning alternative, and accounted peak
-bytes.</p>
+verified domain and physical format, declared error/coverage contract, measured
+winning correct alternative, and accounted peak bytes.</p>
 <p>When implementing <code>pass()</code>, MRT, compact formats, or depth branches, read
 <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-image-pipeline/references/production-image-pipeline.md#graph-construction-and-signal-formats">Graph construction and signal formats</a>.</p>
 <h2>4. Admit temporal history</h2>
@@ -703,6 +874,11 @@ an executable reset, and every temporal allocation has an owner.</p>
 <p>When temporal reconstruction is present, read
 <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-image-pipeline/references/production-image-pipeline.md#temporal-admission-and-resets">Temporal admission and resets</a>
 before creating velocity or history nodes.</p>
+<p>When stock <code>TRAANode</code> is rebuilt for a supported reset, read
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-image-pipeline/examples/rebuild-traa-node.mjs">the minimal rebuild example</a> for its public-API
+replacement, output rebind, graph invalidation, and explicit old/new ownership.
+Retire the returned previous node only after the replacement graph has
+compiled/rendered successfully and the prior GPU generation has completed.</p>
 <h2>5. Compose once</h2>
 <p>Use this default order:</p>
 <pre><code class="language-text">HDR scene pass + depth + admitted MRT
@@ -737,24 +913,26 @@ their final GPU use.</p>
 <p>Add adaptive DPR only after the fixed-DPR graph has sustained timings. Use
 asymmetric dwell and cooldown, distinguish fixed from pixel-scaled work, and
 remeasure every quality tier after a size change.</p>
-<p>This step is complete when repeated enable/disable, resize, tier-switch, and
-dispose cycles stabilize resource counts and every graph mutation marks the
-pipeline dirty.</p>
+<p>This step is complete when repeated cycles for every supported toggle, size,
+tier, and admitted resource stabilize resource counts, and every graph mutation
+marks the pipeline dirty.</p>
 <p>When estimating traffic, private target residency, marginal cost, or adaptive
 DPR, read
 <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-image-pipeline/references/production-image-pipeline.md#memory-timing-and-adaptive-resolution">Memory, timing, and adaptive resolution</a>.</p>
 <h2>7. Prove the graph</h2>
 <p>Capture the no-post baseline, each admitted signal, the diagnostics for each
 admitted temporal/meter/bloom/color branch, final output, and physical target
-inventory. Measure the complete warmed graph and paired marginal
-variants at identical scene state. Exercise negative controls: disable each
-effect, force each reset class, resize, and destroy/recreate the graph.</p>
+inventory. Measure the complete warmed graph and paired marginal variants only
+for admitted alternatives at identical scene state. Exercise the applicable
+negative controls: disable each supported optional effect, force each reset
+class owned by an admitted history, resize admitted size-dependent resources,
+and destroy/recreate the graph.</p>
 <p>When a capture, timing scope, reset, output-isolation, or lifecycle control fails, read <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-image-pipeline/references/production-image-pipeline.md#diagnostics-and-failure-signatures">Diagnostics and failure signatures</a>.</p>
-<p>The pipeline is complete when all shipping tiers preserve the visual contract,
-the full graph and resident targets meet declared budgets, output isolation
-shows one output conversion and—when admitted—one tone map, diagnostics pass
-for every admitted temporal branch and axis, and lifecycle counts plateau after
-disposal.</p>
+<p>The pipeline is complete when every supported shipping tier preserves the
+visual contract, the full graph and resident targets meet declared budgets,
+output isolation shows one output conversion and—when admitted—one tone map,
+diagnostics pass for every admitted temporal branch and axis, and lifecycle
+counts plateau after disposal.</p>
 </div>
   <aside class="skill-guides" aria-labelledby="related-guides-title"><h3 id="related-guides-title">Related guides</h3><ul><li><a href="/compare/renderpipeline-vs-effectcomposer/"><span>Comparisons</span>Three.js RenderPipeline vs EffectComposer</a></li><li><a href="/migrate/"><span>Migration</span>Three.js WebGPU and Agent-Skill Migration Guides</a></li><li><a href="/industries/"><span>Industries</span>Three.js WebGPU Workflows by Industry</a></li><li><a href="/docs/choose-skills/"><span>Documentation</span>Choose the Right Three.js WebGPU Skills</a></li></ul></aside>
   <div class="pn">
@@ -783,7 +961,7 @@ disposal.</p>
 
 <div class="wrap"><footer>
   <div class="footer-summary">Three.js WebGPU Skill Pack: TSL, procedural graphics, and visual validation.
-    <span>Three r185.1 · 40 primary targets · 25 accepted · build <code>ab7d8d17e058</code></span>
+    <span>Three r185.1 · 40 primary targets · 29 accepted · build <code>c151ad21626b</code></span>
     <span>Compiling shaders? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span>
   </div>
   <div class="footer-groups">

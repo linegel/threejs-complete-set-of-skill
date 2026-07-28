@@ -9,7 +9,7 @@
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-procedural-creatures.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:ab7d8d17e0589a6f5c2462d645b9e0d6797cd92eade36e3615dae091c6f9df5b" />
+<meta name="skill-pack-build-revision" content="sha256:c151ad21626b93f809ec207d33636612320aa54cbc192958a440b1ebbffa2dc9" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -24,7 +24,7 @@
 <meta property="og:title" content="Procedural Creatures | Three.js WebGPU Skill" />
 <meta property="og:description" content="Compile procedural creatures for Three.js WebGPU/TSL. Use for generated body surfaces, semantic rigs or creature locomotion, or repeated procedural populations." />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-procedural-creatures.html" />
-<meta property="article:modified_time" content="2026-07-16T11:00:33+03:00" />
+<meta property="article:modified_time" content="2026-07-16T19:46:25+03:00" />
 <meta property="article:published_time" content="2026-07-05T02:51:00+03:00" />
 <meta property="article:section" content="Procedural Content" />
 
@@ -63,7 +63,7 @@
     "@id": "https://threejs-skills.com/skills/threejs-procedural-creatures.html"
    },
    "datePublished": "2026-07-05T02:51:00+03:00",
-   "dateModified": "2026-07-16T11:00:33+03:00",
+   "dateModified": "2026-07-16T19:46:25+03:00",
    "author": {
     "@id": "https://threejs-skills.com/#publisher"
    },
@@ -295,8 +295,8 @@ a.chip:active{scale:.96}
       <span class="chip">1 flagship</span>
       <span class="chip">1 secondary surface</span>
       <span class="chip">accepted runtime evidence</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-16T11:00:33+03:00">2026-07-16</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/2ce13bcc22695dafa808d6019452752d9a39cc71">commit 2ce13bc ↗</a>
+      <span class="chip">Latest skill update <time datetime="2026-07-16T19:46:25+03:00">2026-07-16</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/62a9bc59330c44827824665323823883e88f100c">commit 62a9bc5 ↗</a>
       <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-creatures/SKILL.md">SKILL.md on GitHub ↗</a>
       <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/skills/threejs-procedural-creatures/SKILL.md">raw (for agents) ↗</a>
     </div>
@@ -470,11 +470,19 @@ features or topology changes it cannot represent.</p>
 geometry/cache identity is defined, and every transition has a physical-pixel
 error gate, hysteresis/dwell, simultaneous-memory budget, and reset action.</p>
 <h2>3. Compile the generated body</h2>
-<p>When the request needs a field-derived body, extracted skin, skinning,
-correction, semantic rig, creature locomotion, or repeated pose storage, read
-<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-creatures/references/creature-body-systems.md">creature-body-systems.md</a>. Apply its
-spaces, compiler identities, blend-graph and field-parity rules,
-shipping-surface, fixed-step, support-relative IK, and pose-page contracts.</p>
+<p>When a selected branch needs a field-derived body, extracted skin, skinning,
+correction, semantic rig, creature locomotion, or repeated pose storage, open
+only its applicable sections of <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-creatures/references/creature-body-systems.md">creature-body-systems.md</a>:</p>
+<ul>
+<li>every selected branch reads <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-creatures/references/creature-body-systems.md#spaces-and-state-ownership">Spaces and state ownership</a>
+and <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-creatures/references/creature-body-systems.md#spec-and-compiler">Spec and compiler</a>;</li>
+<li>generated-body work reads <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-creatures/references/creature-body-systems.md#field-and-blend-contract">Field and blend contract</a>
+and <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-creatures/references/creature-body-systems.md#reference-surface-and-correction">Reference surface and correction</a>;</li>
+<li>rig or locomotion work reads <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-creatures/references/creature-body-systems.md#pose-and-locomotion">Pose and locomotion</a>;</li>
+<li>repeated-population work reads <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-creatures/references/creature-body-systems.md#repeated-populations-and-rendering">Repeated populations and rendering</a>;</li>
+<li>verification reads <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-creatures/references/creature-body-systems.md#completion-evidence">Completion evidence</a>
+for the selected branches.</li>
+</ul>
 <p>When the body is a hierarchy of rigid shells or plates, read
 <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-creatures/references/articulated-hard-shell-creatures.md">articulated-hard-shell-creatures.md</a>.
 Keep stable semantic segment/joint IDs, closed surfaces, parent-local pivots,
@@ -617,7 +625,7 @@ VAT animation belong to an imported-asset character pipeline.</p>
 
 <div class="wrap"><footer>
   <div class="footer-summary">Three.js WebGPU Skill Pack: TSL, procedural graphics, and visual validation.
-    <span>Three r185.1 · 40 primary targets · 25 accepted · build <code>ab7d8d17e058</code></span>
+    <span>Three r185.1 · 40 primary targets · 29 accepted · build <code>c151ad21626b</code></span>
     <span>Compiling shaders? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span>
   </div>
   <div class="footer-groups">

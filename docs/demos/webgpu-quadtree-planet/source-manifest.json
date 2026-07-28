@@ -37,9 +37,6 @@
   ],
   "publishedBundleHash": "sha256:d22145ff54661f42da6667ca1509d087c84d6eca7e579ece4bbf51764c440ff8",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:16a8b5868643f52a1e053ac5f8f1efbbf4c97028701cf3578e1acef775c65a89",
-  "evidenceBundleId": "correctness",
-  "skill": "threejs-procedural-planets",
-  "title": "Native WebGPU Quadtree Planet",
-  "publishPath": "/demos/webgpu-quadtree-planet/"
+  "buildRevision": "sha256:c151ad21626b93f809ec207d33636612320aa54cbc192958a440b1ebbffa2dc9",
+  "evidenceBundleId": "correctness"
 }

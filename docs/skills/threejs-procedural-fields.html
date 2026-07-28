@@ -9,7 +9,7 @@
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-procedural-fields.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:ab7d8d17e0589a6f5c2462d645b9e0d6797cd92eade36e3615dae091c6f9df5b" />
+<meta name="skill-pack-build-revision" content="sha256:c151ad21626b93f809ec207d33636612320aa54cbc192958a440b1ebbffa2dc9" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -24,7 +24,7 @@
 <meta property="og:title" content="Procedural Fields | Three.js WebGPU Skill" />
 <meta property="og:description" content="Procedural fields for coherent scalar and vector causes in Three.js WebGPU/TSL. Use when a task needs shared causes across materials, geometry, or compute…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-procedural-fields.html" />
-<meta property="article:modified_time" content="2026-07-16T11:00:33+03:00" />
+<meta property="article:modified_time" content="2026-07-16T19:46:25+03:00" />
 <meta property="article:published_time" content="2026-07-04T23:30:20+03:00" />
 <meta property="article:section" content="Procedural Content" />
 <meta property="og:image" content="https://threejs-skills.com/visual-validation/webgpu-field-bake/final.design.png" />
@@ -74,7 +74,7 @@
     "https://threejs-skills.com/seo/article/threejs-procedural-fields-16x9.png"
    ],
    "datePublished": "2026-07-04T23:30:20+03:00",
-   "dateModified": "2026-07-16T11:00:33+03:00",
+   "dateModified": "2026-07-16T19:46:25+03:00",
    "author": {
     "@id": "https://threejs-skills.com/#publisher"
    },
@@ -312,8 +312,8 @@ a.chip:active{scale:.96}
       <span class="chip">1 flagship</span>
       <span class="chip">1 secondary surface</span>
       <span class="chip">native evidence pending</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-16T11:00:33+03:00">2026-07-16</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/2ce13bcc22695dafa808d6019452752d9a39cc71">commit 2ce13bc ↗</a>
+      <span class="chip">Latest skill update <time datetime="2026-07-16T19:46:25+03:00">2026-07-16</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/62a9bc59330c44827824665323823883e88f100c">commit 62a9bc5 ↗</a>
       <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-fields/SKILL.md">SKILL.md on GitHub ↗</a>
       <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/skills/threejs-procedural-fields/SKILL.md">raw (for agents) ↗</a>
     </div>
@@ -344,12 +344,11 @@ a.chip:active{scale:.96}
     <p class="sub">This skill contributes to the following cross-skill owner graphs.</p>
     <div class="grid">
       <a class="card" href="../demos/procedural-district/">
-        <span class="primary-evidence-panel " data-evidence-state="incomplete" data-preview-for="procedural-district">
-    <span class="primary-evidence-label">Canonical capture</span>
-    <strong>Runtime evidence pending</strong>
-    <span><code>3c2448b5b07d</code> source hash</span>
-    <span>10 fixed states · 4 runtime proof requirements</span>
-  </span>
+        <span class="card-preview-wrap" data-preview-for="procedural-district" data-preview-source="procedural-district" data-preview-classification="inspected-runtime-evidence-preview"><picture class="responsive-preview">
+          <source type="image/avif" srcset="../visual-validation/procedural-district/final.design.avif" />
+          <source type="image/webp" srcset="../visual-validation/procedural-district/final.design.webp" />
+          <img data-responsive-preview src="../visual-validation/procedural-district/final.design.png" alt="Procedural district integration presentation for Procedural District" class="card-preview" width="1200" height="800" loading="lazy" decoding="async" />
+        </picture><span class="media-caption">Procedural district integration presentation</span></span>
         <span class="card-head"><span class="card-kind">Authored procedural world</span><span class="status status--pending">Evidence pending</span></span>
         <h3>Procedural District</h3>
         <span class="card-meta">6 mechanisms · 3 locked tiers</span>
@@ -503,9 +502,6 @@ fragment-only derivatives, vertex camera policy, storage layout, and dispatch
 state. Materialize common intermediates once with <code>.toVar()</code> or an equivalent
 local; inspect generated WGSL when separate outputs might rebuild the same
 warp, hash, or octave chain.</p>
-<pre><code class="language-js">import { WebGPURenderer, StorageTexture } from &#39;three/webgpu&#39;;
-import { Fn, storageTexture, textureStore } from &#39;three/tsl&#39;;
-</code></pre>
 <p>Use <code>WebGPURenderer</code> and verify <code>renderer.backend.isWebGPUBackend === true</code>
 after <code>await renderer.init()</code>. <code>renderer.compute()</code> submits ordinary compute
 work. In r185, <code>computeAsync()</code> initializes before enqueueing but is not a GPU
@@ -514,6 +510,12 @@ completion fence; completion evidence needs timestamps or an actual map/readback
 to the i32 domain before bit reinterpretation. Apply a domain warp once to the
 coordinates, propagate its Jacobian into analytic gradients, and keep spherical
 warps tangent before renormalization.</p>
+<p>Before implementing an integer-lattice CPU/TSL parity branch, read
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-procedural-fields/examples/cpu-tsl-field-parity.mjs">the canonical parity core</a>. It shows the
+signed-i32 gate, wrapping <code>Math.imul</code>/TSL <code>uint</code> hash, explicit f32 normalization,
+and one shared <code>.toVar()</code> bundle without prescribing a field spectrum. CPU
+callers reject <code>valid === false</code>; TSL callers route the <code>valid</code> node into an
+explicit mask, select, or invalid-state diagnostic before consuming hash/value.</p>
 <p>This step is complete when all consumers call the same cause graph, each shared
 intermediate is evaluated once per invocation, and every stage restriction is
 isolated in an adapter.</p>
@@ -617,7 +619,7 @@ through rebuild, LOD, resize, and disposal.</p>
 
 <div class="wrap"><footer>
   <div class="footer-summary">Three.js WebGPU Skill Pack: TSL, procedural graphics, and visual validation.
-    <span>Three r185.1 · 40 primary targets · 25 accepted · build <code>ab7d8d17e058</code></span>
+    <span>Three r185.1 · 40 primary targets · 29 accepted · build <code>c151ad21626b</code></span>
     <span>Compiling shaders? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span>
   </div>
   <div class="footer-groups">

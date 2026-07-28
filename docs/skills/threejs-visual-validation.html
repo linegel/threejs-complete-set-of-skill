@@ -9,7 +9,7 @@
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-visual-validation.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:ab7d8d17e0589a6f5c2462d645b9e0d6797cd92eade36e3615dae091c6f9df5b" />
+<meta name="skill-pack-build-revision" content="sha256:c151ad21626b93f809ec207d33636612320aa54cbc192958a440b1ebbffa2dc9" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -24,7 +24,7 @@
 <meta property="og:title" content="Visual Validation | Three.js WebGPU Skill" />
 <meta property="og:description" content="Validate Three.js WebGPU/TSL implementations against falsifiable claims. Use for visual or mechanism correctness, temporal behavior, target performance or GPU…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-visual-validation.html" />
-<meta property="article:modified_time" content="2026-07-16T12:45:44+03:00" />
+<meta property="article:modified_time" content="2026-07-16T19:46:25+03:00" />
 <meta property="article:published_time" content="2026-07-04T23:30:21+03:00" />
 <meta property="article:section" content="Planning and Validation" />
 <meta property="og:image" content="https://threejs-skills.com/visual-validation/webgpu-validation-harness/final.design.png" />
@@ -74,7 +74,7 @@
     "https://threejs-skills.com/seo/article/threejs-visual-validation-16x9.png"
    ],
    "datePublished": "2026-07-04T23:30:21+03:00",
-   "dateModified": "2026-07-16T12:45:44+03:00",
+   "dateModified": "2026-07-16T19:46:25+03:00",
    "author": {
     "@id": "https://threejs-skills.com/#publisher"
    },
@@ -312,8 +312,8 @@ a.chip:active{scale:.96}
       <span class="chip">1 flagship</span>
       <span class="chip">1 secondary surface</span>
       <span class="chip">accepted runtime evidence</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-16T12:45:44+03:00">2026-07-16</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/8749183dffd84731506239dd86590c92bf958969">commit 8749183 ↗</a>
+      <span class="chip">Latest skill update <time datetime="2026-07-16T19:46:25+03:00">2026-07-16</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/62a9bc59330c44827824665323823883e88f100c">commit 62a9bc5 ↗</a>
       <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-visual-validation/SKILL.md">SKILL.md on GitHub ↗</a>
       <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/skills/threejs-visual-validation/SKILL.md">raw (for agents) ↗</a>
     </div>
@@ -546,9 +546,14 @@ a label-only toggle proves nothing.</p>
 dispatch, resource, and output owner that produced it.</p>
 <h2>4. Measure in the native domain</h2>
 <p>Compare each observable with its declared truth using the frozen metric and
-gate. Inspect the important final and diagnostic images directly; a nonblank
-capture or scalar summary is only transport evidence. Store the error map or
-worst interval when a global statistic can hide a local failure.</p>
+gate. For visual or mechanism claims, inspect the important final and diagnostic
+images directly; a nonblank capture or scalar summary is only transport
+evidence. Store the error map or worst interval when a global statistic can hide
+a local failure.</p>
+<p>When decoding a padded WebGPU texture-to-buffer copy, use the
+<a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-visual-validation/scripts/aligned-readback.mjs">aligned-readback helper</a> with the actual
+integer <code>bytesPerRow</code> supplied to the copy encoder; never recover row stride
+from width or total buffer length.</p>
 <p>Read
 <a href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-visual-validation/references/graphics-validation-protocol.md">the graphics validation protocol</a>
 for metric selection, aligned WebGPU readback, target timing, resource models,
@@ -571,8 +576,9 @@ teardown, and dispose/recreate until resources plateau or trend upward.</li>
 <p><code>renderer.computeAsync()</code> submits work; it is not proof of GPU completion.
 CPU-visible completion requires an actual readback/map, while GPU cost requires
 timestamp evidence.</p>
-<p>This step is complete when every state transition named by a claim has a
-before/after diagnostic, reset policy, and bounded resource outcome.</p>
+<p>This step is complete when every state transition named by a claim has the
+required before/after diagnostic, plus a reset policy or bounded resource
+outcome when that claim concerns reset or resources.</p>
 <h2>6. Return claim-scoped verdicts</h2>
 <p>Assign exactly one verdict to every claim:</p>
 <ul>
@@ -583,10 +589,10 @@ before/after diagnostic, reset policy, and bounded resource outcome.</p>
 <p>Missing required GPU timestamps produce <code>INSUFFICIENT_EVIDENCE</code> for GPU-cost
 claims; CPU frame time and presentation cadence do not become GPU timing.
 Report unsupported claims and the exact evidence needed to close them.</p>
-<p>Validation is complete when every declared claim has one verdict, every verdict
-resolves to direct evidence, the sole output owner is identified, deterministic
-reset is checked where state exists, and persistent resources either plateau or
-fail lifecycle acceptance.</p>
+<p>Validation is complete when every declared claim has one verdict and every
+verdict resolves to direct evidence. Identify the sole output owner when the run
+produces rendered output; check deterministic reset for declared temporal state;
+require a bounded plateau only for declared resource or lifecycle claims.</p>
 </div>
   <aside class="skill-guides" aria-labelledby="related-guides-title"><h3 id="related-guides-title">Related guides</h3><ul><li><a href="/compare/"><span>Comparisons</span>Three.js WebGPU Comparisons</a></li><li><a href="/migrate/"><span>Migration</span>Three.js WebGPU and Agent-Skill Migration Guides</a></li><li><a href="/industries/"><span>Industries</span>Three.js WebGPU Workflows by Industry</a></li><li><a href="/docs/"><span>Documentation</span>Three.js WebGPU Skill Pack Documentation</a></li></ul></aside>
   <div class="pn">
@@ -615,7 +621,7 @@ fail lifecycle acceptance.</p>
 
 <div class="wrap"><footer>
   <div class="footer-summary">Three.js WebGPU Skill Pack: TSL, procedural graphics, and visual validation.
-    <span>Three r185.1 · 40 primary targets · 25 accepted · build <code>ab7d8d17e058</code></span>
+    <span>Three r185.1 · 40 primary targets · 29 accepted · build <code>c151ad21626b</code></span>
     <span>Compiling shaders? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span>
   </div>
   <div class="footer-groups">

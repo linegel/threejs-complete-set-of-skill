@@ -15,7 +15,7 @@
     "threejs-procedural-vegetation/examples/structured-ash-growth"
   ],
   "browserEntry": "threejs-procedural-vegetation/examples/structured-ash-growth/index.html",
-  "sourceHash": "sha256:1ecd4ae09ca0243df7e0406982ed0b0329554bdebe1823896b481dcb8fe37a40",
+  "sourceHash": "sha256:ed9b49a4d8ab1d409ccf87dd5058f2e887dbee9dab0df208a33f6051fd26e80a",
   "publishedHashInputs": [
     "docs/demos/structured-ash-growth",
     "docs/demos/assets/ash-CJFpracT.png",
@@ -43,8 +43,8 @@
     "docs/demos/assets/three.tsl--5AYqKVA.js",
     "docs/demos/assets/three.webgpu-Dss1ekdK.js"
   ],
-  "publishedBundleHash": "sha256:bedd73f7e5b0537c80c97d3dbd4489a34ea60259beb481d3fa750a861ebc517b",
+  "publishedBundleHash": "sha256:2a90cffb19d2f9c00d250162c98b556d5d46345b067b83a0789838b99870d259",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:7ba7b3cc2b0ff75eb71ecf5d8b8e7b6bdf9407d8570076f6a6bce907a7e649d6",
+  "buildRevision": "sha256:c151ad21626b93f809ec207d33636612320aa54cbc192958a440b1ebbffa2dc9",
   "evidenceBundleId": "bundle"
 }
