@@ -21,11 +21,10 @@ execute bounded assignments and never delegate further.
 
 ## METHOD — binding, read before anything else
 
-Read `.claude/skills/product-from-scratch/SKILL.md` in this repo FULLY (canon:
-`github.com/LocSo/product-from-scratch`) — reading it is MANDATORY, before
-any other work. Follow it exactly, including its budget law and its
-bureaucracy prohibitions. Everything below is subordinate to that skill —
-where this prompt and the skill disagree, the skill wins.
+Read `.claude/skills/product-from-scratch/SKILL.md` in this repo fully,
+before any other work (canon: `github.com/LocSo/product-from-scratch`).
+Follow it exactly, including its budget law and its bureaucracy
+prohibitions.
 
 The conditional decision chain — each link exists only when its condition
 holds:
@@ -116,10 +115,8 @@ mediums:**
   relationships, timelines → inline SVG: exact, diffable, controllable.
 - Visual/illustrative content — concept art, mood and style direction, hero
   imagery, product illustration, anything photographic or artistic →
-  GENERATED IMAGE with gpt-image-2, invoked through the imagegen skill —
-  NEVER by calling the model/API directly. Do not fake these with SVG; a
-  missing generation route is a blocker to report, not a reason to switch
-  medium.
+  generated image: gpt-image-2 via the imagegen skill. A missing generation
+  route is a blocker to report, not a reason to switch medium.
 
 SVG lives inline in the HTML or as a sibling `.svg` file; generated rasters
 are committed under `docs/assets/` and referenced from the doc.
@@ -159,10 +156,9 @@ against it and report any drift; the vendored copy remains the binding
 method for this run either way. Inventory: every doc, every product
 surface (routes, pages, commands), every configured hostname. Count candidate
 BRD chains and rank them by business value. One BRD chain = one BRD plus
-whatever PRD/XDS/SD that decision requires — the cap counts CHAINS, not
-documents. **Cap: at most 5 BRD chains in this run; one agent carries at
-most 5 BRDs.** If real scope exceeds 5, take
-the top 5 and record the ordered remainder for the report. Decide what gets
+whatever PRD/XDS/SD that decision requires. **Cap: at most 5 chains in this
+run; at most 5 BRDs per agent.** If real scope exceeds 5, take the top 5 and
+record the ordered remainder for the report. Decide what gets
 delegated and what you do directly; write the partition down before
 launching anything.
 
@@ -241,7 +237,7 @@ the unreliable claim — never add a process layer.
   create branches, worktrees, alternate clones, or isolated copies.
 - **Coexistence** — read `hey.md` (repo root) before starting; other agents
   may be active. Leave a note there for anything they must know; never block
-  on them. Never stage files you did not author.
+  on them.
 - **Scratch discipline** — keep working notes outside the repo. Any temp file
   that must land in-repo is registered in `TEMP_ARTIFACTS.md` the same turn
   it is created and deleted the same session once absorbed.
