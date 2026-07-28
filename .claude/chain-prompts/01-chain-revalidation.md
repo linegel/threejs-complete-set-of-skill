@@ -232,7 +232,7 @@ the unreliable claim — never add a process layer.
 
 - **EXECUTION AUTHORITY** — you run one-shot; never stop to ask approval. For
   any blocker, make the safe choice, proceed, and report the choice. Work
-  left uncommitted is a failed run.
+  left uncommitted or unpushed is a failed run.
 - **SAFEGUARDS ARE NEVER DELETABLE** — owner gates, numeric thresholds,
   validation criteria, security/setup runbooks, and stop rules are CONTENT,
   not format. Never delete or dilute them; format questions go to the owner
@@ -258,7 +258,7 @@ the unreliable claim — never add a process layer.
 - **Repo checks** — if the repo defines a check command (package.json
   `check`/`lint`/`typecheck` scripts, a Makefile target), run it before
   committing and fix whatever YOUR changes broke.
-- Commit in THIS repo only, message prefix `docs(chain):`. NEVER push.
+- Commit with message prefix `docs(chain):`. ALWAYS push when done.
 
 ## REPORT — and its durable landing
 
