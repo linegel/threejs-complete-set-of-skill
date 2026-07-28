@@ -29,9 +29,7 @@ Other models/agents are also working in this project. If anything odd happens or
 ## Product design method
 
 Design precedes implementation, proportionally. The method is the
-`product-from-scratch` skill — canon at `~/_reps/skills/product-from-scratch`
-(load with `--add-dir ~/_reps/skills/product-from-scratch`, or read its
-`SKILL.md` directly). The chain is **BRD → PRD → UX/XDS → SD**, each artifact
+`product-from-scratch` skill — vendored in this repo at `.claude/skills/product-from-scratch` (read its `SKILL.md`); canon at `github.com/LocSo/product-from-scratch`. The chain is **BRD → PRD → UX/XDS → SD**, each artifact
 only when the change actually needs it; reuse and link existing canon instead
 of recreating it. A small UI change needs a short experience brief in the plan
 or PR — no minimum length, no standalone document. A feature gets one design

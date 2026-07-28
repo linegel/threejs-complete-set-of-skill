@@ -1,0 +1,3434 @@
+# Web UI Master Vocabulary — targeted lookup
+
+A normalized, deliberately over-inclusive vocabulary for naming web UI:
+
+- foundations and design-system layers
+- page regions and layout structures
+- components and controls
+- compound interaction patterns
+- search, filtering, navigation, and manipulation
+- content, data display, media, commerce, collaboration, editors, maps, and AI interfaces
+- component states, events, responsive behavior, accessibility, motion, information architecture, page templates, onboarding, and performance
+- visual-design principles, usability heuristics, Gestalt principles, named UX laws, ethical patterns, and anti-patterns
+
+**Scale:** 3,290 checklist rows across 35 categories; approximately 3,042 unique names after case-insensitive deduplication.
+
+This is a lookup vocabulary, not a checklist to complete. Start from the user's task and consult only
+the relevant family or search for a term. Do not walk every row. A row's presence creates no
+requirement to include, document, review, verify, or build the named concept.
+
+This is not an official closed standard. UI terminology is an open vocabulary: design systems use different names for the same thing, and the same name can mean different things. This file therefore keeps useful aliases and intentionally repeats cross-cutting terms in the categories where a reviewer would look for them.
+
+## Critical naming distinctions
+
+- **Live filter / instant filter:** typing immediately narrows an already visible collection.
+- **Search field:** submits or executes a query against an information set.
+- **Autocomplete / autosuggest / typeahead:** predicts or suggests completions while typing.
+- **Combobox:** an input or select control with an associated popup, usually a listbox.
+- **Faceted search:** narrows results through attribute groups such as type, price, or status.
+- **Command palette / quick switcher:** searches and invokes actions, destinations, or entities.
+- **Select:** chooses a value from a predefined set; it is not automatically a “dropdown menu.”
+- **Dropdown menu:** a popup list of actions or commands, not a form-value selector.
+- **Accordion:** a coordinated set of expandable sections.
+- **Disclosure:** one show/hide control and its content.
+- **Tabs:** switch among peer panels while preserving one visible panel.
+- **Segmented control:** selects one mode, option, or view from a compact set.
+- **Tooltip:** brief, non-interactive supplemental text.
+- **Popover:** richer contextual content that may be interactive.
+- **Dialog:** a separate interaction context layered over the page.
+- **Modal dialog:** a dialog that blocks interaction with the underlying page.
+- **Toast / snackbar:** transient feedback, usually not tied to a permanent page location.
+- **Banner / alert / inline message:** persistent or spatially anchored messaging.
+- **Badge:** compact count or status marker.
+- **Tag / label / lozenge:** descriptive classification or status.
+- **Chip / pill:** compact object that may be interactive, removable, or selectable.
+- **Table:** static tabular information.
+- **Grid / data grid:** interactive, keyboard-navigable tabular or spatial control.
+- **Checkbox:** independent binary or tri-state choice.
+- **Radio group:** one mutually exclusive choice.
+- **Switch:** immediate on/off setting.
+- **Toggle button:** action button whose pressed state persists.
+- **Skeleton:** shape-preserving loading placeholder.
+- **Spinner:** indeterminate activity indicator.
+- **Progress bar:** progress representation, determinate or indeterminate.
+- **Drawer / side sheet / slide-over:** panel entering from an edge; names vary by system.
+- **Bottom sheet:** edge panel entering from the bottom.
+- **Navigation menu:** links to destinations.
+- **Application menu:** commands or actions.
+- **Infinite scroll:** automatically loads content near the scroll boundary.
+- **Load more:** explicitly appends another result batch.
+- **Pagination:** navigates discrete result pages.
+
+---
+
+## 1. Vocabulary levels and design-system anatomy
+- [ ] Design foundation
+- [ ] Design principle
+- [ ] Heuristic
+- [ ] Guideline
+- [ ] Rule
+- [ ] Pattern
+- [ ] Anti-pattern
+- [ ] Convention
+- [ ] Paradigm
+- [ ] Interaction model
+- [ ] User flow
+- [ ] Task flow
+- [ ] Journey
+- [ ] Use case
+- [ ] Page
+- [ ] Screen
+- [ ] View
+- [ ] Template
+- [ ] Layout
+- [ ] Region
+- [ ] Landmark
+- [ ] Module
+- [ ] Component
+- [ ] Compound component
+- [ ] Widget
+- [ ] Control
+- [ ] Element
+- [ ] Primitive
+- [ ] Atom
+- [ ] Molecule
+- [ ] Organism
+- [ ] Slot
+- [ ] Variant
+- [ ] Property
+- [ ] Prop
+- [ ] State
+- [ ] Modifier
+- [ ] Design token
+- [ ] Primitive token
+- [ ] Semantic token
+- [ ] Component token
+- [ ] Theme
+- [ ] Mode
+- [ ] Skin
+- [ ] Style
+- [ ] Behavior
+- [ ] Microinteraction
+- [ ] Affordance
+- [ ] Signifier
+- [ ] Feedback
+- [ ] Constraint
+- [ ] Mapping
+- [ ] Mental model
+- [ ] Conceptual model
+- [ ] Anatomy
+- [ ] Composition
+- [ ] Foundation
+- [ ] Pattern library
+- [ ] Component library
+- [ ] UI kit
+- [ ] Design language
+
+## 2. Page shells, regions, surfaces, and structural containers
+- [ ] App shell
+- [ ] Site shell
+- [ ] Page shell
+- [ ] UI shell
+- [ ] Application chrome
+- [ ] Browser chrome
+- [ ] Viewport
+- [ ] Canvas
+- [ ] Frame
+- [ ] Window
+- [ ] Workspace
+- [ ] Surface
+- [ ] Background
+- [ ] Container
+- [ ] Wrapper
+- [ ] Content container
+- [ ] Width container
+- [ ] Max-width container
+- [ ] Full-bleed container
+- [ ] Section
+- [ ] Region
+- [ ] Landmark region
+- [ ] Header
+- [ ] Global header
+- [ ] Site header
+- [ ] App header
+- [ ] Masthead
+- [ ] Top bar
+- [ ] Utility bar
+- [ ] Announcement bar
+- [ ] Promo bar
+- [ ] Status bar
+- [ ] Title bar
+- [ ] Navigation bar
+- [ ] Main content
+- [ ] Article
+- [ ] Aside
+- [ ] Sidebar
+- [ ] Left rail
+- [ ] Right rail
+- [ ] Navigation rail
+- [ ] Panel
+- [ ] Pane
+- [ ] Split pane
+- [ ] Drawer
+- [ ] Sheet
+- [ ] Side sheet
+- [ ] Bottom sheet
+- [ ] Footer
+- [ ] Global footer
+- [ ] Local footer
+- [ ] Hero
+- [ ] Banner
+- [ ] Cover
+- [ ] Well
+- [ ] Inset
+- [ ] Card
+- [ ] Tile
+- [ ] Block
+- [ ] Content block
+- [ ] Group
+- [ ] Cluster
+- [ ] Toolbar
+- [ ] Action bar
+- [ ] Command bar
+- [ ] Inspector
+- [ ] Properties panel
+- [ ] Details panel
+- [ ] HUD
+- [ ] Shell header
+- [ ] Shell side panel
+- [ ] Shell right panel
+- [ ] Content area
+- [ ] Reading pane
+- [ ] Preview pane
+
+## 3. Layout primitives and composition patterns
+- [ ] Grid
+- [ ] Layout grid
+- [ ] CSS Grid
+- [ ] Column grid
+- [ ] Modular grid
+- [ ] Baseline grid
+- [ ] Responsive grid
+- [ ] Fluid grid
+- [ ] Fixed grid
+- [ ] Row
+- [ ] Column
+- [ ] Track
+- [ ] Cell
+- [ ] Span
+- [ ] Gutter
+- [ ] Margin
+- [ ] Padding
+- [ ] Gap
+- [ ] Alignment
+- [ ] Distribution
+- [ ] Stack
+- [ ] Vertical stack
+- [ ] Horizontal stack
+- [ ] Inline layout
+- [ ] Cluster layout
+- [ ] Center layout
+- [ ] Sidebar layout
+- [ ] Switcher layout
+- [ ] Cover layout
+- [ ] Frame layout
+- [ ] Reel layout
+- [ ] Imposter layout
+- [ ] Box layout
+- [ ] Bleed layout
+- [ ] Flow layout
+- [ ] Flex layout
+- [ ] Split layout
+- [ ] Two-column layout
+- [ ] Three-column layout
+- [ ] Master-detail layout
+- [ ] List-detail layout
+- [ ] Holy grail layout
+- [ ] Centered layout
+- [ ] Asymmetric layout
+- [ ] Masonry
+- [ ] Bento grid
+- [ ] Mosaic
+- [ ] Gallery grid
+- [ ] Card grid
+- [ ] Dense grid
+- [ ] Dashboard grid
+- [ ] Nested grid
+- [ ] Subgrid
+- [ ] Auto layout
+- [ ] Intrinsic layout
+- [ ] Fixed layout
+- [ ] Fluid layout
+- [ ] Adaptive layout
+- [ ] Responsive layout
+- [ ] Edge-to-edge layout
+- [ ] Full-bleed layout
+- [ ] Constrained-width layout
+- [ ] Sticky layout
+- [ ] Fixed-position layout
+- [ ] Off-canvas layout
+- [ ] Overlay layout
+- [ ] Layered layout
+- [ ] Absolute positioning
+- [ ] Relative positioning
+- [ ] Anchor positioning
+- [ ] Docking
+- [ ] Pinning
+- [ ] Wrapping
+- [ ] Stacking
+- [ ] Collapsing
+- [ ] Overflow
+- [ ] Clipping
+- [ ] Scroll container
+- [ ] Scroll snap
+- [ ] Horizontal scroller
+- [ ] Vertical scroller
+- [ ] Divider
+- [ ] Separator
+- [ ] Rule
+- [ ] Spacer
+- [ ] Safe area
+- [ ] Fold
+- [ ] Z-order
+- [ ] Stacking context
+- [ ] Elevation layer
+- [ ] Portal layer
+- [ ] Resizable layout
+- [ ] Split-view layout
+- [ ] Multi-pane layout
+- [ ] Accordion layout
+- [ ] Tabbed layout
+
+## 4. Navigation and wayfinding
+- [ ] Link
+- [ ] Text link
+- [ ] Inline link
+- [ ] Standalone link
+- [ ] External link
+- [ ] Deep link
+- [ ] Anchor link
+- [ ] Jump link
+- [ ] Skip link
+- [ ] Back link
+- [ ] Forward link
+- [ ] Previous link
+- [ ] Next link
+- [ ] Home link
+- [ ] Logo link
+- [ ] Navigation link
+- [ ] Active link
+- [ ] Visited link
+- [ ] Navigation menu
+- [ ] Menu
+- [ ] Menubar
+- [ ] Menu item
+- [ ] Submenu
+- [ ] Dropdown menu
+- [ ] Flyout menu
+- [ ] Mega menu
+- [ ] Context menu
+- [ ] Action menu
+- [ ] Overflow menu
+- [ ] Kebab menu
+- [ ] Ellipsis menu
+- [ ] Meatballs menu
+- [ ] Hamburger menu
+- [ ] Burger menu
+- [ ] App menu
+- [ ] Launcher
+- [ ] App switcher
+- [ ] Workspace switcher
+- [ ] Account menu
+- [ ] Top navigation
+- [ ] Global navigation
+- [ ] Primary navigation
+- [ ] Secondary navigation
+- [ ] Tertiary navigation
+- [ ] Local navigation
+- [ ] Subnavigation
+- [ ] Utility navigation
+- [ ] Contextual navigation
+- [ ] Side navigation
+- [ ] Sidenav
+- [ ] Navigation drawer
+- [ ] Navigation rail
+- [ ] Bottom navigation
+- [ ] Tab bar
+- [ ] Dock
+- [ ] Breadcrumb
+- [ ] Breadcrumb trail
+- [ ] Location breadcrumb
+- [ ] Attribute breadcrumb
+- [ ] Path breadcrumb
+- [ ] Tabs
+- [ ] Tab list
+- [ ] Tab
+- [ ] Tab panel
+- [ ] Vertical tabs
+- [ ] Route tabs
+- [ ] Document tabs
+- [ ] Closable tabs
+- [ ] Scrollable tabs
+- [ ] Pagination
+- [ ] Pager
+- [ ] Numbered pagination
+- [ ] Cursor pagination
+- [ ] Load more
+- [ ] Infinite navigation
+- [ ] Table of contents
+- [ ] In-page navigation
+- [ ] Section navigation
+- [ ] Scrollspy
+- [ ] Minimap
+- [ ] Sitemap
+- [ ] A–Z index
+- [ ] Category navigation
+- [ ] Faceted navigation
+- [ ] Stepper
+- [ ] Step indicator
+- [ ] Progress tracker
+- [ ] Wizard navigation
+- [ ] Task list navigation
+- [ ] Back-to-top control
+- [ ] Sticky navigation
+- [ ] Floating navigation
+- [ ] Command palette
+- [ ] Quick switcher
+- [ ] Search navigation
+- [ ] Recent items
+- [ ] Favorites
+- [ ] Bookmarks
+- [ ] History
+- [ ] Navigation trail
+- [ ] Related links
+- [ ] Pagination cursor
+- [ ] Page-size selector
+- [ ] First-page control
+- [ ] Last-page control
+
+## 5. Buttons, actions, and command surfaces
+- [ ] Button
+- [ ] Push button
+- [ ] Primary button
+- [ ] Secondary button
+- [ ] Tertiary button
+- [ ] Ghost button
+- [ ] Text button
+- [ ] Link button
+- [ ] Icon button
+- [ ] Icon-only button
+- [ ] Labeled icon button
+- [ ] Floating action button
+- [ ] Extended floating action button
+- [ ] Split button
+- [ ] Menu button
+- [ ] Dropdown button
+- [ ] Toggle button
+- [ ] Disclosure button
+- [ ] Submit button
+- [ ] Reset button
+- [ ] Cancel button
+- [ ] Close button
+- [ ] Dismiss button
+- [ ] Back button
+- [ ] Destructive button
+- [ ] Danger button
+- [ ] Confirmation button
+- [ ] Undo button
+- [ ] Redo button
+- [ ] Retry button
+- [ ] Refresh button
+- [ ] Copy button
+- [ ] Share button
+- [ ] Download button
+- [ ] Upload button
+- [ ] Print button
+- [ ] Save button
+- [ ] Save-as button
+- [ ] Edit button
+- [ ] Delete button
+- [ ] Add button
+- [ ] Remove button
+- [ ] Create button
+- [ ] Duplicate button
+- [ ] Move button
+- [ ] Archive button
+- [ ] Restore button
+- [ ] Expand button
+- [ ] Collapse button
+- [ ] Maximize button
+- [ ] Minimize button
+- [ ] Full-screen button
+- [ ] Button group
+- [ ] Segmented button group
+- [ ] Action group
+- [ ] Button bar
+- [ ] Toolbar
+- [ ] Action bar
+- [ ] Bulk-action bar
+- [ ] Floating toolbar
+- [ ] Contextual toolbar
+- [ ] Inline action
+- [ ] Row action
+- [ ] Card action
+- [ ] Swipe action
+- [ ] Drag handle
+- [ ] Resize handle
+- [ ] Grabber
+- [ ] Call to action
+- [ ] Primary CTA
+- [ ] Secondary CTA
+- [ ] Sticky CTA
+- [ ] Floating CTA
+- [ ] Speed dial
+- [ ] Radial menu
+- [ ] Pie menu
+- [ ] Command button
+- [ ] Action icon
+- [ ] Overflow action
+- [ ] Quick action
+- [ ] Default action
+- [ ] Destructive action
+- [ ] Reversible action
+
+## 6. Forms and text-entry controls
+- [ ] Form
+- [ ] Form group
+- [ ] Form field
+- [ ] Field
+- [ ] Input
+- [ ] Text field
+- [ ] Text input
+- [ ] Text box
+- [ ] Single-line input
+- [ ] Textarea
+- [ ] Multiline input
+- [ ] Password field
+- [ ] Password reveal
+- [ ] Email input
+- [ ] URL input
+- [ ] Telephone input
+- [ ] Number input
+- [ ] Numeric input
+- [ ] Decimal input
+- [ ] Integer input
+- [ ] Currency input
+- [ ] Percentage input
+- [ ] Unit input
+- [ ] Quantity input
+- [ ] Search input
+- [ ] Date input
+- [ ] Month input
+- [ ] Week input
+- [ ] Time input
+- [ ] Datetime input
+- [ ] Duration input
+- [ ] Color input
+- [ ] Hidden input
+- [ ] File input
+- [ ] Image input
+- [ ] Label
+- [ ] Floating label
+- [ ] Inline label
+- [ ] Stacked label
+- [ ] Visually hidden label
+- [ ] Placeholder
+- [ ] Helper text
+- [ ] Hint text
+- [ ] Instructional text
+- [ ] Field description
+- [ ] Input prefix
+- [ ] Input suffix
+- [ ] Leading icon
+- [ ] Trailing icon
+- [ ] Input adornment
+- [ ] Clear button
+- [ ] Character counter
+- [ ] Word counter
+- [ ] Required indicator
+- [ ] Optional indicator
+- [ ] Input mask
+- [ ] Formatter
+- [ ] Parser
+- [ ] Validation message
+- [ ] Error message
+- [ ] Success message
+- [ ] Warning message
+- [ ] Error summary
+- [ ] Fieldset
+- [ ] Legend
+- [ ] Option group
+- [ ] Form section
+- [ ] Form actions
+- [ ] Submit bar
+- [ ] Sticky form footer
+- [ ] Repeatable field
+- [ ] Repeatable field group
+- [ ] Conditional field
+- [ ] Dependent field
+- [ ] Progressive form
+- [ ] One-question-per-page form
+- [ ] Multi-step form
+- [ ] Form wizard
+- [ ] Review-and-submit
+- [ ] Check answers
+- [ ] Autosave form
+- [ ] Draft form
+- [ ] Inline edit
+- [ ] Editable field
+- [ ] Editable label
+- [ ] Editable cell
+- [ ] Contenteditable field
+- [ ] Plain-text editor
+- [ ] Rich-text editor
+- [ ] WYSIWYG editor
+- [ ] Markdown editor
+- [ ] Code editor
+- [ ] Signature pad
+- [ ] Drawing input
+- [ ] Voice input
+- [ ] Speech-to-text input
+- [ ] Input method
+- [ ] Autofill
+- [ ] Autocomplete attribute
+- [ ] Spellcheck
+- [ ] Input mode
+- [ ] Pattern validation
+- [ ] Minimum length
+- [ ] Maximum length
+- [ ] Minimum value
+- [ ] Maximum value
+- [ ] Step value
+- [ ] Read-only field
+- [ ] Disabled field
+- [ ] Required field
+- [ ] Optional field
+
+## 7. Choice, selection, picker, and range controls
+- [ ] Select
+- [ ] Native select
+- [ ] Dropdown select
+- [ ] Single select
+- [ ] Multi-select
+- [ ] Listbox
+- [ ] Combobox
+- [ ] Editable combobox
+- [ ] Select-only combobox
+- [ ] Autocomplete
+- [ ] Autosuggest
+- [ ] Typeahead
+- [ ] Datalist
+- [ ] Token field
+- [ ] Token input
+- [ ] Tag input
+- [ ] Chip input
+- [ ] Recipient field
+- [ ] Mention input
+- [ ] People picker
+- [ ] Entity picker
+- [ ] Country picker
+- [ ] Language picker
+- [ ] Timezone picker
+- [ ] Icon picker
+- [ ] Emoji picker
+- [ ] Font picker
+- [ ] Color picker
+- [ ] Swatch picker
+- [ ] Checkbox
+- [ ] Checkbox group
+- [ ] Tri-state checkbox
+- [ ] Indeterminate checkbox
+- [ ] Radio button
+- [ ] Radio group
+- [ ] Switch
+- [ ] Toggle switch
+- [ ] Segmented control
+- [ ] Slider
+- [ ] Range slider
+- [ ] Multi-thumb slider
+- [ ] Step slider
+- [ ] Discrete slider
+- [ ] Continuous slider
+- [ ] Vertical slider
+- [ ] Scrubber
+- [ ] Spinbutton
+- [ ] Numeric stepper
+- [ ] Stepper control
+- [ ] Increment control
+- [ ] Decrement control
+- [ ] Quantity stepper
+- [ ] Rating input
+- [ ] Star rating
+- [ ] Reaction picker
+- [ ] Date picker
+- [ ] Calendar picker
+- [ ] Date-range picker
+- [ ] Month picker
+- [ ] Year picker
+- [ ] Time picker
+- [ ] Datetime picker
+- [ ] Time-range picker
+- [ ] Recurrence picker
+- [ ] Schedule picker
+- [ ] File upload
+- [ ] Upload button
+- [ ] Drop zone
+- [ ] Drag-and-drop upload
+- [ ] Multi-file upload
+- [ ] Upload queue
+- [ ] Attachment picker
+- [ ] Camera capture
+- [ ] Image picker
+- [ ] OTP input
+- [ ] PIN input
+- [ ] Verification-code input
+- [ ] Credit-card input
+- [ ] Card-number field
+- [ ] Expiration-date field
+- [ ] CVV field
+- [ ] CVC field
+- [ ] Address input
+- [ ] Address lookup
+- [ ] Address autocomplete
+- [ ] Postcode lookup
+- [ ] Location input
+- [ ] Searchable select
+- [ ] Cascading select
+- [ ] Hierarchical select
+- [ ] Tree select
+- [ ] Dual-list box
+- [ ] Transfer list
+- [ ] Choice chips
+- [ ] Filter chips
+- [ ] Input chips
+- [ ] Assist chips
+- [ ] Suggestion chips
+- [ ] Toggle chips
+
+## 8. Search, filtering, sorting, and discovery
+- [ ] Search box
+- [ ] Search field
+- [ ] Search bar
+- [ ] Global search
+- [ ] Site search
+- [ ] Local search
+- [ ] Scoped search
+- [ ] Contextual search
+- [ ] In-page search
+- [ ] Command search
+- [ ] Live search
+- [ ] Instant search
+- [ ] Search-as-you-type
+- [ ] Incremental search
+- [ ] Predictive search
+- [ ] Federated search
+- [ ] Full-text search
+- [ ] Semantic search
+- [ ] Fuzzy search
+- [ ] Exact search
+- [ ] Filter input
+- [ ] Live filter
+- [ ] Instant filter
+- [ ] List filter
+- [ ] Table filter
+- [ ] Quick filter
+- [ ] Filter bar
+- [ ] Filter toolbar
+- [ ] Filter panel
+- [ ] Filter drawer
+- [ ] Filter popover
+- [ ] Filter menu
+- [ ] Faceted search
+- [ ] Facet
+- [ ] Facet group
+- [ ] Facet value
+- [ ] Filter chip
+- [ ] Active filter chip
+- [ ] Filter tag
+- [ ] Applied filter
+- [ ] Filter summary
+- [ ] Clear filter
+- [ ] Clear all filters
+- [ ] Filter count
+- [ ] Query builder
+- [ ] Visual query builder
+- [ ] Advanced search
+- [ ] Search syntax
+- [ ] Search operator
+- [ ] Saved search
+- [ ] Search history
+- [ ] Recent searches
+- [ ] Search suggestions
+- [ ] Query suggestions
+- [ ] Autocomplete suggestions
+- [ ] Popular searches
+- [ ] Result count
+- [ ] No-results state
+- [ ] Zero-results state
+- [ ] Search result
+- [ ] Result list
+- [ ] Result card
+- [ ] Highlighted match
+- [ ] Search-scope selector
+- [ ] Search-category tabs
+- [ ] Sort control
+- [ ] Sort select
+- [ ] Sort menu
+- [ ] Sort direction
+- [ ] Ascending sort
+- [ ] Descending sort
+- [ ] Sortable column
+- [ ] Group by
+- [ ] View switcher
+- [ ] Density switcher
+- [ ] Column chooser
+- [ ] Relevance ranking
+- [ ] Ranking control
+- [ ] Search token
+- [ ] Query token
+- [ ] Search refinement
+- [ ] Filter pill
+- [ ] Applied-filters row
+- [ ] Result snippet
+- [ ] Search preview
+- [ ] Search overlay
+- [ ] Omnibox
+- [ ] Command bar search
+
+## 9. Selection, drag-and-drop, and direct manipulation
+- [ ] Selection
+- [ ] Single selection
+- [ ] Multiple selection
+- [ ] Range selection
+- [ ] Contiguous selection
+- [ ] Discontiguous selection
+- [ ] Row selection
+- [ ] Column selection
+- [ ] Cell selection
+- [ ] Checkbox selection
+- [ ] Radio selection
+- [ ] Card selection
+- [ ] Tile selection
+- [ ] Selectable list
+- [ ] Selectable card
+- [ ] Selection indicator
+- [ ] Selection count
+- [ ] Select all
+- [ ] Deselect all
+- [ ] Invert selection
+- [ ] Indeterminate selection
+- [ ] Drag and drop
+- [ ] Draggable
+- [ ] Droppable
+- [ ] Drag source
+- [ ] Drop target
+- [ ] Drop zone
+- [ ] Drag handle
+- [ ] Grab handle
+- [ ] Drag preview
+- [ ] Drag ghost
+- [ ] Drag avatar
+- [ ] Drop indicator
+- [ ] Insertion indicator
+- [ ] Drag placeholder
+- [ ] Reorder
+- [ ] Sortable list
+- [ ] Reordering
+- [ ] Moving
+- [ ] Nesting
+- [ ] Drag-to-scroll
+- [ ] Auto-scroll
+- [ ] Resize
+- [ ] Resize handle
+- [ ] Splitter
+- [ ] Sash
+- [ ] Resizable panel
+- [ ] Rotate
+- [ ] Rotation handle
+- [ ] Crop
+- [ ] Crop box
+- [ ] Crop handle
+- [ ] Marquee selection
+- [ ] Lasso selection
+- [ ] Rubber-band selection
+- [ ] Bounding box
+- [ ] Selection box
+- [ ] Pan
+- [ ] Zoom
+- [ ] Pinch-to-zoom
+- [ ] Wheel zoom
+- [ ] Zoom controls
+- [ ] Fit to screen
+- [ ] Actual size
+- [ ] Reset view
+- [ ] Scrub
+- [ ] Seek
+- [ ] Timeline scrubber
+- [ ] Swipe
+- [ ] Swipe action
+- [ ] Swipe-to-delete
+- [ ] Long press
+- [ ] Press and hold
+- [ ] Double click
+- [ ] Double tap
+- [ ] Context click
+- [ ] Right click
+- [ ] Hover intent
+- [ ] Dwell
+- [ ] Keyboard shortcut
+- [ ] Hotkey
+- [ ] Accelerator
+- [ ] Key chord
+- [ ] Roving tabindex
+- [ ] Spatial navigation
+- [ ] Typeahead navigation
+- [ ] Direct manipulation
+- [ ] Indirect manipulation
+- [ ] Object snapping
+- [ ] Alignment snapping
+- [ ] Grid snapping
+- [ ] Magnetic snapping
+
+## 10. Typography, textual content, identity, and small visual objects
+- [ ] Heading
+- [ ] Display heading
+- [ ] Page title
+- [ ] Section title
+- [ ] Subtitle
+- [ ] Subheading
+- [ ] Eyebrow
+- [ ] Overline
+- [ ] Kicker
+- [ ] Lead
+- [ ] Body text
+- [ ] Paragraph
+- [ ] Label text
+- [ ] Caption
+- [ ] Helper text
+- [ ] Metadata
+- [ ] Byline
+- [ ] Timestamp
+- [ ] Dateline
+- [ ] Author line
+- [ ] Summary
+- [ ] Abstract
+- [ ] Excerpt
+- [ ] Teaser
+- [ ] Description
+- [ ] Annotation
+- [ ] Note
+- [ ] Footnote
+- [ ] Endnote
+- [ ] Citation
+- [ ] Reference
+- [ ] Quote
+- [ ] Blockquote
+- [ ] Pull quote
+- [ ] Code block
+- [ ] Inline code
+- [ ] Keyboard key
+- [ ] Preformatted text
+- [ ] Prose
+- [ ] Rich text
+- [ ] Unordered list
+- [ ] Ordered list
+- [ ] Nested list
+- [ ] Definition list
+- [ ] Description list
+- [ ] Checklist
+- [ ] Task list
+- [ ] Icon list
+- [ ] Link list
+- [ ] Inline list
+- [ ] Logo
+- [ ] Wordmark
+- [ ] Logomark
+- [ ] Favicon
+- [ ] App icon
+- [ ] Icon
+- [ ] Glyph
+- [ ] Symbol
+- [ ] Pictogram
+- [ ] Illustration
+- [ ] Hero image
+- [ ] Background image
+- [ ] Cover image
+- [ ] Thumbnail
+- [ ] Avatar
+- [ ] Profile photo
+- [ ] Avatar group
+- [ ] Facepile
+- [ ] Initials avatar
+- [ ] Status avatar
+- [ ] Badge
+- [ ] Counter badge
+- [ ] Notification badge
+- [ ] Status badge
+- [ ] Tag
+- [ ] Chip
+- [ ] Pill
+- [ ] Lozenge
+- [ ] Ribbon
+- [ ] Flag
+- [ ] Status dot
+- [ ] Presence indicator
+- [ ] Verification badge
+- [ ] Divider label
+- [ ] Section label
+- [ ] Data label
+- [ ] Unit label
+- [ ] Value label
+- [ ] Truncated text
+- [ ] Ellipsis
+- [ ] Line clamp
+- [ ] Tooltip label
+- [ ] Icon label
+- [ ] Visually hidden text
+
+## 11. Lists, cards, collections, tables, calendars, and data views
+- [ ] Collection
+- [ ] List view
+- [ ] Compact list
+- [ ] Comfortable list
+- [ ] Spacious list
+- [ ] Media list
+- [ ] Object list
+- [ ] Resource list
+- [ ] Result list
+- [ ] Feed
+- [ ] Activity feed
+- [ ] News feed
+- [ ] Event feed
+- [ ] Timeline
+- [ ] Vertical timeline
+- [ ] Horizontal timeline
+- [ ] Process list
+- [ ] Event stream
+- [ ] Audit log
+- [ ] Changelog
+- [ ] History list
+- [ ] Notification center
+- [ ] Card
+- [ ] Content card
+- [ ] Media card
+- [ ] Article card
+- [ ] Product card
+- [ ] Profile card
+- [ ] Stat card
+- [ ] Metric card
+- [ ] KPI card
+- [ ] Dashboard card
+- [ ] Action card
+- [ ] Interactive card
+- [ ] Selectable card
+- [ ] Expandable card
+- [ ] Summary card
+- [ ] Pricing card
+- [ ] Comparison card
+- [ ] Tile
+- [ ] Table
+- [ ] Static table
+- [ ] Data table
+- [ ] Responsive table
+- [ ] Sortable table
+- [ ] Filterable table
+- [ ] Selectable table
+- [ ] Editable table
+- [ ] Grouped table
+- [ ] Nested table
+- [ ] Pivot table
+- [ ] Cross-tab
+- [ ] Matrix
+- [ ] Comparison table
+- [ ] Timetable
+- [ ] Schedule table
+- [ ] Ledger
+- [ ] Grid
+- [ ] Data grid
+- [ ] Interactive grid
+- [ ] Tree grid
+- [ ] Spreadsheet grid
+- [ ] Property grid
+- [ ] Structured list
+- [ ] Summary list
+- [ ] Key-value list
+- [ ] Property list
+- [ ] Detail list
+- [ ] Tree
+- [ ] Tree view
+- [ ] Outline
+- [ ] Hierarchy view
+- [ ] Directory tree
+- [ ] File tree
+- [ ] Organization chart
+- [ ] Kanban board
+- [ ] Task board
+- [ ] Swimlane board
+- [ ] Calendar
+- [ ] Month calendar
+- [ ] Week calendar
+- [ ] Day calendar
+- [ ] Agenda
+- [ ] Scheduler
+- [ ] Timeline scheduler
+- [ ] Gantt chart
+- [ ] Roadmap
+- [ ] Milestone view
+- [ ] Metric
+- [ ] KPI
+- [ ] Statistic
+- [ ] Counter
+- [ ] Total
+- [ ] Summary box
+- [ ] Scorecard
+- [ ] Dashboard widget
+- [ ] Table header
+- [ ] Table body
+- [ ] Table footer
+- [ ] Column header
+- [ ] Row header
+- [ ] Table row
+- [ ] Table cell
+- [ ] Row actions
+- [ ] Column actions
+- [ ] Sticky header
+- [ ] Frozen column
+- [ ] Pinned row
+- [ ] Expandable row
+- [ ] Grouped row
+- [ ] Subtotal row
+- [ ] Total row
+- [ ] Column resize
+- [ ] Column reorder
+- [ ] Column visibility
+- [ ] Pagination footer
+- [ ] Virtualized table
+- [ ] Infinite table
+
+## 12. Charts, diagrams, and visualization elements
+- [ ] Chart
+- [ ] Graph
+- [ ] Plot
+- [ ] Data visualization
+- [ ] Axis
+- [ ] X axis
+- [ ] Y axis
+- [ ] Scale
+- [ ] Legend
+- [ ] Gridline
+- [ ] Data label
+- [ ] Annotation
+- [ ] Reference line
+- [ ] Threshold line
+- [ ] Data point
+- [ ] Series
+- [ ] Chart tooltip
+- [ ] Line chart
+- [ ] Area chart
+- [ ] Stacked area chart
+- [ ] Bar chart
+- [ ] Column chart
+- [ ] Stacked bar chart
+- [ ] Grouped bar chart
+- [ ] Histogram
+- [ ] Scatter plot
+- [ ] Bubble chart
+- [ ] Pie chart
+- [ ] Donut chart
+- [ ] Treemap
+- [ ] Sunburst chart
+- [ ] Heatmap
+- [ ] Choropleth map
+- [ ] Symbol map
+- [ ] Sparkline
+- [ ] Bullet chart
+- [ ] Gauge
+- [ ] Radial gauge
+- [ ] Progress ring
+- [ ] Funnel chart
+- [ ] Waterfall chart
+- [ ] Radar chart
+- [ ] Polar chart
+- [ ] Box plot
+- [ ] Violin plot
+- [ ] Candlestick chart
+- [ ] OHLC chart
+- [ ] Timeline chart
+- [ ] Sankey diagram
+- [ ] Alluvial diagram
+- [ ] Network graph
+- [ ] Node-link diagram
+- [ ] Dependency graph
+- [ ] Flowchart
+- [ ] Decision tree
+- [ ] Mind map
+- [ ] Matrix chart
+- [ ] Cohort chart
+- [ ] Retention chart
+- [ ] Funnel visualization
+- [ ] Geo chart
+- [ ] Dot plot
+- [ ] Lollipop chart
+- [ ] Slope chart
+- [ ] Bump chart
+- [ ] Streamgraph
+- [ ] Ridgeline plot
+- [ ] Small multiples
+- [ ] Dashboard chart
+- [ ] Interactive chart
+- [ ] Brush selection
+- [ ] Zoomable chart
+- [ ] Drill-down chart
+- [ ] Cross-filtered chart
+- [ ] Chart navigator
+- [ ] Chart range selector
+- [ ] Chart legend toggle
+
+## 13. Feedback, status, validation, loading, and system messaging
+- [ ] Alert
+- [ ] Status message
+- [ ] Notice
+- [ ] Notification
+- [ ] Toast
+- [ ] Snackbar
+- [ ] Banner
+- [ ] Notification banner
+- [ ] Site alert
+- [ ] Inline alert
+- [ ] Inline message
+- [ ] Section message
+- [ ] Callout
+- [ ] Inset message
+- [ ] Info box
+- [ ] Warning box
+- [ ] Success message
+- [ ] Error message
+- [ ] Confirmation message
+- [ ] System message
+- [ ] Flash message
+- [ ] Notification center
+- [ ] Unread indicator
+- [ ] Tooltip
+- [ ] Help tooltip
+- [ ] Validation tooltip
+- [ ] Popover hint
+- [ ] Coach mark
+- [ ] Coachmark
+- [ ] Spotlight
+- [ ] Beacon
+- [ ] Hotspot
+- [ ] Nudge
+- [ ] Prompt
+- [ ] Onboarding tip
+- [ ] Status
+- [ ] Status indicator
+- [ ] Status dot
+- [ ] Presence
+- [ ] Health indicator
+- [ ] Availability indicator
+- [ ] Connectivity indicator
+- [ ] Sync indicator
+- [ ] Save indicator
+- [ ] Unsaved-changes indicator
+- [ ] Dirty-state indicator
+- [ ] Progress indicator
+- [ ] Progress bar
+- [ ] Linear progress
+- [ ] Circular progress
+- [ ] Progress ring
+- [ ] Determinate progress
+- [ ] Indeterminate progress
+- [ ] Step progress
+- [ ] Progress tracker
+- [ ] Upload progress
+- [ ] Download progress
+- [ ] Buffering indicator
+- [ ] Spinner
+- [ ] Activity indicator
+- [ ] Loader
+- [ ] Loading indicator
+- [ ] Throbber
+- [ ] Busy indicator
+- [ ] Skeleton screen
+- [ ] Skeleton loader
+- [ ] Content placeholder
+- [ ] Shimmer
+- [ ] Pulse loader
+- [ ] Dots loader
+- [ ] Lazy-load placeholder
+- [ ] Empty state
+- [ ] Blank state
+- [ ] First-use state
+- [ ] Zero-data state
+- [ ] No-results state
+- [ ] Error state
+- [ ] Offline state
+- [ ] Unavailable state
+- [ ] Maintenance state
+- [ ] Permission-denied state
+- [ ] Deleted state
+- [ ] Archived state
+- [ ] Validation
+- [ ] Inline validation
+- [ ] Client-side validation
+- [ ] Server-side validation
+- [ ] Real-time validation
+- [ ] On-blur validation
+- [ ] Field error
+- [ ] Form error
+- [ ] Critical alert
+- [ ] Destructive warning
+- [ ] Optimistic feedback
+- [ ] Undo toast
+- [ ] Retry prompt
+- [ ] Timeout warning
+- [ ] Session-expiry warning
+- [ ] Rate-limit notice
+- [ ] Stale-data indicator
+- [ ] Connection banner
+- [ ] Offline banner
+- [ ] Reconnection notice
+- [ ] Success panel
+- [ ] Error panel
+- [ ] Warning text
+
+## 14. Overlays, dialogs, disclosure, and progressive reveal
+- [ ] Overlay
+- [ ] Backdrop
+- [ ] Scrim
+- [ ] Blanket
+- [ ] Dimmer
+- [ ] Modal
+- [ ] Modal dialog
+- [ ] Dialog
+- [ ] Non-modal dialog
+- [ ] Alert dialog
+- [ ] Confirmation dialog
+- [ ] Message dialog
+- [ ] Form dialog
+- [ ] Full-screen dialog
+- [ ] Nested dialog
+- [ ] Sheet
+- [ ] Side sheet
+- [ ] Bottom sheet
+- [ ] Drawer
+- [ ] Navigation drawer
+- [ ] Inspector drawer
+- [ ] Overlay panel
+- [ ] Slide-over
+- [ ] Off-canvas panel
+- [ ] Popover
+- [ ] Popup
+- [ ] Popper
+- [ ] Flyout
+- [ ] Hover card
+- [ ] Hover panel
+- [ ] Teaching bubble
+- [ ] Context menu
+- [ ] Dropdown menu
+- [ ] Lightbox
+- [ ] Image viewer
+- [ ] Media viewer
+- [ ] Preview pane
+- [ ] Quick view
+- [ ] Peek view
+- [ ] Accordion
+- [ ] Disclosure
+- [ ] Expansion panel
+- [ ] Collapsible panel
+- [ ] Collapsible section
+- [ ] Details
+- [ ] Summary disclosure
+- [ ] Show/hide control
+- [ ] Expander
+- [ ] Tree disclosure
+- [ ] Read more
+- [ ] Truncate-and-expand
+- [ ] Progressive disclosure
+- [ ] Portal
+- [ ] Layer
+- [ ] Z-index layer
+- [ ] Focus trap
+- [ ] Focus lock
+- [ ] Inert background
+- [ ] Click-outside dismissal
+- [ ] Escape dismissal
+- [ ] Anchored overlay
+- [ ] Tethered overlay
+- [ ] Modal backdrop
+- [ ] Popover anchor
+- [ ] Dismiss layer
+- [ ] Overlay stack
+- [ ] Dialog stack
+- [ ] Sheet grabber
+- [ ] Drawer handle
+
+## 15. Images, galleries, audio, and video
+- [ ] Image
+- [ ] Figure
+- [ ] Figcaption
+- [ ] Media object
+- [ ] Thumbnail list
+- [ ] Gallery
+- [ ] Image gallery
+- [ ] Lightbox gallery
+- [ ] Slideshow
+- [ ] Carousel
+- [ ] Content slider
+- [ ] Image rotator
+- [ ] Filmstrip
+- [ ] Contact sheet
+- [ ] Before-and-after comparison
+- [ ] Image-comparison slider
+- [ ] Hotspot image
+- [ ] Image map
+- [ ] Panoramic viewer
+- [ ] 360-degree viewer
+- [ ] Zoomable image
+- [ ] Video player
+- [ ] Audio player
+- [ ] Poster frame
+- [ ] Playback controls
+- [ ] Play button
+- [ ] Pause button
+- [ ] Stop button
+- [ ] Seek bar
+- [ ] Media scrubber
+- [ ] Volume control
+- [ ] Mute control
+- [ ] Captions
+- [ ] Closed captions
+- [ ] Subtitles
+- [ ] Transcript
+- [ ] Audio description
+- [ ] Mini-player
+- [ ] Picture-in-picture
+- [ ] Playlist
+- [ ] Queue
+- [ ] Waveform
+- [ ] Now-playing bar
+- [ ] Media timeline
+- [ ] Chapter marker
+- [ ] Playback speed control
+- [ ] Quality selector
+- [ ] Full-screen control
+- [ ] Cast control
+- [ ] Live indicator
+- [ ] Buffer indicator
+- [ ] Media thumbnail
+- [ ] Video preview
+- [ ] Audio visualization
+
+## 16. Commerce, pricing, checkout, and transaction patterns
+- [ ] Storefront
+- [ ] Product listing page
+- [ ] Product detail page
+- [ ] Category page
+- [ ] Collection page
+- [ ] Product card
+- [ ] Product grid
+- [ ] Product carousel
+- [ ] Product quick view
+- [ ] Product gallery
+- [ ] Image zoom
+- [ ] Variant selector
+- [ ] Option selector
+- [ ] Size selector
+- [ ] Color swatch
+- [ ] Swatch selector
+- [ ] Quantity selector
+- [ ] Quantity stepper
+- [ ] Price
+- [ ] List price
+- [ ] Sale price
+- [ ] Compare-at price
+- [ ] Discount badge
+- [ ] Promotion badge
+- [ ] Stock status
+- [ ] Inventory message
+- [ ] Low-stock alert
+- [ ] Availability
+- [ ] SKU
+- [ ] Product metadata
+- [ ] Add to cart
+- [ ] Buy now
+- [ ] Shopping cart
+- [ ] Cart icon
+- [ ] Cart badge
+- [ ] Mini cart
+- [ ] Cart drawer
+- [ ] Cart line item
+- [ ] Cart summary
+- [ ] Order summary
+- [ ] Subtotal
+- [ ] Tax estimate
+- [ ] Shipping estimate
+- [ ] Total
+- [ ] Coupon field
+- [ ] Promo-code field
+- [ ] Gift-card field
+- [ ] Remove item
+- [ ] Save for later
+- [ ] Wishlist
+- [ ] Favorite
+- [ ] Product comparison
+- [ ] Checkout
+- [ ] Checkout stepper
+- [ ] Guest checkout
+- [ ] Express checkout
+- [ ] One-page checkout
+- [ ] Multi-step checkout
+- [ ] Shipping address
+- [ ] Billing address
+- [ ] Delivery method
+- [ ] Pickup selector
+- [ ] Store locator
+- [ ] Payment method
+- [ ] Card form
+- [ ] Wallet button
+- [ ] Order review
+- [ ] Place order
+- [ ] Confirmation page
+- [ ] Receipt
+- [ ] Order tracking
+- [ ] Order status
+- [ ] Returns flow
+- [ ] Refund status
+- [ ] Subscription selector
+- [ ] Pricing table
+- [ ] Pricing tier
+- [ ] Plan card
+- [ ] Billing-cycle toggle
+- [ ] Feature comparison
+- [ ] Upgrade prompt
+- [ ] Paywall
+- [ ] Metered usage
+- [ ] Free-trial banner
+- [ ] Rating
+- [ ] Review summary
+- [ ] Review list
+- [ ] Review form
+- [ ] Seller badge
+- [ ] Trust badge
+- [ ] Shipping badge
+- [ ] Invoice
+- [ ] Payment status
+- [ ] Transaction history
+- [ ] Billing portal
+- [ ] Usage meter
+- [ ] Credit balance
+
+## 17. Authentication, accounts, permissions, privacy, and security
+- [ ] Sign-in
+- [ ] Login form
+- [ ] Sign-up
+- [ ] Registration form
+- [ ] Account creation
+- [ ] Username field
+- [ ] Password field
+- [ ] Password reveal
+- [ ] Password-strength meter
+- [ ] Password-requirements checklist
+- [ ] Forgot password
+- [ ] Password reset
+- [ ] Reset link
+- [ ] Email verification
+- [ ] Phone verification
+- [ ] Verification code
+- [ ] OTP input
+- [ ] Multi-factor authentication
+- [ ] Two-factor authentication
+- [ ] Authenticator prompt
+- [ ] Backup code
+- [ ] Passkey prompt
+- [ ] Biometric prompt
+- [ ] Security-key prompt
+- [ ] Single sign-on
+- [ ] Social login
+- [ ] Identity-provider button
+- [ ] Magic link
+- [ ] Device approval
+- [ ] Account menu
+- [ ] Profile menu
+- [ ] User menu
+- [ ] Avatar menu
+- [ ] Account switcher
+- [ ] Organization switcher
+- [ ] Tenant switcher
+- [ ] Workspace switcher
+- [ ] Profile page
+- [ ] Account settings
+- [ ] Preferences
+- [ ] Security settings
+- [ ] Sessions list
+- [ ] Device list
+- [ ] Revoke session
+- [ ] Sign out
+- [ ] Permission prompt
+- [ ] Authorization screen
+- [ ] OAuth consent
+- [ ] Consent screen
+- [ ] Cookie banner
+- [ ] Cookie consent
+- [ ] Consent manager
+- [ ] Preference center
+- [ ] Privacy settings
+- [ ] Tracking opt-out
+- [ ] Age gate
+- [ ] Region gate
+- [ ] Content warning
+- [ ] Sensitive-content gate
+- [ ] CAPTCHA
+- [ ] Bot challenge
+- [ ] Rate-limit challenge
+- [ ] Reauthentication
+- [ ] Step-up authentication
+- [ ] Session timeout
+- [ ] Idle-timeout warning
+- [ ] Lock screen
+- [ ] Masked data
+- [ ] Redacted data
+- [ ] Reveal-sensitive-value control
+- [ ] Copy-secret control
+- [ ] Recovery codes
+- [ ] Security alert
+- [ ] Suspicious-login alert
+- [ ] Audit trail
+- [ ] Role selector
+- [ ] Permission matrix
+- [ ] Access-control list
+- [ ] Invite user
+- [ ] Pending invitation
+- [ ] Member list
+- [ ] Role badge
+- [ ] Ownership transfer
+- [ ] Delete-account flow
+- [ ] Data-export flow
+- [ ] Data-deletion flow
+- [ ] Consent receipt
+- [ ] Privacy notice
+- [ ] Authentication error
+- [ ] Account lockout
+- [ ] Recovery flow
+- [ ] Trusted-device control
+- [ ] Remember-me checkbox
+
+## 18. Collaboration, comments, social, messaging, and calls
+- [ ] Chat
+- [ ] Conversation
+- [ ] Conversation list
+- [ ] Thread
+- [ ] Message thread
+- [ ] Message bubble
+- [ ] Incoming message
+- [ ] Outgoing message
+- [ ] System message
+- [ ] Message group
+- [ ] Timestamp separator
+- [ ] Date separator
+- [ ] Unread separator
+- [ ] Message composer
+- [ ] Send button
+- [ ] Attachment button
+- [ ] Attachment preview
+- [ ] Emoji picker
+- [ ] GIF picker
+- [ ] Sticker picker
+- [ ] Mention picker
+- [ ] Slash command
+- [ ] Command composer
+- [ ] Reply
+- [ ] Threaded reply
+- [ ] Quote reply
+- [ ] Forward
+- [ ] Edit message
+- [ ] Delete message
+- [ ] Reaction
+- [ ] Reaction bar
+- [ ] Reaction picker
+- [ ] Read receipt
+- [ ] Delivery receipt
+- [ ] Typing indicator
+- [ ] Presence indicator
+- [ ] Online status
+- [ ] Last seen
+- [ ] Pinned message
+- [ ] Saved message
+- [ ] Message search
+- [ ] Comment
+- [ ] Comment thread
+- [ ] Comment composer
+- [ ] Inline comment
+- [ ] Anchored comment
+- [ ] Annotation
+- [ ] Review comment
+- [ ] Resolution state
+- [ ] Resolve thread
+- [ ] Reopen thread
+- [ ] Suggestion
+- [ ] Proposed edit
+- [ ] Tracked changes
+- [ ] Diff
+- [ ] Review queue
+- [ ] Activity feed
+- [ ] Social feed
+- [ ] Post composer
+- [ ] Post card
+- [ ] Repost
+- [ ] Share
+- [ ] Like
+- [ ] Favorite
+- [ ] Bookmark
+- [ ] Follow button
+- [ ] Follower count
+- [ ] Friend request
+- [ ] Connect button
+- [ ] Profile card
+- [ ] User card
+- [ ] Notification inbox
+- [ ] Notification item
+- [ ] Notification preference
+- [ ] Digest
+- [ ] Mention badge
+- [ ] Collaborator cursor
+- [ ] Live cursor
+- [ ] Selection presence
+- [ ] Avatar stack
+- [ ] Participant list
+- [ ] Presence bar
+- [ ] Live-edit indicator
+- [ ] Conflict indicator
+- [ ] Version history
+- [ ] Revision history
+- [ ] Autosave status
+- [ ] Sync status
+- [ ] Participant tile
+- [ ] Speaker view
+- [ ] Gallery view
+- [ ] Screen share
+- [ ] Mute toggle
+- [ ] Camera toggle
+- [ ] Raise hand
+- [ ] Call reaction
+- [ ] Call status
+- [ ] Call timer
+- [ ] Waiting room
+- [ ] Call controls
+- [ ] Meeting chat
+- [ ] Live captions
+
+## 19. Editors, canvases, files, and developer-tool interfaces
+- [ ] File browser
+- [ ] File explorer
+- [ ] Directory tree
+- [ ] Folder tree
+- [ ] File list
+- [ ] Folder
+- [ ] File row
+- [ ] Breadcrumb path
+- [ ] Path bar
+- [ ] Address bar
+- [ ] File picker
+- [ ] Save dialog
+- [ ] Open dialog
+- [ ] Upload manager
+- [ ] Download manager
+- [ ] Transfer queue
+- [ ] File preview
+- [ ] Thumbnail view
+- [ ] Details view
+- [ ] File metadata
+- [ ] File version history
+- [ ] Restore version
+- [ ] Conflict dialog
+- [ ] Document editor
+- [ ] Text editor
+- [ ] Rich-text editor
+- [ ] Block editor
+- [ ] Page editor
+- [ ] Markdown editor
+- [ ] Code editor
+- [ ] Notebook
+- [ ] Notebook cell
+- [ ] Code cell
+- [ ] Markdown cell
+- [ ] Output cell
+- [ ] Editor toolbar
+- [ ] Formatting toolbar
+- [ ] Inline toolbar
+- [ ] Bubble menu
+- [ ] Slash menu
+- [ ] Command menu
+- [ ] Block handle
+- [ ] Block inserter
+- [ ] Block palette
+- [ ] Component palette
+- [ ] Insert menu
+- [ ] Inspector
+- [ ] Properties panel
+- [ ] Layers panel
+- [ ] Outline panel
+- [ ] Navigator
+- [ ] Minimap
+- [ ] Ruler
+- [ ] Guide
+- [ ] Grid overlay
+- [ ] Snap line
+- [ ] Smart guide
+- [ ] Alignment guide
+- [ ] Canvas
+- [ ] Artboard
+- [ ] Frame
+- [ ] Board
+- [ ] Whiteboard
+- [ ] Infinite canvas
+- [ ] Node
+- [ ] Edge
+- [ ] Connector
+- [ ] Port
+- [ ] Handle
+- [ ] Anchor point
+- [ ] Control point
+- [ ] Bounding box
+- [ ] Selection box
+- [ ] Resize handle
+- [ ] Rotation handle
+- [ ] Crop handle
+- [ ] Lasso tool
+- [ ] Marquee tool
+- [ ] Pan tool
+- [ ] Hand tool
+- [ ] Zoom tool
+- [ ] Eyedropper
+- [ ] Pen tool
+- [ ] Shape tool
+- [ ] Text tool
+- [ ] Undo stack
+- [ ] Redo stack
+- [ ] History panel
+- [ ] Autosave
+- [ ] Draft
+- [ ] Publish button
+- [ ] Preview mode
+- [ ] Edit mode
+- [ ] Read mode
+- [ ] Source mode
+- [ ] Split view
+- [ ] Diff view
+- [ ] Side-by-side diff
+- [ ] Unified diff
+- [ ] Merge editor
+- [ ] Conflict resolver
+- [ ] Developer console
+- [ ] Terminal
+- [ ] Command line
+- [ ] Log viewer
+- [ ] Trace viewer
+- [ ] Network panel
+- [ ] Inspector panel
+- [ ] Debugger
+- [ ] Breakpoint gutter
+- [ ] Line numbers
+- [ ] Syntax highlighting
+- [ ] Code folding
+- [ ] Editor minimap
+- [ ] Editor breadcrumbs
+- [ ] Editor tabs
+- [ ] Split editor
+- [ ] Editor command palette
+- [ ] Editor status bar
+- [ ] Node editor
+- [ ] Graph editor
+- [ ] Workflow builder
+- [ ] Flow builder
+- [ ] Rule builder
+- [ ] Schema builder
+- [ ] Form builder
+- [ ] Pipeline editor
+- [ ] Timeline editor
+- [ ] Database browser
+- [ ] Query console
+- [ ] Object inspector
+- [ ] Memory viewer
+- [ ] Profiler
+
+## 20. Maps and spatial interfaces
+- [ ] Map
+- [ ] Map canvas
+- [ ] Basemap
+- [ ] Map layer
+- [ ] Layer switcher
+- [ ] Map marker
+- [ ] Pin
+- [ ] Point of interest
+- [ ] Marker cluster
+- [ ] Cluster count
+- [ ] Info window
+- [ ] Map popup
+- [ ] Map callout
+- [ ] Map tooltip
+- [ ] Map legend
+- [ ] Scale bar
+- [ ] Compass
+- [ ] North arrow
+- [ ] Map zoom controls
+- [ ] Map pan controls
+- [ ] Current-location button
+- [ ] Locate-me button
+- [ ] Geolocation prompt
+- [ ] Geocoder
+- [ ] Location search
+- [ ] Address autocomplete
+- [ ] Route
+- [ ] Route line
+- [ ] Directions panel
+- [ ] Turn-by-turn list
+- [ ] Waypoint
+- [ ] Origin
+- [ ] Destination
+- [ ] Travel mode
+- [ ] Estimated time of arrival
+- [ ] Distance
+- [ ] Boundary
+- [ ] Polygon
+- [ ] Geofence
+- [ ] Heatmap layer
+- [ ] Choropleth layer
+- [ ] Street view
+- [ ] Map minimap
+- [ ] Overview map
+- [ ] Map attribution
+- [ ] Map style selector
+- [ ] Terrain layer
+- [ ] Satellite layer
+- [ ] Route alternatives
+- [ ] Map search results
+
+## 21. AI, assistant, and agent interfaces
+- [ ] Prompt box
+- [ ] Prompt field
+- [ ] Prompt composer
+- [ ] Chat composer
+- [ ] Multimodal composer
+- [ ] Attachment tray
+- [ ] Model selector
+- [ ] Mode selector
+- [ ] Tool selector
+- [ ] Agent selector
+- [ ] System-prompt field
+- [ ] Prompt template
+- [ ] Prompt library
+- [ ] Suggestion chips
+- [ ] Starter prompts
+- [ ] Follow-up suggestions
+- [ ] Conversation list
+- [ ] Conversation thread
+- [ ] Assistant message
+- [ ] User message
+- [ ] Tool message
+- [ ] System message
+- [ ] Citation
+- [ ] Source card
+- [ ] Reference chip
+- [ ] Grounded answer
+- [ ] Confidence indicator
+- [ ] Uncertainty note
+- [ ] Hallucination warning
+- [ ] Streaming response
+- [ ] Typing indicator
+- [ ] Generation indicator
+- [ ] Thinking indicator
+- [ ] Reasoning summary
+- [ ] Stop generating
+- [ ] Regenerate
+- [ ] Retry response
+- [ ] Continue generation
+- [ ] Edit prompt
+- [ ] Branch conversation
+- [ ] Response variants
+- [ ] Compare responses
+- [ ] Copy response
+- [ ] Feedback buttons
+- [ ] Thumbs up
+- [ ] Thumbs down
+- [ ] Tool-call card
+- [ ] Function-call card
+- [ ] Action approval
+- [ ] Confirmation gate
+- [ ] Permission gate
+- [ ] Human-in-the-loop review
+- [ ] Agent activity feed
+- [ ] Execution log
+- [ ] Task plan
+- [ ] Step status
+- [ ] Progress timeline
+- [ ] Artifact panel
+- [ ] Canvas panel
+- [ ] Code preview
+- [ ] Data preview
+- [ ] Context panel
+- [ ] Context picker
+- [ ] Knowledge-source picker
+- [ ] File context
+- [ ] Memory indicator
+- [ ] Memory controls
+- [ ] Context-window meter
+- [ ] Token counter
+- [ ] Usage meter
+- [ ] Cost estimate
+- [ ] Latency indicator
+- [ ] Model status
+- [ ] Safety notice
+- [ ] Content-filter notice
+- [ ] Agent handoff
+- [ ] Agent status
+- [ ] Agent queue
+- [ ] Tool result
+- [ ] Approval request
+- [ ] Interrupt control
+- [ ] Resume control
+- [ ] Prompt variables
+- [ ] Structured-output preview
+
+## 22. Component and interface states
+- [ ] Default state
+- [ ] Rest state
+- [ ] Idle state
+- [ ] Hover state
+- [ ] Hover-intent state
+- [ ] Focus state
+- [ ] Focus-visible state
+- [ ] Focus-within state
+- [ ] Active state
+- [ ] Pressed state
+- [ ] Depressed state
+- [ ] Selected state
+- [ ] Unselected state
+- [ ] Checked state
+- [ ] Unchecked state
+- [ ] Indeterminate state
+- [ ] Mixed state
+- [ ] On state
+- [ ] Off state
+- [ ] Expanded state
+- [ ] Collapsed state
+- [ ] Open state
+- [ ] Closed state
+- [ ] Current state
+- [ ] Visited state
+- [ ] Unvisited state
+- [ ] Enabled state
+- [ ] Disabled state
+- [ ] ARIA-disabled state
+- [ ] Read-only state
+- [ ] Editable state
+- [ ] Locked state
+- [ ] Unlocked state
+- [ ] Required state
+- [ ] Optional state
+- [ ] Empty state
+- [ ] Populated state
+- [ ] Placeholder state
+- [ ] Valid state
+- [ ] Invalid state
+- [ ] Error state
+- [ ] Warning state
+- [ ] Success state
+- [ ] Info state
+- [ ] Neutral state
+- [ ] Loading state
+- [ ] Loaded state
+- [ ] Busy state
+- [ ] Buffering state
+- [ ] Pending state
+- [ ] Queued state
+- [ ] Processing state
+- [ ] Uploading state
+- [ ] Downloading state
+- [ ] Syncing state
+- [ ] Synced state
+- [ ] Saving state
+- [ ] Saved state
+- [ ] Autosaved state
+- [ ] Unsaved state
+- [ ] Dirty state
+- [ ] Pristine state
+- [ ] Touched state
+- [ ] Untouched state
+- [ ] Submitted state
+- [ ] Submitting state
+- [ ] Complete state
+- [ ] Incomplete state
+- [ ] Partial state
+- [ ] Stale state
+- [ ] Fresh state
+- [ ] Optimistic state
+- [ ] Confirmed state
+- [ ] Rolled-back state
+- [ ] Offline state
+- [ ] Online state
+- [ ] Reconnecting state
+- [ ] Disconnected state
+- [ ] Unavailable state
+- [ ] Available state
+- [ ] Visible state
+- [ ] Hidden state
+- [ ] Visually hidden state
+- [ ] Clipped state
+- [ ] Truncated state
+- [ ] Overflowing state
+- [ ] Scrolling state
+- [ ] Sticky state
+- [ ] Pinned state
+- [ ] Docked state
+- [ ] Floating state
+- [ ] Maximized state
+- [ ] Minimized state
+- [ ] Full-screen state
+- [ ] Dragging state
+- [ ] Drag-over state
+- [ ] Drop-target state
+- [ ] Resizing state
+- [ ] Sorting state
+- [ ] Filtered state
+- [ ] Grouped state
+- [ ] Highlighted state
+- [ ] Matched state
+- [ ] Muted state
+- [ ] Unmuted state
+- [ ] Playing state
+- [ ] Paused state
+- [ ] Stopped state
+- [ ] Permission-denied state
+- [ ] Forbidden state
+- [ ] Expired state
+- [ ] Archived state
+- [ ] Deleted state
+- [ ] Restored state
+- [ ] Out-of-stock state
+- [ ] Low-stock state
+- [ ] Sold-out state
+- [ ] Destructive-pending state
+- [ ] First-use state
+- [ ] Zero state
+- [ ] No-results state
+- [ ] Loading-error state
+- [ ] Rate-limited state
+- [ ] Timed-out state
+- [ ] Conflict state
+- [ ] Read state
+- [ ] Unread state
+- [ ] Seen state
+- [ ] Unseen state
+
+## 23. Interaction events, gestures, and behavioral patterns
+- [ ] Click
+- [ ] Activation
+- [ ] Double click
+- [ ] Context click
+- [ ] Right click
+- [ ] Pointer down
+- [ ] Pointer up
+- [ ] Press
+- [ ] Tap
+- [ ] Double tap
+- [ ] Long press
+- [ ] Press and hold
+- [ ] Hover
+- [ ] Mouse enter
+- [ ] Mouse leave
+- [ ] Focus
+- [ ] Blur
+- [ ] Focus in
+- [ ] Focus out
+- [ ] Keyboard input
+- [ ] Key down
+- [ ] Key up
+- [ ] Keyboard shortcut
+- [ ] Hotkey
+- [ ] Accelerator
+- [ ] Key chord
+- [ ] Tab navigation
+- [ ] Arrow-key navigation
+- [ ] Typeahead navigation
+- [ ] Roving focus
+- [ ] Focus wrapping
+- [ ] Focus trapping
+- [ ] Escape dismissal
+- [ ] Enter activation
+- [ ] Space activation
+- [ ] Scroll
+- [ ] Wheel scroll
+- [ ] Touch scroll
+- [ ] Inertial scroll
+- [ ] Momentum scroll
+- [ ] Overscroll
+- [ ] Pull to refresh
+- [ ] Scroll snap
+- [ ] Scroll anchoring
+- [ ] Sticky behavior
+- [ ] Parallax scroll
+- [ ] Infinite scroll
+- [ ] Load on scroll
+- [ ] Scrollspy
+- [ ] Lazy reveal
+- [ ] Drag
+- [ ] Drop
+- [ ] Reorder
+- [ ] Resize
+- [ ] Rotate
+- [ ] Pan
+- [ ] Pinch
+- [ ] Zoom
+- [ ] Scrub
+- [ ] Swipe
+- [ ] Fling
+- [ ] Flick
+- [ ] Lasso
+- [ ] Marquee
+- [ ] Rubber-band selection
+- [ ] Auto-scroll
+- [ ] Edge scroll
+- [ ] Open
+- [ ] Close
+- [ ] Expand
+- [ ] Collapse
+- [ ] Reveal
+- [ ] Hide
+- [ ] Show
+- [ ] Toggle
+- [ ] Select
+- [ ] Deselect
+- [ ] Check
+- [ ] Uncheck
+- [ ] Submit
+- [ ] Reset
+- [ ] Cancel
+- [ ] Undo
+- [ ] Redo
+- [ ] Copy
+- [ ] Paste
+- [ ] Cut
+- [ ] Delete
+- [ ] Confirm
+- [ ] Dismiss
+- [ ] Retry
+- [ ] Refresh
+- [ ] Debounce
+- [ ] Throttle
+- [ ] Autosave
+- [ ] Auto-advance
+- [ ] Auto-submit
+- [ ] Autofocus
+- [ ] Auto-scroll
+- [ ] Autoplay
+- [ ] Auto-rotate
+- [ ] Modal interaction
+- [ ] Non-modal interaction
+- [ ] Progressive disclosure
+- [ ] Optimistic update
+- [ ] Pessimistic update
+- [ ] Latency compensation
+- [ ] Click-outside behavior
+- [ ] Hover-to-reveal
+- [ ] Focus-to-reveal
+- [ ] Drag-to-reorder
+- [ ] Drag-to-select
+- [ ] Keyboard-first interaction
+- [ ] Pointer-first interaction
+- [ ] Touch-first interaction
+
+## 24. Responsive, adaptive, input-modality, and viewport terminology
+- [ ] Responsive design
+- [ ] Adaptive design
+- [ ] Fluid design
+- [ ] Fixed design
+- [ ] Elastic design
+- [ ] Intrinsic design
+- [ ] Mobile-first
+- [ ] Desktop-first
+- [ ] Content-first
+- [ ] Breakpoint
+- [ ] Media query
+- [ ] Container query
+- [ ] Style query
+- [ ] Min-width breakpoint
+- [ ] Max-width breakpoint
+- [ ] Responsive range
+- [ ] Viewport
+- [ ] Visual viewport
+- [ ] Layout viewport
+- [ ] Fold
+- [ ] Safe area
+- [ ] Notch
+- [ ] Orientation
+- [ ] Portrait orientation
+- [ ] Landscape orientation
+- [ ] Reflow
+- [ ] Wrap
+- [ ] Stack
+- [ ] Collapse
+- [ ] Hide
+- [ ] Show
+- [ ] Reorder
+- [ ] Resize
+- [ ] Scale
+- [ ] Crop
+- [ ] Art direction
+- [ ] Responsive image
+- [ ] Source set
+- [ ] Density switching
+- [ ] Resolution switching
+- [ ] Fluid typography
+- [ ] Clamp typography
+- [ ] Responsive spacing
+- [ ] Responsive grid
+- [ ] Fluid grid
+- [ ] Auto-fit grid
+- [ ] Auto-fill grid
+- [ ] Minmax track
+- [ ] Flexible track
+- [ ] Percentage width
+- [ ] Max width
+- [ ] Aspect ratio
+- [ ] Off-canvas navigation
+- [ ] Responsive navigation
+- [ ] Priority-plus navigation
+- [ ] Hamburger collapse
+- [ ] Overflow navigation
+- [ ] Adaptive toolbar
+- [ ] Responsive table
+- [ ] Horizontal-scroll table
+- [ ] Stacked table
+- [ ] Card table
+- [ ] Priority columns
+- [ ] Transposed table
+- [ ] Touch target
+- [ ] Coarse pointer
+- [ ] Fine pointer
+- [ ] Hover capability
+- [ ] No-hover mode
+- [ ] Keyboard mode
+- [ ] Reduced motion
+- [ ] Reduced transparency
+- [ ] Preferred color scheme
+- [ ] Dark mode
+- [ ] Light mode
+- [ ] High-contrast mode
+- [ ] Forced-colors mode
+- [ ] Reduced-data mode
+- [ ] Print layout
+- [ ] Progressive enhancement
+- [ ] Graceful degradation
+- [ ] Feature detection
+- [ ] Input-modality adaptation
+- [ ] Device adaptation
+- [ ] Viewport adaptation
+- [ ] Responsive density
+- [ ] Compact mode
+- [ ] Comfortable mode
+- [ ] Spacious mode
+- [ ] Landscape adaptation
+- [ ] Portrait adaptation
+- [ ] Foldable layout
+- [ ] Dual-screen layout
+- [ ] Responsive disclosure
+- [ ] Content prioritization
+
+## 25. Visual-design and Gestalt principles
+- [ ] Visual hierarchy
+- [ ] Information hierarchy
+- [ ] Emphasis
+- [ ] Focal point
+- [ ] Dominance
+- [ ] Subordination
+- [ ] Contrast
+- [ ] Similarity
+- [ ] Repetition
+- [ ] Pattern
+- [ ] Rhythm
+- [ ] Cadence
+- [ ] Balance
+- [ ] Symmetry
+- [ ] Asymmetry
+- [ ] Radial balance
+- [ ] Proportion
+- [ ] Scale
+- [ ] Alignment
+- [ ] Proximity
+- [ ] Grouping
+- [ ] Spacing
+- [ ] Whitespace
+- [ ] Negative space
+- [ ] Density
+- [ ] Visual weight
+- [ ] Unity
+- [ ] Harmony
+- [ ] Variety
+- [ ] Consistency
+- [ ] Continuity
+- [ ] Movement
+- [ ] Direction
+- [ ] Flow
+- [ ] Composition
+- [ ] Framing
+- [ ] Containment
+- [ ] Layering
+- [ ] Depth
+- [ ] Elevation
+- [ ] Figure-ground
+- [ ] Silhouette
+- [ ] Affordance
+- [ ] Signifier
+- [ ] Discoverability
+- [ ] Legibility
+- [ ] Readability
+- [ ] Scannability
+- [ ] Clarity
+- [ ] Simplicity
+- [ ] Minimalism
+- [ ] Restraint
+- [ ] Salience
+- [ ] Differentiation
+- [ ] Law of proximity
+- [ ] Law of similarity
+- [ ] Law of continuity
+- [ ] Law of good continuation
+- [ ] Law of closure
+- [ ] Law of common region
+- [ ] Law of uniform connectedness
+- [ ] Law of common fate
+- [ ] Law of symmetry
+- [ ] Law of parallelism
+- [ ] Law of focal point
+- [ ] Law of past experience
+- [ ] Law of Prägnanz
+- [ ] Typographic hierarchy
+- [ ] Type scale
+- [ ] Modular scale
+- [ ] Measure
+- [ ] Line length
+- [ ] Leading
+- [ ] Tracking
+- [ ] Kerning
+- [ ] Typographic contrast
+- [ ] Text alignment
+- [ ] Rag
+- [ ] Widow control
+- [ ] Orphan control
+- [ ] Vertical rhythm
+- [ ] Hue
+- [ ] Saturation
+- [ ] Lightness
+- [ ] Value
+- [ ] Tint
+- [ ] Shade
+- [ ] Tone
+- [ ] Color harmony
+- [ ] Complementary colors
+- [ ] Analogous colors
+- [ ] Triadic colors
+- [ ] Monochromatic scheme
+- [ ] Semantic color
+- [ ] Contrast ratio
+- [ ] Color temperature
+- [ ] Visual tension
+- [ ] Optical alignment
+- [ ] Optical balance
+
+## 26. Usability heuristics, interaction principles, and named UX laws
+- [ ] Visibility of system status
+- [ ] Match between system and the real world
+- [ ] User control and freedom
+- [ ] Consistency and standards
+- [ ] Error prevention
+- [ ] Recognition rather than recall
+- [ ] Flexibility and efficiency of use
+- [ ] Aesthetic and minimalist design
+- [ ] Help users recognize diagnose and recover from errors
+- [ ] Help and documentation
+- [ ] Strive for consistency
+- [ ] Seek universal usability
+- [ ] Offer informative feedback
+- [ ] Design dialogs to yield closure
+- [ ] Prevent errors
+- [ ] Permit easy reversal of actions
+- [ ] Keep users in control
+- [ ] Reduce short-term memory load
+- [ ] Affordance
+- [ ] Signifier
+- [ ] Natural mapping
+- [ ] Feedback
+- [ ] Constraint
+- [ ] Conceptual model
+- [ ] Discoverability
+- [ ] Predictability
+- [ ] Learnability
+- [ ] Memorability
+- [ ] Efficiency
+- [ ] Flexibility
+- [ ] Error tolerance
+- [ ] Recoverability
+- [ ] Forgiveness
+- [ ] Reversibility
+- [ ] Undoability
+- [ ] Progressive disclosure
+- [ ] Progressive onboarding
+- [ ] Direct manipulation
+- [ ] Sensible defaults
+- [ ] Safe defaults
+- [ ] Immediate feedback
+- [ ] Locality
+- [ ] Control-effect proximity
+- [ ] Minimal cognitive load
+- [ ] Chunking
+- [ ] Information scent
+- [ ] Satisficing
+- [ ] Principle of least surprise
+- [ ] Principle of least astonishment
+- [ ] Universal usability
+- [ ] Inclusive design
+- [ ] Humane design
+- [ ] Ethical design
+- [ ] Fitts's Law
+- [ ] Hick-Hyman Law
+- [ ] Jakob's Law
+- [ ] Miller's Law
+- [ ] Tesler's Law
+- [ ] Doherty Threshold
+- [ ] Parkinson's Law
+- [ ] Pareto Principle
+- [ ] Postel's Law
+- [ ] Occam's Razor
+- [ ] Peak-End Rule
+- [ ] Serial Position Effect
+- [ ] Von Restorff Effect
+- [ ] Zeigarnik Effect
+- [ ] Goal-Gradient Effect
+- [ ] Aesthetic-Usability Effect
+- [ ] Choice Overload
+- [ ] Selective Attention
+- [ ] Change Blindness
+- [ ] Inattentional Blindness
+- [ ] Cognitive Load
+- [ ] Working Memory
+- [ ] Mental Model
+- [ ] Paradox of the Active User
+- [ ] Flow
+- [ ] Proximity Compatibility Principle
+- [ ] Steering Law
+- [ ] Power Law of Practice
+- [ ] Primacy Effect
+- [ ] Recency Effect
+- [ ] Default Effect
+- [ ] Anchoring Effect
+- [ ] Framing Effect
+- [ ] Loss Aversion
+- [ ] Endowment Effect
+- [ ] Status Quo Bias
+- [ ] Confirmation Bias
+- [ ] Social Proof
+- [ ] Scarcity Effect
+- [ ] Commitment and Consistency
+- [ ] Progressive commitment
+- [ ] Recognition principle
+- [ ] Feedback principle
+- [ ] Constraint principle
+- [ ] Tolerance principle
+- [ ] Reuse principle
+- [ ] Structure principle
+- [ ] Visibility principle
+- [ ] Simplicity principle
+- [ ] Consistency principle
+- [ ] Error-recovery principle
+- [ ] User autonomy
+- [ ] Transparency
+- [ ] Explainability
+- [ ] Trust calibration
+
+## 27. Accessibility vocabulary and patterns
+- [ ] Perceivable
+- [ ] Operable
+- [ ] Understandable
+- [ ] Robust
+- [ ] Semantic HTML
+- [ ] Native control
+- [ ] Accessible name
+- [ ] Accessible description
+- [ ] Role
+- [ ] State
+- [ ] ARIA property
+- [ ] Landmark
+- [ ] Heading hierarchy
+- [ ] Document outline
+- [ ] Reading order
+- [ ] Focus order
+- [ ] Tab order
+- [ ] Keyboard operability
+- [ ] Focus indicator
+- [ ] Focus ring
+- [ ] Focus visibility
+- [ ] Focus not obscured
+- [ ] Focus trap
+- [ ] Focus restoration
+- [ ] Skip link
+- [ ] Bypass block
+- [ ] Roving tabindex
+- [ ] Active descendant
+- [ ] Arrow-key navigation
+- [ ] Screen reader
+- [ ] Assistive technology
+- [ ] Accessibility tree
+- [ ] Accessibility API
+- [ ] ARIA
+- [ ] ARIA role
+- [ ] ARIA label
+- [ ] aria-labelledby
+- [ ] aria-describedby
+- [ ] Live region
+- [ ] Polite announcement
+- [ ] Assertive announcement
+- [ ] Status role
+- [ ] Alert role
+- [ ] Label association
+- [ ] Fieldset
+- [ ] Legend
+- [ ] Error identification
+- [ ] Error suggestion
+- [ ] Error summary
+- [ ] Required state
+- [ ] Input-purpose autocomplete
+- [ ] Redundant entry
+- [ ] Accessible authentication
+- [ ] Alt text
+- [ ] Decorative image
+- [ ] Image of text
+- [ ] Caption
+- [ ] Subtitles
+- [ ] Transcript
+- [ ] Audio description
+- [ ] Sign-language interpretation
+- [ ] Color contrast
+- [ ] Text contrast
+- [ ] Non-text contrast
+- [ ] Color-independent cue
+- [ ] Forced colors
+- [ ] High-contrast mode
+- [ ] Reduced motion
+- [ ] Reduced transparency
+- [ ] Magnification
+- [ ] Zoom
+- [ ] Reflow
+- [ ] Text spacing
+- [ ] Target size
+- [ ] Pointer cancellation
+- [ ] Dragging alternative
+- [ ] Single-pointer alternative
+- [ ] Touch target
+- [ ] Keyboard-shortcut control
+- [ ] Motion-actuation alternative
+- [ ] Orientation independence
+- [ ] Language of page
+- [ ] Language of parts
+- [ ] Plain language
+- [ ] Consistent navigation
+- [ ] Consistent identification
+- [ ] Consistent help
+- [ ] Status messages
+- [ ] Visually hidden
+- [ ] Screen-reader-only
+- [ ] Hidden from accessibility tree
+- [ ] Inert
+- [ ] Disabled
+- [ ] ARIA disabled
+- [ ] WCAG Level A
+- [ ] WCAG Level AA
+- [ ] WCAG Level AAA
+- [ ] Accessibility conformance
+- [ ] Accessibility statement
+- [ ] VPAT
+- [ ] Cognitive accessibility
+- [ ] Seizure safety
+- [ ] Flashing threshold
+- [ ] Timeout control
+- [ ] Captions for live media
+- [ ] Captions for prerecorded media
+- [ ] Audio-only alternative
+- [ ] Video-only alternative
+- [ ] Descriptive link text
+- [ ] Label in name
+- [ ] Name role value
+- [ ] Programmatically determined
+- [ ] Programmatically associated
+- [ ] Keyboard interface
+- [ ] Logical focus order
+- [ ] Focus appearance
+- [ ] Target-size minimum
+- [ ] Accessible error recovery
+- [ ] Accessible authentication minimum
+- [ ] Accessible authentication enhanced
+
+## 28. Motion design, animation, and microinteraction vocabulary
+- [ ] Microinteraction
+- [ ] Trigger
+- [ ] Rule
+- [ ] Feedback
+- [ ] Loop
+- [ ] Mode
+- [ ] Motion design
+- [ ] Animation
+- [ ] Transition
+- [ ] Transformation
+- [ ] Keyframe
+- [ ] Tween
+- [ ] Interpolation
+- [ ] Easing
+- [ ] Linear easing
+- [ ] Ease-in
+- [ ] Ease-out
+- [ ] Ease-in-out
+- [ ] Cubic Bézier easing
+- [ ] Spring animation
+- [ ] Damping
+- [ ] Stiffness
+- [ ] Mass
+- [ ] Velocity
+- [ ] Overshoot
+- [ ] Bounce
+- [ ] Anticipation
+- [ ] Follow-through
+- [ ] Settle
+- [ ] Enter animation
+- [ ] Exit animation
+- [ ] Appear
+- [ ] Disappear
+- [ ] Fade
+- [ ] Crossfade
+- [ ] Fade-through
+- [ ] Dissolve
+- [ ] Slide
+- [ ] Push
+- [ ] Reveal
+- [ ] Wipe
+- [ ] Scale animation
+- [ ] Zoom animation
+- [ ] Morph
+- [ ] Shared-element transition
+- [ ] Container transform
+- [ ] Shared-axis transition
+- [ ] Expand animation
+- [ ] Collapse animation
+- [ ] Accordion motion
+- [ ] Parallax
+- [ ] Scroll-linked animation
+- [ ] Scroll-triggered animation
+- [ ] Sticky transition
+- [ ] Page transition
+- [ ] Route transition
+- [ ] View transition
+- [ ] Stagger
+- [ ] Choreography
+- [ ] Sequencing
+- [ ] Delay
+- [ ] Duration
+- [ ] Acceleration
+- [ ] Deceleration
+- [ ] Continuity
+- [ ] Spatial continuity
+- [ ] Motion hierarchy
+- [ ] Parent-child motion
+- [ ] Transform origin
+- [ ] Loading animation
+- [ ] Spinner animation
+- [ ] Shimmer animation
+- [ ] Skeleton pulse
+- [ ] Progress animation
+- [ ] Success checkmark
+- [ ] Error shake
+- [ ] Attention pulse
+- [ ] Badge bounce
+- [ ] Hover transition
+- [ ] Pressed feedback
+- [ ] Ripple
+- [ ] Ink response
+- [ ] Haptic feedback
+- [ ] Sound feedback
+- [ ] Reduced motion
+- [ ] Animation budget
+- [ ] Motion token
+- [ ] Duration token
+- [ ] Easing token
+- [ ] Interruption
+- [ ] Reversible animation
+- [ ] Cancelable animation
+- [ ] Looping animation
+- [ ] Auto-rotation
+- [ ] Motion path
+- [ ] Physics-based motion
+- [ ] Gesture-driven animation
+- [ ] Scroll-driven animation
+
+## 29. Information architecture, content design, and localization
+- [ ] Information architecture
+- [ ] Taxonomy
+- [ ] Ontology
+- [ ] Controlled vocabulary
+- [ ] Metadata
+- [ ] Labeling system
+- [ ] Navigation system
+- [ ] Search system
+- [ ] Organization scheme
+- [ ] Organization structure
+- [ ] Hierarchy
+- [ ] Polyhierarchy
+- [ ] Sequence
+- [ ] Matrix organization
+- [ ] Faceted classification
+- [ ] Category
+- [ ] Subcategory
+- [ ] Tag
+- [ ] Facet
+- [ ] Attribute
+- [ ] Filter
+- [ ] Sort
+- [ ] Sitemap
+- [ ] Content map
+- [ ] Navigation map
+- [ ] User flow
+- [ ] Task flow
+- [ ] Screen flow
+- [ ] Journey map
+- [ ] Service blueprint
+- [ ] Funnel
+- [ ] Happy path
+- [ ] Alternate path
+- [ ] Edge case
+- [ ] Dead end
+- [ ] Entry point
+- [ ] Exit point
+- [ ] Content model
+- [ ] Content type
+- [ ] Content field
+- [ ] Schema
+- [ ] Relationship
+- [ ] Reference
+- [ ] Collection
+- [ ] Archive
+- [ ] Index
+- [ ] Detail page
+- [ ] Landing page
+- [ ] Microcopy
+- [ ] UI copy
+- [ ] Label copy
+- [ ] CTA copy
+- [ ] Helper copy
+- [ ] Hint copy
+- [ ] Placeholder copy
+- [ ] Error copy
+- [ ] Confirmation copy
+- [ ] Empty-state copy
+- [ ] Onboarding copy
+- [ ] Tooltip copy
+- [ ] Notification copy
+- [ ] Plain language
+- [ ] Front-loading
+- [ ] Inverted pyramid
+- [ ] Progressive disclosure
+- [ ] Chunking
+- [ ] Scannability
+- [ ] Information scent
+- [ ] Findability
+- [ ] Discoverability
+- [ ] Content hierarchy
+- [ ] Naming consistency
+- [ ] Terminology management
+- [ ] Internationalization
+- [ ] Localization
+- [ ] Right-to-left layout
+- [ ] Bidirectional text
+- [ ] Text expansion
+- [ ] Locale
+- [ ] Language selector
+- [ ] Date formatting
+- [ ] Number formatting
+- [ ] Currency formatting
+- [ ] Pluralization
+- [ ] Translation key
+- [ ] Content fallback
+- [ ] Locale switcher
+- [ ] Transcreation
+- [ ] Content governance
+- [ ] Content strategy
+- [ ] Voice and tone
+- [ ] Reading level
+
+## 30. Design systems, tokens, visual treatments, and style families
+- [ ] Design system
+- [ ] Component library
+- [ ] Pattern library
+- [ ] UI kit
+- [ ] Style guide
+- [ ] Brand guidelines
+- [ ] Design language
+- [ ] Design tokens
+- [ ] Primitive tokens
+- [ ] Semantic tokens
+- [ ] Component tokens
+- [ ] Reference tokens
+- [ ] Alias tokens
+- [ ] Theme
+- [ ] Mode
+- [ ] Light theme
+- [ ] Dark theme
+- [ ] High-contrast theme
+- [ ] Density mode
+- [ ] Color palette
+- [ ] Typography scale
+- [ ] Spacing scale
+- [ ] Sizing scale
+- [ ] Radius scale
+- [ ] Elevation scale
+- [ ] Shadow scale
+- [ ] Motion scale
+- [ ] Z-index scale
+- [ ] Breakpoint scale
+- [ ] Icon set
+- [ ] Surface
+- [ ] Fill
+- [ ] Stroke
+- [ ] Border
+- [ ] Outline
+- [ ] Focus ring
+- [ ] Divider
+- [ ] Shadow
+- [ ] Drop shadow
+- [ ] Inner shadow
+- [ ] Elevation
+- [ ] Opacity
+- [ ] Blur
+- [ ] Backdrop blur
+- [ ] Gradient
+- [ ] Texture
+- [ ] Noise
+- [ ] Tint
+- [ ] Overlay
+- [ ] Scrim
+- [ ] Corner radius
+- [ ] Pill radius
+- [ ] Cut corner
+- [ ] Border width
+- [ ] Hairline
+- [ ] Separator
+- [ ] Flat design
+- [ ] Skeuomorphism
+- [ ] Neumorphism
+- [ ] Soft UI
+- [ ] Glassmorphism
+- [ ] Material Design
+- [ ] Fluent Design
+- [ ] Brutalism
+- [ ] Neo-brutalism
+- [ ] Minimalism
+- [ ] Maximalism
+- [ ] Bento UI
+- [ ] Card-based UI
+- [ ] Editorial UI
+- [ ] Dashboard UI
+- [ ] Monochrome UI
+- [ ] Retro UI
+- [ ] Y2K UI
+- [ ] Atomic design
+- [ ] Atom
+- [ ] Molecule
+- [ ] Organism
+- [ ] Template
+- [ ] Page
+- [ ] Headless UI
+- [ ] Unstyled primitive
+- [ ] Accessible primitive
+- [ ] Compound component
+- [ ] Controlled component
+- [ ] Uncontrolled component
+- [ ] Slot
+- [ ] Portal
+- [ ] Polymorphic component
+- [ ] Web component
+- [ ] Custom element
+- [ ] Shadow DOM
+- [ ] CSS custom property
+- [ ] Theme token
+- [ ] Semantic color
+- [ ] Brand color
+- [ ] Accent color
+- [ ] Surface color
+- [ ] On-surface color
+- [ ] State layer
+- [ ] Elevation overlay
+- [ ] Visual density
+- [ ] Design-system governance
+- [ ] Component API
+- [ ] Component anatomy
+- [ ] Variant matrix
+- [ ] State matrix
+- [ ] Token taxonomy
+
+## 31. Common page, screen, and flow templates
+- [ ] Home page
+- [ ] Landing page
+- [ ] Marketing page
+- [ ] Campaign page
+- [ ] Splash page
+- [ ] Portal
+- [ ] Dashboard
+- [ ] Workspace
+- [ ] Console
+- [ ] Admin panel
+- [ ] Control panel
+- [ ] Settings page
+- [ ] Profile page
+- [ ] Account page
+- [ ] Preferences page
+- [ ] Listing page
+- [ ] Index page
+- [ ] Collection page
+- [ ] Category page
+- [ ] Archive page
+- [ ] Search-results page
+- [ ] Detail page
+- [ ] Master-detail page
+- [ ] Directory
+- [ ] Catalog
+- [ ] Browse page
+- [ ] Article page
+- [ ] Blog post
+- [ ] News story
+- [ ] Documentation page
+- [ ] Reference page
+- [ ] Guide
+- [ ] Tutorial
+- [ ] FAQ
+- [ ] Help center
+- [ ] Knowledge base
+- [ ] Changelog
+- [ ] Release notes
+- [ ] Status page
+- [ ] Form page
+- [ ] Question page
+- [ ] Wizard
+- [ ] Onboarding flow
+- [ ] Setup flow
+- [ ] Checkout flow
+- [ ] Cart page
+- [ ] Payment page
+- [ ] Confirmation page
+- [ ] Success page
+- [ ] Receipt page
+- [ ] Order-tracking page
+- [ ] Authentication page
+- [ ] Sign-in page
+- [ ] Sign-up page
+- [ ] Forgot-password page
+- [ ] Reset-password page
+- [ ] Verification page
+- [ ] Invitation-acceptance page
+- [ ] Pricing page
+- [ ] Comparison page
+- [ ] Product-detail page
+- [ ] Product-listing page
+- [ ] Storefront
+- [ ] Feed page
+- [ ] Timeline page
+- [ ] Inbox
+- [ ] Notification center
+- [ ] Chat page
+- [ ] Conversation page
+- [ ] Comments page
+- [ ] Gallery page
+- [ ] Portfolio
+- [ ] Media library
+- [ ] Player page
+- [ ] Map page
+- [ ] Calendar page
+- [ ] Board
+- [ ] Kanban page
+- [ ] Gantt page
+- [ ] Report
+- [ ] Analytics dashboard
+- [ ] 404 page
+- [ ] 403 page
+- [ ] 401 page
+- [ ] 500 page
+- [ ] Error page
+- [ ] Service-unavailable page
+- [ ] Maintenance page
+- [ ] Offline page
+- [ ] Empty page
+- [ ] Zero-state page
+- [ ] Permission-denied page
+- [ ] Deleted-content page
+- [ ] Privacy-policy page
+- [ ] Terms page
+- [ ] Cookie-settings page
+- [ ] Accessibility-statement page
+- [ ] Contact page
+- [ ] About page
+- [ ] Team page
+- [ ] Careers page
+- [ ] Pricing calculator
+- [ ] Survey
+- [ ] Questionnaire
+- [ ] Application flow
+- [ ] Booking flow
+- [ ] Reservation flow
+- [ ] Scheduling flow
+- [ ] Import flow
+- [ ] Export flow
+- [ ] Migration flow
+
+## 32. Onboarding, education, help, and guidance patterns
+- [ ] Onboarding
+- [ ] Progressive onboarding
+- [ ] Product tour
+- [ ] Guided tour
+- [ ] Walkthrough
+- [ ] Feature tour
+- [ ] Coachmark
+- [ ] Spotlight
+- [ ] Teaching bubble
+- [ ] Tooltip onboarding
+- [ ] Beacon
+- [ ] Hotspot
+- [ ] Nudge
+- [ ] Checklist
+- [ ] Getting-started checklist
+- [ ] Setup checklist
+- [ ] Activation checklist
+- [ ] Setup wizard
+- [ ] Welcome screen
+- [ ] Welcome modal
+- [ ] First-run experience
+- [ ] First-use state
+- [ ] Sample data
+- [ ] Demo content
+- [ ] Starter template
+- [ ] Empty-state guidance
+- [ ] Contextual help
+- [ ] Inline help
+- [ ] Help panel
+- [ ] Help drawer
+- [ ] Help center
+- [ ] Knowledge base
+- [ ] FAQ
+- [ ] Documentation link
+- [ ] Learn-more link
+- [ ] Help icon
+- [ ] Support widget
+- [ ] Chat support
+- [ ] Contact support
+- [ ] Troubleshooting guide
+- [ ] Diagnostic flow
+- [ ] Interactive tutorial
+- [ ] Practice mode
+- [ ] Sandbox
+- [ ] Guided task
+- [ ] Progressive disclosure
+- [ ] Just-in-time guidance
+- [ ] Feature discovery
+- [ ] New-feature badge
+- [ ] What's new
+- [ ] Release notes
+- [ ] Changelog
+- [ ] Announcement modal
+- [ ] Education banner
+- [ ] Tips carousel
+- [ ] Keyboard-shortcuts sheet
+- [ ] Command-palette help
+- [ ] Contextual documentation
+- [ ] Inline example
+- [ ] Example text
+- [ ] Sample input
+- [ ] Placeholder example
+- [ ] Error-recovery guidance
+
+## 33. Performance, loading, data-fetching, and perceived-speed patterns
+- [ ] Perceived performance
+- [ ] Response time
+- [ ] Latency
+- [ ] Input latency
+- [ ] Loading state
+- [ ] Skeleton screen
+- [ ] Optimistic UI
+- [ ] Pessimistic UI
+- [ ] Prefetch
+- [ ] Preload
+- [ ] Prerender
+- [ ] Lazy loading
+- [ ] Eager loading
+- [ ] Progressive loading
+- [ ] Progressive rendering
+- [ ] Streaming rendering
+- [ ] Server-side rendering
+- [ ] Hydration
+- [ ] Partial hydration
+- [ ] Islands architecture
+- [ ] Virtualization
+- [ ] Windowing
+- [ ] Pagination
+- [ ] Infinite scroll
+- [ ] Load more
+- [ ] Incremental loading
+- [ ] Chunked upload
+- [ ] Background sync
+- [ ] Offline-first
+- [ ] Cache-first
+- [ ] Stale-while-revalidate
+- [ ] Optimistic mutation
+- [ ] Rollback
+- [ ] Retry with backoff
+- [ ] Debouncing
+- [ ] Throttling
+- [ ] Memoization
+- [ ] Placeholder
+- [ ] Low-quality image placeholder
+- [ ] Blur-up image
+- [ ] Responsive image
+- [ ] Resource hint
+- [ ] Code splitting
+- [ ] Route-based splitting
+- [ ] Priority hint
+- [ ] Input responsiveness
+- [ ] Core Web Vitals
+- [ ] Largest Contentful Paint
+- [ ] Interaction to Next Paint
+- [ ] Cumulative Layout Shift
+- [ ] First Contentful Paint
+- [ ] Time to First Byte
+- [ ] Critical rendering path
+- [ ] Above-the-fold content
+- [ ] Progressive image
+- [ ] Streaming response
+- [ ] Partial result
+- [ ] Incremental result
+- [ ] Background loading
+- [ ] Deferred content
+- [ ] Idle loading
+- [ ] Prefetch on hover
+- [ ] Prefetch on intent
+
+## 34. Ethical design, trust, consent, and deceptive-pattern vocabulary
+- [ ] Ethical design
+- [ ] Humane design
+- [ ] Responsible design
+- [ ] Trustworthy design
+- [ ] Trust calibration
+- [ ] Transparency
+- [ ] Explainability
+- [ ] Informed consent
+- [ ] Affirmative consent
+- [ ] Granular consent
+- [ ] Reversible consent
+- [ ] Easy cancellation
+- [ ] Data minimization
+- [ ] Privacy by design
+- [ ] Safety by design
+- [ ] Non-coercive design
+- [ ] Proportional confirmation
+- [ ] Neutral choice architecture
+- [ ] Honest defaults
+- [ ] Dark pattern
+- [ ] Deceptive pattern
+- [ ] Nagging
+- [ ] Obstruction
+- [ ] Roach motel
+- [ ] Hard-to-cancel pattern
+- [ ] Forced action
+- [ ] Forced registration
+- [ ] Forced continuity
+- [ ] Hidden subscription
+- [ ] Sneaking
+- [ ] Hidden costs
+- [ ] Drip pricing
+- [ ] Basket sneaking
+- [ ] Interface interference
+- [ ] Visual interference
+- [ ] Misdirection
+- [ ] Confirmshaming
+- [ ] Trick question
+- [ ] Preselection
+- [ ] Disguised advertisement
+- [ ] Bait and switch
+- [ ] Fake urgency
+- [ ] Fake scarcity
+- [ ] Fake social proof
+- [ ] Countdown pressure
+- [ ] Fake activity message
+- [ ] Privacy Zuckering
+- [ ] Consent asymmetry
+- [ ] Obstructed opt-out
+- [ ] Bundled consent
+- [ ] Dark default
+- [ ] Sludge
+- [ ] Friction asymmetry
+- [ ] Manipulative gamification
+- [ ] Infinite engagement
+- [ ] Autoplay pressure
+- [ ] Variable reward
+- [ ] Deceptive hierarchy
+- [ ] Hidden information
+- [ ] Comparison prevention
+- [ ] Scarcity cue
+- [ ] Urgency cue
+- [ ] Social-proof cue
+- [ ] Forced disclosure
+- [ ] Friend spam
+- [ ] Intermediate currency
+- [ ] Price comparison prevention
+- [ ] Subscription trap
+- [ ] Cancellation maze
+- [ ] Cookie wall
+- [ ] Take-it-or-leave-it consent
+- [ ] Default opt-in
+- [ ] Shaming copy
+- [ ] Manipulative microcopy
+- [ ] False authority
+- [ ] False endorsement
+- [ ] Trust signal
+- [ ] Security signal
+- [ ] Privacy signal
+- [ ] Verified indicator
+- [ ] Disclosure statement
+- [ ] Conflict-of-interest disclosure
+- [ ] Sponsored-content label
+- [ ] Advertisement label
+
+## 35. Common UI and UX anti-pattern names
+- [ ] Mystery-meat navigation
+- [ ] Placeholder-as-label
+- [ ] Icon-only ambiguity
+- [ ] Unlabeled icon
+- [ ] False affordance
+- [ ] Missing affordance
+- [ ] Dead end
+- [ ] Modal cascade
+- [ ] Nested modal
+- [ ] Popup overload
+- [ ] Toast overload
+- [ ] Banner blindness
+- [ ] Carousel blindness
+- [ ] Auto-rotating carousel
+- [ ] Horizontal-scroll trap
+- [ ] Scroll hijacking
+- [ ] Scrolljacking
+- [ ] Infinite-scroll trap
+- [ ] Hover-only interaction
+- [ ] Color-only cue
+- [ ] Keyboard trap
+- [ ] Broken focus trap
+- [ ] Lost focus
+- [ ] Focus reset
+- [ ] Inaccessible custom control
+- [ ] Disabled-button dead end
+- [ ] Disabled control without explanation
+- [ ] Destructive default
+- [ ] Premature validation
+- [ ] Validation on every keystroke
+- [ ] Validation after data loss
+- [ ] Reset-button hazard
+- [ ] Tiny touch target
+- [ ] Low contrast
+- [ ] Unreadable line length
+- [ ] Dense wall of text
+- [ ] Content shift
+- [ ] Layout shift
+- [ ] Visual jank
+- [ ] Interaction jank
+- [ ] Skeleton mismatch
+- [ ] False progress
+- [ ] Spinner of death
+- [ ] Optimistic update without recovery
+- [ ] Hidden navigation
+- [ ] Excessive nesting
+- [ ] Megamenu overload
+- [ ] Accordion overload
+- [ ] Tab misuse
+- [ ] Segmented-control misuse
+- [ ] Dropdown misuse
+- [ ] Select-as-menu misuse
+- [ ] Menu-as-navigation misuse
+- [ ] Button-as-link misuse
+- [ ] Link-as-button misuse
+- [ ] Checkbox-as-radio misuse
+- [ ] Switch-for-delayed-action misuse
+- [ ] Hover tunnel
+- [ ] Tooltip dependency
+- [ ] Tooltip overload
+- [ ] Double scrollbar
+- [ ] Nested scrolling
+- [ ] Scroll chaining problem
+- [ ] Nonstandard control
+- [ ] Inconsistent terminology
+- [ ] Inconsistent iconography
+- [ ] Inconsistent state styling
+- [ ] No undo
+- [ ] Confirmation fatigue
+- [ ] Alert fatigue
+- [ ] Notification fatigue
+- [ ] Choice overload
+- [ ] Feature overload
+- [ ] Cognitive overload
+- [ ] Progressive-disclosure abuse
+- [ ] Dark-pattern consent
+- [ ] Forced sign-up
+- [ ] Forced app install
+- [ ] Autoplay media
+- [ ] Unexpected sound
+- [ ] Unexpected navigation
+- [ ] Unexpected context change
+- [ ] Hidden destructive action
+- [ ] Irreversible action without warning
+- [ ] Ambiguous CTA
+- [ ] Generic CTA
+- [ ] Click here link
+- [ ] Duplicate primary actions
+- [ ] Competing CTAs
+- [ ] Invisible loading
+- [ ] Silent failure
+- [ ] Generic error message
+- [ ] Error without recovery
+- [ ] Data loss on error
+- [ ] Form clearing on validation error
+- [ ] Required-field ambiguity
+- [ ] Password-rule surprise
+- [ ] Masked input rejection
+- [ ] Overrestrictive input formatting
+- [ ] Mobile keyboard mismatch
+- [ ] Focus order mismatch
+- [ ] Reading order mismatch
+- [ ] Touch-target overlap
+- [ ] Responsive overflow
+- [ ] Desktop-only interaction
+- [ ] Motion without reduced-motion fallback
+- [ ] Color contrast failure
+- [ ] Text truncation without access
+- [ ] Icon without accessible name
+- [ ] Dialog without focus restoration
+- [ ] Modal without escape
+- [ ] Background interactive under modal
+- [ ] Auto-dismissed critical message
+- [ ] Toast-only error
+- [ ] Infinite pagination without position recovery
+- [ ] Back-button hijacking
+- [ ] Session timeout without warning
+- [ ] Consent fatigue
+
+---
+
+## Notes on use
+
+This is a lookup vocabulary, not a component checklist. Start from the user's task and current design
+decision, then consult only the relevant families to name it precisely. A row's presence creates no
+requirement to include, document, review, or verify it.
+
+When a term exposes a material difference in interaction, state, recovery, or fit, describe only that
+difference in the owning product or experience material, proportionally. `SKILL.md` decides which
+decisions and verification are relevant to the change.
