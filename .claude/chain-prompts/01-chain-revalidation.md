@@ -39,29 +39,34 @@ BRD when business intent changes
 
 Two phases govern all content work:
 
-- **PHASE 1 — truth before design.** Every existing doc read end to end and
-  rewritten to current state only: no "previously we…", no invented facts,
-  unknowns stated as unknown. Every claim about a live surface verified
-  against the live surface. Public copy that promises behavior the code does
-  not implement is REPORTED, not fixed. No BRD/PRD/XDS/SD authoring in this
-  phase; no backfilling a chain for work already shipped.
+- **PHASE 1 — truth before design.** Every existing doc read end to end,
+  then handled by KIND. DESCRIPTIVE docs (READMEs, setup, current-state
+  description) are rewritten to current state only: no "previously we…", no
+  invented facts, unknowns stated as unknown. NORMATIVE docs (BRD/PRD/XDS/SD
+  — recorded decisions and commitments) are never silently corrected: a
+  normative claim that fails verification becomes a FINDING, and only
+  Phase 2 may supersede the decision, with evidence. Every claim about a
+  live surface is verified against the live surface. Public copy that
+  promises behavior the code does not implement is REPORTED, not fixed. No
+  BRD/PRD/XDS/SD authoring in this phase; no backfilling a chain for work
+  already shipped.
   Phase 1 also runs the budget law BACKWARD — the prune lane: list every
   document, section, and field that records no decision, including survivors
   of retired machinery (hand-typed statuses, approval or conformance
   records, per-feature stubs authored under old quotas). RECOMMEND removal
   in the report with a count and a per-item reason; NEVER execute
   corpus-scale deletion — that call stays with the owner.
-  Canon is not immutable: correct any claim that fails verification, and
-  Phase 2 may supersede a recorded decision with evidence. What is forbidden
-  is rebuilding healthy content for style. In peer-curated corpora (the
-  preamble says so), corrections are coordinated via `hey.md` first.
+  What is forbidden everywhere is rebuilding healthy content for style. In
+  peer-curated corpora (the preamble says so), edits are coordinated via
+  `hey.md` first.
 - **PHASE 2 — design only what a decision requires.** No per-feature artifact
   quota; weight comes from the skill's proportionality rules: small change →
   a short experience brief in the plan or PR; a feature → one design
   document; a journey → one coherent journey document. Author BRD/PRD upward
   only where a business or product decision must outlive this change. A
-  capability with no decision to record gets no document. Ads-monetized
-  content (guides, databases, news) is a viable business model.
+  capability with no decision to record gets no document. Before authoring
+  anything new, search existing canon for a document that already records
+  the decision — extend and relink it instead of duplicating.
 
 Craft rules for everything authored in Phase 2:
 
@@ -71,9 +76,10 @@ Craft rules for everything authored in Phase 2:
   reason on every "cannot occur".
 - Felt quality is committed as observable values (~100 ms acknowledgment,
   ~1,000 ms slow state), never as adjectives.
+- Every interaction scenario uses the skill's interaction-scenario grammar
+  (Starts in / User / Immediately / While / Succeeds as / Fails as /
+  Recovers by / Returns to).
 - PRDs own WHAT; design owns HOW; design never mints a requirement.
-- BRDs scope into blocks, blocks into the product — keep that hierarchy
-  visible.
 - Maintain a docs index page: every doc listed once with a one-line condensed
   summary, so nothing duplicate gets written.
 - Docs are clean RFC-style HTML, cross-linked many-to-many, current state
@@ -156,11 +162,13 @@ against it and report any drift; the vendored copy remains the binding
 method for this run either way. Inventory: every doc, every product
 surface (routes, pages, commands), every configured hostname. Count candidate
 BRD chains and rank them by business value. One BRD chain = one BRD plus
-whatever PRD/XDS/SD that decision requires. **Cap: at most 5 chains in this
-run; at most 5 BRDs per agent.** If real scope exceeds 5, take the top 5 and
-record the ordered remainder for the report. Decide what gets
-delegated and what you do directly; write the partition down before
-launching anything.
+whatever PRD/XDS/SD that decision requires. **Shard chains across drafting
+agents: at most 5 BRDs per agent.** This is a ceiling, not a quota — there
+is no requirement to produce five, or any. The 8-subagent ceiling bounds
+the run; chains beyond what it can carry become the ordered remainder in
+the report.
+Decide what gets delegated and what you do directly; write the partition
+down before launching anything.
 
 ### Stage 1 — truth sweep (parallel read-only subagents)
 
@@ -254,7 +262,7 @@ the unreliable claim — never add a process layer.
 The run report (final text): commit hashes; per-doc summary of what changed
 and why; functional findings with file:line citations; prune-lane
 recommendations with counts; owner-only questions; the ordered remainder
-list if the 5-chain cap was hit; every subagent launched, its assignment,
+list if chains exceeded the run's capacity; every subagent launched, its assignment,
 and whether you accepted or rejected its claims.
 
 Reports evaporate — findings must not. Maintain `docs/open-questions.html`

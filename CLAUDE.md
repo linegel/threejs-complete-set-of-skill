@@ -38,3 +38,6 @@ exercise the real flow — success, failure, recovery, interruption, return,
 responsive — in a real browser. There is no resolver, status vocabulary,
 approval record, or merge gate: document validity is human review. Repository
 documents describe the current state only; git keeps history.
+
+Product-chain revalidation prompts for this repo live in
+`.claude/chain-prompts/`.
