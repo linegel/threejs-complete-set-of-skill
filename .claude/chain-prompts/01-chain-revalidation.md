@@ -146,12 +146,14 @@ yourself.
 **Work-separation law (all stages):** you are the ONLY writer and the only
 committer. Subagents read, verify, and draft in their reports; they never
 edit repo files, never commit, never delegate. Hard ceiling: at most 8
-subagents in the whole run — proportionality usually wants fewer. Partition assignments so no
-two subagents own the same doc or surface for the same purpose — overlap is
-reserved for deliberate cross-verification of the riskiest claims. Every
-assignment states its bounded reading budget: named docs in full, source only
-at named entry points (configs, manifests, route/handler entries), never
-walking trees.
+subagents in the whole run — proportionality usually wants fewer. Partition
+assignments so no two subagents own the same doc or surface for the same
+purpose — overlap is reserved for deliberate cross-verification of the
+riskiest claims. Every assignment you write restates the HARD RULES
+verbatim, plus its scope boundary and its bounded reading budget: named
+docs in full — at most 15 per assignment — and source only at named entry
+points (configs, manifests, route/handler entries), never walking trees. A
+stateless worker obeys its brief, not your copy of the rulebook.
 
 ### Stage 0 — scoping (orchestrator, solo)
 
@@ -162,13 +164,12 @@ against it and report any drift; the vendored copy remains the binding
 method for this run either way. Inventory: every doc, every product
 surface (routes, pages, commands), every configured hostname. Count candidate
 BRD chains and rank them by business value. One BRD chain = one BRD plus
-whatever PRD/XDS/SD that decision requires. **Shard chains across drafting
-agents: at most 5 BRDs per agent.** This is a ceiling, not a quota — there
-is no requirement to produce five, or any. The 8-subagent ceiling bounds
-the run; chains beyond what it can carry become the ordered remainder in
-the report.
-Decide what gets delegated and what you do directly; write the partition
-down before launching anything.
+whatever PRD/XDS/SD that decision requires. **When you write the partition,
+assign no more than 5 BRDs to any one drafting assignment** — a ceiling,
+not a quota; there is no requirement to produce five, or any. The
+8-subagent ceiling bounds the run; chains beyond what it can carry become
+the ordered remainder in the report. Decide what gets delegated and what
+you do directly; write the partition down before launching anything.
 
 ### Stage 1 — truth sweep (parallel read-only subagents)
 
@@ -194,9 +195,11 @@ not canon.
 ### Stage 3 — convergence (orchestrator, solo)
 
 Judge the drafts against the skill and against each other. Resolve
-contradictions, deduplicate against the index, enforce the block hierarchy
-and the craft rules, then author the canon HTML yourself and relink
-many-to-many. No document enters canon that you have not read end to end.
+contradictions, deduplicate against the index, enforce the craft rules,
+then author the canon HTML yourself and relink many-to-many. No document
+enters canon that you have not read end to end. Author, verify, and commit
+each chain COMPLETE before opening the next — an interrupted run leaves
+finished chains, never a half-written corpus.
 
 ### Stage 4 — the single review round
 
