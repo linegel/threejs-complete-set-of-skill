@@ -1,338 +1,259 @@
 ---
 name: product-from-scratch
-description: Use when designing a product change before building it — deciding whether it needs a BRD, PRD, UX note/XDS, or SD/SDD; authoring or amending those artifacts; writing user stories; designing journeys and interactions; choosing controls, states, failures, and recovery; reviewing the result; or handing product decisions to another stateless worker. This skill owns a CONDITIONAL DECISION CHAIN, the boundary between PRODUCT REQUIREMENT AUTHORITY and EXPERIENCE REALIZATION, the PRODUCT-STORY and INTERACTION-SCENARIO grammars, Data · Time · Path · Frame state prompts, durable repository/PR handoff, rendered review, and a PROPORTIONALITY rule that caps process cost. It is a thinking aid, not a governance system — it produces no statuses, hashes, approval records, artifact quotas, or merge gates.
+description: Design a product change before building it. Decides which of BRD, PRD, XDS, and SDD the change needs, and supplies the story, scenario, and state grammars for writing them, a vocabulary for naming controls precisely, and the review and verification rules. Use for any user-facing change, from a one-line fix to a new journey.
 ---
 
-# Product from scratch — design before code, at a cost the change can afford
+# Product from scratch
 
-You are about to decide what a human will see and do. Make the important product and experience
-decisions explicit before they constrain implementation: the user, outcome, journey, interactions,
-states, failures, and recovery. If implementation exposes a real constraint, reopen the relevant
-decision instead of silently redesigning around the code.
+Decide what a person will see and do before code constrains it: the user, the outcome, the journey,
+the interactions, the states, the failures, and the recovery. When implementation exposes a real
+constraint, reopen the decision that owns it instead of redesigning around the code.
 
-## The budget law — read this before anything else
+## Cost rules
 
-This skill's ancestor grew into a certification bureaucracy: manifests, hashes, computed status
-ladders, approval and conformance records, evidence taxonomies, and a resolver wired into CI. In the
-originating trial, that machinery cost far more than implementing the same fixes directly, while the
-decisive defects were caught by simple product stories and state prompts. Three rules keep the
-machinery deleted:
+1. Design effort stays proportionate to consequence and unresolved uncertainty. For an ordinary
+   change it costs materially less than implementing the change twice.
+2. Every artifact and every field must force a distinct decision or improve verification. Remove
+   one that repeatedly does neither.
+3. Reuse existing canon before authoring anything. Touching the interface does not earn a new
+   document.
 
-1. **Design effort must be proportionate to consequence and unresolved uncertainty, and cheaper
-   than the avoidable rework it is likely to prevent.** For an ordinary change that means
-   materially cheaper than implementing the change twice — a falsifiable ceiling, not a vibe.
-   When work grows without resolving a decision or reducing a plausible risk, cut process, not
-   quality.
-2. **A required artifact or field must force a distinct decision or materially improve
-   verification.** If repeated real use shows it does neither, remove it.
-3. **Reuse existing product canon before authoring anything new.** A change does not earn a new
-   document merely because it touches the interface.
+When work grows without resolving a decision or reducing a plausible risk, cut process. A process
+defect is never fixed with another process layer: no manifests, hashes, computed statuses, approval
+records, evidence taxonomies, reviewer machinery, or artifact quotas. Document lint proves
+mechanics; it never approves a design.
 
-## The conditional decision chain
+## The chain
 
 ```text
-BRD when business intent changes
-  → PRD when product behaviour changes
-    → UX/XDS when a material experience decision exists
-      → SDD when a material technical decision exists
-        → implementation → verification
+BRD  when business intent changes
+PRD  when product behaviour changes
+XDS  when a material experience decision exists
+SDD  when a material technical decision exists
+then implementation, then verification
 ```
 
-Conditionality prevents dummy artifacts; it is not permission to skip an unresolved decision. A new
-product capability or cross-surface journey normally uses every layer whose decision actually exists.
+A layer is used only when its decision exists. Conditionality prevents dummy documents; it does not
+permit leaving a decision unresolved. A new capability or cross-surface journey normally uses every
+layer.
 
-| Artifact | Use it when | Owns | Must not own |
+| Artifact | Use when | Owns | Must not own |
 |---|---|---|---|
-| **BRD** (business requirements) | Business intent, target users, outcomes, scope, or non-negotiable qualities change | Why the work deserves to exist; user and business outcomes; acceptable effort/friction; qualities that may not be traded away | Controls, layout, copy, colour |
-| **PRD** (product requirements) | A new capability or material product behaviour needs a durable rule | Product stories, rules, data, permissions, required outcomes and invariants under success, failure, interruption, recovery, and return, plus observable acceptance | Detailed control choice, interaction choreography, layout, copy, visual hierarchy, motion, or technical realization |
-| **UX note / XDS** (experience design) | A new or materially redesigned journey, cross-surface seam, hierarchy, state model, or interaction choice needs design | How the user experiences the product rule: journey, material states and transitions, controls/events, copy, feedback ownership, preservation, retry, return, responsive composition, motion, and meaningful alternatives | New business/product requirement authority or technical realization |
-| **SD / SDD** (solution design) | Architecture, data, security, deployment, performance, or cross-module behaviour needs durable technical resolution | Schemas, APIs, persistence, performance, security, and technical failure handling | Quietly redesigning the user experience |
+| **BRD**, business requirements | Business intent, target users, outcomes, scope, or non-negotiable qualities change | Why the work deserves to exist, user and business outcomes, acceptable effort, qualities that may not be traded away | Controls, layout, copy, colour |
+| **PRD**, product requirements | A new capability or a material behaviour change needs a durable rule | Product stories, rules, data, permissions, required outcomes and invariants under success, failure, interruption, recovery, and return, observable acceptance | Control choice, choreography, layout, copy, hierarchy, motion, technical realization |
+| **XDS**, experience design (a short UX note in the PR counts) | A new or materially changed journey, seam, hierarchy, state model, shared control, or interaction choice needs design | Journey, states and transitions, controls and events, copy, feedback ownership, preservation, retry, return, responsive composition, motion, alternatives | New business or product requirements, technical realization |
+| **SDD**, solution design | Architecture, data, security, deployment, performance, or cross-module behaviour needs a durable technical decision | Schemas, APIs, persistence, performance, security, technical failure handling | Redesigning the experience |
 
-The ordering applies only to artifacts the change actually needs:
+Order and authority:
 
-- When both BRD and PRD are needed, business intent precedes product behaviour.
-- The PRD is authority for **what the product must do**. UX/XDS decides **how the person understands,
-  acts through, and recovers within it**. If experience design reveals a missing product rule, amend
-  the PRD instead of minting that requirement inside the design.
-- When a material user-facing decision and an SDD are both needed, the product/experience decision
-  precedes technical realization. A technical-only SDD does not need a fictional XDS.
-- A feasibility conflict reopens the owning product or experience decision. Technical work may
-  expose constraints and propose options; it does not choose the user-facing resolution silently.
-- Scope experience design by a coherent journey or surface family. Do not split it merely to mirror
-  PRD boundaries. One design may serve several PRDs, and one PRD may participate in several journeys.
+- Business intent precedes product behaviour, product behaviour precedes its experience, and both
+  precede technical realization. A technical-only SDD needs no XDS.
+- The PRD says what the product must do. The XDS says how the person reaches, understands, and
+  recovers through it. A product rule discovered during design goes into the PRD, never into the XDS.
+- A feasibility conflict reopens the owning product or experience decision. Technical work may expose
+  constraints and propose options; it does not pick the user-facing resolution.
+- Scope an XDS by a coherent journey or surface family. One XDS may serve several PRDs and one PRD may
+  appear in several journeys.
+- Current implementation, research, and measurements are evidence. They inform the target; they never
+  define it. Keep the target and the as-built record distinct.
 
-Before writing, identify the decision and read only the existing artifacts that own or constrain it.
-Amend canon only when its decision changes. Link to an owning statement when the dependency matters;
-do not duplicate requirement prose or create a completeness matrix.
+Before writing, name the decision and read only the artifacts that own or constrain it. Amend canon
+only when its decision changes. Link to the owning statement instead of restating it. A legacy
+product without a corpus owes no backfill before a small fix: put the smallest missing decision in
+the issue or PR, and create durable canon only when a decision must outlive the change.
 
-If a legacy product has no formal corpus, do not block a small fix while backfilling one. Put the
-smallest missing decision in the issue or PR. Create durable canon only when a real product, journey,
-or technical decision needs to outlive that change.
+## Proportionality
 
-## Proportionality — choose the smallest useful material
-
-| Change | Smallest useful design material |
+| Change | Smallest useful material |
 |---|---|
 | No user-visible or interaction effect | None, unless a business, product, or technical decision independently needs durable treatment |
-| Small maintenance delta | The issue or PR may contain only: actor/task, current failure, expected behaviour, affected reachable states, preserved context, material recovery/return rule, and observable acceptance. If existing requirements and tests already make the decision clear, link them instead of rewriting them |
-| New capability or material product behaviour | Add or amend the PRD; add or amend UX material when the capability introduces or materially changes a journey, seam, hierarchy, state model, shared control, or interaction choice |
-| New or materially changed journey or cross-surface seam | One coherent UX note/XDS in traversal order, covering the decisions the journey actually needs |
-| Consequential technical choice | One SDD for the architecture, data, security, deployment, performance, or cross-module decision |
+| Small maintenance delta | In the issue or PR: actor and task, current failure, expected behaviour, affected reachable states, preserved context, recovery and return rule, observable acceptance. Link existing requirements and tests instead of restating them |
+| New capability or material behaviour change | Add or amend the PRD. Add or amend XDS material when the change introduces or alters a journey, seam, hierarchy, state model, shared control, or interaction choice |
+| New or materially changed journey or cross-surface seam | One XDS in traversal order, covering only the decisions the journey needs |
+| Consequential technical choice | One SDD |
 
 There is no length quota. Use the lightest material that leaves no material decision implicit.
-Escalate only when the lighter material failed to force a specific product or interaction decision;
-“more rigor” or “a reviewer asked for more documentation” is not enough.
+Escalate only when the lighter material failed to force a decision. A request for more documentation
+is not a reason.
 
-## Experience prompts — not a form
+## Experience prompts
 
-Use only the prompts that resolve the change. Omit irrelevant prompts without explanation.
+Use the prompts that resolve the change and omit the rest without comment.
 
-1. **Product story** — who, in what context, doing what, and for which outcome.
-2. **Experience thesis** — for a new feature or journey only: one sentence naming the committed
-   direction and the one thing a user should remember. If the sentence could caption a
-   competitor's product unchanged, there is no thesis yet.
-3. **Journey** — entry → decisive moments → completion → return/resume.
-4. **Interaction scenario** — named controls/events, visible response, terminal state, and what must
-   never happen. State felt-quality commitments as observable values: input acknowledged within
-   ~100 ms; completed or a designed slow state by ~1,000 ms; motion character named and bounded.
-   A feel adjective ("snappy", "calm") with no value or named behaviour behind it is a wish.
-   Compare alternatives only at a genuine, consequential hinge — and keep the losing candidate
-   with one line on why it lost, so the hinge is not relitigated next session.
-5. **State model** — reachable states that materially alter what the user sees or can do.
-6. **Recovery** — what survives failure, what is lost, what can be retried, and where retry lives.
-7. **Acceptance** — observable scenarios someone will actually exercise.
+1. **Product story**: who, in what context, doing what, for which outcome.
+2. **Experience thesis**, for a new feature or journey only: one sentence naming the committed
+   direction and the one thing a user should remember. If it could caption a competitor's product
+   unchanged, there is no thesis yet.
+3. **Journey**: entry, decisive moments, completion, return or resume.
+4. **Interaction scenario**: named controls and events, visible response, terminal state, and what
+   must never happen. State felt qualities as observable values: input acknowledged within 100 ms,
+   completed or in a designed slow state by 1 s (the classic response-time limits), motion character
+   named and bounded. An adjective with no value behind it is a wish. Compare alternatives only at a
+   consequential hinge, and keep the losing candidate with one line on why it lost.
+5. **State model**: reachable states that change what the user sees or can do.
+6. **Recovery**: what survives failure, what is lost, what can be retried, and where retry lives.
+7. **Acceptance**: observable scenarios someone will exercise.
 
-Render a state board, mockup, or prototype only when layout, density, motion, timing, or responsive
-fit carries the decision. For a new surface or journey, the opening, the decisive interaction,
-failure/recovery, and completion are visual claims — render them. A visual artifact is evidence for
-a visual claim, never a ritual.
+Render a state board, mockup, or prototype when layout, density, motion, timing, or responsive fit
+carries the decision. For a new surface or journey, the opening, the decisive interaction, failure
+and recovery, and completion are visual claims, so render them.
 
-## Product-story grammar
+## Grammars
 
-The conventional form — _“As a creator, I want to add my game so that players can find it”_ — is too
-weak when context, effort, abandonment, or falsification can change the product decision.
+The conventional story ("As a creator, I want to add my game so that players can find it") is too
+weak when context, effort, abandonment, or falsification can change the decision.
 
 ```text
 STORY        <id>
 As           <actor>
-in           <named context: first-run · returning · signed-out · empty account · …>
-I            <the task, independent of the system's route, schema, or control>
+in           <context: first-run, returning, signed-out, empty account, ...>
+I            <the task, independent of route, schema, or control>
 so that      <the business or personal outcome>
 
-Arrives at   <the observable product state that constitutes success>
+Arrives at   <the observable state that constitutes success>
 Abandons at  <plausible exit points and what makes leaving plausible>
-Effort       <material inputs · decisions · context switches · external tools; quantify when useful>
-Falsified by <the concrete observation or anti-pattern that disproves the story>
+Effort       <inputs, decisions, context switches, external tools; quantify when useful>
+Falsified by <the observation that disproves the story>
 ```
 
-Use the full grammar for a material story when its lines force decisions. A local maintenance change
-may need only actor, task, expected outcome, and observable acceptance. An atomic action with no
-meaningful abandonment point does not need a filler `Abandons at` line.
+Use the full grammar when its lines force decisions. A local maintenance change needs only actor,
+task, expected outcome, and acceptance. An atomic action with no meaningful exit needs no
+`Abandons at` line.
 
-A product story does not choose the control. Map a material story into the designed interaction:
+A story never chooses a control. Map a material story into its interaction:
 
 ```text
-SCENARIO     <id, linked to the product story when one exists>
-Starts in    <named state and context>
+SCENARIO     <id, linked to the story when one exists>
+Starts in    <state and context>
 User         <activates a named control or performs a named event>
 Immediately  <visible response>
-While        <pending · slow · interrupted behaviour, when applicable>
-Succeeds as  <named terminal state>
+While        <pending, slow, or interrupted behaviour, when applicable>
+Succeeds as  <terminal state>
 Fails as     <truthful failure state, when reachable>
 Recovers by  <durable action and preserved context>
-Returns to   <resume · back · refresh · authentication return · later-return behaviour, when material>
+Returns to   <resume, back, refresh, authentication return, later return, when material>
 ```
 
-An interaction scenario that omits a material control/event, visible response, terminal state, or,
-when failure or interruption is reachable and material, recovery decision has not designed that part
-of the interaction.
+A scenario that omits a material control, response, terminal state, or reachable recovery has not
+designed that part of the interaction.
 
-## State prompts — inspect affected boundaries
+## State prompts
 
-Authors under pressure omit states they do not remember. Use the dimensions that can change the
-affected experience; scan all four briefly for a material journey:
+Authors omit the states they do not remember. Scan all four dimensions for a material journey and
+use the ones that can change the affected experience.
 
-| Family | Inspect | Yields, for example |
+| Dimension | Inspect | Yields, for example |
 |---|---|---|
-| **Data** | Affected values: absent · partial · invalid · maximal; affected collections: zero · one · several · very many | Empty account · half-completed form · over-limit title |
-| **Time** | Affected asynchronous actions: pending · slow (~1,000 ms) · success · failure · superseded · repeated · late completion | Slow-threshold notice · durable result after a toast is gone · stale completion discarded |
-| **Path** | Relevant ways a value arrives and interruptions/returns: typed · restored · defaulted · fetched · authenticated · refreshed | Stale prefill validity · return from an auth detour with a draft intact |
-| **Frame** | Supported widths/input modes and content extremes that can change the interaction | Narrow-viewport fit · longest label · failed image |
+| **Data** | Values: absent, partial, invalid, maximal. Collections: zero, one, several, very many | Empty account, half-completed form, over-limit title |
+| **Time** | Asynchronous actions: pending, slow (past 1 s), success, failure, superseded, repeated, late completion | Slow-state notice, durable result after the toast is gone, stale completion discarded |
+| **Path** | How a value arrives, and interruptions: typed, restored, defaulted, fetched, authenticated, refreshed | Stale prefill validity, draft intact after an authentication detour |
+| **Frame** | Supported widths, input modes, and content extremes | Narrow-viewport fit, longest label, failed image |
 
-Record only reachable states that change user-visible behaviour or carry a plausible material
-failure. Record an exclusion reason only when a plausible state is deliberately excluded and the
-reason prevents ambiguity. Do not serialize a Cartesian product, inventory impossible combinations,
-or treat the prompts as proof of completeness.
+Record only reachable states that change user-visible behaviour or carry a plausible failure. Record
+an exclusion only when a plausible state is deliberately excluded and the reason prevents ambiguity.
+Never serialize a Cartesian product or claim exhaustive coverage.
 
-For affected controls, decide supported keyboard, pointer, and touch behaviour; focus placement and
-restoration; and relevant orientation, safe-area, and width behaviour. These are ordinary interaction
-decisions, not a separate compliance lane.
+For each affected control, decide keyboard, pointer, and touch behaviour; focus placement and
+restoration; and orientation, safe-area, and width behaviour. These are ordinary interaction
+decisions.
 
 ### Reading symptoms backwards
 
-When the built thing feels wrong, enter here:
-
-| You observe | Ruling |
+| Observed | Ruling |
 |---|---|
-| Success exists only in a toast | **Time** — success shows in the durable resulting state; the toast is at most an accent on it |
-| A wait past ~1,000 ms with no acknowledgment | **Time** — a slow state is a designed state, not an absent one |
-| An error survives a valid prefill, restore, or correction | **Path** — judgment that appears must also be told when to leave |
-| Failure presented as a dead end or false exhaustion | **Recovery** — the retry lives where the failure is shown, and it outlives any toast |
-| Page arrives, then rearranges | Skeleton that approximates the eventual structure, not a spinner (`references/distinctions.md`, loading family) |
-| Breaks at narrow width or the longest real label | **Frame** — content extremes are test inputs, not edge cases |
-| The spec says "dropdown", "modal", "tab", "toast" alone | Not yet a decision — `references/distinctions.md` |
+| Success exists only in a toast | Time. Success shows in the durable resulting state; the toast is at most an accent |
+| A wait past 1 s with no acknowledgment | Time. A slow state is a designed state |
+| An error survives a valid prefill, restore, or correction | Path. Judgment that appears must be told when to leave |
+| Failure shown as a dead end | Recovery. Retry lives where the failure is shown and outlives any toast |
+| Page arrives, then rearranges | A skeleton that approximates the eventual structure. A spinner hides the geometry (`references/vocabulary.md`, loading) |
+| Breaks at narrow width or the longest real label | Frame. Content extremes are test inputs |
+| The spec says "dropdown", "modal", "tab", or "toast" alone | No decision yet (`references/vocabulary.md`) |
 
 ## Choosing and naming a control
 
-Control choice follows the user's task, never the schema type:
+Control choice follows the task, never the schema type:
 
-1. **Reuse audit** — inspect how the same task is solved elsewhere in the product and which existing
-   component or interaction owns it. Reuse the product's grammar unless the task materially differs.
-2. **Retrieval task** — does the user recall a value or recognise one from a set?
-3. **Cardinality and comparability** — how many options exist, how familiar are they, and must users
-   compare them simultaneously?
-4. **Real-world arity** — one or many? Decide reality first, then the schema.
-5. **Assistance audit** — is the value fetchable, derivable, defaultable, or suggestible? “Required by
-   the schema” never justifies human transcription.
-6. Name the control precisely enough to expose its material behaviour.
+1. **Reuse audit**: how is the same task solved elsewhere in the product, and which component owns
+   it? Reuse the product's grammar unless the task materially differs.
+2. **Retrieval**: does the user recall a value or recognise one from a set?
+3. **Cardinality and comparison**: how many options, how familiar, and must they be compared side by
+   side?
+4. **Real-world arity**: one or many, decided from reality before the schema.
+5. **Assistance**: is the value fetchable, derivable, defaultable, or suggestible? A schema
+   requirement never justifies human transcription.
+6. Name the control precisely enough to expose its behaviour. `references/vocabulary.md` defines the
+   names whose choice changes behaviour, states, input model, or recovery. Consult it when a name is
+   ambiguous; it is a lookup and creates no obligation. A project may define a local term when no
+   shared name fits.
 
-`references/ui-ontology/` is a naming corpus, not a component checklist. Use only relevant families
-or alphabetical lookup. `references/distinctions.md` disambiguates overloaded terms such as
-_dropdown_, _modal_, _tab_, _tooltip_, _chip_, _toast_, _grid_, and _drawer_.
+## Durable handoff
 
-When no shared name fits, define a clear project-local term. Propose it upstream only when it is
-likely to be reusable across products. Imprecision is a review comment, not an INVALID verdict.
+The next agent sees only the repository and the issue or PR. Before handoff, put every
+downstream-critical fact in one durable place: the user and outcome; the current failure or
+decision; the chosen behaviour and interaction; affected states, preservation, recovery,
+interruption, and return; non-goals; accepted and rejected alternatives when they prevent reversal;
+observable acceptance and the verification actually performed; known gaps and blocked checks.
 
-## Durable handoff — chat is ephemeral
+Link owning documents instead of duplicating them. Normative documents state the current target; the
+PR keeps the why, the rejected alternatives, and the deviations. Never write "see chat" and never
+leave a load-bearing decision only in private reasoning. If a public review verdict changes, correct
+the PR thread explicitly; a silent edit does not repair a handoff another agent already read.
 
-Assume the next agent sees only the repository and the issue/PR description and threads. Before
-handoff, put every downstream-critical fact in one durable place. Include, where relevant:
+## Review
 
-- the user and outcome;
-- the current failure or decision;
-- the chosen behaviour and interaction;
-- affected reachable states, preservation, recovery, interruption, and return;
-- non-goals and deliberately preserved context;
-- accepted and rejected alternatives when they prevent reversal;
-- observable acceptance and verification actually performed;
-- known gaps, inaccessible scenarios, and blocked checks.
+Review the product decision. The existence of an artifact proves nothing.
 
-Link to owning documents instead of duplicating them. Do not invent status fields, hashes, or a
-handoff manifest. Never write “see chat” or leave a load-bearing decision only in private plans or
-reasoning. Normative specifications state the current target; PR or decision context keeps the why,
-rejected alternatives, deviations, and unresolved evidence when another agent could otherwise undo
-the decision.
-
-If a public review verdict changes, correct the PR thread explicitly. Silent edits do not repair the
-handoff another agent already read.
-
-## Review and decision discipline
-
-Review the product decision, not the existence of artifacts:
-
-- Before a public verdict, read every changed product/design file end-to-end in its branch form.
-  Diff, lint, link, and format checks prove mechanics, not meaning.
+- Before a public verdict, read every changed product or design file end to end in its branch form.
+  Diff, lint, and link checks prove mechanics only.
 - A useful finding names a missing or wrong user-facing decision and points to evidence.
-- For a new feature or journey, the single design review is done by someone who did not author
-  the design and includes the renders needed to judge its material visual or temporal decisions.
-  A small change uses ordinary PR review — no dedicated lane, no role record.
-- Recheck concrete findings after correction when needed. Do not create review-of-review,
-  convergence rituals, or a new process layer.
-- Once the responsible owner approves a direction, execute it. Reopen design when the user or owner
-  changes direction, requirements are corrected, a material constraint is discovered, or new
-  concrete evidence makes the decision materially wrong, impossible, or critically unsafe.
+- A new feature or journey gets one design review by someone who did not author it, with the renders
+  needed to judge its visual and temporal decisions. A small change gets ordinary PR review.
+- Recheck concrete findings after correction. Do not create review-of-review or convergence rituals.
+- Once the owner approves a direction, execute it. Reopen design only when the owner changes
+  direction, a requirement is corrected, a material constraint appears, or concrete evidence makes
+  the decision wrong, impossible, or unsafe.
 
-## Verification — look at the thing
+## Verification
 
-A design artifact can be ready before implementation. The product change is not done until its
-result works.
+A design can be ready before implementation. The change is done only when its result works.
 
-- For user-visible work, exercise the affected real flow in a representative real host, including
-  reachable material failure, recovery, interruption, and return paths. A happy-path screenshot or
-  HTTP status does not verify interaction.
-- Actually inspect UI changes in the supported scenarios that matter. Stills cannot verify motion or
-  interaction feel.
-- An instrumented walk verifies **commitments, not feelings** — it measures the timings, states,
-  and motion properties the design committed to, which is why feel is encoded as observable values
-  upstream. The final judge of feel is a human looking at the real thing; when the human disagrees
-  with a green walk, the human is right and the design was missing a commitment — add the value
-  that would have caught it.
-- Build-time polish — radii, easings, staggers, press states, optical alignment — is the province
-  of companion craft skills loaded at the moment of making; this method neither duplicates nor
-  substitutes for them.
-- Follow repository-required checks and run change-relevant tests. Tests do not replace live
-  interaction verification.
-- If a real host or external seam cannot be exercised, record the exact unverified scenario and
-  follow-up in the PR. Do not claim the product change is fully verified.
-- When the main uncertainty is comprehension, perceived effort, or whether a journey feels worth
-  completing, observe a representative user when feasible. If access is unavailable, record the
-  unresolved assumption and validation follow-up without claiming certainty. More documentation
-  cannot answer that question.
-- Reader-facing documents get an audience-fit read: “What does not parse for a reader outside this
-  project?” Keep workflow jargon out of product documents.
-- Machine checks stay mechanical: links resolve, IDs are unique, referenced documents exist, and the
-  chosen format parses. A project may block mechanical corruption; no machine check may compute
-  design quality, approve implementation, or replace human judgment.
+- Exercise the affected real flow in a representative host, including reachable failure, recovery,
+  interruption, and return paths. A happy-path screenshot or an HTTP status verifies nothing about
+  interaction, and stills never verify motion.
+- An instrumented walk measures the timings, states, and motion properties the design committed to.
+  The final judge of feel is a person using the real thing. When the person disagrees with a green
+  walk, the design was missing a commitment; add the value that would have caught it.
+- Run repository-required checks and change-relevant tests. Tests do not replace live verification.
+- When a host or seam cannot be exercised, record the exact unverified scenario in the PR and make no
+  completion claim.
+- When the main uncertainty is comprehension or perceived effort, observe a representative user when
+  feasible; otherwise record the assumption and the follow-up. More documentation cannot answer that
+  question.
+- Give reader-facing documents an audience-fit read: what does not parse for a reader outside the
+  project? Keep workflow jargon out of product documents.
+- Machine checks stay mechanical: links resolve, IDs are unique, referenced documents exist, the
+  format parses.
 
-Inspect current behaviour, code, research, measurements, and technical constraints as evidence. They
-may inform the target; they do not silently define or authorize it. Keep the normative target and
-the verification of what shipped distinct.
-
-## Hard limits
-
-Design:
-
-- Never make a product story choose a control; never leave a material interaction choice implicit.
-- Never let UX/XDS mint a missing business or product requirement; amend the owning BRD/PRD.
-- Never claim exhaustive state coverage. Record reachable, material decisions and unknowns.
-- Never let technical design silently alter an already-made experience decision.
-- Never reverse artifacts that are actually needed: intent before product behaviour, product
-  behaviour before its experience realization, and product/experience decisions before technical
-  realization.
-- Never create a standalone document when existing canon or the issue/PR already resolves the
-  decision durably.
-- Never let current implementation become authority for the target.
-- Never blur target and as-built.
-- Never leave a load-bearing decision only in chat or private reasoning.
-
-Process:
-
-- Never add manifests, spec/approval/conformance hashes, computed status ladders, evidence-type
-  taxonomies, per-moment identities, reviewer-identity machinery, or artifact quotas.
-- Never treat a document validator as design approval.
-- Never respond to a process defect by adding a process layer.
-- Never restart planning after direction is approved unless the user or owner changes direction,
-  requirements are corrected, a material constraint is discovered, or concrete evidence invalidates
-  it.
-- Never let design material grow beyond what consequence and uncertainty justify; remove work that
-  resolves no decision and reduces no plausible risk.
+Build-time polish (radii, easings, staggers, press states, optical alignment) belongs to the craft
+skills loaded at the moment of making. This method does not duplicate them.
 
 ## Definition of done
 
-Apply only the items relevant to the requested stage and change.
+Ready to implement:
 
-**Ready to implement:**
+1. Only the artifacts the decision needs were created or amended, in chain order.
+2. User, task, outcome, and observable acceptance are clear enough to falsify the decision.
+3. Interaction, state, preservation, recovery, interruption, return, effort, abandonment, and non-goal
+   decisions are explicit where the change has them, and no story chose a control.
+4. Data, Time, Path, and Frame were considered without a completeness ledger.
+5. Visual and temporal decisions were rendered and inspected by the reviewer.
+6. Another agent can recover the controlling decision and known gaps from the repository alone.
+7. Anything that forced no decision was removed.
 
-1. The smallest sufficient durable material was chosen; only the artifacts the decision needs were
-   created or amended, in the right order.
-2. The user, task, outcome, and observable acceptance are clear enough to falsify the decision.
-3. Product requirements state what must be true; UX/XDS states how the person reaches, understands,
-   and recovers through it without inventing new authority.
-4. Material interaction, state, preservation, recovery, interruption, return, effort, abandonment,
-   and non-goal decisions are explicit when the change has them.
-5. Relevant Data · Time · Path · Frame prompts were considered without creating a completeness
-   ledger.
-6. Material visual or temporal decisions were rendered and inspected by the relevant reviewer.
-7. Another agent can recover the controlling decision and known gaps without this chat.
-8. Anything that forced no distinct decision was removed.
+Implemented:
 
-**Implemented change verified:**
-
-1. The implementation preserves the chosen experience; constraints did not silently rewrite it.
-2. The affected real flow and reachable material failure/recovery paths were exercised in a
-   representative real host, or the exact unverified seam is recorded without a completion claim.
-3. Repository-required checks and change-relevant tests were run; blocked checks are recorded
-   honestly.
+1. The implementation preserves the chosen experience; constraints did not rewrite it silently.
+2. The real flow and its failure and recovery paths were exercised in a representative host, or the
+   unverified seam is recorded without a completion claim.
+3. Required checks and relevant tests ran; blocked checks are recorded.
 4. Reader-facing documents describe the current target and passed the audience-fit read.
-5. Mechanical document checks, when the project uses them, report no broken references or malformed
-   structure.
