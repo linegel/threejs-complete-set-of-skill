@@ -8,7 +8,7 @@ Guides and decision support: https://threejs-skills.com/guides/
 About and evidence methodology: https://threejs-skills.com/about/
 Install (Claude Code): git clone https://github.com/linegel/threejs-complete-set-of-skill.git && ln -s "$PWD/threejs-complete-set-of-skill"/skills/threejs-* ~/.claude/skills/
 Install (skills CLI): npx skills@latest add linegel/threejs-complete-set-of-skill --list; npx skills@latest add linegel/threejs-complete-set-of-skill --skill '*'; or npx skills@latest add linegel/threejs-complete-set-of-skill --skill '*' -g -a codex -y for non-interactive Codex setup.
-Install (any agent): clone the repo or use the skills CLI; each skills/<name>/ product directory contains SKILL.md (YAML frontmatter: name, description) and may include references/, scripts/, and license files. Repository examples and labs remain separate validation material.
+Install (any agent): clone the repo or use the skills CLI; each skills/<name>/ product directory contains SKILL.md (YAML frontmatter: name, description), its license and interface metadata, and any reachable bundled references, scripts, examples, assets, or fixtures. Top-level repository demos and labs remain separate validation material.
 Machine-readable index: https://threejs-skills.com/skills.json
 Versioned demo registry: https://threejs-skills.com/demos/registry.json
 Routing: after installing the whole pack, start broad requests with threejs-choose-skills; it selects the smallest useful in-pack skill set.
@@ -64,7 +64,7 @@ Routing: after installing the whole pack, start broad requests with threejs-choo
 ### Motion and Effects
 
 - [Procedural Motion Systems](https://threejs-skills.com/skills/threejs-procedural-motion-systems.html): Animate semantic state with deterministic Three.js WebGPU/TSL motion. Use for launch or staging kinematics, seekable transform timelines, recurrent fixed-step motion, frame-rate-independent follow, GPU-resident instance motion, moving-frame docking or reparenting, and environment-driven actors.
-- [Representation-First Particles, Trails, and Effects](https://threejs-skills.com/skills/threejs-particles-trails-and-effects.html): Representation-first Three.js WebGPU/TSL particles, trails, and effects. Use for analytic or recurrent particle motion, stable-slot or scan-compacted GPU pools, flow-conforming shells and wakes, dissolving debris, or effect-specific HDR and depth integration.
+- [Representation-First Particles, Trails, and Effects](https://threejs-skills.com/skills/threejs-particles-trails-and-effects.html): Representation-first Three.js WebGPU/TSL particles, ribbon or history trails, and effects. Use for analytic or recurrent particle motion, stable-slot or scan-compacted GPU pools, flow-conforming shells and wakes, dissolving debris, or effect-specific HDR and depth integration.
 - [State-Transition Dynamic Surface Effects](https://threejs-skills.com/skills/threejs-dynamic-surface-effects.html): State-transition screen-space surface effects for Three.js WebGPU/TSL. Use for persistent touch, frost, or thaw history; full-field or sparse accumulation; static crystalline fields; reduced-resolution blur; or history-gated normal refraction.
 - [Curved-Ray Space Effects](https://threejs-skills.com/skills/threejs-black-holes-and-space-effects.html): Build curved-ray space effects in Three.js WebGPU/TSL. Use for artistic ray bending, Ellis wormholes, Schwarzschild black-hole lensing, accretion disks, physical thin-disk transport, or requests that need the Kerr/rotating-black-hole support boundary.
 
