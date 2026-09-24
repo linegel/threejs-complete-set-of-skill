@@ -22,9 +22,15 @@ For a spherical reference radius `R` and maximum tangent-plane radial extent
 `r < R`:
 
 ```text
-sagitta = R - sqrt(R^2 - r^2)
-normalRotation = asin(r / R)
+u = r/R
+sagitta = r*u/(1 + sqrt((1-u)*(1+u)))
+normalRotation = asin(u)
 ```
+
+Require finite `R > 0` and `0 <= r < R`. The rationalized form equals
+`R-sqrt(R^2-r^2)` without subtracting nearly equal large radii or forming R^2.
+Check representability and an appropriate small-curvature error tolerance;
+a rounded zero from the subtractive expression is not evidence of flatness.
 
 Project sagitta with the actual camera and gate physical-pixel position error,
 normal error, horizon visibility, geodesic-distance error, and atmosphere
@@ -65,7 +71,10 @@ decision when axes, camera domain, dataset support, atmosphere shell, or
 scattering integration changes.
 
 Convert meters to world units once at the rendering boundary. Keep field and
-query values in their declared physical units. A render-origin rebase changes
+query values in their declared physical units. Use a rigid body frame and the
+declared uniform meter conversion. Nonuniform render stretch changes the body
+metric; it cannot retain the old axes, gravity, and atmosphere lengths without
+an explicitly updated model. A render-origin rebase changes
 presentation transforms, not body-space field coordinates, source versions, or
 stable identities.
 
@@ -103,6 +112,9 @@ sz = z*sqrt(1 - x^2/2 - y^2/2 + x^2*y^2/3)
 n  = normalize(vec3(sx,sy,sz))
 ```
 
+Admit finite face coordinates within the declared cube face domain, with one
+signed face axis at unity and the other coordinates in `[-1,1]`. Invalid
+radicands or degenerate normals are domain failures, not unconditional clamps.
 This reduces corner distortion but is not an equal-area proof. A claimed
 equal-area mapping requires numerical area integration, finite Jacobians,
 forward/inverse tests, and seam/corner equality.
@@ -122,6 +134,12 @@ N0 = normalize(p0 / (a*a))
 p0_i = a_i^2*n_i / sqrt(sum_j(a_j^2*n_j^2))
 N0 = n
 ```
+
+Require finite positive axes and a finite normalized input direction. The
+reference-normal formula defines normal-height coordinates, not a constant
+radial offset; a large negative height can fold that chart and is not admitted
+merely because the base ellipsoid was valid. Use scaled evaluation when squared
+axes overflow or extreme axis ratios exhaust precision.
 
 Height, crater distance, projected bounds, dataset coordinates, queries, and
 atmosphere must share the selected meaning. Validate winding, edge/corner
@@ -194,8 +212,9 @@ floating-origin reconstruction error
 motion during selection dwell
 ```
 
-Use the physical render-target extent and unjittered projection for every
-active view. Project a conservative support through the actual matrix. A
+Use physical viewport extent and unjittered projection for every active view,
+including zoom/cropped-view scale. Follow the router's paired-point error bound;
+projected box extents alone cannot bound displacement of interior features. A
 near-plane or `w <= 0` crossing requires refinement or conservative handling;
 clamping it into a finite error loses the bound. Split above `E_split`, merge
 below `E_merge`, and record dwell/cadence.
@@ -205,7 +224,14 @@ one level across every transformed cube-face boundary. Assign canonical
 edge/corner ownership so both faces evaluate the same direction, height, and
 morph weight.
 
-Reuse one indexed `N x N` grid. A patch receives four transition bits for
+For the alternating-vertex transition scheme, use a shared square grid with
+integer `gridSide >= 3` and an even number of intervals (`gridSide-1`, typically
+2^k). A power of two vertices is not the same condition. Require a proved
+cross-face orientation, index range, winding, and joint-corner rule for every
+mask. Edge-adjacent 2:1 balance alone does not define corner topology; enforce
+any additional corner balance needed by the chosen templates.
+
+A patch receives four transition bits for
 north/east/south/west edges adjacent to a coarser patch. Prebuild the
 
 ```text
@@ -213,7 +239,18 @@ north/east/south/west edges adjacent to a coarser patch. Prebuild the
 ```
 
 index variants that collapse alternating fine-edge vertices onto the coarse
-edge. Apply the same morphed direction before height and normal evaluation.
+edge. Shared surviving endpoints must match the actual coarse positions,
+including its height/filter state and morph. Topological index collapse and
+continuous vertex morph are distinct mechanisms; prove both where present.
+
+A continuous morph target is the position on the rendered coarse triangle or
+edge under its actual interpolation, not the normalized interpolation of its
+directions followed by an independent height evaluation. Even a zero-height
+sphere's linear edge is a chord, while normalized direction returns to the
+sphere and opens a gap. Derive the morph normal from the complete position
+function including blend-weight derivatives, or use a separately bounded normal
+approximation. Morph/corner owners share the same field/cache generation; stale
+coarse/fine combinations remain unadmitted.
 
 Production submission choices:
 
@@ -225,17 +262,30 @@ Production submission choices:
 Three.js r185 exposes `IndirectStorageBufferAttribute` and
 `BufferGeometry.setIndirect()`. Indexed records contain `indexCount`,
 `instanceCount`, `firstIndex`, signed `baseVertex`, and `firstInstance`. Gate
-nonzero `firstInstance` on adapter support; otherwise bind each compact bin from
-logical instance zero. Runtime visibility and indirect state remain GPU-resident.
+nonzero `firstInstance` on the enabled device feature, not just adapter support;
+otherwise bind each compact bin from logical instance zero. The indexed record
+occupies 20 bytes: four u32 lanes and signed i32 baseVertex at byte 12. Retain
+its two's-complement bits when writing through Uint32Array; do not encode it as
+an f32 value. Use a 4-byte-aligned byte offset, complete in-buffer records,
+INDIRECT usage, valid bound geometry/index/instance ranges, and admitted capacity.
+`setIndirect()` stores its inputs without validating these conditions. Bound
+compaction counters and initialize empty-bin counts to zero before generation;
+a workgroup barrier cannot publish a whole-grid result. Order compute and draw
+and keep the active generation immutable. Runtime visibility remains GPU-resident.
+See the [WebGPU indirect draw contract](https://www.w3.org/TR/webgpu/#dom-gpurendercommandsmixin-drawindexedindirect).
 
 Pack face/level, UV rectangle, conservative body-relative bound, morph/error,
 cache index/version, and transition mask in compact aligned records. Report the
-actual stride. Derived triangles are:
+actual stride. The following is the unstitched upper bound, not an exact count
+for a selected mask or culled frontier:
 
 ```text
 activePatches * 2 * (gridSide - 1)^2
 ```
 
+Report actual submitted triangles from each mask's index count and instance
+count, and report nondegenerate primitives separately when collapse retains
+zero-area triangles. Culling and variable-length index templates change totals.
 Sixteen masks bound topology bins per body/material group; they do not bound
 the complete scene's draws.
 

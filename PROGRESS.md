@@ -38,7 +38,7 @@ Use this existing repository plan rather than an unrelated game ticket.
 18. [x] `threejs-procedural-geometry` - source/reference pass; nine pinned-adapter, metadata and quantization checks.
 19. [x] `threejs-object-sculptor` - source/reference/probe pass; eleven header, bounded-read and attachment checks.
 20. [x] `threejs-procedural-buildings-and-cities` — source/reference/key-helper pass; nine identity, facade, and bounds checks.
-21. [ ] `threejs-procedural-planets`
+21. [x] `threejs-procedural-planets` — source/reference pass; ten curvature, LOD, metric, advection, and indirect-record checks.
 22. [ ] `threejs-procedural-vegetation`
 23. [ ] `threejs-procedural-creatures`
 24. [ ] `threejs-procedural-motion-systems`
@@ -140,9 +140,13 @@ Read entrypoint/reference/key helper/interface and generated consumer, plus full
 
 The generated city narrative still uses unbounded rounded bay counts and assumes a handful of draws; reconcile its owning narrative source during publication, not generated HTML in this skill unit.
 
-### Current skill: threejs-procedural-planets
+### Skill 21 result: threejs-procedural-planets
 
-The skills-first session owns planets 21. The inspector-continuation session has vegetation 22 and creatures 23 reserved, applying only after 21 lands. Skills-first owns motion 24 and particles 25 afterward. Labs and recreations remain deferred until the complete skill pass.
+Read all five reachable references, entrypoint and interface, plus the installed indirect attribute and geometry binding API. Corrected sagitta cancellation, actual coarse-triangle morph targets, alternating-edge interval parity, submitted versus nondegenerate triangle counts, device-enabled indirect features and record admission, ellipsoid normal-height tangents, serial cache support and cross-face vector basis, continuous bounds, local-residual precision, crater-center differentiability, and pole-safe inverse gas advection. Ten numerical/API checks pass; all 176 skill tests and distribution validation pass. No rendered transition mask, GPU indirect submission, planet field parity capture, or lab acceptance is claimed. Logs: `artifacts/website-improvement-20260924/continuation/skills-planets-{before,after}.log`.
+
+### Current skill: threejs-procedural-vegetation
+
+The inspector-continuation session owns vegetation 22 then creatures 23. The skills-first session owns motion 24 and particles 25, reading ahead but applying changes only after 23 lands. Labs and recreations remain deferred until the complete skill pass.
 
 
 ## Finished and verified

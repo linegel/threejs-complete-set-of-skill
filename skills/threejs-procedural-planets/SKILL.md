@@ -25,7 +25,7 @@ handoffs, and atmosphere inputs.
 
 2. **Freeze the body model and units.** Declare center, sphere radius or
    ellipsoid axes in meters, `metersPerWorldUnit`, height and sea-level datum,
-   body/world transform, origin policy, surface-coordinate meaning, and
+   rigid body/world transform, origin policy, surface-coordinate meaning, and
    atmosphere bottom/top geometry. When a sphere approximates an ellipsoid,
    read
    [body-model-mapping-and-lod.md](references/body-model-mapping-and-lod.md)
@@ -54,9 +54,10 @@ handoffs, and atmosphere inputs.
 
 4. **Build error-bounded LOD and submission.** For the global branch, maintain
    six 2:1-balanced face quadtrees, continuous parent morph, and one of the 16
-   four-edge transition masks. Reuse a shared indexed grid and submit compact
-   patch records in instanced or indirect mask bins. For clipmaps, bound ring
-   error, recentering, and far-field ownership. Evaluate physical-pixel error
+   four-edge transition masks. The alternating-edge scheme requires an even
+   interval count; morph to the actual coarse rendered surface, not merely a
+   renormalized direction. Submit shared-grid records in instanced/indirect bins.
+   For clipmaps, bound ring error, recentering, and far-field ownership. Evaluate physical-pixel error
    over the complete displaced support for every active view.
 
    A global patch identity is
@@ -83,15 +84,17 @@ handoffs, and atmosphere inputs.
    - **hybrid:** near/far coverage has no gap and one composite owner in the
      overlap, composite position and normal remain continuous through the
      handoff, and overlap residency is bounded;
-   - **gas/cloud deck:** wrapped-longitude seams, advection continuity, stable
-     storm identity, and conservative advected bounds pass.
+   - **gas/cloud deck:** seams and both poles, signed/integrated angular
+     advection, stable storm identity, and conservative advected bounds pass.
 
 5. **Build shared causal fields.** Define common field functions for reference
    direction, displacement, tangent gradient, geology, craters, climate,
    hydrology, snow/ice, material causes, queries, and diagnostics. Direct,
    compute-cached, and CPU-visible paths use the same schema and identity
    constants. Cache only dirty patch causes, include cross-face filter support,
-   and validate gradients independently before using analytic normals. Read
+   and validate gradients independently before using analytic normals. Serial
+   filter/stencil support adds along each reader path; face-local vectors need
+   basis transport. Preserve metric detail with stable local residuals. Read
    [solid-fields-and-coast.md](references/solid-fields-and-coast.md) when
    implementing solid-body caches, crater fields, detail filtering, CPU/TSL
    parity, normals, materials, or coast data. Read
@@ -99,7 +102,9 @@ handoffs, and atmosphere inputs.
 
    GPU patch min/max bounds use workgroup reduction plus deterministic merging,
    or a proven monotonic ordered-integer encoding with explicit sign, NaN, and
-   decode-error rules. Do not rely on unsupported float atomics.
+   decode-error rules. First establish conservative continuous finest-cell bounds;
+   a max over isolated samples is not a bound on procedural peaks. Do not rely
+   on unsupported float atomics.
 
    **Complete when:** geometry and shading use the same height function, cache
    invalidation follows causes rather than cameras, parity covers every

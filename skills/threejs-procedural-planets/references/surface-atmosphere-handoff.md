@@ -38,3 +38,9 @@ Failure signature:
 | Symptom | Inspect |
 | --- | --- |
 | Atmosphere limb drifts | common reference surface, units, and altitude convention |
+
+A constant-geodetic-height shell is not obtained exactly by adding height to
+each ellipsoid axis. Surface and atmosphere must agree on normal height,
+scaled-radial height, or an explicitly error-bounded shell approximation. Use
+the shared body's metric solver and first-opaque-body ray termination; do not
+let an atmosphere LUT reinterpret a radial displacement as geodetic altitude.
