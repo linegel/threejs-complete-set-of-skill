@@ -14,7 +14,8 @@ Use a lathe for a surface of revolution with an authored axis and radial profile
 
 Classify each profile endpoint before tessellation:
 
-- a closed zero-radius pole emits one pole vertex and one triangle fan;
+- a closed zero-radius pole emits one topological pole and a nondegenerate fan;
+  duplicate render-corner poles only where normals, tangents, or UVs require it;
 - an open nonzero rim emits one boundary loop;
 - a capped nonzero rim emits an explicit cap with exterior winding;
 - a UV or material seam duplicates only the vertices needed for that discontinuity.
@@ -25,9 +26,16 @@ Reject coincident pole rings, degenerate triangles, accidental profile self-inte
 
 Use a sweep for handles, cables, pipes, roots, horns, rails, and other parts defined by a path and cross-section. Sample the path by arc length or a declared chord-error bound; consecutive centers must remain distinct.
 
-Carry a rotation-minimizing frame along the path. Project a deterministic initial normal into the first tangent plane, transport it by the shortest tangent rotation, re-orthogonalize, and derive the binormal with a right-handed cross product. Subdivide near an antiparallel tangent; an intentional cusp starts a named deterministic frame seam.
+Carry a rotation-minimizing frame along the path. Reject zero tangents and
+project a deterministic initial normal into the first tangent plane; if the
+projection is ill-conditioned, use the least-aligned coordinate axis with fixed
+ties. Transport by the shortest tangent rotation, re-orthogonalize, and derive
+the binormal with a right-handed cross product. Subdivide near an antiparallel tangent; an intentional cusp starts a named deterministic frame seam.
 
-State cross-section seam policy and whether each endpoint is open, capped, collared, or embedded. Verify finite unit tangents/normals/binormals, pairwise orthogonality, right-handedness, twist continuity, endpoint frames, radius bounds, and attachment overlap.
+For a closed path, correct base holonomy before applying closure-compatible
+authored twist. Radius/curvature and nonadjacent-section intersection tests are
+separate from frame continuity. State cross-section seam policy and whether
+each endpoint is open, capped, collared, or embedded. Verify finite unit tangents/normals/binormals, pairwise orthogonality, right-handedness, twist continuity, endpoint frames, radius bounds, and attachment overlap.
 
 ## Shape extrusion and CSG
 
@@ -42,7 +50,7 @@ Choose from the update and identity contract, then measure the complete draw pat
 | Representation | Select when | Preserve | Reject when |
 | --- | --- | --- | --- |
 | `InstancedMesh` | Geometry/material are shared and transforms or declared instance fields carry variation | logical element IDs/count, per-instance bounds, deterministic seed | per-element topology/material/hierarchy or transparency sorting is required |
-| `BatchedMesh` or merged clusters | Static ranges can share submissions | semantic range table, cluster bounds, material slots | one edit rebuilds too much or movable/detachable parts lose ownership |
+| `BatchedMesh` or merged clusters | Compatible ranges share storage/draw management | semantic range table, cluster bounds, material slots; per-instance transform ownership when supported | one edit rebuilds too much or movable/detachable parts lose ownership |
 | Opaque proxy | Distant detail reads as volume | envelope and identity-critical negative space | the closest required view resolves individual silhouettes |
 | Alpha cards | Thin detail and measured coverage beat geometry | alpha/shadow policy, orientation, mip chain | sorting, overdraw, tile traffic, or shadow aliasing dominates |
 
@@ -50,9 +58,19 @@ Report draw submissions, drawable objects, and multiplicity-expanded logical ele
 
 ## Seams, caps, and normals
 
-For each triangle `(a,b,c)`, use `cross(p_b - p_a, p_c - p_a)` to test nonzero area and exterior winding. A closed surface has two uses per welded physical edge and finite nonzero signed volume; an open surface has exactly its authored boundary loops. Weld only declared positional equivalents, not semantic or material boundaries.
+For each triangle `(a,b,c)`, use `cross(p_b - p_a, p_c - p_a)` to test nonzero
+area and exterior winding. A closed manifold needs two oppositely oriented
+uses per topological edge and a connected manifold link at each vertex; these
+are stronger requirements than a nonzero signed volume. Check connected
+components, self-intersections, and intended boundary loops too. Build adjacency
+from declared topological identities across render seams without merging their
+normal/UV/material attributes. Never weld unrelated coincident surfaces.
 
-Recompute local bounds after final positions. Validate normals with the inverse-transpose transform under nonuniform scale. Inspect a normal/winding diagnostic wherever a pole, cap, seam, boolean boundary, or custom writer can fail.
+Recompute local bounds and degeneracy after final f32 positions. Validate
+normals with the inverse-transpose under nonsingular nonuniform scale. When
+baking a reflection into geometry, repair winding and tangent handedness as
+well; do not apply the renderer's negative-object-scale correction a second
+time. Reject singular transforms before inverse or normalization. Inspect a normal/winding diagnostic wherever a pole, cap, seam, boolean boundary, or custom writer can fail.
 
 ## Material response and footprint filtering
 

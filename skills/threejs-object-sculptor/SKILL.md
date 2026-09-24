@@ -18,7 +18,19 @@ then run `python3 "<skill-dir>/scripts/probe_reference_image.py" "<image>"` usin
 [probe_reference_image.py](scripts/probe_reference_image.py). It reports format,
 byte count, dimensions, aspect ratio, and metadata parsing status. That status
 describes file metadata only; visual inspection in stage 1 alone determines
-whether the pictured object is readable.
+whether the pictured object is readable. The helper reads a bounded prefix
+(default 1 MiB, `--max-header-bytes` up to 64 MiB) and reports file bytes and
+scanned bytes separately. Its width/height are stored raster or canvas dimensions,
+not EXIF-oriented, pixel-aspect-corrected, or decoded-image validation. A partial
+result for a valid but unsupported or late header is not an unreadable object.
+Supported headers are PNG IHDR, JPEG SOF before scan data, GIF logical screen,
+WebP VP8/VP8L/VP8X, BMP CORE/Windows INFO families, and the first classic TIFF
+IFD. BigTIFF and JPEG DNL height recovery are outside this helper. File validity,
+all animation/page frames, orientation, and color remain separate inspections.
+Header rules follow [PNG](https://www.w3.org/TR/png-3/#11IHDR),
+[WebP](https://developers.google.com/speed/webp/docs/riff_container),
+[BMP CORE](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-bitmapcoreheader),
+and the [JPEG frame reader](https://github.com/libjpeg-turbo/libjpeg-turbo/blob/main/src/jdmarker.c).
 
 ## Six-stage sculpt
 
@@ -28,6 +40,8 @@ Inspect every view before planning geometry. Record:
 
 - the target boundary, crop, resolution, blur, occlusion, transparency, and conflicting subjects;
 - visible front/up cues, camera projection clues, a scale anchor when one exists, and view-to-view consistency;
+- the reference identity and orientation/crop transform, including mirroring, pixel
+  aspect, lens distortion, and which frame of an animation is being compared;
 - which contours, negative spaces, contacts, material regions, and repeated features are directly observed;
 - which hidden forms or physical properties remain assumptions.
 
@@ -65,7 +79,11 @@ Choose a representation per semantic part, using the cheapest form that preserve
 
 After choosing one or more of these branches and before implementation, read the matching sections of [procedural object patterns](references/procedural-patterns.md) and apply their construction and verification rules.
 
-Keep separate nodes for parts that move, detach, change material independently, need picking/collision identity, or own an attachment. When a child part touches, enters, hinges from, or follows a parent, read [attachment and joint correctness](references/attachment-joint-correctness.md) before blockout.
+Keep stable logical identities and independent transform/update ownership for
+parts that move, detach, change material, need picking/collision identity, or own
+an attachment. Use separate nodes when their parent/child hierarchy requires
+them; instanced or batched parts may use a stable semantic-to-instance mapping
+when it preserves those operations. When a child part touches, enters, hinges from, or follows a parent, read [attachment and joint correctness](references/attachment-joint-correctness.md) before blockout.
 
 Selection is complete when every decomposed part has exactly one representation and owner, every rejected alternative has a concrete failure condition, and every conditional reference required by the selected branches has been applied.
 
@@ -73,7 +91,12 @@ Selection is complete when every decomposed part has exactly one representation 
 
 Build only macro masses, dominant openings, coordinate frame, and identity-critical negative space. For feasibility or planning, the blockout is a dimensioned primitive/profile sketch; for implementation, it is renderable coarse geometry in the target repository.
 
-Use the intended comparison camera before adding detail. Match framing and projection separately from object proportions so camera error does not become geometry. Preserve semantic node boundaries needed by later attachments or motion.
+Use the intended comparison camera before adding detail. Normalize the reference
+orientation/crop first. Match framing and projection separately from object
+proportions so camera error does not become geometry. With several views, retain
+one shared model and per-view cameras instead of fitting a different object to
+each image. Calibrate against landmarks with uncertainty before freezing the
+comparison views; do not retune the camera to hide each geometry regression. Preserve semantic node boundaries needed by later attachments or motion.
 
 Blockout is complete when the target reads from silhouette alone in every required view, dominant proportions and negative spaces are within the declared tolerance, and geometry and layout carry the match without relying on material or micro detail.
 

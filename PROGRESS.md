@@ -36,7 +36,7 @@ Use this existing repository plan rather than an unrelated game ticket.
 16. [x] `threejs-procedural-fields` - source/reference/helper pass; nine parity, admission, footprint and boundary checks.
 17. [x] `threejs-procedural-materials` — source/reference/helper pass; eight normal, input, and shadow-cache checks.
 18. [x] `threejs-procedural-geometry` - source/reference pass; nine pinned-adapter, metadata and quantization checks.
-19. [ ] `threejs-object-sculptor`
+19. [x] `threejs-object-sculptor` - source/reference/probe pass; eleven header, bounded-read and attachment checks.
 20. [ ] `threejs-procedural-buildings-and-cities`
 21. [ ] `threejs-procedural-planets`
 22. [ ] `threejs-procedural-vegetation`
@@ -130,9 +130,13 @@ The generated material article's narrative incorrectly says screen derivatives g
 
 Read the complete entrypoint/reference/interface and the installed attribute, geometry, merge, and tangent-conversion implementations. Checked four installed files against the integrity-verified published 0.185.1 npm tarball; all match exactly. Corrected index 65535/restart admission and widened byte accounting, repeated vec3 storage padding, idle DynamicDrawUsage uploads, pending range retention, packed write alignment, metadata/group conversion, frame degeneracy, final-f32 topology, and GPU-transform bounds. Nine CPU/API checks execute the actual adapters/utilities with an explicitly non-GPU transport fixture; all 146 skill checks and distribution validation pass. Dependency code and rendering labs remain unchanged. This is not GPU buffer validation, tangent-solver fidelity, disposal plateau, or mesh-writer acceptance. The top-level mesh writer and its tests still require the recorded later runtime corrections. Logs: `artifacts/website-improvement-20260924/continuation/skills-geometry-{before,after}.log`.
 
-### Current skill: threejs-object-sculptor
+### Skill 19 result: threejs-object-sculptor
 
-The inspector-continuation session owns object-sculptor 19. The skills-first session reserves buildings/cities 20 and planets 21, reading ahead but applying no changes until 19 lands. Labs and recreations remain deferred until the complete skill pass.
+Read the complete entrypoint, both representation/attachment references, interface, and executable image probe. Repaired dimension parsing in six format families, bounded metadata reads, and added explicit raw-dimension/partial-header semantics and CLI input errors. Eleven checks include actual encoded PNG/JPEG/WebP/GIF/TIFF metadata, malformed headers, both TIFF byte orders, BMP CORE and INFO, mocked bounded file reads, and parent/child hinge math. Corrected reference orientation/camera fitting, topological poles/seams, singular/reflected transforms, stable instance identity, duplicate attachment translation, and hinge-axis constraints. All 157 skill tests and distribution validation pass. The probe does not decode pixels or determine image readability. No model, screenshot, runtime library, or lab acceptance changed. Logs: `artifacts/website-improvement-20260924/continuation/skills-object-sculptor-{before,after}.log`.
+
+### Current skill: threejs-procedural-buildings-and-cities
+
+The skills-first session owns buildings/cities 20 followed by planets 21. The inspector-continuation session will read vegetation 22 and creatures 23 next, applying changes only after 21 lands. Labs and recreations remain deferred until the complete skill pass.
 
 
 ## Finished and verified
@@ -352,3 +356,17 @@ frame admission numerically. Preserve topology, material, and anchor identities.
 This is installable guidance correction and CPU/API evidence, not GPU allocation,
 rendered geometry, the mesh-writer lab, or a new performance claim. The existing
 lab's 65535-index and dynamic-update assumptions require a later runtime repair.
+
+## What to test: object-sculptor skill
+The existing metadata probe reads the entire image and accepts invalid or misplaced
+header fields. Exercise PNG header/CRC and positive dimensions, JPEG marker fills
+and segment boundaries, WebP chunk boundaries, BMP CORE versus INFO layout, and
+classic TIFF directory bounds in both byte orders. Bound the prefix scan at an
+explicit local-tool budget and report stored rather than orientation-corrected
+sizes. Parsed metadata still does not validate decoded pixels or readability.
+The authored default is 1 MiB, adjustable up to 64 MiB; oversized metadata remains
+partial instead of loading the whole file. This trades exhaustive unusual TIFF
+metadata traversal for bounded standalone probing, with the limit in the result.
+Also check parent-to-child endpoint conversion and hinge axis versus full-frame
+coincidence. Image orientation, reflections, and whole-motion clearance need
+explicit reconstruction contracts. No model, site UI, or reference image is edited.
