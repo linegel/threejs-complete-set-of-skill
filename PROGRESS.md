@@ -34,7 +34,7 @@ Use this existing repository plan rather than an unrelated game ticket.
 14. [x] `threejs-water-optics` — source/reference/comparator pass; eleven new stability/transport checks.
 15. [x] `threejs-rain-snow-and-wet-surfaces` — source/reference/oracle pass; seven deposition and transform checks.
 16. [x] `threejs-procedural-fields` - source/reference/helper pass; nine parity, admission, footprint and boundary checks.
-17. [ ] `threejs-procedural-materials`
+17. [x] `threejs-procedural-materials` — source/reference/helper pass; eight normal, input, and shadow-cache checks.
 18. [ ] `threejs-procedural-geometry`
 19. [ ] `threejs-object-sculptor`
 20. [ ] `threejs-procedural-buildings-and-cities`
@@ -120,9 +120,15 @@ The generated weather article also contains an independently authored force equa
 
 Read the entrypoint, reference, executable parity helper, interface, and prior field review. Reproduced sparse-array admission and the exact maximum-hash endpoint. The helper now rejects missing coordinate lanes and invalid numeric seeds/prefixes, retains the full u32 hash, and derives an exactly representable high-24-bit value below one. WGSL conversion rules were checked against the specification. Corrected remapped mesh support, rectangular mip accounting, nonlocal invalidation, paired-root boundary assumptions, stale bake publication, and actual color encoding. Nine complementary checks pass, including an independent BigInt mixer and a boundary-displacement counterexample; all 129 current skill tests and distribution validation pass. Changes to normalized values require a field revision. No GPU parity capture, field-bake lab acceptance, or shader timing is claimed. Log: `artifacts/website-improvement-20260924/continuation/skills-fields-after.log`.
 
-### Current skill: threejs-procedural-materials
+### Skill 17 result: threejs-procedural-materials
 
-The parallel skills-first session owns this next unit. Labs and recreations remain deferred until the complete skill pass. The inspector-continuation session will prepare procedural-geometry next without overlapping material source or tests.
+Read the complete entrypoint/reference/helper/metadata and generated consumer; checked installed bump, normal, roughness, triplanar, and shadow-adapter source. The executable filtered-height helper now rejects sparse or f32-collapsed fade ranges, invalid scalar/prefix inputs, and returns explicit base-normal fallback/conditioning for degenerate derivative frames while preserving physical slopes. Corrected triplanar sampler-option assumptions, stationary variance scope, color encodings, and versioned shadow-node replacement/coverage rules. Eight tests pass, including actual shadow-cache behavior and independent normal math; all 137 skill tests and distribution validation pass. No GPU shader compilation, material image, shadow capture, or lab acceptance is claimed. Logs: `artifacts/website-improvement-20260924/continuation/skills-materials-{before,after}.log`.
+
+The generated material article's narrative incorrectly says screen derivatives give filtering for free and presents a different roughness equation. Reconcile its owning narrative source after the sequential skill pass; do not hand-edit generated HTML or treat the old article as current helper proof.
+
+### Current skill: threejs-procedural-geometry
+
+The inspector-continuation session owns geometry 18 followed by object-sculptor 19. The skills-first session reserves buildings/cities 20, reading ahead but applying no changes until 18 and 19 land. Labs and recreations remain deferred until the complete skill pass.
 
 
 ## Finished and verified

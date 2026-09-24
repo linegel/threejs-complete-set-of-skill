@@ -118,8 +118,9 @@ override; leave it unset unless that replacement is explicitly derived and
 validated. Visible and caster displacement share one local-space cause. Emission
 feeds the HDR material result; bloom and tone mapping remain downstream owners.
 
-Data textures use `NoColorSpace`; authored color textures use
-`SRGBColorSpace`; scene-linear generated color remains linear. Keep one tone-map
+Data textures use `NoColorSpace`; encoded sRGB color uses `SRGBColorSpace`,
+while linear-sRGB HDR uses `LinearSRGBColorSpace`. Other color encodings require
+their declared conversion; authored does not imply sRGB. Keep one tone-map
 and output-conversion owner through `RenderPipeline.outputColorTransform` or one
 `renderOutput()`.
 
@@ -146,7 +147,10 @@ Jacobian spectral norm, physical support frequency in cycles per length unit,
 and positive band half-range around the supplied mean. `heightHalfAmplitude`
 uses the same length unit as the surface. It keeps attenuation, removed slope
 variance, double-sided surface-gradient normal handling, and `roughness^2`
-widening in one causal path.
+widening in one causal path. Literal inputs are checked in f32 precision;
+dynamic nodes require equivalent producer admission. Degenerate surface frames
+return the base normal and `normalValid=false` rather than normalize zero.
+Validate the conditioning floor and keep the complete derivative path uniform.
 
 This step is complete when all retained bands pass the projected footprint,
 removed slope/normal variance is accounted for exactly once, and a no-post
@@ -158,7 +162,11 @@ sparkle.
 One material graph serves a batch. Static instance variation uses attributes;
 hot GPU-owned variation uses storage-backed instance data only when its measured
 update/access pattern wins. Dissolve, wetness, variant, or lifetime fields drive
-visible and shadow masks from the same stable object/world cause.
+visible and shadow masks from the same stable object/world cause. Stock shadow
+overrides do not automatically copy dynamic opacity/alpha-test nodes; use the
+shared Boolean mask path described in the reference. When replacing material
+node graphs, invalidate material.version with `material.needsUpdate = true` so
+the cached caster path is rebuilt too.
 
 Cause maps use the procedural-fields direct-versus-bake gate. Static maps build
 once; dynamic maps update at their owner cadence and invalidate dependent mips.

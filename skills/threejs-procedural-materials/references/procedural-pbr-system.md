@@ -57,6 +57,13 @@ w_i = q_i/s                    when s > epsilon
 w = oneHot(fallbackIdentity)   otherwise
 ```
 
+Require finite nonnegative response inputs and valid eligibility before
+multiplication; zero eligibility does not sanitize NaN. The epsilon is a named
+low-confidence/fallback policy in response-weight units, not a physical constant.
+Admitted positive sums normalize using that actual sum. Distinct masks may have
+distinct physical meanings, but all channels of one identity use its same
+normalized shading weights.
+
 Keep `H_i` for semantic IDs and picking. Filter `w_i` for shading. A single GGX
 approximation blends `alpha=roughness^2`, then recovers `sqrt(alpha)`; distinct
 visible lobes remain discrete or use explicit layers.
@@ -90,6 +97,13 @@ and cadence.
 Installed r185 `triplanarTexture()` performs three projected samples per bound
 texture and blends with absolute local-normal weights. It does not filter the
 weights, reorient tangent-space normal maps, or implement stochastic tiling.
+The installed function reads only their texture values and constructs new
+TextureNodes for its projected samples. It does not preserve an input node's
+custom UV, explicit LOD/gradient, array-layer, or sampler overrides. Use a
+stage-adapted sampler when those are required, rather than assuming configured
+input nodes survive this helper. Projection position and normal must share the
+same frame; local-space defaults do not provide world-metric scale under object
+stretch. Guard zero normals before normalizing projection weights.
 A projected color plus packed data texture therefore adds six filtered samples;
 a separate projected normal texture adds three more. Prefer projected height or
 gradient with validated per-axis bases for triplanar normal detail.
@@ -101,7 +115,8 @@ Atlas mip safety:
 - for level `l`, gutter width satisfies **Derived**
   `g_l >= ceil(r_l)` where `r_l` includes the selected filter/manual support;
 - transform gradients by tile scale so LOD tracks tile texel density;
-- keep color atlases `SRGBColorSpace` and data atlases `NoColorSpace`;
+- tag color atlases by their actual encoding (sRGB only when encoded that way),
+  and data atlases `NoColorSpace`;
 - a base-level coordinate clamp cannot repair mips already contaminated across
   tile boundaries.
 
@@ -135,7 +150,23 @@ Evaluate it in derivative-uniform fragment control flow. Vertex/compute users
 need analytic or stored gradients. Filter `h` before perturbation. When `N` is
 r185 `normalView` on a double-sided material, multiply `det` by
 `faceDirection`, matching `BumpMapNode`; otherwise restrict the branch to front
-faces.
+faces. The example rescales position and height derivatives by matching axis
+lengths so that the conditioning measure is dimensionless and physical slopes
+are unchanged. A collapsed or poorly conditioned derivative frame returns the
+finite unit base normal with `normalValid=false`, using `minRelativeDet` as an
+explicit authored admission floor. Derivatives are still evaluated uniformly;
+this is not a branch around derivative execution. Wireframes and unreliable
+primitive-edge derivatives require bypass or separate validation, as in stock
+BumpMapNode. The base normal, derivatives, and all intermediate arithmetic must
+remain finite: this guard is not a NaN-recovery contract for broken inputs.
+
+The helper rejects sparse/invalid or f32-collapsed qFade edges, invalid shader
+prefixes, and literal scalar values outside their f32 domains. Dynamic scalar
+nodes must be finite and range-admitted by their producer before use. In
+particular the band half-range must stay positive, roughness stays in `[0,1]`,
+and footprint, frequency, amplitudes, and variance coefficients are nonnegative.
+The sampled band is centered on its declared mean; its positive half-range
+must describe that signal, not be clamped merely to make a division succeed.
 
 Normal/height mip contracts retain unresolved detail:
 
@@ -171,6 +202,14 @@ frequency `f_j`, and retained amplitude weight `w_j`, removed slope variance is
 ```text
 v_removed,j = (2*pi*A_j*f_j)^2/2 * (1-w_j^2)
 ```
+
+This exact sinusoid statement assumes a locally stationary amplitude and
+filter weight with the frequency in the surface's physical length units.
+For warped/noise/remapped bands, derive the actual slope second moment or fit
+`slopeVarianceCalibration` against a named spectrum/reference. A support cutoff
+alone is not its RMS frequency. Spatially varying envelope/weight gradients
+add product-rule slope terms and need their own approximation/error gate.
+The returned height is zero-mean detail, not the geometry owner's base height.
 
 Sum independent bands. Do not add both band-removal variance and mip/box
 variance for the same energy. Expose retained band weights, normal mean,
@@ -226,6 +265,22 @@ instance seed + lifetime + stable object/world field
   -> castShadow/maskShadow
 ```
 
+The installed shadow override does not copy opacityNode or alphaTestNode into
+the shadow material. It propagates scalar alphaTest/alphaMap, selected
+color/map alpha, and maskNode/maskShadowNode through their specific paths.
+For a dynamic cutoff, derive one Boolean visibility cause and use it as
+maskNode and the matching shadow mask; do not assume an opacity-only node
+silently reproduces the cutoff. Colored/transmitted shadows use castShadowNode
+and require the explicitly enabled transmitted-shadow branch. Test both
+surviving coverage and discarded pixels, not just the opaque default.
+
+The renderer caches derived shadow nodes by material.version. Replacing
+position/mask/shadow node graphs requires `material.needsUpdate = true`; changing
+an existing uniform value does not. A separate castShadowPositionNode is needed
+only for an intentionally different caster path; otherwise the renderer reuses
+positionNode. Preserve skinning/morph/instance composition when defining that
+local-position override, and admit motion, depth, and shadow variants together.
+
 Cause maps use the procedural-field amortization decision. Pack only matching
 coordinates, precision, filter, cadence, and locality. Static maps build once;
 edited maps update dirty support plus filter halos and rebuild required mips.
@@ -238,9 +293,11 @@ source data.
 
 ## Output, diagnostics, and failure signatures
 
-Author-facing color textures use `SRGBColorSpace`; normal, roughness,
-metalness, masks, height, LUT, weather, and generated cause maps use
-`NoColorSpace`. HDR material results stay scene-linear until one tone-map and
+Tag color textures by their actual transfer and primaries: encoded sRGB uses
+`SRGBColorSpace`, linear-sRGB HDR uses `LinearSRGBColorSpace`, and other spaces
+need their declared conversion. Normal, roughness, metalness, masks, height,
+LUT, weather, and non-color cause maps use `NoColorSpace`. HDR material results
+stay scene-linear until one tone-map and
 output conversion in the final node pipeline. `emissiveNode` adds actual
 radiance; bloom is downstream.
 
