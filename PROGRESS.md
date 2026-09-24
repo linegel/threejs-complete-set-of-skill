@@ -1,4 +1,4 @@
-# Website improvement pass — 2026-09-24
+# Website improvement pass - 2026-09-24
 
 ## Active order: skills before labs
 
@@ -78,18 +78,18 @@ Next in the roster; read its entrypoint and reachable resources before changes. 
 ## Finished and verified
 - Repaired responsive image publication and manifest consistency.
 - Reuse binds source bytes, encoder settings/versions, URLs, dimensions, and output hashes.
-- Current publication: 201 PNG sources, 402 AVIF/WebP variants; all 603 fully decoded.
+- Current publication: 191 PNG sources and 382 AVIF/WebP variants. The earlier 603-file decode covers the retained unchanged image files; stale Frost media is withheld.
 - Cold migration: 290 sources in 524.55 seconds; unchanged current build: 0.207 seconds.
 - Confirmed unchanged manifest bytes and image modification times on repeat generation.
 - Browser: 129 surfaces at 1440, 390, and 320px; all 402 variants decoded in Chromium.
 - Reconciled 40 evidence reports and retired preview owners during normal builds.
 - Withheld outdated capture summaries without changing canonical source evidence.
-- Restored 51 article crops for 17 skills; complete presentation and SEO checks pass.
+- Restored article crops; current publication contains 48 crops for 16 skills after stale evidence withholding. Complete presentation and SEO checks pass.
 - Raised evidence labels to 12px; resolved narrow-layout overflow with wrapping.
 - Archived 88 unreferenced variants with hashes; original PNGs remain published.
 - Fixed preflight import crash; 10 tests pass on Node 22.22.0 and 26.4.0.
 - Pinned toolchain preflight, full site build, source hashes, and skill distribution pass.
-- Full pinned unit suite: 192/197 passing. Relevant image/evidence tests: 19/19 passing.
+- Full pinned lab unit suite: 211/211 passing. The five inherited failing tests are resolved by af24decc; publication tests and inspector route tests also pass.
 
 ## Deferred / boundaries
 - Atomic output publication and resumable checkpoints were proposed, but tool edits
@@ -98,22 +98,18 @@ Next in the roster; read its entrypoint and reachable resources before changes. 
 - Preserve unrelated capture staging, backups, bisect files, and all other agents' work.
 - Owned browser contexts and preview servers close in finally blocks.
 
-## Next concrete failures (not hidden or marked passing)
-1. tests/labs/capture-contract.test.mjs: favicon request failure policy disagrees with runner.
-2. tests/labs/capture-wiring.test.mjs: weathered-world lacks its declared shared hook;
-   webgpu-touch-history-frost wrapper fails forwarded-profile audit.
-3. tests/labs/demo-roadmap.test.mjs: incomplete-tier closure expectation and creature
-   current-adapter timestamp requirement disagree with the current roadmap output.
-4. tests/labs/runtime-evidence-preview.test.mjs: backend proof fixture omits current
-   adapter/device identity fields. Preserve uncertainty rather than inventing hardware proof.
-5. Build warnings: object-sculptor classic bootstrap script is not bundled; a scenario URL
-   remains unresolved at build time; some chunks exceed 500 kB. Verify actual route behavior.
+## Recorded defects and remaining work
+1. Resolved in af24decc: tests/labs/capture-contract.test.mjs distinguishes optional favicon probes from declared missing SVG assets.
+2. Resolved in af24decc: tests/labs/capture-wiring.test.mjs now passes the corrected Weathered World hook and Frost profile forwarding.
+3. Resolved in af24decc: tests/labs/demo-roadmap.test.mjs and the roadmap retain individual unfinished proofs without inventing open work for accepted tiers.
+4. Resolved in af24decc: tests/labs/runtime-evidence-preview.test.mjs verifies partial and contradictory identity observations; unobserved initialization remains unproven.
+5. Bootstrap publication is repaired in 86578372. Remaining: the compatibility harness scenario URL is unresolved at build time, large chunks require measurement, and interruption-safe image generation remains deferred by the active skill order.
 
 ## Evidence files
 - image-verification.json: full decode, hashes, bytes, no-rewrite benchmark.
 - browser-report.json and screenshots: every evidence report plus core site surfaces.
 - validation-final.log, full-build-final.log, preflight-pinned.log.
-- unit-tests-pinned.log: exact five remaining failed tests and assertions.
+- unit-tests-pinned.log: historical five-failure baseline; continuation/all-tests-final.log records 211 passing tests.
 - obsolete-variants.json: recoverable paths and hashes for archived generated variants.
 - obsolete-responsive-archive/: archived bytes, not deleted original evidence.
 
@@ -121,7 +117,9 @@ Next in the roster; read its entrypoint and reachable resources before changes. 
 - ae403366: responsive delivery, evidence publication, generated outputs, and layout repair.
 - bed34f1f: filesystem permission constant compatibility and real permission regression.
 - 43abcf0b: evidence publication date; local HEAD and origin/main verified identical.
-- Ownership released in hey.md; tracked worktree and index are clean.
+- af24decc and 86578372: capture/proof correctness and synchronous bootstrap delivery.
+- d570997b and 8028e134: inspector source repair and complete generated publication.
+- This unit releases its ownership after its final documentation commit; parallel skill work remains independent.
 
 ## Continuation scope and decisions
 The active repository is the Three.js developer skill pack, not a game database.
@@ -164,19 +162,19 @@ Status: complete means delivered and recorded; pending means not yet established
 25. [x] Inspect affected desktop layouts at 1024, 1280, 1440, and 1728px.
 26. [x] Inspect affected non-map layouts at 390 and 768px after desktop passes.
 27. [x] Capture console/network observations for each affected browser load.
-28. [ ] Commit and push the finished browser-path correction.
+28. [x] Commit and push the finished browser-path correction (d570997b, 8028e134).
 29. [ ] Add interruption-safe image publication using existing encoder helpers.
 30. [ ] Verify resumed generation reuses finished work and repairs partial output.
 31. [ ] Verify corrupt cache records cannot suppress reconstruction.
 32. [ ] Preserve existing encoding settings, source PNGs, and visual results.
 33. [ ] Commit and push the finished image-generator correction.
-34. [ ] Run the pinned unit suite and required source/distribution checks.
-35. [ ] Rebuild the complete site from the latest default branch.
+34. [x] Current repair: 211 pinned lab tests and source/distribution checks pass; repeat after later phases.
+35. [x] Current repair: full committed-source site build published in 8028e134; repeat after later phases.
 36. [ ] Inspect emitted size warnings and identify actual user-facing bottlenecks.
 37. [ ] Exercise the affected rendering paths with truthful backend observations.
 38. [ ] Repair further directly observed defects; retain unmeasured GPU limits.
-39. [ ] Stop owned servers/MCP sessions and clean owned temporary artifacts.
-40. [ ] Update this complete plan, release ownership, and verify remote parity.
+39. [x] Stop owned MCP/server and remove 6,621,675,111 bytes of owned test/build staging.
+40. [ ] Complete project-wide sign-off after the remaining skill, runtime, image, and performance phases. This repair has a current record and pushed commits.
 
 ## What to test: capture/evidence correction
 The first unit changes diagnostics and capture configuration, not visual layout.
@@ -229,8 +227,8 @@ on the public route. Subject selection changed the rendered bonsai into the teal
 hinged teapot; final mode settled with firstFrameCompleted and nativeWebGPU true.
 The inspected screenshot shows the complete pot, lid, handle, and spout. The same
 load has zero console warnings/errors and a successful classic-script request.
-The formerly unbundled-script warning is gone. Inspector text truncation remains
-the next UI repair; this result does not certify model fidelity or GPU timing.
+The formerly unbundled-script warning is gone. Inspector text truncation is now
+resolved in d570997b; this result does not certify model fidelity or GPU timing.
 
 ## Inspector repair acceptance
 The existing inspector unit preserves the procedural subjects and capture-owned
@@ -255,3 +253,17 @@ GPU timing, canonical release acceptance, or a new physical-route capture.
 Screenshots and MCP responses remain under
 artifacts/website-improvement-20260924/continuation/. The active skill sequence
 above remains owned by the separate skills-first session; its files are excluded.
+
+## Publication and cleanup
+8028e134 publishes the complete current committed source, including the four skill
+corrections completed by the parallel session. The full build, presentation/SEO,
+source hashes, and distribution checks pass. New skill edits still require their
+normal later publication; no in-flight skill file entered this unit's commits.
+
+Isolated browser MCP worker 88788 closed its tabs, transport, and port 4173. Removed
+16,890 reviewed temporary files and 2,011 empty directories, including every
+owned build staging tree and synthetic capture fixture under continuation/tmp.
+Temporary MCP transport, schema, snapshot copies, and socket directories are also
+removed. Accepted screenshots, command responses, test logs, and the cleanup
+inventory remain as local verification records. Unrelated historic captures and
+the parallel session's skill logs were preserved.
