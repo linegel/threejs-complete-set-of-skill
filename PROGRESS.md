@@ -29,7 +29,7 @@ Use this existing repository plan rather than an unrelated game ticket.
 9. [x] `threejs-exposure-color-grading` — source/reference/example pass; ten new meter/math/LUT checks.
 10. [x] `threejs-image-pipeline` — source/reference/example pass; eight new graph/transaction checks.
 11. [x] `threejs-sky-atmosphere-and-haze` — source/reference pass; eight transport/domain checks.
-12. [ ] `threejs-volumetric-clouds`
+12. [x] `threejs-volumetric-clouds` — source/reference pass; ten transport/skip/history checks.
 13. [ ] `threejs-spectral-ocean`
 14. [ ] `threejs-water-optics`
 15. [ ] `threejs-rain-snow-and-wet-surfaces`
@@ -98,7 +98,11 @@ Read the complete skill/reference/rebuild example/interface and installed TRAA, 
 
 Read both references, entrypoint, and interface metadata. Corrected opaque-body truncation (no visible far-side interval), reversed shell/post error weighting, scaled-ray parameter ownership, top-boundary LUT degeneracy and cancellation, zero-curvature depth spacing, ordered optical-depth differences, attenuation-aware cumulative inscattering, and superseded product publication. Eight mathematical checks reproduce these counterexamples and retain the original unit-equivalence fixture. All 83 skill tests and distribution validation pass. These are numerical/domain checks, not a GPU transport solve, new phase/energy convergence result, sky capture, or lab acceptance. Logs: `artifacts/website-improvement-20260924/continuation/skills-atmosphere-{before,after}.log`.
 
-### Current skill: threejs-volumetric-clouds
+### Skill 12 result: threejs-volumetric-clouds
+
+Read all three references, entrypoint, and interface metadata. Corrected the zero-limit criterion and stable optical transfer, continuous majorant requirements, background-inclusive accumulated skip/tail error, parallel-axis DDA handling, finite-disc attenuation, overlapping-media composition, shadow epoch admission, small-opacity moments, invalid-history arithmetic, and interval-correct foreground upsampling. Ten checks demonstrate the affected counterexamples and preserve homogeneous step-partition invariance. Floating-point comparisons use explicit tolerances rather than bit equality. All 93 skill tests and distribution validation pass. No GPU volume render, light solve, moving-history capture, causal precipitation simulation, or lab acceptance is claimed. Logs: `artifacts/website-improvement-20260924/continuation/skills-clouds-{before,after}.log`.
+
+### Current skill: threejs-spectral-ocean
 
 Next in the roster; read its entrypoint and reachable resources before changes. All labs and recreations remain deferred.
 

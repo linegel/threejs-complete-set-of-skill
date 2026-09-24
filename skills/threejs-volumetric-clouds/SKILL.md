@@ -70,8 +70,9 @@ T_step = exp(-sigma_t*ds)
 DeltaL = T_acc * (j/sigma_t) * (1-T_step)
 ```
 
-Use the zero-extinction limit `DeltaL = T_acc*j*ds`. Here `j` is source
-radiance per length. For direct light, distinguish finite-disc radiance, which
+Use the zero-optical-depth limit `DeltaL = T_acc*j*ds`, selected by
+`sigma_t*ds` rather than the coefficient alone, with stable expm1/series
+evaluation. Here `j` is source radiance per length. For direct light, distinguish finite-disc radiance, which
 needs a solid-angle integral, from a declared collimated irradiance convention.
 
 Normalize phase so `2*pi*integral_-1^1 p(mu)dmu=1`. Let
@@ -126,8 +127,8 @@ marches agree on transmittance, HDR radiance, and first-contribution depth.
 Write current scene-linear cloud radiance, transmittance, and the depth data
 needed by the selected temporal branch. Bound steps by optical depth, resolved
 field bandwidth, cell/layer exits, opaque depth, and the remaining cloud
-interval. Terminate when the maximum remaining HDR contribution fits the output
-error gate.
+interval. Terminate only when remaining source and background-attenuation error,
+plus already accumulated skip error, fit the output gate.
 
 On Three.js r185, run `await renderer.init()` and require
 `renderer.backend.isWebGPUBackend === true` before allocating or submitting
@@ -181,9 +182,9 @@ resolved = alpha_current*current + (1-alpha_current)*clippedHistory
 Reject history outside the viewport or across depth/spread mismatch, camera
 cuts, projection changes, weather/topology discontinuities, encoding changes,
 resolution/tier changes, or a missing/incompatible previous origin mapping.
-Raise current response for disocclusion and low confidence. Variance-clip
-premultiplied linear HDR radiance and transmittance separately, then upsample
-with scene/cloud depth agreement.
+Raise current response for disocclusion and low confidence. Reject invalid
+samples before arithmetic. Variance-clip premultiplied linear HDR radiance and transmittance separately, then upsample only interval-compatible
+transport; a mean/front depth cannot remove a hidden rear contribution.
 
 Read
 [references/temporal-reconstruction.md](references/temporal-reconstruction.md)
@@ -210,7 +211,9 @@ atmosphere or an unattenuated source plus atmosphere transmittance. Multiply
 each admitted cloud-only transmittance and opaque-visibility factor separately.
 Keep directional sky radiance distinct from hemispherical sky irradiance.
 
-Composite clouds before the host tone map:
+Composite clouds before the host tone map. This transfer applies to its modeled
+interval; overlapping atmosphere/cloud media need a coupled or validated
+interleaved camera-path solve, not two serial whole-segment haze composites:
 
 ```text
 C_out = L_cloud + T_cloud * C_scene

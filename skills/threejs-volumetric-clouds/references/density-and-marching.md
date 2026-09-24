@@ -59,6 +59,12 @@ erosion = detailAmount * detailEnvelope(h) * filteredDetail
 rho = max(rhoBase - erosion * boundarySensitivity(rhoBase), 0)
 ```
 
+Require finite ordered layer heights, nonnegative optical/density parameters,
+and admitted field ranges. A remap whose lower and upper edges coincide needs
+an explicit threshold/tie branch, not division by zero. Evaluate the empty
+support branch before remapping. Detail remains nonnegative erosion unless its
+possible increase is separately included in every continuous majorant.
+
 Use an equivalent bounded remap when it better preserves cloud morphology, but
 retain the causal order: weather/profile establishes support, shape forms broad
 mass, detail removes or reshapes its boundary. Include every operation that can
@@ -91,8 +97,12 @@ macroOffset(t1) = macroOffset(t0) + integral_t0^t1 u_air(x,t) dt
 fieldOffset = macroOffset + boundedRelativeOffset
 ```
 
-Preserve the integrated offset when the velocity input changes. Use the same
-macro cause for weather, shape, detail, and turbulence; relative offsets model
+For a translating pattern use `rho(x,t)=rho0(x-macroOffset(t))`; the opposite
+coordinate sign reverses the apparent velocity. Preserve the integrated offset
+when velocity changes. A single offset represents a uniform macro translation;
+spatially varying flow requires an advected coordinate map/trajectories or an
+explicit bounded anchor approximation, not one global integral for every point.
+Use the same macro cause for weather, shape, detail, and turbulence; relative offsets model
 limited internal evolution. Wrap texture coordinates by a continuous period or
 rebase them without changing the sampled position.
 
@@ -137,22 +147,37 @@ Packed gaps accelerate altitude only; they say nothing about horizontal holes.
 
 Build each macrocell upper bound from every term that can increase density:
 weather, compact profile, base shape, warp reach, relative advection uncertainty,
-and density-increasing remaps. Generate it with max reduction.
+and density-increasing remaps. First establish a finest-cell continuous bound:
+max reduction of isolated samples does not bound an unsampled procedural peak.
+Use interval/analytic or derivative bounds, or maxima of the complete support
+of an admitted non-overshooting interpolant. Include filtered/warped support and
+quantization error, then max-reduce those already-conservative child bounds.
 
-Skipping a cell of length `Delta s` is exact when `rho_max=0`. For an
+Skipping a cell is exact when its matching-generation bound proves zero
+extinction and zero independent source over the entire swept interval. A zero
+density bound alone is insufficient for a separate emitting field. For an
 error-bounded nonzero skip:
 
 ```text
 DeltaTauMax = beta_t * rho_max * DeltaS
-DeltaLMax <= T_acc * S_eq_max * (1-exp(-DeltaTauMax))
+DeltaImageMax <= T_acc * (S_eq_max + L_behind_max) * (1-exp(-DeltaTauMax))
 ```
 
-`S_eq_max` bounds `j/sigma_t`. When that bound is unavailable, use
-`DeltaLMax <= T_acc*j_max*DeltaS`, or sample the cell. Admit the skip only
-when both omitted optical depth and HDR radiance fit their gates.
+`S_eq_max` bounds the cell's `j/sigma_t`; `L_behind_max` bounds all incoming
+radiance behind it, including bright scene surfaces, sun/discs, and later cloud
+contribution. Skipping changes both emission and attenuation. When the source
+ratio is unavailable, replace its term by `T_acc*j_max*DeltaS` but retain the
+background-attenuation bound, or sample the cell. Admit per-band nonnegative
+bounds and accumulate the error budget over all skips and the terminal tail;
+a per-cell gate repeated many times is not a ray-level error guarantee. Missing
+background/source bounds forbid the claimed radiance-bounded skip.
 
-Traverse sparse cells with DDA to the cell exit. Refine the first occupied
-entry at the cell boundary or with bounded search so a long empty step does not
+Traverse sparse cells with DDA to the cell exit. Handle parallel axes with an
+explicit inside/outside slab test and infinite next crossing; avoid 0/0 on cell
+faces. Define half-open boundary ownership, advance tied axes consistently, and
+prove forward progress without stepping over an unvisited cell. Clamp the last
+step to the admitted interval and use a separate finite work-limit failure.
+Refine the first occupied entry at the cell boundary or with bounded search so a long empty step does not
 shift the visible silhouette. Rebuild or dilate affected cells after advection,
 warp, or topology changes; sample directly while the matching majorant
 generation is unavailable.
@@ -175,7 +200,7 @@ At each ray:
 3. Skip proven empty gaps/cells.
 4. Sample the weather/base majorant.
 5. Evaluate shape, turbulence, and detail only where admitted.
-6. Evaluate lighting where extinction can contribute.
+6. Evaluate lighting where extinction or an admitted independent source contributes.
 7. Integrate front-to-back and terminate on a bound for remaining HDR
    contribution.
 
@@ -196,14 +221,26 @@ Use analytic piecewise-constant transfer:
 
 ```text
 stepT = exp(-sigma_t*ds)
-stepL = (j/sigma_t)*(1-stepT)
+tauStep = sigma_t*ds
+phi = -expm1(-tauStep)/tauStep   when tauStep > 0
+phi = 1                        when tauStep = 0
+stepL = j*ds*phi
 L_acc += T_acc*stepL
 T_acc *= stepT
 ```
 
-Use `stepL=j*ds` near zero extinction. Terminate when a maximum possible
-remaining source contribution, not transmittance alone, fits the HDR error
-budget.
+Choose the small-argument limit from dimensionless optical depth `sigma_t*ds`,
+not the coefficient alone: a tiny coefficient over a huge step can be opaque.
+Use a validated series for `phi` near zero; for large optical depth, the finite
+ratio `j/sigma_t` form avoids overflowing `j*ds`. Admit all products and step
+lengths before use. Jitter quadrature points inside a complete partition; do not
+move the first interval boundary and silently drop its front segment.
+
+Terminate only when the entire remaining image error fits the residual budget:
+include remaining source, attenuation of `L_behind_max`, optical-depth error,
+and all already spent skip error. A bright background defeats a transmittance-
+only or source-only threshold. Otherwise continue, change representation, or
+report failure of the quality/work budget.
 
 ## Workload evidence
 
@@ -235,5 +272,6 @@ seeds and camera intervals. Record:
 
 Negative controls must make an averaged occupancy mip, stale majorant,
 occupied-gap swap, missing warp dilation, and raw-depth clamp visibly fail.
-Completion requires the production path to stay within every declared error
-gate while its measured work is lower than the rejected representation.
+Completion requires the production path to meet every declared error and work
+gate. An acceleration claim additionally demonstrates lower complete-branch
+cost than its matching unaccelerated reference at equal quality.

@@ -35,9 +35,13 @@ L_acc += T_acc*L_step
 T_acc *= T_step
 ```
 
-`j` is source radiance per length. Use `L_step=j*ds` as
-`sigma_t -> 0`. Step-partition invariance of a homogeneous slab is the first
-gate; brightness that changes with step count exposes mixed source units.
+`j` is source radiance per length. Evaluate `1-exp(-tau)` stably using expm1
+or a validated series; the zero-limit decision is on `tau=sigma_t*ds`, not
+`sigma_t` alone. The finite expression `j*ds*(-expm1(-tau)/tau)` tends to
+`j*ds`; switch to the finite source-ratio form when needed to avoid overflow.
+Require finite nonnegative coefficients/density and a positive admitted step.
+Step-partition invariance of a homogeneous slab is the first gate; brightness
+that changes with step count exposes mixed source units or unstable evaluation.
 
 Normalize a phase function over `4*pi`. For Henyey-Greenstein:
 
@@ -86,15 +90,19 @@ Honor whether either includes the direct solar disc.
 For a finite solar disc:
 
 ```text
-j_direct =
-  sigma_s * T_cloudToSun
-  * integral_sunDisc p(wi->wo)*L_sun(wi)dOmega
+j_direct = sigma_s * integral_sunDisc
+  p(wi->wo)*L_sunAfterAtmosphere(wi)*T_cloud(wi)*V_opaque(wi) dOmega
 ```
 
-For a declared collimated-irradiance convention:
+Attenuation and visibility generally vary across the disc and belong inside
+the angular integral. A single center-ray transmittance/visibility is an admitted
+approximation only when its finite-disc error is bounded; cloud edges and soft
+opaque penumbrae are counterexamples. For a declared collimated convention,
+the following `E_sun` already includes the chosen atmosphere form and must be
+multiplied by the matching opaque visibility when required:
 
 ```text
-j_direct = sigma_s*p(mu)*E_sun*T_cloudToSun
+j_direct = sigma_s*p(mu)*E_sun*T_cloudToSun*V_opaque
 ```
 
 Derive the irradiance convention once and validate it with a homogeneous slab.
@@ -107,6 +115,10 @@ For sky illumination:
 j_sky = sigma_s * integral_hemisphere p(wi->wo)*L_sky(wi)dOmega
 ```
 
+The hemisphere here means sky-only illumination over a declared upper domain.
+A complete environmental source integrates `4*pi` or separately adds the lower
+hemisphere/ground response without overlap. Do not turn one hemispherical
+irradiance value into directional radiance without a declared angular model.
 Use angular quadrature, a fitted low-order basis, or another approximation with
 an explicit radiance error. The visible cloud result remains linear HDR:
 
@@ -114,6 +126,18 @@ an explicit radiance error. The visible cloud result remains linear HDR:
 j = j_direct + j_sky + j_multiple
 C_out = L_cloud + T_cloud*C_scene
 ```
+
+### Atmosphere/cloud overlap
+
+`L_cloud + T_cloud*C_scene` is the transfer of the modeled cloud interval; it
+cannot generally be layered over a whole-segment atmosphere result when both
+are overlapping media. Transmittances multiply, but inscattering is attenuated
+according to where it occurred. Sum local extinction and source terms in a
+coupled march, or use an explicitly error-bounded interleaving/segment method.
+For disjoint foreground/background atmosphere intervals, compose their transfer
+operators in physical ray order. Keep direct-light attenuation ownership
+separate from this camera-path coupling; a factor trace alone does not prove
+correct interleaving. Test a mixed homogeneous slab against its joint solution.
 
 ## Multiple-scattering approximations
 
@@ -148,6 +172,12 @@ T_cloud = exp(-tauColumn)
 tauMax = -log(T_min)
 ```
 
+Require finite `0 < T_min <= 1`. The optical-depth cap leaves a transmission
+floor `T_min`, whose error must be multiplied by the receiving incident HDR
+radiance before claiming an image-error bound. A short local sun march must
+bound its omitted column or join a valid far product; fixed short distance is
+not automatically a complete shadow.
+
 A single-channel R16F/R32F sun-space product is sufficient when its range and
 quantization fit the gate.
 
@@ -166,7 +196,10 @@ Generate a shadow product by:
    hierarchy as the beauty path.
 2. Marching or DDA-skipping toward the sun.
 3. Accumulating dimensionless optical depth to `tauMax`.
-4. Publishing the product only after its matching density generation completes.
+4. Publishing only when the completed density, sun, support, format, and resource
+   revisions still match the latest required query. Discard superseded work and
+   preserve newer invalidation. An old complete product remains usable only
+   under its explicit age/error envelope.
 
 For beauty samples near the receiver, combine a short local sun march with a
 far shadow representation only when their intervals meet without overlap or a
