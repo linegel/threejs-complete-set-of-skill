@@ -62,9 +62,14 @@ or retain the prior orientation. Validate right-handedness and roll continuity
 around the degeneracy.
 
 The delivered pose is a world pose. Prefer an identity, unit-scale camera
-ancestry. Otherwise update the parent world matrix and transform position and
-orientation through the inverse parent world transform before assigning local
-fields. Nonuniform camera ancestry invalidates a naive `lookAt()` result.
+ancestry. A rigid, orientation-preserving parent can be handled by updating its
+world matrix and inverse-transforming the delivered position and orientation.
+Reject singular, reflected, nonuniformly scaled, or sheared ancestry for this
+position/quaternion path. Inverting an arbitrary affine parent can produce a
+local basis with shear; quaternion decomposition does not preserve that basis.
+A separately verified full-matrix camera path needs explicit matrix ownership.
+Stock controls also need their own parent-space admission, not just a correct
+one-time pose conversion.
 
 ### Planar occupancy
 
@@ -190,19 +195,34 @@ TRAA has replaced its dimensions.
 ### Orbit controls
 
 `OrbitControls` owns camera transform and `target`; with an orthographic camera
-it also writes `zoom`. Before reacquisition:
+it also writes `zoom`. Stock r185 assumes its camera position and target share
+the same frame; use an unparented or identity-parent camera, or an explicitly
+adapted controller. Admit the delivered pose before reacquisition: it must have
+the controller's up convention and no unsupported roll, and satisfy distance,
+polar/azimuth, target-cursor, and orthographic-zoom limits. `lookAt(target)`
+removes arbitrary roll, and limit clamps can move the camera without input.
+Bridge an incompatible pose through an authored transition, change explicitly
+accepted limits, or keep a controller that represents it; do not call the snap
+jump-free. Normalize and validate `camera.up` before construction.
 
-1. disable the old owner;
-2. apply the delivered pose/projection once;
-3. restore the semantic target, or derive
-   `target = position + forward * authoredRadius`;
-4. recreate controls to clear latent spherical, pan, dolly, scale,
-   cursor-zoom, and interaction state;
-5. recreate after changing `camera.up`, whose up-to-Y transform is cached at
-   construction;
-6. apply saved public configuration and call one update;
+The constructor calls `update()` with its default target. Treat construction
+and configuration as one non-rendering transaction. Before reacquisition:
+
+1. disable the old owner and snapshot delivered pose/projection and reset state;
+2. release old listeners/captures, set the validated `camera.up`, and recreate
+   controls to clear latent spherical, pan, dolly, scale, cursor-zoom, and input;
+3. reconstruct the semantic target in the admitted frame, or derive
+   `target = position + forward * authoredRadius` with a positive finite radius;
+4. apply saved public configuration; construction has refreshed the cached
+   up-to-Y transform for the admitted up convention;
+5. reapply the saved delivered pose/projection after constructor side effects;
+6. hold auto-rotation and other input until admission, then call `update(0)`;
 7. compare delivered and post-update position, target, orientation, and
-   projection.
+   projection before exposing the new owner; restore the intended reset baseline.
+
+Recreating controls also resets `target0`, `position0`, and `zoom0`; retain the
+previous reset baseline when reset semantics are unchanged. Do not accidentally
+save the constructor's default target as the user's reset destination.
 
 Call `saveState()` only when the handoff intentionally changes reset semantics.
 Stock damping advances per `update()` call; a fixed programmatic cadence can be
@@ -215,7 +235,11 @@ alpha = 1 - exp(-lambda * dt)
 
 The r185 orthographic `zoomToCursor` path allocates temporary vectors. A
 zero-allocation interaction gate therefore disables that mode or patches it to
-owned scratch storage.
+owned scratch storage. The installed r185 mouse-dolly start handler also passes
+`clientX` for both cursor coordinates instead of using `clientY` for the second.
+Disable that cursor-zoom gesture or apply a narrowly version-pinned, tested
+adapter correction; do not claim cursor anchoring merely because wheel zoom
+passes. Recheck the installed source before carrying this workaround forward.
 
 ### Pointer look
 
@@ -228,7 +252,12 @@ and disposal.
 
 ### Authored handoff and shot
 
-A finite handoff captures its start once:
+A finite handoff captures its start once. Require finite time values and a
+positive finite duration for the interpolation branch below. A zero-duration
+handoff is an instant cut: copy the target and advance the affected history
+epoch without dividing. Reject negative or nonfinite duration. The easing
+function's output and any overshoot must remain inside its admitted pose/path
+envelope.
 
 ```text
 u = clamp((now - startTime) / duration, 0, 1)
@@ -401,6 +430,27 @@ resources, storage buffers, and debug objects. Restore borrowed state in a
 `finally` path. After replacing or restoring `RenderPipeline.outputNode` or
 `outputColorTransform`, set `needsUpdate = true`; warm the graph only after MRT
 and post configuration is final.
+
+### Stock control teardown
+
+Snapshot borrowed DOM `touchAction` and cursor styles before connecting controls.
+Stock r185 OrbitControls clears `touchAction` to an empty string on disconnect;
+that does not restore a pre-existing inline policy. Restore the saved values
+after disposal. Release only pointer captures owned by this rig and remove
+its active gesture/document listeners even when teardown happens mid-drag.
+
+In the installed r185 source, pressing Control attaches a capturing `keyup`
+listener, but `disconnect()` removes only the permanent `keydown` interceptor.
+A version-pinned teardown adapter must also remove the matching
+`_interceptControlUp` listener from the original root with capture enabled, then
+clear held-input state. This private member is revision-specific: verify the
+installed implementation or own the control patch; do not assume `dispose()`
+alone covers this branch. Test disposal with Control held, not just idle.
+
+PointerLockControls disconnects listeners without releasing pointer lock. Before
+teardown, request unlock only when `ownerDocument.pointerLockElement` is this
+rig's element; never release another owner's lock. Handle unlock completion and
+clear held movement inputs without depending on listeners already removed.
 
 ## Workload and acceptance
 

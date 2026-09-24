@@ -62,8 +62,9 @@ coordinates and perspective `w <= 0`; require negative view-space `z`, NDC
 inside the safe frame, and every support point inside the near/far interval.
 
 Update world and projection matrices before reading hierarchy or frustum data.
-Use an identity/unit-scale camera ancestry, or convert the delivered world pose
-through the updated inverse parent transform before assigning local pose.
+Use identity/unit-scale ancestry, or convert through an updated rigid,
+orientation-preserving parent. Reject sheared, reflected, singular, or
+nonuniformly scaled ancestry for a position/quaternion-only camera path.
 
 When obstruction changes the camera, solve the near-plane footprint against
 the path and rerun safe-frame and depth feasibility. Composition and clearance
@@ -78,15 +79,20 @@ depth interval, and a post-obstruction recheck when obstruction is active.
 Resolve the active owner before update. A finite authored handoff captures its
 start once, evaluates time from seconds, writes one positional `lerp` and
 shortest-path quaternion `slerp`, and copies the exact target at completion.
-An authored moving shot separately owns its path continuity, aim/up fields,
-timing, safe frame, and obstruction checks.
+A zero-duration handoff is an explicit cut with its history reset; reject
+negative or nonfinite duration before interpolation. An authored moving shot
+separately owns path continuity, aim/up fields, timing, safe frame, and
+obstruction checks.
 
-On return to controls, reconstruct their semantic state from the delivered
-pose. For `OrbitControls`, restore or derive `target`, recreate the controls to
-clear latent spherical/pan/dolly state, and recreate them after changing
-`camera.up`. Verify the first `update()` preserves the delivered position,
-target, orientation, and projection. Pointer-look controllers reconstruct
-yaw/pitch in their declared up frame and clear held input on unlock, blur,
+On return to controls, first admit the delivered pose into their supported
+up/roll, parent-space, and limit envelope. For `OrbitControls`, reconstruct the
+target and configuration in a non-rendering transaction, recreate to clear
+latent state, then reapply the delivered pose after its constructor update.
+Recreate after changing `camera.up`; preserve the intended reset baseline.
+Hold input/auto-rotation until the first `update(0)` preserves position, target,
+orientation, and projection. Unsupported roll or clamped limits require an
+explicit transition or another controller, not a jump-free claim. Pointer-look
+controllers reconstruct yaw/pitch in their declared up frame and clear held input on unlock, blur,
 owner change, and disposal.
 
 Read [controls and handoffs](references/camera-rig-and-cinematic-systems.md#controls-and-handoffs)
@@ -139,8 +145,11 @@ post resources, jitter scale, and history epoch as one transaction.
 
 Snapshot every field the rig owns: transform, `up`, parent, layers, matrix
 flags, full projection/view-offset state, controls state, output graph, temporal
-nodes, origin buffers, and listeners. Disposal restores that snapshot, disposes
-owned controls/post/storage/debug resources, and marks the render pipeline dirty
+nodes, origin buffers, listeners, borrowed DOM styles, and owned input captures.
+Exercise held-Control, mid-drag, and owned-pointer-lock teardown; stock control
+disposal has revision-specific gaps described in the reference.
+Disposal restores that snapshot, disposes owned controls/post/storage/debug
+resources, and marks the render pipeline dirty
 after output-node or output-conversion changes.
 
 Read [lifecycle and restoration](references/camera-rig-and-cinematic-systems.md#lifecycle-and-restoration)

@@ -22,7 +22,7 @@ Use this existing repository plan rather than an unrelated game ticket.
 2. [x] `threejs-debugging` — source/reference pass; publication uncertainty preserved.
 3. [x] `threejs-visual-validation` — source/reference/helper pass; 17 new checks.
 4. [x] `threejs-compatibility-fallbacks` — source/reference pass; backend and renderer-stack boundaries corrected.
-5. [ ] `threejs-camera-controls-and-rigs`
+5. [x] `threejs-camera-controls-and-rigs` — source/reference pass; nine new numerical/control checks.
 6. [ ] `threejs-scalable-real-time-shadows`
 7. [ ] `threejs-ambient-contact-shading`
 8. [ ] `threejs-bloom`
@@ -70,7 +70,11 @@ Read the entrypoint, protocol, actual aligned-readback helper, and interface met
 
 Read both references, entrypoint and interface metadata, then the installed WebGPURenderer constructor, standard material library, and WebGLBackend initialization. Activation now distinguishes positively identified fallback, capability-related initialization failure, missing identity, and unrelated application failure; explicit user authorization remains mandatory. The guidance separates the node renderer's WebGL backend from classic WebGLRenderer/ShaderMaterial/EffectComposer, including their different timing APIs and resource ownership. No fallback renderer was activated or lab converted. Distribution validation and the existing 29 checks pass; source/API review is not rendered fallback parity. Log: `artifacts/website-improvement-20260924/continuation/skills-compatibility-check.log`.
 
-### Current skill: threejs-camera-controls-and-rigs
+### Skill 5 result: threejs-camera-controls-and-rigs
+
+Read the complete skill/reference/interface and installed OrbitControls, PointerLockControls, TRAA and TAAU implementations. Corrected parent-transform admission, constructor/handoff ordering, roll and limit compatibility, reset-state preservation, zero-duration cuts, and owned DOM/held-input cleanup. The r185 cursor-coordinate and held-Control disposal defects are explicit pinned adapter requirements, not claims that the dependency was patched. Nine new checks reproduce constructor mutation, roll removal, limit clamping, inverse-parent shear, zero-duration NaN, shifted projection matching, cursor-coordinate misuse, and listener/style cleanup with an event-host fixture. The corrected compatible handoff preserves pose and projection. All 38 skill checks and distribution validation pass; no browser, GPU, pointer-lock, or lab acceptance is claimed by these CPU/source tests. Logs: `artifacts/website-improvement-20260924/continuation/skills-camera-{before,after}.log`. Concurrent inspector/source publication through 8028e134 is retained and is not part of this skill unit.
+
+### Current skill: threejs-scalable-real-time-shadows
 
 Next in the roster; read its entrypoint and reachable resources before changes. All labs and recreations remain deferred.
 
