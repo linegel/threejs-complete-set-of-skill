@@ -71,12 +71,19 @@ snippet targets an opaque or already-composited final output.
 
 ```js
 import * as THREE from 'three/webgpu';
-import { emissive, mrt, output, pass, renderOutput, vec4 } from 'three/tsl';
+import { Fn, diffuseColor, emissive, mrt, output, pass, renderOutput, vec4 } from 'three/tsl';
 import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 
 const pipeline = new THREE.RenderPipeline( renderer );
 const scenePass = pass( scene, camera, { samples: sceneSampleCount } );
-const sceneMRT = mrt( { output, emissive } );
+const contributionRGBA = Fn( ( _, builder ) => {
+  const alpha = diffuseColor.a;
+  const rgb = builder.material.premultipliedAlpha === true
+    ? emissive.mul( alpha )
+    : emissive;
+  return vec4( rgb, alpha );
+} )();
+const sceneMRT = mrt( { output, emissive: contributionRGBA } );
 sceneMRT.setBlendMode(
   'emissive',
   new THREE.BlendMode( THREE.MaterialBlending )
@@ -97,7 +104,14 @@ pipeline.needsUpdate = true;
 ```
 
 Both graphs use one scene traversal. The selective graph adds a full-resolution
-HDR attachment; it does not add a selection render.
+HDR attachment; it does not add a selection render. Its contribution explicitly
+carries `diffuseColor.a`: converting a bare vec3 `emissive` to RGBA supplies one,
+not the material opacity. MaterialBlending selects blend factors; it does not
+construct correct source alpha or premultiply an arbitrary MRT RGB. The branch
+above follows each regular material's premultiplied/straight convention. Custom
+fragment/output nodes, transmission, alpha-to-coverage, fog, and other radiance
+changes still require their actual contribution contract and parity fixtures.
+An emissive-only signal is not the already fogged/refracted full-scene radiance.
 
 ### Hybrid graph
 
@@ -171,22 +185,30 @@ const material = new THREE.SpriteNodeMaterial( {
 
 material.colorNode = color( 0x000000 );
 material.opacityNode = alpha;
-material.emissiveNode = radiance.mul( alpha );
+// NodeMaterial premultiplies the visible output once; do not preapply alpha here.
+material.emissiveNode = radiance;
 ```
 
+The selective graph's explicit contribution RGBA applies opacity once when the
+material is premultiplied, and retains straight RGB otherwise. Together with
+`BlendMode(MaterialBlending)`, both paths produce the same weighted emission.
+Premultiplying `emissiveNode` itself would multiply visible emission twice.
 `BlendMode(MaterialBlending)` makes the emissive attachment use that material
 blend state. For ordinary alpha/transmission or custom factors, derive the
 contribution from the same alpha convention and verify order and occlusion.
 This contribution-buffer policy is independent of the final-output alpha branch.
 
 When visible emission must diverge from bloom membership, use a separately
-timed contribution pass or a source-verified merge fix. That branch no longer
-has the one-scene-pass cost profile.
+timed contribution pass or a source-verified merge fix. A separate pass changes
+the traversal count; a corrected MRT merge can remain one pass but still needs
+its own blend, contribution, and cost validation.
 
 Verify:
 
 - one transparent layer over opaque geometry;
-- two overlapping layers in both insertion orders;
+- two overlapping layers in both insertion orders with the intended depth sort:
+  additive emission should commute; ordinary alpha-over is not commutative and
+  must be compared with the expected ordered result, not required to match;
 - additive and alpha-blended policies separately;
 - depth intersection, offscreen clipping, and animated deformation;
 - contribution texture against the visible material state.
@@ -224,6 +246,12 @@ downstream pyramid remains isotropic. Anamorphic streaks, starbursts,
 chromatic scatter, calibrated energy conservation, or resolution-invariant
 sensor-space support need a custom PSF.
 
+Require finite nonnegative strength/threshold, finite spread in `[0,1]`, a
+positive finite scale, and admitted finite source values. Stock high-pass
+`smoothstep` needs a positive finite knee width; a zero-width knee requires an
+explicit hard-threshold `highPassFn` with a defined equality case. Negative,
+nonfinite, overflowed, or out-of-budget values are not usable quality settings.
+
 The deepest level receives approximately `base / 16`. Require:
 
 ```text
@@ -249,11 +277,21 @@ exposed-linear:
   thresholdScene = thresholdExposed / exposure
 
 display-referred:
-  thresholdScene = inverseToneAndOutput(thresholdDisplay) / exposure
+  lowScene = inverseToneAndOutput(thresholdDisplay) / exposure
+  highScene = inverseToneAndOutput(thresholdDisplay + kneeDisplay) / exposure
+  thresholdScene = lowScene
+  kneeScene = highScene - lowScene
 ```
 
-The display branch requires a stable inverse over the accepted range. Convert
-the soft-knee width with the threshold. A known linear radiance rescale converts
+The display branch requires a stable inverse for the specific scalar signal
+and range, including both knee endpoints. Inverting a width alone is incorrect
+for a nonlinear curve. Arbitrary per-channel tone mapping, gamut clipping, and
+color grading do not supply a universal inverse from displayed luminance to
+scene luminance; constrain and validate the signal or stay scene-referred.
+Require a finite positive exposure multiplier before dividing. Convert both
+endpoints and subtract for nonlinear mappings; for exposed-linear policy the
+threshold and knee each divide by the same exposure. A known linear radiance
+rescale converts
 both by the same factor; a primaries, quantity, spectral, nonlinear, or
 calibration change requires a validated transform or re-authoring.
 
@@ -273,7 +311,17 @@ halo-preserving transparent output.
 - Set BloomNode resolution scale before timing.
 - Warm the complete pipeline; scene-pass compile does not warm bloom materials.
 - After changing `outputNode`, set `needsUpdate = true`.
-- BloomNode derives ordinary resize dimensions from the drawing buffer.
+- BloomNode derives ordinary resize dimensions from the drawing buffer. Use a
+  separate stateful node per view; subviewport/offscreen extent mapping needs
+  an adapter. Suspend zero-sized views, and admit all levels before resizing.
+- Do not call `setSize()` before setup creates its blur materials. Validate the
+  arithmetic without mutating an uninitialized node.
+- Changing uniform strength, radius, threshold, and knee does not need a graph
+  rebuild. Installed r185 `setup()` appends five blur materials each time, so
+  repeated setup is not idempotent. For a structural rebuild, construct a fresh
+  BloomNode and retire the old one after final use, or use a tested pinned fix
+  that reuses/replaces exactly five owned slots. Count overlap during replacement;
+  do not call cumulative material growth a stable resource plateau.
 - Dispose BloomNode, any exclusive MRT/pass, pipeline, and materials when
   replaced.
 - Rebuild targets and timing evidence after backend/device loss or format

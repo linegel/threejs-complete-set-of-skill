@@ -25,7 +25,7 @@ Use this existing repository plan rather than an unrelated game ticket.
 5. [x] `threejs-camera-controls-and-rigs` — source/reference pass; nine new numerical/control checks.
 6. [x] `threejs-scalable-real-time-shadows` — source/reference pass; five new math/API checks.
 7. [x] `threejs-ambient-contact-shading` — source/reference pass; seven new math/API/lifecycle checks.
-8. [ ] `threejs-bloom`
+8. [x] `threejs-bloom` — source/reference pass; seven new blend/math/API checks.
 9. [ ] `threejs-exposure-color-grading`
 10. [ ] `threejs-image-pipeline`
 11. [ ] `threejs-sky-atmosphere-and-haze`
@@ -82,7 +82,11 @@ Read the skill/reference/interface and installed LightShadow, ShadowNode, CSMSha
 
 Read the complete skill/reference/interface and installed GTAO, Denoise, RTT and AO-context source, plus base-node disposal. Corrected final-image versus scene-linear invariance, admitted the default graph only for its supported perspective/non-logarithmic depth path, added per-view/positive-extent checks, replaced unconditional stock denoising with an explicitly validated optional reconstruction contract, and supplied the actual index/rotation correction. Noise and RTT target/material teardown now has explicit ownership. Seven tests cover radiance invariance, orthographic direction, denoiser math, zero-sized AO, real disposal omissions, and real opaque/transparent AO-context behavior. All 50 skill tests and distribution validation pass. No shader compilation, GPU resource plateau, corrected dependency renderer, or lab acceptance is claimed. Logs: `artifacts/website-improvement-20260924/continuation/skills-ambient-{before,after}.log`.
 
-### Current skill: threejs-bloom
+### Skill 8 result: threejs-bloom
+
+Read the skill/reference/interface and installed BloomNode, MRTNode, RenderOutputNode, alpha helpers, SpriteNodeMaterial, relevant NodeMaterial output/lighting, and WebGPU blending source. Corrected the emitter's double premultiplication and supplied alpha-aware contribution RGBA, distinguished ordered alpha-over from additive invariance, inverted nonlinear knee endpoints, admitted finite kernel controls, and documented non-idempotent setup replacement. Existing minimum-mip/storage equations and normal disposal were retained. Seven checks cover real blend factors, merge loss, allocated mip dimensions, repeated material growth, endpoint math, ordering, and all 18 owned disposal events. All 57 skill tests and distribution validation pass. No transparent GPU capture, custom shader compilation, runtime engine patch, or lab acceptance is claimed. Logs: `artifacts/website-improvement-20260924/continuation/skills-bloom-{before,after}.log`.
+
+### Current skill: threejs-exposure-color-grading
 
 Next in the roster; read its entrypoint and reachable resources before changes. All labs and recreations remain deferred.
 

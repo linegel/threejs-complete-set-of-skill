@@ -38,8 +38,10 @@ limits.
 
 Use one HDR scene traversal for both full-scene and selective bloom. Full-scene
 bloom reads the scene output. Selective bloom adds an `emissive` MRT output to
-the same pass and gives it `BlendMode(MaterialBlending)` so transparent
-contributions follow the material blend state.
+the same pass and gives it `BlendMode(MaterialBlending)`. Supply explicit
+contribution RGBA with the material's alpha and matching RGB convention;
+blend factors alone do not repair a bare emissive vec3 or double premultiplication.
+The reference includes the per-material expression and corrected emitter.
 
 In r185, material-level `mrtNode` merging can lose the operative blend-mode map.
 Keep the canonical selective path on the regular `emissiveNode`; use a separate
@@ -79,8 +81,11 @@ Name the threshold domain:
 - display-referred: use only with a stable inverse of the declared tone/output
   path.
 
-Convert threshold and soft-knee width together when exposure or calibration
-changes. Treat `radius` as cross-mip spread, not a physical radius. Validate
+Convert threshold and soft-knee together: divide both by positive exposure for
+an exposed-linear rule, but invert both endpoints and subtract for a validated
+nonlinear scalar rule. Reject an undefined display-luminance inverse. Require a
+positive stock knee, or implement a separately validated hard-threshold branch.
+Treat `radius` as cross-mip spread, not a physical radius. Validate
 minimum and maximum viewport/DPR. Stock r185's five-level chain requires:
 
 ```text
@@ -138,7 +143,9 @@ memory, thermal, or marginal-time gate still fails.
 
 Replace the output node for the disabled path, mark the pipeline dirty, and
 dispose `BloomNode` and any exclusive contribution resources after final GPU
-use. Recreate evidence after renderer/device loss or format generation change.
+use. Uniform updates do not rebuild the graph; structural rebuilds use a fresh
+node or an idempotent pinned correction because stock setup appends materials.
+Recreate evidence after renderer/device loss or format generation change.
 
 This step is complete when every shipping tier passes fixed captures and
 sustained target-device budgets, bloom-off timing loses the bloom work, and
