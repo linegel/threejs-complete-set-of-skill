@@ -31,7 +31,7 @@ Use this existing repository plan rather than an unrelated game ticket.
 11. [x] `threejs-sky-atmosphere-and-haze` — source/reference pass; eight transport/domain checks.
 12. [x] `threejs-volumetric-clouds` — source/reference pass; ten transport/skip/history checks.
 13. [x] `threejs-spectral-ocean` — source/reference/oracle pass; nine new transform/phase checks.
-14. [ ] `threejs-water-optics`
+14. [x] `threejs-water-optics` — source/reference/comparator pass; eleven new stability/transport checks.
 15. [ ] `threejs-rain-snow-and-wet-surfaces`
 16. [ ] `threejs-procedural-fields`
 17. [ ] `threejs-procedural-materials`
@@ -106,7 +106,11 @@ Read all three references, entrypoint, and interface metadata. Corrected the zer
 
 Read the skill/reference/interface and executable FFT oracle. The oracle now bounds CPU work, validates finite data/seed/flags, retains scale-correct relative norms, reports zero-reference errors explicitly, and rejects empty gates or invalid ungated metrics. All fourteen existing fixtures agree with an independent separable DFT. Corrected uniform-current Hermitian evolution, two-branch velocity bounds, stable signed-mode seeds, Nyquist parity versus geometry scope, choppiness product rules, and foam/query admission. Nine new tests pass; all 102 skill tests and distribution validation pass. No GPU FFT, physical spectrum convergence, ocean capture, or lab acceptance is claimed. Logs: `artifacts/website-improvement-20260924/continuation/skills-spectral-{before,after}.log`.
 
-### Current skill: threejs-water-optics
+### Skill 14 result: threejs-water-optics
+
+Read both references, entrypoint, interface, and executable dispersion comparator. The comparator now rejects marginal CFL equality, invalid derived arithmetic and aliased admission, and represents undefined DC phase explicitly. Corrected mean-drift assumptions, coast-seeded phase direction, current-aware action flux, gravity-only operator scope, shared positivity limiting, interface radiance convention, small-extinction albedo, receiver-caustic double counting, and opaque/water pass ownership. PBRT's dielectric transport source was checked for the radiance/power distinction. Eleven tests pass; all 113 skill tests and distribution validation pass. No GPU water solve, refraction/caustic capture, wet/dry benchmark, or lab acceptance is claimed. Logs: `artifacts/website-improvement-20260924/continuation/skills-water-{before,after}.log`.
+
+### Current skill: threejs-rain-snow-and-wet-surfaces
 
 Next in the roster; read its entrypoint and reachable resources before changes. All labs and recreations remain deferred.
 

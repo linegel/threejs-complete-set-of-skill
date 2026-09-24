@@ -132,6 +132,9 @@ and call `boundedHeightfieldDispersion()` with the selected `c`, `dt`, `dx`,
 `dz`, `kx`, and `kz`. It predicts the undamped (`gamma=0`) discrete phase;
 compare that prediction with the measured analytic-mode phase. Measure
 amplitude error independently for the actual damping and source configuration.
+The helper rejects nonfinite arithmetic, excludes marginal CFL equality, and
+separates global stability from represented-mode admission; DC phase fields
+are explicitly unavailable, not fake numeric measurements.
 
 **Branch complete when:** the CFL margin is positive; analytic-mode phase and
 amplitude errors, boundary reflection, mean drift, precision error, and
@@ -262,11 +265,16 @@ sigma_t = sigma_a + sigma_s
 T = exp(-sigma_t pathLengthMeters)
 
 L_water = F L_reflection
-        + (1-F) [T L_background + (1-T) omega_0 L_source].
+        + (1-F) etaRadiance [T L_background + (1-T) omega_0 L_source].
 ```
 
-Foam replaces a bounded fraction of this response. A specular BRDF owns sun
-glint unless another explicitly budgeted lobe replaces it.
+Use the reference's explicit physical-versus-reduced radiance convention for
+`etaRadiance`; Fresnel power transmission is not automatically a cross-index
+radiance conversion. For positive extinction divide scattering by the actual
+extinction, with a separate zero branch, and evaluate short optical depths
+stably. Caustics replace the corresponding direct-light transport instead of
+adding it again. Foam replaces a bounded fraction of this response. A specular
+BRDF owns sun glint unless another explicitly budgeted lobe replaces it.
 
 Caustics deposit surface-cell power in receiver space using the determinant of
 the receiver map. Track invalid/TIR samples, power before and after deposition,
@@ -287,7 +295,9 @@ producer/consumer dependency crosses a dispatch boundary.
 not GPU-completion evidence. Keep simulation resolution independent of
 viewport resolution.
 
-Render with one scene pass, one `RenderPipeline`, and one output transform. If
+Use an opaque pass excluding water, then explicitly budget the water/composite
+work that consumes it. Do not sample an attachment while writing it or label
+multiple traversals as one pass. Use one `RenderPipeline` and output transform. If
 `renderOutput(...)` owns conversion, set
 `pipeline.outputColorTransform = false`. After replacing
 `pipeline.outputNode`, set `pipeline.needsUpdate = true`.

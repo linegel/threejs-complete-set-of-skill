@@ -40,7 +40,16 @@ Its undamped stability condition is:
 (c dt/dx)^2 + (c dt/dz)^2 <= 1.
 ```
 
-For square cells this is `c dt/dx <= 1/sqrt(2)`. Select a stricter margin.
+For square cells this is `c dt/dx <= 1/sqrt(2)`. Production admission requires
+strict positive margin: the endpoint has a repeated Nyquist eigenvalue and can
+grow under generic state perturbations. Select an authored margin beyond
+roundoff, rather than accepting equality. The helper's `stable` uses strict
+inequalities; `admissible` additionally rejects aliased wavevectors. It reports
+null phase speed/error for DC and null oscillatory frequency for an out-of-range
+mode, rather than NaN. Invalid or unrepresentable derived arithmetic is rejected.
+The helper does not account for damping or prove a caller's chosen quality gate.
+The exponential integrates only the damping substep exactly, not the combined
+forced oscillator. Measure the actual splitting's damping/forcing error.
 Damping does not legalize a CFL violation. If the integrator or stencil
 changes, derive its amplification matrix and replace this bound.
 
@@ -78,7 +87,10 @@ quantization/error scale. Ordinary float scatter to the same texel races.
 
 ### Boundaries
 
-- **Periodic:** wrap neighbors; zero-mean forcing preserves the periodic mean.
+- **Periodic:** wrap neighbors. Mean preservation additionally requires zero
+  initial mean velocity and a mean-compatible damping/source operator; zero-mean
+  forcing alone does not stop existing mean drift. Variable damping can change
+  the mean through velocity correlations. Record any projection as a source/sink.
 - **Reflecting:** ghost samples enforce zero normal derivative under the chosen
   cell/node convention.
 - **Absorbing:** a smooth damping sponge; measure reflection over frequency and
@@ -136,6 +148,12 @@ For depth `d` and `tau=sigma_surface/rho`:
 omega_i^2 = (g k_i+tau k_i^3) tanh(k_i d).
 ```
 
+Require finite normalized directions, positive wavelengths/depth/density, and
+admitted finite amplitudes, horizontal ratios and dispersion inputs. The compact
+formulas below freeze these coefficients and direction in space/time. Changes
+need their product-rule terms and integrated phase, not `omega(t)*t` reseeding.
+A uniform current adds the correct common advection under the declared chart;
+spatially varying current needs a spatial solver or a bounded approximation.
 Differentiate the actual map:
 
 ```text
@@ -182,7 +200,7 @@ The sufficient global no-fold condition is:
 sum_i |b_i k_i| < 1.
 ```
 
-Also measure actual minimum `J_h`. A negative determinant means the
+Also measure actual minimum `J_h`. A nonpositive determinant means the
 single-valued surface and ordinary Eulerian query are invalid. Validate
 tangents and normals against finite differences over phase, time, and domain.
 
@@ -250,8 +268,12 @@ tau(q) = n_b dot (b-p)/(n_b dot r)
 Q(q) = p + tau r.
 ```
 
-Reject near-parallel denominators, `tau<=0`, total internal reflection, and
-non-finite values. Project `Q` into an orthonormal receiver basis:
+Use unit incident/refracted directions and normals in one metric physical
+space. Reject near-parallel denominators, `tau<=0`, total internal reflection,
+non-finite values, and receiver points occluded by a nearer surface. A plane is
+an admitted receiver approximation, not a hit test for arbitrary receiver
+geometry. Finite-source and rough-interface models require their own ray bundle.
+Project `Q` into an orthonormal receiver basis:
 
 ```text
 F(q) = (e_1 dot Q(q), e_2 dot Q(q)).
@@ -275,18 +297,30 @@ P_in = E_i max(0,-i dot n) A_surface
        (1-F_interface) T_light.
 ```
 
-Deposit `P_in` into receiver texels with conservative splatting or an inverse
-map. Writing source-cell brightness at the source coordinate is not a
-receiver-space caustic.
+`E_i` here is irradiance on a plane perpendicular to the incident direction,
+not an already cosine-weighted surface irradiance. `T_light` follows the actual
+light path, not the camera path. Deposit `P_in` into receiver texels with
+conservative splatting or an inverse map. Writing source-cell brightness at the
+source coordinate is not a receiver-space caustic.
 
 Finite pixels, source angular extent, interface roughness, and wave bandwidth
 regularize caustic folds. Derive the minimum receiver area from that footprint.
-Record invalid/TIR counts and power before regularization, after deposition,
-after filtering, and after display clamp.
+Convert accumulated power to irradiance using each actual receiver area.
+Normalize footprint kernels and count clipped/occluded power; regularizing a
+determinant by clamping without an energy account is not conservative.
+Caustics replace the corresponding receiver direct-light term for the same
+incident transport. Adding full deposited power over the unchanged direct
+lighting counts that energy twice. Keep excluded components and reflected,
+absorbed, transmitted, lost, and displayed power separate. Record invalid/TIR
+counts and power before regularization, after deposition, filtering, and clamp.
 
 ## Refraction and Fresnel
 
-Classify the incident side before selecting refractive indices. With
+Classify the incident side before selecting finite positive refractive indices.
+Normalize both directions and the oriented normal in one metric frame. Handle
+matched indices as no interface (`F=0`), and a nonmatched grazing limit explicitly
+before 0/0. Bound roundoff in cosines and TIR classification without hiding an
+invalid incident direction. With
 `c_i>0` and `eta=n_i/n_t`:
 
 ```text
@@ -313,7 +347,11 @@ For screen-space refraction:
 5. require cross-track residual
    `||q_s-p_s-ell r_s||` below its world- or pixel-space gate.
 
-Only then is `ell` a path length in metres. Raw-depth subtraction and
+The ray in this dot product must be unit length in the common physical metric;
+a nonuniformly scaled view/object basis does not preserve metres. Clip the water
+segment at the first valid interface/receiver. Missing or ambiguous screen-space
+hits use a named fallback or invalid result, not zero thickness. Only then is
+`ell` a path length in metres. Raw-depth subtraction and
 view-depth difference alone are not refracted-ray distance.
 
 ## Beer-Lambert transport
@@ -324,12 +362,29 @@ metres:
 ```text
 sigma_t = sigma_a+sigma_s
 T_rgb = exp(-sigma_t_rgb ell)
-omega_0 = sigma_s/max(sigma_t,epsilon_sigma)
+omega_0 = sigma_s/sigma_t       when sigma_t > 0
+omega_0 = 0                       when sigma_t = 0
 
 L_water = F L_reflection
-        + (1-F)[T L_background+(1-T)omega_0 L_source].
+        + (1-F) etaRadiance [T L_background+(1-T)omega_0 L_source].
 ```
 
+`etaRadiance = (n_camera/n_path)^2` when the bracket is physical radiance in the
+transmitted medium and the result is physical radiance toward the camera. For
+consistently reduced radiance `L/n^2`, that factor is one; label the convention
+and convert external lighting inputs accordingly. Fresnel's `1-F` is a power
+fraction, not by itself a cross-index radiance conversion. A conventional
+screen-color approximation must be named and validated, not called exact
+radiometric transport. Do not apply the factor twice if an adapter already did.
+The distinction between transmitted power and radiance follows the dielectric
+transport convention in [PBRT, Dielectric BSDF](https://pbr-book.org/4ed/Reflection_Models/Dielectric_BSDF).
+
+Use finite nonnegative extinction and finite nonnegative path length. Divide
+positive coefficients by their actual positive extinction, not a fixed epsilon:
+a tiny coefficient over a long ray can be optically thick with albedo one.
+Evaluate `1-T` with stable expm1/series for small optical depth. The homogeneous
+source expression assumes a constant admitted angular source along the segment;
+a variable or overlapping medium requires its own integrated transport.
 Handle zero extinction explicitly. The fraction
 `(1-T)(1-omega_0)` is absorbed; it is not emitted as scattering. More complex
 scattering may replace `L_source` only with an explicit phase and source-light

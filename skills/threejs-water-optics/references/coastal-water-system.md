@@ -86,6 +86,13 @@ theta = omega[T_in(x)-t]+beta
 k = grad(theta).
 ```
 
+The sign also depends on where the travel field was seeded: `T_in` in this
+formula grows from an incoming offshore source toward the receiver. A positive
+time-to-coast field seeded at the coast instead requires
+`theta_in = -omega*(T_toCoast+t)+beta` for shoreward motion. The unsigned eikonal
+residual alone cannot distinguish those opposite directions. Require finite
+positive speed and ordered boundary data; do not propagate through dry/invalid
+or unreachable cells by clamping their speed.
 Solve the eikonal equation to convergence and store unreachable/shadow
 classification. This bends crests with the speed field; it does not add
 diffraction, reflection, amplitude transport, or hydrodynamics.
@@ -160,13 +167,22 @@ frequency, group velocity, current, phase policy, breaking/bottom/numerical
 dissipation, and stable band identity. Surface amplitude squared without
 frequency and quadrature is not action.
 
-In a stationary source-free ray tube of width `b`:
+In a stationary source-free narrow ray tube of width `b`, use the wave-action
+flux of the same integrated packet/frequency band and its quadrature:
 
 ```text
-E_b |c_g| b = constant
+V_tube = positive normal speed of (U+c_g) through the tube cross-section
+(E_b/sigma_i) V_tube b = constant
 a_rms proportional to
-  1/sqrt[(rho g+sigma_surface k^2)|c_g|b].
+  sqrt[sigma_i/((rho g+sigma_surface k^2) V_tube b)].
 ```
+
+Require finite positive intrinsic frequency, tube width and outgoing group
+speed. Current work can change wave energy while action is conserved. Only
+when current is absent and intrinsic frequency constant does this reduce to
+`E_b |c_g| b = constant`. A blocked/turning tube with zero speed is outside
+this amplitude formula; switch representation or regularize under an explicit
+error/flux contract rather than divide by a clamped speed.
 
 Report energy removed by breaking, clipping, regularization, and numerical
 diffusion. Geometric rays do not model diffraction or fill wave shadows.
@@ -188,7 +204,11 @@ div(C C_g grad(Phi))
 C = omega/k.
 ```
 
-Specify radiation/open and wall boundary conditions. Prefer an offline solve
+This displayed operator is the standard gravity-wave, no-current mild-slope
+branch with its matching assumptions. Current, capillary terms, and other
+extensions require a derived and validated operator; inserting a different
+dispersion speed into these coefficients is not sufficient. Specify
+radiation/open and wall boundary conditions. Prefer an offline solve
 for stationary bathymetry and forcing, then store complex amplitude/phase with
 source version, bounds, footprint, interpolation, and invalidation.
 
@@ -219,7 +239,11 @@ E_linear =
   rho/2 integral [g eta'^2+|q|^2/H] dA.
 ```
 
-Use compatible divergence/gradient operators or a finite-volume flux so volume
+These linear equations expand about a stationary fixed-wet reference depth;
+nonzero mean-current advection or time-dependent bathymetry requires additional
+terms and its own energy/stability contract. Require small perturbations
+relative to the positive reference depth. Use compatible divergence/gradient
+operators or a finite-volume flux so volume
 and the selected discrete-energy behavior are measurable. This branch can
 transmit and refract long linear waves over variable depth. It cannot own
 drying, finite-amplitude advection, bores, hydraulic jumps, or breaking.
@@ -306,7 +330,11 @@ Higher order requires limiting and its own positivity evidence.
 Choose dry depth from vertical precision, bed error, and the smallest meaningful
 film; demonstrate threshold convergence. A cell cannot export more water than
 it owns. Use a positivity-preserving update or rescale outgoing fluxes rather
-than clamping negative depth and losing unreported mass.
+than clamping negative depth and losing unreported mass. Both neighbors consume
+the same limited canonical face flux, including its coupled momentum transport;
+independent post-update clamps or separate neighbor scaling break conservation.
+External drains and source steps must respect available water too. Record
+limiter/source changes in the mass and momentum ledgers.
 
 Report minimum depth, attempted-negative count, total mass, boundary/source
 flux integral, residual, shoreline sensitivity, and near-dry velocity extrema.
@@ -361,7 +389,11 @@ errors. For a linear component:
 q'_k = (sigma_i/k^2) k H,
 ```
 
-where `q'` is depth-integrated discharge in square metres per second. In the
+where `q'` is depth-integrated discharge in square metres per second. This
+is a single signed traveling component, not an assembled Hermitian Fourier
+coefficient. For the assembled field use the spectral skill's
+`Q'_k = i k/k^2 [partial_t H_k+i(k dot U)H_k]`; opposite intrinsic branches
+cannot both be multiplied by one positive frequency. In the
 long-wave limit:
 
 ```text
@@ -378,7 +410,10 @@ R_minus = u_n-2 sqrt(g h).
 ```
 
 Select incoming/outgoing from eigenvalue signs relative to the oriented
-boundary normal.
+boundary normal. A two-dimensional shallow-water boundary also has the
+advected tangential characteristic; prescribe only its incoming part. Handle
+subcritical, supercritical and dry/near-dry states separately. One incoming
+normal invariant is not a complete generic 2D boundary prescription.
 
 ### Phase-averaged
 
@@ -448,6 +483,12 @@ f_eq=s_f/r
 f_next=f_eq+(f_advected-f_eq)exp(-r dt).
 ```
 
+Require finite nonnegative source/diffusivity/dt and a positive finite lifetime,
+or an explicit zero-decay infinite-lifetime branch. Zero lifetime/drying time
+is an instant event before division, never 0/0 at dt=0. Apply a stable small-rate
+exponential update and the diffusion/advection solver's positivity/CFL bounds;
+exact reaction alone does not ensure a stable full update. Declared film/wash
+thresholds need finite ranges and hysteresis where chatter is observable.
 Handle `r=0` explicitly. Partition breaking dissipation once and drive one
 foam history; coverage is not wave energy.
 
@@ -536,7 +577,9 @@ transition; coast distance alone is not optical depth.
 Geometry, tangents, normal, velocity, foam, shadows, refraction, and temporal
 effects consume one immutable state generation. Datum, bed, coast, source,
 active-domain, representation, cadence, or origin changes migrate state with
-an error record or reset all dependent histories. One final output transform
+an error record or reset all dependent histories. A completed pending generation
+must still match the required source/bed/ownership epochs at publication; do not
+let superseded work overwrite an already reset domain. One final output transform
 owns presentation.
 
 ## Acceptance
