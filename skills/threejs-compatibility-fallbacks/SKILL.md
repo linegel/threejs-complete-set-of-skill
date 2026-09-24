@@ -1,6 +1,6 @@
 ---
 name: threejs-compatibility-fallbacks
-description: Fallback unavailable WebGPU features through an isolated compatibility branch. Use only when the user explicitly asks how to handle an initialized non-WebGPU backend; then classify canonical behavior as preserved, weakened, or removed.
+description: Fallback unavailable WebGPU features through an isolated compatibility branch. Use only when the user explicitly requests a fallback after verified WebGPU unavailability; then classify canonical behavior as preserved, weakened, or removed.
 ---
 
 # Three.js Compatibility Fallbacks
@@ -13,17 +13,24 @@ work and native WebGPU quality tuning remain with their owning skills.
 Record all of the following before selecting an implementation:
 
 - the user's explicit request for unavailable-WebGPU fallback;
-- proof from an initialized `WebGPURenderer` that
-  `renderer.backend.isWebGPUBackend !== true` on the named target;
+- either a positively identified initialized non-WebGPU backend, or a
+  reproducible capability-related initialization failure on the named target;
+  record which state occurred, rather than inferring a backend from a missing
+  `isWebGPUBackend` property;
 - the canonical owner and exact feature;
 - the accepted scope of visual, physical, temporal, interaction, performance,
   and maintenance loss;
 - the compatibility branch's maintenance owner.
 
-Backend truth is available only after `await renderer.init()`. When WebGPU
-initializes, return to the canonical owner. When the explicit request is absent,
-report the unavailable-WebGPU blocker from the canonical path. Dispose the
-capability-probe renderer before constructing a separate compatibility renderer.
+Inspect backend identity only after `await renderer.init()` succeeds. In r185,
+`renderer.backend.isWebGLBackend === true` positively identifies the initialized
+WebGL backend; an absent/unknown flag is not proof. When initialization rejects,
+record its exact error and leave initialized-backend identity unknown. Route an
+application/configuration exception through debugging instead of disguising it
+as unavailable hardware. When WebGPU initializes, return to the canonical owner.
+Without an explicit fallback request, report the canonical blocker. Clean up the
+probe's resources/listeners using the installed API's initialized or partial-init
+cleanup path, and use a separate fresh canvas for a different renderer stack.
 
 This step is complete when the five activation facts are recorded and the
 canonical implementation remains unchanged.
@@ -77,10 +84,19 @@ signal graph and one tone-map/output-transform owner inside the branch. Record
 color versus data texture domains, resource creation/reset/resize/disposal, and
 the boundary between canonical and compatibility assets.
 
-When a GPU-performance claim requires timestamps, construct the branch renderer
-with `trackTimestamp: true` before initialization. A legacy branch may use
+When a node-renderer branch needs GPU timestamps, construct it with
+`trackTimestamp: true` before initialization. Classic `WebGLRenderer` has no
+such option or `resolveTimestampsAsync()` API; it needs its own supported,
+validated timer-query instrumentation or an insufficient-evidence verdict.
+A legacy branch may use
 `WebGPURenderer( { forceWebGL: true } )` only after activation; it remains a
-compatibility product rather than the canonical renderer.
+compatibility product rather than the canonical renderer. Choose one coherent
+stack: `WebGPURenderer` with its WebGL backend retains the node-material/TSL and
+`RenderPipeline` model; `WebGLRenderer` uses classic `ShaderMaterial` and
+`EffectComposer` APIs. `forceWebGL` does not turn the former into the latter.
+Do not share incompatible materials, passes, render targets, or renderer-specific
+resources between these stacks. Preserve application state and restore its
+controls through explicit branch adapters, not by retaining old GPU objects.
 
 This step is complete when disabling or deleting the compatibility entrypoint
 leaves the canonical build and runtime graph unchanged, and every branch-owned

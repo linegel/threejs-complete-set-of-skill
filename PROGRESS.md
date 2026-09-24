@@ -21,7 +21,7 @@ Use this existing repository plan rather than an unrelated game ticket.
 1. [x] `threejs-choose-skills` — source/reference pass; 12 regression checks.
 2. [x] `threejs-debugging` — source/reference pass; publication uncertainty preserved.
 3. [x] `threejs-visual-validation` — source/reference/helper pass; 17 new checks.
-4. [ ] `threejs-compatibility-fallbacks`
+4. [x] `threejs-compatibility-fallbacks` — source/reference pass; backend and renderer-stack boundaries corrected.
 5. [ ] `threejs-camera-controls-and-rigs`
 6. [ ] `threejs-scalable-real-time-shadows`
 7. [ ] `threejs-ambient-contact-shading`
@@ -66,7 +66,11 @@ Read the entrypoint, upstream reference, and interface metadata. Fixed the ambig
 
 Read the entrypoint, protocol, actual aligned-readback helper, and interface metadata. Corrected blanket sRGB tagging, specified the helper's uncompressed single-layer padded-copy scope and raw-byte output, separated CPU-only claims from renderer-dependent proof, and required fresh scoped timing samples with bounded query collection. The installed HDR loader, color management, and both timestamp-pool source files were inspected. Seventeen new checks cover HDR parsing, layout boundaries, larger stride, mapped-view/copy offsets, minimal last-row bytes, invalid/overflowing layouts, independent output bytes, and half-float preservation. All 29 skill tests and distribution validation pass. The decoder itself was already correct for its declared scope and remains unchanged. Timestamp safeguards are source-reviewed guidance, not newly measured GPU results. Logs: `artifacts/website-improvement-20260924/continuation/skills-visual-validation-{before,after}.log`.
 
-### Current skill: threejs-compatibility-fallbacks
+### Skill 4 result: threejs-compatibility-fallbacks
+
+Read both references, entrypoint and interface metadata, then the installed WebGPURenderer constructor, standard material library, and WebGLBackend initialization. Activation now distinguishes positively identified fallback, capability-related initialization failure, missing identity, and unrelated application failure; explicit user authorization remains mandatory. The guidance separates the node renderer's WebGL backend from classic WebGLRenderer/ShaderMaterial/EffectComposer, including their different timing APIs and resource ownership. No fallback renderer was activated or lab converted. Distribution validation and the existing 29 checks pass; source/API review is not rendered fallback parity. Log: `artifacts/website-improvement-20260924/continuation/skills-compatibility-check.log`.
+
+### Current skill: threejs-camera-controls-and-rigs
 
 Next in the roster; read its entrypoint and reachable resources before changes. All labs and recreations remain deferred.
 
