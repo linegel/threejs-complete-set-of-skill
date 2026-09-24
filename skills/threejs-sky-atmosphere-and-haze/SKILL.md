@@ -83,8 +83,8 @@ readback, reuse, and retirement with an actual completion mechanism.
 
 **Complete when:** every sampled product names all of its physical and view
 dependencies, no consumer can observe a newer dependency with an older
-dependent product, every unadmitted product has zero allocation and no
-dependency state, and unchanged base LUTs survive camera-only changes.
+dependent product, superseded work cannot publish over the current model epoch,
+every unadmitted product has zero allocation and no dependency state, and unchanged base LUTs survive camera-only changes.
 
 ### 4. Compose the selected branch
 
@@ -94,8 +94,9 @@ host scene and keep their output scene-linear.
 For a separate depth-aware haze or LUT aerial branch, reuse the host scene
 color and depth. Reconstruct the active perspective, reversed, logarithmic, or
 orthographic depth convention into a metric segment, then intersect that
-segment with the atmosphere. Classify sky through explicit coverage or the
-declared clear-depth encoding.
+segment with the atmosphere and stop at the first opaque-body entry. Do not
+resume integration in a far-side shell after the opaque interval. Classify sky
+through explicit coverage or the declared clear-depth encoding.
 
 For a visible surface in that branch, apply exactly:
 

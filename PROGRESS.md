@@ -28,7 +28,7 @@ Use this existing repository plan rather than an unrelated game ticket.
 8. [x] `threejs-bloom` — source/reference pass; seven new blend/math/API checks.
 9. [x] `threejs-exposure-color-grading` — source/reference/example pass; ten new meter/math/LUT checks.
 10. [x] `threejs-image-pipeline` — source/reference/example pass; eight new graph/transaction checks.
-11. [ ] `threejs-sky-atmosphere-and-haze`
+11. [x] `threejs-sky-atmosphere-and-haze` — source/reference pass; eight transport/domain checks.
 12. [ ] `threejs-volumetric-clouds`
 13. [ ] `threejs-spectral-ocean`
 14. [ ] `threejs-water-optics`
@@ -94,7 +94,11 @@ Read the skill/reference/interface, executable identity LUT, and installed LUT, 
 
 Read the complete skill/reference/rebuild example/interface and installed TRAA, RenderPipeline, and PassNode implementations. The executable helper now validates inputs and synchronous output, preserves tuned public settings, and returns an ownership-checked rollback without prematurely disposing either generation. Corrected named-attachment allocation order, transparent-layer exclusion, alpha-aware contribution/output contracts, logical versus physical traffic, bounded timing, failure-state restoration, and stock jitter/first-use/border limitations. Eight tests cover failed composition, invalid output, settings retention, rollback ownership, cropped camera state, render-target ownership, actual MRT allocation, and failed compile restoration. All 75 skill tests and distribution validation pass. No GPU shader compile, first-frame reset rendering, output capture, or lab acceptance is claimed. Logs: `artifacts/website-improvement-20260924/continuation/skills-image-pipeline-{before,after}.log`.
 
-### Current skill: threejs-sky-atmosphere-and-haze
+### Skill 11 result: threejs-sky-atmosphere-and-haze
+
+Read both references, entrypoint, and interface metadata. Corrected opaque-body truncation (no visible far-side interval), reversed shell/post error weighting, scaled-ray parameter ownership, top-boundary LUT degeneracy and cancellation, zero-curvature depth spacing, ordered optical-depth differences, attenuation-aware cumulative inscattering, and superseded product publication. Eight mathematical checks reproduce these counterexamples and retain the original unit-equivalence fixture. All 83 skill tests and distribution validation pass. These are numerical/domain checks, not a GPU transport solve, new phase/energy convergence result, sky capture, or lab acceptance. Logs: `artifacts/website-improvement-20260924/continuation/skills-atmosphere-{before,after}.log`.
+
+### Current skill: threejs-volumetric-clouds
 
 Next in the roster; read its entrypoint and reachable resources before changes. All labs and recreations remain deferred.
 

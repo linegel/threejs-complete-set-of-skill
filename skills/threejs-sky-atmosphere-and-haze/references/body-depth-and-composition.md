@@ -52,6 +52,10 @@ C  = dot(o',o') - 1
 D  = B^2 - 4*A*C
 ```
 
+Require finite positive semi-axes and a finite nonzero ray direction. Normalize
+`d` in the physical body frame when `t` is metric distance, but do not renormalize
+`d'` after axis scaling: that changes the meaning of the roots. A valid affine
+body-frame conversion must preserve or explicitly convert the length unit.
 Classify a negative discriminant using a scale-aware roundoff bound. For a hit,
 use stable roots:
 
@@ -61,9 +65,16 @@ t0 = q/A
 t1 = C/q
 ```
 
-Handle the tangent/`q=0` case directly, sort the roots, retain the positive
-ray interval, and subtract the opaque bottom-body interval from the top-shell
-interval. Use closest-point/ray-entry logic for an exterior camera; clamping an
+Handle tangent/`q=0` directly, sort roots, and intersect the top-shell interval
+with the positive camera-to-surface ray. Terminate at the first opaque-body
+entry; never resume behind the opaque body. Set subtraction would incorrectly
+admit a second far-side atmosphere segment. A camera inside the opaque body
+needs an explicitly unsupported/recovery branch, not the body's exit as a new
+visible start. Define boundary/tangent tolerances without inventing penetration.
+Stable root division does not repair cancellation already lost in coefficients
+or the discriminant: use a centered/scaled or higher-precision construction when
+planet size, distance, or grazing geometry exceeds the admitted error budget.
+Use closest-point/ray-entry logic for an exterior camera; clamping an
 orbital camera to a surface altitude changes both limb position and optical
 depth.
 
@@ -105,7 +116,7 @@ Use one host scene pass:
 ```text
 covered surface:
   segment = camera-to-surface ray intersected with top shell,
-            excluding the opaque body
+            terminated at its first opaque-body entry
   C_out = C_scene*T_segment + S_segment
 
 sky:
@@ -136,10 +147,16 @@ When a raster shell is retained for fill rate or precision, assign one owner by
 geometric overlap or an error estimate:
 
 ```text
-segment = intersect(cameraRay, topShell) - opaqueBodyInterval
-ownerWeight = smoothstep(errorLow, errorHigh, estimatedPostError)
-L = mix(L_shell, L_post, ownerWeight)
+segment = intersect(cameraRay, topShell) truncated at first opaque-body entry
+postWeight = 1 - smoothstep(errorLow, errorHigh, estimatedPostError)
+L = mix(L_shell, L_post, postWeight)
 ```
+
+Require finite ordered `errorLow < errorHigh`, an admitted error estimate, and
+a valid shell result where the post loses weight. Increasing post error must
+not increase the post's weight. The blend is an authored transition, not a
+proof that an invalid branch becomes accurate; reject missing/invalid support
+or select the independently valid owner instead.
 
 Drive both owners from identical body axes, length units, sun direction,
 density profiles, and transport basis. Verify value and first-derivative

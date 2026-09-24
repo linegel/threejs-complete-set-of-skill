@@ -64,6 +64,10 @@ disc of angular radius `alpha`:
 L_sun = E_normal / (pi * sin(alpha)^2)
 ```
 
+Require finite nonnegative source irradiance and a finite disc radius strictly
+above zero and at most `pi/2` radians for this normal-irradiance formula.
+A point/delta sun is a different source model, not division by a zero solid
+angle. Admit finite-disc quadrature when a narrow phase lobe resolves the disc.
 Apply that conversion once. Keep authored relative brightness outside physical
 radiance/irradiance interfaces. Treat transport bands as a declared spectral or
 linear working basis; convert to scene-linear RGB once and apply no display
@@ -144,7 +148,11 @@ Update in this order:
    for an admitted depth-aware composition consumer.
 6. Publish the complete admitted product set, then compose the scene.
 
-Publish a product generation only when every dependency revision matches.
+Publish a product generation only when every dependency revision matches both
+its frozen request and the latest required model/resource epoch. Superseded
+pending products cannot clear newer dirty reasons or mix with current partners.
+An old complete generation can remain visible only inside its declared support
+and age/error policy.
 Camera yaw/roll, temporal jitter, and a pure floating-origin translation do not
 change a body-frame transmittance or multiscatter product. Camera body-relative
 pose, projection, viewport, and depth distribution do change aerial products.
@@ -159,26 +167,37 @@ point radius `r`, and ray zenith cosine `mu`, a top-boundary transmittance
 map is:
 
 ```text
-H    = sqrt(Rt^2 - Rg^2)
-rho  = sqrt(max(r^2 - Rg^2, 0))
-d    = -r*mu + sqrt(r^2*(mu^2 - 1) + Rt^2)
+H    = sqrt((Rt-Rg)*(Rt+Rg))
+rho  = sqrt((r-Rg)*(r+Rg))
+root = sqrt(r^2*(mu^2 - 1) + Rt^2)
+d    = (Rt-r)*(Rt+r)/(root + r*mu)   when mu >= 0 and denominator > 0
+d    = -r*mu + root                 otherwise
 dMin = Rt - r
 dMax = rho + H
 xR   = rho / H
 xMu  = (d - dMin) / (dMax - dMin)
 ```
 
-Guard a true negative discriminant as a miss before the square root. The inverse
-is:
+Admit finite `0 < Rg < Rt`, `Rg <= r <= Rt`, and `mu` in `[-1,1]`, with a
+separate mask for ground-intersecting directions. Handle the exact top tangent
+as zero distance. Reject truly negative radicands before square roots; tolerate
+only bounded roundoff, not an invalid body/domain. Difference-of-squares factors
+and the rationalized outward root reduce cancellation but do not eliminate all
+f32 planetary precision error. Validate against higher precision. The inverse is:
 
 ```text
 rho = H*xR
 r   = sqrt(rho^2 + Rg^2)
 d   = mix(Rt-r, rho+H, xMu)
-mu  = (Rt^2 - r^2 - d^2) / (2*r*d)   # define mu=1 at d=0
+mu  = ((Rt-r)*(Rt+r) - d^2) / (2*r*d)   # canonical mu=1 at d=0
 ```
 
-When a stored endpoint coordinate is `x=i/(N-1)`, sample its texel center at
+At `r=Rt`, outward rays all have zero path length: the map is many-to-one and
+its canonical inverse cannot recover every original angle. Require unit
+transmittance and a stable boundary branch there, not an impossible angular
+round trip. Test invertibility only on the nondegenerate admitted domain.
+Require integer `N >= 2` before using endpoint sampling. When a stored endpoint
+coordinate is `x=i/(N-1)`, sample its texel center at
 `u=(x*(N-1)+0.5)/N`. Route ground-intersecting rays through an explicit
 ground branch.
 
@@ -204,22 +223,44 @@ Reconstruct each froxel ray from the same unjittered projection used by its
 depth map. A zero-origin exponential depth distribution may use:
 
 ```text
-d(z) = dMax * (exp(k*z)-1)/(exp(k)-1), z in [0,1]
+d(z) = dMax * expm1(k*z)/expm1(k), z in [0,1], k > 0
+z(d) = log1p((d/dMax)*expm1(k))/k
+k = 0: d(z) = dMax*z, z(d) = d/dMax
 ```
+
+Admit finite positive `dMax` and a finite nonnegative curvature range whose
+exponentials remain representable. Use stable expm1/log1p evaluation or a tested
+small-argument series; the zero-curvature limit is linear, not 0/0.
 
 Store cumulative RGB inscattering and RGB optical depth in separate products,
 or validate endpoint reconstruction:
 
 ```text
-choose w so p and q reach the same top boundary without crossing the body
-tauSegment = abs(tauToTop(p,w) - tauToTop(q,w))
+q = p + distance*w, distance >= 0, w a unit direction toward their common top exit
+tauSegment = tauToTop(p,w) - tauToTop(q,w)
 T_segment  = exp(-tauSegment)
 C_out      = C_scene * T_segment + S_segment
 ```
 
-Use the clipped visible interval when the endpoints cannot share a clear top
-boundary. A scalar opacity payload is a reduced chromatic model and needs an
-explicit RGB transmittance error gate.
+Require a collinear, correctly ordered pair and a clear path to that same exit.
+A negative difference outside bounded roundoff signals invalid ordering/cache
+or excessive cancellation; taking an absolute value hides the defect. For two
+large nearly equal optical depths, integrate the segment directly when the
+difference cannot meet tolerance. Use the first-body-clipped visible interval
+when the endpoints cannot share a clear top boundary.
+
+Cumulative inscattering needs its own attenuation-aware difference:
+
+```text
+S(0->q) = S(0->p) + T(0->p)*S(p->q)
+S(p->q) = (S(0->q) - S(0->p)) / T(0->p)
+```
+
+For an optically thick prefix or cancelling radiances, that division is unstable;
+use direct segment integration or a valid local product. Never clamp a tiny
+transmittance denominator and label the result equivalent transport. A scalar
+opacity payload is a reduced chromatic model and needs an explicit RGB
+transmittance error gate.
 
 ## Imported products
 
