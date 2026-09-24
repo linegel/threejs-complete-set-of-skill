@@ -88,6 +88,10 @@ instance transform. Use stable seeded variation and injected simulation time.
 Closed-form motion samples time directly. Gait, springs, ropes, buoyancy, and
 contact response advance at a fixed step owned locally or by the routed
 simulation stage, with immutable previous/current states for presentation.
+Reference-surface skinning applies pose times inverse bind in creature space.
+Rigid joint-local segments follow their joint pose directly. Interpolate joint
+rotations before hierarchy composition and keep previous-presented transforms
+separate from fixed-step history for motion vectors.
 
 For support-relative limbs:
 
@@ -98,7 +102,9 @@ For support-relative limbs:
 4. predict targets from body velocity relative to represented support-point
    velocity;
 5. transform targets through the inverse root into body space;
-6. solve IK, write local slots, then update posed bounds.
+6. solve IK with scale-relative reach/conditioning gates and publish any
+   unresolved contact residual; recheck contacts after secondary writers, then
+   update posed bounds.
 
 When support, water, air, gravity, weather, or physical contacts participate,
 define a handoff with units, frame/origin, interval or sample instant,
@@ -117,7 +123,8 @@ terrain, water, wind, gravity, or contact state.
 This step is complete when equal seed/tick/inputs reproduce pose, render cadence
 cannot alter recurrent state, support-relative drift and limb-length residuals
 pass, required provider channels are present with bounded error, and every pose
-writer has a deterministic order.
+writer has a deterministic order with final contact/limit validation, not merely
+a last-writer rule.
 
 ## 5. Scale the population and present once
 

@@ -58,11 +58,18 @@ Emit closed capped tubes, swept plates, palms, digits, eyes, or analogous
 parts with consistent outward winding and finite normals. Overlap may hide a
 joint visually, but it does not make an open segment valid. Parent-local pivots
 and axes feed one transform path reused by visible geometry, depth/shadow,
-bounds, picking, and motion vectors.
+bounds, picking, and motion vectors. Declare whether a vertex is joint-local
+or creature-rest-local; only the latter needs the inverse-bind transform.
+Preserve root ownership once. A mirrored rig must remap axis signs and winding
+consistently; arbitrary nonuniform parent scales can introduce shear and
+invalidate a rigid-joint interpretation. Admit the rig metric explicitly.
 
 Compilation is complete when all graph references resolve, the graph is
 acyclic, stable slots are unique, every component is closed and oriented, joint
-ranges are finite, and sampled poses keep bounds and surfaces valid.
+ranges are finite and ordered, rest angles lie in range, and sampled poses keep
+bounds and surfaces valid. A claim across the complete continuous motion range
+needs conservative swept/analytic or bounded adaptive checks; a few extreme
+poses can miss an intermediate collision.
 
 ## Locomotion and support
 
@@ -85,7 +92,10 @@ anchors through its own transform; a deforming support requires a named
 material-coordinate mapping.
 
 This branch is kinematic unless a routed physics owner supplies contacts and
-reactions. One-way visual water/contact effects return no reaction. Two-way
+reactions. A clamped IK target reports unresolved contact distance instead of
+claiming the original stance point was reached. Recheck contacts and joint
+limits after every secondary pose writer and during interpolated presentation.
+One-way visual water/contact effects return no reaction. Two-way
 effects pass through the authoritative owner described by the cross-system
 handoff.
 

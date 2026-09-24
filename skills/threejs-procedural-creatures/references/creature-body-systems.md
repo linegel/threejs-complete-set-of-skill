@@ -26,12 +26,19 @@ storage. It specifies reusable mechanisms rather than a named animal profile.
 
 Use metres and seconds at simulation handoffs. Root motion is applied once by
 the instance transform; creature-local slots never contain that translation or
-yaw. Name every transform where spaces meet.
+yaw. Name every transform where spaces meet. Reference skin points use
+`poseLocal * inverse(bindLocal)` for each joint, with both joint matrices
+composed into the same creature frame; the root follows skinning once. Rigid
+segment vertices authored in joint-local coordinates instead use that joint's
+pose directly. Do not mix the two conventions. Reject singular transforms and
+admit uniform rig scale or explicitly account for the full affine metric.
 
 One stable creature identity binds immutable previous/current pose snapshots,
 posed bounds, visible/depth/shadow deformation, motion vectors, and temporal
-history. Creation, death, teleport, reparenting, page-slot reuse, topology or
-LOD change, provider discontinuity, and quality migration advance its history
+history. Distinguish simulation previous/current snapshots from the previous
+presented pose used for motion vectors; a skipped or interpolated render is not
+a fixed-step snapshot. Creation, death, teleport, reparenting, page-slot reuse,
+topology/LOD change, provider discontinuity, and quality migration advance its history
 generation and reset affected consumers.
 
 ## Spec and compiler
@@ -74,13 +81,16 @@ For a tapered capsule from `a,ra` to `b,rb`:
 
 ```text
 ba = b - a
-t = |ba|^2 < eps^2 ? 0 : clamp(dot(p-a,ba)/|ba|^2, 0, 1)
+t = clamp(dot(p-a,ba)/|ba|^2, 0, 1)
 q = p - a - t ba
 d = |q| - lerp(ra, rb, t)
 ```
 
-This lerped-radius value is exact Euclidean distance for `ra=rb`. With taper
-slope `s=(rb-ra)/|ba|`, its interior gradient magnitude is
+Admit finite radii and a nonzero, well-conditioned axis before evaluating this
+formula. A degenerate segment is rejected or becomes an explicitly declared
+sphere model; silently choosing the first endpoint loses a different second
+radius. This lerped-radius value is exact Euclidean distance for `ra=rb`.
+With taper slope `s=(rb-ra)/|ba|`, its interior gradient magnitude is
 `sqrt(1+s^2)`; strong tapers require an exact round-cone distance or an explicit
 error gate.
 
@@ -92,8 +102,11 @@ d = mix(d_a, d_b, h) - k h(1-h)
 grad = mix(grad_a, grad_b, h)
 ```
 
-The pair is commutative but a fold over three or more inputs is not associative.
-Therefore the authored blend tree and its per-node `k` are part of the
+Admit finite `k>0`; `k=0` is a separate hard-union/tie rule, not division by
+zero. The displayed gradient assumes a spatially constant width. For varying
+`k(p)`, add `- h*(1-h)*grad(k)` in the unsaturated region and declare its
+support/filter. The pair is commutative but a fold over three or more inputs
+is not associative. Therefore the authored blend tree and its per-node `k` are part of the
 topology/compiler identity. Renaming or reordering part records cannot change
 the field. A symmetric n-ary kernel is another branch only when its
 multiplicity bias and omitted-tail error are bounded.
@@ -101,13 +114,14 @@ multiplicity bias and omitted-tail error are bounded.
 For the tapered-capsule interior, preserve the raw analytic derivative:
 
 ```text
-radial = q / max(|q|, eps)
-s = (rb-ra) / max(|ba|, eps)
+radial = q / |q|
+s = (rb-ra) / |ba|
 grad_primitive = radial - s normalize(ba)
 ```
 
-Caps use their radial derivative. Blend raw derivatives and normalize only the
-final shading normal. Central differences remain a CPU parity probe with a
+Reject the axis/zero-radial conditioning case before division and admit a
+normal only where the derivative is defined. Caps use their radial derivative.
+Blend raw derivatives and normalize only the final shading normal. Central differences remain a CPU parity probe with a
 scale/precision-relative epsilon sweep; shader evaluation uses the fused
 analytic derivative.
 
@@ -121,13 +135,20 @@ acceptance proof.
 
 For a polynomial tree, omit a sibling only when a conservative distance
 interval proves the same saturated branch across the complete pose/morphology
-envelope. For a log-sum-exp group, bound the omitted tail: if included and
-omitted exponential sums are `A` and `B`, distance error is
-`k log(1+B/A)`. Bound proximity-color weight independently because geometric
-saturation does not bound material mixing; for linear RGB in `[0,1]`, the
-Euclidean bound is `sqrt(3) B/(A+B)` when omitted distances cannot replace the
-included minimum. Failed full-field sweeps enlarge or rebuild the candidate
-program, or reject the tier.
+envelope and every query location, including correction trials throughout the
+trust region and shadow/normal probes. A certificate for rest vertices alone
+does not cover those evaluations. For a log-sum-exp group, bound the omitted
+tail: if included and omitted exponential sums are `A` and `B`, distance error is
+`k log(1+B/A)`. Use a shared shifted exponential reference and a stable
+`log1p(B/A)` evaluation with bounded arithmetic. Bound proximity-color weight
+independently because geometric saturation does not bound material mixing; for linear RGB in `[0,1]`, the
+Euclidean bound is `sqrt(3) B/(A+B)` for the same positive mixing weights;
+other radiance/color ranges need their own diameter bound. Normal admission
+needs a gradient-error bound and a positive gradient norm floor. Tiny distance
+error alone permits a large normal rotation near gradient cancellation. Bound
+K/storage capacity before publishing a candidate; overflow cannot silently
+truncate leaves or ancestry. Failed full-field sweeps enlarge or rebuild the
+candidate program, or reject the tier.
 
 This section is complete when CPU/TSL values and normals agree within declared
 precision, part permutation/consistent renaming preserves the field, explicit
@@ -156,8 +177,13 @@ surface must pass:
 Create skin weights from semantic/geodesic or bounded-harmonic distance with
 barriers where touching limbs would leak Euclidean influence. After pruning,
 weights are finite, nonnegative, normalized, and within a measured influence
-cap. Select linear-blend, dual-quaternion, or centre-of-rotation skinning from
-bend/twist, volume, bulge, and joint-collapse sweeps.
+cap. Reject an empty/zero-sum influence set before normalization. Preserve
+inverse-bind transforms, semantic barriers and stable bone indices. Select
+linear-blend, dual-quaternion, or centre-of-rotation skinning from
+bend/twist, volume, bulge, and joint-collapse sweeps. The normal transform follows
+the accepted deformation Jacobian (including spatial weight/field derivatives
+when relevant), or a measured mesh-normal approximation. Per-bone normalization
+before blending is not the derivative of the skinned surface.
 
 Store a radial direction or angle in a Bishop/rotation-minimizing rest frame
 along each semantic chain. Transport that frame with the rig. Selecting a new
@@ -174,7 +200,8 @@ delta = clampLength(-F grad / dot(grad,grad), trustRadius)
 Backtrack until residual decreases; reject gradient degeneracy, exhausted
 trials, triangle inversion, or failed descent. Set trust radius and residual
 from local edge/radius/curvature scale and projected error. Residual descent is
-not topology proof, so the corrected envelope repeats the full mesh-validity
+not topology proof. A surface-distance bound additionally requires a conditioned
+transverse root/gradient bound. The corrected envelope repeats the full mesh-validity
 gates. On failure, retain the last proven skinned position or reject the
 morphology/tier.
 
@@ -188,13 +215,18 @@ Determinism comes from a stable seed and injected simulation time. Closed-form
 motion samples that time directly. Recurrent gait, springs, ropes, buoyancy, and
 contact response advance on a fixed step owned either locally for a standalone
 system or by the routed simulation stage. Keep immutable previous/current pose
-states and interpolate only for presentation. Variable render `dt` never owns
-recurrent creature state.
+states and interpolate only for presentation. Interpolate rigid joint rotations
+with their declared quaternion path, then compose the hierarchy; Cartesian
+endpoint interpolation can shorten limbs. Contact-preserving presentation also
+uses the same support transform/time and reapplies admitted constraints where
+needed. Variable render `dt` never owns recurrent creature state.
 
 Pose order is explicit. A common order is morphology/squash, body-local rig,
 support-relative IK, secondary chains, then one root transform at the instance.
-Later writers may touch a slot only under a declared last-writer order. Update
-the posed bound after final local slots and before visibility submission.
+Later writers may touch a slot only under a declared last-writer order. That
+order alone does not preserve solved contacts: keep ownership disjoint, or
+recheck contacts and limits after all writers and use a constrained correction.
+Update the posed bound after final local slots and before visibility submission.
 
 ### Support-relative planted limbs
 
@@ -205,7 +237,10 @@ rate-versus-integrated meaning. A support sample additionally needs stable
 support/feature identity, point and geometric normal, and represented point
 velocity. Store a stance point in the support's local frame; reconstruct it
 each step from the current support transform. A deforming support needs a named
-material-coordinate extension.
+material-coordinate extension. Rigid support velocity at a point is
+`v_linear + cross(omega, point - origin)` in one frame and unit system. Body
+velocity used in prediction is the matching hip/material-point velocity, not
+a root translation that omits rotation.
 
 For each fixed step:
 
@@ -223,10 +258,19 @@ d = clamp(d, |l1-l2|+eps, l1+l2-eps)
 a = (l1^2-l2^2+d^2)/(2d)
 h = sqrt(max(l1^2-a^2,0))
 knee = hip + direction*a + orthonormalBendHint*h
+resolvedTarget = hip + direction*d
 ```
 
-Construct the bend hint with full 3D Gram-Schmidt. Gate relative segment-length
-residual, reach classification, support-relative stance drift, normal/frame
+Require finite positive lengths and a finite target. Scale the length algebra
+by a characteristic limb length; choose `0 < eps < min(l1,l2)` so the reach
+interval exists, and check derived conditioning rather than using one absolute
+world-space margin. When target and hip coincide, use a stable rest/previous
+direction. Construct the bend hint with full 3D Gram-Schmidt, choosing a
+deterministic nonparallel fallback before normalization. Use `resolvedTarget`,
+not the unreachable input point, as the solved endpoint. Publish the reach
+residual to body adjustment/replant logic; a clamped solve does not prove the
+original foot contact. Joint-limit admission is separate from the two-length
+reach interval. Gate relative segment-length residual, reach classification, support-relative stance drift, normal/frame
 discontinuities, and explicit replant behaviour. A kinematic support sample
 does not imply a physical impulse; two-way contact belongs to the authoritative
 solver named by the handoff.
@@ -245,8 +289,15 @@ solver named by the handoff.
   velocity, material current, depth, and density channels only when represented.
   A critically damped tracking state may use
   `eNew=(e+(v+omega*e)dt)exp(-omega dt)` and
-  `vNew=(v-omega(v+omega*e)dt)exp(-omega dt)`. Force-based buoyancy instead
-  passes a step-halving convergence gate.
+  `vNew=(v-omega(v+omega*e)dt)exp(-omega dt)`. Here `e = position - goal`
+  and `v = velocity - goalVelocity`. This is exact for constant `omega` and
+  constant goal velocity over the interval; advance that goal consistently.
+  Accelerating/changing targets need the corresponding forcing integration or
+  a bounded substep model. Admit finite `dt>=0` and `omega>=0`; the zero-time
+  step preserves state. Bound intermediate products and handle the settled
+  exponential limit without `0*Infinity`; finite inputs alone do not guarantee
+  finite arithmetic. Force-based buoyancy instead passes a step-halving
+  convergence gate.
 
 Provider channels retain their support/filter, time, validity, error, and
 version. Missing current is absence, not zero. Frame-critical GPU readback is

@@ -40,7 +40,7 @@ Use this existing repository plan rather than an unrelated game ticket.
 20. [x] `threejs-procedural-buildings-and-cities` — source/reference/key-helper pass; nine identity, facade, and bounds checks.
 21. [x] `threejs-procedural-planets` — source/reference pass; ten curvature, LOD, metric, advection, and indirect-record checks.
 22. [x] `threejs-procedural-vegetation` - source/reference/oracle pass; nine placement, cutout and moving-root checks.
-23. [ ] `threejs-procedural-creatures`
+23. [x] `threejs-procedural-creatures` - source/reference pass; nine field, bind, contact, IK and damping checks.
 24. [ ] `threejs-procedural-motion-systems`
 25. [ ] `threejs-particles-trails-and-effects`
 26. [ ] `threejs-dynamic-surface-effects`
@@ -148,9 +148,13 @@ Read all five reachable references, entrypoint and interface, plus the installed
 
 Read the entrypoint, both references, existing placement oracle and interface, historical review, and the installed renderer/SSS material implementations. The oracle now rejects sparse inputs, duplicate identities and non-Boolean conflict results before using them; generated keys retain immutable tuple copies, and nested LOD counts are explicit. One-hop Matérn-II semantics and integer random lanes remain unchanged. Corrected conflict invalidation reach, exact limiting zeroes, density versus intensity, physical footprint spacing, attachment-relative leaf roots, modal/drag units, and cutout versus transparent two-pass behavior. Nine CPU/API checks pass, including the actual renderer decision with callback fixtures; all 185 skill checks and distribution pass. This is not GPU placement, rendered foliage, measured density, or vegetation-lab acceptance. Logs: `artifacts/website-improvement-20260924/continuation/skills-vegetation-{before,after}.log`.
 
-### Current skill: threejs-procedural-creatures
+### Skill 23 result: threejs-procedural-creatures
 
-The inspector-continuation session owns creatures 23. The skills-first session owns motion 24 and particles 25, reading ahead but applying changes only after 23 lands. Inspector owns dynamic-surface 26 and blackholes 27 after 25. Labs and recreations remain deferred until the complete skill pass.
+Read the full entrypoint, continuous-body and hard-shell references, interface and existing locomotion IK source. Corrected bind-to-pose/root conventions, tapered-field degeneracy, spatial smooth-min derivatives, candidate query/normal conditioning, scale-relative IK reach and resolved endpoints, moving-support point velocity, final-writer contact checks, interpolation state, and constant-goal-velocity damping. Nine mathematical/API checks pass; all 194 skill checks and distribution pass. The runtime IK already returns a clamped endpoint, but its absolute minimum reach margin remains a later lab correction. No field extraction, posed mesh, rendering, contact solver, CPU/TSL GPU parity, or lab acceptance is claimed. Logs: `artifacts/website-improvement-20260924/continuation/skills-creatures-{before,after}.log`.
+
+### Current skill: threejs-procedural-motion-systems
+
+The skills-first session owns motion 24 and particles 25. Inspector owns dynamic-surface 26 and blackholes 27, applying after 25 lands. Labs, recreations and publication remain deferred until the complete skill pass.
 
 
 ## Finished and verified
@@ -396,3 +400,15 @@ membership and exact limiting-response zeroes. Exercise the actual r185 material
 double-pass decision with CPU callbacks and parent-relative leaf roots with
 transforms. These tests do not prove rendered foliage, physical drag, GPU
 placement, ecological target density, or the vegetation labs.
+
+## What to test: creature skill
+Check the documented field, pose and locomotion equations in their stated
+coordinate frames. Separate bind-to-pose transforms from root motion, include
+spatial blend-width derivatives, and distinguish small field error from normal
+conditioning. Exercise scale-relative IK reach/endpoint rules and moving-support
+point velocity. Compare joint interpolation with Cartesian endpoint interpolation,
+and check the damped solution against a constant-velocity goal. The existing
+native IK implementation was read; it already clamps the returned endpoint but
+uses an absolute minimum reach margin that fails for very short limbs. Record
+that runtime correction for the later lab phase. This unit changes guidance,
+not the creature renderer, solver, model, or current-source GPU evidence.
