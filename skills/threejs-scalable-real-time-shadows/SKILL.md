@@ -20,7 +20,7 @@ Compare the same seeded workload, projection, filter, and receiver policy:
 | --- | --- | --- |
 | A bounded receiver/caster volume passes world-texel and depth-precision gates | one `DirectionalLight` shadow | one view, one depth texture, one filter evaluation |
 | Camera-depth coverage changes continuously | `CSMShadowNode` | `L` shadow views/maps; normally one active filter, two in a fade |
-| One fixed orthographic footprint is partitioned spatially | `TileShadowNode` | one depth array, `N` backend layer passes, `N` containment branches, and a union render list that can draw each caster in every layer |
+| One fixed orthographic footprint is partitioned spatially | `TileShadowNode` | one depth array, `N` backend layer passes, `N` containment tests, and a union render list that can draw each caster in every layer |
 | Very large coverage persists and measured reuse survives invalidation | custom cached clipmap | `L` persistent levels; selected updates; `L` portable filters or one/two target-proven array/atlas filters |
 | Casters deform or change broadly each frame | one fitted shadow, CSM, or a same-light static/dynamic split | Cache invalidation approaches full redraw. |
 
@@ -98,7 +98,10 @@ coverage is lit. Correctness invalidations outrank age/quality refreshes.
 
 Freeze desired center, depth interval, basis epoch, and content epoch; render;
 restore renderer state; then atomically commit center, interval, target/layer,
-matrix, and rendered epoch. Work encoded after the current presentation seal
+matrix, and rendered epoch only after rechecking that content, basis, and
+resource versions were not superseded. Preserve newer invalidations. Filter,
+normal-bias, and fade changes also revalidate guarded coverage and dependent
+resources before reuse. Work encoded after the current presentation seal
 uses an inactive resource generation and commits to the next presentation;
 the prior committed generation remains immutable until its consumers finish.
 

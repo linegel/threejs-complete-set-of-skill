@@ -93,9 +93,12 @@ by a disposal/recreation check.
   passes.
 - r185 builds one union-frustum render list, then can draw each listed caster in
   every layer. It does not independently recull that list per tile.
-- Receiver code emits `N` containment/conditional filter branches. One interior
-  fragment normally selects one tile, but borders and subgroup divergence can
-  execute more. Inspect the generated shader/profile before counting filters.
+- Receiver code emits `N` containment tests and combines all child results.
+  TSL `select()` is not an unconditional short-circuit promise: the installed
+  ConditionalNode emits branches in ordinary flow but a ternary in uniform
+  flow, where WGSL `select` evaluates its operands. Borders and subgroup
+  divergence can add work even in a branched graph. Inspect generated WGSL
+  and profiling before calling one selected tile one executed filter.
 - All layers update together. There is no per-tile persistence scheduler.
 - The depth array has no filter gutter. Validate PCF/PCFSoft at every border.
 - Stock Tile rejects VSM, uses a shared Red color array, and cannot preserve RGBA
@@ -121,8 +124,10 @@ parity. Backend device access is version-gated diagnostic state.
 For r185 total-render GPU timing, construct `WebGPURenderer` with
 `trackTimestamp: true` before initialization, then require both backend tracking
 and `timestamp-query`. Resolve periodically with
-`renderer.resolveTimestampsAsync('render')`; it is total render time, not
-automatic shadow-pass attribution. Unsupported timing is unavailable, not zero.
+`renderer.resolveTimestampsAsync('render')`; an aggregate is not automatic
+shadow-pass attribution or a per-frame distribution. Follow the visual-validation
+skill's fresh frame/scope identity, bounded query-capacity, and failed-resolution
+rules. Unsupported or stale timing is unavailable, not zero-cost shadow work.
 
 ## Projection, filter, and bias
 
@@ -176,9 +181,16 @@ change unless an exact handoff proves equivalent coordinates.
 For finest half-width `R0`, scale `s > 1`, and required `Rmax`:
 
 ```text
-L  = ceil(log(Rmax / R0) / log(s)) + 1
-Ri = min(R0 * s^i, Rmax)
+Rrequired = max(R0, Rmax)
+L  = max(1, ceil(log(Rrequired / R0) / log(s)) + 1)
+Ri = min(R0 * s^i, Rrequired)
 ```
+
+Require finite positive `R0` and `Rmax`, finite `s > 1`, and a finite integer
+level count within the admitted resource budget before allocating. Required
+coverage smaller than the finest footprint still uses one covering level;
+it must not produce zero or negative levels. Avoid overflowing intermediate
+powers when evaluating an admitted level's capped radius.
 
 Derive `R0` from required receiver coverage and world texel density. Derive
 `Rmax` from biased receiver coordinates plus filter, snap, basis-error, and
@@ -337,7 +349,13 @@ Commit sequence:
 3. render caster depth;
 4. restore render target, scene override, clear state, camera layers, and hooks;
 5. publish the matching center, interval, matrix, resource identity, and epoch;
-6. mark valid and clear satisfied reasons/debt.
+6. mark valid and clear only the satisfied reasons/debt from that request.
+
+Before publication, recheck the frozen content, basis, and resource generation
+against the latest required versions. A render superseded while it was pending
+cannot clear newer invalidation or become a valid current commit. Preserve new
+reason bits and debt. A newer coverage-only request may coexist with an older
+commit only while the currently required rays remain inside its valid domain.
 
 A changed valid commit is a radiance discontinuity. Publish or derive a
 conservative affected receiver region for temporal rejection; use a full reset
@@ -375,6 +393,12 @@ fi = 1 - smoothstep(inneri, sampledHalfWidthi, di)
 wi = fi * remaining
 remaining *= (1 - fi)
 ```
+
+For this square-domain equation require a positive finite sampled half-width
+and finite `0 < blendRatioi <= 1`. A zero-width fade (`blendRatioi = 0`) needs
+an explicit hard containment step; do not pass equal edges to `smoothstep`.
+Negative/nonfinite ratios and nonpositive guarded domains are invalid. A
+rectangular domain needs independent axis support and a declared 2D blend.
 
 Accumulate fine to coarse. Invalid forces `fi = 0`; unresolved remainder is lit.
 After subtracting filter and coverage guards, require per axis:
@@ -437,11 +461,18 @@ Event dependencies:
 | Event | Depth redraw | Other action |
 | --- | --- | --- |
 | Receiver-only motion inside committed coverage | no for opaque comparison depth | update lookup/coverage; VSM receiver submission is exceptional |
-| Filter, bias, or fade change | usually no | rebuild/update sampling state |
+| Filter, bias, or fade change | only if newly required rays/depth are missing | revalidate guarded coverage; update sampling and any dependent VSM blur resources |
 | Caster transform/deformation/coverage | affected levels | swept invalidation |
 | Light direction/basis | all retained levels | new basis epoch |
 | Map dimensions/format/generation | all affected resources | recreate and invalidate |
 | Compensated renderer-origin change | no semantic redraw | atomically update render transforms |
+
+A larger filter or changed normal-bias lookup can leave previously guarded
+coverage even when no caster moved. Validate the new lookup/filter domain
+against the committed map before sampling it; use a valid coarser map or lit
+fallback until missing coverage is rendered. Unchanged raw depth does not
+make an old VSM distribution valid after its blur kernel changes. Apply each
+resource dependency and its sampling epoch together.
 
 ### Local/world parity
 
@@ -494,7 +525,7 @@ frame allowance      = 1000 / targetRefreshHz
 
 CSM uses `L` maps/views and approximately one active filter per receiver, two in
 a fade. Stock Tile uses `N` layer passes, can approach
-`N * unionVisibleCasterDraws`, and emits `N` containment branches. Per-level
+`N * unionVisibleCasterDraws`, and emits `N` containment tests. Per-level
 clipmap textures use `L` bindings/portable filters unless a validated array or
 atlas selects one/two layers.
 

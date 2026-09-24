@@ -23,7 +23,7 @@ Use this existing repository plan rather than an unrelated game ticket.
 3. [x] `threejs-visual-validation` — source/reference/helper pass; 17 new checks.
 4. [x] `threejs-compatibility-fallbacks` — source/reference pass; backend and renderer-stack boundaries corrected.
 5. [x] `threejs-camera-controls-and-rigs` — source/reference pass; nine new numerical/control checks.
-6. [ ] `threejs-scalable-real-time-shadows`
+6. [x] `threejs-scalable-real-time-shadows` — source/reference pass; five new math/API checks.
 7. [ ] `threejs-ambient-contact-shading`
 8. [ ] `threejs-bloom`
 9. [ ] `threejs-exposure-color-grading`
@@ -74,7 +74,11 @@ Read both references, entrypoint and interface metadata, then the installed WebG
 
 Read the complete skill/reference/interface and installed OrbitControls, PointerLockControls, TRAA and TAAU implementations. Corrected parent-transform admission, constructor/handoff ordering, roll and limit compatibility, reset-state preservation, zero-duration cuts, and owned DOM/held-input cleanup. The r185 cursor-coordinate and held-Control disposal defects are explicit pinned adapter requirements, not claims that the dependency was patched. Nine new checks reproduce constructor mutation, roll removal, limit clamping, inverse-parent shear, zero-duration NaN, shifted projection matching, cursor-coordinate misuse, and listener/style cleanup with an event-host fixture. The corrected compatible handoff preserves pose and projection. All 38 skill checks and distribution validation pass; no browser, GPU, pointer-lock, or lab acceptance is claimed by these CPU/source tests. Logs: `artifacts/website-improvement-20260924/continuation/skills-camera-{before,after}.log`. Concurrent inspector/source publication through 8028e134 is retained and is not part of this skill unit.
 
-### Current skill: threejs-scalable-real-time-shadows
+### Skill 6 result: threejs-scalable-real-time-shadows
+
+Read the skill/reference/interface and installed LightShadow, ShadowNode, CSMShadowNode, TileShadowNode, shadow filters, and conditional-node implementations. Corrected level sizing below the finest footprint, degenerate fades, publication of superseded cache work, sampling-domain/VSM invalidation after filter changes, and conditional-versus-eager receiver cost accounting. Five new checks cover level count, fade admission, late-content guidance, real clone omissions, real multi-camera throttling, and per-tap static/dynamic union. All 43 skill tests and distribution validation pass. The existing reversed-Tile and other rejected GPU configurations remain rejected; no engine patch, actual cache rendering, generated GPU shader profile, or target timing is claimed. Logs: `artifacts/website-improvement-20260924/continuation/skills-shadows-{before,after}.log`.
+
+### Current skill: threejs-ambient-contact-shading
 
 Next in the roster; read its entrypoint and reachable resources before changes. All labs and recreations remain deferred.
 
