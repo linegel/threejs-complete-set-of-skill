@@ -42,7 +42,7 @@ Use this existing repository plan rather than an unrelated game ticket.
 22. [x] `threejs-procedural-vegetation` - source/reference/oracle pass; nine placement, cutout and moving-root checks.
 23. [x] `threejs-procedural-creatures` - source/reference pass; nine field, bind, contact, IK and damping checks.
 24. [x] `threejs-procedural-motion-systems` - source/reference pass; eight Timer, mixer and moving-frame checks.
-25. [ ] `threejs-particles-trails-and-effects`
+25. [x] `threejs-particles-trails-and-effects` - source/reference/oracle pass; eight trail, flow and integration checks.
 26. [ ] `threejs-dynamic-surface-effects`
 27. [ ] `threejs-black-holes-and-space-effects`
 
@@ -156,9 +156,13 @@ Read the full entrypoint, continuous-body and hard-shell references, interface a
 
 Continued from the peer's recorded read-only findings after24/25 showed no new writes or coordination. Read complete entrypoint/reference/interface plus pinned Timer, mixer and action update implementations. Corrected mixer seek versus action replay and timescale, Timer hidden/reset/elapsed semantics, loop-step initialization, stable follow increments, relative child release and moving-port terminal velocity, quaternion winding, and previous-presented history. Eight actual API/numeric checks pass; all202 skill checks and distribution pass. No render, GPU motion, docking solver, or timeline lab acceptance changed. Logs: `artifacts/website-improvement-20260924/continuation/skills-motion-{before,after}.log`.
 
-### Current skill: threejs-particles-trails-and-effects
+### Skill 25 result: threejs-particles-trails-and-effects
 
-Inspector-continuation continues25 if the peer unit remains untouched, then26/27 in order. The peer is asked to coordinate before resuming overlapping work. Labs, recreations and publication remain deferred until the complete skill pass.
+Read the complete entrypoint/reference/interface and trail-ring oracle, with no peer edits present. The oracle now requires an explicit capacity budget, validates dense finite position/identity/break inputs and derived arithmetic before mutation, allocates retained samples lazily, and clears retained references on identity reset. Documented its sample-gate rather than resampler scope, fixed downstream wake sign and normalized flow-facing masks, and corrected drag limits, dead identity maps, empty indirect publication, GPU-bound culling and queue reuse. Eight CPU/oracle checks pass; all210 skill checks and distribution pass. No trail render, pool dispatch, transport timing, or effect-lab acceptance changed. Logs: `artifacts/website-improvement-20260924/continuation/skills-particles-{before,after}.log`.
+
+### Current skill: threejs-dynamic-surface-effects
+
+Inspector-continuation owns26 then27. All27 package reviews precede lab/recreation and source-to-site work.
 
 
 ## Finished and verified
@@ -426,3 +430,14 @@ quaternion winding, local release velocity, moving-port terminal velocity, and
 previous-presented versus simulation state. Preserve existing debt/target-signal
 contracts. Source guidance and CPU/API tests do not establish rendered motion,
 GPU pose transport, docking physics, or the timeline lab's acceptance.
+
+## What to test: particles and trails
+Continue25 with its existing trail-ring oracle; no peer source/test edits are
+present. Exercise finite dense positions, safe identity, caller-provided capacity
+budget, strict break flags, chronological wrap, atomic input rejection and identity
+reset. Allocate only samples actually retained, not a huge sparse array at creation.
+The oracle is a gate over already reconstructed samples, not a trajectory resampler:
+record its endpoint-chord distance semantics and require upstream time/arc-length
+resampling for cadence-invariant trails. Check the downstream wake sign and unit
+flow normal, plus drag zero limits and compaction invalidation/publication. CPU
+oracle/math checks do not establish rendered trails, GPU pools or effect timing.

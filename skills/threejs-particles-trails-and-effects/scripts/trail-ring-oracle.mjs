@@ -1,26 +1,30 @@
 function position3(value) {
-  const position = Array.from(value ?? []);
-  if (position.length !== 3 || !position.every(Number.isFinite)) {
+  if ((!Array.isArray(value) && !ArrayBuffer.isView(value)) || value.length !== 3 ||
+      [0, 1, 2].some(index => !Object.hasOwn(value, index) || !Number.isFinite(value[index]))) {
     throw new TypeError("position must contain three finite numbers");
   }
-  return position;
+  return Array.from(value);
 }
 
 function distance(a, b) {
-  return Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
+  const result = Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
+  if (!Number.isFinite(result)) throw new RangeError("trail distance exceeds finite arithmetic");
+  return result;
 }
 
 export function createTrailRing({
   capacity,
+  maxCapacity,
   entityId,
   generation,
   sampling,
 }) {
-  if (!Number.isInteger(capacity) || capacity < 2) {
-    throw new RangeError("capacity must be an integer >= 2");
+  if (!Number.isSafeInteger(maxCapacity) || maxCapacity < 2 || maxCapacity > 0xffffffff ||
+      !Number.isSafeInteger(capacity) || capacity < 2 || capacity > maxCapacity) {
+    throw new RangeError("capacity must be an integer from 2 to the explicit maxCapacity array budget");
   }
-  if (!Number.isInteger(entityId) || !Number.isInteger(generation)) {
-    throw new TypeError("entityId and generation must be integers");
+  if (![entityId, generation].every(value => Number.isInteger(value) && value >= 0 && value <= 0xffffffff)) {
+    throw new TypeError("entityId and generation must be uint32 integers");
   }
   const unit = sampling?.mode === "time"
     ? sampling.seconds
@@ -34,8 +38,8 @@ export function createTrailRing({
     capacity,
     entityId,
     generation,
-    sampling: { mode: sampling.mode, unit },
-    samples: Array(capacity),
+    sampling: Object.freeze({ mode: sampling.mode, unit }),
+    samples: [],
     head: 0,
     count: 0,
     breakBeforeNext: true,
@@ -43,15 +47,15 @@ export function createTrailRing({
 }
 
 export function resetTrailIdentity(ring, { entityId, generation }) {
-  if (!Number.isInteger(entityId) || !Number.isInteger(generation)) {
-    throw new TypeError("entityId and generation must be integers");
+  if (![entityId, generation].every(value => Number.isInteger(value) && value >= 0 && value <= 0xffffffff)) {
+    throw new TypeError("entityId and generation must be uint32 integers");
   }
   ring.entityId = entityId;
   ring.generation = generation;
   ring.head = 0;
   ring.count = 0;
   ring.breakBeforeNext = true;
-  ring.samples.fill(undefined);
+  ring.samples.length = 0;
 }
 
 export function markTrailBreak(ring) {
@@ -81,17 +85,21 @@ export function appendTrailSample(ring, {
   if (!Number.isFinite(timeSeconds)) {
     throw new TypeError("timeSeconds must be finite");
   }
+  if (typeof breakBefore !== "boolean") throw new TypeError("breakBefore must be a boolean");
   const point = position3(position);
   const previous = ring.count === 0
     ? undefined
     : ring.samples[(ring.head + ring.count - 1) % ring.capacity];
   const forceBreak = breakBefore || ring.breakBeforeNext || previous === undefined;
+  const elapsed = previous ? timeSeconds - previous.timeSeconds : 0;
+  if (!Number.isFinite(elapsed)) throw new RangeError("trail elapsed interval exceeds finite arithmetic");
+  const chord = previous ? distance(point, previous.position) : 0;
   if (previous && timeSeconds < previous.timeSeconds) {
     throw new RangeError("trail samples require nondecreasing authoritative time");
   }
   if (previous &&
       timeSeconds === previous.timeSeconds &&
-      distance(point, previous.position) > 0 &&
+      chord > 0 &&
       !forceBreak) {
     throw new RangeError(
       "equal-time displacement requires an explicit segment break",
@@ -99,8 +107,8 @@ export function appendTrailSample(ring, {
   }
   if (previous && !forceBreak) {
     const accepted = ring.sampling.mode === "time"
-      ? timeSeconds - previous.timeSeconds >= ring.sampling.unit
-      : distance(point, previous.position) >= ring.sampling.unit;
+      ? elapsed >= ring.sampling.unit
+      : chord >= ring.sampling.unit;
     if (!accepted) return false;
   }
 

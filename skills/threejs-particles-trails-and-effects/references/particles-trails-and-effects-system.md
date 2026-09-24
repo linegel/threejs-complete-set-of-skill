@@ -42,7 +42,10 @@ state.
 Spawn packets carry an ordered interval, transform, direction, seed range,
 count, emission scale, and class. Prefix-sum packet counts to assign deterministic
 ranges. Declare capacity behavior: reject, coalesce presentation-only work, or
-defer it. Seed integer hashing from the event identity; record seed, time,
+defer it. Validate packet count and scan totals before allocation or u32
+publication; split/reject overflow instead of wrapping the destination. Resolve
+unique integer event/particle identities before random sampling; no float seed
+conversion. Seed integer hashing from the event identity; record seed, time,
 camera, exposure, backend, and workload for reproducible captures.
 
 Partition fixed-capacity pages by compatible representation and conservative
@@ -78,7 +81,11 @@ Dispatch boundaries separate mark, each hierarchical scan level, scatter, and
 publication; a workgroup barrier cannot order separate workgroups globally.
 Move identity, current recurrent state, previous presentation state, and every
 render lane together. Publishing only a new count leaves state and identity
-incoherent.
+incoherent. Invalidate entity-to-index entries for dead entities with an explicit
+sentinel/generation; writing only surviving mappings leaves dead lookups live.
+Publish zero live count and initialized commands for an empty pool. Stable scan
+order preserves input order, not globally sorted identity unless that order was
+already established. Atomic append order is not seeded repeatability.
 
 A serialized tail swap is correct only when one remover owns each source and
 destination:
@@ -111,6 +118,16 @@ pNext = p + v*dt*phi1(x) + a*dt^2*phi2(x)
 age01 = (time - spawnTime) / lifetime
 ```
 
+Admit finite `dt>=0`, positive lifetime and finite nonnegative drag, then check
+derived arithmetic. At `dt=0` preserve state before divisions; `gamma=0` uses
+the ballistic limits `phi1=1`, `phi2=1/2`. Choose the series switch from the
+precision/error contract and handle large products without `0*Infinity`. These
+are local formulas, not assumed TSL `expm1` exports. With drag toward constant
+flow `u`, replace acceleration by `a + gamma*u`; time-varying forcing must be
+integrated in chronological source intervals. Birth time must be the event time,
+not the render callback that first notices it. Reject/prevent drawing unborn or
+expired particles rather than clamping their age to fake a live state.
+
 Use a named fixed-step integrator for position-dependent forces, collision, or
 constraints. Convert units and frames once at the boundary; keep lateral spawn
 velocity in the event frame until that conversion.
@@ -134,7 +151,9 @@ derive cell key from committed source state
 ```
 
 Sort equal keys by stable entity identity when deterministic accumulation is
-claimed. A hash route declares bucket capacity, collision handling, maximum
+claimed; reduction order and floating-point error also belong to that claim.
+Enforce zero-distance/self-interaction rules before normalized force directions.
+A hash route declares bucket capacity, collision handling, maximum
 neighbors examined, and whether overflow rejects the claim, defers work, or
 uses a bounded approximation. Workgroup barriers do not publish ranges between
 workgroups. Reset or rebuild after origin, bounds, representation, identity, or
@@ -175,8 +194,10 @@ is not a motion vector; derive motion from adjacent presented poses and the
 camera mappings used for those poses.
 
 Keep previous/current resources immutable until every consuming submission has
-completed. Resource rings are safe only when reuse is gated by the actual GPU
-completion for all consumers; device loss invalidates the resource generation
+completed. Ordered GPU reuse on one queue can follow all prior reads without
+waiting on a CPU fence each frame. CPU mapping/recycling and cross-queue consumers need
+actual completion dependencies; physical destruction and logical epoch reuse
+are separate operations. Device loss invalidates the resource generation
 and forces a reset.
 
 ## Trail Histories and Ribbons
@@ -192,7 +213,11 @@ Sample by authoritative elapsed time or traveled distance in declared units,
 never by presentation-frame count. State the sampling interval, lifetime,
 capacity, and decimation error. Time sampling consumes timestamped committed
 poses; distance sampling measures in one declared frame. A render callback may
-request publication but does not invent samples.
+request publication but does not invent samples. Reconstruct exact tick times
+or arc-length locations upstream, with a declared interpolation/decimation
+error and bounded catch-up. Picking the first callback beyond a time threshold
+is cadence dependent. A closed loop can have zero endpoint chord and nonzero
+traveled distance, so chord thresholds alone do not measure path length.
 
 For a history ring, one writer commits sample payload before publishing `head`
 and `count`. Draw reconstructs chronological order from one committed
@@ -214,8 +239,18 @@ prevent ribbon flips. Define joins, caps, width units, depth/blend behavior, and
 whether width is world-space or screen-space.
 
 Use [the deterministic trail-ring oracle](../scripts/trail-ring-oracle.mjs) for
-time- or distance-gated insertion, wrap order, identity reset, and segment
-breaks. Failure signatures: trail length changes with display Hz, a teleport
+time- or endpoint-chord-distance-gated insertion, wrap order, identity reset,
+and segment breaks. It does not interpolate missing sample times or accumulate
+curved trajectory length. Pass an explicit caller-budgeted `maxCapacity` with
+`capacity`; both are safe integers within the array domain, and identity and
+generation are u32. The helper stores only admitted samples, clears retained
+references on identity reset, validates before mutation, and copies positions.
+Treat the returned ring as owner-private mutable state; do not mutate its
+head/count/configuration or retained sample payloads from outside its methods.
+Epoch/generation wrap requires all prior identities to be retired, not silent
+reuse. Lifetime pruning remains a separate chronological operation that
+preserves breaks; this helper does not claim to perform it. Failure signatures:
+trail length changes with display Hz, a teleport
 creates a spanning segment, ring wrap connects newest to oldest, a reused slot
 inherits history, or ribbon sides alternate sign.
 
@@ -258,11 +293,18 @@ indexed:     [indexCount:u32, instanceCount:u32, firstIndex:u32,
 Initialize every word before publication. The attribute stores `Uint32Array`
 words, so a negative `baseVertex` uses its two's-complement bit pattern. Check
 byte length, alignment, signed range, and `firstInstance` support before draw.
+The complete command is 16 or 20 bytes at a four-byte-aligned byte offset. Use
+`firstInstance=0` unless `indirect-first-instance` is enabled on the actual
+device. Commit command/count and state/index mappings from one generation.
 
 `InstancedMesh.computeBoundingBox()` and `computeBoundingSphere()` cover
 CPU-authored instance matrices. Storage-driven motion uses conservative
 analytic envelopes per page/chunk or a GPU reduction. Bound pages separately
-so culling does not depend on frame-critical readback.
+so culling does not depend on frame-critical readback. A GPU-only reduced bound
+does not update the CPU frustum culler by itself: use it in an admitted GPU
+visibility/indirect stage, retain a valid conservative CPU envelope, or disable
+that CPU culling path. Include particle radius/ribbon width and all current
+poses in bounds; matching CPU base geometry is not enough.
 
 ## Coupled Inputs
 
@@ -299,7 +341,7 @@ Define `flowDirectionWorld` once as downstream fluid motion relative to the
 body. Build a stable right-handed event frame:
 
 ```text
-forward = normalize(flowDirectionWorld)
+forward = normalize(flowDirectionWorld)  // finite nonzero flow admitted first
 up = project(preferredUp onto plane normal to forward)
 if |up| is small: project(preferredRight instead)
 right = normalize(cross(up, forward))
@@ -307,6 +349,9 @@ up = cross(forward, right)
 wakeOrigin = hull vertex maximizing dot(positionWorld, forward)
 ```
 
+Require a nonparallel fallback up/right axis with deterministic ties and a
+positive finite wake length. Zero flow either disables the direction-dependent
+branch or retains a declared prior orientation without a new force claim.
 Cache hull samples and update the support point only when hull pose or flow
 direction changes enough to exceed the visible error gate. Displace the shell
 along hull normals just enough to avoid depth fighting.
@@ -314,7 +359,7 @@ along hull normals just enough to avoid depth fighting.
 Use a flow-facing shell mask:
 
 ```text
-facing = saturate(dot(normalWorld, -flowDirectionWorld))
+facing = saturate(dot(normalWorld, -forward))
 facingMask = smoothstep(facingLow, facingHigh, facing)
 ```
 
@@ -325,7 +370,7 @@ scene-linear HDR; calibrate the map in raw HDR with bloom disabled.
 For a generated wake profile along `t in [0,1]`:
 
 ```text
-axial = -length * t
+axial = length * t  // along the declared downstream forward axis
 radius = baseRadius * spread(t)
 profile = radius * (1 + turbulence(theta, t))
 tail = fade(t)
@@ -378,9 +423,11 @@ inherited dissolve/color after slot reuse indicates incomplete identity reset.
 Class order does not solve ordinary alpha transparency. Record which
 approximation owns ordering and validate intersecting layers and occluders.
 
-Keep beauty scene-linear in `HalfFloatType` working buffers. LDR color textures
-use `SRGBColorSpace`; HDR radiance stays loader-declared linear; masks, noise,
-LUTs, and storage fields use `NoColorSpace`.
+Keep beauty scene-linear in `HalfFloatType` working buffers within its finite
+range; inspect overflow before tonemapping. Encoded sRGB color textures use
+`SRGBColorSpace`, other encodings are declared explicitly, and HDR radiance
+stays loader-declared linear. Masks, noise, LUTs and storage fields use
+`NoColorSpace`.
 
 Full-scene bloom consumes HDR beauty directly. A selective `emissive` MRT is a
 separate branch that requires authored inclusion/exclusion, a compatible

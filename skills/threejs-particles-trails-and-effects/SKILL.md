@@ -96,7 +96,8 @@ entity identity across slot movement. Birth, death, slot reuse, teleport,
 representation change, and unavailable prior state invalidate motion vectors,
 trails, interpolation, and temporal history before presentation. Analytic
 particles evaluate both previous and current presentation times; recurrent
-pools retain adjacent immutable presentation states.
+pools retain their simulation pair and a separately timestamped previous
+presented state when the renderer interpolates or skips ticks.
 
 A camera cut or other presentation-only discontinuity resets affected
 screen-space motion and temporal accumulation without restarting particle
@@ -129,7 +130,8 @@ counts and state GPU-resident.
 Read [r185 execution facts](references/particles-trails-and-effects-system.md#r185-execution-facts)
 when implementing compute, indirect draw, bounds, or completion. The step is
 complete when every admitted spawn, update, neighborhood, compaction, trail
-publication, and draw phase has explicit GPU ordering and the steady frame path
+publication, and draw phase has explicit GPU ordering, empty/overflow states
+publish valid counts and mappings, and the steady frame path
 performs no readback or per-particle object update.
 
 ### 5. Bind representation, depth, and output
