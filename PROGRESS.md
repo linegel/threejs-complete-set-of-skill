@@ -27,7 +27,7 @@ Use this existing repository plan rather than an unrelated game ticket.
 7. [x] `threejs-ambient-contact-shading` — source/reference pass; seven new math/API/lifecycle checks.
 8. [x] `threejs-bloom` — source/reference pass; seven new blend/math/API checks.
 9. [x] `threejs-exposure-color-grading` — source/reference/example pass; ten new meter/math/LUT checks.
-10. [ ] `threejs-image-pipeline`
+10. [x] `threejs-image-pipeline` — source/reference/example pass; eight new graph/transaction checks.
 11. [ ] `threejs-sky-atmosphere-and-haze`
 12. [ ] `threejs-volumetric-clouds`
 13. [ ] `threejs-spectral-ocean`
@@ -90,7 +90,11 @@ Read the skill/reference/interface and installed BloomNode, MRTNode, RenderOutpu
 
 Read the skill/reference/interface, executable identity LUT, and installed LUT, tone-mapping, and 3D-texture implementations. Corrected small-weight normalization, pre-arithmetic validity masking, reduction fan-in, histogram boundary/overflow rules, shared-view source ownership, calibration compensation, finite adaptation, and superseded-epoch publication. Normalization conversions now include dependent EV bounds. The identity LUT now checks safe arithmetic, caller dimension limits, and byte budget before allocation and declares its RGBA8 quantization error; existing voxel order, filtering, and alpha-safe placement remain. Ten tests cover those equations, actual allocation rejection, voxel data, quantization, and half-texel mapping. All 67 skill tests and distribution validation pass. No GPU meter dispatch, LUT shader compilation/capture, resource plateau, or lab acceptance is claimed. Logs: `artifacts/website-improvement-20260924/continuation/skills-exposure-{before,after}.log`.
 
-### Current skill: threejs-image-pipeline
+### Skill 10 result: threejs-image-pipeline
+
+Read the complete skill/reference/rebuild example/interface and installed TRAA, RenderPipeline, and PassNode implementations. The executable helper now validates inputs and synchronous output, preserves tuned public settings, and returns an ownership-checked rollback without prematurely disposing either generation. Corrected named-attachment allocation order, transparent-layer exclusion, alpha-aware contribution/output contracts, logical versus physical traffic, bounded timing, failure-state restoration, and stock jitter/first-use/border limitations. Eight tests cover failed composition, invalid output, settings retention, rollback ownership, cropped camera state, render-target ownership, actual MRT allocation, and failed compile restoration. All 75 skill tests and distribution validation pass. No GPU shader compile, first-frame reset rendering, output capture, or lab acceptance is claimed. Logs: `artifacts/website-improvement-20260924/continuation/skills-image-pipeline-{before,after}.log`.
+
+### Current skill: threejs-sky-atmosphere-and-haze
 
 Next in the roster; read its entrypoint and reachable resources before changes. All labs and recreations remain deferred.
 

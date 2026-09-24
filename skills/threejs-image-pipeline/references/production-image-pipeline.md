@@ -34,8 +34,8 @@ Configure all MRT outputs and request every texture node before
 scene-pass compilation does not warm private fullscreen materials.
 
 ```js
-import { HalfFloatType, RenderPipeline, WebGPURenderer } from 'three/webgpu';
-import { diffuseColor, emissive, mrt, normalView, output, pass, velocity } from 'three/tsl';
+import { BlendMode, HalfFloatType, MaterialBlending, RenderPipeline, WebGPURenderer } from 'three/webgpu';
+import { diffuseColor, mrt, normalView, output, pass, velocity } from 'three/tsl';
 
 const renderer = new WebGPURenderer( {
   antialias: false,
@@ -49,18 +49,29 @@ if ( renderer.backend.isWebGPUBackend !== true ) {
 }
 
 const pipeline = new RenderPipeline( renderer );
-const scenePass = pass( scene, camera );
+const scenePass = pass( scene, camera, { samples: temporalEnabled ? 0 : sceneSampleCount } );
+scenePass.transparent = false; // Excluded layers have a separately budgeted compositor.
 const outputs = { output };
 if ( needNormal ) outputs.normal = normalView;
-if ( needSelectiveBloom ) outputs.emissive = emissive;
+if ( needSelectiveBloom ) outputs.emissive = selectiveContributionRGBA;
 if ( temporalEnabled ) outputs.velocity = velocity;
 if ( needBaseColor ) outputs.albedo = diffuseColor.rgb;
-scenePass.setMRT( mrt( outputs ) );
-
-const hdr = scenePass.getTextureNode( 'output' );
+const sceneMRT = mrt( outputs );
+if ( needSelectiveBloom ) sceneMRT.setBlendMode( 'emissive', new BlendMode( MaterialBlending ) );
+scenePass.setMRT( sceneMRT );
+const signals = {};
+for ( const name of Object.keys( outputs ) ) signals[ name ] = scenePass.getTextureNode( name );
+const hdr = signals.output;
 const depth = scenePass.getTextureNode( 'depth' );
-await scenePass.compileAsync( renderer );
+// Apply any compact formats below before compile, then use the guarded compile path.
+
 ```
+
+`selectiveContributionRGBA` is the alpha-aware expression from the bloom skill,
+not a built-in export or bare emissive vec3. The explicit opaque pass keeps
+ordinary transparency out of history/AO; compose excluded layers with their
+own depth/sort/blend policy and count any additional traversal. Merely declaring
+MRT names does not allocate attachments: request each signal before compilation.
 
 `PassNode` creates named attachments by cloning the output texture. Verify the
 actual target inventory before claiming compact storage. A compact velocity
@@ -78,7 +89,30 @@ const velocityTexture = scenePass.getTextureNode( 'velocity' );
 ```
 
 Changing a normal target to two channels also requires a named encoder,
-decoder, and error bound; format selection alone is not packing.
+decoder, and error bound; format selection alone is not packing. Configure the
+output type before named clones where possible, then verify every actual format
+again after setup. Pass setup can replace the output's type without updating
+already-cloned named attachments.
+
+Stock pass compilation and rendering do not restore all borrowed state on an
+exception. Wrap the whole exclusive operation with try/finally; for compile:
+
+```js
+const savedTarget = renderer.getRenderTarget();
+const savedMRT = renderer.getMRT();
+try {
+  await scenePass.compileAsync( renderer );
+} finally {
+  renderer.setRenderTarget( savedTarget );
+  renderer.setMRT( savedMRT );
+}
+```
+
+Rendering additionally borrows renderer color/tone/XR/clear/layer/context state,
+scene override/name, and temporal camera/jitter state. Restore the exact owned
+snapshot on failure, not global defaults. Prevent concurrent mutation while
+these operations borrow shared state. A resolved compile promise is not by
+itself a clean shader-validation or first-frame acceptance result.
 
 ### Attachment decision
 
@@ -91,16 +125,23 @@ Hp = floor(H * s)
 logicalPayloadBytes = Wp * Hp * b * m * l * k
 ```
 
-When a multisampled attachment is stored and later sampled once, its explicit
-uncompressed traffic lower bound is:
+Use `m = 1` for non-multisampled storage, even when the API encodes that as
+`samples: 0`. A retained multisample allocation and its resolved single-sample
+texture are separate resources; count both when live. For an intentionally
+uncompressed model that writes all samples, stores the resolve, then reads it
+once, model each operation separately:
 
 ```text
-attachmentTraffic >= Wp * Hp * b * l * (m + 1)
+sampleStoreBytes = Wp * Hp * b * l * m
+resolveStoreBytes = multisampled ? Wp * Hp * b * l : 0
+laterReadBytes = Wp * Hp * b * l
 ```
 
-Alignment, compression, tile residency, resolves, allocator granularity, and
-cache behavior require target evidence. Reject any candidate that misses the
-signal's domain, error, coverage, temporal, or discard contract before timing
+This is logical operation accounting, not a measured DRAM lower bound. Tile
+memory, discard/store policies, compression, cache hits, resolves and allocator
+padding can change external traffic and residency; require target evidence.
+Reject any candidate that misses the signal's domain, error, coverage, temporal,
+or discard contract before timing
 it. Compare only correct implementations in paired complete graphs:
 
 ```text
@@ -168,15 +209,37 @@ bridge.
 
 ### Stock TRAA limits
 
-- input must be a texture; wrapping a composite adds a full-resolution color
-  target and fullscreen draw, so disable its unused depth and own its disposal;
+- input must be a render-target-owned pass texture or explicit RTTNode. Stock
+  update reads its owner's renderTarget; an arbitrary external TextureNode
+  lacks that owner. Materialize composites explicitly, disable unused depth,
+  and own the RTT target/material rather than relying on recursive disposal;
 - input, scene color, depth, velocity, and drawing-buffer extents must match;
 - MSAA must be disabled;
 - previous object state is global rather than target/view keyed, so multiple
   velocity-bearing views or passes need a custom snapshot-bound path;
 - resize reseeds internal targets, but cuts and other discontinuities have no
   public general `reset()`;
-- there is no public reactive-mask input.
+- there is no public reactive-mask input;
+- stock jitter replaces a pre-existing camera view offset and clears it rather
+  than restoring it. Cropped/tiled views and custom projection matrices need a
+  composed-jitter adapter; use the ordinary unmodified-camera branch otherwise;
+- pipeline callbacks are single slots, not automatically chained across two
+  TRAA nodes or another jitter owner. Use one admitted owner per pipeline;
+- stock first-use reseeding is based on a size change from 1x1. A 1x1 image does
+  not trigger that path: use a verified explicit seed or bypass, and suspend
+  zero-sized views. Verify initial depth/history as well as resized color;
+- its 3x3 loads do not clamp the border coordinates. GPU robust-access behavior
+  is not an edge policy; compile/test border strips or provide a valid adapter.
+
+The rebuild example validates node/owner inputs and synchronous output, retains
+public thresholds/subpixel policy, and returns a guarded `rollback()` plus both
+resource generations. Rollback restores only output binding/transform policy;
+it does not fence the GPU, undo failed rendering side effects, or dispose either
+generation. The host restores borrowed state, validates the replacement, and
+retires only unreachable resources after final use. A newer graph owner cannot
+be overwritten by an old rollback. Compose callbacks own any additional
+allocations and must release them on failure; they must not mutate pipeline
+ownership during composition.
 
 Use an evidenced node rebuild or bypass/reseed wrapper for stock TRAA. Use a
 custom node only when it consumes the full previous/current transforms,
@@ -238,8 +301,12 @@ display-domain grade/effect:
 ```
 
 `RenderOutputNode` clamps alpha, unpremultiplies, transforms, and premultiplies
-again. Nonlinear tone mapping or a cube LUT therefore operates on straight RGB;
-add bloom RGB while retaining the photographed alpha. A scene-linear cube needs
+again. Nonlinear tone mapping or a cube LUT therefore operates on straight RGB.
+A display-domain nonlinear effect also unpremultiplies encoded RGB and restores
+alpha without another output conversion. Bloom uses the explicit alpha branch
+from its owner: opaque/composited output, coverage-clipped unchanged alpha, or
+separate halo-preserving composition. Unchanged zero alpha loses off-surface
+halo energy; it is not a universally valid bloom ending. A scene-linear cube needs
 a shaper for unbounded HDR. A tone-mapped-linear cube is not interchangeable
 with a display-encoded cube.
 
@@ -266,7 +333,11 @@ peakLive = max_t(sum(bytes(resource) for resources live at t))
 
 Report both peak live logical bytes and actual resident allocations. Rebuild a
 pass to reclaim old attachments, then dispose its resources after a safe graph
-handoff.
+handoff. Disposal is not graph traversal: RenderPipeline disposes its material,
+not all referenced effects; RTT targets/materials and generated AO noise need
+explicit ownership, as specified by their skills. Pass previous-texture slots,
+external references, and any in-flight copies remain separately accounted.
+Never clear shared ownership with an indiscriminate recursive dispose.
 
 ### Marginal timing
 
@@ -286,7 +357,9 @@ fullscreen draws, dispatches, target inventory, and timing scope.
 `timestamp-query` is gated after renderer initialization. r185 render/compute
 timestamp pools sum instrumented pass durations; copies, barriers, submission
 gaps, and presentation can lie outside them. Label that sum as pass-duration
-evidence unless an independent scope proves end-to-end coverage.
+evidence unless an independent scope proves end-to-end coverage. Use fresh
+frame/scope identities, bounded query collection, and failure handling from
+visual-validation; a stale lastValue or exhausted pool is not a timing sample.
 
 ### Adaptive DPR
 
@@ -300,7 +373,10 @@ C(s) ~= F + A * s^2
 sBudget = sqrt(max((gpuBudget - F) / max(A, epsilon), 0))
 ```
 
-Require `A > epsilon`, `gpuBudget > F`, and acceptable third-point error.
+Require distinct finite positive scales, positive observed costs, physically
+admitted nonnegative fixed cost, `A > epsilon`, `gpuBudget > F`, and acceptable
+third-point error. Cap to declared quality/device extents before allocation.
+A clamp cannot repair an invalid fit or a fixed-cost budget miss.
 Drive changes from sustained filtered pressure with a faster downshift, slower
 upshift, asymmetric thresholds, quantized steps, and cooldown. On every DPR
 change, update explicit dimensions, reseed affected histories and jitter/meter

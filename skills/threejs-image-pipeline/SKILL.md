@@ -88,8 +88,10 @@ current presentation state:
 
 r185 velocity is `currentNDC - previousNDC`; TRAA converts it to UV with a
 negative Y scale. Stock `TRAANode` requires matching color/depth/velocity/input
-extents and MSAA off. A composite temporal input materializes another texture
-and fullscreen draw. Stock TRAA has no public general reset or reactive-mask
+extents and MSAA off. Its ordinary branch cannot preserve an existing camera
+view offset or arbitrarily supplied texture owner. Admit first-frame and border
+behavior explicitly, rather than assuming resize logic proves both. A composite
+temporal input materializes another texture and fullscreen draw. Stock TRAA has no public general reset or reactive-mask
 input, so cuts and discontinuities require an evidenced rebuild or
 bypass/reseed policy.
 
@@ -103,7 +105,8 @@ before creating velocity or history nodes.
 
 When stock `TRAANode` is rebuilt for a supported reset, read
 [the minimal rebuild example](examples/rebuild-traa-node.mjs) for its public-API
-replacement, output rebind, graph invalidation, and explicit old/new ownership.
+validated replacement, public-setting retention, output rebind, guarded rollback,
+graph invalidation, and explicit old/new ownership.
 Retire the returned previous node only after the replacement graph has
 compiled/rendered successfully and the prior GPU generation has completed.
 
@@ -126,8 +129,10 @@ HDR scene pass + depth + admitted MRT
   -> display-domain AA, dither, diagnostics, and UI
 ```
 
-Keep history in stable pre-exposure scene radiance by default. Add bloom RGB
-while preserving scene alpha. If `renderOutput()` owns presentation, set
+Keep history in stable pre-exposure scene radiance by default. Apply the bloom
+owner's opaque, coverage-clipped, or halo-preserving alpha branch; unchanged
+source alpha does not preserve off-surface halos. If `renderOutput()` owns
+presentation, set
 `renderPipeline.outputColorTransform = false`; after any output-node change,
 set `renderPipeline.needsUpdate = true`.
 
@@ -144,8 +149,9 @@ Count persistent private targets owned by built-in `BloomNode`, `GTAONode`,
 `TRAANode`, and `PassNode`. Rebuild the pass to reclaim an attachment previously
 requested with `getTextureNode()`; a logical MRT toggle does not reclaim it.
 On resize or DPR change, update every explicit extent and reseed all affected
-histories. Dispose removed nodes, passes, targets, materials, and storage after
-their final GPU use.
+histories. Node/pipeline disposal is not recursive graph cleanup; retain explicit
+owned handles and restore borrowed state with try/finally on failed operations.
+Dispose removed nodes, passes, targets, materials, and storage after final GPU use.
 
 Add adaptive DPR only after the fixed-DPR graph has sustained timings. Use
 asymmetric dwell and cooldown, distinguish fixed from pixel-scaled work, and
