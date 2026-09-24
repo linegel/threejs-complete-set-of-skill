@@ -30,7 +30,7 @@ Use this existing repository plan rather than an unrelated game ticket.
 10. [x] `threejs-image-pipeline` — source/reference/example pass; eight new graph/transaction checks.
 11. [x] `threejs-sky-atmosphere-and-haze` — source/reference pass; eight transport/domain checks.
 12. [x] `threejs-volumetric-clouds` — source/reference pass; ten transport/skip/history checks.
-13. [ ] `threejs-spectral-ocean`
+13. [x] `threejs-spectral-ocean` — source/reference/oracle pass; nine new transform/phase checks.
 14. [ ] `threejs-water-optics`
 15. [ ] `threejs-rain-snow-and-wet-surfaces`
 16. [ ] `threejs-procedural-fields`
@@ -102,7 +102,11 @@ Read both references, entrypoint, and interface metadata. Corrected opaque-body 
 
 Read all three references, entrypoint, and interface metadata. Corrected the zero-limit criterion and stable optical transfer, continuous majorant requirements, background-inclusive accumulated skip/tail error, parallel-axis DDA handling, finite-disc attenuation, overlapping-media composition, shadow epoch admission, small-opacity moments, invalid-history arithmetic, and interval-correct foreground upsampling. Ten checks demonstrate the affected counterexamples and preserve homogeneous step-partition invariance. Floating-point comparisons use explicit tolerances rather than bit equality. All 93 skill tests and distribution validation pass. No GPU volume render, light solve, moving-history capture, causal precipitation simulation, or lab acceptance is claimed. Logs: `artifacts/website-improvement-20260924/continuation/skills-clouds-{before,after}.log`.
 
-### Current skill: threejs-spectral-ocean
+### Skill 13 result: threejs-spectral-ocean
+
+Read the skill/reference/interface and executable FFT oracle. The oracle now bounds CPU work, validates finite data/seed/flags, retains scale-correct relative norms, reports zero-reference errors explicitly, and rejects empty gates or invalid ungated metrics. All fourteen existing fixtures agree with an independent separable DFT. Corrected uniform-current Hermitian evolution, two-branch velocity bounds, stable signed-mode seeds, Nyquist parity versus geometry scope, choppiness product rules, and foam/query admission. Nine new tests pass; all 102 skill tests and distribution validation pass. No GPU FFT, physical spectrum convergence, ocean capture, or lab acceptance is claimed. Logs: `artifacts/website-improvement-20260924/continuation/skills-spectral-{before,after}.log`.
+
+### Current skill: threejs-water-optics
 
 Next in the roster; read its entrypoint and reachable resources before changes. All labs and recreations remain deferred.
 

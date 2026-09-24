@@ -74,8 +74,11 @@ Water current remains a distinct velocity field:
 omega_abs = omega_int + k dot U.
 ```
 
-Uniform current changes the shared phase clock. Wind does not become current,
-and current does not replace wind forcing.
+Uniform current advects the assembled intrinsic field. With time-varying but
+spatially uniform current use its integrated displacement in the phase; do not
+multiply the new instantaneous frequency by the entire elapsed time. Likewise
+integrate intrinsic phase when its dispersion changes continuously. Wind does
+not become current, and current does not replace wind forcing.
 
 ## Wavevector and transform convention
 
@@ -181,7 +184,11 @@ Patch length sets both spectral spacing and exact spatial repetition. Choose it
 from visible footprint and correlation/repetition evidence, not a fixed tier.
 
 Generate coordinate-stable independent normals from
-`(seed,cascade,index_x,index_z)`:
+`(seed,cascade,signed_mode_x,signed_mode_z)` for a fixed physical patch/grid.
+Do not hash centered storage offsets: increasing resolution shifts those offsets
+and would reseed surviving physical modes. A changed patch length changes the
+mode frequencies and needs an explicit compatible-mode transfer or a new state.
+Normals are:
 
 ```text
 zeta_k = (xi_1 + i xi_2)/sqrt(2)
@@ -194,9 +201,17 @@ For the unnormalized inverse,
 ```text
 a_k = sqrt(P_c(k) Delta k_x Delta k_z / 2) zeta_k
 
-H_k(t) = a_k exp(-i omega_k t)
-       + conjugate(a_-k) exp(+i omega_k t).
+H_intrinsic,k(t) = a_k exp(-i omega_int(k) t)
+                 + conjugate(a_-k) exp(+i omega_int(k) t)
+H_k(t) = exp(-i k dot U t) * H_intrinsic,k(t).
 ```
+
+Use the even positive intrinsic frequency inside the pair. In a stationary
+physics chart the two signed temporal branch frequencies are `omega_int+k dot U` and
+`omega_int-k dot U`; substituting one absolute frequency into both opposite
+exponentials breaks Hermitian symmetry. For an exactly current-advected chart,
+the common current phase is removed, and reconstruction maps that chart back
+to the physics frame. Both charts must yield the same displayed surface.
 
 This gives `H_-k=conjugate(H_k)`. Directional asymmetry between `P(k)` and
 `P(-k)` controls propagation while instantaneous height stays real. Construct
@@ -235,6 +250,14 @@ Set every divided field to zero at DC. On an even grid:
 - `D_xz` is zero on either Nyquist line;
 - even `D_xx` and `D_zz` retain their Nyquist values;
 - every self-conjugate output cell is real.
+
+These deliberately populated Nyquist cells test transform parity, not an
+admitted geometric band. Production guard bands zero every Nyquist line before
+surface assembly. An odd derivative has zero Nyquist samples while an even
+one may remain nonzero under a selected continuous cosine extension; the latter
+is not the derivative of an identically zero interpolated displacement map.
+Do not use that mixed interpretation to claim exact map-derived tangents. An
+alternative continuous extension must be explicit and independently sampled.
 
 Verify `F(-k)=conjugate(F(k))` for every field. A pairwise validation
 projection is
@@ -290,6 +313,16 @@ separate bit reversal; explicit-bit-reversal radix-2 performs it exactly once.
 ## Transform gate
 
 Compare a small GPU transform with a CPU DFT before loading a random spectrum.
+The bundled O(N^4) oracle admits only sizes 8, 16, and 32; this is a host-work
+limit, not a production FFT cap. It requires finite numeric fields, a uint32
+seed, a Boolean real-field flag, and a nonempty set of named finite tolerances.
+Use explicit maximum/RMS/relative/Parseval gates and real-field gates where
+applicable. Invalid measurements fail even when that metric was not selected.
+Relative errors divide by their actual reference norms: a zero reference with
+nonzero error is infinite, not softened by a fixed epsilon. Norm accumulation
+avoids squaring tiny inputs into underflow. An overflow is rejected or reported
+invalid, never a pass. CPU agreement verifies conventions, not GPU execution,
+sustained performance, or the physical spectrum.
 Exercise:
 
 - DC;
@@ -342,6 +375,11 @@ cross(P_qz,P_qx)
   = (h_z B-C h_x, J, B h_x-h_z A).
 ```
 
+These formulas require one finite spatially constant choppiness `chi` and
+consistent filtering across all component fields. For spatially varying chi,
+add `D * grad(chi)` to the horizontal tangents; a material-only taper is not
+covered by the constant-chi Jacobian.
+
 Use the normalized cross product while `J>0`. A shortcut that divides each
 slope by its same-axis stretch omits cross coupling. Validate both tangents and
 the normal against central differences of the displaced map. Report minimum
@@ -355,6 +393,11 @@ partial_t P|q =
    partial_t h,
    chi partial_t D_z).
 ```
+
+The displayed formula also holds chi fixed in time. A time-varying chi adds
+`chiDot * D` to both horizontal velocity components. Changing amplitudes,
+windows, chart maps, or blend ownership adds their corresponding product-rule
+terms; differentiating only oscillator phase would miss them.
 
 This is surface-point velocity under the declared parameterization, not phase
 speed, group speed, or material current. Its invariant geometric interface
@@ -389,11 +432,23 @@ f_eq = s/r
 f_next = f_eq + (f_advected-f_eq) exp(-r dt).
 ```
 
+Require finite nonnegative source, elapsed time, and diffusivity, and a positive
+finite lifetime or explicit infinite-lifetime/zero-decay branch. A zero lifetime
+is an authored instant-clear event, not division by zero at dt=0. Use stable
+exponential differences for tiny rates. The exact reaction does not make an
+explicit diffusion step unconditionally stable: for the ordinary 2D central
+stencil require `kappa*dt*(1/dx^2+1/dz^2) <= 1/2`, or validate another solver.
+
 Handle `r=0` explicitly. Declare whether texels live in Lagrangian parameter
 space, an Eulerian stable-frame atlas, or a conservative density grid.
 Eulerian semi-Lagrangian transport reports blur/backtrace error; a conservative
 finite-volume branch reports mass error and satisfies its positivity CFL. One
 combined source drives one history—never saturating-add independent histories.
+A wave parameter chart is not automatically a material-fluid chart. To advect
+Eulerian surface transport through a displaced chart, include the inverse
+horizontal Jacobian and subtract the chart's own velocity; conserve physical
+area/density with its Jacobian. Reject singular/folded mappings rather than
+calling parameter-grid coverage a conserved physical foam mass.
 
 ## CPU queries
 
@@ -402,7 +457,8 @@ Retain a deterministic coefficient set `K_r`. For omitted modes `K_o`:
 ```text
 B_0 = sum_(k in K_o) (|a_k|+|a_-k|)
 B_1 = sum_(k in K_o) |k| (|a_k|+|a_-k|)
-B_t = sum_(k in K_o) |omega_param(k)| (|a_k|+|a_-k|).
+B_t = sum_(k in K_o) [abs(omega_int+k dot U)*|a_k|
+                     + abs(omega_int-k dot U)*|a_-k|]  # stationary chart
 ```
 
 At fixed parameter coordinate:
@@ -410,14 +466,19 @@ At fixed parameter coordinate:
 ```text
 |delta h| <= B_0
 ||delta grad h|| <= B_1
-||delta chi D|| <= chi B_0
+||delta chi D|| <= abs(chi) B_0
 |delta partial_t h| <= B_t
-||delta chi partial_t D|| <= chi B_t.
+||delta chi partial_t D|| <= abs(chi) B_t.
 ```
 
 Serialize whether the parameter chart is stationary in the physics frame or
-advected exactly by uniform current; that selects `omega_param`. Sort retained
-modes for the queried quantity: amplitude for height, `|k|`-weighted amplitude
+advected exactly by uniform current. In the latter chart both branch magnitudes
+reduce to intrinsic frequency. One absolute-frequency magnitude cannot bound
+both stationary-chart terms: one can stop while the other still travels.
+Retain conjugate-compatible mode subsets for a real query. These bounds assume
+fixed coefficients/windows and chi over the query interval; include amplitude,
+window, and chi derivatives or publish a shorter validity interval otherwise.
+Sort retained modes for the queried quantity: amplitude for height, `|k|`-weighted amplitude
 for slopes, and frequency-weighted amplitude for velocity.
 
 For a physics-horizontal query, solve:
@@ -430,16 +491,18 @@ With
 
 ```text
 G = sum_all |k|(|a_k|+|a_-k|)
-L = chi G,
+L = abs(chi) G,
 ```
 
-`L<1` gives the conservative bounds:
+Require finite `G`, chi, and `0 <= L < 1`. A pointwise positive Jacobian is
+local orientation information, not this global contraction/inversion proof.
+The contraction bound gives:
 
 ```text
-||q_full-q_reduced|| <= chi B_0/(1-L)
+||q_full-q_reduced|| <= abs(chi) B_0/(1-L)
 
 |h_full(q_full)-h_reduced(q_reduced)|
-  <= B_0 + G chi B_0/(1-L).
+  <= B_0 + G abs(chi) B_0/(1-L).
 ```
 
 When `L>=1` or folds are allowed, publish a parametric result or measured local

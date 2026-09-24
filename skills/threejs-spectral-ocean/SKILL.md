@@ -79,7 +79,9 @@ When implementing or changing the transform, import or adapt the
 [FFT convention oracle](scripts/fft-convention-oracle.mjs). Feed every
 `makeConventionFixtures()` spectrum through the implementation, then pass its
 `measureTransform()` metrics and caller-declared gates to `applyTolerances()`
-before loading the production spectrum.
+before loading the production spectrum. The CPU oracle is deliberately limited
+to sizes 8/16/32, rejects invalid numeric inputs and empty gates, and reports
+zero-reference relative errors explicitly; it is not a production FFT cap.
 
 For directional angular-frequency variance density `S_omega`,
 
@@ -91,10 +93,12 @@ P(k_x,k_z) = S_omega(omega(k),theta) |d omega/dk| / |k|,
 Include `Delta k_x Delta k_z` in discrete coefficient variance. Power windows
 obey `sum_c w_c(k)=1` over the represented band; smooth overlap uses
 `sqrt(w_c)` on amplitude. Generate normals from
-`(seed,cascade,index_x,index_z)` so masks and quality changes do not perturb
-surviving coefficients.
+`(seed,cascade,signed_mode_x,signed_mode_z)` on the same physical grid so
+centered storage shifts do not reseed surviving modes.
 
-Evolve a Hermitian height field, construct derivatives in wavevector space,
+Evolve the intrinsic Hermitian pair and apply uniform-current advection as a
+common phase. Its two stationary-chart frequencies differ; query velocity
+bounds retain both. Construct derivatives in wavevector space,
 then transform height, horizontal displacement, slopes, and displacement
 derivatives. Treat DC and self-conjugate Nyquist cells explicitly before any
 division.
@@ -118,8 +122,10 @@ P(q) = (q_x + chi D_x, h, q_z + chi D_z),
 
 derive both parametric tangents from the summed displacement and set the normal
 to `normalize(cross(P_qz,P_qx))`. Compute the full horizontal Jacobian,
-including the mixed derivative. A nonpositive determinant is a fold, not a
-normal-map defect.
+including the mixed derivative. These compact formulas hold chi constant;
+spatial or temporal variation adds its product-rule terms. A nonpositive
+determinant is a fold, not a normal-map defect. Production guard bands remove
+Nyquist lines; parity-only transform fixtures do not prove resolved geometry.
 
 Choose the sign of `chi` with the one-mode criterion: under the positive
 inverse convention, `h=a cos(kx)` and positive choppiness must produce
