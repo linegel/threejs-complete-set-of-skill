@@ -24,7 +24,7 @@ Use this existing repository plan rather than an unrelated game ticket.
 4. [x] `threejs-compatibility-fallbacks` — source/reference pass; backend and renderer-stack boundaries corrected.
 5. [x] `threejs-camera-controls-and-rigs` — source/reference pass; nine new numerical/control checks.
 6. [x] `threejs-scalable-real-time-shadows` — source/reference pass; five new math/API checks.
-7. [ ] `threejs-ambient-contact-shading`
+7. [x] `threejs-ambient-contact-shading` — source/reference pass; seven new math/API/lifecycle checks.
 8. [ ] `threejs-bloom`
 9. [ ] `threejs-exposure-color-grading`
 10. [ ] `threejs-image-pipeline`
@@ -78,7 +78,11 @@ Read the complete skill/reference/interface and installed OrbitControls, Pointer
 
 Read the skill/reference/interface and installed LightShadow, ShadowNode, CSMShadowNode, TileShadowNode, shadow filters, and conditional-node implementations. Corrected level sizing below the finest footprint, degenerate fades, publication of superseded cache work, sampling-domain/VSM invalidation after filter changes, and conditional-versus-eager receiver cost accounting. Five new checks cover level count, fade admission, late-content guidance, real clone omissions, real multi-camera throttling, and per-tap static/dynamic union. All 43 skill tests and distribution validation pass. The existing reversed-Tile and other rejected GPU configurations remain rejected; no engine patch, actual cache rendering, generated GPU shader profile, or target timing is claimed. Logs: `artifacts/website-improvement-20260924/continuation/skills-shadows-{before,after}.log`.
 
-### Current skill: threejs-ambient-contact-shading
+### Skill 7 result: threejs-ambient-contact-shading
+
+Read the complete skill/reference/interface and installed GTAO, Denoise, RTT and AO-context source, plus base-node disposal. Corrected final-image versus scene-linear invariance, admitted the default graph only for its supported perspective/non-logarithmic depth path, added per-view/positive-extent checks, replaced unconditional stock denoising with an explicitly validated optional reconstruction contract, and supplied the actual index/rotation correction. Noise and RTT target/material teardown now has explicit ownership. Seven tests cover radiance invariance, orthographic direction, denoiser math, zero-sized AO, real disposal omissions, and real opaque/transparent AO-context behavior. All 50 skill tests and distribution validation pass. No shader compilation, GPU resource plateau, corrected dependency renderer, or lab acceptance is claimed. Logs: `artifacts/website-improvement-20260924/continuation/skills-ambient-{before,after}.log`.
+
+### Current skill: threejs-bloom
 
 Next in the roster; read its entrypoint and reachable resources before changes. All labs and recreations remain deferred.
 

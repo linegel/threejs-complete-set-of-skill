@@ -6,8 +6,10 @@ description: Ground indirect lighting with ambient visibility in Three.js r185 W
 # Ambient Contact Shading
 
 AO is visibility of indirect illumination. It may attenuate indirect diffuse and
-environment/specular response. Direct light, emission, UI, and the tone-mapped
-frame remain invariant.
+environment/specular response. Do not multiply direct light, emission, UI, or
+an already tone-mapped frame by AO. The final image changes through indirect
+lighting; test direct/emissive invariance in separate scene-linear terms at
+fixed exposure, not by requiring unchanged final RGB.
 
 `$threejs-choose-skills` is an optional multi-system coordinator. Use
 `$threejs-image-pipeline` when AO shares depth, normals, velocity, history, or
@@ -35,13 +37,16 @@ charges every added pass/attachment or records screen AO as omitted.
 ## 2. Fix the input contract
 
 - Initialize the renderer and require a WebGPU backend before graph creation.
-  Stock r185 GTAO is gated to standard depth; a custom reversed-depth adapter
-  must prove sky classification, reconstruction, and occluder ordering.
+  The default r185 graph requires perspective, non-logarithmic standard depth.
+  Orthographic, logarithmic, reversed-depth, and subviewport adapters must prove
+  every depth/normal reconstruction, view direction, sky, and ordering rule.
 - Define opaque occluders, opaque receivers, alpha coverage, and one transparent
   policy: no screen AO, authored material AO, or a validated custom lighting
   model. Stock `builtinAOContext()` skips transparent materials.
 - Bind AO to the active view's `screenUV`, drawing-buffer dimensions, and
-  projection. Keep width and height independent for non-square/asymmetric views.
+  projection. Use a separate stateful node per independent view. Keep width and
+  height independent, admit positive rounded target dimensions, and suspend
+  zero-sized views rather than publishing invalid AO.
 - Choose depth-reconstructed normals for reduced raw AO only when edge fixtures
   and target timing pass. Choose an MRT normal when it is shared, reconstruction
   is materialized, smooth/thin geometry fails, or its measured attachment delta
@@ -75,8 +80,10 @@ shared-or-AO-owned depth + optional normal/velocity
 
 - Reuse a shared scene pass; do not create a second G-buffer for AO.
 - Raw reduced-resolution AO receives ordinary texture filtering, not bilateral
-  reconstruction. When edges fail, evaluate `rtt(denoise(...))` once, then
-  sample the materialized texture with `screenUV`.
+  reconstruction. When edges fail, use a validated, materialized
+  reconstruction once, then sample it with `screenUV`. The installed denoiser
+  needs the index/rotation correction in the reference; stock construction
+  alone is not admission. Raw/full-resolution AO or omission remain alternatives.
 - Inside a mesh material graph, sample both raw and reconstructed visibility
   explicitly with `screenUV`; implicit texture coordinates resolve to mesh UVs.
 - Keep stock transparent/transmission rendering in the non-temporal lit pass;
@@ -86,6 +93,8 @@ shared-or-AO-owned depth + optional normal/velocity
   the marginal delta when that compositor is shared.
 - Keep scalar visibility single-channel. Replace the output graph and mark the
   `RenderPipeline` dirty when AO is disabled so inactive work is unreachable.
+  Retain all owned noise, reconstruction-target, and material handles; base
+  node disposal is not recursive and stock AO disposal leaves its noise alive.
 
 When implementing GTAO or choosing reconstruction, read
 [the r185 GTAO pipeline](references/gtao-bent-normal-pipeline.md#r185-graph-and-api-gates)

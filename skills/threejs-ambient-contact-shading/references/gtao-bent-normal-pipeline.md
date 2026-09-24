@@ -41,15 +41,30 @@ if ( renderer.backend.isWebGPUBackend !== true ) {
   throw new Error( 'WebGPU is required.' );
 }
 
-if ( renderer.reversedDepthBuffer === true ) {
-  throw new Error( 'Stock r185 GTAO requires standard depth.' );
+if ( renderer.reversedDepthBuffer === true ||
+     renderer.logarithmicDepthBuffer === true ||
+     camera.isPerspectiveCamera !== true ) {
+  throw new Error( 'This stock AO graph requires standard perspective depth.' );
 }
 ```
 
-For standard depth, prove sky visibility is `1`, fronto-parallel view Z is
-monotonic, orthographic and asymmetric projections preserve world radius, and
-resize/DPR updates every target. A custom reversed-depth node must pass the same
-fixtures with its own sky and ordering rules.
+For this perspective branch, prove sky visibility is `1`, fronto-parallel view
+Z is monotonic, asymmetric projections preserve world radius, and resize/DPR
+updates every target. Stock GTAO uses `normalize(-viewPosition)` for its horizon
+view direction; orthographic rays need a parallel view direction instead.
+Its logarithmic-depth conversion does not cover raw-depth normal reconstruction,
+and stock DenoiseNode reconstructs raw depth without that conversion. An adapter
+must correct every consumer, not only the central GTAO sample. Reversed-depth
+admission additionally needs its own sky and occluder-ordering rules.
+
+Use one stateful AO/reconstruction instance per independent view. Stock GTAO
+sizes from the whole drawing buffer; a subviewport needs an explicit coordinate
+and extent adapter. Require finite positive scale and positive rounded dimensions
+on both axes. A hidden/zero-sized view is suspended, not rendered at zero extent.
+Validate finite positive radius, thickness, and AO exponent, positive integer
+sample counts within a declared work budget, and finite bounded controls before
+shader loops or allocation. For reconstruction, positive finite luma/depth Phi
+values prevent division by zero; reject invalid kernel settings before use.
 
 ### Diagnostic scaffold
 
@@ -60,10 +75,9 @@ passes:
 import * as THREE from 'three/webgpu';
 import {
   builtinAOContext, mrt, normalView, output, pass, renderOutput,
-  rtt, screenUV, velocity
+  screenUV, velocity
 } from 'three/tsl';
 import { ao } from 'three/addons/tsl/display/GTAONode.js';
-import { denoise } from 'three/addons/tsl/display/DenoiseNode.js';
 import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
 const pipeline = new THREE.RenderPipeline( renderer );
@@ -88,14 +102,10 @@ gtao.radius.value = contactRadius;
 gtao.thickness.value = depthThickness;
 
 const raw = gtao.getTextureNode();
-const reconstructed = rtt( denoise( raw, depth, normal, camera ), null, null, {
-  colorSpace: THREE.NoColorSpace,
-  depthBuffer: false,
-  format: THREE.RedFormat,
-  type: THREE.UnsignedByteType
-} );
-
-const visibility = reconstructed.sample( screenUV ).r;
+const reconstruction = reconstructionEnabled
+  ? createValidatedAOReconstruction( raw, depth, normal, camera )
+  : null;
+const visibility = ( reconstruction?.textureNode ?? raw ).sample( screenUV ).r;
 const separateExcludedLayers =
   temporalEnabled || externalLayerCompositorOwned;
 const litPass = pass( scene, camera );
@@ -119,9 +129,14 @@ pipeline.outputNode = renderOutput( finalHDR );
 pipeline.needsUpdate = true;
 ```
 
-`composeExcludedLayers(...)`, `excludedTransparentAndRefractiveLayers`, and
-`externalLayerCompositorOwned` are application-owned placeholders, not r185
-exports. The ordinary non-temporal
+`createValidatedAOReconstruction(...)` and `reconstructionEnabled` are
+application-owned, optional reconstruction policy, not Three.js exports. The
+factory returns `{ textureNode, dispose }`, materializes one admitted R8/linear
+visibility result, retains its denoiser/noise/target/material handles, and passes
+the correction and lifecycle gates below. Leave it disabled until verified;
+raw AO itself still has to pass edge fixtures. `composeExcludedLayers(...)`,
+`excludedTransparentAndRefractiveLayers`, and `externalLayerCompositorOwned` are
+also application-owned placeholders, not r185 exports. The ordinary non-temporal
 stock-forward branch leaves `litPass.transparent` enabled, so r185 keeps its
 built-in transparent/transmission rendering and no extra composition is added.
 A temporal resolve, or an already-owned external compositor, renders only the
@@ -146,6 +161,31 @@ sidedness, and depth. A generic override material does not prove that parity.
 
 ## Reconstruction and cost
 
+### r185 denoiser correction gate
+
+The installed DenoiseNode applies `2 * PI` inside the noise-vector index, then
+uses an incorrectly assembled 2x2 matrix. With index 1 the requested component
+is already beyond a four-component vector; at zero angle its matrix is singular.
+A version-pinned correction replaces those expressions inside `setup()` with:
+
+```js
+// Host validates this.index.value as an integer in [0, 3].
+const channel = int( this.index );
+const theta = noiseTexel.element( channel ).mul( 2 ).mul( PI );
+const c = cos( theta );
+const s = sin( theta );
+const rotationMatrix = mat2( c, s, s.negate(), c );
+```
+
+The column-major matrix must remain orthonormal with determinant one. Compile
+and exercise all four channels, a non-square target, and silhouette/gap fixtures
+before enabling the corrected branch. Preserve the default denoiser's 16 sample
+and weighting semantics unless separately revalidated. Its noise generator uses
+an unseeded SimplexNoise instance: deterministic comparisons require retained
+identical noise bytes or an explicitly seeded owned noise texture, not a new
+random texture each capture. Dispose the replaced default texture only when
+owned and no longer referenced. These source corrections are not GPU acceptance.
+
 r185 converts `samples` into directions and steps:
 
 ```text
@@ -167,7 +207,7 @@ Choose reconstruction by observable error:
 | Observation | Decision |
 | --- | --- |
 | Raw reduced AO passes silhouette and gap fixtures | Sample raw visibility with `screenUV`. |
-| Halos or block structure fail | Materialize `rtt(denoise(...))` once. |
+| Halos or block structure fail | Materialize a corrected, validated reconstruction once; otherwise use a passing raw/full-resolution branch or omit screen AO. |
 | Reconstruction is active | Prefer MRT normals: about 17 AO + 17 depth + 17 normal + 1 noise fetch = 52 fetches/output pixel. Reconstructing every normal adds `17 * 9 = 153` depth loads, about 188 total. |
 | Thin/alpha-masked surfaces still fail | Reduce radius/thickness, use MRT normals, or omit AO for that tier. |
 
@@ -249,6 +289,22 @@ wrapper/custom node, or conservatively rebuild/reset. On rebuild, replace the
 pipeline output, set `needsUpdate = true`, dispose the old node, and verify
 resource counters plateau.
 
+## Owned resource teardown
+
+Disconnect the AO graph and invalidate the pipeline before disposal. Retain
+explicit handles; base `Node.dispose()` is an event, not recursive cleanup.
+In the installed revision, `GTAONode.dispose()` releases its target/material but
+not `_noiseNode.value`; `DenoiseNode.dispose()` does not release `noiseNode.value`;
+and `RTTNode.dispose()` does not release `renderTarget` or `_quadMesh.material`.
+A version-pinned owner disposes those generated resources exactly once after
+their last consumer finishes. A reconstruction factory must implement this in
+its `dispose()` contract. Private fields need rechecking when the revision changes.
+Do not dispose borrowed depth/normal inputs, shared noise, or shared quad geometry.
+Shared resources require ownership/refcounts, not broad recursive traversal.
+Exercise repeated AO on/off, reconstruction changes, resize, failure, and view
+replacement with texture/target/material counters; CPU dispose events alone do
+not demonstrate a GPU-allocation plateau.
+
 ## Bent-normal extension
 
 A bent normal is the normalized visibility-weighted mean unoccluded direction.
@@ -283,7 +339,7 @@ it.
 | Meshes with incompatible UV layouts | AO follows UV islands or stretches per object | Sample visibility with `screenUV`. |
 | Thin foreground silhouette | Dark exterior halo | Repair depth/normal-aware reconstruction or reduce radius/thickness. |
 | Transparent crossing | Medium becomes an opaque occluder/receiver | Enforce the declared transparent policy. |
-| Hard direct light and emitter | Either darkens | AO is applied after lighting; move it to indirect response. |
+| Separate scene-linear direct/emissive terms at fixed exposure | Either changes | Inspect AO placement; nonlinear final-image differences are not this invariant. |
 | Screen-edge occluder | Contact pops when the occluder leaves view | Accept screen-space loss or use authored visibility. |
 | Smooth curve | Faceted/crawling contact | Use MRT normals or omit the failing tier. |
 | Moving/deforming occluder | Trail | Repair velocity/rejection or disable temporal AO. |
