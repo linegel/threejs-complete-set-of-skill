@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-  <url><loc>https://threejs-skills.com/</loc><lastmod>2026-07-16</lastmod><image:image><image:loc>https://threejs-skills.com/visual-validation/final-image-flight/final.design.png</image:loc><image:title>Three.js WebGPU Skill Pack</image:title></image:image></url>
-  <url><loc>https://threejs-skills.com/about/</loc><lastmod>2026-07-16</lastmod></url>
+  <url><loc>https://threejs-skills.com/</loc><lastmod>2026-09-24</lastmod><image:image><image:loc>https://threejs-skills.com/visual-validation/final-image-flight/final.design.png</image:loc><image:title>Three.js WebGPU Skill Pack</image:title></image:image></url>
+  <url><loc>https://threejs-skills.com/about/</loc><lastmod>2026-09-24</lastmod></url>
   <url><loc>https://threejs-skills.com/evidence/</loc><lastmod>2026-07-16</lastmod></url>
   <url><loc>https://threejs-skills.com/agents/</loc><lastmod>2026-07-16</lastmod></url>
   <url><loc>https://threejs-skills.com/agents/routing-and-minimal-context/</loc><lastmod>2026-07-16</lastmod></url>

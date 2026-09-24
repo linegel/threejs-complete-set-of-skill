@@ -1609,7 +1609,7 @@ ${science ? `<link rel="stylesheet" href="../assets/vendor/katex/katex.min.css" 
   onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>` : ''}
 <style>
 ${baseCss}
-header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
+main>header{padding:clamp(50px,7vw,90px) 0 clamp(40px,5vw,60px)}
 .skill-hero{position:relative;overflow:hidden;min-height:min(680px,calc(100svh - 90px));display:grid;align-items:end}
 .skill-hero .wrap{position:relative;z-index:2}
 .skill-hero-bg{position:absolute;z-index:0;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;opacity:.78;filter:saturate(1.18) contrast(1.08) brightness(1.08);scale:1.015}
