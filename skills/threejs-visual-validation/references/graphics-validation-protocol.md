@@ -55,10 +55,15 @@ Freeze camera matrices, viewport, DPR, seed, time, quality, and output transform
 across comparisons. A diagnostic route must change the actual output node and
 mark the pipeline dirty when graph compilation depends on it.
 
-Color inputs use `SRGBColorSpace`. Computational data, masks, normals, fields,
-and diagnostic storage use `NoColorSpace` or explicit linear-data semantics.
-HDR targets remain scene-linear until one tone-map/output-transform owner.
-Captures use the same exposure, transform, encoding, and alpha policy.
+Tag color inputs by their actual encoding: ordinary sRGB-encoded color maps
+use `SRGBColorSpace`; scene-linear HDR/EXR color in linear-sRGB primaries uses
+`LinearSRGBColorSpace`. Preserve a loader's verified metadata rather than
+applying sRGB decoding to every color texture. Other primaries need their own
+declared conversion. Computational data, masks, normals, and fields are not
+color images: use `NoColorSpace` or explicit linear-data semantics. HDR targets
+remain scene-linear until one tone-map/output-transform owner. Captures use
+the same exposure, transform, encoding, and alpha policy. Byte layout alone
+does not establish any of these color or alpha semantics.
 
 ## Metric selection
 
@@ -83,6 +88,12 @@ pixel identity is appropriate only when exact deterministic output is claimed.
 
 ## WebGPU render-target readback
 
+This helper covers a nonempty, uncompressed, single-layer 2D color copy with
+an explicitly supplied padded stride. It is not a decoder for compressed
+blocks, depth/stencil aspects, multi-layer/3D copies, or omitted-stride single
+rows. Those require their actual block/aspect/layer layout; do not label such
+valid API layouts invalid merely because this helper does not support them.
+
 Carry the actual integer row stride used by the copy encoder into decoding:
 
 ```text
@@ -105,7 +116,11 @@ undersized, or assumed-tight row layouts. Use
 [the aligned-readback helper](../scripts/aligned-readback.mjs) for this branch.
 It accepts the actual stride and permits backing buffers larger than the minimum
 copy span. Mapping/readback completion proves host visibility; submission or
-`computeAsync()` alone does not.
+`computeAsync()` alone does not. The helper returns packed raw bytes, not
+RGBA8 display pixels: decode the actual component format, channel order,
+endianness, alpha, and orientation separately. In particular, half-float words
+are not normalized integer colors. Its layout checks do not prove format or
+GPU-copy legality; retain the actual encoder metadata and validation result.
 
 ## Temporal claims
 
@@ -145,9 +160,21 @@ sustained window; an early fast segment cannot hide later degradation.
 
 GPU timestamps are required for GPU headroom, per-pass/dispatch cost,
 GPU-stage-envelope, GPU thermal, or bandwidth-attribution claims. Resolve render
-and compute scopes separately and keep query resolution/readback outside the
-steady-state window. Missing required timestamps yields
-`INSUFFICIENT_EVIDENCE` for the affected claim.
+and compute scopes separately. Budget query capacity before collecting a long
+window: do not exhaust a fixed pool while waiting to resolve everything at the
+end. Use bounded batches or a supported asynchronous collection path, keep host
+waits off the frame-critical path, and report query/readback overhead. A gap
+between batches is not continuous sustained execution; do not concatenate it
+away when the claim depends on thermal or uninterrupted behavior.
+
+Bind each accepted sample to a fresh frame/scope identifier and successful
+resolution. In the pinned r185 implementation a failed or empty resolution can
+return `lastValue`, and a missing context lookup can return zero; neither is a
+new measurement. Record missing/dropped scopes and capacity/resolve failures,
+not fabricated zero-cost work. A last-frame aggregate is not a distribution of
+all collected frames. Preserve per-frame samples for percentile claims.
+Missing required timestamps yields `INSUFFICIENT_EVIDENCE` for the affected
+claim. Recheck these API details against the installed revision.
 
 ## Resources, tile pressure, and traffic
 

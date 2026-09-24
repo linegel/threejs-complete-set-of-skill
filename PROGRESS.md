@@ -20,7 +20,7 @@ Use this existing repository plan rather than an unrelated game ticket.
 
 1. [x] `threejs-choose-skills` — source/reference pass; 12 regression checks.
 2. [x] `threejs-debugging` — source/reference pass; publication uncertainty preserved.
-3. [ ] `threejs-visual-validation`
+3. [x] `threejs-visual-validation` — source/reference/helper pass; 17 new checks.
 4. [ ] `threejs-compatibility-fallbacks`
 5. [ ] `threejs-camera-controls-and-rigs`
 6. [ ] `threejs-scalable-real-time-shadows`
@@ -62,7 +62,11 @@ All four router references, entrypoint, interface metadata, and generated articl
 
 Read the entrypoint, upstream reference, and interface metadata. Fixed the ambiguous `fixed-unreleased` classification: unverified publication stays insufficient evidence. Added check-time/package-integrity requirements and kept unknown/not-run values in the current-version matrix. Reviewed three distinct cases: merged fix with unavailable publication evidence, checked unshipped fix, and published fix passing the same reproduction. Tag ancestry alone is not shipped-code proof. The packaging validator and existing 12 numeric/router tests pass; no upstream bug or GPU behavior is claimed fixed by this guidance correction. Log: `artifacts/website-improvement-20260924/continuation/skills-debugging-check.log`. Generated article publication remains part of the source-to-site reconciliation after the sequential skill pass; inherited lab outputs remain untouched.
 
-### Current skill: threejs-visual-validation
+### Skill 3 result: threejs-visual-validation
+
+Read the entrypoint, protocol, actual aligned-readback helper, and interface metadata. Corrected blanket sRGB tagging, specified the helper's uncompressed single-layer padded-copy scope and raw-byte output, separated CPU-only claims from renderer-dependent proof, and required fresh scoped timing samples with bounded query collection. The installed HDR loader, color management, and both timestamp-pool source files were inspected. Seventeen new checks cover HDR parsing, layout boundaries, larger stride, mapped-view/copy offsets, minimal last-row bytes, invalid/overflowing layouts, independent output bytes, and half-float preservation. All 29 skill tests and distribution validation pass. The decoder itself was already correct for its declared scope and remains unchanged. Timestamp safeguards are source-reviewed guidance, not newly measured GPU results. Logs: `artifacts/website-improvement-20260924/continuation/skills-visual-validation-{before,after}.log`.
+
+### Current skill: threejs-compatibility-fallbacks
 
 Next in the roster; read its entrypoint and reachable resources before changes. All labs and recreations remain deferred.
 

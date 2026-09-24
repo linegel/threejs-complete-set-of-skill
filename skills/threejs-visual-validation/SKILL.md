@@ -30,6 +30,11 @@ supported only by the final image.
 
 ## 2. Freeze the run
 
+For a purely CPU-side numerical, byte-layout, or metadata claim, freeze its
+actual execution environment without inventing a renderer dependency. Such
+results do not prove a GPU shader, rendered image, or target-performance claim.
+The initialized-backend gate below applies to renderer-dependent claims.
+
 Freeze the exact Three.js revision, renderer and initialized backend, target,
 browser/GPU, camera matrices, seed, time or deterministic step, viewport, DPR,
 quality state, assets, and color/output graph. Construct the renderer with
@@ -103,8 +108,8 @@ Run only the branches the claims require:
 - temporal: reset, first response, steady state, invalidation/disocclusion, and
   recovery under deterministic camera/object/state changes;
 - performance: cold and final sustained windows on the named target;
-- GPU attribution: resolved render/compute timestamps outside the measured
-  steady-state window;
+- GPU attribution: fresh frame/scoped render and compute timestamps with
+  bounded off-critical-path resolution and recorded collection overhead;
 - resource: resident, transient, attachment, upload/readback, and traffic
   evidence proportional to the claim;
 - lifecycle: repeated resize/DPR, quality/debug transition, history reset,
