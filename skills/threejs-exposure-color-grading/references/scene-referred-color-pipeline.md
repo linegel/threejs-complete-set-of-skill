@@ -89,12 +89,19 @@ nonnegative weight `w_i`:
 
 ```text
 l_i   = log2(max(Y_i, epsilon))
-L_key = exp2(sum(w_i * l_i) / max(sum(w_i), epsilon))
+L_key = exp2(sum(w_i * l_i) / sum(w_i))
 ```
 
 Weights may multiply validity, photographed-layer inclusion, UI exclusion,
-shot mask, and center policy. Define every mask polarity. An empty or nonfinite
-weight sum keeps the prior valid GPU target and raises a GPU validity flag.
+shot mask, and center policy. Define every mask polarity. Reject nonfinite or
+negative weights and apply invalid-sample masking before logarithms or
+multiplication: `0 * NaN` remains NaN. An empty, nonfinite, or numerically
+unusable weight sum keeps the prior valid GPU target and raises invalidity.
+For an admitted positive sum, divide by that actual sum; clamping it to a
+luminance epsilon biases valid small weights and breaks scale invariance.
+The luminance floor has radiance units, not weight units. Validate the weighted
+sum and resulting EV too. A declared common weight rescale can avoid underflow
+or overflow, but it must preserve the weighted statistic within tolerance.
 
 Auto exposure assumes all contributors share one scene-linear radiance scale.
 It cannot repair arbitrary per-light, emissive, environment, atmosphere, foam,
@@ -136,9 +143,16 @@ nextGroups  = ceil(previousGroups / W)
 repeat until one aggregate remains
 ```
 
-The four `f32` fields occupy 16 bytes per partial. Choose a workgroup shape that
-compiles on every target and wins measured timings. Accumulate finite values in
-`f32`; keep full-resolution readback outside the controller.
+The four `f32` fields occupy 16 bytes per partial. Hierarchical fan-in requires
+integer `W >= 2`, or an explicit serial special case; `W = 1` never shrinks a
+multi-element reduction. The lane-reduction algorithm must cover the admitted
+shape, including non-power-of-two and partial groups. Inactive lanes contribute
+neutral values and still reach workgroup barriers. Validate positive dimensions,
+safe counts, and device limits before allocating or dispatching. Exact here
+means every admitted pixel is included, not exact real-number arithmetic;
+compare f32 accumulation with a higher-precision reference and an error bound.
+Choose a shape that compiles on every target and wins measured timings; keep
+full-resolution readback outside the controller.
 
 ### Explicit pyramid
 
@@ -148,9 +162,11 @@ children:
 ```text
 parentWeight = sum(childWeight) / 4
 parentMean   = sum(childMean * childWeight)
-             / max(sum(childWeight), epsilon)
+             / sum(childWeight)  // only when the positive sum is admitted
 ```
 
+An empty parent has zero weight and a neutral unused mean; branch before
+normalization. Apply the same finite/weight rules as the direct reduction.
 Use explicit sample counts or `f32` sums when edge tiles have unequal areas or
 exact large sums matter. Keep the level chain only when its spatial outputs
 have a named consumer.
@@ -175,16 +191,26 @@ Clear costs `B` stores and `u32` bins cost `4B` bytes. Counts define an
 unweighted percentile. Weighted percentiles require bounded fixed-point weights
 with an overflow proof or a per-bin weight reduction.
 
-After locating the percentile interval, prefer a second weighted-log reduction
-over accepted samples. Using bin centers instead has at most half a bin of
-single-bin quantization error and is valid only inside the declared EV
-tolerance. Record underflow and overflow so the interval cannot silently clip
-the distribution.
+Require a positive integer bin count and finite ordered EV endpoints. Clear
+bins in an ordered dispatch before writers; workgroup barriers cannot order a
+global clear against other workgroups' increments. Bound total counts/weights
+before u32 overflow. Define boundary-bin fractions or refine quantile boundaries,
+and declare how equal-value ties are handled. Keeping whole boundary bins does
+not in general implement the requested exact percentile interval.
+
+After locating the interval, prefer a second weighted-log reduction over the
+admitted samples. Bin centers have at most half a bin of quantization error
+only for non-clamped interior values; underflow/overflow have no such bound.
+Count and handle those tails explicitly rather than silently treating clamped
+centers as valid luminance. Admit the resulting EV error against its tolerance.
 
 ## GPU exposure state
 
 Allocate one state record per exposure-control group. Key it by target/view,
-radiance basis, meter policy, and reset epoch. A compact typed layout is:
+radiance basis, meter policy, and reset epoch. Multiple views share it only with
+one named meter source or an explicitly combined aggregate and one update per
+group tick; matching settings alone do not make independent images equivalent.
+A compact typed layout is:
 
 ```wgsl
 struct ExposureFloatState {
@@ -212,19 +238,25 @@ targetEV = clamp(log2(keyCalibration / max(L_key, epsilon))
 exposure = exp2(currentEV)
 ```
 
-`keyCalibration`, compensation, and clamps are authored controls. A card whose
-luminance equals the authored key has `targetEV = 0` and exposure `1`.
+`keyCalibration`, compensation, and clamps are authored controls. Validate
+positive finite key/floor, finite ordered EV limits, and a representable positive
+exposure multiplier. A card at the key has `targetEV = 0` only when compensation
+is zero and the limits include zero; otherwise use the configured formula.
+Do not compare a compensated or clamped card with the unmodified zero-EV fixture.
 
 Adapt EV rather than linear exposure:
 
 ```text
 tau = targetEV < currentEV ? tauBrightScene : tauDarkScene
-alpha = 1 - exp(-max(dt, 0) / max(tau, epsilon))
+alpha = 1 - exp(-dt / tau)  // admitted finite dt >= 0 and finite tau > 0
 currentEV += (targetEV - currentEV) * alpha
 ```
 
-Clamp stalled `dt`. Choose bright-to-dark and dark-to-bright time constants
-from the authored response and verify their trajectories. Meter cadence may be
+A zero time constant is an explicit instant-target branch before division;
+negative or nonfinite time constants are invalid, not implicit instant response.
+Validate finite nonnegative dt and cap stalls using the authored policy.
+Choose bright-to-dark and dark-to-bright constants from the response and verify
+trajectories and f32 precision for the admitted dt/tau range. Meter cadence may be
 lower than presentation cadence; adaptation advances every frame toward the
 last valid target.
 
@@ -247,7 +279,13 @@ authored schedule; an untracked previous-frame texture is a scheduling defect.
 - A cut executes its declared hold, fixed-EV, or reseed policy.
 - A pure positive scale change `L_new = k * L_old` converts both EV values with
   `EV_new = EV_old - log2(k)` when primaries, quantity, and exposure key are
-  unchanged.
+  unchanged. This is a normalization/unit conversion, not an ordinary scene
+  illumination change. Also convert the EV bounds when they encode the old
+  normalization, or acknowledge that clamping breaks product preservation.
+  Reject an unrepresentable converted state rather than silently overflowing.
+- Queued targets from a superseded epoch cannot overwrite the reseeded state.
+  Tag publications with the source/epoch and discard incompatible late work,
+  or apply an explicitly proven bridge before publishing it.
 - A primary, spectral basis, quantity, nonlinear normalization, or key change
   clears meter statistics and reseeds adaptation before presentation.
 - A resize/DPR change rebuilds source-sized resources and regenerates sample
@@ -306,9 +344,12 @@ renderPipeline.outputNode = final;
 renderPipeline.needsUpdate = true;
 ```
 
-The scene pass is premultiplied here. Exposure, tone mapping, and grading are
-nonlinear RGB operations, so unpremultiply before them and premultiply before
-output conversion. Preserve alpha through exposure.
+The scene pass is premultiplied here. Exposure multiplication is linear; tone
+mapping and grading generally are not. Work on straight RGB for those operations,
+then premultiply before output conversion. Preserve alpha through exposure and
+grading. A display-encoded LUT after `renderOutput()` likewise needs to operate
+on unpremultiplied encoded RGB, then restore/premultiply alpha without a second
+output transform. The stock LUT node preserves the input alpha, not cube alpha.
 
 Use `Data3DTexture` as transform data with `NoColorSpace`, linear min/mag
 filters, clamp-to-edge wrapping, no mipmaps, and unpack alignment compatible
@@ -318,6 +359,15 @@ with the uploaded rows. For cube edge `D`, channels `C`, and bytes per channel
 ```text
 residentBytes = D^3 * C * b
 ```
+
+The identity helper validates safe byte arithmetic before allocation and accepts
+`{ maxTextureDimension3D, maxBytes }`. Its defaults of edge 128 and 8 MiB are
+fixture guards, not a hardware support claim; supply the actual initialized
+device limit and the owned upload budget. Its RGBA8 values are rounded: for
+arbitrary edge lengths the maximum per-channel quantization error is `0.5/255`,
+not zero. The public LUT maps endpoints to half-texel centers; use that mapping
+when comparing CPU interpolation. Changing cube size does not remove RGBA8
+quantization. Dispose each owned cube after final use.
 
 Choose the smallest cube that passes fixed ramps and swatches. Public r185
 `lut3D()` uses texture interpolation; a tetrahedral requirement needs a custom
@@ -340,8 +390,9 @@ physical resolution, meter mode/count/cadence, workgroup shape, dispatches,
 buffer sizes, cube size/format, and timestamp source.
 
 Resolve renderer timestamps only when timestamp queries are supported after
-initialization. r185 render timestamps cover timestamped render passes, not
-compute, copies, queue gaps, or presentation; label narrower evidence
+initialization, using the visual-validation skill's fresh scoped samples and
+bounded query-capacity rules. r185 render timestamps cover timestamped render
+passes, not compute, copies, queue gaps, or presentation; label narrower evidence
 accordingly.
 
 Acceptance requires exactly one exposure, tone map, and output conversion, plus

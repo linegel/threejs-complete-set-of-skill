@@ -9,16 +9,54 @@ import {
 
 const CHANNELS = 4;
 const MAX_CODE = 255;
+// Authored fixture limits, not detected device capabilities.
+const DEFAULT_MAX_EDGE = 128;
+const DEFAULT_MAX_BYTES = 8 * 1024 * 1024;
 
-export function createIdentity3DLut( size ) {
+/**
+ * Creates bounded RGBA8 transform data. Pass the actual device dimension limit
+ * and the caller's upload budget when admitting this texture to a GPU graph.
+ * @param {number} size
+ * @param {{maxTextureDimension3D?: number, maxBytes?: number}} [options]
+ * @returns {Data3DTexture}
+ */
+export function createIdentity3DLut( size, options = {} ) {
 
 	if ( ! Number.isSafeInteger( size ) || size < 2 ) {
 
 		throw new RangeError( 'Identity LUT edge must be a safe integer greater than one.' );
 
 	}
+	if ( options === null || typeof options !== 'object' || Array.isArray( options ) ) {
+
+		throw new TypeError( 'Identity LUT options must be an object.' );
+
+	}
+	const { maxTextureDimension3D = DEFAULT_MAX_EDGE, maxBytes = DEFAULT_MAX_BYTES } = options;
+	if ( ! Number.isSafeInteger( maxTextureDimension3D ) || maxTextureDimension3D < 1 ||
+		! Number.isSafeInteger( maxBytes ) || maxBytes < 1 ) {
+
+		throw new RangeError( 'Identity LUT limits must be positive safe integers.' );
+
+	}
+	if ( size > maxTextureDimension3D ) {
+
+		throw new RangeError( 'Identity LUT exceeds the texture dimension limit.' );
+
+	}
 	const voxelCount = size ** 3;
-	const data = new Uint8Array( voxelCount * CHANNELS );
+	const byteCount = voxelCount * CHANNELS;
+	if ( ! Number.isSafeInteger( voxelCount ) || ! Number.isSafeInteger( byteCount ) ) {
+
+		throw new RangeError( 'Identity LUT byte count must be a safe integer.' );
+
+	}
+	if ( byteCount > maxBytes ) {
+
+		throw new RangeError( 'Identity LUT exceeds the byte budget.' );
+
+	}
+	const data = new Uint8Array( byteCount );
 	let offset = 0;
 
 	// x/red varies fastest, followed by y/green and z/blue.
@@ -52,6 +90,8 @@ export function createIdentity3DLut( size ) {
 	texture.generateMipmaps = false;
 	texture.unpackAlignment = 1;
 	texture.needsUpdate = true;
+	texture.userData.logicalBytes = byteCount;
+	texture.userData.maxQuantizationError = 0.5 / MAX_CODE;
 	texture.userData.domain = Object.freeze( {
 		input: 'tone-mapped linear working primaries',
 		output: 'tone-mapped linear working primaries',

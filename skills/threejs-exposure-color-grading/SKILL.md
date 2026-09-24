@@ -19,8 +19,10 @@ materials, bloom sources, and optical effects.
 Partition targets or views into exposure-control groups. A group may share GPU
 state only when its radiance basis, exposure policy, and reset history are
 identical; an automatic group also requires the same meter mask, key, and
-sample schedule. Assign exactly one exposure owner, one tone-map owner, and one
-output-conversion owner per group.
+sample schedule and one explicit source/combined aggregate. Independent images
+with matching settings are not interchangeable meter inputs. Assign exactly
+one exposure owner, one tone-map owner, and one output-conversion owner per
+group.
 
 **Complete when:** every photographed input has one basis and scale, and every
 group names its members, exposure/tone-map/output owners, and state-sharing
@@ -94,6 +96,10 @@ currentEV_new = currentEV_old - log2(k)
 targetEV_new  = targetEV_old  - log2(k)
 ```
 
+Convert normalization-dependent EV bounds too, or state that clamping breaks
+preservation. This is not a shortcut for normal lighting changes. Discard queued
+publications from a superseded epoch before they can overwrite converted state.
+
 Every other incompatible change starts a new exposure epoch. Automatic
 exposure resets meter accumulation and reseeds adapted state; fixed exposure
 rebinds its authored value before the new signal is presented. Resize or DPR
@@ -132,8 +138,10 @@ only when loading, authoring, or placing a cube.
 
 When a tone-mapped-linear cube is admitted, read
 [the identity 3D-LUT example](examples/identity-3d-lut.mjs) for voxel ordering
-and `Data3DTexture` configuration. It is a correctness fixture, not a look or
-performance bypass.
+and `Data3DTexture` configuration. Supply the device edge limit and byte budget;
+the helper checks both before allocation. Its RGBA8 identity has a declared
+quantization tolerance. It is a correctness fixture, not a look or performance
+bypass.
 
 **Complete when:** the graph contains one exposure multiply, one tone map, one
 working-to-output conversion, and—only when admitted—one LUT placement in its

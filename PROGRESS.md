@@ -26,7 +26,7 @@ Use this existing repository plan rather than an unrelated game ticket.
 6. [x] `threejs-scalable-real-time-shadows` — source/reference pass; five new math/API checks.
 7. [x] `threejs-ambient-contact-shading` — source/reference pass; seven new math/API/lifecycle checks.
 8. [x] `threejs-bloom` — source/reference pass; seven new blend/math/API checks.
-9. [ ] `threejs-exposure-color-grading`
+9. [x] `threejs-exposure-color-grading` — source/reference/example pass; ten new meter/math/LUT checks.
 10. [ ] `threejs-image-pipeline`
 11. [ ] `threejs-sky-atmosphere-and-haze`
 12. [ ] `threejs-volumetric-clouds`
@@ -86,7 +86,11 @@ Read the complete skill/reference/interface and installed GTAO, Denoise, RTT and
 
 Read the skill/reference/interface and installed BloomNode, MRTNode, RenderOutputNode, alpha helpers, SpriteNodeMaterial, relevant NodeMaterial output/lighting, and WebGPU blending source. Corrected the emitter's double premultiplication and supplied alpha-aware contribution RGBA, distinguished ordered alpha-over from additive invariance, inverted nonlinear knee endpoints, admitted finite kernel controls, and documented non-idempotent setup replacement. Existing minimum-mip/storage equations and normal disposal were retained. Seven checks cover real blend factors, merge loss, allocated mip dimensions, repeated material growth, endpoint math, ordering, and all 18 owned disposal events. All 57 skill tests and distribution validation pass. No transparent GPU capture, custom shader compilation, runtime engine patch, or lab acceptance is claimed. Logs: `artifacts/website-improvement-20260924/continuation/skills-bloom-{before,after}.log`.
 
-### Current skill: threejs-exposure-color-grading
+### Skill 9 result: threejs-exposure-color-grading
+
+Read the skill/reference/interface, executable identity LUT, and installed LUT, tone-mapping, and 3D-texture implementations. Corrected small-weight normalization, pre-arithmetic validity masking, reduction fan-in, histogram boundary/overflow rules, shared-view source ownership, calibration compensation, finite adaptation, and superseded-epoch publication. Normalization conversions now include dependent EV bounds. The identity LUT now checks safe arithmetic, caller dimension limits, and byte budget before allocation and declares its RGBA8 quantization error; existing voxel order, filtering, and alpha-safe placement remain. Ten tests cover those equations, actual allocation rejection, voxel data, quantization, and half-texel mapping. All 67 skill tests and distribution validation pass. No GPU meter dispatch, LUT shader compilation/capture, resource plateau, or lab acceptance is claimed. Logs: `artifacts/website-improvement-20260924/continuation/skills-exposure-{before,after}.log`.
+
+### Current skill: threejs-image-pipeline
 
 Next in the roster; read its entrypoint and reachable resources before changes. All labs and recreations remain deferred.
 
