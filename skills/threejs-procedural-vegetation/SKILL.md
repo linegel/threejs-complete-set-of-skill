@@ -127,7 +127,8 @@ bounds with declared age/error.
 This step is complete when each dynamic field has one state owner, a precise
 sample/application time, a stable identity/version, a bounded update domain,
 and an explicit reset rule for creation, removal, teleport, slot reuse,
-topology change, LOD discontinuity, provider discontinuity, and resize.
+topology change, LOD discontinuity, and provider discontinuity. Resize affects
+screen resources/history, not the immutable world placement or structural state.
 
 ## 5. Render and present once
 
@@ -143,13 +144,19 @@ if (renderer.backend.isWebGPUBackend !== true) {
 }
 ```
 
-- Use `MeshStandardNodeMaterial` for grass and bark; use
-  `MeshPhysicalNodeMaterial` when leaf transmission/wax response is required.
-- Use `alphaTest` or `alphaHash` for foliage. `forceSinglePass` is appropriate
-  when a validated double-sided card does not need separate back-face lighting.
-- Decode color/albedo as sRGB. Normal, roughness, density, alpha, wind, LUT, and
-  other data fields remain linear/`NoColorSpace`.
-- Keep leaf/grass roots fixed in the position function. Reuse that function for
+- Use `MeshStandardNodeMaterial` for grass/bark and a physical clearcoat branch
+  when wax response needs it. Refractive `transmission` is not a thin-leaf
+  diffuse scattering model; admit and validate that lighting term separately.
+- Use `alphaTest` or `alphaHash` for cutout coverage. In r185,
+  `forceSinglePass` changes transparent double-sided back/front submissions;
+  opaque cutouts already use one. It does not disable back-face normal lighting.
+  Validate transparent sorting/coverage before selecting that optimization.
+- Declare actual color encodings: decode encoded sRGB once, retain linear HDR
+  as linear, and use `NoColorSpace` for normal, roughness, density, alpha, wind,
+  LUT and other data fields.
+- Keep plant roots at their support anchor and leaf/child roots attached to the
+  moving parent. Apply parent deformation once and additional local bend with
+  zero weight at the attachment. Reuse that function for
   visible and cast-shadow geometry.
 - Cull and reduce geometry/alpha coverage before adding AO, bloom, or temporal
   filtering. Request only MRT signals a consumer uses.

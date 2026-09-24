@@ -48,9 +48,11 @@ plants sample the declared footprint, not just the centre point. A coarse field
 level is admissible only while its support preserves the classifications used
 by the candidate.
 
-Placement is a compile or sparse-update product. A change invalidates only the
-pages whose input support overlaps the changed region. Camera motion, render
-LOD, and material detail leave placement identity unchanged.
+Placement is a compile or sparse-update product. Expand changed input support
+through the conflict dependency closure before invalidating pages. A changed
+candidate can change a directly conflicting local winner outside the changed
+field footprint. Global greedy selection may propagate farther along chains.
+Camera motion, render LOD, and material detail leave placement identity unchanged.
 
 ## Suitability and community
 
@@ -71,19 +73,29 @@ from preference. One useful limiting-factor model is:
 
 ```text
 E_s(x) in {0,1}
-ell_s(x) = sum_k a_s,k log(max(g_s,k(x), eps))
+ell_s(x) = sum_(k with a_s,k > 0) a_s,k log(g_s,k(x))
 S_s(x) = E_s(x) C_s(x) exp(ell_s(x))
 ```
 
 `E_s` is hard eligibility, `g_s,k` are normalized responses, and `C_s` is the
-shared community factor. An additive score is unsuitable when a favourable
-factor could compensate for lethal occupancy or salinity. Record the selected
+shared community factor. Evaluate hard eligibility first and reject invalid
+required inputs before arithmetic; multiplying a NaN by zero does not reject
+it. Admit finite nonnegative weights and community factors, with normalized
+responses in `[0,1]`. A positive-weight zero response returns exactly zero;
+zero-weight factors are omitted before logarithms. An epsilon log floor would
+create a nonzero population where a limiting response forbids one. The log
+formula applies only after these branches. An additive score is unsuitable when
+a favourable factor could compensate for lethal occupancy or salinity. Record the selected
 rule and the response of every accepted candidate.
 
 Suitability is not density. Map `S_s` to a target intensity, candidate
 acceptance, and spacing rule explicitly. If a sparse cell process uses
 `p = clamp(lambda_s A_cell, 0, 1)`, verify that at most one relevant candidate
-per cell and weak exclusion correlations make that approximation valid.
+per cell and weak exclusion correlations make that approximation valid. The
+pre-exclusion mean is `p/A_cell`, bounded by `1/A_cell`; post-conflict density
+is lower and must be measured/calibrated separately. Clamping cannot attain a
+higher intensity. Poisson occupancy `1-exp(-lambda_s*A_cell)` is a different
+quantity and does not supply multiplicity in a one-candidate cell.
 
 Community coherence comes from shared causes: one moisture field, one
 disturbance state, one exposure reduction, and one substrate classification
@@ -140,7 +152,19 @@ chunk ownership, Matérn-II acceptance, and nested LOD rank selection.
 Its schema uses two global-seed words, two authored immutable species-ID words,
 three biased signed-cell-coordinate words, and one candidate ordinal. A
 different tuple width or field order requires a new generator schema and its
-own parity oracle.
+own parity oracle. The helper requires dense own uint32 lanes and freezes a
+copy of each generated key tuple. Callers keep candidate geometry and manually
+provided keys stable while comparing them. It validates all identities before
+calling a synchronous, pure Boolean conflict predicate and rejects duplicates
+before any conflict work. Its all-pairs Matérn-II check is an offline oracle:
+callers bound the input and `N*(N-1)` predicate calls; a production compiler
+uses a validated spatial index. `retainedCount` is an integer in `[0,N]`, not
+a silently clamped request.
+
+Signed cell coordinates must fit the declared bias domain; reject overflow or
+advance the coordinate schema instead of wrapping identity. Quantized position,
+distance comparison, equality/touch policy, and conflict radii need CPU/TSL
+parity near boundaries; matching integer hashes alone is insufficient.
 
 ## Conflict selection
 
@@ -154,12 +178,18 @@ Choose one process and preserve its semantics:
 | frequently regenerated dense population | compute evaluation/compaction after an A/B comparison | same IDs and independent-set result across dispatch layouts |
 
 Declare the symmetric conflict distance, such as `max(r_i,r_j)` or a
-species-pair matrix.
+species-pair matrix. State whether these are exclusion distances or physical
+footprint radii: non-overlap of two physical disks requires the sum of radii,
+not automatically their maximum. Reject nonfinite radii and predicates.
 
 - **Matérn-II/local maximum:** accept `i` exactly when its total `winnerKey` is
-  lexicographically higher than every directly conflicting candidate's key. A
-  halo covering the maximum conflict reach plus all sampled-field support is
-  sufficient.
+  lexicographically higher than every directly conflicting eligible,
+  suitability-admitted candidate's key. An excluded high-priority candidate
+  must not suppress a valid plant. Compare against the full admitted candidate
+  population, including candidates which themselves lose; otherwise the
+  algorithm becomes a different process. A halo covering the maximum possible conflict reach plus all sampled-field
+  support is sufficient for this one-hop process. Derive reach from the
+  admissible population, not just the currently accepted plants.
 - **Global priority-greedy:** visit all candidates in total priority order and
   accept each candidate with no already accepted conflict. Influence may cross
   arbitrarily long conflict chains, so use a global/offline compile, an
@@ -168,8 +198,8 @@ species-pair matrix.
 
 Generate halo candidates from global IDs and emit only the half-open chunk
 interior. Report the selected Matérn-II or global-greedy semantics explicitly;
-their densities and pair correlations differ. Compare the selected process
-with its stated target.
+a local maximum set need not be maximal. Their densities and pair correlations
+differ. Compare the selected process with its stated target.
 
 Clusters derive child IDs from `(parentId, childOrdinal)`. Each child passes
 eligibility and conflict tests independently, so a valid centre cannot drag a
@@ -181,8 +211,10 @@ Accepted placement is immutable across render LOD. Derive a stable thinning key
 independently from the placement winner key, order plants from higher to lower
 thinning key, and define every lower-density tier as a prefix of that same
 ordering. Preserve landmarks and protected species/community fractions
-explicitly without reordering unrelated plants. A transition passes only when
-canopy or ground-cover error and habitat-boundary movement remain inside the
+explicitly through one fixed, priority-ordered admission policy with monotone
+retention; do not redraw per-tier quotas or independently select each tier.
+Domain-separate the thinning random lane while retaining the full plant identity.
+A transition passes only when canopy or ground-cover error and habitat-boundary movement remain inside the
 declared limits. Chunk loading and camera motion cannot reshuffle survivors.
 
 Static placement normally compiles on the CPU or a worker into compact records.
@@ -219,7 +251,8 @@ representations. Acceptance requires all of the following:
 - hard exclusions have zero accepted violations;
 - every accepted plant resolves its source revisions, response factors, asset,
   and stable identity;
-- field changes invalidate only the declared support region;
+- field changes invalidate the complete field-support and conflict dependency
+  closure, including valid boundary reconciliation where required;
 - render LOD preserves IDs and nested population membership;
 - directional probes rotate the exposure response with the declared
   prevailing direction;

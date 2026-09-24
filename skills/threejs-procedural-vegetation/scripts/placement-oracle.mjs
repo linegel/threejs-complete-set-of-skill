@@ -21,7 +21,10 @@ function assertPlacementTuple(tuple, label) {
   if (!Array.isArray(tuple) || tuple.length !== PLACEMENT_TUPLE_WORDS) {
     throw new Error(`${label} must contain exactly ${PLACEMENT_TUPLE_WORDS} u32 words`);
   }
-  tuple.forEach((word, index) => u32(word, `${label}[${index}]`));
+  for (let index = 0; index < tuple.length; index += 1) {
+    if (!Object.hasOwn(tuple, index)) throw new Error(`${label}[${index}] must be an own u32 word`);
+    u32(tuple[index], `${label}[${index}]`);
+  }
   return tuple;
 }
 
@@ -45,7 +48,10 @@ function words(values, label, expectedLength) {
   if (!Array.isArray(values) || values.length !== expectedLength) {
     throw new Error(`${label} must contain exactly ${expectedLength} u32 words`);
   }
-  return values.map((value, index) => u32(value, `${label}[${index}]`));
+  return Array.from({length:expectedLength}, (_, index) => {
+    if (!Object.hasOwn(values, index)) throw new Error(`${label}[${index}] must be an own u32 word`);
+    return u32(values[index], `${label}[${index}]`);
+  });
 }
 
 export function candidateTuple({
@@ -95,7 +101,9 @@ export function hashTuple(tuple) {
 }
 
 export function winnerKey(tuple) {
-  return Object.freeze({ priorityHashU32: hashTuple(tuple), tuple });
+  assertPlacementTuple(tuple, "candidate tuple");
+  const retainedTuple = Object.freeze([...tuple]);
+  return Object.freeze({ priorityHashU32: hashTuple(retainedTuple), tuple:retainedTuple });
 }
 
 export function compareWinnerKeys(left, right) {
@@ -122,41 +130,51 @@ export function ownsHalfOpen(position, minimum, maximum) {
     minimum[axis] <= value && value < maximum[axis]);
 }
 
-// Higher winner keys win. `conflicts(a, b)` must be symmetric.
-export function maternII(candidates, conflicts) {
-  candidates.forEach((candidate, index) =>
-    assertWinnerKey(candidate.winnerKey, `candidates[${index}].winnerKey`));
-  const accepted = [];
+function assertCandidates(candidates, keyField) {
+  if (!Array.isArray(candidates)) throw new Error("candidates must be a dense array");
+  const seen = new Set();
   for (let index = 0; index < candidates.length; index += 1) {
     const candidate = candidates[index];
-    let wins = true;
-    for (let otherIndex = 0; otherIndex < candidates.length; otherIndex += 1) {
-      if (index === otherIndex) continue;
-      const other = candidates[otherIndex];
-      if (compareTuples(candidate.winnerKey.tuple, other.winnerKey.tuple) === 0) {
-        throw new Error("duplicate candidate tuple");
+    if (!Object.hasOwn(candidates, index) || candidate === null || typeof candidate !== "object" || Array.isArray(candidate)) {
+      throw new Error(`candidates[${index}] must be a candidate record`);
+    }
+    const key = assertWinnerKey(candidate[keyField], `candidates[${index}].${keyField}`);
+    const identity = key.tuple.join(",");
+    if (seen.has(identity)) throw new Error("duplicate candidate tuple");
+    seen.add(identity);
+  }
+}
+
+// Higher keys win. The callback and candidate records must remain pure/stable.
+// This is a quadratic offline oracle, not a production spatial index.
+export function maternII(candidates, conflicts) {
+  if (typeof conflicts !== "function") throw new TypeError("conflicts must be a function");
+  assertCandidates(candidates, "winnerKey");
+  const wins = candidates.map(() => true);
+  for (let index = 0; index < candidates.length; index += 1) {
+    for (let otherIndex = index + 1; otherIndex < candidates.length; otherIndex += 1) {
+      const candidate = candidates[index], other = candidates[otherIndex];
+      const forward = conflicts(candidate, other), reverse = conflicts(other, candidate);
+      if (typeof forward !== "boolean" || typeof reverse !== "boolean") {
+        throw new TypeError("conflicts must return a synchronous boolean");
       }
-      const forward = Boolean(conflicts(candidate, other));
-      const reverse = Boolean(conflicts(other, candidate));
       if (forward !== reverse) throw new Error("conflicts(a, b) must be symmetric");
-      if (forward && compareWinnerKeys(candidate.winnerKey, other.winnerKey) <= 0) {
-        wins = false;
+      if (forward) {
+        const lower = compareWinnerKeys(candidate.winnerKey, other.winnerKey) < 0 ? index : otherIndex;
+        wins[lower] = false;
       }
     }
-    if (wins) accepted.push(candidate);
   }
-  return accepted.sort((left, right) =>
+  return candidates.filter((_, index) => wins[index]).sort((left, right) =>
     compareWinnerKeys(right.winnerKey, left.winnerKey));
 }
 
 export function nestedLodPrefix(candidates, retainedCount) {
-  if (!Number.isInteger(retainedCount) || retainedCount < 0) {
-    throw new Error("retainedCount must be a non-negative integer");
+  assertCandidates(candidates, "thinningKey");
+  if (!Number.isSafeInteger(retainedCount) || retainedCount < 0 || retainedCount > candidates.length) {
+    throw new RangeError("retainedCount must be a safe integer from zero to candidate count");
   }
-  candidates.forEach((candidate, index) =>
-    assertWinnerKey(candidate.thinningKey, `candidates[${index}].thinningKey`));
   return [...candidates]
-    .sort((left, right) =>
-      compareWinnerKeys(right.thinningKey, left.thinningKey))
+    .sort((left, right) => compareWinnerKeys(right.thinningKey, left.thinningKey))
     .slice(0, retainedCount);
 }

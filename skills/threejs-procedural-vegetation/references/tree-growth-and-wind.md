@@ -67,13 +67,18 @@ r_parent^p >= r_continuation^p + sum_i r_lateral_i^p
 
 `p` and any tolerance are authored or measured for the species. Rescale or
 reject descendants that violate the rule; hidden overlap does not repair an
-impossible radius budget.
+impossible radius budget. Admit finite `p>0` and nonnegative radii and evaluate
+the parent radius at the actual junction, not the wider trunk base. Bound queue
+expansion and output capacity before allocating or enqueuing each generation.
 
 For a close branch, cut the child tube at the parent surface and stitch a
 collar/zipper patch, or extract the local junction implicitly during load. A
 mid/far overlap may be used only after hidden caps/internal faces are removed
-and projected seam error passes. Gate watertightness, signed triangle area,
-self-intersection, normal continuity, and UV continuity at every junction.
+and projected seam error passes. Classify that representation as overlapping
+shells rather than a watertight union; removing hidden caps does not stitch a
+junction. For a claimed continuous trunk/branch union, gate watertightness,
+signed triangle area, self-intersection, normal continuity, and UV continuity
+at every junction.
 
 ## Bark coordinates
 
@@ -91,12 +96,19 @@ card rotates both geometry and every normal term into its own basis.
 For rounded card lighting, combine dimensionless directions, for example:
 
 ```text
-n = normalize(n_card + beta * (p - leaf_origin) / max(leaf_length, eps))
+n = normalize(n_card + beta * (p - leaf_origin) / leaf_length)
 ```
 
-Gate scale invariance, view rotation, and front/back lighting. Leaf roots remain
-fixed under deformation. Dense canopies use instanced cards or clusters after
-matching the close silhouette, porosity, and alpha-coverage contract.
+Admit finite positive leaf length and use one common card frame for the unit
+normal and offset. Reject or use the undeformed normal when their sum is
+ill-conditioned before normalization. Gate scale invariance, view rotation,
+and front/back lighting. Leaf roots remain
+fixed relative to their moving parent attachment; they inherit parent pose
+once. Only the plant root stays at its ground/support anchor. The leaf's own
+additional bend is zero at its attachment, not at a frozen world position.
+Normals follow the complete nonsingular posed transform/Jacobian; rotating
+only a card basis does not handle nonuniform deformation. Dense canopies use
+instanced cards or clusters after matching the close silhouette, porosity, and alpha-coverage contract.
 
 ## Hierarchical wind
 
@@ -117,10 +129,16 @@ A reduced branch mode may use:
 q_j'' + 2 zeta_j omega_j q_j' + omega_j^2 q_j = b_j dot F_external
 ```
 
-State the units, integrator, stable step/substep bound, and truncation error.
+State the units of generalized position and force coupling, integrator, stable
+step/substep bound, and truncation error. `omega_j` is angular frequency, not
+cycles per second; mass-normalized coupling contains the inverse modal mass.
+A quality change must preserve or explicitly project displacement and velocity,
+not silently reset the modal state.
 When physical drag is claimed, consume air density and relative velocity and
-derive `F = 0.5 rho C_D A |u_rel| u_rel`. Otherwise label the bend as an
-authored visual response.
+derive `F = 0.5 rho C_D A |u_rel| u_rel`, with finite nonnegative density, drag
+coefficient and projected area. Sample `u_rel` against material-point velocity,
+including parent translation and rotation at that point; root velocity alone
+does not supply it. Otherwise label the bend as an authored visual response.
 
 Wind LOD collapses high modes before low modes and preserves displacement,
 velocity, silhouette, bounds, and shadow error. Display and shadow paths use

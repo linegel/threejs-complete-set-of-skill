@@ -39,7 +39,7 @@ Use this existing repository plan rather than an unrelated game ticket.
 19. [x] `threejs-object-sculptor` - source/reference/probe pass; eleven header, bounded-read and attachment checks.
 20. [x] `threejs-procedural-buildings-and-cities` — source/reference/key-helper pass; nine identity, facade, and bounds checks.
 21. [x] `threejs-procedural-planets` — source/reference pass; ten curvature, LOD, metric, advection, and indirect-record checks.
-22. [ ] `threejs-procedural-vegetation`
+22. [x] `threejs-procedural-vegetation` - source/reference/oracle pass; nine placement, cutout and moving-root checks.
 23. [ ] `threejs-procedural-creatures`
 24. [ ] `threejs-procedural-motion-systems`
 25. [ ] `threejs-particles-trails-and-effects`
@@ -144,9 +144,13 @@ The generated city narrative still uses unbounded rounded bay counts and assumes
 
 Read all five reachable references, entrypoint and interface, plus the installed indirect attribute and geometry binding API. Corrected sagitta cancellation, actual coarse-triangle morph targets, alternating-edge interval parity, submitted versus nondegenerate triangle counts, device-enabled indirect features and record admission, ellipsoid normal-height tangents, serial cache support and cross-face vector basis, continuous bounds, local-residual precision, crater-center differentiability, and pole-safe inverse gas advection. Ten numerical/API checks pass; all 176 skill tests and distribution validation pass. No rendered transition mask, GPU indirect submission, planet field parity capture, or lab acceptance is claimed. Logs: `artifacts/website-improvement-20260924/continuation/skills-planets-{before,after}.log`.
 
-### Current skill: threejs-procedural-vegetation
+### Skill 22 result: threejs-procedural-vegetation
 
-The inspector-continuation session owns vegetation 22 then creatures 23. The skills-first session owns motion 24 and particles 25, reading ahead but applying changes only after 23 lands. Labs and recreations remain deferred until the complete skill pass.
+Read the entrypoint, both references, existing placement oracle and interface, historical review, and the installed renderer/SSS material implementations. The oracle now rejects sparse inputs, duplicate identities and non-Boolean conflict results before using them; generated keys retain immutable tuple copies, and nested LOD counts are explicit. One-hop Matérn-II semantics and integer random lanes remain unchanged. Corrected conflict invalidation reach, exact limiting zeroes, density versus intensity, physical footprint spacing, attachment-relative leaf roots, modal/drag units, and cutout versus transparent two-pass behavior. Nine CPU/API checks pass, including the actual renderer decision with callback fixtures; all 185 skill checks and distribution pass. This is not GPU placement, rendered foliage, measured density, or vegetation-lab acceptance. Logs: `artifacts/website-improvement-20260924/continuation/skills-vegetation-{before,after}.log`.
+
+### Current skill: threejs-procedural-creatures
+
+The inspector-continuation session owns creatures 23. The skills-first session owns motion 24 and particles 25, reading ahead but applying changes only after 23 lands. Inspector owns dynamic-surface 26 and blackholes 27 after 25. Labs and recreations remain deferred until the complete skill pass.
 
 
 ## Finished and verified
@@ -380,3 +384,15 @@ metadata traversal for bounded standalone probing, with the limit in the result.
 Also check parent-to-child endpoint conversion and hinge axis versus full-frame
 coincidence. Image orientation, reflections, and whole-motion clearance need
 explicit reconstruction contracts. No model, site UI, or reference image is edited.
+
+## What to test: vegetation skill
+Reproduce sparse tuple admission, mutable key/hash drift, duplicate identities,
+and asynchronous conflict coercion in the existing placement oracle. Preserve
+its total order and one-hop Matérn-II semantics rather than replacing it with
+greedy packing. Validate all identities before calling a pure conflict predicate;
+retain a quadratic offline oracle, with caller-bounded candidate populations,
+instead of introducing a second production spatial index. Check nested LOD
+membership and exact limiting-response zeroes. Exercise the actual r185 material
+double-pass decision with CPU callbacks and parent-relative leaf roots with
+transforms. These tests do not prove rendered foliage, physical drag, GPU
+placement, ecological target density, or the vegetation labs.
