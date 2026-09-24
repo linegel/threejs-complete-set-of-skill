@@ -43,9 +43,9 @@
     "site:validate": "node scripts/validate-site-presentation.mjs && node scripts/validate-site-seo.mjs",
     "skills:list": "npx skills@latest add linegel/threejs-complete-set-of-skill --list",
     "skills:check": "node scripts/validate-skill-distribution.mjs",
-    "test:skills": "npm run skills:check",
-    "check:all": "npm run skills:check && npm run labs:check && npm run evidence:test && npm run site:build",
-    "test": "npm run skills:check"
+    "test:skills": "npm run skills:check && node --test tests/skills/*.test.mjs",
+    "check:all": "npm run test:skills && npm run labs:check && npm run evidence:test && npm run site:build",
+    "test": "npm run test:skills"
   },
   "keywords": [
     "skills",

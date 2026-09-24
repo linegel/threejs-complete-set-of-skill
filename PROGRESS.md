@@ -1,5 +1,68 @@
 # Website improvement pass — 2026-09-24
 
+## Active order: skills before labs
+
+The September 24 owner instruction supersedes the earlier lab-first checklist.
+Work through the 27 authoritative `skills/` packages in roster order, one at a
+time. For each, read its entrypoint and reachable guidance, correct concrete
+defects, run source/distribution and relevant executable checks, and record
+what was actually verified. Do not infer skill correctness from lab badges.
+Only after this skill pass proceed to labs, visualisations, and recreations.
+
+The unfinished Object Sculptor inspector and generated site changes are
+preserved in the working tree, not accepted or included in skill commits.
+Interruption-safe image publication is also deferred to the later website/lab
+phase. No branch or worktree is created. Linear searches for `threejs` and
+`Three.js` found no matching project issue; the latter returned only WAR DOGS.
+Use this existing repository plan rather than an unrelated game ticket.
+
+### Skill sequence
+
+1. [x] `threejs-choose-skills` — source/reference pass; 12 regression checks.
+2. [ ] `threejs-debugging`
+3. [ ] `threejs-visual-validation`
+4. [ ] `threejs-compatibility-fallbacks`
+5. [ ] `threejs-camera-controls-and-rigs`
+6. [ ] `threejs-scalable-real-time-shadows`
+7. [ ] `threejs-ambient-contact-shading`
+8. [ ] `threejs-bloom`
+9. [ ] `threejs-exposure-color-grading`
+10. [ ] `threejs-image-pipeline`
+11. [ ] `threejs-sky-atmosphere-and-haze`
+12. [ ] `threejs-volumetric-clouds`
+13. [ ] `threejs-spectral-ocean`
+14. [ ] `threejs-water-optics`
+15. [ ] `threejs-rain-snow-and-wet-surfaces`
+16. [ ] `threejs-procedural-fields`
+17. [ ] `threejs-procedural-materials`
+18. [ ] `threejs-procedural-geometry`
+19. [ ] `threejs-object-sculptor`
+20. [ ] `threejs-procedural-buildings-and-cities`
+21. [ ] `threejs-procedural-planets`
+22. [ ] `threejs-procedural-vegetation`
+23. [ ] `threejs-procedural-creatures`
+24. [ ] `threejs-procedural-motion-systems`
+25. [ ] `threejs-particles-trails-and-effects`
+26. [ ] `threejs-dynamic-surface-effects`
+27. [ ] `threejs-black-holes-and-space-effects`
+
+### Skill 1 result: threejs-choose-skills
+
+Observed defect: the projected-error reference uses nominal FOV/orthographic
+span, omitting camera zoom and cropped-view scale. Preserve its cause-first
+routing, one output owner, and fallback-only-on-request boundary. Use the
+actual unjittered projection matrix; test the documented equations against
+Three.js 0.185.1 perspective and orthographic projection, including zoom,
+view offsets, depth perturbation, and near-plane restrictions. No rendering
+lab source or capture is part of this unit.
+
+All four router references, entrypoint, interface metadata, and generated article were read. The reference now uses actual projection-matrix scales, a finite paired-point depth-error equation, and explicit clipping/panorama limits. Twelve checks pass against pinned Three.js 0.185.1, including zoom/crop underestimation, finite depth changes, exact destination coverage, and a 50px interior-error counterexample with unchanged outer bounds. Distribution validation passes for all 27 packages. Near-plane restrictions were reviewed, not GPU-rendered. The existing article links this reference on main rather than embedding it, so no generated lab/site output is part of this change. Logs: `artifacts/website-improvement-20260924/continuation/skills-router-{before,after}.log`.
+
+### Current skill: threejs-debugging
+
+Next in the roster; source and reachable references must be read before changes. All labs and recreations remain deferred.
+
+
 ## Finished and verified
 - Repaired responsive image publication and manifest consistency.
 - Reuse binds source bytes, encoder settings/versions, URLs, dimensions, and output hashes.
