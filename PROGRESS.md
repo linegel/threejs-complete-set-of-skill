@@ -35,7 +35,7 @@ Use this existing repository plan rather than an unrelated game ticket.
 15. [x] `threejs-rain-snow-and-wet-surfaces` — source/reference/oracle pass; seven deposition and transform checks.
 16. [x] `threejs-procedural-fields` - source/reference/helper pass; nine parity, admission, footprint and boundary checks.
 17. [x] `threejs-procedural-materials` — source/reference/helper pass; eight normal, input, and shadow-cache checks.
-18. [ ] `threejs-procedural-geometry`
+18. [x] `threejs-procedural-geometry` - source/reference pass; nine pinned-adapter, metadata and quantization checks.
 19. [ ] `threejs-object-sculptor`
 20. [ ] `threejs-procedural-buildings-and-cities`
 21. [ ] `threejs-procedural-planets`
@@ -126,9 +126,13 @@ Read the complete entrypoint/reference/helper/metadata and generated consumer; c
 
 The generated material article's narrative incorrectly says screen derivatives give filtering for free and presents a different roughness equation. Reconcile its owning narrative source after the sequential skill pass; do not hand-edit generated HTML or treat the old article as current helper proof.
 
-### Current skill: threejs-procedural-geometry
+### Skill 18 result: threejs-procedural-geometry
 
-The inspector-continuation session owns geometry 18 followed by object-sculptor 19. The skills-first session reserves buildings/cities 20, reading ahead but applying no changes until 18 and 19 land. Labs and recreations remain deferred until the complete skill pass.
+Read the complete entrypoint/reference/interface and the installed attribute, geometry, merge, and tangent-conversion implementations. Checked four installed files against the integrity-verified published 0.185.1 npm tarball; all match exactly. Corrected index 65535/restart admission and widened byte accounting, repeated vec3 storage padding, idle DynamicDrawUsage uploads, pending range retention, packed write alignment, metadata/group conversion, frame degeneracy, final-f32 topology, and GPU-transform bounds. Nine CPU/API checks execute the actual adapters/utilities with an explicitly non-GPU transport fixture; all 146 skill checks and distribution validation pass. Dependency code and rendering labs remain unchanged. This is not GPU buffer validation, tangent-solver fidelity, disposal plateau, or mesh-writer acceptance. The top-level mesh writer and its tests still require the recorded later runtime corrections. Logs: `artifacts/website-improvement-20260924/continuation/skills-geometry-{before,after}.log`.
+
+### Current skill: threejs-object-sculptor
+
+The inspector-continuation session owns object-sculptor 19. The skills-first session reserves buildings/cities 20 and planets 21, reading ahead but applying no changes until 19 lands. Labs and recreations remain deferred until the complete skill pass.
 
 
 ## Finished and verified
@@ -335,3 +339,16 @@ rectangular mip storage, transitive drainage invalidation, and stale bake result
 This changes the installable guidance/example only. It is not a new rendered field,
 GPU parity capture, or acceptance of the existing field-bake lab. Prior website
 screenshots remain valid for the unchanged published pages.
+
+## What to test: procedural-geometry skill
+Check the published 0.185.1 attribute implementation, not assumptions from API
+names. The installed Attributes.js, BufferGeometry.js, BufferGeometryUtils.js,
+and WebGPUAttributeUtils.js match the integrity-checked npm tarball byte for byte.
+Exercise index widening/restart remapping, vec3 storage padding on later updates,
+version-driven versus DynamicDrawUsage uploads, retained dirty ranges, and packed
+write alignment with a CPU queue fixture. Exercise Mikk conversion and merge
+metadata behavior through the actual utilities, then final-f32 degeneracy and
+frame admission numerically. Preserve topology, material, and anchor identities.
+This is installable guidance correction and CPU/API evidence, not GPU allocation,
+rendered geometry, the mesh-writer lab, or a new performance claim. The existing
+lab's 65535-index and dynamic-update assumptions require a later runtime repair.

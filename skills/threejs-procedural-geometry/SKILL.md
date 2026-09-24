@@ -72,13 +72,16 @@ Count render vertices after all required duplication and count indices before
 allocation:
 
 ```text
-vertexCount = smooth vertices + hard-edge duplicates + UV seams
-            + material-boundary duplicates + caps and explicit boundaries
+vertexCount = unique (topological vertex, boundary domain, attribute values) tuples
 indexCount = 3 * triangleCount
 ```
 
-Allocate typed arrays once. Use `Uint16Array` only when the highest referenced
-vertex is at most `65535`; otherwise use `Uint32Array`. Emit through a small
+Count overlapping split reasons once; a material slot alone need not duplicate
+identical vertex attributes. Validate safe capacity arithmetic and memory limits
+before allocation. On the pinned r185 path, use `Uint16Array` only through
+index `65534`, otherwise explicit `Uint32Array`: its upload adapter rewrites
+`65535` in a Uint16 index to the restart sentinel and widens the buffer. Account
+for the actual uploaded width separately from the CPU array. Emit through a small
 writer surface such as:
 
 ```text
@@ -105,7 +108,9 @@ Use analytic normals/tangents where the generator owns a parameterization.
 `computeVertexNormals()` is for deliberately smooth shared-vertex regions. For
 normal-map parity, await `MikkTSpace.ready` before
 `computeMikkTSpaceTangents(...)`; r185 de-indexes indexed geometry, so recompute
-counts, groups, bounds, and bytes for that distinct representation.
+counts, groups, bounds, and bytes for that distinct representation. Preserve
+semantic metadata, active draw range, and attribute type/usage outside that
+conversion, which does not retain all of them. Convert before GPU publication.
 
 Production UVs express physical distance or declared repeats; normalized local
 parameters belong in a separate debug attribute. Profile and branch sweeps use
@@ -135,14 +140,20 @@ if (renderer.backend.isWebGPUBackend !== true) {
 Check the selected storage bindings and buffer usage against the initialized
 device limits before compilation.
 
-Set attribute `usage` before first render. Static geometry uploads once and may
-release CPU arrays only when no rebuild requires them. Dynamic sections use
-`addUpdateRange()` in component units, `needsUpdate`, and targeted bounds
-recomputation. Capacity, item size, or usage-model changes rebuild the owning
-attribute/geometry rather than mutating its contract.
+Set attribute `usage` before first render. Keep live attribute arrays when
+layout compilation, raycasting, bounds, serialization, or restoration still
+reads them; releasing generator intermediates is a separate operation. Dynamic
+sections retain unconsumed `addUpdateRange()` component intervals until the
+adapter uploads them. Empty ranges mean a full upload, not zero work. In r185,
+`DynamicDrawUsage` also uploads without a version change; intermittent edits
+use version-driven usage plus `needsUpdate`. Recompute affected bounds.
+Capacity, item size, or usage-model changes replace the owning geometry as a
+validated resource generation, with explicit retirement of the previous one.
 
 When compute owns instance state, submit compute before the consuming render
-and keep one transform owner. In r185, `computeAsync()` is not a GPU-completion
+and keep one transform owner. GPU transforms require bounds for the posed
+instance domain in every view; base-mesh bounds and CPU raycasts do not observe
+storage-only deformation. In r185, `computeAsync()` is not a GPU-completion
 fence. Indirect commands use CPU-known byte offsets and stable homogeneous
 buckets; shader masking is not visibility compaction.
 

@@ -43,16 +43,25 @@ Capacity includes seam, cap, hard-edge, material-boundary, and tangent-space
 duplicates. Quads with outward winding use `a,b,c / b,d,c` only after verifying
 that convention against the local frame. Use f64 and robust predicates for
 generation decisions whose rounded result changes topology; quantize final
-attributes to f32 after the decision.
+attributes to f32 after the decision. Use a chunk-local origin before conversion
+when world magnitudes would collapse distinct vertices. Recheck triangle area,
+edge length, winding, and intersections on the final values; robust f64 decisions
+alone do not make a quantized mesh valid. Count the union of split reasons rather
+than adding overlapping duplicates; identical tuples may share a render vertex
+across material groups within the same topological vertex/domain. Do not weld
+unrelated coincident topological vertices merely because their values match.
 
 Attribute lifecycle:
 
 - set usage before upload;
-- retain immutable static arrays only when rebuilds need them;
+- retain live arrays while any layout, raycast, bounds, clone, serialization, or
+  context-restoration path needs them; discard generator intermediates separately;
 - express dynamic ranges with `addUpdateRange(start,count)` in component units;
-- set `needsUpdate`, then clear ranges after the upload frame;
+- set `needsUpdate`; retain every pending range across culled/skipped frames and
+  let the adapter clear consumed ranges, rather than clearing on a frame clock;
 - recompute only affected chunk bounds;
-- rebuild when capacity, item size, or usage changes.
+- rebuild when capacity, item size, or usage changes, and retire the old resource
+  generation before losing its ownership handles.
 
 Group coverage is exact: every index is in one group, groups neither overlap nor
 leave holes, and material slot order remains stable across LODs even when a slot
@@ -193,17 +202,25 @@ semantic region, smoothing group, material slot, and UV chart.
 
 Construct a rotation-minimizing frame:
 
-1. Project an authored initial normal off the first tangent and normalize it.
+1. Reject or explicitly collapse repeated centers and resolve cusp/zero tangents
+   before transport. Project the initial normal off the first unit tangent; when
+   its norm fails the conditioning gate, project the least-aligned coordinate
+   axis with deterministic ties instead. Normalize only a nonzero result.
 2. Apply the minimal rotation from `t_(i-1)` to `t_i`.
 3. For antiparallel tangents, choose a deterministic axis from the prior frame.
 4. Re-orthonormalize the transported normal and binormal.
-5. Apply authored twist separately around the tangent.
-6. For a closed loop, measure residual holonomy and distribute its inverse by
-   arc length before closing the seam.
+5. Keep the untwisted transport separate from the authored twist so each sample
+   receives its absolute twist once, rather than accumulating it repeatedly.
+6. For a closed loop with matching endpoint tangents, distribute inverse base
+   holonomy by arc length, then apply a closure-compatible authored twist. Check
+   profile, UV, material, and semantic seam symmetry too; positional closure or
+   circular cross-section symmetry alone does not make the full seam compatible.
 
 Frenet frames fail at zero curvature and inflections; parallel transport keeps
 orientation defined there. Gate tangent/frame angular change, orientation sign,
-closed-seam angle, and positional chord error.
+closed-seam angle, and positional chord error. A valid frame does not establish
+an embedded sweep: bound cross-section radius against curvature, inspect the
+surface Jacobian, and test nonadjacent sections for unintended intersections.
 
 Emit profile skins, backs, side walls, and caps as separate semantic regions.
 Duplicate vertices at hard boundaries. UVs use accumulated curve length and
@@ -221,8 +238,14 @@ computeMikkTSpaceTangents(geometry, MikkTSpace, negateSign)
 
 Installed r185 de-indexes indexed input in this path. Treat the result as a new
 representation: rebuild groups as needed and recalculate vertex/index counts,
-bounds, draw entries, and bytes. Analytic tangents avoid that conversion when
-the parameterization supplies a valid tangent basis.
+bounds, draw entries, and bytes. The helper mutates the supplied geometry through
+`toNonIndexed()` and `copy()`: name, userData, drawRange, attribute gpuType/usage,
+and derived metadata can reset even while groups and raw attribute values
+survive. Keep semantic identity outside the conversion, restore intended range
+and typed attributes, and validate a CPU candidate before publishing it. Never
+convert a live uploaded geometry in place and assume old buffers are retired.
+Analytic tangents avoid that conversion when the parameterization supplies a
+valid tangent basis.
 
 Branch-like hierarchies resolve topology and attachments before parent buffers
 are emitted. Reserve attachment rings and all child capacity in the plan pass;
@@ -244,6 +267,12 @@ material and semantic IDs remain stable when LOD removes subordinate geometry.
 and replacement. In r185 WebGPU, the backend loops visible `_multiDrawCount`
 entries and issues one draw item per entry. Measure renderer stats and GPU
 submission; do not claim native draw collapse.
+
+`mergeGeometries(..., true)` creates one group per input geometry, indexed by
+input ordinal; it does not preserve each input's nested material groups, honor
+its active drawRange, or apply a Mesh transform. Extract the admitted triangles,
+put candidates in one coordinate frame with correct normal/winding treatment,
+remap semantic groups and anchor IDs, then validate the merged representation.
 
 `InstancedMesh` owns an `instanceMatrix` (`64 B` per f32 mat4). When storage owns
 the complete transform, use a matrix-free `Mesh` with instanced geometry and
@@ -268,8 +297,35 @@ StorageInstancedBufferAttribute
 
 There is one transform owner. `computeAsync()` initializes before enqueueing in
 r185 but does not prove GPU completion. Queue order covers dependent GPU work;
-CPU-visible completion uses an actual map/readback outside the frame-critical
-path or timestamps for timing.
+CPU-visible completion uses an awaited map/readback or queue completion promise
+outside the frame-critical path; GPU cost needs actual resolved timestamps.
+
+### Pinned r185 attribute adapter boundaries
+
+These details were reproduced against the published `three@0.185.1` source,
+including [WebGPUAttributeUtils](https://github.com/mrdoob/three.js/blob/r185/src/renderers/webgpu/utils/WebGPUAttributeUtils.js)
+and [Attributes](https://github.com/mrdoob/three.js/blob/r185/src/renderers/common/Attributes.js).
+
+- Uint16 indices are widened to Uint32; value `65535` becomes `0xffffffff`.
+  Use Uint16 only through `65534`, or use explicit Uint32. Budget the post-upload
+  array and GPU allocation rather than assuming two GPU bytes per index.
+- `DynamicDrawUsage` triggers update even with unchanged version. With no pending
+  ranges that update copies the full buffer. Intermittent edits use default
+  version-driven usage and `needsUpdate`; do not set a dynamic hint merely
+  because an attribute may change someday.
+- Storage itemSize 3 is padded to 4 and the CPU array is replaced. A later CPU
+  update in this release repads already-padded storage with the old stride.
+  Use explicit four-lane storage from creation, including the unused lane, and
+  index/range/account against that layout. Do not mutate itemSize after upload.
+- Packed writes must give a four-byte-aligned destination and byte length. Expand
+  dirty intervals to valid aligned ranges while retaining neighboring bytes and
+  actual backing-array bounds. `writeBuffer` source offsets/counts for typed
+  arrays are elements; the destination offset is always bytes.
+- An in-place attribute swap can lose the old allocation before geometry teardown
+  sees it. Publish a separately owned geometry generation, then retire the old
+  one with all its consumers accounted for. A dispose event alone is not a
+  resource-release measurement; storage/indirect buffers also need explicit
+  retirement evidence.
 
 ### Indirect commands
 
@@ -291,6 +347,17 @@ uses its two's-complement bit pattern and must remain in i32 range. Each
 CPU-known byte offset produces one indirect draw; r185 has no GPU-generated
 indirect-count multi-draw. One command can compact instances of one homogeneous
 geometry/material bucket. Varied topology needs stable CPU-known buckets.
+Validate four-byte command alignment and the complete 16/20-byte range in the
+indirect buffer. Keep `firstInstance=0` unless `indirect-first-instance` is
+enabled on the actual device. Zero empty command counts each generation before
+compaction; bound writes by capacity and publish commands with the same instance
+state generation they address. Reject invalid counts/offsets/baseVertex rather
+than relying on a silent no-op. See [indirect draw validation](https://developer.mozilla.org/en-US/docs/Web/API/GPURenderPassEncoder/drawIndexedIndirect).
+
+CPU culling and picking do not read storage-only transforms. Supply a conservative
+posed bound including all instances and deformation for each view, or explicitly
+disable that culling path until a valid bound exists. Picking needs the same
+posed geometry through an admitted CPU mirror or a GPU identity pass.
 
 The indirect count must reduce submitted primitives or instances. Moving hidden
 items offscreen or masking them in the vertex/fragment path preserves submission
