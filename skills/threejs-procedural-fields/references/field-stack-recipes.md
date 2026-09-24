@@ -28,6 +28,22 @@ multipliers and the u32 seed, and normalize with an explicitly shared rule.
 JavaScript uses `Math.imul`; TSL uses wrapping `uint` arithmetic. A sine-dot hash
 does not form a cross-implementation parity contract.
 
+The canonical helper preserves the full u32 `hash` but derives `value` as
+`f32(hash >> 8u) * 2^-24`, in `[0, 1 - 2^-24]`. Every retained integer and
+product is exactly representable. Converting the full u32 hash to f32 first
+can round to `2^32`; WGSL also permits either adjacent representable value
+for an inexact numeric conversion. See [WGSL numeric conversion](https://www.w3.org/TR/WGSL/#floating-point-conversion).
+Changing normalization changes the field algorithm revision, even when the
+u32 hash is unchanged. The helper samples a cell-constant lattice hash, not
+a continuous noise field or its derivative.
+
+CPU inputs are dense triples rounded to f32 before flooring, with a uint32
+integer seed. GPU inputs must already be finite vec3<f32> values and a u32
+seed; converting a previously rounded float seed cannot recover lost bits.
+Reject nonfinite inputs at the producer. The validity node handles the finite
+out-of-range lattice only; a sentinel is not a valid field sample. Use a
+unique variable prefix per independent bundle in the same shader scope.
+
 For octave `i`, a useful authored spectrum is
 
 ```text
@@ -52,11 +68,15 @@ observable. Nonlinear remaps such as `abs`, ridges, hard thresholds, powers,
 and products create harmonics; record a conservative support multiplier or a
 measured spectral envelope for the exact remap.
 
-At large coordinate magnitude `|x|`, f32 spacing is approximately **Derived**
+For normal finite f32 coordinates at magnitude `|x|`, spacing is **Derived**
 
 ```text
 ulp32(x) ~= 2^(floor(log2(|x|)) - 23)
 ```
+
+For subnormals the spacing is `2^-149`; shader subnormal preservation is not
+a portable assumption. At lattice boundaries also check cell identity: a tiny
+coordinate error can change a discrete hash completely.
 
 Gate phase error `2*pi*f*ulp32(x)`. When it fails, use integer tile identity
 plus tile-local coordinates, a camera-relative presentation mapping, or a
@@ -121,8 +141,10 @@ zBase(p) = waterLevel + C(d(p))
          + S(-d(p)) * rBed(p)
 ```
 
-`L(s)=S(s)=0` for `s<=0`; residual relief cannot cross the boundary. For a
-smooth shore, gate `C(0)=0` and the intended one-sided derivative match. If
+Use nonnegative masks with `L(s)=S(s)=0` for `s<=0`; they exclude relief on
+the opposite side. Preventing relief from crossing the water level also
+requires the signed margin bounds below. For a smooth shore, gate `C(0)=0`
+and the intended one-sided derivative match. If
 `|rLand|<=R_L` and `|rBed|<=R_B`, preserve an error margin outside a declared
 uncertainty tube:
 
@@ -171,18 +193,28 @@ candidate identity and conflict resolution; water owns free surface, foam, and
 transport; a receiver-state owner integrates wetness or snow. Preserve those
 owners through every quality tier.
 
-For a classifier `g` with value error `epsilon_g` and gradient floor `m`, the
+For paired classifier roots in a shared tube, with uniform value error
+`epsilon_g` and a transverse derivative of constant sign and magnitude at
+least `m` over the entire connecting segment on each comparison ray,
 boundary-position error is **Derived**
 
 ```text
 epsilon_boundary <= epsilon_g / m
 ```
 
-Where `m` approaches zero, refine or declare the contour ill-conditioned.
+Require bracketed corresponding roots throughout that tube. A gradient norm
+at one point does not establish a global Hausdorff bound, topology preservation,
+or this transverse condition. Where `m` approaches zero, refine or declare
+the contour ill-conditioned.
 
 Tile seams require global lattice keys, a halo covering the largest filter,
 derivative, drainage, or distance stencil, shared edge/site identities, and
-versioned seed/algorithm/water-level/encoding inputs.
+versioned seed/algorithm/water-level/encoding inputs. A finite stencil halo
+only closes local operations. Drainage edits require a nonlocal dependency closure:
+propagate changed accumulation downstream, and changed depression/flat resolution can alter the graph
+upstream as well. Nearest-site removal can change a distance field arbitrarily
+far away. Recompute the affected graph/domain or prove a bounded influence
+region; a fixed halo alone does not close those nonlocal operations.
 
 ## Filtering, derivatives, and parity
 
@@ -193,9 +225,14 @@ support `f_support`, use
 
 ```text
 q_screen = f_support * sigmaMax(J')
-q_mesh = f * maxProjectedEdgeInFieldUnits
+q_mesh = f_support * maxPostWarpEdgeInFieldUnits
 q = max(q_screen, q_mesh)
 ```
+
+Bound the mapped distance along every edge using the warp Jacobian over that
+edge, not only the distance between warped endpoints. A curved or folded warp
+can travel far between equal endpoints. This edge gate still requires the
+mesh interior and interpolation error to be bounded for the accepted field.
 
 The sampling bound is **Derived** `q <= 0.5`. Choose a smooth authored fade
 ending no later than that bound. Keep coordinates stable while attenuating the
@@ -267,8 +304,12 @@ then add interpolation and mip error.
 Exact IDs use an integer/storage-buffer representation or nearest exact loads
 with explicit encode/decode. Never linearly filter category identity.
 
-A full 2D mip chain approaches **Derived** `4/3` of base bytes before alignment;
-ping-pong doubles simultaneous allocation. Set `mipmapsAutoUpdate` according to
+For positive integer base extents `W,H`, compute full-chain texels exactly:
+`sum_(l=0..floor(log2(max(W,H)))) max(1,floor(W/2^l))*max(1,floor(H/2^l))`.
+The `4/3` limit applies to large square power-of-two textures, not arbitrary
+rectangles. A `1 x N` chain has a one-dimensional tail and approaches `2N`
+texels. Multiply by bytes/texel and layers before backend alignment; ping-pong
+doubles simultaneous allocation. Set `mipmapsAutoUpdate` according to
 the actual ownership: when false, write every sampled level; when true, verify
 automatic generation for the selected format after compute. Storage writes and
 filtered reads occur in separate usage scopes.
@@ -283,9 +324,12 @@ threshold or classification change -> contours, anchors, and category caches
 resize/domain change -> storage, dispatch geometry, and diagnostics
 ```
 
-Increment the source revision before publishing the replacement. Keep previous
-and current resources immutable until every consuming frame completes; reset or
-invalidate histories that cannot map the old representation to the new one.
+Reserve an immutable requested revision before starting a replacement bake.
+Publish only after its writes and every sampled mip are ready, and only if its
+seed/domain/encoding revision still matches the current request. Discard late
+results from superseded edits. Advance the published revision with the complete
+resource set, not ahead of it. Retain old resources until outstanding consumers
+finish; reset histories that cannot map the old representation to the new one.
 
 ## Diagnostics and failure signatures
 

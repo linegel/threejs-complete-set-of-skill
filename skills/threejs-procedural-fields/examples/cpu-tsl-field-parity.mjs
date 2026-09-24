@@ -11,7 +11,8 @@ import {
 // this interval before conversion; the clamped path is only a defined sentinel.
 const I32_F32_MIN = -2147483648;
 const I32_F32_MAX = 2147483520;
-const U32_TO_UNIT_F32 = 1 / 4294967296;
+// Shift before float conversion: every retained integer and scaled value is exact.
+const U24_TO_UNIT_F32 = 1 / 16777216;
 
 const HASH = Object.freeze({
   lattice: Object.freeze([0x8da6b343, 0xd8163841, 0xcb1ab31f]),
@@ -30,7 +31,7 @@ export function sampleLatticeCPU(coordinate, seed) {
   if (
     !Array.isArray(coordinate) ||
     coordinate.length !== 3 ||
-    coordinate.some((value) => !Number.isFinite(value))
+    [0, 1, 2].some((index) => !Object.hasOwn(coordinate, index) || !Number.isFinite(coordinate[index]))
   ) {
     throw new TypeError("coordinate must contain three finite values");
   }
@@ -58,7 +59,7 @@ export function sampleLatticeCPU(coordinate, seed) {
     Math.imul(lane[2], HASH.lattice[2]) ^
     Math.imul(seed, HASH.seed),
   );
-  const value = Math.fround(Math.fround(hash) * Math.fround(U32_TO_UNIT_F32));
+  const value = (hash >>> 8) * U24_TO_UNIT_F32;
   return Object.freeze({ cell: Object.freeze(cell), valid: true, hash, value });
 }
 
@@ -77,6 +78,16 @@ function gatedI32Bits(value) {
 }
 
 export function createLatticeParityBundle({ coordinate, seed, prefix = "field" }) {
+  if (typeof prefix !== "string" || !/^[A-Za-z_][A-Za-z0-9_]*$/.test(prefix) || prefix.startsWith("__")) {
+    throw new TypeError("prefix must be a nonreserved shader identifier prefix");
+  }
+  if (typeof seed === "number") {
+    if (!Number.isInteger(seed) || seed < 0 || seed > 0xffffffff) {
+      throw new RangeError("seed must be a uint32 integer or a u32 node");
+    }
+  } else if (seed?.isNode !== true) {
+    throw new TypeError("seed must be a uint32 integer or a u32 node");
+  }
   const cell = floor(coordinate).toVar(`${prefix}Cell`);
   const valid = cell.x.greaterThanEqual(I32_F32_MIN)
     .and(cell.x.lessThanEqual(I32_F32_MAX))
@@ -92,7 +103,7 @@ export function createLatticeParityBundle({ coordinate, seed, prefix = "field" }
       .bitXor(gatedI32Bits(cell.z).mul(uint(HASH.lattice[2])))
       .bitXor(uint(seed).mul(uint(HASH.seed))),
   ).toVar(`${prefix}Hash`);
-  const value = float(hash).mul(U32_TO_UNIT_F32).toVar(`${prefix}Value`);
+  const value = float(hash.shiftRight(uint(8))).mul(U24_TO_UNIT_F32).toVar(`${prefix}Value`);
 
   return Object.freeze({ cell, valid, hash, value });
 }

@@ -51,7 +51,8 @@ warp, hash, or octave chain.
 Use `WebGPURenderer` and verify `renderer.backend.isWebGPUBackend === true`
 after `await renderer.init()`. `renderer.compute()` submits ordinary compute
 work. In r185, `computeAsync()` initializes before enqueueing but is not a GPU
-completion fence; completion evidence needs timestamps or an actual map/readback.
+completion fence. CPU-visible completion needs an awaited map/readback or queue
+completion promise; timestamp-query setup alone proves neither completion nor cost.
 
 Carry parity-critical seeds as `u32`, not f32. Gate floored lattice coordinates
 to the i32 domain before bit reinterpretation. Apply a domain warp once to the
@@ -60,7 +61,7 @@ warps tangent before renormalization.
 
 Before implementing an integer-lattice CPU/TSL parity branch, read
 [the canonical parity core](examples/cpu-tsl-field-parity.mjs). It shows the
-signed-i32 gate, wrapping `Math.imul`/TSL `uint` hash, explicit f32 normalization,
+signed-i32 gate, wrapping `Math.imul`/TSL `uint` hash, exact high-24-bit normalization,
 and one shared `.toVar()` bundle without prescribing a field spectrum. CPU
 callers reject `valid === false`; TSL callers route the `valid` node into an
 explicit mask, select, or invalid-state diagnostic before consuming hash/value.
@@ -135,8 +136,10 @@ source, bound, and threshold behavior.
 ## 5. Wire consumers, invalidation, and diagnostics
 
 Use NodeMaterial slots or geometry/compute inputs without recreating causes.
-Data fields use linear/`NoColorSpace` handling; authored color textures use
-`SRGBColorSpace`. Keep HDR buffers linear until the single output owner.
+Data fields use `NoColorSpace`. Color textures declare their actual transfer
+function and primaries: encoded sRGB uses `SRGBColorSpace`, linear-sRGB HDR
+uses `LinearSRGBColorSpace`; convert other encodings explicitly. Keep HDR
+working buffers linear until the single output owner.
 
 A field revision changes when its seed, coordinates, algorithm, source data,
 encoding, or accepted values change. Propagate that revision to dependent mips,

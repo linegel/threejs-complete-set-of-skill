@@ -33,7 +33,7 @@ Use this existing repository plan rather than an unrelated game ticket.
 13. [x] `threejs-spectral-ocean` — source/reference/oracle pass; nine new transform/phase checks.
 14. [x] `threejs-water-optics` — source/reference/comparator pass; eleven new stability/transport checks.
 15. [x] `threejs-rain-snow-and-wet-surfaces` — source/reference/oracle pass; seven deposition and transform checks.
-16. [ ] `threejs-procedural-fields`
+16. [x] `threejs-procedural-fields` - source/reference/helper pass; nine parity, admission, footprint and boundary checks.
 17. [ ] `threejs-procedural-materials`
 18. [ ] `threejs-procedural-geometry`
 19. [ ] `threejs-object-sculptor`
@@ -116,9 +116,13 @@ Read both references, entrypoint, metadata, generated consumer, and the existing
 
 The generated weather article also contains an independently authored force equation mixing wind velocity with acceleration; repair its owning narrative source during source-to-site reconciliation, not by editing generated HTML.
 
-### Current skill: threejs-procedural-fields
+### Skill 16 result: threejs-procedural-fields
 
-Next in the roster; read its entrypoint and reachable resources before changes. All labs and recreations remain deferred.
+Read the entrypoint, reference, executable parity helper, interface, and prior field review. Reproduced sparse-array admission and the exact maximum-hash endpoint. The helper now rejects missing coordinate lanes and invalid numeric seeds/prefixes, retains the full u32 hash, and derives an exactly representable high-24-bit value below one. WGSL conversion rules were checked against the specification. Corrected remapped mesh support, rectangular mip accounting, nonlocal invalidation, paired-root boundary assumptions, stale bake publication, and actual color encoding. Nine complementary checks pass, including an independent BigInt mixer and a boundary-displacement counterexample; all 129 current skill tests and distribution validation pass. Changes to normalized values require a field revision. No GPU parity capture, field-bake lab acceptance, or shader timing is claimed. Log: `artifacts/website-improvement-20260924/continuation/skills-fields-after.log`.
+
+### Current skill: threejs-procedural-materials
+
+The parallel skills-first session owns this next unit. Labs and recreations remain deferred until the complete skill pass. The inspector-continuation session will prepare procedural-geometry next without overlapping material source or tests.
 
 
 ## Finished and verified
@@ -313,3 +317,15 @@ Temporary MCP transport, schema, snapshot copies, and socket directories are als
 removed. Accepted screenshots, command responses, test logs, and the cleanup
 inventory remain as local verification records. Unrelated historic captures and
 the parallel session's skill logs were preserved.
+
+## What to test: procedural-fields skill continuation
+The installed field helper currently accepts sparse coordinate arrays and converts
+all 32 hash bits through f32 before normalization. Test dense input admission and
+exact 24-bit half-open normalization against independent integer arithmetic; retain
+the full u32 hash. WGSL allows either adjacent float on an inexact conversion, so
+Math.fround alone is not a cross-device parity contract. Update the field revision
+when normalization changes. Check mesh filtering against remapped support, exact
+rectangular mip storage, transitive drainage invalidation, and stale bake results.
+This changes the installable guidance/example only. It is not a new rendered field,
+GPU parity capture, or acceptance of the existing field-bake lab. Prior website
+screenshots remain valid for the unchanged published pages.
