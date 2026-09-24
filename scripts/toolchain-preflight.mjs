@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import {
-  X_OK,
+  constants,
   accessSync,
   existsSync,
   readFileSync,
@@ -162,7 +162,7 @@ export function validateChromiumInstallation({
   pathExists = existsSync,
   pathIsExecutable = (path) => {
     try {
-      accessSync(path, X_OK);
+      accessSync(path, constants.X_OK);
       return true;
     } catch {
       return false;

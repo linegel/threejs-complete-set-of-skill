@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { chmodSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { test } from 'node:test';
 import {
@@ -204,4 +204,19 @@ test('Chromium validation accepts only executable paths confined after realpath'
   }), [
     "[PLAYWRIGHT_BROWSER_ROOT_SYMLINK_ESCAPE] Playwright's local browser directory resolves outside /repo: /tmp/shared-browser-cache. Re-run npm run browser:install in a non-symlinked dependency tree.",
   ]);
+});
+
+test('default Chromium executable probe honors actual POSIX permissions', { skip: process.platform === 'win32' }, () => {
+  const artifacts = join(REPO_ROOT, 'artifacts');
+  mkdirSync(artifacts, { recursive: true });
+  const repositoryRoot = mkdtempSync(join(artifacts, 'toolchain-permissions-'));
+  const localBrowsersRoot = join(repositoryRoot, '.local-browsers');
+  mkdirSync(localBrowsersRoot);
+  const executablePath = join(localBrowsersRoot, 'chromium-fixture');
+  writeFileSync(executablePath, 'Executable permission fixture; never launched.\n');
+  const input = { executablePath, localBrowsersRoot, repositoryRoot };
+  chmodSync(executablePath, 0o600);
+  assert.match(validateChromiumInstallation(input)[0], /PLAYWRIGHT_CHROMIUM_NOT_EXECUTABLE/);
+  chmodSync(executablePath, 0o700);
+  assert.deepEqual(validateChromiumInstallation(input), []);
 });
