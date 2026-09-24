@@ -44,10 +44,8 @@
     "docs/demos/assets/three.tsl--5AYqKVA.js",
     "docs/demos/assets/three.webgpu-Dss1ekdK.js"
   ],
-  "publishedBundleHash": "sha256:75debb9aee031b9381f49214cf212267b80a3d5888d886f6a059b0f1eea0f1b7",
+  "publishedBundleHash": "sha256:7881a124223a6608d8528fc91d4cbecac02c56701fa6af04c71d828dc7b2e9b3",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:16a8b5868643f52a1e053ac5f8f1efbbf4c97028701cf3578e1acef775c65a89",
-  "evidenceBundleId": "correctness",
-  "skill": "threejs-procedural-motion-systems",
-  "publishPath": "/demos/webgpu-procedural-timelines/"
+  "buildRevision": "sha256:466bfaa1379c77e7660d4e6fab015b0529f8ba02aeb3cd8161b7d3ed8911fc7b",
+  "evidenceBundleId": "correctness"
 }

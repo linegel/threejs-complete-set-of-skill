@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "labId": "webgpu-node-gtao",
   "kind": "canonical-lab",
-  "status": "incomplete",
+  "status": "accepted",
   "canonicalSource": [
     "threejs-ambient-contact-shading/examples/webgpu-node-gtao"
   ],
@@ -30,10 +30,8 @@
     "docs/demos/assets/three.tsl--5AYqKVA.js",
     "docs/demos/assets/three.webgpu-Dss1ekdK.js"
   ],
-  "publishedBundleHash": "sha256:61b70669608b9f263d18d349c79210cd593b28d2ccb8a19e370e06275b237cf4",
+  "publishedBundleHash": "sha256:4e3debc2323f214d10d49f7c6f4b747a464fc7c8767b51c19622928cde664979",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:16a8b5868643f52a1e053ac5f8f1efbbf4c97028701cf3578e1acef775c65a89",
-  "evidenceBundleId": "correctness",
-  "skill": "threejs-ambient-contact-shading",
-  "publishPath": "/demos/webgpu-node-gtao/"
+  "buildRevision": "sha256:466bfaa1379c77e7660d4e6fab015b0529f8ba02aeb3cd8161b7d3ed8911fc7b",
+  "evidenceBundleId": "bundle"
 }

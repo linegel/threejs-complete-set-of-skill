@@ -1,16 +1,11 @@
 #!/usr/bin/env node
 
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, unlinkSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import sharp from 'sharp';
-import {
-  ownerIdForResponsiveSource,
-  responsiveDependencyHash,
-  sha256,
-  staleManifestOwnedOutputPaths,
-} from './lib/generated-asset-ledger.mjs';
+import { staleManifestOwnedOutputPaths } from './lib/generated-asset-ledger.mjs';
+import { encodeResponsivePreview } from './lib/responsive-image-encoder.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DOCS = join(ROOT, 'docs');
@@ -96,61 +91,17 @@ for (const pagePath of pageFiles()) {
 }
 
 const manifest = {};
+let reused = 0;
 for (const sourcePath of [...sources].sort()) {
   const relativeSource = relative(DOCS, sourcePath).split(sep).join('/');
-  const sourceMetadata = await sharp(sourcePath).metadata();
-  const sourceBytes = statSync(sourcePath).size;
-  const outputs = [
-    {
-      format: 'avif',
-      path: sourcePath.replace(/\.png$/i, '.avif'),
-      candidates: [
-        { id: 'quality-60', encode: (pipeline) => pipeline.avif({ quality: 60, effort: 7, chromaSubsampling: '4:4:4' }) },
-      ],
-    },
-    {
-      format: 'webp',
-      path: sourcePath.replace(/\.png$/i, '.webp'),
-      candidates: [
-        { id: 'quality-80', encode: (pipeline) => pipeline.webp({ quality: 80, effort: 6, smartSubsample: true }) },
-        { id: 'lossless', encode: (pipeline) => pipeline.webp({ lossless: true, effort: 6 }) },
-      ],
-    },
-  ];
-  manifest[relativeSource] = {
-    ownerId: ownerIdForResponsiveSource(relativeSource),
-    url: new URL(relativeSource, SITE).href,
-    width: sourceMetadata.width,
-    height: sourceMetadata.height,
-    bytes: sourceBytes,
-    sourceSha256: sha256(readFileSync(sourcePath)),
-    formats: {},
-  };
-
-  for (const output of outputs) {
-    const candidates = await Promise.all(output.candidates.map(async (candidate) => ({
-      id: candidate.id,
-      bytes: await candidate.encode(sharp(sourcePath)).toBuffer(),
-    })));
-    const selected = candidates.reduce((smallest, candidate) => (
-      candidate.bytes.byteLength < smallest.bytes.byteLength ? candidate : smallest
-    ));
-    writeFileSync(output.path, selected.bytes);
-    const outputMetadata = await sharp(output.path).metadata();
-    const relativeOutput = relative(DOCS, output.path).split(sep).join('/');
-    manifest[relativeSource].formats[output.format] = {
-      url: new URL(relativeOutput, SITE).href,
-      width: outputMetadata.width,
-      height: outputMetadata.height,
-      bytes: statSync(output.path).size,
-      encoding: selected.id,
-      sha256: sha256(selected.bytes),
-    };
-  }
-  manifest[relativeSource].dependencyClosureHash = responsiveDependencyHash(
-    relativeSource,
-    manifest[relativeSource],
-  );
+  const result = await encodeResponsivePreview(sourcePath, {
+    docsRoot: DOCS,
+    site: SITE,
+    previous: previousManifests[0]?.sources?.[relativeSource],
+  });
+  manifest[relativeSource] = result.record;
+  if (result.reused) reused += 1;
+  else console.log(`Encoded ${relativeSource}`);
 }
 
 mkdirSync(dirname(MANIFEST_PATH), { recursive: true });
@@ -166,4 +117,4 @@ for (const stalePath of staleManifestOwnedOutputPaths(previousManifests, outputM
   pruned += 1;
 }
 writeFileSync(MANIFEST_PATH, `${JSON.stringify(outputManifest, null, 2)}\n`);
-console.log(`Generated AVIF and WebP variants for ${sources.size} visible PNG previews; pruned ${pruned} stale manifest-owned output(s).`);
+console.log(`Generated AVIF and WebP variants for ${sources.size} visible PNG previews (${sources.size - reused} encoded, ${reused} reused); pruned ${pruned} stale manifest-owned output(s).`);

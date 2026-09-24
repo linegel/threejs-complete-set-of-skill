@@ -21,15 +21,15 @@
     "threejs-image-pipeline/examples/webgpu-temporal-history"
   ],
   "browserEntry": "threejs-image-pipeline/examples/webgpu-temporal-history/index.html",
-  "sourceHash": "sha256:352e63969cda6e0d302fb4c0815aea5621f441e913147513387c5a0e36739b7d",
+  "sourceHash": "sha256:2f41080c1ecbec60bc1f3678e21c2039ede72793e8ba39260302cef254c97c3f",
   "publishedHashInputs": [
     "docs/demos/webgpu-temporal-history",
     "docs/demos/assets/BloomNode-B7VcMtwE.js",
     "docs/demos/assets/GTAONode-IHocvv2Q.js",
     "docs/demos/assets/TRAANode-s2X8LMY_.js",
-    "docs/demos/assets/canonical-browser-app-DcJB-Tu3.js",
-    "docs/demos/assets/canonical-browser-app-idOAEOAg.js",
-    "docs/demos/assets/index-BpTPoaB6.js",
+    "docs/demos/assets/canonical-browser-app-BSS4FhY5.js",
+    "docs/demos/assets/canonical-browser-app-D77GmXJG.js",
+    "docs/demos/assets/index-DmumGe2Z.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
     "docs/demos/assets/preload-helper-DYl5dUZ5.js",
     "docs/demos/assets/stage-CpfIdkfY.js",
@@ -41,9 +41,9 @@
     "docs/demos/assets/BloomNode-B7VcMtwE.js",
     "docs/demos/assets/GTAONode-IHocvv2Q.js",
     "docs/demos/assets/TRAANode-s2X8LMY_.js",
-    "docs/demos/assets/canonical-browser-app-DcJB-Tu3.js",
-    "docs/demos/assets/canonical-browser-app-idOAEOAg.js",
-    "docs/demos/assets/index-BpTPoaB6.js",
+    "docs/demos/assets/canonical-browser-app-BSS4FhY5.js",
+    "docs/demos/assets/canonical-browser-app-D77GmXJG.js",
+    "docs/demos/assets/index-DmumGe2Z.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
     "docs/demos/assets/preload-helper-DYl5dUZ5.js",
     "docs/demos/assets/stage-CpfIdkfY.js",
@@ -51,8 +51,8 @@
     "docs/demos/assets/three.webgpu-Dss1ekdK.js",
     "docs/demos/assets/webgpu-device-identity-uNUcs3Wh.js"
   ],
-  "publishedBundleHash": "sha256:2d524ad415c0041959f58a62e9a2d425f13c8eff016afd4282c0f2bc597e52a3",
+  "publishedBundleHash": "sha256:ca294f6feb1ee2da01c112d4811953e0bf37bc6cf2d1327ef391ee6d3cfcad59",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:964ca5ad710de3b6d6671fe8a2dffea9892fc0ef4930a24c5a8b88546933a964",
-  "evidenceBundleId": null
+  "buildRevision": "sha256:466bfaa1379c77e7660d4e6fab015b0529f8ba02aeb3cd8161b7d3ed8911fc7b",
+  "evidenceBundleId": "bundle"
 }

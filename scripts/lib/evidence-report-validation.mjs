@@ -51,3 +51,20 @@ export function validateEvidenceReportManifest({
   }
   return errors;
 }
+
+export function currentRuntimeEvidenceSummary(summary, demo) {
+  if (
+    summary?.schemaVersion !== 1
+    || summary.labId !== demo.id
+    || summary.classification !== 'inspected-runtime-evidence-preview'
+    || summary.runtime?.isWebGPUBackend !== true
+    || !Array.isArray(summary.images)
+    || !Array.isArray(summary.limitations)
+  ) throw new Error(`Runtime evidence summary is invalid: ${demo.id}`);
+
+  // Old captures remain archived, but cannot describe the current implementation.
+  if (summary.acceptanceStatus !== demo.status || summary.canonicalSourceHash !== demo.sourceHash) {
+    return null;
+  }
+  return summary;
+}

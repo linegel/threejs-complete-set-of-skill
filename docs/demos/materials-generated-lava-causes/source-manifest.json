@@ -18,10 +18,10 @@
     "threejs-procedural-materials/examples/tsl-procedural-pbr"
   ],
   "browserEntry": null,
-  "sourceHash": "sha256:399f62a0febd55cea55cb1f5d14b481b949bbac37779da4629cd6e0c57457877",
+  "sourceHash": "sha256:6cb5c679b8ba393d25163d87437cc3e8844af27480dd985e139029d059f2b623",
   "publishedHashInputs": [
     "docs/demos/materials-generated-lava-causes",
-    "docs/demos/assets/OrbitControls-CJtJSLBE.js",
+    "docs/demos/assets/OrbitControls-BPue_ISR.js",
     "docs/demos/assets/biome-field-a-R50xQW_s.png",
     "docs/demos/assets/biome-field-b-DSx0H3Jp.png",
     "docs/demos/assets/biome-field-c-BZ_lWbL6.png",
@@ -37,7 +37,7 @@
     "docs/demos/assets/frost-crystal-a-CjHo8bxl.png",
     "docs/demos/assets/frost-crystal-b-kNAvb4JM.png",
     "docs/demos/assets/frost-crystal-c-Djo5kuxi.png",
-    "docs/demos/assets/index-Bv9Z2STC2.js",
+    "docs/demos/assets/index-BTw8KJUW2.js",
     "docs/demos/assets/index-DXnOktML.css",
     "docs/demos/assets/lava-cause-a-CBm0KOVs.png",
     "docs/demos/assets/lava-cause-b-BnS0O13v.png",
@@ -52,13 +52,13 @@
     "docs/demos/assets/starfield-tile-a-DskCqFuO.png",
     "docs/demos/assets/starfield-tile-b-DVehl-cc.png",
     "docs/demos/assets/starfield-tile-c-n_f64xn1.png",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js",
     "docs/demos/assets/weather-map-a-BZhzXSIs.png",
     "docs/demos/assets/weather-map-b-BdrawmJ-.png",
     "docs/demos/assets/weather-map-c-CZsKB9yR.png"
   ],
   "emittedAssetDependencies": [
-    "docs/demos/assets/OrbitControls-CJtJSLBE.js",
+    "docs/demos/assets/OrbitControls-BPue_ISR.js",
     "docs/demos/assets/biome-field-a-R50xQW_s.png",
     "docs/demos/assets/biome-field-b-DSx0H3Jp.png",
     "docs/demos/assets/biome-field-c-BZ_lWbL6.png",
@@ -74,7 +74,7 @@
     "docs/demos/assets/frost-crystal-a-CjHo8bxl.png",
     "docs/demos/assets/frost-crystal-b-kNAvb4JM.png",
     "docs/demos/assets/frost-crystal-c-Djo5kuxi.png",
-    "docs/demos/assets/index-Bv9Z2STC2.js",
+    "docs/demos/assets/index-BTw8KJUW2.js",
     "docs/demos/assets/index-DXnOktML.css",
     "docs/demos/assets/lava-cause-a-CBm0KOVs.png",
     "docs/demos/assets/lava-cause-b-BnS0O13v.png",
@@ -89,13 +89,13 @@
     "docs/demos/assets/starfield-tile-a-DskCqFuO.png",
     "docs/demos/assets/starfield-tile-b-DVehl-cc.png",
     "docs/demos/assets/starfield-tile-c-n_f64xn1.png",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js",
     "docs/demos/assets/weather-map-a-BZhzXSIs.png",
     "docs/demos/assets/weather-map-b-BdrawmJ-.png",
     "docs/demos/assets/weather-map-c-CZsKB9yR.png"
   ],
-  "publishedBundleHash": "sha256:803c1136a23cf26d4eb3c106adc74a336dcd67f155fc23ed0f68faef92c43ef7",
+  "publishedBundleHash": "sha256:460c1a9824b253433aa38bdb4a5e5428f6139967d401d03139e79b023912daae",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b",
+  "buildRevision": "sha256:466bfaa1379c77e7660d4e6fab015b0529f8ba02aeb3cd8161b7d3ed8911fc7b",
   "evidenceBundleId": null
 }

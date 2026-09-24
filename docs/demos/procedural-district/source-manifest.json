@@ -75,8 +75,8 @@
     "docs/demos/assets/three.webgpu-Dss1ekdK.js",
     "docs/demos/assets/webgpu-device-identity-uNUcs3Wh.js"
   ],
-  "publishedBundleHash": "sha256:55c15b40ae21d00ac84657fc799f730b25140b78bc10d12e8dec46909ff19635",
+  "publishedBundleHash": "sha256:03a6118ba4fc22e0fb36e3db9edbfb713d1f53d6f5bb05ed8f2b129d48db08ed",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:7337612b5315e5a755dede94228e759957f0bdbc71bcb8ed6dd083fc23e678c5",
+  "buildRevision": "sha256:466bfaa1379c77e7660d4e6fab015b0529f8ba02aeb3cd8161b7d3ed8911fc7b",
   "evidenceBundleId": null
 }

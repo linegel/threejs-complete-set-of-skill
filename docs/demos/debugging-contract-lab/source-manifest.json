@@ -4,35 +4,35 @@
   "kind": "canonical-lab",
   "status": "accepted",
   "canonicalSource": [
-    "threejs-debugging/SKILL.md",
-    "threejs-debugging/references/upstream-research.md",
+    "skills/threejs-debugging/SKILL.md",
+    "skills/threejs-debugging/references/upstream-research.md",
     "threejs-debugging/examples/triage-cases.json",
     "threejs-debugging/examples/debugging-contract.test.mjs",
     "threejs-debugging/examples/debugging-contract-lab/app.mjs",
     "threejs-debugging/examples/debugging-contract-lab/contract-lab.test.mjs"
   ],
   "sourceHashInputs": [
+    "skills/threejs-debugging/references/upstream-research.md",
+    "skills/threejs-debugging/SKILL.md",
     "threejs-debugging/examples/debugging-contract-lab",
     "threejs-debugging/examples/debugging-contract.test.mjs",
-    "threejs-debugging/examples/triage-cases.json",
-    "threejs-debugging/references/upstream-research.md",
-    "threejs-debugging/SKILL.md"
+    "threejs-debugging/examples/triage-cases.json"
   ],
   "browserEntry": "threejs-debugging/examples/debugging-contract-lab/index.html",
-  "sourceHash": "sha256:e05617dff164cec3be892a9ae9711d5cfdc9df517e7a544070af0180960ad124",
+  "sourceHash": "sha256:65a4329cc5248ade7712d2861f6156d407f5683ef6b90d626689caec43d1988a",
   "publishedHashInputs": [
     "docs/demos/debugging-contract-lab",
-    "docs/demos/assets/index-BRat-IVG.js",
     "docs/demos/assets/index-C9Tc45Xr.css",
+    "docs/demos/assets/index-DiJBEz5H.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js"
   ],
   "emittedAssetDependencies": [
-    "docs/demos/assets/index-BRat-IVG.js",
     "docs/demos/assets/index-C9Tc45Xr.css",
+    "docs/demos/assets/index-DiJBEz5H.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js"
   ],
-  "publishedBundleHash": "sha256:0a209be5529d1b05de9ef2586d0f11a32028f92457ea124727b5c994d3c82ae2",
+  "publishedBundleHash": "sha256:5f4c6316fdb1fda90f0b1d92fcd5255b44684ea6f5a6dd2c69dd3820a2320d34",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b",
+  "buildRevision": "sha256:466bfaa1379c77e7660d4e6fab015b0529f8ba02aeb3cd8161b7d3ed8911fc7b",
   "evidenceBundleId": null
 }

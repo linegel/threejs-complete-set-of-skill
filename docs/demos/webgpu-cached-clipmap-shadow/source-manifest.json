@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "labId": "webgpu-cached-clipmap-shadow",
   "kind": "canonical-lab",
-  "status": "accepted",
+  "status": "incomplete",
   "canonicalSource": [
     "threejs-scalable-real-time-shadows/examples/webgpu-cached-clipmap-shadow"
   ],
@@ -31,8 +31,8 @@
     "docs/demos/assets/three.webgpu-Dss1ekdK.js",
     "docs/demos/assets/webgpu-device-identity-uNUcs3Wh.js"
   ],
-  "publishedBundleHash": "sha256:72e144235093a27db006d320ace064ac03847d86675a96d56284aef9768ad47a",
+  "publishedBundleHash": "sha256:29d16c6bdc6000b26de67c42640f99ee92eea6f299560298dcbb7c04b51fb6b9",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:348d7584a398e339bdf08ac952ded6eb67b5ed813416a6fe3ba445615164b63a",
-  "evidenceBundleId": "bundle"
+  "buildRevision": "sha256:466bfaa1379c77e7660d4e6fab015b0529f8ba02aeb3cd8161b7d3ed8911fc7b",
+  "evidenceBundleId": null
 }

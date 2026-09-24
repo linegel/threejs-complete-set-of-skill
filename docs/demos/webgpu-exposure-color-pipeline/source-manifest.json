@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "labId": "webgpu-exposure-color-pipeline",
   "kind": "canonical-lab",
-  "status": "incomplete",
+  "status": "accepted",
   "canonicalSource": [
     "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline"
   ],
@@ -11,10 +11,10 @@
     "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline"
   ],
   "browserEntry": "threejs-exposure-color-grading/examples/webgpu-exposure-color-pipeline/index.html",
-  "sourceHash": "sha256:624a69e65b925d89de6524febba86d95e9c4845a5b44818c77dd31cd2996df90",
+  "sourceHash": "sha256:f238d4795026d7eee618bb68657735e143873008a57b23f304866b075361dc97",
   "publishedHashInputs": [
     "docs/demos/webgpu-exposure-color-pipeline",
-    "docs/demos/assets/index-DrSUVdFV.js",
+    "docs/demos/assets/index-oqMpwGHG.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
     "docs/demos/assets/stage-CpfIdkfY.js",
     "docs/demos/assets/three.tsl--5AYqKVA.js",
@@ -22,15 +22,15 @@
     "docs/demos/assets/webgpu-device-identity-uNUcs3Wh.js"
   ],
   "emittedAssetDependencies": [
-    "docs/demos/assets/index-DrSUVdFV.js",
+    "docs/demos/assets/index-oqMpwGHG.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
     "docs/demos/assets/stage-CpfIdkfY.js",
     "docs/demos/assets/three.tsl--5AYqKVA.js",
     "docs/demos/assets/three.webgpu-Dss1ekdK.js",
     "docs/demos/assets/webgpu-device-identity-uNUcs3Wh.js"
   ],
-  "publishedBundleHash": "sha256:afb21d87a09147fe4c7ecb2fa38fc4ab4fba3cfe8c46732e091e3ff19525551c",
+  "publishedBundleHash": "sha256:f3df21da735421b789589338bb9b9a8d1fd16a8a9407ae3c702030f824feb14f",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:4754cb3c1dfa6966f3bb946b270578476d12628fa2ac597ec254ab8568601690",
-  "evidenceBundleId": null
+  "buildRevision": "sha256:466bfaa1379c77e7660d4e6fab015b0529f8ba02aeb3cd8161b7d3ed8911fc7b",
+  "evidenceBundleId": "bundle"
 }

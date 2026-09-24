@@ -102,6 +102,6 @@
   ],
   "publishedBundleHash": "sha256:f7bdaff3205a2d3441c110a795e7275ac987a29f9e9b87b960600d08062e509c",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:609c76b24dfb75268a7ba472031af3cc89589f2e2b921cad404c1aa37dfb156e",
+  "buildRevision": "sha256:466bfaa1379c77e7660d4e6fab015b0529f8ba02aeb3cd8161b7d3ed8911fc7b",
   "evidenceBundleId": "correctness"
 }

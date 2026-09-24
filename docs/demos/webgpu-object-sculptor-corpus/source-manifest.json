@@ -14,12 +14,12 @@
     "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus"
   ],
   "browserEntry": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/index.html",
-  "sourceHash": "sha256:5f7aa125f305d18e139f1c8cee2e4b2bed5b96f1764c27a7f07378a2608b1a42",
+  "sourceHash": "sha256:a619e33bbaacb7e1afcc06f4036b26271135677342b1274f632bcab194c07046",
   "publishedHashInputs": [
     "docs/demos/webgpu-object-sculptor-corpus",
     "docs/demos/assets/OrbitControls-BPue_ISR.js",
     "docs/demos/assets/aligned-readback-XAnJComS.js",
-    "docs/demos/assets/index-GfveAfig.js",
+    "docs/demos/assets/index-DiQ9WhpU.js",
     "docs/demos/assets/index-M60Or1av.css",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
     "docs/demos/assets/three.tsl--5AYqKVA.js",
@@ -28,17 +28,14 @@
   "emittedAssetDependencies": [
     "docs/demos/assets/OrbitControls-BPue_ISR.js",
     "docs/demos/assets/aligned-readback-XAnJComS.js",
-    "docs/demos/assets/index-GfveAfig.js",
+    "docs/demos/assets/index-DiQ9WhpU.js",
     "docs/demos/assets/index-M60Or1av.css",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
     "docs/demos/assets/three.tsl--5AYqKVA.js",
     "docs/demos/assets/three.webgpu-Dss1ekdK.js"
   ],
-  "publishedBundleHash": "sha256:3b5d4c97c67dc834354b1bf6cbb7092a49e498f5a52b048565791b09765d9cfb",
+  "publishedBundleHash": "sha256:1bb4bcd08fe12acc508c8ae33e7ed83d676dc126b025f6109a7da797898fb175",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:16a8b5868643f52a1e053ac5f8f1efbbf4c97028701cf3578e1acef775c65a89",
-  "evidenceBundleId": "correctness",
-  "skill": "threejs-object-sculptor",
-  "title": "Object Sculptor Multi-Subject Corpus",
-  "publishPath": "/demos/webgpu-object-sculptor-corpus/"
+  "buildRevision": "sha256:466bfaa1379c77e7660d4e6fab015b0529f8ba02aeb3cd8161b7d3ed8911fc7b",
+  "evidenceBundleId": "correctness"
 }

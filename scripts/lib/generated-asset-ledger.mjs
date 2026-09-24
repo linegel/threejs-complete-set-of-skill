@@ -25,6 +25,7 @@ export function responsiveDependencyHash(relativeSource, record) {
     ownerId: record.ownerId,
     sourceSha256: record.sourceSha256,
     sourceBytes: record.bytes,
+    encoderHash: record.encoderHash,
     formats,
   }));
 }

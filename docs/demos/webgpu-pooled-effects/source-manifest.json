@@ -32,10 +32,8 @@
     "docs/demos/assets/three.tsl--5AYqKVA.js",
     "docs/demos/assets/three.webgpu-Dss1ekdK.js"
   ],
-  "publishedBundleHash": "sha256:397e1487c38318dc5e2773b6bf2ec4db58929c4b17ddb1f962731b456c9ef50e",
+  "publishedBundleHash": "sha256:9d119674aea5f8846c3126b797f7a5476332858c0de69a59476d8088ab69e810",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:16a8b5868643f52a1e053ac5f8f1efbbf4c97028701cf3578e1acef775c65a89",
-  "evidenceBundleId": "correctness",
-  "skill": "threejs-particles-trails-and-effects",
-  "publishPath": "/demos/webgpu-pooled-effects/"
+  "buildRevision": "sha256:466bfaa1379c77e7660d4e6fab015b0529f8ba02aeb3cd8161b7d3ed8911fc7b",
+  "evidenceBundleId": "correctness"
 }

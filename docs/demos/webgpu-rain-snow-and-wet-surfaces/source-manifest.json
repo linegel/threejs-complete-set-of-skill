@@ -35,8 +35,6 @@
   ],
   "publishedBundleHash": "sha256:aa10cb43f1dbc2f345a4ae9132e19526fd9b57a08b32e645f69476e74139fa8e",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:36e4490fcd74f5f358440cf8a67dbb057ea2e2c73bcfde6078bc53b0a5e63ee2",
-  "evidenceBundleId": "bundle",
-  "skill": "threejs-rain-snow-and-wet-surfaces",
-  "publishPath": "/demos/webgpu-rain-snow-and-wet-surfaces/"
+  "buildRevision": "sha256:466bfaa1379c77e7660d4e6fab015b0529f8ba02aeb3cd8161b7d3ed8911fc7b",
+  "evidenceBundleId": "bundle"
 }

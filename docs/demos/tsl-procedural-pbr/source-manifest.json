@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "labId": "tsl-procedural-pbr",
   "kind": "canonical-lab",
-  "status": "incomplete",
+  "status": "accepted",
   "canonicalSource": [
     "threejs-procedural-materials/examples/tsl-procedural-pbr"
   ],
@@ -13,32 +13,32 @@
     "threejs-procedural-materials/examples/tsl-procedural-pbr"
   ],
   "browserEntry": "threejs-procedural-materials/examples/tsl-procedural-pbr/index.html",
-  "sourceHash": "sha256:0440d83b0ba396903a57f8a1a6e0835d3cdb005b26e12e1eee64cfa35e051044",
+  "sourceHash": "sha256:f09b1846e6537e593e648751ef90f6d662afa7232eabc72806789510e70d95d5",
   "publishedHashInputs": [
     "docs/demos/tsl-procedural-pbr",
-    "docs/demos/assets/BloomNode-qktuf1Q7.js",
-    "docs/demos/assets/index-CPwhrrkI.js",
+    "docs/demos/assets/BloomNode-B7VcMtwE.js",
+    "docs/demos/assets/index-THlXS3Ww.js",
     "docs/demos/assets/lava-cause-a-CBm0KOVs.png",
     "docs/demos/assets/lava-cause-b-BnS0O13v.png",
     "docs/demos/assets/lava-cause-c-BhZU7h7H.png",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/procedural-pbr-materials-uYZjnkN3.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+    "docs/demos/assets/procedural-pbr-materials-CwQBni-l.js",
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js"
   ],
   "emittedAssetDependencies": [
-    "docs/demos/assets/BloomNode-qktuf1Q7.js",
-    "docs/demos/assets/index-CPwhrrkI.js",
+    "docs/demos/assets/BloomNode-B7VcMtwE.js",
+    "docs/demos/assets/index-THlXS3Ww.js",
     "docs/demos/assets/lava-cause-a-CBm0KOVs.png",
     "docs/demos/assets/lava-cause-b-BnS0O13v.png",
     "docs/demos/assets/lava-cause-c-BhZU7h7H.png",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
-    "docs/demos/assets/procedural-pbr-materials-uYZjnkN3.js",
-    "docs/demos/assets/three.tsl-0l0bfIsw.js",
-    "docs/demos/assets/three.webgpu-Bjfb9xWU.js"
+    "docs/demos/assets/procedural-pbr-materials-CwQBni-l.js",
+    "docs/demos/assets/three.tsl--5AYqKVA.js",
+    "docs/demos/assets/three.webgpu-Dss1ekdK.js"
   ],
-  "publishedBundleHash": "sha256:2dcd9eab6790456662260bbd72f274365c43169b22f93a64c1d66ab1ea9e4683",
+  "publishedBundleHash": "sha256:2d31dfbab8ed46494f50947ced5b5ee0cf8dcf6195f107764655a526b7473507",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:6c7881ab73865696d689489de465e1cd67e1f2242d43641279abac777df0479b",
-  "evidenceBundleId": null
+  "buildRevision": "sha256:466bfaa1379c77e7660d4e6fab015b0529f8ba02aeb3cd8161b7d3ed8911fc7b",
+  "evidenceBundleId": "bundle"
 }

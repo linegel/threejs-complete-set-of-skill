@@ -20,7 +20,7 @@
     "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost/frost-surface-effect.js"
   ],
   "browserEntry": "threejs-dynamic-surface-effects/examples/integration-temporal-surface/index.html",
-  "sourceHash": "sha256:5ef23999a95cfd6bd026911487463fd725caa69adcb2b3b6f4f822e14ab1d966",
+  "sourceHash": "sha256:9ca89c8d7137946af3673e6485cb5d8cb9398a9ec24d02b355ec7112dd378dc3",
   "publishedHashInputs": [
     "docs/demos/integration-temporal-surface",
     "docs/demos/assets/frost-surface-effect-DC3Wu82M.js",
@@ -38,8 +38,8 @@
     "docs/demos/assets/three.webgpu-Dss1ekdK.js",
     "docs/demos/assets/webgpu-device-identity-uNUcs3Wh.js"
   ],
-  "publishedBundleHash": "sha256:1ad86d2cb6cb4af3fedbd2d3488937aac5646744cfc03b5739d0036470f6c946",
+  "publishedBundleHash": "sha256:2a364daf35dd733841ba35e7fbf27254da0e8af62dd640a6807f33d235b6a506",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:83b208ec61a7d8ea1260929095a2bb81138a2c704d4c38524f02888b93407987",
+  "buildRevision": "sha256:466bfaa1379c77e7660d4e6fab015b0529f8ba02aeb3cd8161b7d3ed8911fc7b",
   "evidenceBundleId": null
 }

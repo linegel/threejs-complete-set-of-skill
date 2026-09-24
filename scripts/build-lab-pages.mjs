@@ -41,6 +41,7 @@ import {
 } from './lib/published-pages.mjs';
 import { labViteAliases } from './lib/vite-lab-config.mjs';
 import { buildDemoRoadmap } from './lib/demo-roadmap.mjs';
+import { currentSitePreviewManifest } from './lib/site-preview-manifest.mjs';
 
 const SITE = 'https://threejs-skills.com/';
 const SITE_NAME = 'Three.js WebGPU Skill Pack';
@@ -53,9 +54,13 @@ const skillManifest = JSON.parse(readFileSync(join(REPO_ROOT, 'skills.json'), 'u
 const skillsByName = new Map(skillManifest.skills.map((skill) => [skill.name, skill]));
 const registry = buildDemoRegistry();
 const previewManifestPath = join(REPO_ROOT, 'docs', 'previews', 'manifest.json');
-const previewManifest = existsSync(previewManifestPath)
+const previousPreviewManifest = existsSync(previewManifestPath)
   ? JSON.parse(readFileSync(previewManifestPath, 'utf8'))
   : { results: [] };
+const previewManifest = currentSitePreviewManifest(previousPreviewManifest, new Set(registry.demos.map(demo => demo.id)));
+if (previewManifest.results.length !== previousPreviewManifest.results.length) {
+  writeFileSync(previewManifestPath, `${JSON.stringify(previewManifest, null, 2)}\n`);
+}
 const usablePreviewPaths = new Set((previewManifest.results ?? [])
   .filter((entry) => entry.verdict === 'PREVIEW_CAPTURED' && entry.image)
   .map((entry) => entry.image));

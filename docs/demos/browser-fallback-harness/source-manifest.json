@@ -16,7 +16,7 @@
     "threejs-compatibility-fallbacks/examples/browser-fallback-harness"
   ],
   "browserEntry": "threejs-compatibility-fallbacks/examples/browser-fallback-harness/index.html",
-  "sourceHash": "sha256:011de00a6e6b3405f93f63bb7732538384e03e8ede5c5e53eacd4edee65d6a81",
+  "sourceHash": "sha256:2c70688f1b3c7de4a118000dad52b1c3b5033faf133b4026c7e50b0b954a0398",
   "publishedHashInputs": [
     "docs/demos/browser-fallback-harness",
     "docs/demos/assets/compatibility-renderer-CrxVRi9V.js",
@@ -42,6 +42,6 @@
   ],
   "publishedBundleHash": "sha256:013cb38db6a97ec86cbf7d03620fb0d6b9e0b8eefd7b439538dd6947b69352a3",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:30cdd83579e699aa18bb7ce54d4b2b2dc41a7f066411642dd94cd155e2b955dd",
+  "buildRevision": "sha256:466bfaa1379c77e7660d4e6fab015b0529f8ba02aeb3cd8161b7d3ed8911fc7b",
   "evidenceBundleId": null
 }
