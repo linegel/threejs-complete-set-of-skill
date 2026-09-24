@@ -1690,7 +1690,7 @@
   "coverageSummary": {
     "schemaVersion": 2,
     "threeRevision": "0.185.1",
-    "buildRevision": "sha256:466bfaa1379c77e7660d4e6fab015b0529f8ba02aeb3cd8161b7d3ed8911fc7b",
+    "buildRevision": "sha256:de7025cf80da8e1c51de4d4ed4570ea5e053c396346c2d317a93a24b9a707ed4",
     "skills": 27,
     "primaryImplementations": 40,
     "declaredEntrypointPrimaryTargets": 40,
@@ -2491,7 +2491,7 @@
             "scripts/provider-demos.mjs",
             "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost"
           ],
-          "sourceHash": "sha256:26ba7fca71611434f019d7b3d00a2142609c64b8d0af7db9fc1353041eff60a8",
+          "sourceHash": "sha256:d94317f77d101aaa1962b3cc2b1cbdd816594f65ecf3a7eba19b7eec6dcf8f57",
           "proxyStatus": {
             "limitation": "Generated crystal maps are reduced-tier static inputs. The production frost path remains StorageTexture history, reduced blur, and TSL refraction.",
             "canonicalLabId": "webgpu-touch-history-frost"
@@ -2537,7 +2537,7 @@
             "labs/runtime/lifecycle-profile.mjs",
             "threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost"
           ],
-          "sourceHash": "sha256:03e91ff6e6dd78f32c9b32143a28ca560c1332ca6e6abede836c387430b534fe",
+          "sourceHash": "sha256:cf45abc35d5dd9f1c5b5f180e1c57de0a44fdbcd281126dd53121a31f3af2ac3",
           "proxyStatus": null
         }
       ],
@@ -3056,7 +3056,7 @@
             "threejs-water-optics/examples/webgpu-bounded-water/integration-stage.js",
             "threejs-water-optics/examples/webgpu-bounded-water/webgpu-bounded-water.js"
           ],
-          "sourceHash": "sha256:ee567208048ea566e42c5972e06890e54ebefb6e63c6eee51d6c10afa686d885",
+          "sourceHash": "sha256:35d83f50227954e02492c8d87ee9bec5379074d8f3821f7e89b5eaaf83f30780",
           "proxyStatus": null
         },
         {

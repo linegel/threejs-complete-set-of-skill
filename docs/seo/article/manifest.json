@@ -143,37 +143,6 @@
       },
       "dependencyClosureHash": "sha256:216b01d30a9b68a92816dc50dbb095cfc52125addbed6e8bf8b9d43ebea1f7aa"
     },
-    "threejs-dynamic-surface-effects": {
-      "ownerId": "webgpu-touch-history-frost",
-      "source": "https://threejs-skills.com/visual-validation/webgpu-touch-history-frost/final.design.png",
-      "sourceSha256": "sha256:4fddb7f7faf27042ed9d0ee454fb7dc9d10a42f2b6b1789803c5890246efccd9",
-      "sourceWidth": 1200,
-      "sourceHeight": 800,
-      "images": {
-        "1x1": {
-          "url": "https://threejs-skills.com/seo/article/threejs-dynamic-surface-effects-1x1.png",
-          "width": 1200,
-          "height": 1200,
-          "bytes": 272359,
-          "sha256": "sha256:d50d8a3fe149424d4cb8e452b888d03eaeb0b28c3b61e86f01d24e3267a01eca"
-        },
-        "4x3": {
-          "url": "https://threejs-skills.com/seo/article/threejs-dynamic-surface-effects-4x3.png",
-          "width": 1200,
-          "height": 900,
-          "bytes": 224210,
-          "sha256": "sha256:82fd7ea399b07d41fa3b4e31a17ec5f46b6c5875e812f2779c42d8c2a9180452"
-        },
-        "16x9": {
-          "url": "https://threejs-skills.com/seo/article/threejs-dynamic-surface-effects-16x9.png",
-          "width": 1200,
-          "height": 675,
-          "bytes": 158694,
-          "sha256": "sha256:d16d238f4f593859277eb84fe4ae27c2e1e4704b984c178be7fe847785af1306"
-        }
-      },
-      "dependencyClosureHash": "sha256:cbb5b20920435cdb28db1c2d9868d920b503ef0973870da3e7ad752b2d725de7"
-    },
     "threejs-image-pipeline": {
       "ownerId": "creature-habitat",
       "source": "https://threejs-skills.com/visual-validation/creature-habitat/final.design.png",

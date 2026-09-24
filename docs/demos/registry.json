@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:466bfaa1379c77e7660d4e6fab015b0529f8ba02aeb3cd8161b7d3ed8911fc7b",
+  "buildRevision": "sha256:de7025cf80da8e1c51de4d4ed4570ea5e053c396346c2d317a93a24b9a707ed4",
   "demoKinds": [
     "canonical-lab",
     "mechanism-demo",
@@ -2020,7 +2020,7 @@
       "evidenceContract": "none",
       "evidenceBundle": null,
       "validationCommand": "npm --prefix threejs-dynamic-surface-effects/examples/webgpu-touch-history-frost run validate:generated-assets",
-      "sourceHash": "sha256:26ba7fca71611434f019d7b3d00a2142609c64b8d0af7db9fc1353041eff60a8",
+      "sourceHash": "sha256:d94317f77d101aaa1962b3cc2b1cbdd816594f65ecf3a7eba19b7eec6dcf8f57",
       "proxyStatus": {
         "limitation": "Generated crystal maps are reduced-tier static inputs. The production frost path remains StorageTexture history, reduced blur, and TSL refraction.",
         "canonicalLabId": "webgpu-touch-history-frost"
@@ -6642,7 +6642,7 @@
         "validateQuick": "npm --prefix integration-labs/weathered-world run validate:quick",
         "validateFull": "npm --prefix integration-labs/weathered-world run validate:full"
       },
-      "sourceHash": "sha256:ee567208048ea566e42c5972e06890e54ebefb6e63c6eee51d6c10afa686d885",
+      "sourceHash": "sha256:35d83f50227954e02492c8d87ee9bec5379074d8f3821f7e89b5eaaf83f30780",
       "proxyStatus": null,
       "notes": [
         "The atmosphere and cloud stages now contain the corrected live-input, bounded-domain, persistent-history, sampled-depth, radiometric, and source-level composition paths.",
@@ -12826,7 +12826,7 @@
       "evidenceContract": "v2",
       "evidenceBundle": "docs/visual-validation/webgpu-touch-history-frost/bundle",
       "validationCommand": "node validate-temporal-surface.js",
-      "sourceHash": "sha256:03e91ff6e6dd78f32c9b32143a28ca560c1332ca6e6abede836c387430b534fe",
+      "sourceHash": "sha256:cf45abc35d5dd9f1c5b5f180e1c57de0a44fdbcd281126dd53121a31f3af2ac3",
       "proxyStatus": null,
       "executionClass": "rendering",
       "flagship": false,

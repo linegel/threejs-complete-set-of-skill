@@ -59,11 +59,27 @@
       <h1>WebGPU Procedural Creature Lab</h1>
       <p>Interactive Three.js WebGPU/TSL demo for WebGPU Procedural Creature Lab, with 7 scenarios, 8 mechanisms, and 3 quality tiers and evidence-gated validation.</p>
       <p class="demo-seo-shell__evidence"><strong>Evidence status:</strong> Accepted runtime evidence is available for the published contract represented by this demo.</p>
-      <details class="demo-roadmap" data-demo-roadmap data-roadmap-status="accepted" data-open-count="0">
-        <summary>Readiness &amp; remaining fixes <span>0</span></summary>
+      <details class="demo-roadmap" data-demo-roadmap data-roadmap-status="accepted" data-open-count="4">
+        <summary>Readiness &amp; remaining fixes <span>4</span></summary>
         <div class="demo-roadmap__body">
-          <p>The declared published contract has accepted evidence and no open acceptance gates.</p>
-          <ol><li data-roadmap-item data-priority="done" data-category="accepted"><div><span>DONE</span><strong>No open acceptance gates</strong></div><p>The declared published contract is accepted.</p><code>status.accepted</code></li></ol>
+          <p>Declared evidence work remains. Overall implementation status does not establish individual runtime or performance claims.</p>
+          <ol><li data-roadmap-item data-priority="P0" data-category="capability">
+          <div><span>P0</span><strong>Storage Buffers capability proof</strong></div>
+          <p>src/tsl/pose-storage.js defines pose, root, and owner-inclusive candidate storage; current-source readback evidence is pending</p>
+          <code>capabilityRequirements.storage-buffers</code>
+        </li><li data-roadmap-item data-priority="P0" data-category="runtime">
+          <div><span>P0</span><strong>Candidate Certification runtime proof</strong></div>
+          <p>candidate-set-sweep and raise-k-policy-fixture prove frozen-corpus K/storage agreement on CPU; GPU binding recapture is pending</p>
+          <code>runtimeProof.candidate-certification</code>
+        </li><li data-roadmap-item data-priority="P0" data-category="runtime">
+          <div><span>P0</span><strong>Shadow Parity runtime proof</strong></div>
+          <p>visible and cast-shadow materials share the owner-masked deformation node; current-source atlas evidence is pending</p>
+          <code>runtimeProof.shadow-parity</code>
+        </li><li data-roadmap-item data-priority="P0" data-category="runtime">
+          <div><span>P0</span><strong>Current Adapter Performance runtime proof</strong></div>
+          <p>INSUFFICIENT_EVIDENCE: frozen hero/crowd/background 60 Hz profiles and a timestamp-query measurement API now exist, but current-source profile artifacts are pending and the runtime still identifies its geometry as a diagnostic owner-masked shell. The legacy measureSteadyFrames submission proxy is explicitly ineligible for acceptance. A 2026-07-11 browser audit measured the same approximately 33.3 ms requestAnimationFrame baseline with the render loop active and paused; the fail-closed evaluator rejects that host cadence.</p>
+          <code>runtimeProof.current-adapter-performance</code>
+        </li></ol>
         </div>
       </details>
       <p>Use the linked skill and source to inspect route ownership and evidence classification before treating this presentation as an accepted implementation.</p>

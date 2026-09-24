@@ -75,17 +75,17 @@ function readJson(path) {
 }
 
 export function extractRuntimeBackendProof(document) {
-  const captureMetrics = document.runtime?.metrics ?? document.finalRuntime?.metrics ?? null;
+  const captureMetrics = document.finalRuntime?.metrics ?? document.runtime?.metrics ?? null;
   const backendEvidence = captureMetrics?.rendererBackendEvidence ?? null;
   const backend = document.backend ?? document.rendererInfo?.backend ?? captureMetrics?.backend ?? null;
-  const isWebGPUBackend = backend?.isWebGPUBackend
-    ?? document.isWebGPUBackend
-    ?? document.rendererInfo?.isWebGPUBackend
-    ?? backendEvidence?.isWebGPUBackend
-    ?? captureMetrics?.backendIsWebGPU
-    ?? (typeof backend === 'string' && /webgpu/i.test(backend))
-    ?? (typeof document.backend === 'string' && /webgpu/i.test(document.backend))
-    ?? false;
+  // Names describe a backend; only explicit observations establish its identity.
+  // Contradictory observations cannot be promoted by selecting the positive one.
+  const observedBoolean = (...values) => !values.includes(false) && values.includes(true);
+  const isWebGPUBackend = observedBoolean(
+    backend?.isWebGPUBackend, document.isWebGPUBackend,
+    document.rendererInfo?.isWebGPUBackend, backendEvidence?.isWebGPUBackend,
+    captureMetrics?.backendIsWebGPU,
+  );
   const name = typeof backend === 'string'
     ? backend
     : backend?.name
@@ -109,17 +109,19 @@ export function extractRuntimeBackendProof(document) {
     }
     : rawAdapter;
   const webgpuProven = isWebGPUBackend === true;
-  // Coherence: if the proof document only serializes backend name/isWebGPUBackend
-  // (mechanism-metrics / renderer-info without full capture metrics), still mark
-  // nativeWebGPU/initialized when WebGPU is proven so published summaries are not
-  // half-true (isWebGPUBackend true, nativeWebGPU false).
+  // Backend identity does not establish initialization or GPU timing.
   return {
     renderer: document.renderer ?? captureMetrics?.rendererInfo?.rendererType ?? (name === 'WebGPUBackend' || webgpuProven ? 'WebGPURenderer' : 'unknown'),
     backend: name === 'unknown' && webgpuProven ? 'WebGPUBackend' : name,
     isWebGPUBackend: webgpuProven,
     threeRevision: document.threeRevision ?? captureMetrics?.threeRevision ?? null,
-    nativeWebGPU: captureMetrics?.nativeWebGPU === true || document.nativeWebGPU === true || webgpuProven,
-    initialized: captureMetrics?.initialized === true || document.initialized === true || webgpuProven,
+    nativeWebGPU: webgpuProven && observedBoolean(
+      captureMetrics?.nativeWebGPU, document.nativeWebGPU, webgpuProven,
+    ),
+    initialized: observedBoolean(
+      captureMetrics?.initialized, backendEvidence?.initialized,
+      document.initialized, document.rendererInfo?.initialized,
+    ),
     adapterClass: document.adapterClass ?? document.browser?.adapterClass ?? (webgpuProven ? 'unknown' : null),
     adapterIdentity,
     deviceIdentity: backendEvidence
@@ -157,7 +159,7 @@ export function normalizedPreviewClaimVerdicts(document) {
   }
   return {
     mechanismCorrectness: document.verdict ?? 'INSUFFICIENT_EVIDENCE',
-    performanceCompliance: document.performanceVerdict ?? document.verdict ?? 'INSUFFICIENT_EVIDENCE',
+    performanceCompliance: document.performanceVerdict ?? 'NOT_CLAIMED',
     lifecycleStability: document.lifecycleVerdict ?? 'INSUFFICIENT_EVIDENCE',
   };
 }

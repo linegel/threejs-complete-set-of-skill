@@ -163,5 +163,6 @@ test('the live registry has one statically auditable capture policy per primary 
   assert.equal(result.primaryCount, registry.counts.primary);
   assert.deepEqual(result.records.map(({ id }) => id).sort(), [...new Set(result.records.map(({ id }) => id))].sort());
   assert.deepEqual(result.errors, []);
-  assert.equal(result.records.filter(({ policy }) => policy === NON_RENDERING_CAPTURE_POLICY).length, 2);
+  const nonRenderingCount = registry.demos.filter((demo) => PRIMARY_DEMO_KINDS.includes(demo.kind) && demo.nonRenderingScenarioSuite === true).length;
+  assert.equal(result.records.filter(({ policy }) => policy === NON_RENDERING_CAPTURE_POLICY).length, nonRenderingCount);
 });

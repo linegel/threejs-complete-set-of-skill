@@ -40,8 +40,8 @@
     "docs/demos/assets/three.webgpu-Bxw5NSti.js",
     "docs/demos/assets/three.webgpu-Dss1ekdK.js"
   ],
-  "publishedBundleHash": "sha256:013cb38db6a97ec86cbf7d03620fb0d6b9e0b8eefd7b439538dd6947b69352a3",
+  "publishedBundleHash": "sha256:c31ea5082b2b4b41abbee9664591b3a5a7bc771ae6ffff72597e66a7da150fb3",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:466bfaa1379c77e7660d4e6fab015b0529f8ba02aeb3cd8161b7d3ed8911fc7b",
+  "buildRevision": "sha256:de7025cf80da8e1c51de4d4ed4570ea5e053c396346c2d317a93a24b9a707ed4",
   "evidenceBundleId": null
 }

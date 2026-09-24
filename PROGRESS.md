@@ -73,17 +73,17 @@ Status: complete means delivered and recorded; pending means not yet established
 9. [x] Repair evidence text sizes and narrow overflow (ae403366).
 10. [x] Fix preflight imports and executable-permission checks (bed34f1f).
 11. [x] Refresh evidence publication date (43abcf0b).
-12. [ ] Reproduce the five remaining tests on the pinned toolchain.
-13. [ ] Trace favicon failure handling and preserve legitimate error reporting.
-14. [ ] Resolve capture-hook detection using the actual configured paths.
-15. [ ] Verify Frost profile forwarding without changing its runtime contract.
-16. [ ] Correct stale roster assertions without weakening capture checks.
-17. [ ] Derive roadmap expectations from declared open fields and accepted tiers.
-18. [ ] Verify accepted labels cannot invent missing current-adapter timing proof.
-19. [ ] Preserve unknown/false backend identity and initialization facts.
-20. [ ] Test partial, contradictory, and complete runtime-proof records.
+12. [x] Reproduce the five remaining tests on the pinned toolchain.
+13. [x] Trace favicon failure handling and preserve legitimate error reporting.
+14. [x] Resolve capture-hook detection using the actual configured paths.
+15. [x] Verify Frost profile forwarding without changing its runtime contract.
+16. [x] Correct stale roster assertions without weakening capture checks.
+17. [x] Derive roadmap expectations from declared open fields and accepted tiers.
+18. [x] Verify accepted labels cannot invent missing current-adapter timing proof.
+19. [x] Preserve unknown/false backend identity and initialization facts.
+20. [x] Test partial, contradictory, and complete runtime-proof records.
 21. [ ] Commit and push the finished capture/evidence correction.
-22. [ ] Reproduce object-sculptor bootstrap loading in isolated browser MCP.
+22. [x] Reproduce object-sculptor bootstrap loading in isolated browser MCP.
 23. [ ] Repair its source-owned bundling without removing controls or routes.
 24. [ ] Exercise object selection, diagnostics, reload, and history restoration.
 25. [ ] Inspect affected desktop layouts at 1024, 1280, 1440, and 1728px.
@@ -108,3 +108,25 @@ The first unit changes diagnostics and capture configuration, not visual layout.
 Reproduce recorded failures with focused tests; distinguish stale assertions from
 runtime defects. Preserve earlier image/layout evidence. For a user-facing change,
 inspect the affected rendered demo through browser MCP before reporting it fixed.
+
+## Capture/evidence correction results
+Pinned root unit suite: 208/208 pass; focused changed suite: 47/47 pass.
+The Weathered World hook path now resolves from its npm package directory. Frost
+forwards correctness/performance and output arguments; performance records cannot
+pass through its correctness-only finalizer. A declared SVG failure remains fatal.
+The roadmap reads each declared proof even when overall status says accepted; it
+does not invent open work for accepted tiers. Backend names no longer imply device
+initialization, explicit false observations survive, and the final snapshot wins.
+
+Browser observation: the creature demo's opened documentation drawer displays its
+four remaining proof records, including current-adapter timestamps. The same load
+reported zero console errors and failed network requests. The screenshot still
+shows shader compilation behind the drawer, so it establishes the drawer result,
+not completed creature rendering. Its undersized shared labels join the inspector
+readability repair. The object-sculptor baseline shows a rendered bonsai but a 404
+for its classic bootstrap script, truncated metric values, and labels below 12px.
+
+Full site build passes. Changing Frost's capture source invalidates its prior
+promoted preview binding; the builder withholds those images rather than relabeling
+old evidence. Current publication has 191 preview sources and 48 article crops.
+This is not new Frost render or performance acceptance. Original PNGs remain intact.

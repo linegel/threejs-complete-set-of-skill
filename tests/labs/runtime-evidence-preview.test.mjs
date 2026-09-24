@@ -74,6 +74,16 @@ test('runtime evidence extracts native backend and bounded claims from capture s
     backend: 'WebGPUBackend',
     isWebGPUBackend: true,
     threeRevision: '0.185.1',
+    nativeWebGPU: true,
+    initialized: false,
+    adapterClass: 'unknown',
+    adapterIdentity: {
+      source: 'capture-session.rendererBackendEvidence',
+      backendType: 'WebGPUBackend', deviceType: null,
+      deviceIdentityVerified: false, lossPromiseObservedOnActualDevice: false,
+      rendererDeviceGeneration: null,
+    },
+    deviceIdentity: { verified: false, source: null, deviceType: null, generation: null },
   });
   assert.deepEqual(normalizedPreviewClaimVerdicts(session), {
     visualCorrectness: 'PASS',
@@ -92,4 +102,53 @@ test('runtime evidence promotion selects explicit labs and rejects filter drift'
   assert.deepEqual(selectRuntimeEvidencePreviews(config), config.previews);
   assert.throws(() => selectRuntimeEvidencePreviews(config, ['missing']), /has no labs/);
   assert.throws(() => selectRuntimeEvidencePreviews(config, ['alpha', 'alpha']), /duplicates/);
+});
+
+test('backend names cannot invent device or initialization proof', () => {
+  for (const backend of ['WebGPUBackend', 'not-webgpu', 'WebGLBackend']) {
+    const proof = extractRuntimeBackendProof({ backend });
+    assert.equal(proof.isWebGPUBackend, false);
+    assert.equal(proof.initialized, false);
+    assert.equal(proof.deviceIdentity, null);
+  }
+  const proof = extractRuntimeBackendProof({ isWebGPUBackend: true, initialized: false, nativeWebGPU: false });
+  assert.equal(proof.initialized, false);
+  assert.equal(proof.nativeWebGPU, false);
+});
+
+test('the final snapshot controls capture proof and contradictions fail closed', () => {
+  const proof = extractRuntimeBackendProof({
+    runtime: { metrics: { initialized: true, rendererBackendEvidence: { isWebGPUBackend: true } } },
+    finalRuntime: { metrics: { initialized: false, rendererBackendEvidence: { isWebGPUBackend: false } } },
+  });
+  assert.equal(proof.isWebGPUBackend, false);
+  assert.equal(proof.initialized, false);
+  assert.equal(extractRuntimeBackendProof({
+    isWebGPUBackend: true,
+    finalRuntime: { metrics: { rendererBackendEvidence: { isWebGPUBackend: false } } },
+  }).isWebGPUBackend, false);
+});
+
+test('complete initialized device observations remain explicit', () => {
+  const proof = extractRuntimeBackendProof({
+    adapterClass: 'hardware',
+    finalRuntime: { metrics: {
+      initialized: true, nativeWebGPU: true, rendererBackend: 'WebGPUBackend',
+      rendererBackendEvidence: {
+        isWebGPUBackend: true, initialized: true, deviceIdentityVerified: true,
+        deviceIdentitySource: 'controller.renderer.backend.device',
+        lossPromiseObservedOnActualDevice: true, rendererDeviceGeneration: 2,
+      },
+    } },
+  });
+  assert.equal(proof.initialized, true);
+  assert.equal(proof.nativeWebGPU, true);
+  assert.equal(proof.deviceIdentity.verified, true);
+  assert.equal(proof.deviceIdentity.generation, 2);
+  assert.equal(proof.adapterClass, 'hardware');
+});
+
+test('a generic passing verdict does not establish performance', () => {
+  assert.equal(normalizedPreviewClaimVerdicts({ verdict: 'PASS' }).performanceCompliance, 'NOT_CLAIMED');
+  assert.equal(normalizedPreviewClaimVerdicts({ performanceVerdict: 'FAIL' }).performanceCompliance, 'FAIL');
 });

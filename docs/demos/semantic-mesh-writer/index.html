@@ -50,11 +50,43 @@
       <h1>Semantic Mesh Writer</h1>
       <p>Interactive Three.js WebGPU/TSL demo for Semantic Mesh Writer, with 6 scenarios, 6 mechanisms, and 3 quality tiers and evidence-gated validation.</p>
       <p class="demo-seo-shell__evidence"><strong>Evidence status:</strong> Accepted runtime evidence is available for the published contract represented by this demo.</p>
-      <details class="demo-roadmap" data-demo-roadmap data-roadmap-status="accepted" data-open-count="0">
-        <summary>Readiness &amp; remaining fixes <span>0</span></summary>
+      <details class="demo-roadmap" data-demo-roadmap data-roadmap-status="accepted" data-open-count="8">
+        <summary>Readiness &amp; remaining fixes <span>8</span></summary>
         <div class="demo-roadmap__body">
-          <p>The declared published contract has accepted evidence and no open acceptance gates.</p>
-          <ol><li data-roadmap-item data-priority="done" data-category="accepted"><div><span>DONE</span><strong>No open acceptance gates</strong></div><p>The declared published contract is accepted.</p><code>status.accepted</code></li></ol>
+          <p>Declared evidence work remains. Overall implementation status does not establish individual runtime or performance claims.</p>
+          <ol><li data-roadmap-item data-priority="P0" data-category="performance">
+          <div><span>P0</span><strong>Define and measure the target performance contract</strong></div>
+          <p>The hero, standard, crowd tiers have no accepted frame target. Record named device/browser/GPU, viewport, DPR, sustained CPU/GPU/presentation p50 and p95, deadline misses, memory, and settled quality. Submission time is not GPU timing.</p>
+          <code>tiers[].frameTargetMs</code>
+        </li><li data-roadmap-item data-priority="P0" data-category="capability">
+          <div><span>P0</span><strong>Native Webgpu capability proof</strong></div>
+          <p>The canonical controller blocks unless renderer.backend.isWebGPUBackend is true after initialization.</p>
+          <code>capabilityRequirements.native-webgpu</code>
+        </li><li data-roadmap-item data-priority="P0" data-category="capability">
+          <div><span>P0</span><strong>Storage Buffers capability proof</strong></div>
+          <p>StorageInstancedBufferAttribute and IndirectStorageBufferAttribute are required by the batching-comparison and indirect-draw routes.</p>
+          <code>capabilityRequirements.storage-buffers</code>
+        </li><li data-roadmap-item data-priority="P0" data-category="runtime">
+          <div><span>P0</span><strong>Renderer Init runtime proof</strong></div>
+          <p>Await createGeometryLabController(), which awaits renderer.init() before constructing proof state.</p>
+          <code>runtimeProof.renderer-init</code>
+        </li><li data-roadmap-item data-priority="P0" data-category="runtime">
+          <div><span>P0</span><strong>Backend Is Webgpu runtime proof</strong></div>
+          <p>Capture renderer.backend.isWebGPUBackend === true from the initialized controller.</p>
+          <code>runtimeProof.backend-is-webgpu</code>
+        </li><li data-roadmap-item data-priority="P0" data-category="runtime">
+          <div><span>P0</span><strong>Mechanism Reachable runtime proof</strong></div>
+          <p>Load every physical mechanism route and reconcile the selected runtime graph against its locked startup mode.</p>
+          <code>runtimeProof.mechanism-reachable</code>
+        </li><li data-roadmap-item data-priority="P0" data-category="runtime">
+          <div><span>P0</span><strong>Aligned Readback runtime proof</strong></div>
+          <p>Capture MRT pixels using the controller&#39;s integer 256-byte-aligned row-stride contract.</p>
+          <code>runtimeProof.aligned-readback</code>
+        </li><li data-roadmap-item data-priority="P0" data-category="runtime">
+          <div><span>P0</span><strong>Indirect Command runtime proof</strong></div>
+          <p>Read back the compute-written indexed indirect command and reconcile its instanceCount with submitted work.</p>
+          <code>runtimeProof.indirect-command</code>
+        </li></ol>
         </div>
       </details>
       <p>Use the linked skill and source to inspect route ownership and evidence classification before treating this presentation as an accepted implementation.</p>

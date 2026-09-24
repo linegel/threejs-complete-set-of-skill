@@ -64,11 +64,31 @@
       <h1>WebGPU Bounded Water</h1>
       <p>Interactive Three.js WebGPU/TSL demo for WebGPU Bounded Water, with 1 scenario, 6 mechanisms, and 4 quality tiers and evidence-gated validation.</p>
       <p class="demo-seo-shell__evidence"><strong>Evidence status:</strong> Accepted runtime evidence is available for the published contract represented by this demo.</p>
-      <details class="demo-roadmap" data-demo-roadmap data-roadmap-status="accepted" data-open-count="0">
-        <summary>Readiness &amp; remaining fixes <span>0</span></summary>
+      <details class="demo-roadmap" data-demo-roadmap data-roadmap-status="accepted" data-open-count="5">
+        <summary>Readiness &amp; remaining fixes <span>5</span></summary>
         <div class="demo-roadmap__body">
-          <p>The declared published contract has accepted evidence and no open acceptance gates.</p>
-          <ol><li data-roadmap-item data-priority="done" data-category="accepted"><div><span>DONE</span><strong>No open acceptance gates</strong></div><p>The declared published contract is accepted.</p><code>status.accepted</code></li></ol>
+          <p>Declared evidence work remains. Overall implementation status does not establish individual runtime or performance claims.</p>
+          <ol><li data-roadmap-item data-priority="P0" data-category="performance">
+          <div><span>P0</span><strong>Define and measure the target performance contract</strong></div>
+          <p>The ultra, high, medium, low tiers have no accepted frame target. Record named device/browser/GPU, viewport, DPR, sustained CPU/GPU/presentation p50 and p95, deadline misses, memory, and settled quality. Submission time is not GPU timing.</p>
+          <code>tiers[].frameTargetMs</code>
+        </li><li data-roadmap-item data-priority="P0" data-category="runtime">
+          <div><span>P0</span><strong>Heightfield Readback runtime proof</strong></div>
+          <p>presentation final/no-post/diagnostics RGBA8 readbacks captured; specialized heightfield storage probe remains residual for full acceptance.</p>
+          <code>runtimeProof.heightfield-readback</code>
+        </li><li data-roadmap-item data-priority="P0" data-category="runtime">
+          <div><span>P0</span><strong>Receiver Caustic Energy Readback runtime proof</strong></div>
+          <p>GPU storage-buffer energy-closure probe required for full acceptance; not claimed on primary correctness lane.</p>
+          <code>runtimeProof.receiver-caustic-energy-readback</code>
+        </li><li data-roadmap-item data-priority="P0" data-category="runtime">
+          <div><span>P0</span><strong>Opaque Color Depth Without Water runtime proof</strong></div>
+          <p>primary correctness presentation captured; specialized opaque-without-water pass proof residual for full acceptance.</p>
+          <code>runtimeProof.opaque-color-depth-without-water</code>
+        </li><li data-roadmap-item data-priority="P0" data-category="runtime">
+          <div><span>P0</span><strong>GPU Mutation Probes runtime proof</strong></div>
+          <p>async-impulse-loss and receiver-energy-closure probes required for full acceptance; not claimed on primary correctness lane.</p>
+          <code>runtimeProof.gpu-mutation-probes</code>
+        </li></ol>
         </div>
       </details>
       <p>Use the linked skill and source to inspect route ownership and evidence classification before treating this presentation as an accepted implementation.</p>

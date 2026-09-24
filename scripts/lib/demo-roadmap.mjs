@@ -28,14 +28,6 @@ function gateItem(category, entry) {
 export function buildDemoRoadmap(lab) {
   if (!lab || typeof lab !== 'object') throw new TypeError('buildDemoRoadmap requires a demo registry record');
 
-  if (lab.status === 'accepted') {
-    return {
-      status: lab.status,
-      summary: 'The declared published contract has accepted evidence and no open acceptance gates.',
-      items: [],
-    };
-  }
-
   if (lab.status === 'secondary') {
     const canonicalLabId = lab.proxyStatus?.canonicalLabId ?? null;
     return {
@@ -72,7 +64,7 @@ export function buildDemoRoadmap(lab) {
   items.push(...capabilityGates.map((entry) => gateItem('capability', entry)));
   items.push(...runtimeGates.map((entry) => gateItem('runtime', entry)));
 
-  if (!lab.evidenceBundle) {
+  if (!lab.evidenceBundle && lab.status !== 'accepted') {
     items.push({
       id: 'evidence:current-source-bundle',
       priority: 'P1',
@@ -98,7 +90,9 @@ export function buildDemoRoadmap(lab) {
   items.sort((left, right) => priorityOrder.get(left.priority) - priorityOrder.get(right.priority));
   return {
     status: lab.status,
-    summary: `${items.length} open closure item${items.length === 1 ? '' : 's'}. Loadable does not mean accepted or performance-valid.`,
+    summary: items.length > 0
+      ? 'Declared evidence work remains. Overall implementation status does not establish individual runtime or performance claims.'
+      : 'Every declared capability, runtime proof, and tier has accepted evidence.',
     items,
   };
 }

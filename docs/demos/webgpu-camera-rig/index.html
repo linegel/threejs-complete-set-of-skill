@@ -58,11 +58,31 @@
       <h1>WebGPU Camera Rig</h1>
       <p>Interactive Three.js WebGPU/TSL demo for WebGPU Camera Rig, with 1 scenario, 6 mechanisms, and 3 quality tiers and evidence-gated validation.</p>
       <p class="demo-seo-shell__evidence"><strong>Evidence status:</strong> Accepted runtime evidence is available for the published contract represented by this demo.</p>
-      <details class="demo-roadmap" data-demo-roadmap data-roadmap-status="accepted" data-open-count="0">
-        <summary>Readiness &amp; remaining fixes <span>0</span></summary>
+      <details class="demo-roadmap" data-demo-roadmap data-roadmap-status="accepted" data-open-count="5">
+        <summary>Readiness &amp; remaining fixes <span>5</span></summary>
         <div class="demo-roadmap__body">
-          <p>The declared published contract has accepted evidence and no open acceptance gates.</p>
-          <ol><li data-roadmap-item data-priority="done" data-category="accepted"><div><span>DONE</span><strong>No open acceptance gates</strong></div><p>The declared published contract is accepted.</p><code>status.accepted</code></li></ol>
+          <p>Declared evidence work remains. Overall implementation status does not establish individual runtime or performance claims.</p>
+          <ol><li data-roadmap-item data-priority="P0" data-category="performance">
+          <div><span>P0</span><strong>Define and measure the target performance contract</strong></div>
+          <p>The full, budgeted, minimum tiers have no accepted frame target. Record named device/browser/GPU, viewport, DPR, sustained CPU/GPU/presentation p50 and p95, deadline misses, memory, and settled quality. Submission time is not GPU timing.</p>
+          <code>tiers[].frameTargetMs</code>
+        </li><li data-roadmap-item data-priority="P0" data-category="capability">
+          <div><span>P0</span><strong>Storage Buffer capability proof</strong></div>
+          <p>origin storage is part of the camera-rig controller contract; dedicated storage binary ledger residual for full acceptance.</p>
+          <code>capabilityRequirements.storage-buffer</code>
+        </li><li data-roadmap-item data-priority="P0" data-category="runtime">
+          <div><span>P0</span><strong>MRT Readback runtime proof</strong></div>
+          <p>MRT attachment recipes residual; primary presentation readbacks only on this package.</p>
+          <code>runtimeProof.mrt-readback</code>
+        </li><li data-roadmap-item data-priority="P0" data-category="runtime">
+          <div><span>P0</span><strong>Origin Storage Readback runtime proof</strong></div>
+          <p>origin storage binary ledger residual for full acceptance.</p>
+          <code>runtimeProof.origin-storage-readback</code>
+        </li><li data-roadmap-item data-priority="P0" data-category="runtime">
+          <div><span>P0</span><strong>Current Adapter GPU Timestamp runtime proof</strong></div>
+          <p>timestampQueriesActive remains false for correctness profile; GPU timing is not accepted as performance evidence.</p>
+          <code>runtimeProof.current-adapter-gpu-timestamp</code>
+        </li></ol>
         </div>
       </details>
       <p>Use the linked skill and source to inspect route ownership and evidence classification before treating this presentation as an accepted implementation.</p>
