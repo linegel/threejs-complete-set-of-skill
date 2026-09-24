@@ -2,6 +2,9 @@ import { createHash } from 'node:crypto';
 import {
   existsSync,
   lstatSync,
+  mkdirSync,
+  realpathSync,
+  writeFileSync,
   readFileSync,
   readdirSync,
 } from 'node:fs';
@@ -125,4 +128,33 @@ export function computePublishedBundleHash(repoRoot, inputs) {
     hash.update('\0');
   }
   return `sha256:${hash.digest('hex')}`;
+}
+
+// Classic scripts can depend on synchronous head execution and currentScript.
+// Copy their bytes unchanged instead of silently turning them into modules.
+export function stageClassicScripts(html, { entryPath, repoRoot, publicRoot }) {
+  const root = realpathSync(repoRoot);
+  return html.replace(/<script\b([^>]*)>[\s\S]*?<\/script\s*>/gi, (tag, attributes) => {
+    const type = attributes.match(/(?:^|\s)type\s*=\s*(["'])([^"']*)\1/i)?.[2];
+    if (type && !/^(?:text|application)\/javascript$/i.test(type)) return tag;
+    const source = attributes.match(/(?:^|\s)src\s*=\s*(["'])([^"']+)\1/i)?.[2];
+    if (!source || /^(?:[a-z][a-z0-9+.-]*:|\/\/)/i.test(source)) return tag;
+    const [pathname] = source.split(/[?#]/, 1);
+    const suffix = source.slice(pathname.length);
+    const decoded = decodeURIComponent(pathname);
+    const sourcePath = realpathSync(decoded.startsWith('/')
+      ? resolve(root, decoded.replace(/^\/+/, ''))
+      : resolve(dirname(entryPath), decoded));
+    if (!sourcePath.startsWith(`${root}${sep}`) || !lstatSync(sourcePath).isFile()) {
+      throw new Error(`Classic script is outside its repository: ${source}`);
+    }
+    const bytes = readFileSync(sourcePath);
+    const digest = createHash('sha256').update(bytes).digest('hex');
+    const filename = `classic-${digest}.js`;
+    const output = join(publicRoot, 'assets', filename);
+    mkdirSync(dirname(output), { recursive: true });
+    if (!existsSync(output)) writeFileSync(output, bytes, { flag: 'wx' });
+    else if (!readFileSync(output).equals(bytes)) throw new Error(`Classic script asset collision: ${filename}`);
+    return tag.replace(/(\ssrc\s*=\s*)(["'])([^"']+)\2/i, (_match, prefix, quote) => `${prefix}${quote}/assets/${filename}${suffix}${quote}`);
+  });
 }

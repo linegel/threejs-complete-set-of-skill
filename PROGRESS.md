@@ -82,9 +82,9 @@ Status: complete means delivered and recorded; pending means not yet established
 18. [x] Verify accepted labels cannot invent missing current-adapter timing proof.
 19. [x] Preserve unknown/false backend identity and initialization facts.
 20. [x] Test partial, contradictory, and complete runtime-proof records.
-21. [ ] Commit and push the finished capture/evidence correction.
+21. [x] Commit and push the finished capture/evidence correction (af24decc).
 22. [x] Reproduce object-sculptor bootstrap loading in isolated browser MCP.
-23. [ ] Repair its source-owned bundling without removing controls or routes.
+23. [x] Repair its source-owned bundling without removing controls or routes.
 24. [ ] Exercise object selection, diagnostics, reload, and history restoration.
 25. [ ] Inspect affected desktop layouts at 1024, 1280, 1440, and 1728px.
 26. [ ] Inspect affected non-map layouts at 390 and 768px after desktop passes.
@@ -130,3 +130,29 @@ Full site build passes. Changing Frost's capture source invalidates its prior
 promoted preview binding; the builder withholds those images rather than relabeling
 old evidence. Current publication has 191 preview sources and 48 article crops.
 This is not new Frost render or performance acceptance. Original PNGs remain intact.
+
+## What to test: published scripts and inspector readability
+The object-sculptor entry must keep its synchronous head bootstrap and exact source
+bytes. Converting it to a module would break document.currentScript and observer
+installation order, so publication will copy classic scripts through Vite's public
+asset path with content-based names. Module scripts retain the normal bundler path.
+
+The inspector keeps all existing subject/mode/tier/camera behavior and diagnostic
+facts. Labels use at least 12px; values wrap rather than truncate. Metric geometry
+must leave no partial final row. Small-screen controls remain reachable without
+covering the entire object. The shared evidence drawer receives the same type floor.
+Check desktop widths 1024, 1280, 1440, and 1728 before 390/768. Exercise subject and
+mode changes, camera control, keyboard input, reload, history, hover details, and
+same-load console/network output. Earlier image-cache evidence remains unchanged.
+
+## Classic script publication result
+The builder now preserves synchronous classic scripts as exact, content-addressed
+public assets. Five asset-publication tests pass. In isolated browser MCP the
+bootstrap loads from /demos/assets/classic-02b6399d3910b7432a1f23a6cc662f9f21c5f2830335872ffca7861692a90576.js,
+executes with its original correctness surface attribute, and remains capture-disabled
+on the public route. Subject selection changed the rendered bonsai into the teal
+hinged teapot; final mode settled with firstFrameCompleted and nativeWebGPU true.
+The inspected screenshot shows the complete pot, lid, handle, and spout. The same
+load has zero console warnings/errors and a successful classic-script request.
+The formerly unbundled-script warning is gone. Inspector text truncation remains
+the next UI repair; this result does not certify model fidelity or GPU timing.

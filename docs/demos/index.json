@@ -952,7 +952,7 @@
         "threejs-object-sculptor/examples/shared/sculpt-runtime.js",
         "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus"
       ],
-      "publishedBundleHash": "sha256:5793be555bc98e8755400b8b1aa25af2a2743439ec1600f6827d45ba8048c19a",
+      "publishedBundleHash": "sha256:7174ec65eda6936e2cd12a68a21a36bc94fac7adf418726250d6f214bbc9799d",
       "mechanisms": [
         "/demos/webgpu-object-sculptor-corpus/mechanism/final/",
         "/demos/webgpu-object-sculptor-corpus/mechanism/blockout/",

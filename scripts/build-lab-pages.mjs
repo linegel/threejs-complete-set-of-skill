@@ -38,6 +38,7 @@ import {
   computePublishedBundleHash,
   publishedAssetDependencies,
   publishedHashInputs,
+  stageClassicScripts,
 } from './lib/published-pages.mjs';
 import { labViteAliases } from './lib/vite-lab-config.mjs';
 import { buildDemoRoadmap } from './lib/demo-roadmap.mjs';
@@ -574,13 +575,16 @@ if (bundledPrimary.length + secondaryProviders.length > 0) {
   const stagingRoot = realpathSync(mkdtempSync(join(tmpdir(), 'threejs-lab-pages-')));
   try {
     const compiledRoot = join(stagingRoot, '__compiled');
+    const publicRoot = join(stagingRoot, '__public');
     const inputs = [];
     for (const lab of bundledPrimary) {
       const canonicalEntry = join(REPO_ROOT, lab.browserEntry);
       const stagedDir = join(stagingRoot, lab.id);
       const stagedEntry = join(stagedDir, 'index.html');
       mkdirSync(stagedDir, { recursive: true });
-      const html = readFileSync(canonicalEntry, 'utf8');
+      const html = stageClassicScripts(readFileSync(canonicalEntry, 'utf8'), {
+        entryPath: canonicalEntry, repoRoot: REPO_ROOT, publicRoot,
+      });
       const rewritten = injectDemoSeoShell(injectDemoSeo(injectPrimaryClassification(
         normalizeHtmlDocument(rewriteEntryReferences(html, canonicalEntry, stagedEntry)),
         lab,
@@ -624,6 +628,7 @@ if (bundledPrimary.length + secondaryProviders.length > 0) {
 
     await build({
       root: stagingRoot,
+      publicDir: publicRoot,
       base: './',
       logLevel: 'warn',
       resolve: {

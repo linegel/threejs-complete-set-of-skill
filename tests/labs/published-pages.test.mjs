@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
@@ -9,6 +9,7 @@ import {
   computePublishedBundleHash,
   publishedAssetDependencies,
   publishedHashInputs,
+  stageClassicScripts,
 } from '../../scripts/lib/published-pages.mjs';
 
 function fixture() {
@@ -71,4 +72,38 @@ test('missing emitted file references fail closed', () => {
   const { root, lab } = fixture();
   writeFileSync(join(lab, 'index.html'), '<script type="module" src="../assets/missing.js"></script>\n');
   assert.throws(() => publishedAssetDependencies(root, 'lab'), /published asset reference is missing/);
+});
+
+test('classic head scripts retain exact bytes, attributes, and execution order', () => {
+  const { root } = fixture();
+  const entryPath = join(root, 'index.html');
+  const publicRoot = join(root, 'public');
+  const bytes = 'window.surface = document.currentScript.dataset.surface;\n';
+  writeFileSync(join(root, 'bootstrap.js'), bytes);
+  const html = '<head><script src="./bootstrap.js" data-surface="correctness"></script><script type="module" src="./app.js"></script></head>';
+  const result = stageClassicScripts(html, { entryPath, repoRoot: root, publicRoot });
+  const asset = result.match(/src="(\/assets\/classic-[a-f0-9]{64}\.js)"/)[1];
+  assert.equal(readFileSync(join(publicRoot, asset), 'utf8'), bytes);
+  assert.match(result, /data-surface="correctness"><\/script><script type="module" src="\.\/app\.js"/);
+  assert.equal(stageClassicScripts(html, { entryPath, repoRoot: root, publicRoot }), result);
+  writeFileSync(join(root, 'bootstrap.js'), bytes + '// new bytes\n');
+  assert.notEqual(stageClassicScripts(html, { entryPath, repoRoot: root, publicRoot }), result);
+});
+
+test('inline, module, and external scripts are not copied as classic assets', () => {
+  const { root } = fixture();
+  const html = '<script>window.ready=true</script><script type="module" src="./app.js"></script><script src="https://example.org/vendor.js"></script>';
+  const publicRoot = join(root, 'public');
+  assert.equal(stageClassicScripts(html, { entryPath: join(root, 'index.html'), repoRoot: root, publicRoot }), html);
+  assert.equal(existsSync(publicRoot), false);
+});
+
+test('missing and out-of-repository classic scripts fail before publication', () => {
+  const { root } = fixture();
+  const repoRoot = join(root, 'source');
+  mkdirSync(repoRoot);
+  writeFileSync(join(root, 'outside.js'), 'window.outside=true;');
+  const options = { entryPath: join(repoRoot, 'index.html'), repoRoot, publicRoot: join(root, 'public') };
+  assert.throws(() => stageClassicScripts('<script src="./missing.js"></script>', options), /ENOENT/);
+  assert.throws(() => stageClassicScripts('<script src="../outside.js"></script>', options), /outside its repository/);
 });

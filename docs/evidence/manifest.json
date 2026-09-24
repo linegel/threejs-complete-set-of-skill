@@ -695,10 +695,10 @@
       "path": "evidence/webgpu-object-sculptor-corpus/",
       "status": "incomplete",
       "sourceHash": "sha256:a619e33bbaacb7e1afcc06f4036b26271135677342b1274f632bcab194c07046",
-      "publishedBundleHash": "sha256:5793be555bc98e8755400b8b1aa25af2a2743439ec1600f6827d45ba8048c19a",
+      "publishedBundleHash": "sha256:7174ec65eda6936e2cd12a68a21a36bc94fac7adf418726250d6f214bbc9799d",
       "evidenceBundleId": "artifacts/visual-validation/webgpu-object-sculptor-corpus/correctness",
       "media": [],
-      "htmlSha256": "sha256:7fffb3669ac4387a3c52f8504d0b7d97315c93e217139dd2d55a9108f14b7b7d"
+      "htmlSha256": "sha256:e46c32b048799ecec7c8b14bdd23740d087c2fdc8814041a1d1fd85e4665a758"
     },
     {
       "labId": "webgpu-pooled-effects",
