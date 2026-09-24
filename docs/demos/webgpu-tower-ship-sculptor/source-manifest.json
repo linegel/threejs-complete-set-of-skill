@@ -31,8 +31,8 @@
     "docs/demos/assets/three.webgpu-Dss1ekdK.js",
     "docs/demos/assets/tower-ship-reference-D3qlgi5o.png"
   ],
-  "publishedBundleHash": "sha256:ffc7bd80742d7773f94e3626a130de45d79f7a8396d410619d564e547e91477b",
+  "publishedBundleHash": "sha256:24a7b1cdb25296089f13e0b516c16219e49bc19aa87b6724e9b2ad9409cd6928",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:de7025cf80da8e1c51de4d4ed4570ea5e053c396346c2d317a93a24b9a707ed4",
+  "buildRevision": "sha256:b951f17018466135b2d841a246127bf96c7f617f6274e73736ec257a7293369f",
   "evidenceBundleId": "bundle"
 }

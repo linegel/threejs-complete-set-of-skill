@@ -1,25 +1,25 @@
 {
   "schemaVersion": 1,
   "generatedBy": "scripts/build-evidence-pages.mjs",
-  "buildRevision": "sha256:de7025cf80da8e1c51de4d4ed4570ea5e053c396346c2d317a93a24b9a707ed4",
-  "indexSha256": "sha256:b3bc30602200bfee1091998b75a119ec38e0e2e573ef8a423438cdf5cf00f7f1",
+  "buildRevision": "sha256:b951f17018466135b2d841a246127bf96c7f617f6274e73736ec257a7293369f",
+  "indexSha256": "sha256:44060e4452283b4a6cdabac7f849a733c408163ee6f616aed6702f8e54458b3c",
   "reports": [
     {
       "labId": "browser-fallback-harness",
       "path": "evidence/browser-fallback-harness/",
       "status": "accepted",
       "sourceHash": "sha256:2c70688f1b3c7de4a118000dad52b1c3b5033faf133b4026c7e50b0b954a0398",
-      "publishedBundleHash": "sha256:c31ea5082b2b4b41abbee9664591b3a5a7bc771ae6ffff72597e66a7da150fb3",
+      "publishedBundleHash": "sha256:0074307f6097416d848d614cc62a1dab66f13ba2ca5b7b21138290a600408343",
       "evidenceBundleId": null,
       "media": [],
-      "htmlSha256": "sha256:37befcb984cbb4994d22fe8e2a93bdc46254805fbe1c8c1cfc69094c5c166b5b"
+      "htmlSha256": "sha256:95964a34489ec8700d19c7669df6cd480d73169f353572c00684d333c6832bd9"
     },
     {
       "labId": "creature-habitat",
       "path": "evidence/creature-habitat/",
       "status": "accepted",
       "sourceHash": "sha256:a4b636f72b858d8bc5ba64756b8a8fd8f9f4d442fc88693e9cba59adfe145210",
-      "publishedBundleHash": "sha256:849b6cccc9ab391953ae57894092f4ffaa29ac1821073695add9c12818518548",
+      "publishedBundleHash": "sha256:e4b6ecb5baee26195c0a8a4d89fce21d7d37d8187de60eb0e584bd4351063b75",
       "evidenceBundleId": "correctness",
       "media": [
         {
@@ -73,14 +73,14 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:cdd8c384173ed32725425f4c3b4824d4a1b84c8720971edea1755107a686aa83"
+      "htmlSha256": "sha256:5efe13cb1e0cb1dff8fe5084ddda5efd69ad98e65a3cf623d4ee00a2c8da6b5e"
     },
     {
       "labId": "debugging-contract-lab",
       "path": "evidence/debugging-contract-lab/",
       "status": "accepted",
-      "sourceHash": "sha256:65a4329cc5248ade7712d2861f6156d407f5683ef6b90d626689caec43d1988a",
-      "publishedBundleHash": "sha256:0ed318c29abded32b9d3cc26280c8d4bbe76193da3f3cd147962605212989a2f",
+      "sourceHash": "sha256:1cee2bb8081b3a6fccff63c4007d88e078d99a7532c2da0bedab2153a9ced1b8",
+      "publishedBundleHash": "sha256:c848e78e768cfe96c61a7ec8afa4ee07a0fb1855c6acec027b115c202382a1f2",
       "evidenceBundleId": null,
       "media": [
         {
@@ -89,14 +89,14 @@
           "classification": "non-rendering-lab-preview"
         }
       ],
-      "htmlSha256": "sha256:612bd9097a4ad5c4f36312bfef16ed6f9329c3347ba98dc2004c9b653d73bcc5"
+      "htmlSha256": "sha256:d9ce4bbe7ce9c5a201c52c217c584fbccbb2ac046331faa6c60e600aecafbd4d"
     },
     {
       "labId": "final-image-flight",
       "path": "evidence/final-image-flight/",
       "status": "accepted",
       "sourceHash": "sha256:e0039ddb39a7791ff16eb9cbbe328c6a58a076a7fdc69077232950a4f54dd7e4",
-      "publishedBundleHash": "sha256:294251c99c080a4174c93b2fd6ab3be902e3bdb45bcddf7825dec72f61f59739",
+      "publishedBundleHash": "sha256:5127cd5ef5451c65adf7601010feade0a841b70b518d04268c41604e3fa3fd77",
       "evidenceBundleId": "correctness",
       "media": [
         {
@@ -150,14 +150,14 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:6b766f905aeca733b4d6222e9cde3bdaee6839d35005634065985ef5ff9eacab"
+      "htmlSha256": "sha256:aa9d704d709cda3c8cd172bf9a81b93fe9f0fc2b992a0da4ccebbd9db8c38c5d"
     },
     {
       "labId": "integration-image-pipeline-ao",
       "path": "evidence/integration-image-pipeline-ao/",
       "status": "accepted",
       "sourceHash": "sha256:4399f1417fde0b9b36d8c262a938d03b0c167b73301a03d5ca8be4aaffb072e0",
-      "publishedBundleHash": "sha256:ff26e8ab8bec8528f52e45dfd087dfc0035b10fe3606883755cd8ffa1379b8ad",
+      "publishedBundleHash": "sha256:7cd94e159883f4dd3226b85c20e4144054ed4fa951eceade679e2189512274b8",
       "evidenceBundleId": "correctness",
       "media": [
         {
@@ -206,74 +206,74 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:25728041ec73ca0157cd51326e72ac0ed6831f6b08a6b53bfd8541881635301e"
+      "htmlSha256": "sha256:e0f46403be3e10b93fa53d137673d3ff20221ec99a73599f916feea2ff894404"
     },
     {
       "labId": "integration-precipitation-image-pipeline",
       "path": "evidence/integration-precipitation-image-pipeline/",
       "status": "incomplete",
       "sourceHash": "sha256:f99da0788cb6a9099450518afc43a77dc027c1ba6c0c0ada54b5f7ea4c5caf32",
-      "publishedBundleHash": "sha256:e244205b7d8488c35e7b412b09e9b4b3b75339cdc0d795f4f0adc4c2f829517f",
+      "publishedBundleHash": "sha256:6bab47848bddcaa89fa766b288d8cc27eeaad1473c1e26e4e641245fe3124418",
       "evidenceBundleId": null,
       "media": [],
-      "htmlSha256": "sha256:519af14197204864479af5420f53e34d40d469d49bc3b65ddd3ef2a3b463afaf"
+      "htmlSha256": "sha256:ded0269cd1bcb7df24ed29cc345d904de096066966ee0d783b67a6943fe8a280"
     },
     {
       "labId": "integration-temporal-surface",
       "path": "evidence/integration-temporal-surface/",
       "status": "incomplete",
       "sourceHash": "sha256:9ca89c8d7137946af3673e6485cb5d8cb9398a9ec24d02b355ec7112dd378dc3",
-      "publishedBundleHash": "sha256:a6a182173896f1da90b91045b460aca36360a3fe260503ccdb27a3ea2142bfdc",
+      "publishedBundleHash": "sha256:4daeef8205935daaf7febfe9b83a31cb55b5ac4a36c43f35d254c2d32180d3bb",
       "evidenceBundleId": null,
       "media": [],
-      "htmlSha256": "sha256:334168a611f65d945627029c0e2631bf5d470d73d3f8ddbad91d61cce798e052"
+      "htmlSha256": "sha256:f2bb0dec075fe2affb064c0f3fcb5e6d7460bbdc2ae0220dedcc71de5aa2e53d"
     },
     {
       "labId": "node-selective-bloom",
       "path": "evidence/node-selective-bloom/",
       "status": "accepted",
       "sourceHash": "sha256:878849be345c850bfb109f3c0850ad454ce206fcca6bfaf208f329c3a6fbdf39",
-      "publishedBundleHash": "sha256:d0f63096949a53b19b28d93206a7bc598dbbb4047f10beb9a01e8c4bd92b5a52",
+      "publishedBundleHash": "sha256:6d91447614ea034ecbdc9fd27dbaa6a46692e3e40ccc49e1eb4f4cdc4d217d0a",
       "evidenceBundleId": "docs/visual-validation/node-selective-bloom/bundle",
       "media": [],
-      "htmlSha256": "sha256:9f1287c0101e5b2480c7c6d73d982b24405d8322010cfbf56253f2cdb5b44990"
+      "htmlSha256": "sha256:5b938363c7ed89ac80b1264753cbe789316426da184c8b40ea69debfdaaee57f"
     },
     {
       "labId": "procedural-district",
       "path": "evidence/procedural-district/",
       "status": "incomplete",
       "sourceHash": "sha256:3c2448b5b07d5c420110bd92c9993bf65286c7b109b71c41c137156aafbb87e3",
-      "publishedBundleHash": "sha256:802f93b9c0015e6ea44f1952b23890daa2814ee28ed4326cd447f316f74baf0c",
+      "publishedBundleHash": "sha256:1783e64582327b6e191b8580e819d0b8afda45fcf2be7a4f46f4a967450d1512",
       "evidenceBundleId": null,
       "media": [],
-      "htmlSha256": "sha256:735ebb79950ef9d537e18b3afb25a324092a1f9b65051bacfe9054ba844ca0d4"
+      "htmlSha256": "sha256:0b721e706ea37d39b97c86212d59abebef77df13cd3fc537d89cfeec82908b2a"
     },
     {
       "labId": "relativistic-space-shot",
       "path": "evidence/relativistic-space-shot/",
       "status": "incomplete",
       "sourceHash": "sha256:e2e9d6b673af27aa96c4ba0031dc031d2e7234ed4cb924e663098d21d1bdea01",
-      "publishedBundleHash": "sha256:6804eb835d51994be13c69d95f89590e02b12f0fc7c8a7011e209e7acf5a2fb1",
+      "publishedBundleHash": "sha256:feab2035ebbddb7eb989e1199841b1dde312f23e24a54b3f9105fc339d091a54",
       "evidenceBundleId": null,
       "media": [],
-      "htmlSha256": "sha256:de1f27bf25a80d3cfc61510e52e4357431e3b7b75dd50635a66f9433e071c688"
+      "htmlSha256": "sha256:a99b5cd6dbd29f42b47a7edf521714fcccbf209141d31874440a0d83218b936f"
     },
     {
       "labId": "semantic-mesh-writer",
       "path": "evidence/semantic-mesh-writer/",
       "status": "accepted",
       "sourceHash": "sha256:29d2b3162053692b6582029c67743f09e8ea8f0087e44190b1fb6c3c782ac5da",
-      "publishedBundleHash": "sha256:0a666a007a0838f800a8bd800721021ac3607f2a15f8cc01c37ad16c23a862d1",
+      "publishedBundleHash": "sha256:9bc99e03517b4a58b583cbb3a3e156a4bb6996fd8734cc35fbc9aeaf8a5cbb39",
       "evidenceBundleId": "docs/visual-validation/semantic-mesh-writer/bundle",
       "media": [],
-      "htmlSha256": "sha256:297b35f2ecc3d4b3819ed94ece73cbf7daa4b0d04f0a19051415ac38241f9b32"
+      "htmlSha256": "sha256:3e6438593b7e0ad1658e220fa167ca64ab21bffd4e02a9df7e3a0f6bf84d7864"
     },
     {
       "labId": "structured-ash-growth",
       "path": "evidence/structured-ash-growth/",
       "status": "accepted",
       "sourceHash": "sha256:1ecd4ae09ca0243df7e0406982ed0b0329554bdebe1823896b481dcb8fe37a40",
-      "publishedBundleHash": "sha256:a67d3c05f2bb86302ceb322ee80747acbdb8ef44e6f9f1aa04eff3a400012e07",
+      "publishedBundleHash": "sha256:91d302a644f275653940efa09fa73b10c284e524e98ab59931ceea3d0a42e1b4",
       "evidenceBundleId": "docs/visual-validation/structured-ash-growth/bundle",
       "media": [
         {
@@ -327,64 +327,64 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:47d4e921d69c965ffb6d79ec5b2e2ce8f87d7aba75b4ff46e92d9ca45dcfd16e"
+      "htmlSha256": "sha256:33873663a27c95c69c1a46ca2a1e606a3b5e36db4e89e305ec35e41ea24840c3"
     },
     {
       "labId": "tsl-curved-ray",
       "path": "evidence/tsl-curved-ray/",
       "status": "accepted",
       "sourceHash": "sha256:c0bee8cf5535d232c7af888c5ef3a7313b27afc656742ed271a5a49c36c780c2",
-      "publishedBundleHash": "sha256:2cc386f05f773d5935b688c1c1c4055b212cb442da632aa9045179b00bd5d4db",
+      "publishedBundleHash": "sha256:a7c22dceebb8c8db20532be85ba587e94a42f6d2e7cae659236da79f8aa465d5",
       "evidenceBundleId": "docs/visual-validation/tsl-curved-ray/bundle",
       "media": [],
-      "htmlSha256": "sha256:bd244d2b012de7f49f53f8c34c88f04266649f3f8ffe20e51aa687d94257255d"
+      "htmlSha256": "sha256:16b7c048c37b2594fd635cd0107f7f1bff26431fe2610f40ee6f5cd103c5c22e"
     },
     {
       "labId": "tsl-procedural-pbr",
       "path": "evidence/tsl-procedural-pbr/",
       "status": "accepted",
       "sourceHash": "sha256:f09b1846e6537e593e648751ef90f6d662afa7232eabc72806789510e70d95d5",
-      "publishedBundleHash": "sha256:4b8ac19912639fa056d2f56fcbb7efee2fb353378806b24bd105c5457abd4c61",
+      "publishedBundleHash": "sha256:6faee4b67c6b7d59896481b4bacb6716fb05c3765c6e396846a78ef015d1c73d",
       "evidenceBundleId": "docs/visual-validation/tsl-procedural-pbr/bundle",
       "media": [],
-      "htmlSha256": "sha256:220fd9bf41c29721278fa414315ca79b88f306f5e39c56b2b82f8f519df75be9"
+      "htmlSha256": "sha256:4da78d80d84e1cf5c9412b31c8db480abd2ebc9dc0942f63ec807bcd0ad32575"
     },
     {
       "labId": "weathered-world",
       "path": "evidence/weathered-world/",
       "status": "incomplete",
       "sourceHash": "sha256:35d83f50227954e02492c8d87ee9bec5379074d8f3821f7e89b5eaaf83f30780",
-      "publishedBundleHash": "sha256:f3b06c6c36f766d52347e1e8889408ee84fc9765b93fa263bdd7c955a3faa84c",
+      "publishedBundleHash": "sha256:0429c264b4fef507d953b648beae862841b5567547b511c8a660442dcabd866a",
       "evidenceBundleId": "artifacts/visual-validation/weathered-world/correctness",
       "media": [],
-      "htmlSha256": "sha256:2ab468c53683a1139720ac552388e28cea49257f59890d9d34701d0428481dfc"
+      "htmlSha256": "sha256:515f7c2082455f37ab7f84ce1e82e15dff9565541e2b0fad34752f65fdc42d5a"
     },
     {
       "labId": "webgpu-bounded-water",
       "path": "evidence/webgpu-bounded-water/",
       "status": "accepted",
       "sourceHash": "sha256:fb62459b213aa96d321eb5a2959b842f41537e1fde576734dab71d1a2fbdb60a",
-      "publishedBundleHash": "sha256:996dc3d8ad204df27d938e66f6781378adf0b6e1a9a6cbff5f46ea439ebd10df",
+      "publishedBundleHash": "sha256:86f955ac8ff98153dc84f32c249a333bf7738460cc678fe4076d85d8890799a6",
       "evidenceBundleId": "docs/visual-validation/webgpu-bounded-water/bundle",
       "media": [],
-      "htmlSha256": "sha256:8f4e6575252cfcfd603afb88cd0fe35d2a1d755261f54decc2cefd4e3ad1c33c"
+      "htmlSha256": "sha256:42a3bec714718b6ec5eb64fb219df303dbc5027c4b3e32d3f9e6dbd0b278042a"
     },
     {
       "labId": "webgpu-cached-clipmap-shadow",
       "path": "evidence/webgpu-cached-clipmap-shadow/",
       "status": "incomplete",
       "sourceHash": "sha256:cb4d3abfaab1a84e0fbef28fd523befc0f09ed465690426c58eff739e7b1171c",
-      "publishedBundleHash": "sha256:55c312706fbc657d30771b01429bc3b2331629c4f2cd64da66da3cdfcf4554c7",
+      "publishedBundleHash": "sha256:34554bb569d16c4ec78c89faef8567bbdd4bde79d4218614fc3a6937941ac578",
       "evidenceBundleId": null,
       "media": [],
-      "htmlSha256": "sha256:47974ee930f60bb4eaae999f50677bdb09eea13356eac6ec0e3b900367c467ac"
+      "htmlSha256": "sha256:8ed4417e0ea2286287980085eae0796feca21ae8e664640f45e01f26df423cf5"
     },
     {
       "labId": "webgpu-camera-rig",
       "path": "evidence/webgpu-camera-rig/",
       "status": "accepted",
       "sourceHash": "sha256:5de189ce8d19010837810f2c4ffbc15213cf5a11141018d2dd71799da904c7e0",
-      "publishedBundleHash": "sha256:230e6ce48c8cec398d62c0ad985fd211130ada8721cf044a7551f8f14460ae3c",
+      "publishedBundleHash": "sha256:0e3a9b9350a81dbf4e9cb3781171bbbd45024c6371a3231d23af7344f016266f",
       "evidenceBundleId": "correctness",
       "media": [
         {
@@ -403,14 +403,14 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:4a7f915617d06454df5910158c456805f3c0dcb9f3eb3a2427d0eab693da7e9d"
+      "htmlSha256": "sha256:9df917ce39abf0fec41f2b6a8e1b4f4563bc8be7b5ed091cb8275442b60ad737"
     },
     {
       "labId": "webgpu-dense-grass",
       "path": "evidence/webgpu-dense-grass/",
       "status": "accepted",
       "sourceHash": "sha256:588a351cf985a1cbc55b7192354f2e1b61572d70c61ad41b408c73888b017fc6",
-      "publishedBundleHash": "sha256:f8faccf190c8bb48bce599cab9379a5fc6525397212687d46b1ed16adbf35e03",
+      "publishedBundleHash": "sha256:3a3a004cf54667600c86c7b7ac55646dc930e925d0ea662b583371f2cd7eaae5",
       "evidenceBundleId": "correctness",
       "media": [
         {
@@ -464,24 +464,24 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:e257a5e89cdcfd18bc2e8087df965a444a1f19a72e88d325cda01904615f3aa8"
+      "htmlSha256": "sha256:be3594fddae786fca8f7962a04432f2eed4b48cd90d40c356eeed6a4bc2f32fd"
     },
     {
       "labId": "webgpu-exposure-color-pipeline",
       "path": "evidence/webgpu-exposure-color-pipeline/",
       "status": "accepted",
       "sourceHash": "sha256:f238d4795026d7eee618bb68657735e143873008a57b23f304866b075361dc97",
-      "publishedBundleHash": "sha256:401dc22b0c7db34a053624f602baaa5fef6210f26ab8e529fa125b249a6dcc5c",
+      "publishedBundleHash": "sha256:45227bfccf749ebc2a2a76074f0ae9eefaf8ca9bbae007f33cc0cf52be3f6809",
       "evidenceBundleId": "docs/visual-validation/webgpu-exposure-color-pipeline/bundle",
       "media": [],
-      "htmlSha256": "sha256:2244b42a3828bad85fd9b6f74ccd14cc94db18f81a5d8b30d49bc0723b605fbf"
+      "htmlSha256": "sha256:d938e4c1fa768caaa53c833a7bbe9b7a254dde2278bb9812faf17d9b06ccd0be"
     },
     {
       "labId": "webgpu-fft-ocean",
       "path": "evidence/webgpu-fft-ocean/",
       "status": "incomplete",
       "sourceHash": "sha256:d8bfba57799a06f5fb8bdaf78eb70bb58a6de29a5de8f98724aa03bf85bda91a",
-      "publishedBundleHash": "sha256:ff2659caae051b621a64f2e6f4476b597b1fd8bf30da1a544645fe08d90006c4",
+      "publishedBundleHash": "sha256:c444ac8e2f069e356c29b077de68c376f796d0d8bc5da699f483e2c2a4142a53",
       "evidenceBundleId": "correctness",
       "media": [
         {
@@ -525,14 +525,14 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:9782ee80e1e78bd030ef072d1e46dda8262b8436219852c8b4f115e87f644327"
+      "htmlSha256": "sha256:d3dc47a01db605edd5eb917ac895e0d8370d4bd041a86914ac3c282b770a9dd1"
     },
     {
       "labId": "webgpu-field-bake",
       "path": "evidence/webgpu-field-bake/",
       "status": "incomplete",
       "sourceHash": "sha256:015f3e41078f1c643c314785c9c8cb6a54091805c1f6ce8646f17b1b54fd93f6",
-      "publishedBundleHash": "sha256:b3b1bc58398b7e4d3b7f9cf99fb5b6a655332053be71aaa429caca49e8013057",
+      "publishedBundleHash": "sha256:1399d94f24312362dda179e990f43579cab26380dd92e13d90a0d0760442206d",
       "evidenceBundleId": "correctness",
       "media": [
         {
@@ -581,24 +581,24 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:9a02e303c825aa4ab82777bc214341d23fd84a31d39ed8e8b0dbac8003bfe649"
+      "htmlSha256": "sha256:d3e245a9f988dc35a0dde3e520fe208a33c8218a98a533b51334ac013a859f87"
     },
     {
       "labId": "webgpu-image-pipeline",
       "path": "evidence/webgpu-image-pipeline/",
       "status": "incomplete",
       "sourceHash": "sha256:367f880e1d52528732e0897e77d0a8f54ce141320660ff3876cde33663e00201",
-      "publishedBundleHash": "sha256:9307ec318fe2d189e58faa35ce6375634305fc11b5104a2ac85b803a6877fe4b",
+      "publishedBundleHash": "sha256:4fba35bcf9ca6bc1c63f27c6aacfe33db483f50ffea039d6d1c893432236c6f0",
       "evidenceBundleId": "docs/visual-validation/webgpu-image-pipeline/bundle",
       "media": [],
-      "htmlSha256": "sha256:121034488026132dacd37cfa24e9d0d477ceebedb47dc6dee012c9b49af1ae86"
+      "htmlSha256": "sha256:539a623ad9648029db099b8c8f4f56b2a467004c40753910dccc4f6f18644e90"
     },
     {
       "labId": "webgpu-lut-atmosphere",
       "path": "evidence/webgpu-lut-atmosphere/",
       "status": "incomplete",
       "sourceHash": "sha256:e93675b0f1b0ec4adb8c247bf7dfb5a3e6a3f9c8c260b4cb239ab0afcd7e433c",
-      "publishedBundleHash": "sha256:c8e61b9fe8c40f93836a9c04a7b39ee198cf8366ba514fcad450904ea19a24a8",
+      "publishedBundleHash": "sha256:3c483f98a26fca3e31a3e4744a8551fba6b8508a1dfe75051a0c25bcdc89b6b9",
       "evidenceBundleId": "correctness",
       "media": [
         {
@@ -632,14 +632,14 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:8ded52e4c6139bcfb9895442fe4af1a4093e025c6b6ece62c6f30d714d56ac8a"
+      "htmlSha256": "sha256:ad80fcd070bff3dcd2934eca3bc53947898740a77493451d2e15918f49863bf4"
     },
     {
       "labId": "webgpu-material-slot-compiler",
       "path": "evidence/webgpu-material-slot-compiler/",
       "status": "incomplete",
       "sourceHash": "sha256:dd6b7dfc24b0553b4562b465dcfd3dcf5a10c6741d76da60e2f70ceb8355e500",
-      "publishedBundleHash": "sha256:fb575beb39bb2c35044eb186531260e4e3f1efd9b1bf109efdcf6c60beea5f1b",
+      "publishedBundleHash": "sha256:b6bf4a1f70f05ab578fa3e5cdfa85a89afa0848be5b2bd07222c96f435fb6bfc",
       "evidenceBundleId": "correctness",
       "media": [
         {
@@ -678,34 +678,34 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:836eca52bb90389fffd2e173ae7e1a1dc30b275333090536bf19f80a354e6cd2"
+      "htmlSha256": "sha256:7dcd3bec2e79b1d29000b29a34bc5365ae06cc0a6482ee2874dc5972430d187d"
     },
     {
       "labId": "webgpu-node-gtao",
       "path": "evidence/webgpu-node-gtao/",
       "status": "accepted",
       "sourceHash": "sha256:d151b7e9512ba31533653581a04ac7359ab067c8ae0963625f675ecdc4781455",
-      "publishedBundleHash": "sha256:13d87fad42bc3be578734fbb1e2f03e70ac47b657969a2fce98e502f7d80f11b",
+      "publishedBundleHash": "sha256:7fbd73ef0e48d0ee7e7da556ce06c24071e704535c206b0babf683a01d74f311",
       "evidenceBundleId": "docs/visual-validation/webgpu-node-gtao/bundle",
       "media": [],
-      "htmlSha256": "sha256:436b494ff040d42303f9ee4353b42ebe08edaa8a92661ab8ec8fa1bb8d5d4a96"
+      "htmlSha256": "sha256:09e94440bc3e404691d39bf7b10f08566cc39886f187ee606f2889f90865a277"
     },
     {
       "labId": "webgpu-object-sculptor-corpus",
       "path": "evidence/webgpu-object-sculptor-corpus/",
       "status": "incomplete",
-      "sourceHash": "sha256:a619e33bbaacb7e1afcc06f4036b26271135677342b1274f632bcab194c07046",
-      "publishedBundleHash": "sha256:7174ec65eda6936e2cd12a68a21a36bc94fac7adf418726250d6f214bbc9799d",
+      "sourceHash": "sha256:b1362871cbd74059dde01abd859ec92c1d0ec8c66b4690b7bdf67b89a5e49293",
+      "publishedBundleHash": "sha256:b15c52cdc5ab10830a4f4698653955c4520396b6e40b554b8f74ede6e04cb761",
       "evidenceBundleId": "artifacts/visual-validation/webgpu-object-sculptor-corpus/correctness",
       "media": [],
-      "htmlSha256": "sha256:e46c32b048799ecec7c8b14bdd23740d087c2fdc8814041a1d1fd85e4665a758"
+      "htmlSha256": "sha256:35125908d2c6fc28b7f55a14a7a434949be4c4a33a4a0c40ae5785d79707215e"
     },
     {
       "labId": "webgpu-pooled-effects",
       "path": "evidence/webgpu-pooled-effects/",
       "status": "incomplete",
       "sourceHash": "sha256:c1cfa5fb0841304840abfd5345fcbfeca96f981778f28c7dd86db982ac2a75d0",
-      "publishedBundleHash": "sha256:fed99833156b529b01bd4b5f687df99a9192e7fe1d34e4f0034e9b5b56d6202e",
+      "publishedBundleHash": "sha256:2d199764d888ca9c77f5df5e6a5a475d21621f847b52d2e2ff84a17569f6f82c",
       "evidenceBundleId": "correctness",
       "media": [
         {
@@ -749,34 +749,34 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:e504747789c3d26e89fc6acfcdba90a38fcb56accf9bf2d28e7f7e75168d8dd7"
+      "htmlSha256": "sha256:27af83d6e44bd3faa391819e06848334228ef8c20066b5b5750ddef62adc0a65"
     },
     {
       "labId": "webgpu-procedural-creature-lab",
       "path": "evidence/webgpu-procedural-creature-lab/",
       "status": "accepted",
       "sourceHash": "sha256:66a3fc6e27a7e6499d3a360ff4b9cf1c66de0275b5d5aa083b218f11af08f6c8",
-      "publishedBundleHash": "sha256:4890f0e9e86aa1746fe00bba1bc00964ddebc8a6c0d67134a6f5d92dedeb30d7",
+      "publishedBundleHash": "sha256:f0a543466eea4e04498c1fec434cb712edd62efdc9e09a4522060b4f48046a55",
       "evidenceBundleId": "docs/visual-validation/webgpu-procedural-creature-lab/bundle",
       "media": [],
-      "htmlSha256": "sha256:ab1eb08e3a9942e6d65e5bb14a747ba9b4ac62e44ddc789e77a5fc8ccb1f1686"
+      "htmlSha256": "sha256:d4854535b2f3b01def3d74fe454ab4a3b86e2b4a3036eb89536f268b3dcab810"
     },
     {
       "labId": "webgpu-procedural-timelines",
       "path": "evidence/webgpu-procedural-timelines/",
       "status": "incomplete",
       "sourceHash": "sha256:75dc31ba17b9a98981bc67e8517eaaa97542ffa9d2bbef2e72929db178ebe709",
-      "publishedBundleHash": "sha256:4f9430fd2fea8a4f477af2095a26680b9a231a5d267548a1b54ddfab19fcc910",
+      "publishedBundleHash": "sha256:1c9e7737fedbcdb1473aa0c2bf3b68b19ec1249d51e09fc78fa474fb7d79a258",
       "evidenceBundleId": "artifacts/visual-validation/webgpu-procedural-timelines/correctness",
       "media": [],
-      "htmlSha256": "sha256:bc1783461459930305e1fc29959de5168ede90bcdccbc224c1b0132d3e50cc4d"
+      "htmlSha256": "sha256:5c8d303f526e1688b76e740c8ec86cd383a4a278ca0893df7d8bc3ec51237777"
     },
     {
       "labId": "webgpu-quadtree-planet",
       "path": "evidence/webgpu-quadtree-planet/",
       "status": "incomplete",
       "sourceHash": "sha256:4928ca7a78df196ce1a15165473dff8498bd7b4d2d3a8258b602370dde998fe9",
-      "publishedBundleHash": "sha256:d6538d747ce0054250afbb445ef7d4cb71b9de727de6a5eb1a5994b1a8bd380e",
+      "publishedBundleHash": "sha256:2440151ab21452c673260f1594d5fdb4f0f94e85b01fafaeae6c3d1babdda7a8",
       "evidenceBundleId": "correctness",
       "media": [
         {
@@ -830,14 +830,14 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:8220075500ad0cbe74f814c6368cdd480dab96ee333987abec0727b502f852e0"
+      "htmlSha256": "sha256:9301055700508934819dce22d8ffa1c90ab71f6b3db2d41faf7e9ee8682b5d78"
     },
     {
       "labId": "webgpu-rain-snow-and-wet-surfaces",
       "path": "evidence/webgpu-rain-snow-and-wet-surfaces/",
       "status": "accepted",
       "sourceHash": "sha256:6bccc892e96e099bb776969a9c27c14df04050467bfa3b6abfdd8e3b4b440de4",
-      "publishedBundleHash": "sha256:0d74da88733732aa3a6b0c7bab9782c130cc19d037a20504c97f531f32db0ade",
+      "publishedBundleHash": "sha256:bca8bb5d2f42a02b7c2864313a7fab6961933a6701886153f801e615f166f6f3",
       "evidenceBundleId": "release-approved-current",
       "media": [
         {
@@ -891,14 +891,14 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:7e06bb221873fbe695e22d09e48ee479b2a9a50bd5e157f443b21d03e1ad2a00"
+      "htmlSha256": "sha256:00deeead9b121cbf469123b78f7659d6950a9428964c27fe0893f325e5801cd5"
     },
     {
       "labId": "webgpu-shadow-architecture-bench",
       "path": "evidence/webgpu-shadow-architecture-bench/",
       "status": "accepted",
       "sourceHash": "sha256:b5720ffcb576439ae355f3ce8334a1d5c572150b82563c85bf2276b91012cf53",
-      "publishedBundleHash": "sha256:2319e1b617228e913993c6ccb7e7d52db390e848cccc97d93c82b87c8d100532",
+      "publishedBundleHash": "sha256:1264a3284071fd84209ab313708169b9a0a2c5d909fa027d2bf305fbd238358d",
       "evidenceBundleId": "release-approved-current",
       "media": [
         {
@@ -952,14 +952,14 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:88bfce41a3d43eb2687dbe8a9db891cc6152ae380e4f3d63d0ade18c4e7f8fa4"
+      "htmlSha256": "sha256:eb6c257750c3f227a3b62fb29321d9aa9cd6434207370de687e18af29ad054bc"
     },
     {
       "labId": "webgpu-shadow-pipeline-integration",
       "path": "evidence/webgpu-shadow-pipeline-integration/",
       "status": "accepted",
       "sourceHash": "sha256:aa939380149e6a342b386e1a409c5f08636a10b6a07b5a235473f3ff04566328",
-      "publishedBundleHash": "sha256:2d27e27abc2b69f2e24939dede9731b4b4e7c0a0a3bcc2ab07646e18ed0849e4",
+      "publishedBundleHash": "sha256:d699277a6a39286852d57bb49ddd588878de201cf3c6dbbee00d11cfe292aafe",
       "evidenceBundleId": "release-approved-current",
       "media": [
         {
@@ -1013,44 +1013,44 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:e53a6d651bece1fdb06c9a9f03a8edd921cb22f476df7ba91770ed7b1a9bfd5c"
+      "htmlSha256": "sha256:075a4a49b6bf41fca2d96473683ffddb40332423288969f06357c945ab6a9cf5"
     },
     {
       "labId": "webgpu-temporal-history",
       "path": "evidence/webgpu-temporal-history/",
       "status": "accepted",
       "sourceHash": "sha256:2f41080c1ecbec60bc1f3678e21c2039ede72793e8ba39260302cef254c97c3f",
-      "publishedBundleHash": "sha256:fdcb36325ea16eeabc5bff07f694ccb9e2b158516d3cb090a24c8aaac476b6ec",
+      "publishedBundleHash": "sha256:a089a729245fd6dc77852d5864896ad287b2ec68f9a1bd7f1c7e190420a4d8e7",
       "evidenceBundleId": "docs/visual-validation/webgpu-temporal-history/bundle",
       "media": [],
-      "htmlSha256": "sha256:7c8721ab0112bd1477a0d66c653cdfdd6faa0c5829e328fc16cb00618db1ec06"
+      "htmlSha256": "sha256:c6e58cc8fbee7b0cf5ed9bde202b9a002ccba6a31529197e7b53da5fe3e8e611"
     },
     {
       "labId": "webgpu-touch-history-frost",
       "path": "evidence/webgpu-touch-history-frost/",
       "status": "accepted",
       "sourceHash": "sha256:cf45abc35d5dd9f1c5b5f180e1c57de0a44fdbcd281126dd53121a31f3af2ac3",
-      "publishedBundleHash": "sha256:ee8661fd1e2062b5689b54dd00482164906af988f7fe19e6b5be2f837b45cee8",
+      "publishedBundleHash": "sha256:4c7a8b64d18cb9640fc08b0436e68490ae4d3201d61ef1e3e8cd293f0846714e",
       "evidenceBundleId": "docs/visual-validation/webgpu-touch-history-frost/bundle",
       "media": [],
-      "htmlSha256": "sha256:2c734ebf3957467ba7b46c1ed43369478e58a32447a56c73aa5132e057253c0c"
+      "htmlSha256": "sha256:021b04480e293b85bc40deb80c3a9a11b5edaf2370cc326e07290c27bc1a6f2d"
     },
     {
       "labId": "webgpu-tower-ship-sculptor",
       "path": "evidence/webgpu-tower-ship-sculptor/",
       "status": "accepted",
       "sourceHash": "sha256:23543812e0d47c905610422df3df9e6032244ef6db2c6664a2b82ad606137b3c",
-      "publishedBundleHash": "sha256:ffc7bd80742d7773f94e3626a130de45d79f7a8396d410619d564e547e91477b",
+      "publishedBundleHash": "sha256:24a7b1cdb25296089f13e0b516c16219e49bc19aa87b6724e9b2ad9409cd6928",
       "evidenceBundleId": "docs/visual-validation/webgpu-tower-ship-sculptor/bundle",
       "media": [],
-      "htmlSha256": "sha256:f43cc7c80fc7af25142d0dadea9b42d78677d0605c3e95fdbb10922b9a737c64"
+      "htmlSha256": "sha256:ebc88b4b5d0719982b28d3230237b98059e293769e49054141714d5285991d54"
     },
     {
       "labId": "webgpu-validation-harness",
       "path": "evidence/webgpu-validation-harness/",
       "status": "accepted",
       "sourceHash": "sha256:c099d8c03b07280a4553e1ea687d4ca092809fba4efc5c67429b954c242359c7",
-      "publishedBundleHash": "sha256:e63fd118bada7afbce13f6b11b9339b932980e26307c4ffe98fbc7f73b9183a5",
+      "publishedBundleHash": "sha256:0047c33fc945250611efa13c29ac17c2793c32174e325b0fa57ebbc0b30ff665",
       "evidenceBundleId": "bundle",
       "media": [
         {
@@ -1104,14 +1104,14 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:c429a190c72d89f38d859226b123cd6499e552d777126bf8e7b28d04cca080d3"
+      "htmlSha256": "sha256:58e663d9bd7d2ae9442a7732d966c9866bf03850b2e832e3c89f0d3e9d1f3752"
     },
     {
       "labId": "webgpu-vegetation-integration",
       "path": "evidence/webgpu-vegetation-integration/",
       "status": "accepted",
       "sourceHash": "sha256:8a87d3f3d13fec679b92809ee861d339bf5727a1774906d7723c2378afd5c615",
-      "publishedBundleHash": "sha256:b0cbadac36b68144df0e97a23c2bdbcd0084216b94e41a113d359a427495cb08",
+      "publishedBundleHash": "sha256:c877c9b9f9897f3c23e1ba0e5009630c121cac30abfb9577d5f8f7b3074552ee",
       "evidenceBundleId": "bundle",
       "media": [
         {
@@ -1165,14 +1165,14 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:c9036515f52cfc34b1365e4b868a5c5b6eee9a22352455f1be415c2b363ff7f6"
+      "htmlSha256": "sha256:9178b8afb33bcd734350f65b75dcbb8e018d3cebe16dbf6721d1a1fc4f629d52"
     },
     {
       "labId": "webgpu-weather-volume-clouds",
       "path": "evidence/webgpu-weather-volume-clouds/",
       "status": "accepted",
       "sourceHash": "sha256:b83999fb74b8fa55414b46e601f8ee2c6f2ecd0882a06e112f92cc8f563e1899",
-      "publishedBundleHash": "sha256:9ef30d6602285179715985fd95423700304530d9f9932381b74d0c182835d5b5",
+      "publishedBundleHash": "sha256:ea005a7a685989a42e168f3c5d263a9004f31c11fa3d105e3ed45a3731ddc24a",
       "evidenceBundleId": "bundle",
       "media": [
         {
@@ -1226,7 +1226,7 @@
           "classification": "inspected-runtime-evidence-preview"
         }
       ],
-      "htmlSha256": "sha256:4c56d29b221f6da0bdf00b0757b75dedf6f5d09d33d756a4a3af9de52539835b"
+      "htmlSha256": "sha256:3819d83bf837887d93be2874ff0ea1cffddc9c350eadb55e4f47aec6400d6931"
     }
   ]
 }

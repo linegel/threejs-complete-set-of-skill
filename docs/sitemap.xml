@@ -48,9 +48,9 @@
   <url><loc>https://threejs-skills.com/skills/threejs-black-holes-and-space-effects.html</loc><lastmod>2026-07-16</lastmod></url>
   <url><loc>https://threejs-skills.com/skills/threejs-bloom.html</loc><lastmod>2026-07-16</lastmod></url>
   <url><loc>https://threejs-skills.com/skills/threejs-camera-controls-and-rigs.html</loc><lastmod>2026-07-16</lastmod><image:image><image:loc>https://threejs-skills.com/seo/article/threejs-camera-controls-and-rigs-16x9.png</image:loc><image:title>Camera Controls And Rigs</image:title></image:image></url>
-  <url><loc>https://threejs-skills.com/skills/threejs-choose-skills.html</loc><lastmod>2026-07-16</lastmod></url>
-  <url><loc>https://threejs-skills.com/skills/threejs-compatibility-fallbacks.html</loc><lastmod>2026-07-16</lastmod><image:image><image:loc>https://threejs-skills.com/seo/article/threejs-compatibility-fallbacks-16x9.png</image:loc><image:title>Three.js Compatibility Fallbacks</image:title></image:image></url>
-  <url><loc>https://threejs-skills.com/skills/threejs-debugging.html</loc><lastmod>2026-07-16</lastmod><image:image><image:loc>https://threejs-skills.com/seo/article/threejs-debugging-16x9.png</image:loc><image:title>Three.js Debugging</image:title></image:image></url>
+  <url><loc>https://threejs-skills.com/skills/threejs-choose-skills.html</loc><lastmod>2026-09-24</lastmod></url>
+  <url><loc>https://threejs-skills.com/skills/threejs-compatibility-fallbacks.html</loc><lastmod>2026-09-24</lastmod><image:image><image:loc>https://threejs-skills.com/seo/article/threejs-compatibility-fallbacks-16x9.png</image:loc><image:title>Three.js Compatibility Fallbacks</image:title></image:image></url>
+  <url><loc>https://threejs-skills.com/skills/threejs-debugging.html</loc><lastmod>2026-09-24</lastmod><image:image><image:loc>https://threejs-skills.com/seo/article/threejs-debugging-16x9.png</image:loc><image:title>Three.js Debugging</image:title></image:image></url>
   <url><loc>https://threejs-skills.com/skills/threejs-dynamic-surface-effects.html</loc><lastmod>2026-07-16</lastmod></url>
   <url><loc>https://threejs-skills.com/skills/threejs-exposure-color-grading.html</loc><lastmod>2026-07-16</lastmod></url>
   <url><loc>https://threejs-skills.com/skills/threejs-image-pipeline.html</loc><lastmod>2026-07-16</lastmod><image:image><image:loc>https://threejs-skills.com/seo/article/threejs-image-pipeline-16x9.png</image:loc><image:title>Image Pipeline</image:title></image:image></url>
@@ -68,12 +68,12 @@
   <url><loc>https://threejs-skills.com/skills/threejs-scalable-real-time-shadows.html</loc><lastmod>2026-07-16</lastmod><image:image><image:loc>https://threejs-skills.com/seo/article/threejs-scalable-real-time-shadows-16x9.png</image:loc><image:title>Scalable Real-Time Shadows</image:title></image:image></url>
   <url><loc>https://threejs-skills.com/skills/threejs-sky-atmosphere-and-haze.html</loc><lastmod>2026-07-16</lastmod><image:image><image:loc>https://threejs-skills.com/seo/article/threejs-sky-atmosphere-and-haze-16x9.png</image:loc><image:title>Sky, Atmosphere, and Haze</image:title></image:image></url>
   <url><loc>https://threejs-skills.com/skills/threejs-spectral-ocean.html</loc><lastmod>2026-07-16</lastmod><image:image><image:loc>https://threejs-skills.com/seo/article/threejs-spectral-ocean-16x9.png</image:loc><image:title>Spectral Ocean</image:title></image:image></url>
-  <url><loc>https://threejs-skills.com/skills/threejs-visual-validation.html</loc><lastmod>2026-07-16</lastmod><image:image><image:loc>https://threejs-skills.com/seo/article/threejs-visual-validation-16x9.png</image:loc><image:title>Visual Validation</image:title></image:image></url>
+  <url><loc>https://threejs-skills.com/skills/threejs-visual-validation.html</loc><lastmod>2026-09-24</lastmod><image:image><image:loc>https://threejs-skills.com/seo/article/threejs-visual-validation-16x9.png</image:loc><image:title>Visual Validation</image:title></image:image></url>
   <url><loc>https://threejs-skills.com/skills/threejs-volumetric-clouds.html</loc><lastmod>2026-07-16</lastmod><image:image><image:loc>https://threejs-skills.com/seo/article/threejs-volumetric-clouds-16x9.png</image:loc><image:title>Volumetric Clouds</image:title></image:image></url>
   <url><loc>https://threejs-skills.com/skills/threejs-water-optics.html</loc><lastmod>2026-07-16</lastmod></url>
   <url><loc>https://threejs-skills.com/evidence/browser-fallback-harness/</loc><lastmod>2026-07-13</lastmod></url>
   <url><loc>https://threejs-skills.com/evidence/creature-habitat/</loc><lastmod>2026-07-13</lastmod></url>
-  <url><loc>https://threejs-skills.com/evidence/debugging-contract-lab/</loc><lastmod>2026-07-16</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/debugging-contract-lab/</loc><lastmod>2026-09-24</lastmod></url>
   <url><loc>https://threejs-skills.com/evidence/final-image-flight/</loc><lastmod>2026-07-13</lastmod></url>
   <url><loc>https://threejs-skills.com/evidence/integration-image-pipeline-ao/</loc><lastmod>2026-07-13</lastmod></url>
   <url><loc>https://threejs-skills.com/evidence/integration-precipitation-image-pipeline/</loc><lastmod>2026-07-16</lastmod></url>
@@ -85,7 +85,7 @@
   <url><loc>https://threejs-skills.com/evidence/structured-ash-growth/</loc><lastmod>2026-07-13</lastmod></url>
   <url><loc>https://threejs-skills.com/evidence/tsl-curved-ray/</loc><lastmod>2026-07-13</lastmod></url>
   <url><loc>https://threejs-skills.com/evidence/tsl-procedural-pbr/</loc><lastmod>2026-07-13</lastmod></url>
-  <url><loc>https://threejs-skills.com/evidence/weathered-world/</loc><lastmod>2026-07-13</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/weathered-world/</loc><lastmod>2026-09-24</lastmod></url>
   <url><loc>https://threejs-skills.com/evidence/webgpu-bounded-water/</loc><lastmod>2026-07-16</lastmod></url>
   <url><loc>https://threejs-skills.com/evidence/webgpu-cached-clipmap-shadow/</loc><lastmod>2026-07-13</lastmod></url>
   <url><loc>https://threejs-skills.com/evidence/webgpu-camera-rig/</loc><lastmod>2026-07-13</lastmod></url>
@@ -97,7 +97,7 @@
   <url><loc>https://threejs-skills.com/evidence/webgpu-lut-atmosphere/</loc><lastmod>2026-07-13</lastmod></url>
   <url><loc>https://threejs-skills.com/evidence/webgpu-material-slot-compiler/</loc><lastmod>2026-07-13</lastmod></url>
   <url><loc>https://threejs-skills.com/evidence/webgpu-node-gtao/</loc><lastmod>2026-07-13</lastmod></url>
-  <url><loc>https://threejs-skills.com/evidence/webgpu-object-sculptor-corpus/</loc><lastmod>2026-07-16</lastmod></url>
+  <url><loc>https://threejs-skills.com/evidence/webgpu-object-sculptor-corpus/</loc><lastmod>2026-09-24</lastmod></url>
   <url><loc>https://threejs-skills.com/evidence/webgpu-pooled-effects/</loc><lastmod>2026-07-13</lastmod></url>
   <url><loc>https://threejs-skills.com/evidence/webgpu-procedural-creature-lab/</loc><lastmod>2026-07-16</lastmod></url>
   <url><loc>https://threejs-skills.com/evidence/webgpu-procedural-timelines/</loc><lastmod>2026-07-13</lastmod></url>
@@ -117,11 +117,11 @@
   <url><loc>https://threejs-skills.com/demos/cloud-generated-weather-maps/</loc><lastmod>2026-07-16</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/compatibility-fallback-planner-demo/</loc><lastmod>2026-07-16</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/creature-habitat/</loc><lastmod>2026-07-13</lastmod></url>
-  <url><loc>https://threejs-skills.com/demos/debugging-contract-lab/</loc><lastmod>2026-07-16</lastmod></url>
+  <url><loc>https://threejs-skills.com/demos/debugging-contract-lab/</loc><lastmod>2026-09-24</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/exposure-color-grading-demo/</loc><lastmod>2026-07-16</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/fields-generated-biome-maps/</loc><lastmod>2026-07-16</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/final-image-flight/</loc><lastmod>2026-07-13</lastmod></url>
-  <url><loc>https://threejs-skills.com/demos/frost-generated-crystals/</loc><lastmod>2026-07-16</lastmod></url>
+  <url><loc>https://threejs-skills.com/demos/frost-generated-crystals/</loc><lastmod>2026-09-24</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/image-pipeline-framegraph-demo/</loc><lastmod>2026-07-16</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/integration-image-pipeline-ao/</loc><lastmod>2026-07-13</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/integration-precipitation-image-pipeline/</loc><lastmod>2026-07-16</lastmod></url>
@@ -150,7 +150,7 @@
   <url><loc>https://threejs-skills.com/demos/visual-validation-harness-demo/</loc><lastmod>2026-07-16</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/water-generated-caustics/</loc><lastmod>2026-07-16</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/water-integration-surface/</loc><lastmod>2026-07-16</lastmod></url>
-  <url><loc>https://threejs-skills.com/demos/weathered-world/</loc><lastmod>2026-07-13</lastmod></url>
+  <url><loc>https://threejs-skills.com/demos/weathered-world/</loc><lastmod>2026-09-24</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/webgpu-bounded-water/</loc><lastmod>2026-07-16</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/webgpu-cached-clipmap-shadow/</loc><lastmod>2026-07-13</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/webgpu-camera-rig/</loc><lastmod>2026-07-13</lastmod></url>
@@ -162,7 +162,7 @@
   <url><loc>https://threejs-skills.com/demos/webgpu-lut-atmosphere/</loc><lastmod>2026-07-13</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/webgpu-material-slot-compiler/</loc><lastmod>2026-07-13</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/webgpu-node-gtao/</loc><lastmod>2026-07-13</lastmod></url>
-  <url><loc>https://threejs-skills.com/demos/webgpu-object-sculptor-corpus/</loc><lastmod>2026-07-16</lastmod></url>
+  <url><loc>https://threejs-skills.com/demos/webgpu-object-sculptor-corpus/</loc><lastmod>2026-09-24</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/webgpu-pooled-effects/</loc><lastmod>2026-07-13</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/webgpu-procedural-creature-lab/</loc><lastmod>2026-07-16</lastmod></url>
   <url><loc>https://threejs-skills.com/demos/webgpu-procedural-timelines/</loc><lastmod>2026-07-13</lastmod></url>

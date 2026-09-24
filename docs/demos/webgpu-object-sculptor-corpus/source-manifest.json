@@ -14,14 +14,14 @@
     "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus"
   ],
   "browserEntry": "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus/index.html",
-  "sourceHash": "sha256:a619e33bbaacb7e1afcc06f4036b26271135677342b1274f632bcab194c07046",
+  "sourceHash": "sha256:b1362871cbd74059dde01abd859ec92c1d0ec8c66b4690b7bdf67b89a5e49293",
   "publishedHashInputs": [
     "docs/demos/webgpu-object-sculptor-corpus",
     "docs/demos/assets/OrbitControls-BPue_ISR.js",
     "docs/demos/assets/aligned-readback-XAnJComS.js",
     "docs/demos/assets/classic-02b6399d3910b7432a1f23a6cc662f9f21c5f2830335872ffca7861692a90576.js",
-    "docs/demos/assets/index-DiQ9WhpU.js",
-    "docs/demos/assets/index-M60Or1av.css",
+    "docs/demos/assets/index-CJI8MyZ3.css",
+    "docs/demos/assets/index-DwgPquDf.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
     "docs/demos/assets/three.tsl--5AYqKVA.js",
     "docs/demos/assets/three.webgpu-Dss1ekdK.js"
@@ -30,14 +30,14 @@
     "docs/demos/assets/OrbitControls-BPue_ISR.js",
     "docs/demos/assets/aligned-readback-XAnJComS.js",
     "docs/demos/assets/classic-02b6399d3910b7432a1f23a6cc662f9f21c5f2830335872ffca7861692a90576.js",
-    "docs/demos/assets/index-DiQ9WhpU.js",
-    "docs/demos/assets/index-M60Or1av.css",
+    "docs/demos/assets/index-CJI8MyZ3.css",
+    "docs/demos/assets/index-DwgPquDf.js",
     "docs/demos/assets/modulepreload-polyfill-Dezn_h7o.js",
     "docs/demos/assets/three.tsl--5AYqKVA.js",
     "docs/demos/assets/three.webgpu-Dss1ekdK.js"
   ],
-  "publishedBundleHash": "sha256:7174ec65eda6936e2cd12a68a21a36bc94fac7adf418726250d6f214bbc9799d",
+  "publishedBundleHash": "sha256:b15c52cdc5ab10830a4f4698653955c4520396b6e40b554b8f74ede6e04cb761",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:de7025cf80da8e1c51de4d4ed4570ea5e053c396346c2d317a93a24b9a707ed4",
+  "buildRevision": "sha256:b951f17018466135b2d841a246127bf96c7f617f6274e73736ec257a7293369f",
   "evidenceBundleId": "correctness"
 }

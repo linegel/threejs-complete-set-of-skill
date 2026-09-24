@@ -26,8 +26,8 @@
     "docs/demos/assets/three.tsl--5AYqKVA.js",
     "docs/demos/assets/three.webgpu-Dss1ekdK.js"
   ],
-  "publishedBundleHash": "sha256:0a666a007a0838f800a8bd800721021ac3607f2a15f8cc01c37ad16c23a862d1",
+  "publishedBundleHash": "sha256:9bc99e03517b4a58b583cbb3a3e156a4bb6996fd8734cc35fbc9aeaf8a5cbb39",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:de7025cf80da8e1c51de4d4ed4570ea5e053c396346c2d317a93a24b9a707ed4",
+  "buildRevision": "sha256:b951f17018466135b2d841a246127bf96c7f617f6274e73736ec257a7293369f",
   "evidenceBundleId": "bundle"
 }

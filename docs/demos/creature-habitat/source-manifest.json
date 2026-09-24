@@ -102,8 +102,8 @@
     "docs/demos/assets/webgpu-bounded-water-BTmuFlv9.js",
     "docs/demos/assets/webgpu-device-identity-uNUcs3Wh.js"
   ],
-  "publishedBundleHash": "sha256:849b6cccc9ab391953ae57894092f4ffaa29ac1821073695add9c12818518548",
+  "publishedBundleHash": "sha256:e4b6ecb5baee26195c0a8a4d89fce21d7d37d8187de60eb0e584bd4351063b75",
   "threeRevision": "0.185.1",
-  "buildRevision": "sha256:de7025cf80da8e1c51de4d4ed4570ea5e053c396346c2d317a93a24b9a707ed4",
+  "buildRevision": "sha256:b951f17018466135b2d841a246127bf96c7f617f6274e73736ec257a7293369f",
   "evidenceBundleId": "bundle"
 }

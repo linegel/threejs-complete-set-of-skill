@@ -1690,7 +1690,7 @@
   "coverageSummary": {
     "schemaVersion": 2,
     "threeRevision": "0.185.1",
-    "buildRevision": "sha256:de7025cf80da8e1c51de4d4ed4570ea5e053c396346c2d317a93a24b9a707ed4",
+    "buildRevision": "sha256:b951f17018466135b2d841a246127bf96c7f617f6274e73736ec257a7293369f",
     "skills": 27,
     "primaryImplementations": 40,
     "declaredEntrypointPrimaryTargets": 40,
@@ -2261,10 +2261,10 @@
       "flagshipParticipation": [],
       "demos": [],
       "latestUpdate": {
-        "date": "2026-07-16",
-        "datetime": "2026-07-16T19:46:25+03:00",
-        "commit": "62a9bc59330c44827824665323823883e88f100c",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/62a9bc59330c44827824665323823883e88f100c"
+        "date": "2026-09-24",
+        "datetime": "2026-09-24T07:15:04+03:00",
+        "commit": "a75bae8044681d98aefa173a157edb3c87cac6d3",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/a75bae8044681d98aefa173a157edb3c87cac6d3"
       },
       "page": "https://threejs-skills.com/skills/threejs-choose-skills.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-choose-skills/SKILL.md",
@@ -2273,7 +2273,7 @@
     {
       "name": "threejs-compatibility-fallbacks",
       "title": "Three.js Compatibility Fallbacks",
-      "description": "Fallback unavailable WebGPU features through an isolated compatibility branch. Use only when the user explicitly asks how to handle an initialized non-WebGPU backend; then classify canonical behavior as preserved, weakened, or removed.",
+      "description": "Fallback unavailable WebGPU features through an isolated compatibility branch. Use only when the user explicitly requests a fallback after verified WebGPU unavailability; then classify canonical behavior as preserved, weakened, or removed.",
       "examples": [
         "browser-fallback-harness"
       ],
@@ -2356,10 +2356,10 @@
         }
       ],
       "latestUpdate": {
-        "date": "2026-07-16",
-        "datetime": "2026-07-16T19:46:25+03:00",
-        "commit": "62a9bc59330c44827824665323823883e88f100c",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/62a9bc59330c44827824665323823883e88f100c"
+        "date": "2026-09-24",
+        "datetime": "2026-09-24T07:28:02+03:00",
+        "commit": "b9e736a844564d5c0aac4fb37c2ca997d17fe715",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/b9e736a844564d5c0aac4fb37c2ca997d17fe715"
       },
       "page": "https://threejs-skills.com/skills/threejs-compatibility-fallbacks.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-compatibility-fallbacks/SKILL.md",
@@ -2409,15 +2409,15 @@
             "threejs-debugging/examples/debugging-contract.test.mjs",
             "threejs-debugging/examples/triage-cases.json"
           ],
-          "sourceHash": "sha256:65a4329cc5248ade7712d2861f6156d407f5683ef6b90d626689caec43d1988a",
+          "sourceHash": "sha256:1cee2bb8081b3a6fccff63c4007d88e078d99a7532c2da0bedab2153a9ced1b8",
           "proxyStatus": null
         }
       ],
       "latestUpdate": {
-        "date": "2026-07-16",
-        "datetime": "2026-07-16T19:46:25+03:00",
-        "commit": "62a9bc59330c44827824665323823883e88f100c",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/62a9bc59330c44827824665323823883e88f100c"
+        "date": "2026-09-24",
+        "datetime": "2026-09-24T07:17:12+03:00",
+        "commit": "2aaa86b8bb646e2223b12d88a9c94958970a68c1",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/2aaa86b8bb646e2223b12d88a9c94958970a68c1"
       },
       "page": "https://threejs-skills.com/skills/threejs-debugging.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-debugging/SKILL.md",
@@ -3187,7 +3187,7 @@
             "threejs-object-sculptor/examples/shared/sculpt-runtime.js",
             "threejs-object-sculptor/examples/webgpu-object-sculptor-corpus"
           ],
-          "sourceHash": "sha256:a619e33bbaacb7e1afcc06f4036b26271135677342b1274f632bcab194c07046",
+          "sourceHash": "sha256:b1362871cbd74059dde01abd859ec92c1d0ec8c66b4690b7bdf67b89a5e49293",
           "proxyStatus": null
         },
         {
@@ -4812,10 +4812,10 @@
         }
       ],
       "latestUpdate": {
-        "date": "2026-07-16",
-        "datetime": "2026-07-16T19:46:25+03:00",
-        "commit": "62a9bc59330c44827824665323823883e88f100c",
-        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/62a9bc59330c44827824665323823883e88f100c"
+        "date": "2026-09-24",
+        "datetime": "2026-09-24T07:23:59+03:00",
+        "commit": "423c9d66ad71fe53b9f17a6a7a82765e0f1ac898",
+        "commitUrl": "https://github.com/linegel/threejs-complete-set-of-skill/commit/423c9d66ad71fe53b9f17a6a7a82765e0f1ac898"
       },
       "page": "https://threejs-skills.com/skills/threejs-visual-validation.html",
       "skillMd": "https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-visual-validation/SKILL.md",

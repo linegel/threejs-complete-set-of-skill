@@ -4,12 +4,12 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Three.js Compatibility Fallbacks | Three.js WebGPU Skill</title>
-<meta name="description" content="Fallback unavailable WebGPU features through an isolated compatibility branch. Use only when the user explicitly asks how to handle an initialized non-WebGPU…" />
+<meta name="description" content="Fallback unavailable WebGPU features through an isolated compatibility branch. Use only when the user explicitly requests a fallback after verified WebGPU…" />
 <meta name="author" content="Three.js WebGPU Skill Pack contributors" />
 <link rel="canonical" href="https://threejs-skills.com/skills/threejs-compatibility-fallbacks.html" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#0a0c10" />
-<meta name="skill-pack-build-revision" content="sha256:de7025cf80da8e1c51de4d4ed4570ea5e053c396346c2d317a93a24b9a707ed4" />
+<meta name="skill-pack-build-revision" content="sha256:b951f17018466135b2d841a246127bf96c7f617f6274e73736ec257a7293369f" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
 <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
@@ -22,9 +22,9 @@
 <meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="Three.js WebGPU Skill Pack" />
 <meta property="og:title" content="Three.js Compatibility Fallbacks | Three.js WebGPU Skill" />
-<meta property="og:description" content="Fallback unavailable WebGPU features through an isolated compatibility branch. Use only when the user explicitly asks how to handle an initialized non-WebGPU…" />
+<meta property="og:description" content="Fallback unavailable WebGPU features through an isolated compatibility branch. Use only when the user explicitly requests a fallback after verified WebGPU…" />
 <meta property="og:url" content="https://threejs-skills.com/skills/threejs-compatibility-fallbacks.html" />
-<meta property="article:modified_time" content="2026-07-16T19:46:25+03:00" />
+<meta property="article:modified_time" content="2026-09-24T07:28:02+03:00" />
 <meta property="article:published_time" content="2026-07-04T23:30:19+03:00" />
 <meta property="article:section" content="Planning and Validation" />
 <meta property="og:image" content="https://threejs-skills.com/previews/primary/browser-fallback-harness.png" />
@@ -36,7 +36,7 @@
 <meta name="twitter:image:alt" content="Deterministic contract-lab screenshot for Three.js Compatibility Fallbacks" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Three.js Compatibility Fallbacks | Three.js WebGPU Skill" />
-<meta name="twitter:description" content="Fallback unavailable WebGPU features through an isolated compatibility branch. Use only when the user explicitly asks how to handle an initialized non-WebGPU…" />
+<meta name="twitter:description" content="Fallback unavailable WebGPU features through an isolated compatibility branch. Use only when the user explicitly requests a fallback after verified WebGPU…" />
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
@@ -62,7 +62,7 @@
    ],
    "@id": "https://threejs-skills.com/skills/threejs-compatibility-fallbacks.html#article",
    "headline": "Three.js Compatibility Fallbacks",
-   "description": "Fallback unavailable WebGPU features through an isolated compatibility branch. Use only when the user explicitly asks how to handle an initialized non-WebGPU backend; then classify canonical behavior as preserved, weakened, or removed.",
+   "description": "Fallback unavailable WebGPU features through an isolated compatibility branch. Use only when the user explicitly requests a fallback after verified WebGPU unavailability; then classify canonical behavior as preserved, weakened, or removed.",
    "url": "https://threejs-skills.com/skills/threejs-compatibility-fallbacks.html",
    "mainEntityOfPage": {
     "@type": "WebPage",
@@ -74,7 +74,7 @@
     "https://threejs-skills.com/seo/article/threejs-compatibility-fallbacks-16x9.png"
    ],
    "datePublished": "2026-07-04T23:30:19+03:00",
-   "dateModified": "2026-07-16T19:46:25+03:00",
+   "dateModified": "2026-09-24T07:28:02+03:00",
    "author": {
     "@id": "https://threejs-skills.com/#publisher"
    },
@@ -304,15 +304,15 @@ a.chip:active{scale:.96}
   <div class="wrap">
     <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Skill Pack</a></li><li><a href="../#skills">Planning and Validation</a></li><li aria-current="page">Three.js Compatibility Fallbacks</li></ol></nav>
     <h1 style="view-transition-name:skill-threejs-compatibility-fallbacks">Three.js Compatibility Fallbacks</h1>
-    <p class="lede">Fallback unavailable WebGPU features through an isolated compatibility branch. Use only when the user explicitly asks how to handle an initialized non-WebGPU backend; then classify canonical behavior as preserved, weakened, or removed.</p>
+    <p class="lede">Fallback unavailable WebGPU features through an isolated compatibility branch. Use only when the user explicitly requests a fallback after verified WebGPU unavailability; then classify canonical behavior as preserved, weakened, or removed.</p>
     <p class="hero-evidence-caption">Image: Deterministic contract-lab screenshot. Source lab: browser-fallback-harness.</p>
     <div class="meta-row">
       <span class="chip a">$threejs-compatibility-fallbacks</span>
       <span class="chip">1 primary target</span>
       <span class="chip">1 secondary surface</span>
       <span class="chip">accepted runtime evidence</span>
-      <span class="chip">Latest skill update <time datetime="2026-07-16T19:46:25+03:00">2026-07-16</time></span>
-    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/62a9bc59330c44827824665323823883e88f100c">commit 62a9bc5 ↗</a>
+      <span class="chip">Latest skill update <time datetime="2026-09-24T07:28:02+03:00">2026-09-24</time></span>
+    <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/commit/b9e736a844564d5c0aac4fb37c2ca997d17fe715">commit b9e736a ↗</a>
       <a class="chip" href="https://github.com/linegel/threejs-complete-set-of-skill/blob/main/skills/threejs-compatibility-fallbacks/SKILL.md">SKILL.md on GitHub ↗</a>
       <a class="chip" href="https://raw.githubusercontent.com/linegel/threejs-complete-set-of-skill/main/skills/threejs-compatibility-fallbacks/SKILL.md">raw (for agents) ↗</a>
     </div>
@@ -396,17 +396,24 @@ work and native WebGPU quality tuning remain with their owning skills.</p>
 <p>Record all of the following before selecting an implementation:</p>
 <ul>
 <li>the user&#39;s explicit request for unavailable-WebGPU fallback;</li>
-<li>proof from an initialized <code>WebGPURenderer</code> that
-<code>renderer.backend.isWebGPUBackend !== true</code> on the named target;</li>
+<li>either a positively identified initialized non-WebGPU backend, or a
+reproducible capability-related initialization failure on the named target;
+record which state occurred, rather than inferring a backend from a missing
+<code>isWebGPUBackend</code> property;</li>
 <li>the canonical owner and exact feature;</li>
 <li>the accepted scope of visual, physical, temporal, interaction, performance,
 and maintenance loss;</li>
 <li>the compatibility branch&#39;s maintenance owner.</li>
 </ul>
-<p>Backend truth is available only after <code>await renderer.init()</code>. When WebGPU
-initializes, return to the canonical owner. When the explicit request is absent,
-report the unavailable-WebGPU blocker from the canonical path. Dispose the
-capability-probe renderer before constructing a separate compatibility renderer.</p>
+<p>Inspect backend identity only after <code>await renderer.init()</code> succeeds. In r185,
+<code>renderer.backend.isWebGLBackend === true</code> positively identifies the initialized
+WebGL backend; an absent/unknown flag is not proof. When initialization rejects,
+record its exact error and leave initialized-backend identity unknown. Route an
+application/configuration exception through debugging instead of disguising it
+as unavailable hardware. When WebGPU initializes, return to the canonical owner.
+Without an explicit fallback request, report the canonical blocker. Clean up the
+probe&#39;s resources/listeners using the installed API&#39;s initialized or partial-init
+cleanup path, and use a separate fresh canvas for a different renderer stack.</p>
 <p>This step is complete when the five activation facts are recorded and the
 canonical implementation remains unchanged.</p>
 <h2>2. Classify canonical behavior</h2>
@@ -450,10 +457,19 @@ tests, artifacts, capability gate, and maintenance ownership. Keep one scene
 signal graph and one tone-map/output-transform owner inside the branch. Record
 color versus data texture domains, resource creation/reset/resize/disposal, and
 the boundary between canonical and compatibility assets.</p>
-<p>When a GPU-performance claim requires timestamps, construct the branch renderer
-with <code>trackTimestamp: true</code> before initialization. A legacy branch may use
+<p>When a node-renderer branch needs GPU timestamps, construct it with
+<code>trackTimestamp: true</code> before initialization. Classic <code>WebGLRenderer</code> has no
+such option or <code>resolveTimestampsAsync()</code> API; it needs its own supported,
+validated timer-query instrumentation or an insufficient-evidence verdict.
+A legacy branch may use
 <code>WebGPURenderer( { forceWebGL: true } )</code> only after activation; it remains a
-compatibility product rather than the canonical renderer.</p>
+compatibility product rather than the canonical renderer. Choose one coherent
+stack: <code>WebGPURenderer</code> with its WebGL backend retains the node-material/TSL and
+<code>RenderPipeline</code> model; <code>WebGLRenderer</code> uses classic <code>ShaderMaterial</code> and
+<code>EffectComposer</code> APIs. <code>forceWebGL</code> does not turn the former into the latter.
+Do not share incompatible materials, passes, render targets, or renderer-specific
+resources between these stacks. Preserve application state and restore its
+controls through explicit branch adapters, not by retaining old GPU objects.</p>
 <p>This step is complete when disabling or deleting the compatibility entrypoint
 leaves the canonical build and runtime graph unchanged, and every branch-owned
 resource has one owner and disposal path.</p>
@@ -518,7 +534,7 @@ owner, and the exact evidence needed for each <code>INSUFFICIENT_EVIDENCE</code>
 
 <div class="wrap"><footer>
   <div class="footer-summary">Three.js WebGPU Skill Pack: TSL, procedural graphics, and visual validation.
-    <span>Three r185.1 · 40 primary targets · 25 accepted · build <code>de7025cf80da</code></span>
+    <span>Three r185.1 · 40 primary targets · 25 accepted · build <code>b951f1701846</code></span>
     <span>Compiling shaders? <a href="https://devme.me/">devme.me</a> has dev memes worth the wait.</span>
   </div>
   <div class="footer-groups">
