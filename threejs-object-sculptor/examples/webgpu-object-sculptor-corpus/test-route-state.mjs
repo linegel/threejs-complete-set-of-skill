@@ -6,6 +6,8 @@ import {
   CORPUS_CAMERAS,
   corpusRouteFromLocation,
   corpusStateChanged,
+  corpusViewStateFromLocation,
+  corpusViewUrl,
   resolveCorpusInitialState,
 } from "./route-state.js";
 
@@ -109,3 +111,17 @@ console.log(JSON.stringify({
   defaults: expectedDefaults,
   cameras: CORPUS_CAMERAS,
 }, null, 2));
+
+const interactiveUrl = new URL('https://threejs-skills.com/demos/webgpu-object-sculptor-corpus/?subject=ceramic-teapot&mode=final&quality=full&view=profile#object');
+assert.deepEqual(corpusViewStateFromLocation(interactiveUrl), {
+  scenario: 'ceramic-teapot', mechanism: 'final', tier: 'full', camera: 'profile',
+});
+assert.deepEqual(corpusRouteFromLocation(interactiveUrl), generalRoute, 'share state must not lock controls');
+assert.equal(corpusViewUrl(interactiveUrl, corpusViewStateFromLocation(interactiveUrl)), interactiveUrl.pathname + interactiveUrl.search + interactiveUrl.hash);
+assert.equal(corpusViewUrl(interactiveUrl, expectedDefaults), interactiveUrl.pathname + '#object');
+assert.throws(() => corpusViewStateFromLocation(new URL('?mode=final&mode=materials', interactiveUrl)), /Unknown|Conflicting/);
+assert.throws(() => corpusViewStateFromLocation({ pathname: '/', search: '?subject=unknown' }), /Unknown/);
+assert.throws(() => corpusViewStateFromLocation({ pathname: '/scenario/potted-bonsai/', search: '?subject=ceramic-teapot' }), /conflicts/);
+assert.deepEqual(corpusViewStateFromLocation({ pathname: '/scenario/potted-bonsai/', search: '?mode=materials' }), {
+  ...expectedDefaults, mechanism: 'materials',
+});

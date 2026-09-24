@@ -9,8 +9,8 @@ defects, run source/distribution and relevant executable checks, and record
 what was actually verified. Do not infer skill correctness from lab badges.
 Only after this skill pass proceed to labs, visualisations, and recreations.
 
-The unfinished Object Sculptor inspector and generated site changes are
-preserved in the working tree, not accepted or included in skill commits.
+The already-started Object Sculptor inspector repair is browser-checked in its
+own source unit. Generated publication stays separate from the skill commits.
 Interruption-safe image publication is also deferred to the later website/lab
 phase. No branch or worktree is created. Linear searches for `threejs` and
 `Three.js` found no matching project issue; the latter returned only WAR DOGS.
@@ -160,10 +160,10 @@ Status: complete means delivered and recorded; pending means not yet established
 21. [x] Commit and push the finished capture/evidence correction (af24decc).
 22. [x] Reproduce object-sculptor bootstrap loading in isolated browser MCP.
 23. [x] Repair its source-owned bundling without removing controls or routes.
-24. [ ] Exercise object selection, diagnostics, reload, and history restoration.
-25. [ ] Inspect affected desktop layouts at 1024, 1280, 1440, and 1728px.
-26. [ ] Inspect affected non-map layouts at 390 and 768px after desktop passes.
-27. [ ] Capture console/network observations for each affected browser load.
+24. [x] Exercise object selection, diagnostics, reload, and history restoration.
+25. [x] Inspect affected desktop layouts at 1024, 1280, 1440, and 1728px.
+26. [x] Inspect affected non-map layouts at 390 and 768px after desktop passes.
+27. [x] Capture console/network observations for each affected browser load.
 28. [ ] Commit and push the finished browser-path correction.
 29. [ ] Add interruption-safe image publication using existing encoder helpers.
 30. [ ] Verify resumed generation reuses finished work and repairs partial output.
@@ -231,3 +231,27 @@ The inspected screenshot shows the complete pot, lid, handle, and spout. The sam
 load has zero console warnings/errors and a successful classic-script request.
 The formerly unbundled-script warning is gone. Inspector text truncation remains
 the next UI repair; this result does not certify model fidelity or GPU timing.
+
+## Inspector repair acceptance
+The existing inspector unit preserves the procedural subjects and capture-owned
+controller contract. Browser MCP inspected 1024, 1280, 1440, and 1728px before
+390/768px. All four controls measure 44px; paired mode/tier centres match and the
+1440px header centres both measure 57.3984375px. Inspector text is at least 12px.
+The canvas reserves the inspector column; narrow layouts stack the object,
+inspector, and evidence drawer without overlap or horizontal overflow.
+
+Keyboard Home/End/Enter changes the object or camera and keeps focus on the
+trigger. Escape preserves the committed mode. Pointer hover leaves keyboard
+selection unchanged with exactly one popup; clicking hierarchy changes the
+rendered semantic colours and URL. Back/Forward restores subject and title.
+A direct URL restores all four choices; route-locked subject stays disabled.
+Invalid view parameters show an unobstructed reset action, which returns to a
+ready default scene. Motion/DPR details use one authored tooltip, not title bubbles.
+Successful loads report no console errors or failed requests.
+
+The object package syntax, target, route, lifecycle, and artifact tests pass; the
+pinned root lab suite passes 211 tests. These checks do not establish sustained
+GPU timing, canonical release acceptance, or a new physical-route capture.
+Screenshots and MCP responses remain under
+artifacts/website-improvement-20260924/continuation/. The active skill sequence
+above remains owned by the separate skills-first session; its files are excluded.

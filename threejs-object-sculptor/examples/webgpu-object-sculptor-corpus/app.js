@@ -1,3 +1,5 @@
+import { attachMetricTooltip } from "./metric-tooltip.js";
+import { enhanceValueSelectors } from "./value-selector.js";
 import { SCULPT_TARGETS } from "./object-catalog.js";
 import {
   SCULPT_MODES,
@@ -9,7 +11,8 @@ import {
 import {
   CORPUS_CAMERAS,
   corpusRouteFromLocation,
-  resolveCorpusInitialState,
+  corpusViewStateFromLocation,
+  corpusViewUrl,
 } from "./route-state.js";
 import { settleCorpusControlAction } from "./frame-driver.js";
 import { runtimeOptionsFromLocation } from "./app-runtime-options.js";
@@ -67,7 +70,6 @@ const cameraSelect = requireElement("#camera");
 const status = requireElement("#status");
 const subjectTitle = requireElement("#subject-title");
 const subjectDescription = requireElement("#subject-description");
-const corpusIndex = requireElement(".corpus-index");
 const modeTitle = requireElement("#mode-title");
 const modeDescription = requireElement("#mode-description");
 const metricNodes = requireElement("#metric-nodes");
@@ -106,11 +108,9 @@ function targetCopy(id) {
 
 function updateSubjectCopy(id) {
   const copy = targetCopy(id);
-  const index = Math.max(SCULPT_TARGETS.findIndex((entry) => entry.id === id), 0);
   document.documentElement.dataset.subject = id;
   subjectTitle.textContent = copy.title;
   subjectDescription.textContent = copy.description;
-  corpusIndex.textContent = `${String(index + 1).padStart(2, "0")} / ${String(SCULPT_TARGETS.length).padStart(2, "0")} · generated procedural asset`;
   document.title = `${copy.title} · Object Sculptor Corpus`;
 }
 
@@ -168,6 +168,7 @@ function updateHud(metrics) {
   updateSubjectCopy(metrics.subjectId ?? subjectSelect.value);
   updateModeCopy(metrics.mode ?? modeSelect.value);
 
+  valueSelectors?.sync();
   const draws = finiteOrNull(metrics.drawCalls, metrics.rendererInfo?.render?.calls);
   const submissions = finiteOrNull(metrics.renderSubmissions);
   const handoffCount = finiteOrNull(metrics.physicsHandoffCount, metrics.colliderConstructionInputs, metrics.colliders);
@@ -182,9 +183,9 @@ function updateHud(metrics) {
   metricHandoffs.textContent = handoffCount === null ? "—" : `${Math.round(handoffCount)} inputs`;
   metricPhysicsStatus.textContent = physicsStatus(metrics, handoffCount ?? 0);
   metricMotion.textContent = motion.text;
-  metricMotion.title = motion.title;
+  metricMotion.dataset.detail = motion.title;
   metricDpr.textContent = dpr === null ? runtimeProfile : `${dpr.toFixed(2)}× · ${runtimeProfile}`;
-  metricDpr.title = `${runtimeProfile} profile; ${metrics.timingMethod ?? "timing method unavailable"}; shadow map ${shadowPolicy?.mapSize ?? "—"} px; ${shadowPolicy?.enabledCasterCount ?? "—"}/${shadowPolicy?.authoredCasterCount ?? "—"} authored casters enabled; antialias policy match ${shadowPolicy?.antialiasMatchesCurrentTier ?? "—"}`;
+  metricDpr.dataset.detail = `${runtimeProfile} profile; ${metrics.timingMethod ?? "timing method unavailable"}; shadow map ${shadowPolicy?.mapSize ?? "—"} px; ${shadowPolicy?.enabledCasterCount ?? "—"}/${shadowPolicy?.authoredCasterCount ?? "—"} authored casters enabled; antialias policy match ${shadowPolicy?.antialiasMatchesCurrentTier ?? "—"}`;
 }
 
 function reportRuntimeError(value) {
@@ -193,6 +194,7 @@ function reportRuntimeError(value) {
   document.body.dataset.runtime = "error";
   status.dataset.state = "error";
   status.textContent = `Error · ${error.message}`;
+  showSceneRecovery(error);
   console.error(error);
 }
 
@@ -206,7 +208,7 @@ async function boot() {
   addOptions(cameraSelect, CORPUS_CAMERAS.map((id) => [id, CAMERA_LABELS[id] ?? id.replaceAll("-", " ")]));
 
   const route = corpusRouteFromLocation(window.location);
-  const routeState = resolveCorpusInitialState(route);
+  const routeState = corpusViewStateFromLocation(window.location);
   const runtimeOptions = runtimeOptionsFromLocation(window.location);
   const frameOwner = objectSculptorCorpusFrameOwner(window.location.search);
   const physicalRouteLockCount = Object.values(route).filter((value) => value !== null).length;
@@ -229,10 +231,14 @@ async function boot() {
   updateModeCopy(initial.mode);
   document.documentElement.dataset.profile = runtimeOptions.profile;
 
+  document.documentElement.dataset.frameOwner = frameOwner;
+  const viewport = () => frameOwner === "live-page"
+    ? { width: Math.max(1, Math.round(canvas.clientWidth)), height: Math.max(1, Math.round(canvas.clientHeight)) }
+    : { width: window.innerWidth, height: window.innerHeight };
+  if (frameOwner === "live-page") valueSelectors = enhanceValueSelectors([subjectSelect, modeSelect, tierSelect, cameraSelect]);
   const controller = await createObjectSculptorCorpusController({
     canvas,
-    width: window.innerWidth,
-    height: window.innerHeight,
+    ...viewport(),
     dpr: Math.min(window.devicePixelRatio, 1.5),
     subjectId: initial.subjectId,
     mode: initial.mode,
@@ -275,11 +281,11 @@ async function boot() {
   let controlActionOrdinal = 0;
   let lastControlAction = Object.freeze({ ordinal: 0, promise: Promise.resolve(null) });
 
-  function observeAction(promise, onSuccess = () => {}) {
+  function observeAction(promise, onSuccess = () => {}, writeHistory = false) {
     const ordinal = controlActionOrdinal + 1;
     controlActionOrdinal = ordinal;
     const settled = settleCorpusControlAction(promise, {
-      onApplied: onSuccess,
+      onApplied: () => { onSuccess(); if (writeHistory && frameOwner === "live-page") updateViewUrl(labController); },
       onRestore: restoreControlsFromMetrics,
     });
     lastControlAction = Object.freeze({ ordinal, promise: settled });
@@ -302,38 +308,45 @@ async function boot() {
   }
 
   function onSubjectChange() {
-    observeAction(labController.setSubject(subjectSelect.value), () => updateSubjectCopy(subjectSelect.value));
+    observeAction(labController.setSubject(subjectSelect.value), () => updateSubjectCopy(subjectSelect.value), true);
   }
 
   function onModeChange() {
-    observeAction(labController.setMode(modeSelect.value), () => updateModeCopy(modeSelect.value));
+    observeAction(labController.setMode(modeSelect.value), () => updateModeCopy(modeSelect.value), true);
   }
 
   function onTierChange() {
-    observeAction(labController.setTier(tierSelect.value));
+    observeAction(labController.setTier(tierSelect.value), undefined, true);
   }
 
   function onCameraChange() {
-    observeAction(labController.setCamera(cameraSelect.value));
+    observeAction(labController.setCamera(cameraSelect.value), undefined, true);
   }
+
+  const onPopState = () => observeAction(restoreViewFromUrl(labController), restoreControlsFromMetrics);
 
   function onResize() {
     observeAction(labController.resize(
-      window.innerWidth,
-      window.innerHeight,
+      viewport().width,
+      viewport().height,
       Math.min(window.devicePixelRatio, 1.5),
     ));
   }
 
+  const disposeMetricTooltip = attachMetricTooltip([metricMotion, metricDpr]);
   let listenersAttached = true;
   function detachListeners() {
     if (!listenersAttached) return false;
     listenersAttached = false;
+    disposeMetricTooltip();
     subjectSelect.removeEventListener("change", onSubjectChange);
     modeSelect.removeEventListener("change", onModeChange);
     tierSelect.removeEventListener("change", onTierChange);
     cameraSelect.removeEventListener("change", onCameraChange);
     window.removeEventListener("resize", onResize);
+    window.removeEventListener("popstate", onPopState);
+    valueSelectors?.dispose();
+    valueSelectors = null;
     window.removeEventListener("pagehide", onPageHide);
     window.removeEventListener("pageshow", onPageShow);
     return true;
@@ -361,6 +374,7 @@ async function boot() {
   tierSelect.addEventListener("change", onTierChange);
   cameraSelect.addEventListener("change", onCameraChange);
   if (frameOwner === "live-page") window.addEventListener("resize", onResize);
+  if (frameOwner === "live-page") window.addEventListener("popstate", onPopState);
   window.addEventListener("pagehide", onPageHide);
   window.addEventListener("pageshow", onPageShow);
 
@@ -454,4 +468,46 @@ async function boot() {
   else updateHud(labController.getMetrics());
 }
 
+let valueSelectors = null;
 boot().catch(reportRuntimeError);
+
+function updateViewUrl(controller) {
+  const metrics = controller.getMetrics();
+  const path = corpusViewUrl(window.location, {
+    scenario: metrics.subjectId, mechanism: metrics.mode,
+    tier: metrics.tier, camera: metrics.camera,
+  });
+  if (path !== location.pathname + location.search + location.hash) {
+    history.pushState(null, '', path);
+  }
+}
+
+async function restoreViewFromUrl(controller) {
+  const state = corpusViewStateFromLocation(window.location);
+  await Promise.all([
+    controller.setSubject(state.scenario), controller.setMode(state.mechanism),
+    controller.setTier(state.tier), controller.setCamera(state.camera),
+  ]);
+  return true;
+}
+
+function showSceneRecovery(error) {
+  if (new URLSearchParams(location.search).get('capture') === '1') return;
+  document.documentElement.dataset.frameOwner = 'live-page';
+  const url = new URL(location.href);
+  const invalidView = error instanceof RangeError;
+  if (invalidView) {
+    url.search = '';
+    subjectTitle.textContent = 'Object sculptor';
+    document.title = 'Invalid view | Object sculptor';
+  }
+  let link = document.getElementById('scene-retry');
+  if (!link) {
+    link = document.createElement('a');
+    link.id = 'scene-retry';
+    link.className = 'scene-recovery';
+    status.closest('.inspector-header').after(link);
+  }
+  link.href = url.href;
+  link.textContent = invalidView ? 'Reset view' : 'Reload scene';
+}

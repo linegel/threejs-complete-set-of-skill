@@ -93,3 +93,34 @@ export function corpusStateChanged(current, next, allowed, label = "corpus state
   if (current !== null && current !== undefined) validateAllowed(current, values, label, { nullable: false });
   return current !== next;
 }
+
+// Interactive view state is distinct from immutable scenario/mechanism locks.
+const VIEW_FIELDS = Object.freeze({
+  subject: 'scenario', mode: 'mechanism', quality: 'tier', view: 'camera',
+});
+
+export function corpusViewStateFromLocation(location = {}) {
+  const locks = corpusRouteFromLocation(location);
+  const params = new URLSearchParams(location.search ?? '');
+  const state = { ...locks };
+  for (const [query, field] of Object.entries(VIEW_FIELDS)) {
+    const value = oneValue(params.getAll(query), query, 'query');
+    if (value === null) continue;
+    if (locks[field] !== null && locks[field] !== value) {
+      throw new RangeError(`Interactive ${query} conflicts with its locked route`);
+    }
+    state[field] = value;
+  }
+  return resolveCorpusInitialState(state);
+}
+
+export function corpusViewUrl(location, state) {
+  const url = new URL(location.href);
+  const locks = corpusRouteFromLocation(location);
+  const validated = resolveCorpusInitialState(state);
+  for (const [query, field] of Object.entries(VIEW_FIELDS)) {
+    if (locks[field] !== null || validated[field] === DEFAULT_CORPUS_STATE[field]) url.searchParams.delete(query);
+    else url.searchParams.set(query, validated[field]);
+  }
+  return `${url.pathname}${url.search}${url.hash}`;
+}

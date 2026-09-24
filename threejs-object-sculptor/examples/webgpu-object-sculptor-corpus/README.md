@@ -36,6 +36,28 @@ The authored DPR ceilings are `1.5` for `full`, `1.25` for `budgeted`, and `1.0`
 
 Review cameras are `design`, `profile`, `attachment`, and `close-material`. The attachment camera is for checking parent-local joints, sockets, embedded starts, and visible gaps; it does not prove collision behavior.
 
+## Interactive view state
+
+Public inspection controls use `subject`, `mode`, `quality`, and `view` query
+parameters. For example, `?subject=ceramic-teapot&mode=final&quality=minimum&view=profile`
+opens that exact object and view without locking its controls. Changing a selector
+updates history after the controller applies the change. Reload and Back/Forward
+restore the selected subject, mode, tier, and camera; the subject also owns the title.
+Invalid view parameters expose a reset link rather than an apparently usable empty
+scene. Runtime failures retain the current URL for an explicit reload.
+
+`value-selector.js` enhances the existing controller-bound selects with one shared
+listbox owner. Keyboard selection is independent of pointer hover. Escape cancels
+an uncommitted choice, selection returns focus to its trigger, and route-locked
+controls remain disabled. `metric-tooltip.js` exposes motion and DPR details to
+pointer and keyboard users without a native title bubble.
+
+The live canvas reserves the inspector column on desktop. Narrow viewports place
+the object above the inspector and evidence drawer in document flow. All inspector
+labels are at least 12px, controls share a 44px height, and metric values wrap rather
+than truncate. Capture-owned routes retain their viewport-sized render surface and
+native controller-bound select contract.
+
 ## Route locks
 
 The page accepts generated pathname routes such as `/scenario/potted-bonsai/`, `/mechanism/action-ready/`, `/tier/minimum/`, and `/camera/attachment/`. The equivalent query keys are `scenario`, `mechanism`, `tier`, and `camera`. A value supplied by either surface disables that selector. Repeated conflicting values or path/query conflicts fail closed and publish `window.__LAB_ERROR__`.
