@@ -70,18 +70,47 @@ function compareLane(left, right) {
   return left < right ? -1 : left > right ? 1 : 0;
 }
 
-export function compareWinnerKeys(left, right) {
-  const duplicateIdentity = left.candidateTuple.every(
-    (lane, index) => compareLane(lane, right.candidateTuple[index]) === 0,
-  );
-  if (duplicateIdentity) throw new Error("duplicate candidate identity");
+function validatedWinnerKey(value) {
+  if (value === null || typeof value !== "object" || Array.isArray(value)) {
+    throw new TypeError("winner key must be an object");
+  }
+  const tuple = value.candidateTuple;
+  if (!Array.isArray(tuple) || tuple.length !== 5 ||
+      ![0, 1, 2, 3, 4].every(index => Object.hasOwn(tuple, index))) {
+    throw new TypeError("candidateTuple must be a dense five-lane array");
+  }
+  return winnerKey({
+    generatorSchemaVersion: tuple[0], stableSeed: tuple[1], familyId: tuple[2],
+    sourceCellId: tuple[3], candidateOrdinal: tuple[4],
+  }, value);
+}
 
-  for (const [a, b] of [
-    [left.priorityRank, right.priorityRank],
-    [left.scoreRank, right.scoreRank],
-    ...left.candidateTuple.map((lane, index) => [lane, right.candidateTuple[index]]),
+// Validate the entire phase before sorting or conflict decisions. Sorting
+// need not compare every pair of duplicate IDs.
+export function validateWinnerKeys(keys) {
+  if (!Array.isArray(keys)) throw new TypeError("winner keys must be a dense array");
+  const seen = new Set();
+  const snapshots = [];
+  for (let index = 0; index < keys.length; index++) {
+    if (!Object.hasOwn(keys, index)) throw new TypeError("winner keys must be a dense array");
+    const key = validatedWinnerKey(keys[index]);
+    const identity = JSON.stringify(key.candidateTuple);
+    if (seen.has(identity)) throw new Error("duplicate candidate identity");
+    seen.add(identity);
+    snapshots.push(key);
+  }
+  return Object.freeze(snapshots);
+}
+
+export function compareWinnerKeys(left, right) {
+  const a = validatedWinnerKey(left);
+  const b = validatedWinnerKey(right);
+  for (const [x, y] of [
+    [a.priorityRank, b.priorityRank],
+    [a.scoreRank, b.scoreRank],
+    ...a.candidateTuple.map((lane, index) => [lane, b.candidateTuple[index]]),
   ]) {
-    const order = compareLane(a, b);
+    const order = compareLane(x, y);
     if (order !== 0) return order;
   }
   return 0;

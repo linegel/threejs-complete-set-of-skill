@@ -42,14 +42,16 @@ exposed surfaces, placements, material slots, and stable identity.
    geometry emission is unnecessary to diagnose an invalid plan.
 
 3. **Resolve exposed boundaries before facade placement.** Subtract shared or
-   blocked side intervals, quantize each surviving interval into legal bays,
-   and attach facade, roof, trim, and corner placements to those intervals.
+   blocked side regions with their vertical overlap; unequal-height neighbors
+   require height bands, not whole-side removal. Quantize positive surviving
+   spans into a bounded legal bay count, and attach facade, roof, trim, and
+   corner placements to those surface regions.
    Read [grammar-and-mesh-compiler.md](references/grammar-and-mesh-compiler.md)
    when implementing footprint subtraction, bay quantization, placement
    ownership, or module-local frames.
 
-   **Complete when:** no facade interval lies inside the footprint, every legal
-   interval has a declared placement or semantic blank, and corner ownership is
+   **Complete when:** no facade region lies inside occupied mass at its height,
+   every legal region has a declared placement or semantic blank, and corner ownership is
    unambiguous.
 
 4. **Close and validate the plan.** Add visible caps, decks, soffits, and
@@ -65,8 +67,10 @@ exposed surfaces, placements, material slots, and stable identity.
    [grammar-and-mesh-compiler.md](references/grammar-and-mesh-compiler.md).
    When implementing candidate identity, random lanes, or phase ranking, import
    [deterministic-placement-key.mjs](scripts/deterministic-placement-key.mjs).
-   The helper does not own support, clearance, conflict detection, or phase
-   admission.
+   Validate whole-phase key uniqueness with `validateWinnerKeys()` before
+   using its reflexive comparator. The helper does not own support, clearance,
+   conflict detection, or phase admission; strict local winners are not a
+   maximal packing algorithm. Halo reach includes both candidate extents.
    Place the landmark first, then solve access, support, and clearance before
    repeated detail.
 
@@ -86,8 +90,9 @@ exposed surfaces, placements, material slots, and stable identity.
    implementing slot writers, paging, projected-error LOD, or draw accounting.
 
    **Complete when:** slot membership is complete, indexed bounds are finite,
-   pages are independently cullable, LOD error is gated in physical pixels, and
-   actual backend draw items are reported.
+   pages are independently cullable with refreshed transform/count bounds and
+   upload flags, LOD error is gated in physical viewport pixels, and actual
+   backend draw items are reported.
 
 6. **Bind materials and presentation.** Use `MeshStandardNodeMaterial` or
    `MeshPhysicalNodeMaterial` per semantic slot. Preserve physical texture

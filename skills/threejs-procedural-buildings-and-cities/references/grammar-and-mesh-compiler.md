@@ -34,7 +34,7 @@ The plan records:
 ```text
 normalized settings and seed
 mass volumes and footprint pieces
-full side, blocker, and surviving exposed intervals
+full side, height bands, blockers, and surviving exposed surface regions
 endpoint/corner semantics
 bay counts and effective bay widths
 placements and ownership rectangles
@@ -89,7 +89,16 @@ declared coordinate lattice. For arbitrary overlaps, compute a robust 2D union
 or planar arrangement first; side-touch subtraction is valid only after
 interiors are disjoint.
 
-For each rectangle side:
+The following one-dimensional subtraction is sufficient only for masses with
+equal vertical spans. For unequal heights, setbacks, or stacked/overhanging
+volumes, split the side into height bands at every relevant bottom/top endpoint
+and subtract horizontal blockers separately in each band, or Boolean-subtract
+in the two-dimensional side chart `(alongSide, height)`. A low neighbor blocks
+only its actual height overlap; it does not remove the taller mass's upper
+facade. Horizontal caps/soffits require their own exposed-region subtraction.
+Keep the complete surface support in ownership IDs and placement tests.
+
+For each rectangle side in an admitted height band:
 
 1. Create its full one-dimensional interval.
 2. Find touching rectangles using a tolerance derived from lattice spacing,
@@ -114,7 +123,7 @@ For an exposed interval of length `L`, choose an integer bay count within the
 legal width range:
 
 ```text
-nMin = ceil(L / bayWidthMax)
+nMin = max(1, ceil(L / bayWidthMax))
 nMax = floor(L / bayWidthMin)
 
 if nMin <= nMax:
@@ -123,6 +132,14 @@ if nMin <= nMax:
 else:
   classify the interval as an explicit blank/infill or reject the plan
 ```
+
+Admit finite `L > 0` and `0 < bayWidthMin <= bayWidthMax`, with a bounded safe
+integer candidate count before enumerating penalties or allocating geometry.
+A zero-length side is absent, not a zero-bay division; an infeasible positive
+span is an explicit blank/infill or error. Recheck the resulting effective width
+against the legal interval using the declared lattice/roundoff policy. Nearly
+integer quotients need a deterministic boundary policy, not a free epsilon
+that silently admits undersized bays. Ties in rhythm penalty use a fixed rank.
 
 This creates equal bays without a narrow remainder. Reserve whole-height or
 whole-interval zones for entrances, service areas, structural piers, and other
@@ -201,18 +218,48 @@ and units, or dimensionless status, of `priorityRank` and `scoreRank`; convert
 higher-is-better values to a lower-is-better rank. Reject non-finite ranks.
 Compare `(priorityRank, scoreRank, candidateTuple)` lexicographically: numeric
 order for ranks and `uint32` lanes, code-unit order for the canonical NFC string
-lanes. The lower key wins. Equal tuples are duplicate candidate identities and
-are a plan error. Accept a candidate only when its key strictly wins against
-every conflicting candidate. Support and validity may read the immutable
-environment and completed prior phases, but not acceptance order within the
-current phase.
+lanes. The lower key wins. Run `validateWinnerKeys()` on the complete phase
+before sorting or conflict decisions; it snapshots/validates every dense typed
+key and rejects duplicate tuples even when their ranks differ. Comparison alone
+cannot find all duplicates because sort need not compare every pair. The
+comparator validates both operands and returns zero for the same valid key,
+including self-comparison, as a consistent sorting comparator must.
+
+```js
+const checked = validateWinnerKeys(candidateKeys);
+const ordered = [...checked].sort(compareWinnerKeys);
+```
+
+Validate identity for all generated records, then exclude unsupported/invalid
+candidates from conflict decisions. A geometrically invalid candidate cannot
+suppress a valid neighbor. The strict local-winner rule accepts a candidate
+only when its key wins against every conflicting eligible candidate. With a
+symmetric conflict relation this is conflict-free, but not necessarily maximal:
+a priority chain A-B-C can select A and reject C even though A and C do not
+conflict. Do not describe this as greedy backfilling or maximal packing. A
+maximal/priority-greedy requirement needs its own global phase or proven
+multi-round dependency closure, tie-breaking, and termination.
+
+Support and validity may read immutable environment and completed prior phases,
+but not acceptance order within the current local-winner phase. Comparator
+requirements: [ECMAScript sorting](https://tc39.es/ecma262/multipage/indexed-collections.html#sec-sortindexedproperties).
 
 `environmentRevision` versions terrain, parcel, support, access, and registry
 inputs for acceptance-cache invalidation; it is not part of candidate identity
-or randomness. For chunk-local solving, load a halo at least as wide as the
-largest support, validity, or conflict radius and assign boundary winners by
-stable source cell, not the requesting chunk. A rule without a finite support
-radius requires a global phase after all relevant candidates are known.
+or randomness. For chunk-local solving, derive the full center-to-center query
+reach from both candidates' support and clearance extents (their Minkowski
+interaction neighborhood), plus validity/environment sampling reach. The
+largest individual radius alone can miss a conflict between two large assets.
+Assign boundary winners by stable source cell, not the requesting chunk. A rule
+without finite dependency reach requires a global phase after all relevant
+candidates are known. Revalidate a pending accepted package against the current
+environment/registry epoch before publication; stale work cannot overwrite a
+newer plan.
+
+The helper's randomLane01 uses a f64 division by 2^32 and lies in `[0,1)` on
+CPU. Rounding that value to f32 can reach one. A GPU half-open requirement needs
+a separately versioned high-24-bit conversion or another verified mapping; do
+not silently change existing candidate identity or random streams.
 
 Replay with reversed chunk order, an inserted unrelated family, forced hash
 collisions, and boundary candidates. Accepted placement IDs and transforms must
@@ -242,6 +289,19 @@ visibility; it does not establish draw collapse. Merge compatible static slot
 geometry or instance identical topology when fewer GPU draw items are required,
 and report the actual renderer/backend counts.
 
+Admit the complete shared attribute/index schema before batching, including
+component types, normalization, and semantic channel meaning. Capacity includes
+reserved vertex/index ranges, instances, and representation-specific textures;
+reject an over-budget plan before constructing a partial batch. BatchedMesh
+reuses numeric entry IDs after deletion, so query/event identity includes the
+stable plan ID and generation, not the recycled index alone.
+
+BatchedMesh's installed setMatrixAt path does not support negative-scale
+matrices. Bake a mirrored module with corrected winding/tangent parity and use
+an admitted positive instance transform, or choose a separately validated
+representation. A transform that was accepted as a Matrix4 is not proof the
+batch's normal/culling path supports it.
+
 Keep transparent or transmissive geometry in an explicit slot and draw
 category. Use world-distance UVs:
 
@@ -259,14 +319,23 @@ texture repetition.
 Bound chunks before batching. A page contains only geometry whose visibility
 and lifecycle can be managed together; its bounds include any active animation
 or transition envelope. Recompute bounds after compilation and every geometry
-replacement.
+replacement. Include transforms and instance-count changes, not only edits to
+vertex buffers. `InstancedMesh.setMatrixAt()` neither marks the upload dirty
+nor recomputes existing bounds: set `instanceMatrix.needsUpdate = true` after
+writes and refresh the page box/sphere before culling. BatchedMesh updates its
+matrix texture but leaves aggregate bounds stale. Recompute both levels of
+bounds after relevant changes; GPU deformation requires an independently
+expanded envelope. Use chunk-local Float32 positions with a stable high-precision
+anchor when global positions lose the required detail. Rebasing an anchor does
+not rename placements or resample their randomness.
 
-Gate LOD in physical pixels using each active view's actual render-target
-dimensions and unjittered projection. Project the complete animated support
-plus its conservative approximation error; for depth-spanning or off-axis
-support, project its extrema through the actual view-projection rather than a
-center-distance shortcut. Give every view separate split/merge thresholds and
-dwell, select the most demanding result, and budget simultaneous transition
+Gate LOD in physical pixels using each active view's actual physical
+viewport dimensions and unjittered projection. Use the router's paired-point
+projected-error contract over the complete animated support and displacement
+set, including zoom, depth changes, and near-plane admission. Comparing projected
+bounding-box extents alone does not bound movement of corresponding features;
+unchanged outer boxes can hide a moved window or doorway. Give every view
+separate split/merge thresholds and dwell, select the most demanding result, and budget simultaneous transition
 residency.
 
 For a district, report:
@@ -294,9 +363,13 @@ procedural data use `NoColorSpace` or their declared linear encoding. Keep HDR
 working color linear until the scene's one output transform.
 
 Use `RenderPipeline` for scene output. Add MRT attachments only for named
-consumers and account their bandwidth and lifetime. Dispose generated
-geometries, batches, textures, and node resources when a building or district
-is replaced.
+consumers and account their bandwidth and lifetime. Retire the replaced package
+after its last render/picking consumer. BatchedMesh disposal owns its merged
+geometry and internal textures, not the borrowed material. InstancedMesh disposal
+does not dispose shared source geometry/material; use the actual owner/refcounts.
+Node/pipeline disposal is not recursive cleanup. A failed replacement retains
+the previous valid package or a declared unavailable state, not a half-emitted
+mix of registry generations.
 
 ## 8. Validation and Failure Signatures
 

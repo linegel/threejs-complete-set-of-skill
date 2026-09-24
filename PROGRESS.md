@@ -37,7 +37,7 @@ Use this existing repository plan rather than an unrelated game ticket.
 17. [x] `threejs-procedural-materials` — source/reference/helper pass; eight normal, input, and shadow-cache checks.
 18. [x] `threejs-procedural-geometry` - source/reference pass; nine pinned-adapter, metadata and quantization checks.
 19. [x] `threejs-object-sculptor` - source/reference/probe pass; eleven header, bounded-read and attachment checks.
-20. [ ] `threejs-procedural-buildings-and-cities`
+20. [x] `threejs-procedural-buildings-and-cities` — source/reference/key-helper pass; nine identity, facade, and bounds checks.
 21. [ ] `threejs-procedural-planets`
 22. [ ] `threejs-procedural-vegetation`
 23. [ ] `threejs-procedural-creatures`
@@ -134,9 +134,15 @@ Read the complete entrypoint/reference/interface and the installed attribute, ge
 
 Read the complete entrypoint, both representation/attachment references, interface, and executable image probe. Repaired dimension parsing in six format families, bounded metadata reads, and added explicit raw-dimension/partial-header semantics and CLI input errors. Eleven checks include actual encoded PNG/JPEG/WebP/GIF/TIFF metadata, malformed headers, both TIFF byte orders, BMP CORE and INFO, mocked bounded file reads, and parent/child hinge math. Corrected reference orientation/camera fitting, topological poles/seams, singular/reflected transforms, stable instance identity, duplicate attachment translation, and hinge-axis constraints. All 157 skill tests and distribution validation pass. The probe does not decode pixels or determine image readability. No model, screenshot, runtime library, or lab acceptance changed. Logs: `artifacts/website-improvement-20260924/continuation/skills-object-sculptor-{before,after}.log`.
 
-### Current skill: threejs-procedural-buildings-and-cities
+### Skill 20 result: threejs-procedural-buildings-and-cities
 
-The skills-first session owns buildings/cities 20 followed by planets 21. The inspector-continuation session will read vegetation 22 and creatures 23 next, applying changes only after 21 lands. Labs and recreations remain deferred until the complete skill pass.
+Read entrypoint/reference/key helper/interface and generated consumer, plus full installed InstancedMesh/BatchedMesh source. Replaced non-reflexive comparison with fully validated lexicographic comparison and whole-phase duplicate validation; random streams and canonical identities are unchanged. Corrected vertical facade exposure, legal bay-count boundaries, eligibility/halo reach, local-winner versus maximal packing claims, batching limits, stale transform bounds/uploads, and resource retirement. Nine tests execute the helper and actual Three.js bounds behavior, plus geometry/selection counterexamples. All 166 skill checks and distribution validation pass. No city compiler runtime, rendering, GPU draws, or lab acceptance is claimed. Logs: `artifacts/website-improvement-20260924/continuation/skills-cities-{before,after}.log`.
+
+The generated city narrative still uses unbounded rounded bay counts and assumes a handful of draws; reconcile its owning narrative source during publication, not generated HTML in this skill unit.
+
+### Current skill: threejs-procedural-planets
+
+The skills-first session owns planets 21. The inspector-continuation session has vegetation 22 and creatures 23 reserved, applying only after 21 lands. Skills-first owns motion 24 and particles 25 afterward. Labs and recreations remain deferred until the complete skill pass.
 
 
 ## Finished and verified
