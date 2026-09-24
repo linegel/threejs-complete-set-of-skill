@@ -17,28 +17,25 @@ function readJson(path) {
 }
 
 function declarationFixture() {
-  const dependencies = { three: REQUIRED_TOOLCHAIN.three };
   const devDependencies = {
+    three: REQUIRED_TOOLCHAIN.three,
     playwright: REQUIRED_TOOLCHAIN.playwright,
     sharp: REQUIRED_TOOLCHAIN.sharp,
     vite: REQUIRED_TOOLCHAIN.vite,
   };
   const engines = {
-    node: REQUIRED_TOOLCHAIN.node,
-    npm: REQUIRED_TOOLCHAIN.npm,
+    node: '>=22',
   };
   return {
     nodeVersion: `${REQUIRED_TOOLCHAIN.node}\n`,
     packageJson: {
       packageManager: REQUIRED_TOOLCHAIN.packageManager,
-      dependencies,
       devDependencies,
       engines,
     },
     packageLock: {
       packages: {
         '': {
-          dependencies: { ...dependencies },
           devDependencies: { ...devDependencies },
           engines: { ...engines },
         },
@@ -51,7 +48,7 @@ function declarationFixture() {
   };
 }
 
-test('root metadata declares every toolchain component exactly', () => {
+test('skill-pack metadata preserves supported engines and exact lab dependencies', () => {
   const packageJson = readJson(join(REPO_ROOT, 'package.json'));
   const packageLock = readJson(join(REPO_ROOT, 'package-lock.json'));
   const nodeVersion = readFileSync(join(REPO_ROOT, '.node-version'), 'utf8');
@@ -80,13 +77,13 @@ test('declaration validation rejects ranges and lock drift with stable reasons',
 test('declaration validation rejects runtime metadata drift', () => {
   const fixture = declarationFixture();
   fixture.packageJson.packageManager = 'npm@10.9.3';
-  fixture.packageJson.engines.node = '>=22';
+  fixture.packageJson.engines.node = '>=20';
   fixture.packageLock.packages[''].engines.npm = '^10.9.4';
   fixture.nodeVersion = '22\n';
   assert.deepEqual(validateToolchainDeclarations(fixture), [
     '[PACKAGE_MANAGER_MISMATCH] packageManager must equal npm@10.9.4; received "npm@10.9.3".',
-    '[ENGINE_NODE_MISMATCH] engines.node must equal 22.22.0; received ">=22".',
-    '[LOCK_ENGINE_NPM_MISMATCH] package-lock packages[""].engines.npm must equal 10.9.4; received "^10.9.4".',
+    '[ENGINE_NODE_MISMATCH] engines.node must equal >=22; received ">=20".',
+    '[LOCK_ENGINE_NPM_MISMATCH] package-lock packages[""].engines.npm must match package.json; received "^10.9.4" instead of missing.',
     '[NODE_VERSION_FILE_MISMATCH] .node-version must contain 22.22.0; received "22".',
   ]);
 });
@@ -113,10 +110,40 @@ test('installed dependency and runtime probes remain claim-specific', () => {
   ]);
 });
 
-test('npm probe executes the active npm and reports the pinned version', () => {
+test('npm probe reports the executable version without enforcing the runtime pin', () => {
   const probe = probeNpmVersion();
   assert.equal(probe.error, null);
-  assert.equal(probe.version, REQUIRED_TOOLCHAIN.npm);
+  assert.match(probe.version, /^\d+\.\d+\.\d+/);
+});
+
+test('npm probe uses the active npm entrypoint or the PATH executable', () => {
+  for (const npmExecPath of ['/repo/node_modules/npm/bin/npm-cli.js', null]) {
+    const calls = [];
+    const probe = probeNpmVersion({
+      npmExecPath,
+      spawn: (...args) => {
+        calls.push(args);
+        return { status: 0, stdout: '10.9.8\n' };
+      },
+    });
+    assert.equal(probe.version, '10.9.8');
+    assert.equal(probe.executable, npmExecPath ?? 'npm');
+    assert.equal(probe.error, null);
+    assert.deepEqual(calls, [[
+      npmExecPath ? process.execPath : 'npm',
+      npmExecPath ? [npmExecPath, '--version'] : ['--version'],
+      { encoding: 'utf8', env: process.env, shell: false },
+    ]]);
+  }
+});
+
+test('npm probe preserves executable failures as errors', () => {
+  const probe = probeNpmVersion({
+    npmExecPath: null,
+    spawn: () => ({ status: 1, stderr: 'npm failed' }),
+  });
+  assert.equal(probe.version, null);
+  assert.match(probe.error, /NPM_EXECUTABLE_FAILED.*npm failed/);
 });
 
 test('Chromium validation rejects global caches, missing files, and non-executables', () => {

@@ -25,7 +25,7 @@ export const REQUIRED_TOOLCHAIN = Object.freeze({
 export const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
 const PACKAGE_LOCATIONS = Object.freeze({
-  three: 'dependencies',
+  three: 'devDependencies',
   playwright: 'devDependencies',
   vite: 'devDependencies',
   sharp: 'devDependencies',
@@ -59,8 +59,9 @@ export function validateToolchainDeclarations({ packageJson, packageLock, nodeVe
     ));
   }
 
-  for (const runtime of ['node', 'npm']) {
-    const expected = REQUIRED_TOOLCHAIN[runtime];
+  // Package installation supports Node >=22; reproducible lab runs retain the
+  // exact runtime pins in REQUIRED_TOOLCHAIN and .node-version.
+  for (const [runtime, expected] of Object.entries({ node: '>=22' })) {
     if (packageJson?.engines?.[runtime] !== expected) {
       errors.push(failure(
         `ENGINE_${runtime.toUpperCase()}_MISMATCH`,
@@ -73,6 +74,13 @@ export function validateToolchainDeclarations({ packageJson, packageLock, nodeVe
         `package-lock packages[""].engines.${runtime} must equal ${expected}; received ${received(lockRoot?.engines?.[runtime])}.`,
       ));
     }
+  }
+
+  if (lockRoot?.engines?.npm !== packageJson?.engines?.npm) {
+    errors.push(failure(
+      'LOCK_ENGINE_NPM_MISMATCH',
+      `package-lock packages[""].engines.npm must match package.json; received ${received(lockRoot?.engines?.npm)} instead of ${received(packageJson?.engines?.npm)}.`,
+    ));
   }
 
   if (nodeVersion.trim() !== REQUIRED_TOOLCHAIN.node) {
@@ -199,10 +207,10 @@ export function validateChromiumInstallation({
   return [];
 }
 
-export function probeNpmVersion({ npmExecPath = process.env.npm_execpath } = {}) {
+export function probeNpmVersion({ npmExecPath = process.env.npm_execpath, spawn = spawnSync } = {}) {
   const command = npmExecPath ? process.execPath : 'npm';
   const args = npmExecPath ? [npmExecPath, '--version'] : ['--version'];
-  const probe = spawnSync(command, args, {
+  const probe = spawn(command, args, {
     encoding: 'utf8',
     env: process.env,
     shell: false,
