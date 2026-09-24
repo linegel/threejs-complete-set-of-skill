@@ -22,13 +22,20 @@ mass per area in `kg m^-2` is a useful authoritative representation:
 
 ```text
 d m_liquid / dt = rain + runup + melt
-                  - drainage - infiltration - evaporation - exportedRunoff
+                  - refreeze - drainage - infiltration - evaporation - exportedRunoff
 d m_snow / dt   = snowfall + refreeze
                   - melt - sublimation - transport - inundationWash
 ```
 
 Every term has units `kg m^-2 s^-1`, a sign, support, cadence, producer, and
-valid interval. Clamp only at a declared capacity/positivity boundary and
+valid interval. Melt and refreeze are equal-and-opposite internal transfers;
+limit each by available donor mass and apply the same accepted amount to both
+inventories. Competing sinks share the donor budget; clamping each updated
+inventory afterward can create mass. Distinguish bulk-density compaction from
+melt: compaction changes snow height without creating water. For a moving or
+deforming receiver, conserve cell mass `M=m*A(t)`; if area changes, derive the
+new areal density from conserved M, or include the area-rate term explicitly.
+Clamp only at a declared capacity/positivity boundary and
 report rejected or exported mass. Integrate the complete elapsed interval when
 the receiver runs more slowly than airborne precipitation.
 
@@ -73,9 +80,23 @@ topMask = smoothstep(flatThreshold, 1,
 coverage = topMask * modelSpaceCoverage(modelPosition)
 ```
 
-Planetary or local-gravity scenes provide `gravityWorld` per sample. Convert
-world snow thickness to the object's displacement units, and displace along
-the host surface normal. A physically claimed accumulation model also includes
+Require finite nonzero gravity, a normalized finite world support normal, and
+`flatThreshold < 1` for this smoothstep; an exact slope cutoff is a separate
+hard-step rule. Planetary scenes provide gravity per sample. A deposited cap
+stays in rest/material coordinates (including skin/morph correspondence), not
+merely current deformed local coordinates. The up gate controls incoming
+support; do not erase accumulated mass immediately when an object tilts unless
+an explicit shedding/transport event exports that mass.
+
+For world-normal thickness h under an affine object transform with linear part
+M, compute `deltaLocal = inverse(M) * (h * worldNormal)` using the inverse linear
+transform, not the normal matrix. Normals use normalized inverse-transpose;
+displacements use inverse-linear mapping. A local normal times one scalar does
+not reproduce a world-normal offset under nonuniform scale/shear. Reject
+singular transforms. Reconstruct normals from the complete displaced surface:
+for `P'=P+h*n`, tangents include `P_u+h_u*n+h*n_u` and its v counterpart.
+The flat-chart slope formula alone omits base curvature. A physical accumulation
+model also includes
 exposure/occlusion, adhesion/slope, transport or melt, and capacity; the
 up-normal gate alone is a stylized cap.
 
@@ -191,9 +212,12 @@ For pipeline-owned conversion, assign `scenePass` directly and set
 conversion ownership, including restoring either, sets
 `pipeline.needsUpdate = true`.
 
-Use MRT only when later nodes reuse the same scene pass's depth, normal,
-velocity, or weather mask. Set reduced node-post resolution with
-`PassNode.setResolutionScale()`.
+Use MRT only for named shared readers and request each attachment before
+compilation. `PassNode.setResolutionScale()` scales that entire scene pass,
+not just a weather effect; reduced weather uses its own resources while the
+host color/depth retain their required extent. Convert generated normals to
+the normal slot's expected frame (view space in this node-material path), using
+`normalMap()` for encoded tangent-normal inputs rather than assigning raw RGB.
 
 Color interpretation is part of correctness:
 
@@ -217,7 +241,12 @@ support, stable identity, or event-model changes. Camera-projection or
 viewport-extent changes preserve committed impacts and events; reset only view
 temporal/reprojection history and recreate size-dependent targets. Keep
 committed receiver inventory unless the receiver contract itself resets.
-Dispose all owned textures, storage/event buffers, materials, and post nodes.
+Stopping new precipitation preserves deposited snow/liquid and lets named
+sinks evolve it. A diagnostic weather-render bypass may hide its appearance
+without resetting physical state; restoring a dry initial state is an explicit
+reset with exported/discarded mass recorded, not an implicit off switch.
+Dispose owned resources only; node/pipeline disposal is not recursive cleanup.
+Keep foreign receiver inventories and shared scene inputs intact.
 
 Expose these views:
 

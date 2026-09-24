@@ -7,6 +7,7 @@ description: Couple Three.js WebGPU/TSL rain, snow, and wet surfaces. Use for ai
 
 Couple appearance to causes: one time source and wind field drive airborne
 precipitation, while one owner per receiver integrates deposited rain or snow.
+Melt/refreeze transfer equal mass between liquid and snow; neither creates inventory.
 Visual particle count samples the weather; it never sets the deposited mass.
 
 Use Three.js r185 `WebGPURenderer`, TSL, storage nodes, node materials, and the
@@ -82,7 +83,9 @@ sum_i A_i = represented receiver area
 deltaMass = deltaTime * sum_i(massFlux_i * A_i)
 ```
 
-Each `A_i` includes the receiver chart Jacobian and has units of square metres.
+Each `A_i` includes the physical receiver Jacobian in square metres. Convert
+horizontal/source-area flux to receiver-relative surface arrival once; the
+reference distinguishes that projection from already-normal arrival flux.
 When sparse impacts represent the already-integrated transfer, partition that
 extensive mass and momentum across impacts so their sum closes the parent
 transfer exactly once. Keep rendered streak/flake density, sprite size, and
@@ -165,9 +168,10 @@ hot bytes per frame, active impact tiles, and peak live storage on the named
 target.
 
 This step is complete when the final and diagnostic views pass the observable
-checks below, disabling weather restores the baseline image, resize/rebuild
-preserves owners and resets transient history, and disposal releases every
-weather-owned buffer, texture, material, and pass.
+checks below, diagnostic rendering bypass restores its baseline without erasing
+deposited inventory, stopping precipitation stops only new input, resize/rebuild
+preserves owners and resets only affected transient history, and disposal releases
+every weather-owned buffer, texture, material, and pass.
 
 ## Observable checks
 

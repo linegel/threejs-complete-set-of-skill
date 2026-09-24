@@ -67,14 +67,16 @@ those inputs are supplied.
 
 ## Analytic motion
 
-For an immutable seed at `x0`, constant fall velocity `v_fall`, and air
+For an immutable birth position `xBirth` at `tBirth`, constant `v_fall`, and air
 velocity `u_air(t)`, evaluate
 
 ```text
-x(t) = x0 + v_fall * t + integral_0^t u_air(tau) d tau
+x(t) = xBirth + v_fall * (t-tBirth) + integral_tBirth^t u_air(tau) d tau
 ```
 
-Constant wind reduces the integral to `u_air * t`. For authored periodic wind,
+Constant wind reduces the integral to `u_air * (t-tBirth)`. Each respawn
+uses its own birth instant and integrated-wind baseline; lifetime wrapping
+must not reuse global elapsed displacement as a fresh birth offset. For periodic wind,
 use its analytic antiderivative or accumulate displacement with the same clock
 that owns the forcing. `u_air(t_now) * t_now` changes the entire historical
 trajectory when the current wind changes and produces a visible teleport.
@@ -148,7 +150,15 @@ has a different meaning: it distributes one already-extensive transfer over
 area. Convert an external water-equivalent depth rate only through its named
 reference density, `massFlux = rho_reference * depthRate`; project a volume
 source through its physical support and Jacobian before calling it an area
-flux. Select one representation:
+flux. The flux must already refer to the receiver's actual area. Horizontal-gauge
+rainfall or cloud-emission-area flux is not automatically surface-normal arrival
+flux. For a local monokinetic population of mass concentration rho and outward
+receiver normal n, `F_arrival = rho * max(0, -(v_particle - v_receiver) dot n)`
+before collection efficiency and occlusion. A velocity distribution requires
+its integral. Transform the upstream area/angle, fall delay, and support once;
+do not project an already surface-normal flux again. Moving/deforming supports
+use their current physical Jacobian and a conservative trajectory mapping.
+Select one representation:
 
 - **Rate:** flux/traction over a stated interval; integrate each disjoint
   subinterval once.
@@ -164,8 +174,14 @@ inserting it into an unrelated horizontal momentum equation.
 When sparse impacts stand in for the integrated parent transfer, assign each a
 stable identity, receiver, interval, mass, impulse, and partition weight. Their
 mass and impulse sums close the parent within the declared residual. Capacity
-overflow reports lost or deferred mass/momentum explicitly. A visual splash
-references an impact but does not deposit a second copy.
+overflow retains a deferred ledger or records a named export/loss; it cannot
+silently replace another event. Stable source/receiver/generation/interval IDs
+prevent replay and retries from depositing twice. Split intervals by their
+actual integrated forcing or declared quadrature, not automatically by duration
+when flux varies. Source changes must not erase valid in-flight old-generation
+mass: complete it under its original mapping, explicitly remap, or record export.
+A stale duplicate is rejected; a physically pending shipment is not a duplicate.
+A visual splash references an impact but does not deposit a second copy.
 
 One-way deposition is the default when the weather source does not model
 reaction. When two-way reaction is required, publish an explicit equal-and-
@@ -187,6 +203,12 @@ advance solver
   -> scatter events or write indirect arguments
   -> integrate touched receiver tiles
 ```
+
+Resolve continuous/swept particle-to-receiver motion or substep within a proved
+collision bound; testing only endpoints tunnels through thin surfaces. A wrapped
+visual trajectory must split at respawn, not strike everything on its artificial
+teleport segment. Camera depth can gate visible splashes, but cannot own physical
+collisions/deposition on hidden or offscreen receivers.
 
 A workgroup barrier synchronizes threads in one workgroup. A later dispatch or
 pass dependency makes whole-grid writes visible to the next stage. Keep

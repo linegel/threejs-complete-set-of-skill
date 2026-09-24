@@ -9,7 +9,7 @@ function nonnegative(value, name) {
 }
 
 function values(input, name) {
-  if (!Array.isArray(input) && !ArrayBuffer.isView(input)) {
+  if (!Array.isArray(input) && !(ArrayBuffer.isView(input) && typeof input.length === "number")) {
     throw new TypeError(`${name} must be an array or typed array`);
   }
   return Array.from(input, (value) => nonnegative(value, name));
@@ -35,6 +35,8 @@ function massTolerance(input) {
 }
 
 function assertMassClose(observedKg, expectedKg, limits, label) {
+  nonnegative(observedKg, `${label} observed mass`);
+  nonnegative(expectedKg, `${label} expected mass`);
   const residualKg = observedKg - expectedKg;
   const allowedKg = nonnegative(
     limits.absoluteKg
@@ -80,7 +82,8 @@ export function partitionExtensiveTransfer({
   const accepted = massTolerance(limits);
   const acceptedFraction = nonnegative(fractionTolerance, "fractionTolerance");
   if (weights.length === 0) throw new RangeError("fractions must be nonempty");
-  const fractionResidual = compensatedSum(weights) - 1;
+  const fractionSum = nonnegative(compensatedSum(weights), "fraction sum");
+  const fractionResidual = fractionSum - 1;
   if (Math.abs(fractionResidual) > acceptedFraction) {
     throw new Error(`partition fraction residual ${fractionResidual}; no normalization was applied`);
   }

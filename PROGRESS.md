@@ -32,7 +32,7 @@ Use this existing repository plan rather than an unrelated game ticket.
 12. [x] `threejs-volumetric-clouds` — source/reference pass; ten transport/skip/history checks.
 13. [x] `threejs-spectral-ocean` — source/reference/oracle pass; nine new transform/phase checks.
 14. [x] `threejs-water-optics` — source/reference/comparator pass; eleven new stability/transport checks.
-15. [ ] `threejs-rain-snow-and-wet-surfaces`
+15. [x] `threejs-rain-snow-and-wet-surfaces` — source/reference/oracle pass; seven deposition and transform checks.
 16. [ ] `threejs-procedural-fields`
 17. [ ] `threejs-procedural-materials`
 18. [ ] `threejs-procedural-geometry`
@@ -110,7 +110,13 @@ Read the skill/reference/interface and executable FFT oracle. The oracle now bou
 
 Read both references, entrypoint, interface, and executable dispersion comparator. The comparator now rejects marginal CFL equality, invalid derived arithmetic and aliased admission, and represents undefined DC phase explicitly. Corrected mean-drift assumptions, coast-seeded phase direction, current-aware action flux, gravity-only operator scope, shared positivity limiting, interface radiance convention, small-extinction albedo, receiver-caustic double counting, and opaque/water pass ownership. PBRT's dielectric transport source was checked for the radiance/power distinction. Eleven tests pass; all 113 skill tests and distribution validation pass. No GPU water solve, refraction/caustic capture, wet/dry benchmark, or lab acceptance is claimed. Logs: `artifacts/website-improvement-20260924/continuation/skills-water-{before,after}.log`.
 
-### Current skill: threejs-rain-snow-and-wet-surfaces
+### Skill 15 result: threejs-rain-snow-and-wet-surfaces
+
+Read both references, entrypoint, metadata, generated consumer, and the existing deposition oracle/test stub. Corrected refreeze mass conservation, surface-relative arrival flux, per-birth analytic wind, pending-transfer and offscreen collision ownership, affine snow displacement/curvature, and weather-off inventory semantics. The oracle now rejects nonnumeric views, overflowed fraction sums, and invalid closure totals. Seven tests (including the inherited area-partition check) pass; all 120 skill tests and distribution validation pass. No GPU precipitation simulation, transformed-snow capture, or lab acceptance is claimed. Logs: `artifacts/website-improvement-20260924/continuation/skills-weather-{before,after}.log`.
+
+The generated weather article also contains an independently authored force equation mixing wind velocity with acceleration; repair its owning narrative source during source-to-site reconciliation, not by editing generated HTML.
+
+### Current skill: threejs-procedural-fields
 
 Next in the roster; read its entrypoint and reachable resources before changes. All labs and recreations remain deferred.
 
