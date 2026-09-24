@@ -25,6 +25,7 @@ accumulator, simulation time, timeline time, separate debt state, and pause/resu
 policy:
 
 ```text
+substeps = 0
 debtDecision = none
 clampedDelta = min(rawDelta, maxFrameDelta)
 clampDebt = rawDelta - clampedDelta
@@ -34,6 +35,7 @@ while accumulator >= fixedStep and substeps < maxSubsteps:
   current = step(current, fixedStep, simulationTime + fixedStep)
   simulationTime += fixedStep
   accumulator -= fixedStep
+  substeps += 1
 
 if accumulator >= fixedStep:
   wholeStepDebt = floor(accumulator / fixedStep) * fixedStep
@@ -56,6 +58,11 @@ presentationTime = max(0, simulationTime - fixedStep + accumulator)
 presented = interpolate(previous, current, alpha)
 ```
 
+Admit finite nonnegative raw delta, positive fixed step and a finite substep
+budget before arithmetic. Increment `substeps` on each executed step. Keep
+integer tick identity separate from accumulated floating seconds; long runs
+need a declared roundoff/epoch policy rather than a new epsilon at each gate.
+
 Debt accounts for complete unprocessed steps outside the interpolation
 accumulator plus time excluded by raw-delta clamping. Every excluded interval is
 recorded as scheduled catch-up, an explicit authoritative-time drop, or a
@@ -73,6 +80,16 @@ motion from wall time while recurrence drops time causes visible phase drift.
 
 `THREE.Timer` connects once to the document, updates from the timestamp passed
 to `renderer.setAnimationLoop()`, and supplies delta to this one policy. A
+timer timestamp is milliseconds in the same performance-clock epoch as
+construction; its delta and elapsed queries return seconds. Hidden updates
+report zero delta and leave elapsed unchanged, and becoming visible resets the
+current reference time. This is active-time suppression, not evidence of the
+raw hidden interval. Record that interval separately when the debt policy
+needs it. `reset() does not zero elapsed` or the already queried delta; it
+resets the current sample reference. Semantic time reset belongs to the motion
+owner. Connect once (disconnect before reconnecting), dispose the listener,
+and apply time scaling once; external replay clocks should supply their own
+deltas rather than mixing a synthetic epoch with Timer visibility callbacks. A
 simulation owner may provide its own cadence; in that branch the render loop
 requests presentation but never advances the coupled state.
 
@@ -86,9 +103,12 @@ velocity += acceleration * fixedStep
 position += velocity * fixedStep
 ```
 
+The coefficients above are mass-normalized; stiffness has units `s^-2` and
+damping `s^-1`. A physical spring with force coefficients divides by mass.
 Choose the fixed step through stability analysis and step-halving over the full
 stiffness/damping envelope. A finite terminal-lock sequence copies the exact
-terminal pose and zeros linear/angular velocity; a finite hand-off preserves its
+terminal pose and zeros relative linear/angular velocity in the declared lock
+frame; a finite hand-off preserves its
 declared terminal pose and velocity. Residual spring drift satisfies neither
 contract. A periodic sequence wraps with declared phase/state continuity. An
 open-ended sequence follows its declared external stop/reset transition without
@@ -100,6 +120,13 @@ For perceptual response, author retention per second:
 alpha = 1 - pow(retentionPerSecond, dt)
 value = lerp(value, target, alpha)
 ```
+
+For finite `0 < retentionPerSecond <= 1`, use
+`alpha = -expm1(dt * log(retentionPerSecond))` to preserve tiny increments;
+validate `dt>=0`, return unchanged state for zero duration, and treat zero
+retention as an explicit instantaneous rule for positive duration. A shader
+without `expm1` needs a bounded small-argument approximation or precomputed
+uniform, not an invented API. The increment form is `value += (target-value)*alpha`.
 
 This update is cadence-invariant only when target history is held or integrated
 consistently over each processed interval; it is not a physical integrator.
@@ -144,6 +171,17 @@ Reset all semantic state atomically when that contract calls for reset.
 
 `AnimationMixer` consumes the same time policy: use `mixer.update(fixedStep)`
 for simulation-owned clips and `mixer.setTime(authoritativeTime)` for seeking.
+In r185, `setTime() is not a complete replay`: it zeros mixer/action times and
+then calls `update(time)`, multiplying by mixer `timeScale`. It does not
+restore finished/disabled/paused action state, prior loop count, scheduled
+starts, fade/warp schedules, or one-shot side effects. Define a reset/replay
+recipe for the admitted action set, restore its loop/weight/time-scale policy,
+and reconstruct schedules from the same semantic event log. Use a unit mixer
+scale for an already scaled authoritative clock, or invert the admitted nonzero
+scale explicitly. Calling reset/play on every frame is not a seeking solution.
+Idempotent event application separates replayed state from external side effects.
+See [AnimationMixer](https://github.com/mrdoob/three.js/blob/r185/src/animation/AnimationMixer.js)
+and [Timer](https://github.com/mrdoob/three.js/blob/r185/src/core/Timer.js).
 Assign channels explicitly, for example skeletal pose to the clip, root
 transform to procedural motion, and camera transform to the camera rig.
 
@@ -231,7 +269,10 @@ deceleration = peakSpeed / decelDuration
 ```
 
 Integrate each segment analytically and verify position/speed continuity at
-both boundaries. Use Hermite or quintic segments when endpoint velocity or
+both boundaries. Require finite positive durations and a feasible distance/velocity
+envelope before division; a negative solved acceleration violates a stated
+accelerating phase. Declare the acceleration jumps this piecewise curve permits.
+Use Hermite or quintic segments when endpoint velocity or
 acceleration constraints differ.
 
 ### Curved launch frame
@@ -251,6 +292,11 @@ velocity = bodyCenterVelocity
          + crossrangeDot
 ```
 
+The displayed basis is fixed and `bodyRadius` constant. A rotating body frame
+adds its angular transport term and changes every basis derivative; a changing
+radius adds its radial rate. Declare crossrange in one frame and differentiate
+that mapping too. When velocity vanishes, retain the declared orientation or
+use a separately authored tangent, rather than normalizing zero.
 Align the model's declared forward/up axis to the differentiated velocity, then
 apply authored roll as a separate quaternion in the stated local/world order.
 A radial/tangent blend is not the path derivative and may point off-trajectory.
@@ -265,9 +311,15 @@ section. The release state inherits the parent's point velocity:
 
 ```text
 v_release = v_parent_origin + omega_parent cross r_world
-          + v_authored_separation
+          + R_parent * v_local + v_authored_separation
 ```
 
+The formula assumes rigid parent motion and parent-local coordinate velocity
+`v_local`, including any pre-release peel derivative. For `x_world=o+A*x_local`,
+use the full derivative `oDot + ADot*x_local + A*xLocalDot` under changing scale
+or affine motion. The child angular velocity similarly combines parent motion
+with its relative angular motion in the declared frame. Velocity offsets are
+not impulses; a physical impulse uses the authoritative mass/inertia owner.
 Use seeded variation around declared separation axes. For a closed-form peel,
 evaluate attachment-local displacement until the release event:
 
@@ -299,8 +351,11 @@ radialDirection = normalizeOrFallback(radialVector, previousRadialDirection)
 ```
 
 Recompute the dock port and axis after the target rotates. Blend axial and
-radial errors independently, then snap to the exact target pose and zero
-velocity at the terminal condition. Align the actor's declared docking axis,
+radial errors independently. Admit a finite unit docking axis and preserve its
+orientation convention. At a terminal lock set the exact port-relative pose
+and zero relative velocity, not zero world velocity: the actor inherits the
+port point velocity and angular motion. A stationary world target is the
+special case where those inherited rates are zero. Align the actor's declared docking axis,
 then compose local spin or world roll in the stated order. The fallback
 direction makes on-axis docking finite.
 
@@ -324,8 +379,12 @@ deltaWorld * q         -> q.premultiply(deltaWorld).normalize()
 
 Normalize input axes. Nearly parallel alignment returns identity; nearly
 antiparallel alignment selects a stable perpendicular axis. Before storing or
-interpolating consecutive quaternions, negate the new quaternion when their dot
-product is negative so the double cover does not create a long-path jump.
+interpolating consecutive quaternions on a shortest-path branch, negate the
+new quaternion when their dot product is negative so the double cover does
+not create a jump. Three.js `slerp` selects that short orientation path; endpoint
+quaternions alone cannot encode full revolutions or a declared long arc. Keep
+an unwrapped angle/axis or winding-aware multi-key path for those branches;
+unconditional sign canonicalization must not erase its semantic turns.
 Validate `abs(length(q) - 1)` against a declared tolerance.
 
 ### Reparenting without a jump
@@ -336,6 +395,9 @@ Update the old and new parent world matrices, capture `M_world_old`, then solve:
 M_local_new = inverse(M_world_newParent) * M_world_old
 ```
 
+Require finite, nonsingular and sufficiently conditioned parent matrices before
+inversion; an inverse routine returning a zero matrix does not make the handoff
+valid. Reject hierarchy cycles and update all affected ancestors first.
 `Object3D.attach()` is valid for compatible scale chains. Non-uniform ancestry
 may introduce shear; accept TRS decomposition only when recomposition residual
 passes. Otherwise preserve the full affine local matrix with
@@ -382,6 +444,9 @@ current immersion, returned by the same validated hull-cell approximation as
 `submergedVolume_i` and expressed in the stable physics frame. `samplePoint_i`
 is the declared drag quadrature point in that frame. A dry cell contributes zero
 buoyancy force and torque without evaluating a nonexistent submerged centroid.
+Admit finite positive density and a finite nonzero gravity norm for this
+hydrostatic model, with finite nonnegative drag coefficient, area and cell
+volume. A zero-gravity branch needs its own model instead of division by zero.
 This approximation needs step-halving and sample-layout refinement. Surface
 parameterization velocity is not material current; substituting it creates
 wave-phase drift.
@@ -400,7 +465,10 @@ frame-loop readback is outside the valid route.
 Publish previous/current pose generations with independent timestamps and the
 same stable actor identity. Presentation interpolates this pair; transforms,
 motion vectors, bounds, shadows, and temporal effects consume it without
-resampling live simulation state. Resource reuse waits until all consumers of a
+resampling live simulation state. Keep the previous presented pose and camera
+separate from the simulation pair: motion vectors compare two presented
+samples, including their interpolation fractions, not two fixed ticks.
+Resource reuse waits until all consumers of a
 generation are complete.
 
 Every discontinuity chooses a scoped history action:
@@ -423,7 +491,8 @@ motion vector rather than a large derived velocity.
 ### Output and resource ownership
 
 Animation data textures, pose buffers, masks, and lookup tables use
-`NoColorSpace`; albedo uses `SRGBColorSpace`; HDR intermediates remain linear.
+`NoColorSpace`; encoded sRGB albedo uses `SRGBColorSpace`, while other color
+inputs declare their actual encoding. HDR working buffers remain linear.
 Use node materials for vertex/instance motion. A node-post app renders through
 `RenderPipeline` and has one tone-map/output conversion owner,
 `outputColorTransform` or explicit `renderOutput()`.
@@ -445,7 +514,7 @@ disposal relinquishes ownership.
 | NaN on an aligned or opposite axis | zero/antiparallel fallback absent | exercise both degenerate alignment inputs |
 | detached child jumps | old world matrix used as new local matrix | compare complete world matrices around reparenting |
 | detached part lacks readable tangential motion | rotating-parent `omega cross r` omitted | compare release velocity with analytic transport term |
-| finite docked actor creeps | terminal lock retained residual velocity | inspect exact pose and zero linear/angular velocity |
+| finite docked actor creeps | terminal lock retained port-relative motion | inspect exact port-relative pose and inherited world point/angular velocity |
 | instance reads another actor's phase | stride, slot generation, or identity mismatch | validate selected slots outside the frame loop |
 | history streaks after teleport or slot reuse | validity epoch was preserved incorrectly | inspect reset scope and stable identity generation |
 | CPU stalls on GPU motion | frame-critical map/readback | count copies/maps on the frame path |
@@ -461,7 +530,7 @@ For every selected branch, record thresholds and direct evidence:
   agree at shared wall-time checkpoints within the branch's analytic or
   convergence tolerance;
 - duration: finite motion reaches its exact pose and declared velocity/hand-off,
-  with zero residual velocity only for a finite terminal lock; periodic motion
+  with zero relative velocity in the declared terminal-lock frame; periodic motion
   preserves phase/wrap continuity; open-ended motion obeys its stop/reset
   transition without a fabricated terminal state;
 - frames: zero-length and antiparallel inputs stay finite, quaternion norm and

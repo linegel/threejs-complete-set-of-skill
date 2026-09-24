@@ -41,7 +41,7 @@ Use this existing repository plan rather than an unrelated game ticket.
 21. [x] `threejs-procedural-planets` — source/reference pass; ten curvature, LOD, metric, advection, and indirect-record checks.
 22. [x] `threejs-procedural-vegetation` - source/reference/oracle pass; nine placement, cutout and moving-root checks.
 23. [x] `threejs-procedural-creatures` - source/reference pass; nine field, bind, contact, IK and damping checks.
-24. [ ] `threejs-procedural-motion-systems`
+24. [x] `threejs-procedural-motion-systems` - source/reference pass; eight Timer, mixer and moving-frame checks.
 25. [ ] `threejs-particles-trails-and-effects`
 26. [ ] `threejs-dynamic-surface-effects`
 27. [ ] `threejs-black-holes-and-space-effects`
@@ -152,9 +152,13 @@ Read the entrypoint, both references, existing placement oracle and interface, h
 
 Read the full entrypoint, continuous-body and hard-shell references, interface and existing locomotion IK source. Corrected bind-to-pose/root conventions, tapered-field degeneracy, spatial smooth-min derivatives, candidate query/normal conditioning, scale-relative IK reach and resolved endpoints, moving-support point velocity, final-writer contact checks, interpolation state, and constant-goal-velocity damping. Nine mathematical/API checks pass; all 194 skill checks and distribution pass. The runtime IK already returns a clamped endpoint, but its absolute minimum reach margin remains a later lab correction. No field extraction, posed mesh, rendering, contact solver, CPU/TSL GPU parity, or lab acceptance is claimed. Logs: `artifacts/website-improvement-20260924/continuation/skills-creatures-{before,after}.log`.
 
-### Current skill: threejs-procedural-motion-systems
+### Skill 24 result: threejs-procedural-motion-systems
 
-The skills-first session owns motion 24 and particles 25. Inspector owns dynamic-surface 26 and blackholes 27, applying after 25 lands. Labs, recreations and publication remain deferred until the complete skill pass.
+Continued from the peer's recorded read-only findings after24/25 showed no new writes or coordination. Read complete entrypoint/reference/interface plus pinned Timer, mixer and action update implementations. Corrected mixer seek versus action replay and timescale, Timer hidden/reset/elapsed semantics, loop-step initialization, stable follow increments, relative child release and moving-port terminal velocity, quaternion winding, and previous-presented history. Eight actual API/numeric checks pass; all202 skill checks and distribution pass. No render, GPU motion, docking solver, or timeline lab acceptance changed. Logs: `artifacts/website-improvement-20260924/continuation/skills-motion-{before,after}.log`.
+
+### Current skill: threejs-particles-trails-and-effects
+
+Inspector-continuation continues25 if the peer unit remains untouched, then26/27 in order. The peer is asked to coordinate before resuming overlapping work. Labs, recreations and publication remain deferred until the complete skill pass.
 
 
 ## Finished and verified
@@ -412,3 +416,13 @@ native IK implementation was read; it already clamps the returned endpoint but
 uses an absolute minimum reach margin that fails for very short limbs. Record
 that runtime correction for the later lab phase. This unit changes guidance,
 not the creature renderer, solver, model, or current-source GPU evidence.
+
+## What to test: motion skill continuation
+The reserved peer unit has no visible writes or new coordination after23 landed;
+inspector-continuation is continuing24 from the peer's recorded findings. Read
+Timer, AnimationMixer and action update source before testing actual behavior.
+Exercise hidden-time/elapsed/reset semantics, completed-action seek and timescale,
+quaternion winding, local release velocity, moving-port terminal velocity, and
+previous-presented versus simulation state. Preserve existing debt/target-signal
+contracts. Source guidance and CPU/API tests do not establish rendered motion,
+GPU pose transport, docking physics, or the timeline lab's acceptance.

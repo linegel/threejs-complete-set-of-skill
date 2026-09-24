@@ -81,8 +81,9 @@ the underlying target signal.
 
 Use stored seeds, counters, and one-shot event flags. A direct seek reconstructs
 the same phase and event state as replay to that time. `AnimationMixer` either
-updates at the fixed step or uses `setTime()` for seeking; it does not sample an
-independent clock.
+updates at the fixed step or follows a declared action-state reset/replay recipe
+for seeking; `setTime()` alone does not reconstruct completed actions or event
+schedules. It does not sample an independent clock.
 
 **Complete when:** analytic and recurrent clocks cannot diverge after a stall,
 the interpolation pair brackets presentation time with a bounded accumulator,
@@ -94,14 +95,16 @@ reproduce the same matched-time state at every tested presentation cadence.
 
 Name source and destination frames for every position, direction, velocity, and
 quaternion. Normalize axes, handle parallel and antiparallel vector alignment,
-canonicalize quaternion signs before interpolation, state multiplication order,
+canonicalize signs for a shortest-path quaternion branch, retain winding for
+authored long arcs/full turns, state multiplication order,
 and normalize accumulated rotations.
 
 Preserve world pose during reparenting with
 `M_local_new = inverse(M_world_newParent) * M_world_old`. Decompose to TRS only
 when the residual passes; retain an affine matrix or wrapper when non-uniform
 ancestry creates shear. Released children inherit moving-frame velocity,
-including `omega cross r` for a rotating parent. Docking error is decomposed in
+including `omega cross r` for a rotating parent and the transformed relative
+velocity of an already-moving child. Docking error is decomposed in
 the current docking frame, not a stale world frame.
 
 **Complete when:** every transform has a declared frame chain and quaternion
@@ -111,8 +114,9 @@ inputs stay finite, and moving-frame release includes all transport terms.
 ### 5. Publish, reset, and dispose
 
 Publish immutable previous/current pose generations with stable actor identity;
-derive render pose, motion vectors, bounds, shadows, and temporal consumers from
-that same pair. A cut, teleport, spawn/despawn, reparent, topology or deformation
+derive render pose, bounds and shadows from that same pair. Motion vectors
+also retain the prior presented sample and camera; they do not substitute a
+previous simulation tick for a previous displayed pose. A cut, teleport, spawn/despawn, reparent, topology or deformation
 change, LOD/quality change, storage-slot reuse, or identity change starts a new
 validity epoch and resets the affected history instead of deriving an extreme
 velocity.
@@ -138,7 +142,8 @@ Recurrent motion holds one fixed-step schedule across those presentation rates
 and passes step-halving. Perceptual follow consumes one timestamped or
 analytically integrated target signal and compares shared wall-time checkpoints.
 Finite motion reaches its exact terminal pose and declared velocity or hand-off;
-only a terminal lock requires zero residual velocity. Periodic and open-ended
+a terminal lock requires zero relative residual velocity in its declared frame
+while inheriting any moving port rates. Periodic and open-ended
 motion verify their declared wrap or stop/reset transition.
 
 Where selected, also check quaternion norm and sign continuity, world-matrix
