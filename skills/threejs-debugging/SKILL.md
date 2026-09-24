@@ -84,14 +84,18 @@ Classify every candidate independently:
 | `usage-or-integration-error` | installed contract explains the failure and the local correction passes |
 | `intentional-api-change` | official migration or source history proves a deliberate change |
 | `upstream-active` | current checked code reproduces and an upstream record matches |
-| `fixed-unreleased` | the matching fix is merged but no verified published package contains it |
+| `fixed-unreleased` | the matching fix is merged and checked publication/package contents show it is not yet shipped, as of the recorded check time |
 | `fixed-released` | a published package contains the fix and the same reproduction passes |
 | `not-reproduced` | the candidate configuration does not reproduce the local failure |
 | `unrelated` | API, backend, symptom, affected range, or reproduction differs materially |
 | `insufficient-evidence` | reproduction, containment, fix, or release proof is missing |
 
 Closed is not a classification, and merged is not evidence that an npm release
-contains the fix.
+contains the fix. An unavailable registry, uninspected package, or unknown
+publication state is `insufficient-evidence`, not `fixed-unreleased`. Record
+the check time and versions inspected for a publication claim. A passing
+candidate configuration does not prove the original failure resolved unless
+the reproduction and relevant environment remain comparable.
 
 This step is complete when every inspected candidate has exactly one supported
 classification.

@@ -19,7 +19,7 @@ Use this existing repository plan rather than an unrelated game ticket.
 ### Skill sequence
 
 1. [x] `threejs-choose-skills` — source/reference pass; 12 regression checks.
-2. [ ] `threejs-debugging`
+2. [x] `threejs-debugging` — source/reference pass; publication uncertainty preserved.
 3. [ ] `threejs-visual-validation`
 4. [ ] `threejs-compatibility-fallbacks`
 5. [ ] `threejs-camera-controls-and-rigs`
@@ -58,9 +58,13 @@ lab source or capture is part of this unit.
 
 All four router references, entrypoint, interface metadata, and generated article were read. The reference now uses actual projection-matrix scales, a finite paired-point depth-error equation, and explicit clipping/panorama limits. Twelve checks pass against pinned Three.js 0.185.1, including zoom/crop underestimation, finite depth changes, exact destination coverage, and a 50px interior-error counterexample with unchanged outer bounds. Distribution validation passes for all 27 packages. Near-plane restrictions were reviewed, not GPU-rendered. The existing article links this reference on main rather than embedding it, so no generated lab/site output is part of this change. Logs: `artifacts/website-improvement-20260924/continuation/skills-router-{before,after}.log`.
 
-### Current skill: threejs-debugging
+### Skill 2 result: threejs-debugging
 
-Next in the roster; source and reachable references must be read before changes. All labs and recreations remain deferred.
+Read the entrypoint, upstream reference, and interface metadata. Fixed the ambiguous `fixed-unreleased` classification: unverified publication stays insufficient evidence. Added check-time/package-integrity requirements and kept unknown/not-run values in the current-version matrix. Reviewed three distinct cases: merged fix with unavailable publication evidence, checked unshipped fix, and published fix passing the same reproduction. Tag ancestry alone is not shipped-code proof. The packaging validator and existing 12 numeric/router tests pass; no upstream bug or GPU behavior is claimed fixed by this guidance correction. Log: `artifacts/website-improvement-20260924/continuation/skills-debugging-check.log`. Generated article publication remains part of the source-to-site reconciliation after the sequential skill pass; inherited lab outputs remain untouched.
+
+### Current skill: threejs-visual-validation
+
+Next in the roster; read its entrypoint and reachable resources before changes. All labs and recreations remain deferred.
 
 
 ## Finished and verified

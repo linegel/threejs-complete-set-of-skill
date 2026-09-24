@@ -68,13 +68,19 @@ Query the registry when publication status matters:
 
 ```bash
 npm view three versions --json
-npm view three@<version> dist.tarball gitHead
+npm view three@<version> dist.tarball dist.integrity gitHead
 ```
 
 Do not assume a revision-to-semver mapping from naming convention alone. Check
 the package metadata and runtime `THREE.REVISION`. A fix can be merged to `dev`,
 excluded from a release branch, superseded, reverted, or present in source while
-the tested bundle resolves another package copy.
+the tested bundle resolves another package copy. Tag ancestry and `gitHead`
+identify candidates; they do not prove the shipped file still contains the
+fix. Inspect the published tarball without executing its lifecycle scripts,
+verify its registry integrity, and reproduce against that exact package.
+Record retrieval time and inspected versions. Registry failure or uninspected
+versions leave publication unknown; absence of a verified release is not proof
+that the fix is unreleased.
 
 ## Version Matrix
 
@@ -87,7 +93,7 @@ Keep environment variables fixed and change one Three.js version at a time:
 | first bad | exact | measured | no | pass/fail | regression bound |
 | fixing commit | commit build | measured | yes | pass/fail | patch causality |
 | first fixed release | exact | measured | yes | pass/fail | upgrade proof |
-| current checked | exact | measured | yes/no | pass/fail | present upstream state |
+| current checked | exact | measured | yes/no/unknown | pass/fail/not run | present upstream state |
 
 Do not mix browser, GPU, renderer backend, import entrypoint, build flags, assets,
 or scene state across rows. When exact hardware reproduction is unavailable,
